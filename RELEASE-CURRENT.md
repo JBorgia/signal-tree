@@ -49,6 +49,20 @@ remain historical evidence at their stated source.
 | Stronger semantic matrix | Scope disposition recorded, not passed | Preserve 188 held / 68 violated / 168 unsupported record and test supported public contract separately |
 | Final exact-SHA qualification | Not yet eligible | Close supported blockers, freeze source, then complete required verification |
 
+## Equal inspected-value adoption — owner decision
+
+[Native/declaration boundary evidence and review](docs/audits/2026-10-17-incumbent-readiness/link-equal-write-boundary/README.md)
+shows the prior native behavior: ordinary7, inspection99, equal ordinary99 emits
+no contribution; an equal transaction rolls back leaving physical99 and eligible7.
+Inspection context exit restores metadata only. Baseline and private candidate
+agree; this was not a declaration-only regression.
+
+The owner subsequently authorized v16 adoption: explicit ordinary99 adopts that
+value, and transactional rejection restores both physical state and publication
+authority7. Genuine ordinary99-to99 remains a no-op. This is a new explicit
+compatibility decision, not a claim that the existing implementation meets it.
+A bounded native implementation experiment is underway; production hold remains.
+
 ## Native declaration boundary correction — October 20
 
 [Preserved correction, failures and review](docs/audits/2026-10-17-incumbent-readiness/link-native-boundaries/README.md)
