@@ -49,6 +49,22 @@ remain historical evidence at their stated source.
 | Stronger semantic matrix | Scope disposition recorded, not passed | Preserve 188 held / 68 violated / 168 unsupported record and test supported public contract separately |
 | Final exact-SHA qualification | Not yet eligible | Close supported blockers, freeze source, then complete required verification |
 
+## Equal inspected-value adoption — bounded candidate
+
+[Native candidate, first failures, exact inputs and independent review](docs/audits/2026-10-17-incumbent-readiness/link-equal-adoption/README.md)
+implements authorized scalar adoption in a disposable native overlay. Final
+focused Nx: 96/96; targeted kernel typecheck passes. Independent facade cases:
+16 direct and 24 native root/branch cases pass. Original 25 safety assertions,
+13 prior controls and nested failure remain passing. Three prior no-adoption
+expectations now differ under the owner's new rule; historical32/34 delivery
+accounting remains separate. Raw original assertions are preserved.
+
+First native compile/type failures and the unchanged P5 acquisition regression
+are preserved. Root/branch authority admission fixes P5 without a Link-specific
+exception or forcing value notifications. Production runtime remains unchanged;
+this evidence does not qualify complete declarations, entity/removal/destruction
+retention, performance/artifacts or release. No full qualification was run.
+
 ## Equal inspected-value adoption — owner decision
 
 [Native/declaration boundary evidence and review](docs/audits/2026-10-17-incumbent-readiness/link-equal-write-boundary/README.md)
