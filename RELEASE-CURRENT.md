@@ -49,6 +49,18 @@ remain historical evidence at their stated source.
 | Stronger semantic matrix | Scope disposition recorded, not passed | Preserve 188 held / 68 violated / 168 unsupported record and test supported public contract separately |
 | Final exact-SHA qualification | Not yet eligible | Close supported blockers, freeze source, then complete required verification |
 
+## Shared transition migration plan — awaiting specific authorization
+
+[Reviewed cross-cutting plan](docs/audits/2026-10-17-incumbent-readiness/semantic-transition-plan/README.md)
+maps six installation paths, eleven writer families and their capture, inspection
+and publication consumers. It separates physical and ordinary facts and defines
+six gated slices, fault/reentry/refusal controls, retention obligations and final
+verification/cost gates. Independent review corrections are recorded in the plan.
+This is planning evidence only. The owner explicitly requires authorization of
+this specific migration before runtime changes; none have been made. Production
+remains `87f6831f`, declared-Link integration remains rejected, and entity
+collectibility remains separately unresolved. B stays closed.
+
 ## Shared semantic transition feasibility — scope decision before implementation
 
 [Writer inventory, traces and independent premise review](docs/audits/2026-10-17-incumbent-readiness/semantic-transition-feasibility/README.md)
