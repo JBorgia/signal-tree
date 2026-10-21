@@ -76,6 +76,27 @@ The [authorized plan](docs/audits/2026-10-17-incumbent-readiness/semantic-transi
 remains the historical scope record; its original pending-authorization language
 predates the subsequent explicit owner approval.
 
+## Slice2 execution — rejected at structural admission recurrence
+
+[Exact source, failures, reviews and replay](docs/audits/2026-10-17-incumbent-readiness/semantic-transition-slice2/README.md)
+preserve the isolated structural experiment. C1–C3 and focused compound controls
+pass, but an independently reproduced rekey into an inspected vacancy loses the
+prior ordinary destination: rollback succeeds with only B, while old A remains
+absent. Root's asserting Nx reproduction fails. W5's transfer-key branch was
+explicitly migrated; it omits destination displacement admitted by the add branch.
+This repeats missing ordinary facts within the proposed shared admission mechanism.
+Runtime work stopped under the recurrence condition; no local rekey patch followed.
+
+Final candidate source manifest:
+`6796adabea84c967b08784134772777dc238c086f8708cb9f33e480747aadb1a`.
+Recorded runs include20 structural controls and73 prior/affected controls passing;
+counts overlap with other runs and are not release qualification. A separate
+inspection-rekey/key-reuse inverse safely refuses; cleanup concerns remain source
+findings, not measured leaks. The record corrects an interim source-manifest timing
+mismatch and preserves exact executable artifacts. Slice1 stays closed. Slices3–5,
+full suites, collectibility and costs were not reached. Production stays87f6831f;
+B stays closed, budgets unchanged, no integration/activation/publication.
+
 ## Slice2 prerequisites — ready for bounded preparation
 
 The owner closed slice1 within its existing-lifetime scope. The
