@@ -76,7 +76,27 @@ The [authorized plan](docs/audits/2026-10-17-incumbent-readiness/semantic-transi
 remains the historical scope record; its original pending-authorization language
 predates the subsequent explicit owner approval.
 
-## Read-only realization boundary trace — no successor authorized
+## Ordered realization successor — bounded handoff survives
+
+[Successor evidence and replay](docs/audits/2026-10-17-incumbent-readiness/semantic-transition-successor/README.md)
+record the subsequently authorized private handoff experiment. Ordered presence/value
+edits now determine ordinary authority separately from the physical installation
+target. The unchanged mixed/entity-only/second-transaction falsifier passes.
+Independent review found preparation aliasing and duplicate getter evaluation;
+both first failures are preserved, corrected and independently rechecked.
+
+Final focused results:34/34 across six files; affected inspection/egress/recovery/
+adapter controls109/109 across eight files; source typecheck passes. Candidate
+package-TypeScript manifest fingerprint is
+`47f5ee8aea90ffb2c9d6e89eb1e287e73b39c3eeab8f42ede9ea5b2fd125dfb7`.
+Supplemental batch-publication assertions pass5/5 (overlapping cases). Independent
+gate review finds the scoped existing-lifetime slice1 gate satisfied. This does
+not qualify the entire migration or release.
+Structural/full-target and nested missing-parent qualification remain open;
+no later slices, activation, full suites or costs followed. Production remains
+`87f6831f`; B stays closed and entity collectibility remains unresolved.
+
+## Read-only realization boundary trace — historical checkpoint
 
 [Boundary trace and independent review](docs/audits/2026-10-17-incumbent-readiness/semantic-transition-boundary/README.md)
 locate the loss at the private point adapter: ordered reversal effects still name
