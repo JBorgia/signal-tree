@@ -76,6 +76,23 @@ The [authorized plan](docs/audits/2026-10-17-incumbent-readiness/semantic-transi
 remains the historical scope record; its original pending-authorization language
 predates the subsequent explicit owner approval.
 
+## Slice2 prerequisites — ready for bounded preparation
+
+The owner closed slice1 within its existing-lifetime scope. The
+[prerequisite assessment and independent review](docs/audits/2026-10-17-incumbent-readiness/semantic-transition-slice2-prerequisites/README.md)
+preserve checkpoint `91058393` and its exact isolated source. No tests were rerun.
+The approved ordinary-topology rule governs the unchanged C1–C3 structural
+failures; no new semantic decision blocks bounded slice2 preparation and tests.
+
+Before runtime changes, map explicit physical/ordinary presence, lifetime, key,
+order and consumer facts for W4–W8, including C1's structural adoption through a
+field-write entrypoint. Prewrite missing composition/fault/reentry/refusal checks.
+Slice2 acceptance includes the minimal structural inverse needed to reject its
+own operations; it cannot defer that correctness gate or silently expand into
+full-target restoration. Nested missing-parent authority remains conditional;
+no supported reproduction currently makes it an entry blocker. Later slices,
+integration, collectibility, costs and release qualification remain gated.
+
 ## Ordered realization successor — bounded handoff survives
 
 [Successor evidence and replay](docs/audits/2026-10-17-incumbent-readiness/semantic-transition-successor/README.md)
