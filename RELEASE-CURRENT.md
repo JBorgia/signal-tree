@@ -516,5 +516,6 @@ this is not release readiness.
 separate ordinary inverse authority from physical realization. Both validation and
 target construction need the same identity join before physical guards; an installer-only
 change is insufficient. No runtime successor or later slices were started.
-The added active-old inspected-payload case needs a narrow owner decision; the
-two original failures remain unambiguous. Recurrence stop remains active.
+The owner resolved the active-old payload case: preserve inspected display99
+while restoring ordinary7; explicit field reversals remain separate. The original
+failures and remaining preparation gates are unchanged. Recurrence stop remains active.

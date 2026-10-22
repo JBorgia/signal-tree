@@ -57,27 +57,25 @@ node --input-type=module -e 'const m=await import("/private/tmp/semantic-transit
 node /private/tmp/semantic-transition-slice2/retention-review/bundle.mjs
 ```
 
-## Concrete pending contract decision
+## Owner-approved active-old payload rule
 
-Minimal active-old relocation is already determined. A distinct payload variant
-is not explicitly settled: ordinary oldA(n7), inspection relocates oldA to B and
-changes displayed n99, transaction creates fresh A, then rejection. OldA must
-return to A and freshA must detach. Does oldA display99 with ordinary7, or does
-structural restoration replace its displayed payload with7 as well?
+On October 22, 2026 the owner selected: **Preserve inspected display99;
+ordinary truth7.** In the specified case, ordinary oldA(n7) is relocated by
+inspection to B and displayed as n99; a transaction creates fresh A; rejection
+must detach freshA and relocate the exact old lifetime to A. Its inspected n99
+display survives while ordinary n7 is restored. Explicit field reversals remain
+separate; this decision does not authorize retaining values those reversals undo.
 
-Existing C2 restores a physically absent old lifetime; W5 excludes incidental
-field adoption, but this example's authored operation is W4 creation. Preserving
-an inspected sibling on another lifetime does not settle inspected fields on
-the displaced lifetime itself. The [interpretation review](interpretation-review.md)
-records that distinction. The owner has been asked; no answer is inferred.
-Recommendation: preserve inspected fields outside explicit field reversals.
-This is a narrow physical realization choice, not a change to restored ordinary7.
+The original [interpretation review](interpretation-review.md) remains unchanged
+as the evidence for why owner authority was needed. Its pending wording describes
+the pre-decision review, not current status. See the
+[acceptance mapping](PAYLOAD-DECISION.md) for the required assertions and limits.
+No new test execution or implementation acceptance follows from this decision.
 
 ## Disposition
 
 Recurrence stop remains active. No successor is selected, and slices3–5 remain
-gated. Preserve the two failures unchanged. Before runtime consideration, resolve
-the payload case and demonstrate one prevalidation account covering normalization,
+gated. Preserve the two failures unchanged. Before runtime consideration, demonstrate one prevalidation account covering normalization,
 occupancy, value edits and approved successor placement through all private routes.
 Retained ordinary divergence is a live obligation; the separate source-only false
 entry cleanup risk is not a measured leak. No cost or collectibility claim follows.
