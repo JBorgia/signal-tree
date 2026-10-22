@@ -509,3 +509,12 @@ runtime is unchanged and the original failures remain archived. The earlier
 44-test run and fresh artifact results retain their original provenance. R1/R2
 composition, broader Link progression and final qualification remain unresolved;
 this is not release readiness.
+
+## Ordinary occupancy account — successor remains gated
+
+[Reviewed inventory, private-boundary audit and preserved replays](docs/audits/2026-10-17-incumbent-readiness/ordinary-occupancy-account/README.md)
+separate ordinary inverse authority from physical realization. Both validation and
+target construction need the same identity join before physical guards; an installer-only
+change is insufficient. No runtime successor or later slices were started.
+The added active-old inspected-payload case needs a narrow owner decision; the
+two original failures remain unambiguous. Recurrence stop remains active.
