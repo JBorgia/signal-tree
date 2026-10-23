@@ -519,3 +519,15 @@ change is insufficient. No runtime successor or later slices were started.
 The owner resolved the active-old payload case: preserve inspected display99
 while restoring ordinary7; explicit field reversals remain separate. The original
 failures and remaining preparation gates are unchanged. Recurrence stop remains active.
+
+## Occupancy successor feasibility — capture scope revised
+
+[Specification, exact probes and independent review](docs/audits/2026-10-17-incumbent-readiness/occupancy-successor-feasibility/README.md)
+show that chronological Bind/Unbind output cannot enter the unchanged incumbent
+fold: same-lifetime removal/rebind loses the final ordinary binding. This is a
+producer/consumer incompatibility, not a newly failed native rollback sequence.
+An isolated endpoint encoder expresses the tested occupancy facts, with its own
+payload-context first failure preserved. Native capture, nested obligations and
+sparse transfer/placement remain unqualified. A successor needs coordinated
+capture-interval composition and prevalidation realization, not an installer-only
+fix. No runtime changed; recurrence stop and slices3–5 gates remain active.
