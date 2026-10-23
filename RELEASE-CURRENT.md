@@ -531,3 +531,20 @@ payload-context first failure preserved. Native capture, nested obligations and
 sparse transfer/placement remain unqualified. A successor needs coordinated
 capture-interval composition and prevalidation realization, not an installer-only
 fix. No runtime changed; recurrence stop and slices3–5 gates remain active.
+
+## Coordinated occupancy successor — rejected
+
+[Exact source, independent reviews and replay](docs/audits/2026-10-17-incumbent-readiness/occupancy-native-successor/README.md)
+preserve the owner-authorized native experiment. Independent realized admission
+between transaction-owned writes breaks the endpoint composer's continuity
+assumption. Final frozen Nx control:2 pass/1 fail; comparator constructs, inspects
+and confirms the identical sequence. This is an established internal participation
+boundary, not a claimed public end-to-end trigger. Independent review and root
+replay agree. A placement correction separately reorders restoration across a
+dependent field operation and causes atomic refusal in the private adapter.
+
+The successor is rejected under the recurrence condition. No guard weakening,
+further repair, slices3–5, broad qualification or costs followed. Source manifest
+is `9e4f72b0a3c83f3c60ba62ad35695c0f5ff41099060a65bf6271d8f736da5c54`.
+Slice1 retains scoped validity; production remains87f6831f. B remains closed.
+No activation, API change, budget increase, merge, push or publication occurred.
