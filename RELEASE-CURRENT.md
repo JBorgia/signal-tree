@@ -49,6 +49,24 @@ remain historical evidence at their stated source.
 | Stronger semantic matrix | Scope disposition recorded, not passed | Preserve 188 held / 68 violated / 168 unsupported record and test supported public contract separately |
 | Final exact-SHA qualification | Not yet eligible | Close supported blockers, freeze source, then complete required verification |
 
+## Inverse-disposition successor — bounded evidence; contract decision pending
+
+[Exact source, unchanged failures, review and replay](docs/audits/2026-10-17-incumbent-readiness/inverse-disposition-successor/README.md)
+preserve the isolated successor. The frozen source passes 239 focused cases,
+workspace types and configured spec types. Admission segments, authority-selected
+inverse compilation and exact-record notification pairing repair the tested
+capture, foreign-field and inverse-order failures. No runtime is integrated.
+
+A genuine full-order compatibility question remains: initial ABC; own CBA,
+independent realized BCA, own ACB; rejection returns ABC in both production and
+candidate. Preserve current behavior, refuse atomically, or retain intermediate
+BCA requires owner disposition. The proposed contrary assertion is not yet a
+proven contract failure. Dependent order work pauses; later integration gates
+remain closed. Production remains `87f6831f`, slice 1 retains its scoped validity,
+and B remains closed. Full final suites, collectibility and fresh costs are not
+qualified by this focused result. Original getter-premise failures and the
+interrupted non-frozen broad run are separately retained, not counted as passes.
+
 ## Shared transition migration — rejected at covered S3 recurrence
 
 [Execution, exact sources and independent review](docs/audits/2026-10-17-incumbent-readiness/semantic-transition-execution/README.md)
