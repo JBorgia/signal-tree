@@ -49,6 +49,41 @@ remain historical evidence at their stated source.
 | Stronger semantic matrix | Scope disposition recorded, not passed | Preserve 188 held / 68 violated / 168 unsupported record and test supported public contract separately |
 | Final exact-SHA qualification | Not yet eligible | Close supported blockers, freeze source, then complete required verification |
 
+## Indexed ordinary order — bounded experiment survives; integration remains blocked
+
+[Exact source, unchanged failures, indexed workloads and independent reviews](docs/audits/2026-10-17-incumbent-readiness/ordinary-order-indexed/README.md)
+record the owner-authorized indexed model and conditional native experiment.
+Local agreement cleanup now processes changed slots; recovery records remain until
+their last obligation ends. The model's unchanged 26 fixtures, supplemental work and
+staggered/held-reference controls pass. Native source preserves ordinary placement
+before inspection changes physical fallback; existing authority still selects
+inverses. All four original compound/prepend failures pass unchanged, with useful
+rejection, publication and subsequent-write checks.
+
+The final focused union is **350 ordinary passes / 2 ordinary failures**, not wholly
+green. Both updater/identical-replacement inspection-egress failures reproduce on
+the preserved predecessor and remain unresolved. Root independently passes the
+original 13 plus 2 owner preparation fault/reentry controls on the exact source.
+Source/kernel typing and corrected spec-types pass; runtime lint has 0 errors and 4
+inherited warnings. Original first failures and test-contract corrections remain
+separate. Corrected source manifest is d13c33b1a515c65e4ca008df5caab0ac4976ed4db0cc166b922998fd2b7f6cb6;
+its sole delta from the combined run is an erased test `this` annotation.
+
+Costs remain explicit: fresh prepend avoids snapshots in the measured workload,
+but moving one existing row expands from 2N comparator snapshot entries to 6N
+shared physical/ordinary stage entries (3N each at equal-size domains). Indexed
+local cleanup does not establish generally sparse settlement or better CPU/heap.
+Full collectibility, framework/broad integration and artifacts are not qualified.
+
+The bounded source-owner mechanism survives review; **slice 2 and integration do
+not pass**. Keep the isolated source/evidence, production `87f6831f` and accepted
+slice 1 (`91058393`) unchanged. Slices3–5 remain gated by unresolved supported-writer
+failures and remaining qualification. No further repair is inferred from the
+aggregate pass count. B remains closed; no API, activation, ceiling or release
+change. The following source-design/representation sections retain their prior
+checkpoint evidence; this section supersedes their unimplemented indexed-cleanup
+status only within the measured/model and bounded native scope above.
+
 ## Ordinary-order lifecycle and source-owner design — reviewed; native gated
 
 [Workloads, raw evidence and review](docs/audits/2026-10-17-incumbent-readiness/ordinary-order-source-design/README.md)

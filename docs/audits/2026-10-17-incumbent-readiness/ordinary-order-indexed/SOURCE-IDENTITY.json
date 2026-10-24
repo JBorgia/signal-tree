@@ -1,0 +1,12 @@
+{
+  "evidenceBase": "e7b47c558a46e2919ff14af0d142b2d3d8d19227",
+  "production": "87f6831fa60cafe87508f0ace84b7638698ca3b0",
+  "acceptedSlice1": "91058393308faadbd8f5cdd2e0a3271c4e56ee22",
+  "controlManifestSHA256": "d1ff7c33a380d578390879a79e142950d0655920710a818af7d49fe2a017521b",
+  "combinedRunManifestSHA256": "781b7561517ad1e4d6bdba2dc0a47b5561ff75cef67b76bf4ad59024fe3f84a7",
+  "correctedManifestSHA256": "d13c33b1a515c65e4ca008df5caab0ac4976ed4db0cc166b922998fd2b7f6cb6",
+  "modelSHA256": "7f9354d7932eafea6069d82700f053319cc2d4d3f463cf38609f107d21cc0dbd",
+  "typeOnlyDelta": [
+    "packages/kernel/src/lib/ordinary-order-owner-preparation.spec.ts"
+  ]
+}
