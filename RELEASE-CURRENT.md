@@ -49,6 +49,35 @@ remain historical evidence at their stated source.
 | Stronger semantic matrix | Scope disposition recorded, not passed | Preserve 188 held / 68 violated / 168 unsupported record and test supported public contract separately |
 | Final exact-SHA qualification | Not yet eligible | Close supported blockers, freeze source, then complete required verification |
 
+## Boundary audit — slice-1 W2 acceptance narrowed; prepend duplication traced
+
+[Exact-checkpoint replay, source trace and independent reviews](docs/audits/2026-10-17-incumbent-readiness/ordinary-order-boundary-audit/README.md)
+qualify the earlier acceptance: **slice 1 does not satisfy its full W2 derive-footprint
+and identity-updater no-op obligations**. Both are inside the approved existing-lifetime
+scope, not deferred structural work. The recorded 143 passing cases and realization-edit
+handoff remain finite valid evidence; the blanket acceptance does not.
+
+The unchanged footprint fixture reproduces 13 passes / 2 failures on the exact
+`91058393` source reconstruction. Derived y updates and identity updaters alone
+incorrectly adopt inspected x99 because replaceOne loses the authored footprint
+before value preparation; the notifier then derives fields from the incorrect
+ordinary transition. A separate original assertion combines explicit replacement
+with identity update and expects no send. That expectation conflicts with approved
+same-display replacement adoption; preserve the original red as a test-contract
+mismatch, alongside the genuine derive defect. The prior current-source 350/2 result
+is unchanged, not rerun and not qualified by correcting that classification.
+
+Prepend attribution independently reproduces 6N versus 2N snapshot entries at
+N16/256/1024. Current has three physical and three ordinary walks. P-after is
+snapshotted twice at the same private stage version; O-after rewalks an already
+constructed permutation. O-before/O-current reuse is conditional on unchanged
+placement. Distinct P/O authority and endpoint facts remain necessary. The entire
+increase is not established as unavoidable; no optimization or CPU improvement is
+claimed. No source, assertion, API or budget changed. Production remains `87f6831f`;
+slice 2, integration and later slices remain gated. Historical sections below retain
+their measured results; this audit supersedes their blanket slice-1 acceptance and
+the classification of both original assertion failures as runtime defects.
+
 ## Indexed ordinary order — bounded experiment survives; integration remains blocked
 
 [Exact source, unchanged failures, indexed workloads and independent reviews](docs/audits/2026-10-17-incumbent-readiness/ordinary-order-indexed/README.md)
@@ -61,8 +90,9 @@ inverses. All four original compound/prepend failures pass unchanged, with usefu
 rejection, publication and subsequent-write checks.
 
 The final focused union is **350 ordinary passes / 2 ordinary failures**, not wholly
-green. Both updater/identical-replacement inspection-egress failures reproduce on
-the preserved predecessor and remain unresolved. Root independently passes the
+green. Both updater/identical-replacement inspection-egress assertions fail on
+the preserved predecessor. Their distinct runtime/test-contract dispositions are
+now established by the boundary audit above. Root independently passes the
 original 13 plus 2 owner preparation fault/reentry controls on the exact source.
 Source/kernel typing and corrected spec-types pass; runtime lint has 0 errors and 4
 inherited warnings. Original first failures and test-contract corrections remain
@@ -76,8 +106,9 @@ local cleanup does not establish generally sparse settlement or better CPU/heap.
 Full collectibility, framework/broad integration and artifacts are not qualified.
 
 The bounded source-owner mechanism survives review; **slice 2 and integration do
-not pass**. Keep the isolated source/evidence, production `87f6831f` and accepted
-slice 1 (`91058393`) unchanged. Slices3–5 remain gated by unresolved supported-writer
+not pass**. Keep the isolated source/evidence and production `87f6831f` unchanged.
+Slice 1 (`91058393`) now has the W2 qualification stated above. Slices 3–5 remain
+gated by unresolved supported-writer
 failures and remaining qualification. No further repair is inferred from the
 aggregate pass count. B remains closed; no API, activation, ceiling or release
 change. The following source-design/representation sections retain their prior
