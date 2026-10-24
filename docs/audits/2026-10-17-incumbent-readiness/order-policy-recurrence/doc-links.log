@@ -1,0 +1,5 @@
+(node:21215) ExperimentalWarning: `--experimental-loader` may be removed in the future; instead use `register()`:
+--import 'data:text/javascript,import { register } from "node:module"; import { pathToFileURL } from "node:url"; register("/private/tmp/inverse-disposition-native/docs-loader.mjs", pathToFileURL("./"));'
+(Use `node --trace-warnings ...` to show where the warning was created)
+728 relative link(s) across 181 live surface(s); 728 resolve.
+✅ every relative link resolves and every install instruction names a publishable, current package. (docs/archive/** and CHANGELOG.md are point-in-time and excluded.)

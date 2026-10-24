@@ -1,6 +1,6 @@
 # Current work — incumbent v16 readiness
 
-Updated October 20, 2026. Branch `codex/v16-incumbent-readiness`.
+Updated October 24, 2026. Branch `codex/v16-incumbent-readiness`.
 Baseline: `8d220643e0d4e34cbdbc6e55e6ef692b25d5e023`.
 Accepted new-key runtime checkpoint: `9917c92fbbdc9dfdd14601f1f5fb7ce21799be71`.
 Version **16.0.0-dev**. **Not release-ready; no final candidate freeze yet.**
@@ -49,7 +49,32 @@ remain historical evidence at their stated source.
 | Stronger semantic matrix | Scope disposition recorded, not passed | Preserve 188 held / 68 violated / 168 unsupported record and test supported public contract separately |
 | Final exact-SHA qualification | Not yet eligible | Close supported blockers, freeze source, then complete required verification |
 
-## Inverse-disposition successor — bounded evidence; contract decision pending
+## Latest successor — policy repaired; structural recurrence rejects integration
+
+[Exact source, policy approval, first failures and independent adjudication](docs/audits/2026-10-17-incumbent-readiness/order-policy-recurrence/README.md)
+preserve the October24 result. Owner approved atomic refusal of the interleaved
+independent full-order case. Its bounded implementation passes12 new controls,
+independent native replays and the239 prior focused controls; pending authority,
+inspection, confirmation and callback-error recovery remain useful. No runtime
+changes are integrated.
+
+The combined successor is rejected at the existing recurrence stop: compound
+inspection/setAll/rejection publishes inspected orderCAB as ordinary truth instead
+ofABC. The independent trace locates contaminated ordinary neighbors before
+inversion, and a permanent ordinary-only regression plus root replay fail. A
+separate prepend source-placement mismatch also fails3 existing history redo
+controls that production passes. The new physicalABC assertion is overstrong and
+preserved separately; physicalCAB alone is not the established defect.
+
+Current isolated transactions source is SHA2568ccc2ed77f5cb018fdaf596730223bb78f967bf948f58327304e9c9642e45ea9;
+full final source manifest and reconstructible overlay are archived. Workspace
+and configured spec types pass; no budgets changed. No full qualification/cost
+run followed the recurrence. Production87f6831f, accepted slice1 and closedB
+remain unchanged. Later slices remain gated. No automatic additional repair is
+authorized by the passing order policy; the ordinary-placement representation
+needs a reviewed completeness account before a successor.
+
+## Prior successor record — decision subsequently resolved above
 
 [Exact source, unchanged failures, review and replay](docs/audits/2026-10-17-incumbent-readiness/inverse-disposition-successor/README.md)
 preserve the isolated successor. The frozen source passes 239 focused cases,
