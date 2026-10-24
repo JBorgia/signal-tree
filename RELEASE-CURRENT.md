@@ -49,6 +49,27 @@ remain historical evidence at their stated source.
 | Stronger semantic matrix | Scope disposition recorded, not passed | Preserve 188 held / 68 violated / 168 unsupported record and test supported public contract separately |
 | Final exact-SHA qualification | Not yet eligible | Close supported blockers, freeze source, then complete required verification |
 
+## Ordinary-order representation check — complete; native remains paused
+
+[Preregistration, frozen models, work/retention and independent review](docs/audits/2026-10-17-incumbent-readiness/ordinary-order-representation/README.md)
+compare a retained ordinary snapshot with sparse lifetime/adjacency facts against
+the compound ordinary-order leak and three prepend-redo failures. Both represent
+the required facts in the finite models, using common prepared facts/inverse
+consumers. Both require ordinary placement retained before physical inspection
+changes and final compound placement specified before source capture.
+
+The snapshot copies/retains complete ordinary order during divergence. Sparse
+fixed-local capture avoids those copies, but its tested drain still scans all
+current exceptions after full divergence (16/256/1024). No globally bounded drain,
+native integration, GC, speed or artifact result follows. Models use trusted
+lifetime commands and shared supplied physicalCAB realization; those limits are
+explicit. No representation is selected as a native implementation.
+
+Native source remains unchanged from rejected manifestd1ff7c33..., and production
+87f6831f / accepted slice1 are unchanged. The bounded refusal-policy pass remains
+separate. The recurrence stop and later-slice gates remain active. This finite
+check does not authorize another native source-state migration or consumer patch.
+
 ## Latest successor — policy repaired; structural recurrence rejects integration
 
 [Exact source, policy approval, first failures and independent adjudication](docs/audits/2026-10-17-incumbent-readiness/order-policy-recurrence/README.md)
