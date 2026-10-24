@@ -49,6 +49,27 @@ remain historical evidence at their stated source.
 | Stronger semantic matrix | Scope disposition recorded, not passed | Preserve 188 held / 68 violated / 168 unsupported record and test supported public contract separately |
 | Final exact-SHA qualification | Not yet eligible | Close supported blockers, freeze source, then complete required verification |
 
+## Ordinary-order lifecycle and source-owner design — reviewed; native gated
+
+[Workloads, raw evidence and review](docs/audits/2026-10-17-incumbent-readiness/ordinary-order-source-design/README.md)
+extend the frozen models without repeating the completed representation experiment.
+Local order move/return keeps three sparse adjacency exceptions at N16/256/1024;
+repeated cycles and staggered recovery/same-key held-reference controls pass within
+the finite model. Full convergence scans/releases N. A separate partial-convergence
+case proves the tested sparse drain scans 1,024 to retire four records; independent
+replay agrees. Cleanup locality is therefore an unimplemented requirement, not a
+claimed benefit already delivered. No CPU, heap, native or artifact result follows.
+
+The [source-owner design](docs/audits/2026-10-17-incumbent-readiness/ordinary-order-source-design/SOURCE-OWNER-DESIGN.md)
+assigns current ordinary placement to source-owned EntityOrdinaryTopology, keeps
+payload/physical views separate and maps all six paths/eleven writer families.
+Review exposed direct lifetime creation and point-value installation routes, now
+explicitly classified. Complete final placement must precede capture; normalization
+must follow affected slots, with separate indexed recovery obligations. Sparse is
+the leading hypothesis; snapshot remains the reference. Neither is natively adopted.
+All 770 frozen native source hashes and original four falsifiers remain unchanged.
+The recurrence stop, slice-2 rejection and later-slice gates remain active.
+
 ## Ordinary-order representation check — complete; native remains paused
 
 [Preregistration, frozen models, work/retention and independent review](docs/audits/2026-10-17-incumbent-readiness/ordinary-order-representation/README.md)
