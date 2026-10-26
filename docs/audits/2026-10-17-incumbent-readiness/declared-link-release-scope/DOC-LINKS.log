@@ -1,0 +1,5 @@
+(node:95497) ExperimentalWarning: `--experimental-loader` may be removed in the future; instead use `register()`:
+--import 'data:text/javascript,import { register } from "node:module"; import { pathToFileURL } from "node:url"; register("./docs/audits/2026-10-17-incumbent-readiness/membership-admission-design/docs-loader.mjs", pathToFileURL("./"));'
+(Use `node --trace-warnings ...` to show where the warning was created)
+800 relative link(s) across 190 live surface(s); 800 resolve.
+✅ every relative link resolves and every install instruction names a publishable, current package. (docs/archive/** and CHANGELOG.md are point-in-time and excluded.)

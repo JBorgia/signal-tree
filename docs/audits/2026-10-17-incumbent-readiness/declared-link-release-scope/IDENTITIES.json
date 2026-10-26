@@ -1,0 +1,12 @@
+{
+  "source": "cebfcd4ae050403452c3dda1e4373a27331d9ab9",
+  "runtime": "87f6831fa60cafe87508f0ace84b7638698ca3b0",
+  "rejectedCandidate": "f01ed39a7df8a5de185ebec0773e09e36537dacb",
+  "reviewedDraftSHA256": "ea01813c38fe76dbcbb92271df4f1ae61fc7a5effb9b8f853205ae278d6b6145",
+  "execution": "Read-only scope/design comparison; no runtime/model/tests/build/cost run",
+  "unrelatedChangesPreserved": [
+    "AGENTS.md",
+    "docs/performance/measurement-contract.md"
+  ],
+  "finalComparisonSHA256": "f1d3a5804d7a01e54f59f50c99d7a93aefae9d8d66ae5797406d46a559176e29"
+}

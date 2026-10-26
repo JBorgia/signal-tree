@@ -1,0 +1,17 @@
+2026-10-26 documentation-only scope comparison
+Parent: cebfcd4ae050403452c3dda1e4373a27331d9ab9
+Production runtime: 87f6831fa60cafe87508f0ace84b7638698ca3b0
+Frozen rejected source: f01ed39a7df8a5de185ebec0773e09e36537dacb, clean
+Node: v24.15.0
+
+Executed:
+- 10 source hashes verified against git show cebfcd4a:<path> (including pre-update controller).
+- Exact REVIEWED-DRAFT hash matches independent review: ea01813c38fe76dbcbb92271df4f1ae61fc7a5effb9b8f853205ae278d6b6145.
+- git diff --check: pass.
+- git diff --name-only 87f6831f -- packages: empty.
+- shasum -a 256 -c MEMBERS.sha256 from packet directory: pass.
+- node --loader ./docs/audits/2026-10-17-incumbent-readiness/membership-admission-design/docs-loader.mjs tools/check-doc-links.mjs: exit0, 800/800 links across190 surfaces. Existing loader only resolves semver from main checkout.
+
+No runtime/model/test/build/demo/artifact/performance execution. Documentation verification is not a semantic or release acceptance gate.
+No scope selected. No runtime changes. No API, budget, merge, push, tag, activation or publication.
+Unrelated AGENTS.md and docs/performance/measurement-contract.md preserved and excluded.

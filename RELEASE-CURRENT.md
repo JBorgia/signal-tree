@@ -49,6 +49,21 @@ remain historical evidence at their stated source.
 | Stronger semantic matrix | Scope disposition recorded, not passed | Preserve 188 held / 68 violated / 168 unsupported record and test supported public contract separately |
 | Final exact-SHA qualification | Not yet eligible | Close supported blockers, freeze source, then complete required verification |
 
+## Declared Link scope comparison — owner selection remains open
+
+[Reviewed scope/design comparison and finite acceptance boundaries](docs/audits/2026-10-17-incumbent-readiness/declared-link-release-scope/README.md)
+compare design-only A0 (expanded membership admission, publication-support transfer
+and completion scheduling) with B0 (explicitly defer declared early publication).
+Neither scope is selected; runtime recurrence stop remains active.
+
+Expansion adds a publication-authority representation and native writer/lifecycle
+work; queue reuse does not supply those rules. Deferral changes the conditional
+progress promise but leaves separately approved inspection adoption, rollback,
+ordinary publication and release qualification obligations intact. Neither choice
+establishes production readiness. Historical architecture B remains closed and is
+unrelated to deferral option B. No tests, models, runtime, artifact or cost runs
+accompany this comparison; original failures and budgets retain exact provenance.
+
 ## Membership handoff review — additional mechanism required
 
 [Producer trace, exact reviewed proposal and disposition](docs/audits/2026-10-17-incumbent-readiness/membership-admission-design/README.md)

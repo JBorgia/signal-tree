@@ -1,0 +1,10 @@
+13085d516d244db453b2f38592fe7496fba2cedc6923b38af692f55df0d0c433  RELEASE-CURRENT.md
+fccbc00d70312c574abcdb4b70d1228669580bd8a3a5990b460e158e481eec5d  docs/audits/2026-10-17-incumbent-readiness/semantic-transition-plan/README.md
+e7d2de6cf601d2b0c91929229a783a9c29e84edbff1cbb248c09e16d5b5f113b  docs/audits/2026-10-17-incumbent-readiness/membership-admission-design/README.md
+5c50856ea269e11b6c4b7beed5ef7061f6e5c36e2bb18ec612a0ada0565fa123  docs/audits/2026-10-17-incumbent-readiness/membership-admission-design/INDEPENDENT-REVIEW.md
+4a7427f9be5fcb4d94fcbc777b626931e9562049803651384f2c7bfc7965ef6a  docs/audits/2026-10-17-incumbent-readiness/link-declared-contract/README.md
+16ac804a2c1cd8530504576622f1a0b6f7d9c3b83b22182b09ba353dfa0a252e  docs/audits/2026-10-17-incumbent-readiness/link-declared-contract/SPEC.md
+8ad903032bd8d997ec3afade190dd081205847daca9755edd4026a053601a3c7  docs/audits/2026-10-17-incumbent-readiness/workflow-adoption/README.md
+d8cb39fd6ef2066bb53e02d730ab44686e42e4b5c9696a5ba75ca0f6c721f357  docs/audits/2026-10-17-incumbent-readiness/remaining-runtime/README.md
+775f1ffe605881d6b5ded38a2c346f6676b15b5c17b59ae5ca082c735d7b3861  docs/audits/2026-10-17-incumbent-readiness/slice5-integration-disposition/README.md
+d16e5f14cd4ad52d2b4b4f22466208004d73e7f464318cc910adfa7889bd6901  packages/kernel/src/lib/link.ts
