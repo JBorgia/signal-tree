@@ -71,9 +71,18 @@ or collectibility result is claimed. A reviewed source-presence mechanism and
 operation-level delivery chronology are required before dependent runtime repair.
 The owner subsequently authorized the aggregate experiment and authored-input
 rule; the [successor design and authority](docs/audits/2026-10-17-incumbent-readiness/link-a1-successor-design/README.md)
-record the reviewed source mapping and its bounded gates. Native successor work
-is isolated and unaccepted. Production `87f6831f`, the conservative default,
-budgets and B closure remain unchanged.
+record the reviewed source mapping and its bounded gates.
+The [aggregate successor disposition](docs/audits/2026-10-17-incumbent-readiness/link-a1-aggregate-successor/README.md)
+freezes rejected `2d71d733`: 58/64 in the combined focused vector. Five failed
+assertions establish scalar membership regressions and recurring passive-recipient
+interference; the sixth retains an unresolved fallback oracle. Two additional
+same-tree pending-input controls pass and do not demonstrate leakage. Dependent
+aggregate repair stops at recurrence; source-presence and invalidation gains keep
+only their recorded bounded validity. Entity selected installation remains
+unimplemented beyond reviewed source maps. Source types pass; spec types fail on
+two fixture accesses. No full qualification, artifact or cost acceptance follows.
+Production `87f6831f`, the conservative default, budgets and B closure remain
+unchanged.
 
 ## Expanded Link design A0 — reviewed for bounded native experiment
 

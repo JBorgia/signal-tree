@@ -1,0 +1,9 @@
+{
+  "fourth_manifest_sha256": "3689e43962a931080c002735fb32773a2d77ce58a114db81bb37add4691a10e0",
+  "matched_files": 698,
+  "mismatches": [],
+  "additional_specs": [
+    "aggregate-native-input-independent.spec.ts",
+    "aggregate-native-input-default-control.spec.ts"
+  ]
+}
