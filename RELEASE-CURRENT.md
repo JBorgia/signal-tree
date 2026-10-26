@@ -49,6 +49,32 @@ remain historical evidence at their stated source.
 | Stronger semantic matrix | Scope disposition recorded, not passed | Preserve 188 held / 68 violated / 168 unsupported record and test supported public contract separately |
 | Final exact-SHA qualification | Not yet eligible | Close supported blockers, freeze source, then complete required verification |
 
+## Native Link address correction — isolated focused gate improves
+
+[Exact trace, correction, controls and review](docs/audits/2026-10-17-incumbent-readiness/link-native-address/README.md)
+close the eight inherited field-Link timeouts. Bare entity fields already carry native
+collection position/lifetime/field identity; experimental Link instead bound position
+-1 when optional capture metadata was absent. Reusing the native collection position
+at all six publication sites restores the matching ticket and existing conservative
+fallback. No owner registration, independence grant, flush or production activation.
+This corrects the earlier provisional owner-initialization attribution below: the
+fallback did run, but there was no matching ticket to authorize.
+
+Combined focused result: **495 passes / 1 preserved contract-mismatch failure**, 496 cases
+in 46 files. Final affected delivery checks: 72 passes (overlapping new 10); four facade
+checks: 8 passes. Rebuilt unchanged declarations/lifecycle/projection:141 contract passes
+plus 1 misuse demonstration, excluded from safety counts. Source typecheck, corrected
+spec-types and changed-file lint pass. First failures and original assertions stay
+archived. Independent ingress/pending isolation review and root replay pass.
+
+Exact 798-file TS/TSX candidate manifest:
+16d33224f969b9e284e61c8affbacd544d1ebfba6397ae69f9a3cb2030008935.
+Only link.ts runtime and five new specs differ from the preceding isolated successor.
+Production `87f6831f` remains unchanged. Remaining 4N versus 2N snapshot cost, collectibility,
+structural/later-slice integration and artifact gates are not waived. No broad
+qualification or release sign-off. Historical checkpoint reports below remain valid
+at their source; their open Link counterexample is closed only in this new candidate.
+
 ## Derive and snapshot successor — bounded corrections survive; integration blocked
 
 [Exact candidate, first failures, reviews and remaining public counterexample](docs/audits/2026-10-17-incumbent-readiness/derive-placement-successor/README.md)
