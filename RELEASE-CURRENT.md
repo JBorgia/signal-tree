@@ -49,6 +49,26 @@ remain historical evidence at their stated source.
 | Stronger semantic matrix | Scope disposition recorded, not passed | Preserve 188 held / 68 violated / 168 unsupported record and test supported public contract separately |
 | Final exact-SHA qualification | Not yet eligible | Close supported blockers, freeze source, then complete required verification |
 
+## Slice 3 realization qualification — bounded gate closes
+
+[Source, preserved first failures and independent review](docs/audits/2026-10-17-incumbent-readiness/slice3-realization-qualification/README.md)
+record the isolated restoration successor. The raw restoration route now carries the
+existing paired ordinary/physical preparation through validation and installation.
+The ordinary plan installs ordinary authority after physical installation, eliminating
+the newly exposed duplicate backing writes without removing divergence or placement.
+
+Final combined 78-file vector: 1,060 passes / one unchanged adjudicated contract
+mismatch. Both original 130,000-row restoration controls pass; the first 2N versus N
+value-store-write failure remains archived. Types/spec-types pass; three existing lint
+warnings remain. Independent public mixed P99/O7 publication, array-identity and
+backing-identity probes pass and were replayed by root. This is not CPU superiority.
+
+805-file manifest 6a43358ddc287d4b58b56a0bd5aa83440e901817520ea6c64690196de5e4e648
+identifies /private/tmp/restoration-install-successor/candidate. The finite slice-3
+gate is reviewed; authorized combined slice-4 framework/declaration/lifecycle checks
+continue. Production 87f6831f remains unchanged. Full verification, fresh artifacts,
+collectibility and cost acceptance remain separate gates; no activation or release.
+
 ## Slice 2 prerequisite qualification — bounded gate closes
 
 [Exact source, first failures and independent gate review](docs/audits/2026-10-17-incumbent-readiness/slice2-prerequisite-qualification/README.md)
