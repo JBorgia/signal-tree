@@ -1,0 +1,9 @@
+{
+  "source": "f01ed39a7df8a5de185ebec0773e09e36537dacb",
+  "sourceDirty": "",
+  "sourceRoot": "/private/tmp/v16-transition-qualification",
+  "production": "87f6831fa60cafe87508f0ace84b7638698ca3b0",
+  "priorDesign": "f5d5cae2f5385c5eb1d7637658140a447ab8e24b",
+  "execution": "Source inspection only; no runtime tests, model, build, or cost measurements",
+  "reviewedDesignSHA256": "ab44d268839310eabaca7dca0f0a80cc1424fb0412f7c4bf5fbf517ecc85edc4"
+}

@@ -1,0 +1,21 @@
+2026-10-26 read-only design archive verification
+Readiness parent: f5d5cae2f5385c5eb1d7637658140a447ab8e24b
+Frozen source: f01ed39a7df8a5de185ebec0773e09e36537dacb, clean
+Production/runtime: 87f6831fa60cafe87508f0ace84b7638698ca3b0
+Node: v24.15.0, matches .nvmrc
+
+Executed:
+- git diff --check: pass.
+- git diff --name-only 87f6831fa60cafe87508f0ace84b7638698ca3b0 -- packages: empty.
+- shasum -a 256 -c SOURCE-SHA256.txt from frozen source: 22/22 match.
+- shasum -a 256 -c MEMBERS.sha256 from archive: packet members match.
+- node --loader /private/tmp/inverse-disposition-native/docs-loader.mjs tools/check-doc-links.mjs from readiness: exit 0; 790/790 relative links, 189 live surfaces.
+  Loader resolves semver from main checkout only; exact copy preserved as docs-loader.mjs.
+  Loader SHA256 f7189b08c65bb2962e85743fd41f28a0138a8833527a1afb8c0e2cab7396cbe4.
+  Replay can use this archive's loader instead of the original /private/tmp path.
+
+Not executed: runtime/model tests, package/framework suites, builds, demo, artifact/performance campaigns.
+No runtime changes. No changed original assertion or budget. No release acceptance.
+Unrelated AGENTS.md and docs/performance/measurement-contract.md changes preserved and excluded.
+
+Invocation correction: one manifest check was accidentally launched from the repository root; relative member names failed there (including root README mismatch). Re-running from the archive directory with unchanged files passed 11/11. This was a command-working-directory error, not artifact corruption or a runtime test failure.

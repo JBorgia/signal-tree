@@ -49,6 +49,22 @@ remain historical evidence at their stated source.
 | Stronger semantic matrix | Scope disposition recorded, not passed | Preserve 188 held / 68 violated / 168 unsupported record and test supported public contract separately |
 | Final exact-SHA qualification | Not yet eligible | Close supported blockers, freeze source, then complete required verification |
 
+## Membership handoff review — additional mechanism required
+
+[Producer trace, exact reviewed proposal and disposition](docs/audits/2026-10-17-incumbent-readiness/membership-admission-design/README.md)
+rule out an event-identity-only leaf repair. Net-zero membership can omit the outer
+event; a late after-image can contain nested authorship. Equal retained-value re-add
+also bypasses the scalar value-preparation hook. Existing one-fact supersession
+does not define eligibility for all contributions remaining in a mixed payload.
+
+A native successor therefore needs a membership-aware writer seam and explicit
+publication-support replacement rules, plus no-event completion mapped to existing
+Link pending work/consequence delivery. These are not supplied by event metadata
+or by reusing a queue. The additional writer/authority scope must be adjudicated;
+the recurrence stop remains active. No runtime/model/test/build/cost run occurred.
+Production `87f6831f`, rejected `f01ed39a`, original assertions, recorded failures
+and budgets remain unchanged. B stays closed; no new API or product scope selected.
+
 ## Paired-boundary source proof — native admission still gated
 
 [Concrete mechanism, selection mapping and independent review](docs/audits/2026-10-17-incumbent-readiness/complete-operation-proof/README.md)
