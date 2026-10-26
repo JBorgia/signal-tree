@@ -49,6 +49,27 @@ remain historical evidence at their stated source.
 | Stronger semantic matrix | Scope disposition recorded, not passed | Preserve 188 held / 68 violated / 168 unsupported record and test supported public contract separately |
 | Final exact-SHA qualification | Not yet eligible | Close supported blockers, freeze source, then complete required verification |
 
+## Paired-boundary source proof — native admission still gated
+
+[Concrete mechanism, selection mapping and independent review](docs/audits/2026-10-17-incumbent-readiness/complete-operation-proof/README.md)
+advance the finite design beyond the prior inventory. Separate prepared P/O pairs
+are required: existing structuralRecords derive from ordinary changes under a
+physical frontier and cannot simply be relabeled. Order-witness admission belongs
+in terminal installation before reentry; later projections consume it once.
+
+The reviewed mapping preserves useful own-rekey/foreign-remove/fresh-same-key
+rollback, occupied-destination retry and subset-order authority through the existing
+selector/resolver. It adds no second journal or settlement engine. These are static
+source/design results, not native tests or cost evidence. The initial review gaps
+and corrections are preserved.
+
+Leaf Link remains separate: member creation, omission and path re-addition can
+publish natively before the final tagged event. Its private producer-to-event
+association must be specified before a native successor; a notifier-only fix is
+insufficient. The runtime recurrence stop remains active. Production `87f6831f`,
+rejected `f01ed39a`, original falsifiers and four failed budgets remain unchanged.
+B stays closed; no activation, API change, ceiling increase or release.
+
 ## Complete-operation design review — runtime stop retained
 
 [Finite design review and independent scrutiny](docs/audits/2026-10-17-incumbent-readiness/complete-operation-design-review/README.md)
