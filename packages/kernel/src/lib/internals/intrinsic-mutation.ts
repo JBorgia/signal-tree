@@ -1,5 +1,5 @@
 export interface TerminalRecordPlan {
-  readonly writes: readonly { readonly map: Map<unknown,unknown>; readonly key: unknown; readonly value: unknown }[];
+  readonly writes: readonly { readonly map: { set(key: unknown, value: unknown): unknown }; readonly key: unknown; readonly value: unknown }[];
   readonly adds: readonly { readonly set: Set<unknown>; readonly value: unknown }[];
 }
 /** Apply only precomputed internal writes; callers own installation ordering. */

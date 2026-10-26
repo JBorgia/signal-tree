@@ -1,3 +1,5 @@
+import type { EntityPlacementStage } from './entity-placement-stage';
+import type { EntityValueTransition } from '../internals/entity-value-transition';
 import { installTerminalRecord } from '../internals/intrinsic-mutation';
 import type { TerminalRecordPlan } from '../internals/intrinsic-mutation';
 import type { CommittedEntityMutation } from '../internals/mutation-capture-runtime';
@@ -15,6 +17,7 @@ export type PreparedValueReplacement<
   key: K;
   subjectId: number;
   nextValue: E;
+  authoredFields?: readonly string[] | null | 'derive';
 };
 
 export type PreparedRetainedValueRetirement = {
@@ -33,6 +36,8 @@ export type PreparedRetainedValueRetirement = {
 
 export type PreparedKeyTransfer<K extends string | number> = {
   kind: 'transfer-key';
+  /** Placement is independent of key identity; only inverse existence supplies it. */
+  placement?: { beforeSubject?: number; afterSubject?: number };
   fromKey: K;
   toKey: K;
   subjectId: number;
@@ -121,6 +126,110 @@ export class EntityMutationFrame<
     private readonly structuralStore: StructuralStore<K>
   ) {}
 
+  private preparedInstructions:
+    | readonly PreparedCommitInstruction<K, E>[]
+    | undefined;
+  ordinaryOrder: readonly number[] | undefined;
+  orderEndpoints:
+    | { readonly before: readonly number[]; readonly after: readonly number[] }
+    | undefined;
+  private finalFront: readonly K[] | undefined;
+  private finalOrder: readonly K[] | undefined;
+  stageFinalFront(keys: readonly K[]): void {
+    this.finalFront = keys;
+  }
+  stageFinalOrder(keys: readonly K[]): void {
+    this.finalOrder = keys;
+  }
+  preparePlacement(): EntityPlacementStage<K> {
+    const instructions = (this.preparedInstructions =
+      this.prepareCommitInstructions());
+    const stage = this.structuralStore.preparePlacement();
+    const base = this.structuralStore.preparePlacement();
+    let beforeOrder = this.ordinaryOrder ? base.snapshot() : undefined;
+    for (const mutation of instructions) {
+      if (mutation.kind === 'create-fresh-subject')
+        stage.insert(mutation.subjectId, mutation.key);
+      else if (mutation.kind === 'tombstone-subject')
+        stage.remove(mutation.subjectId);
+      else if (mutation.kind === 'restore-subject')
+        stage.insert(
+          mutation.subjectId,
+          mutation.key,
+          mutation.resolvedPlacement.beforeSubject,
+          mutation.resolvedPlacement.afterSubject
+        );
+      else if (mutation.kind === 'transfer-key') {
+        stage.rekey(mutation.subjectId, mutation.toKey);
+        if (mutation.placement)
+          stage.insert(
+            mutation.subjectId,
+            mutation.toKey,
+            mutation.placement.beforeSubject,
+            mutation.placement.afterSubject
+          );
+      }
+    }
+    // Final key order resolves against this complete private placement stage.
+    // Build its lookup once; searching the patch for every key makes a full
+    // setAll/prepend batch quadratic. No index is installed in live storage.
+    const stagedSubjects =
+      this.finalFront || this.finalOrder ? new Map<K, number>() : undefined;
+    if (stagedSubjects) {
+      for (const [id, row] of stage.patch) {
+        // Preserve the prior strict-equality lookup (including NaN) and first
+        // match while falling back to the existing committed key index.
+        if (
+          row.present &&
+          !Number.isNaN(row.key) &&
+          !stagedSubjects.has(row.key)
+        )
+          stagedSubjects.set(row.key, id);
+      }
+    }
+    const subjectFor = (key: K) =>
+      stagedSubjects?.get(key) ?? this.structuralStore.subjectIdForKey(key);
+    let prefixOrder: readonly number[] | undefined;
+    if (this.finalFront) {
+      const ids = this.finalFront
+        .map(subjectFor)
+        .filter((id): id is number => id !== undefined);
+      const existing = ids.filter((subject) => base.read(subject).present);
+      let cursor = base.head;
+      let moved = false;
+      for (const subject of existing) {
+        if (cursor !== subject) {
+          moved = true;
+          break;
+        }
+        const row = base.read(subject);
+        cursor = row.present ? row.afterSubject : undefined;
+      }
+      if (moved) beforeOrder = base.snapshot();
+      for (const id of ids) stage.remove(id);
+      const after = stage.head;
+      let before: number | undefined;
+      for (let index = 0; index < ids.length; index++) {
+        stage.insert(ids[index], this.finalFront[index], before, after);
+        before = ids[index];
+      }
+      if (moved) this.ordinaryOrder = prefixOrder = stage.snapshot();
+    }
+    if (this.finalOrder)
+      stage.order(
+        this.finalOrder
+          .map(subjectFor)
+          .filter((id): id is number => id !== undefined)
+      );
+    if (beforeOrder)
+      this.orderEndpoints = Object.freeze({
+        before: beforeOrder,
+        // A later full order changes the prepared stage. Otherwise the prefix
+        // domain already is this exact immutable physical-after sequence.
+        after: !this.finalOrder && prefixOrder ? prefixOrder : stage.snapshot(),
+      });
+    return stage;
+  }
   stageValueReplacement(replacement: PreparedValueReplacement<K, E>): void {
     this.mutations.push(replacement);
   }
@@ -157,9 +266,15 @@ export class EntityMutationFrame<
   commit(
     observeCommitted?: (changes: readonly CommittedEntityMutation[]) => void,
     responsibility?: TerminalRecordPlan,
-    structuralFrontier?: { after: unknown }
+    structuralFrontier?: { after: unknown },
+    valueTransitions?: ReadonlyMap<
+      PreparedValueReplacement<K, E>,
+      EntityValueTransition<E>
+    >,
+    installOrdinary?: () => void
   ): EntityMutationCommitResult {
-    const preparedMutations = this.prepareCommitInstructions();
+    const preparedMutations =
+      this.preparedInstructions ?? this.prepareCommitInstructions();
     // Before-images of touched lifetimes only. An inactive lifetime's retained
     // backing is not current truth, so it reads as absent (undefined).
     const before = observeCommitted
@@ -214,10 +329,13 @@ export class EntityMutationFrame<
       }
 
       if (mutation.kind === 'replace-value') {
-        this.valueStore.retainSubjectValue(
-          mutation.subjectId,
-          mutation.nextValue
-        );
+        const transition = valueTransitions?.get(mutation);
+        if (transition) this.valueStore.installValueTransition(transition);
+        else
+          this.valueStore.retainSubjectValue(
+            mutation.subjectId,
+            mutation.nextValue
+          );
         continue;
       }
 
@@ -242,6 +360,12 @@ export class EntityMutationFrame<
           mutation.fromKey,
           mutation.toKey
         );
+        if (mutation.placement)
+          this.structuralStore.placeActiveSubject(
+            mutation.subjectId,
+            mutation.placement.beforeSubject,
+            mutation.placement.afterSubject
+          );
         physicallyChangedSubjectIds.add(mutation.subjectId);
         continue;
       }
@@ -254,9 +378,13 @@ export class EntityMutationFrame<
       physicallyChangedSubjectIds.add(mutation.subjectId);
     }
 
+    if (this.finalFront) this.structuralStore.moveKeysToFront(this.finalFront);
+    if (this.finalOrder)
+      this.structuralStore.reorderActiveKeys(this.finalOrder);
     if (structuralFrontier) {
       structuralFrontier.after = this.structuralStore.activeOrderFrontier();
     }
+    installOrdinary?.();
     if (responsibility) {
       installTerminalRecord(responsibility);
     }

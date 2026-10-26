@@ -1,3 +1,4 @@
+import {needsLocationAuthorityAdmission} from './internals/location-runtime';
 import { reportContainedObserverError } from './internals/error-reporter';
 import type { TerminalRecordPlan } from './internals/intrinsic-mutation';
 import {
@@ -1146,7 +1147,7 @@ function recursiveUpdate(
         // location for the value without enrolling the write path as a reactive
         // consumer.
         const current = readWritableCell(sig);
-        if (current === value && !isAbsentMember(sig)) {
+        if (current === value && !isAbsentMember(sig) && !needsLocationAuthorityAdmission(sig)) {
           // Dev-mode footgun guard: a merge write whose value is reference-
           // identical to the current value is a no-op. For objects/arrays this
           // almost always means the caller mutated the value in place and re-set

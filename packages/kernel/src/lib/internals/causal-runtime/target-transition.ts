@@ -1,4 +1,8 @@
-import { prepareEntityTransitionTarget, type EntityTargetPreparer } from '../../physical/prepare-entity-target';
+import { realizationPlacement } from './ordinary-realization';
+import {
+  prepareEntityTransitionTarget,
+  type EntityTargetPreparer,
+} from '../../physical/prepare-entity-target';
 import type { PositionId, ReversalEffect } from './causal-types';
 import { appendAll } from '../utilities/append-all';
 
@@ -15,7 +19,12 @@ export type CollectionTransitionSource = {
   readonly orderFrontier: unknown;
 };
 
-export type CollectionTransitionTarget = CollectionTransitionSource;
+export type CollectionTransitionTarget = CollectionTransitionSource & {
+  /** Original admitted inverse facts, in application order; never inferred from the physical target. */
+  readonly admittedEffects?: readonly ReversalEffect[];
+  /** Existing selected order endpoint, separate from physical display order. */
+  readonly admittedOrder?: readonly number[];
+};
 
 export type DeclarativeTransitionTarget = {
   readonly collections: ReadonlyMap<PositionId, CollectionTransitionTarget>;
@@ -105,7 +114,9 @@ export function prepareDeclarativeTransitionInstallation(
         `Declarative transition has no collection binding ${owner}`
       );
     }
-    prepared.push(binding.prepareTarget(collection, prepareEntityTransitionTarget));
+    prepared.push(
+      binding.prepareTarget(collection, prepareEntityTransitionTarget)
+    );
   }
   if (scalars.size > 0) {
     if (!scalarBinding) {
@@ -125,12 +136,24 @@ export function prepareDeclarativeTransitionInstallation(
       let failed = false;
       let first: unknown;
       for (const collection of prepared) {
-        try { collection.publishOrder?.(); }
-        catch (error) { if (!failed) { failed = true; first = error; } }
+        try {
+          collection.publishOrder?.();
+        } catch (error) {
+          if (!failed) {
+            failed = true;
+            first = error;
+          }
+        }
       }
       for (const collection of prepared) {
-        try { collection.publish(); }
-        catch (error) { if (!failed) { failed = true; first = error; } }
+        try {
+          collection.publish();
+        } catch (error) {
+          if (!failed) {
+            failed = true;
+            first = error;
+          }
+        }
       }
       if (failed) throw first;
     },
@@ -233,6 +256,11 @@ export type CollectionOrderDelta = {
   readonly beforeFrontier: unknown;
   readonly afterFrontier: unknown;
   readonly participants: readonly CollectionOrderParticipant[];
+  readonly ordinaryEndpoints?: {
+    readonly before: readonly number[];
+    readonly after: readonly number[];
+    readonly domain?: readonly number[];
+  };
 };
 
 export function requiresDeclarativeStructuralTarget(
@@ -434,7 +462,9 @@ export function deriveDeclarativeTransitionTarget(
         : deriveStructuralTargetOrder(
             collection.order,
             collection.subjects,
-            options.effects.filter((effect) => effect.owner === owner)
+            options.effects
+              .filter((effect) => effect.owner === owner)
+              .map((effect) => realizationPlacement(effect) ?? effect)
           );
       assertCollectionOrderMatchesSubjects(order, collection.subjects);
     } catch (failure) {
@@ -479,7 +509,12 @@ export function deriveCollectionOrderDelta(
   before: readonly number[],
   after: readonly number[],
   beforeFrontier: unknown,
-  afterFrontier: unknown
+  afterFrontier: unknown,
+  ordinaryEndpoints?: {
+    readonly before: readonly number[];
+    readonly after: readonly number[];
+    readonly domain?: readonly number[];
+  }
 ): CollectionOrderDelta {
   assertUniqueSubjects(before);
   assertUniqueSubjects(after);
@@ -518,6 +553,7 @@ export function deriveCollectionOrderDelta(
     afterLength: after.length,
     beforeFrontier,
     afterFrontier,
+    ordinaryEndpoints,
     participants: [...participants.values()].sort(
       (left, right) => left.subject - right.subject
     ),
@@ -795,11 +831,15 @@ function placeAdditions(
   survives: (subject: number) => boolean
 ): void {
   const pending = [...additions];
+  // Preserve the pending-anchor membership test without rebuilding every
+  // remaining prefix. Multiplicity matters when the same lifetime recurs.
+  const pendingSubjects = new Map<number, number>();
+  for (const effect of pending) {
+    const subject = effect.subjectId as number;
+    pendingSubjects.set(subject, (pendingSubjects.get(subject) ?? 0) + 1);
+  }
 
   while (pending.length > 0) {
-    const pendingSubjects = new Set(
-      pending.map((effect) => effect.subjectId as number)
-    );
     const waitsOnPending = (effect: ReversalEffect): boolean => {
       const context = effect.structuralContext;
       return (
@@ -857,6 +897,9 @@ function placeAdditions(
     }
     const effect = pending.splice(readyIndex, 1)[0];
     const subject = effect.subjectId as number;
+    const remaining = (pendingSubjects.get(subject) ?? 1) - 1;
+    if (remaining === 0) pendingSubjects.delete(subject);
+    else pendingSubjects.set(subject, remaining);
     const context = effect.structuralContext;
     const beforeSubject =
       context?.kind === 'add' || context?.kind === 'remove'

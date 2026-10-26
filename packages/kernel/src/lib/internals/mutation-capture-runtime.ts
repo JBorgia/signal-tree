@@ -11,6 +11,12 @@ export type CollectionOrderCapture = {
   readonly afterSubjects: readonly number[];
   readonly beforeFrontier: unknown;
   readonly afterFrontier: unknown;
+  /** Prepared source ordinary order, distinct from physical order/frontier. */
+  readonly ordinaryEndpoints?: {
+    readonly before: readonly number[];
+    readonly after: readonly number[];
+    readonly domain?: readonly number[];
+  };
   readonly meta?: WriteMetadata;
 };
 
@@ -39,7 +45,9 @@ export type StructuralFrontierInterval = {
 };
 
 export type StructuralPlacementEvidence = StructuralEffect extends infer E
-  ? E extends StructuralEffect ? Omit<E, 'value'> : never
+  ? E extends StructuralEffect
+    ? Omit<E, 'value'>
+    : never
   : never;
 
 export type CommittedEntityCapture = {
@@ -57,7 +65,11 @@ export const MUTATION_CAPTURE_RUNTIME = Symbol.for(
 
 export interface MutationCaptureRuntime {
   /** Prepared ordinary membership responsibility; installed without delivery. */
-  prepareMemberResponsibility?: (branch: object, key: string, child: object) => TerminalRecordPlan | undefined;
+  prepareMemberResponsibility?: (
+    branch: object,
+    key: string,
+    child: object
+  ) => TerminalRecordPlan | undefined;
   prepareEntityResponsibility?: (
     capture: CommittedEntityCapture
   ) => TerminalRecordPlan | undefined;
@@ -83,7 +95,9 @@ export interface MutationCaptureRuntime {
 export function createMutationCaptureRuntime(): MutationCaptureRuntime {
   let activeCount = 0;
   const entityListeners = new Set<(capture: CommittedEntityCapture) => void>();
-  const structuralBoundaryListeners = new Set<(capture: CommittedEntityCapture) => void>();
+  const structuralBoundaryListeners = new Set<
+    (capture: CommittedEntityCapture) => void
+  >();
   const collectionOrderListeners = new Set<
     (capture: CollectionOrderCapture) => void
   >();
@@ -97,7 +111,9 @@ export function createMutationCaptureRuntime(): MutationCaptureRuntime {
     },
     subscribeStructuralBoundary(listener): () => void {
       structuralBoundaryListeners.add(listener);
-      return () => { structuralBoundaryListeners.delete(listener); };
+      return () => {
+        structuralBoundaryListeners.delete(listener);
+      };
     },
     publishCommittedEntity(capture): void {
       if (activeCount === 0) return;

@@ -1,3 +1,7 @@
+import { hasSelectedEntityDisposition } from './internals/selected-entity-disposition';
+import type { WriteMetadata } from './mutation-types';
+import { ordinaryEntityEntries } from './internals/ordinary-entity-entries';
+import * as research from './experimental-publication/private';
 import {
   applyPlainBranchMembership,
   plainBranchMembershipChange,
@@ -47,6 +51,40 @@ import type { EntityMapBuilder } from './markers/entity-map';
 import type { NodeAccessor } from './node-accessor';
 import type { ConstructionOf } from './internals/construction-accessor';
 import type { ResolveLeafDefinitions } from './types';
+
+/** Physical topology and eligible semantic facts have distinct existing carriers. */
+function applyCollectionNotification(
+  projection: EntityEgressProjection,
+  subject: number | undefined,
+  row: unknown,
+  effect: Parameters<EntityEgressProjection['apply']>[2],
+  inspection: boolean,
+  fields: readonly string[] | null | undefined,
+  meta: WriteMetadata | undefined
+): boolean {
+  if (!hasSelectedEntityDisposition(meta))
+    return projection.apply(subject, row, effect, inspection, fields);
+  projection.apply(subject, row, effect, true, fields);
+  if (inspection) return false;
+  let advanced = false;
+  for (const entry of ordinaryEntityEntries({
+    path: '',
+    newValue: row,
+    oldValue: undefined,
+    subjectIds: subject === undefined ? undefined : [subject],
+    meta,
+  }))
+    advanced =
+      projection.apply(
+        entry.subjectIds?.[0],
+        entry.newValue,
+        entry.meta?.structuralEffect,
+        false,
+        fields,
+        true
+      ) || advanced;
+  return advanced;
+}
 
 /**
  * `link(x, y)` — synchronize a SignalTree location with an external endpoint.
@@ -285,6 +323,11 @@ export function link<S>(
   const releaseObservation = acquireObservation(x);
   const ownerPath = getOwnedOwnerPath(x) ?? '';
   const notifier = getPathNotifier();
+  // Entity projections carry their native collection position independently of
+  // optional capture metadata. Bind admission and incoming evidence to that
+  // same position, with the existing lifetime/field identity kept separate.
+  const publicationPosition =
+    entityLocation?.owner ?? getOwnedPositionIds(x)?.[0] ?? -1;
 
   let knownY: { value: T } | undefined;
   let disposed = false;
@@ -317,6 +360,7 @@ export function link<S>(
    * can never advance the projection (BASE-1 vs BASE-2).
    */
   let eligible: T = read();
+  let researchFact: ReturnType<typeof research.evidence>;
 
   /**
    * A collection source keeps its eligible value as a SUBJECT-KEYED projection
@@ -482,7 +526,9 @@ export function link<S>(
     // authoritative for this relationship — it is not inspection, and it is not
     // an authored mutation to be reduced.
     eligible = value;
-    external(() => write(value));
+    research.acquire(registry.id, publicationPosition, () =>
+      external(() => write(value))
+    );
     // ⚠️ AND THE SUBJECT SHADOW IS RESEEDED, not reduced. Applying inbound truth
     // may emit no notification at all when it coincides with what is already
     // shown (the I4 case), so the shadow is rebuilt from the post-apply
@@ -492,8 +538,31 @@ export function link<S>(
     }
   };
 
-  const offSub = notifier.subscribe(
-    '**',
+  research.bindSource(
+    consequenceKey,
+    registry.id,
+    publicationPosition,
+    {
+      supported:
+        !collection &&
+        !isNodeAccessor(x) &&
+        !getRootTree(x) &&
+        isWritableLocation(x) &&
+        (!entityLocation || entityLocation.fieldKey !== undefined),
+      subject: entityLocation?.subjectId,
+      field: entityLocation?.fieldKey,
+    },
+    (error) =>
+      reportTreeError({
+        error,
+        operation: 'link:declare',
+        treeId: registry.id,
+        path: ownerPath || undefined,
+      })
+  );
+  const offSub = research.subscribeProjection(
+    notifier,
+    consequenceKey,
     (
       v,
       prev,
@@ -625,6 +694,8 @@ export function link<S>(
           if (next === eligible) return;
           eligible = next as T;
         }
+        researchFact = research.evidence(meta);
+        researchFact = research.project(consequenceKey, meta, eligible);
         dirty = true;
         observeLink();
         return;
@@ -651,12 +722,14 @@ export function link<S>(
         const effect = (meta as Record<string, unknown> | undefined)?.[
           'structuralEffect'
         ] as Parameters<EntityEgressProjection['apply']>[2];
-        const advanced = nested.projection.apply(
+        const advanced = applyCollectionNotification(
+          nested.projection,
           subjectIds?.[0],
           v,
           effect,
           inspection,
-          fields
+          fields,
+          meta
         );
         if (advanced) {
           advanceNested(nested);
@@ -673,12 +746,14 @@ export function link<S>(
         const effect = (meta as Record<string, unknown> | undefined)?.[
           'structuralEffect'
         ] as Parameters<EntityEgressProjection['apply']>[2];
-        const advanced = entityProjection.apply(
+        const advanced = applyCollectionNotification(
+          entityProjection,
           subjectIds?.[0],
           v,
           effect,
           inspection,
-          fields
+          fields,
+          meta
         );
         if (advanced) {
           dirty = true;
@@ -687,12 +762,21 @@ export function link<S>(
         return;
       }
       if (inspection) return;
+      researchFact =
+        relative.length === 0 ? research.evidence(meta) : undefined;
       eligible = applyAtRelativePath(eligible, relative, v);
+      researchFact = research.project(consequenceKey, meta, eligible);
       dirty = true;
       observeLink();
     }
   );
 
+  const researchHold = (): void => {
+    if (held.size > 0 || disposed) return;
+    let resolve!: () => void;
+    const promise = new Promise<void>((r) => (resolve = r));
+    held.add({ promise, resolve });
+  };
   const sendEligible = (): Promise<boolean> =>
     new Promise((resolve, reject) => {
       const cancel = () => {
@@ -709,6 +793,7 @@ export function link<S>(
         try {
           // No remaining work needs no permission. Read only the eligible
           // projection, once per attempt; deferred admission restarts here.
+          const researchTicket = researchFact;
           const now = entityProjection
             ? (entityProjection.value() as unknown as T)
             : eligible;
@@ -716,47 +801,78 @@ export function link<S>(
             cancel();
             return;
           }
-          scheduleDurableConsequence({
-            claimant: x as object,
-            key: sendConsequenceKey,
-            run: () => {
-              if (!synchronous) {
-                // Settlement can precede delivery of rollback notifications.
-                // Resume after that turn, then ask the authority again: another
-                // scope may have opened before this continuation runs.
-                queueMicrotask(attempt);
-                return;
-              }
-              waitingSends.delete(cancel);
-              // Entering I/O is observable; a listener may dispose here, and
-              // then no endpoint call may start.
-              sending = true;
-              observeLink();
-              if (disposed) {
-                sending = false;
-                resolve(false);
-                return;
-              }
-              try {
-                // Invoke inside the authority's callback. Awaiting permission
-                // first would let a new scope open before the actual send.
-                Promise.resolve(endpoint.set?.(now)).then(
-                  () => {
-                    sending = false;
-                    knownY = { value: now };
-                    resolve(true);
-                  },
-                  (error) => {
-                    sending = false;
-                    reject(error);
-                  }
-                );
-              } catch (error) {
-                sending = false;
-                reject(error);
-              }
-            },
-          });
+          const researchAdmitted = research.admit(
+            scheduleDurableConsequence,
+            researchTicket,
+            registry.id,
+            publicationPosition,
+            consequenceKey,
+            {
+              claimant: x as object,
+              key: sendConsequenceKey,
+              run: () => {
+                if (!synchronous) {
+                  // Settlement can precede delivery of rollback notifications.
+                  // Resume after that turn, then ask the authority again: another
+                  // scope may have opened before this continuation runs.
+                  queueMicrotask(attempt);
+                  return;
+                }
+                waitingSends.delete(cancel);
+                // Entering I/O is observable; a listener may dispose here, and
+                // then no endpoint call may start.
+                sending = true;
+                try {
+                  observeLink();
+                } catch (error) {
+                  sending = false;
+                  throw error;
+                }
+                if (
+                  !disposed &&
+                  !research.allowed(
+                    researchTicket,
+                    registry.id,
+                    publicationPosition,
+                    consequenceKey
+                  )
+                ) {
+                  sending = false;
+                  researchHold();
+                  cancel();
+                  return;
+                }
+                if (disposed) {
+                  sending = false;
+                  resolve(false);
+                  return;
+                }
+                try {
+                  // Invoke inside the authority's callback. Awaiting permission
+                  // first would let a new scope open before the actual send.
+                  research.started(researchTicket, consequenceKey);
+                  Promise.resolve(endpoint.set?.(now)).then(
+                    () => {
+                      sending = false;
+                      knownY = { value: now };
+                      resolve(true);
+                    },
+                    (error) => {
+                      sending = false;
+                      reject(error);
+                    }
+                  );
+                } catch (error) {
+                  sending = false;
+                  reject(error);
+                }
+              },
+            }
+          );
+          if (!researchAdmitted) {
+            researchHold();
+            cancel();
+          }
           // Held behind an open scope: the send waits for permission.
           if (waitingSends.has(cancel)) observeLink();
         } catch (error) {
@@ -793,68 +909,100 @@ export function link<S>(
     }
     const pending = entry;
 
-    scheduleDurableConsequence({
-      claimant: x as object,
-      key: consequenceKey,
-      run: () => {
-        held.delete(pending);
-        pending.resolve();
-        if (disposed) return;
-        queued++;
-        chain = chain
-          .then(async () => {
-            queued--;
-            // Publish after entering I/O or completing reconciliation, never
-            // between removal from the queue and the first endpoint call.
-            try {
-              // LINK-RACE-1. Reconcile until X equals Y's acknowledged state.
-              // Terminates on EQUALITY, not on a counter — a write that lands
-              // while an earlier one is in flight is picked up by the next lap.
-              for (;;) {
-                if (disposed) return;
-                // Each lap can follow an async acknowledgement or queued turn;
-                // admission of the original flush cannot authorize this send.
-                if (!(await sendEligible())) return;
+    research.admit(
+      scheduleDurableConsequence,
+      researchFact,
+      registry.id,
+      publicationPosition,
+      consequenceKey,
+      {
+        claimant: x as object,
+        key: consequenceKey,
+        run: () => {
+          held.delete(pending);
+          pending.resolve();
+          if (disposed) return;
+          queued++;
+          chain = chain
+            .then(async () => {
+              queued--;
+              // Publish after entering I/O or completing reconciliation, never
+              // between removal from the queue and the first endpoint call.
+              try {
+                // LINK-RACE-1. Reconcile until X equals Y's acknowledged state.
+                // Terminates on EQUALITY, not on a counter — a write that lands
+                // while an earlier one is in flight is picked up by the next lap.
+                for (;;) {
+                  if (disposed) return;
+                  // Each lap can follow an async acknowledgement or queued turn;
+                  // admission of the original flush cannot authorize this send.
+                  if (!(await sendEligible())) return;
+                }
+              } finally {
+                observeLink();
               }
-            } finally {
-              observeLink();
-            }
-          })
-          .catch((error) => {
-            observeLink('send-failed');
-            // LINK-2 case 3. A rejected outbound `set()` reaches the EXISTING
-            // central reporter, so `Link` needs NO error surface of its own:
-            // no `failures`, no error signal, no status. Reusing the reporter
-            // is why the handle stays three members.
-            //
-            // ⚠️ PUBLICLY OBSERVABLE, as of ERROR-SURFACE-2:
-            //
-            //     Rejected outbound Link sends are publicly observable through
-            //     `onTreeError`.
-            //
-            // ERROR-SURFACE-1 had blocked that claim on two counts, both now
-            // measured closed: the event carries a REQUIRED `treeId`, so two
-            // same-shaped trees are distinguishable; and the `source` union is
-            // deleted rather than frozen into public API.
-            //
-            // The queue must SURVIVE the failure too. Otherwise one rejection
-            // wedges the link forever, which is a retry policy's failure mode
-            // arriving without a retry policy.
-            reportTreeError({
-              error,
-              operation: 'link:set',
-              treeId: registry.id,
-              // ⚠️ `ownerPath` was already known here and previously dropped.
-              // Location, never identity — two trees share this string.
-              path: ownerPath === '' ? undefined : ownerPath,
+            })
+            .catch((error) => {
+              observeLink('send-failed');
+              // LINK-2 case 3. A rejected outbound `set()` reaches the EXISTING
+              // central reporter, so `Link` needs NO error surface of its own:
+              // no `failures`, no error signal, no status. Reusing the reporter
+              // is why the handle stays three members.
+              //
+              // ⚠️ PUBLICLY OBSERVABLE, as of ERROR-SURFACE-2:
+              //
+              //     Rejected outbound Link sends are publicly observable through
+              //     `onTreeError`.
+              //
+              // ERROR-SURFACE-1 had blocked that claim on two counts, both now
+              // measured closed: the event carries a REQUIRED `treeId`, so two
+              // same-shaped trees are distinguishable; and the `source` union is
+              // deleted rather than frozen into public API.
+              //
+              // The queue must SURVIVE the failure too. Otherwise one rejection
+              // wedges the link forever, which is a retry policy's failure mode
+              // arriving without a retry policy.
+              reportTreeError({
+                error,
+                operation: 'link:set',
+                treeId: registry.id,
+                // ⚠️ `ownerPath` was already known here and previously dropped.
+                // Location, never identity — two trees share this string.
+                path: ownerPath === '' ? undefined : ownerPath,
+              });
             });
-          });
-        observeLink();
-      },
-    });
+          observeLink();
+        },
+      }
+    );
     observeLink();
   };
-  const offFlush = notifier.onFlush?.(flushOutbound);
+  const researchRefresh = (): void => {
+    const receipt = research.refreshSource(consequenceKey);
+    if (!receipt || receipt.fact === researchFact) return;
+    researchFact = receipt.fact;
+    eligible = receipt.payload as T;
+    dirty = true;
+  };
+  const offFlush = notifier.onFlush?.(() => {
+    researchRefresh();
+    flushOutbound();
+  });
+  const offResearchEligibility = research.onEligibility(
+    registry.id,
+    () => {
+      if (!disposed) researchRefresh();
+      if (
+        disposed ||
+        held.size === 0 ||
+        research.pendingDecision(researchFact, consequenceKey)
+      )
+        return;
+      dirty = true;
+      flushOutbound();
+    },
+    consequenceKey
+  );
 
   // Order-only changes need no row notification. Consume their existing capture
   // channel, after earlier queued row notifications, then use the same durable
@@ -873,8 +1021,17 @@ export function link<S>(
       pendingOrders.add(pending);
       queueMicrotask(() => {
         try {
-          if (disposed || !projection.reorder(order.afterSubjects, inspection))
-            return;
+          const selected = hasSelectedEntityDisposition(order.meta);
+          if (selected) projection.reorder(order.afterSubjects, true);
+          const advanced = selected
+            ? order.ordinaryEndpoints !== undefined &&
+              projection.reorder(
+                order.ordinaryEndpoints.after,
+                inspection,
+                true
+              )
+            : projection.reorder(order.afterSubjects, inspection);
+          if (disposed || !advanced) return;
           if (projection !== entityProjection) {
             const nested = nestedCollections.get(order.owner);
             if (nested) advanceNested(nested);
@@ -898,6 +1055,8 @@ export function link<S>(
   const dispose = (): void => {
     if (disposed) return;
     disposed = true;
+    offResearchEligibility();
+    research.dispose(consequenceKey, sendConsequenceKey);
     // Release only this relationship's claim; overlapping links stay armed.
     releaseObservation();
     offSub();
@@ -933,7 +1092,21 @@ export function link<S>(
   }
   observeLink('created');
 
-  return {
+  const experimental: Link & {
+    declare(
+      declaration: unknown,
+      work: () => unknown
+    ): ReturnType<typeof research.declare>;
+  } = {
+    declare: (declaration: unknown, work: () => unknown) =>
+      research.declare(
+        consequenceKey,
+        registry.id,
+        publicationPosition,
+        declaration,
+        work,
+        () => disposed
+      ),
     async retrieve() {
       if (!endpoint.get) {
         throw new Error('link: endpoint supplies no get().');
@@ -1020,4 +1193,5 @@ export function link<S>(
     },
     dispose,
   };
+  return experimental;
 }

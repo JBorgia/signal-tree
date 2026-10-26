@@ -172,28 +172,32 @@ function createNativeScalarLeaf<T>(
 
   const binding: WritableLocationBinding<T> = {
     location: leaf,
+    needsAuthorityAdmission: () => kernel.needsAuthorityAdmission(slotIndex),
     notify: () => publication.publishSlot({ changed: true, slot: slotIndex }),
     replace: (value) => {
       const observer = mutationSource.observer, capture = mutationSource.capture;
       const observing = observer || capture;
       const dormant = observing ? liveness.absence?.isAbsent(leaf) === true : false;
-      const before = observing ? (dormant ? kernel.readSlot<T>(slotIndex) : realized.peek()) : undefined;
-      const changed = kernel.commitRecorded(slotIndex, value, () => mutationSource.prepareTerminal?.({intent:'replace',before:before as T,after:value,changed:true}));
+      const before = observing ? kernel.readRecordSlot<T>(slotIndex) : undefined;
+      const resultCommit = kernel.commitRecorded(slotIndex, value, () => mutationSource.prepareTerminal?.({intent:'replace',before:before as T,after:value,changed:true}));
+      const changed=resultCommit.changed;
       const mutation = observing ? {intent:'replace' as const,before:before as T,after:changed || dormant ? value : before as T,changed:changed || dormant} : undefined;
       if (mutation) capture?.(mutation);
-      publishChanged(changed, {value});
+      publishChanged(resultCommit.physicalChanged, {value});
       if (mutation) observer?.(mutation);
     },
     derive: (update) => {
       const observer = mutationSource.observer, capture = mutationSource.capture;
       const dormant = liveness.absence?.isAbsent(leaf) === true;
-      const before = dormant ? kernel.readSlot<T>(slotIndex) : realized.peek();
-      const next = update(dormant ? undefined as T : before);
-      const changed = kernel.commitRecorded(slotIndex,next,()=>mutationSource.prepareTerminal?.({intent:'derive',before,after:next,changed:true}));
+      const current = dormant ? kernel.readSlot<T>(slotIndex) : realized.peek();
+      const before = kernel.readRecordSlot<T>(slotIndex);
+      const next = update(dormant ? undefined as T : current);
+      const resultCommit = kernel.commitRecorded(slotIndex,next,()=>mutationSource.prepareTerminal?.({intent:'derive',before,after:next,changed:true}));
+      const changed=resultCommit.changed;
       const result = changed ? {revision:kernel.revision(),changed:true as const,slot:slotIndex} : {revision:kernel.revision(),changed:false as const};
       const mutation = {intent:'derive' as const,before,after:result.changed || dormant ? next : before,changed:result.changed || dormant};
       capture?.(mutation);
-      publishResult(result);
+      publishResult(resultCommit.physicalChanged ? {revision:kernel.revision(),changed:true,slot:slotIndex} : {revision:kernel.revision(),changed:false});
       observer?.(mutation);
     },
   };

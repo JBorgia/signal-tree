@@ -43,6 +43,7 @@ export interface LocationPublisher {
 }
 
 export interface WritableLocationBinding<T> extends LocationPublisher {
+  needsAuthorityAdmission?():boolean;
   readonly location: Location<T>;
   replace(value: T): void;
   derive(update: (current: T) => T): void;
@@ -299,7 +300,7 @@ export interface LocationRuntime {
      * value, so a reversal restores storage as it was (v16 8e).
      */
     read: (stored?: boolean) => T,
-    write: (value: T, intent: 'replace' | 'derive', prepare?: () => TerminalRecordPlan | undefined) => boolean
+    write: (value: T, intent: 'replace' | 'derive', prepare?: () => TerminalRecordPlan | undefined) => boolean | {changed:boolean;physicalChanged:boolean}
   ): WritableLocationBinding<T>;
   createWritableProjection?<T>(
     compute: () => T,
@@ -408,7 +409,7 @@ export function createLocationRuntime(
 
   const createWritable = <T>(
     read: (stored?: boolean) => T,
-    write: (value: T, intent: 'replace' | 'derive', prepare?: () => TerminalRecordPlan | undefined) => boolean
+    write: (value: T, intent: 'replace' | 'derive', prepare?: () => TerminalRecordPlan | undefined) => boolean | {changed:boolean;physicalChanged:boolean}
   ): WritableLocationBinding<T> => {
     let observationToken: ObservationToken | undefined;
     const listeners = new Set<() => void>();
@@ -447,7 +448,9 @@ export function createLocationRuntime(
       replace: (next) => {
         const observer = mutationSource2.observer;
         const before = observer ? read(true) : undefined;
-        const changed = write(next, 'replace',()=>mutationSource2.prepareTerminal?.({intent:'replace',before:before as T,after:next,changed:true}));
+        const result = write(next, 'replace',()=>mutationSource2.prepareTerminal?.({intent:'replace',before:before as T,after:next,changed:true}));
+        const changed=typeof result==='boolean'?result:result.changed;
+        const physicalChanged=typeof result==='boolean'?result:result.physicalChanged;
         if (observer) {
           observer({
             intent: 'replace',
@@ -456,7 +459,7 @@ export function createLocationRuntime(
             changed,
           });
         }
-        if (changed) publish([binding]);
+        if (physicalChanged) publish([binding]);
       },
       derive: (update) => {
         // The updater receives the location's value (absent reads undefined);
@@ -464,7 +467,9 @@ export function createLocationRuntime(
         const current = read();
         const before = mutationSource2.observer ? read(true) : current;
         const next = update(current);
-        const changed = write(next, 'derive',()=>mutationSource2.prepareTerminal?.({intent:'derive',before,after:next,changed:true}));
+        const result = write(next, 'derive',()=>mutationSource2.prepareTerminal?.({intent:'derive',before,after:next,changed:true}));
+        const changed=typeof result==='boolean'?result:result.changed;
+        const physicalChanged=typeof result==='boolean'?result:result.physicalChanged;
         const observer = mutationSource2.observer;
         if (observer) {
           observer({
@@ -474,7 +479,7 @@ export function createLocationRuntime(
             changed,
           });
         }
-        if (changed) publish([binding]);
+        if (physicalChanged) publish([binding]);
       },
     };
     registerWritableLocationBinding(binding);
@@ -681,3 +686,5 @@ export function createLocationRuntime(
 export const NEUTRAL_LOCATION_RUNTIME = createLocationRuntime(
   NEUTRAL_OBSERVATION_ADAPTER
 );
+
+export function needsLocationAuthorityAdmission(value:object):boolean {return WRITABLE_LOCATION_BINDINGS.get(value)?.needsAuthorityAdmission?.() ?? false;}

@@ -134,15 +134,16 @@ function createScalarLeaf<T>(
       return undefined as T;
     }
 
-    return kernel.readSlot<T>(slotIndex);
+    return stored ? kernel.readRecordSlot<T>(slotIndex) : kernel.readSlot<T>(slotIndex);
   };
   const binding = locations.createWritable(read, (value, _intent, prepare) => {
     const changedValue = kernel.commitRecorded(slotIndex, value, prepare);
-    const result = {changed:changedValue};
+    const result = {changed:changedValue.physicalChanged};
     const reAdded = liveness.absence?.reAdd(holder.leaf) === true;
     const changed = publication.prepareSlot(slotIndex, result.changed, reAdded);
-    return changed;
+    return {changed:changedValue.changed || reAdded,physicalChanged:changed};
   });
+  binding.needsAuthorityAdmission = () => kernel.needsAuthorityAdmission(slotIndex);
   const leaf = binding.location as Location<T>;
   holder.leaf = leaf;
   return { leaf, binding };

@@ -40,6 +40,9 @@ export interface RollbackPendingTurnAtOptions {
   readonly topology: Pick<PositionRegistry, 'contains'>;
   readonly port: PendingRollbackPort;
   readonly realizationContext: RealizationContext;
+  /** Authority-selected inverses in execution order. Their segments must not
+   * be reduced through the legacy raw-turn context projection. */
+  readonly selectedCompensation?: readonly ReversalEffect[];
   readonly onMaintenanceMayBeUseful?: (turn: CausalTurn) => void;
   readonly reportMaintenanceObserverError?: (
     error: unknown,
@@ -72,10 +75,9 @@ export function rollbackPendingTurnAt(
     return { ok: false, refusal: { kind: 'dependency-conflict' } };
   }
 
-  const effects = createPendingRollbackEffects(
-    turn,
-    options.realizationContext
-  );
+  const effects = options.selectedCompensation
+    ? placeFieldReversalsWhileRowsExist(options.selectedCompensation)
+    : createPendingRollbackEffects(turn, options.realizationContext);
   const validationRefusal = options.port.validateEffects?.(effects);
   if (validationRefusal) {
     return { ok: false, refusal: validationRefusal };

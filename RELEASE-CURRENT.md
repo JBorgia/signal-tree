@@ -49,6 +49,24 @@ remain historical evidence at their stated source.
 | Stronger semantic matrix | Scope disposition recorded, not passed | Preserve 188 held / 68 violated / 168 unsupported record and test supported public contract separately |
 | Final exact-SHA qualification | Not yet eligible | Close supported blockers, freeze source, then complete required verification |
 
+## Isolated slice 5 qualification candidate
+
+[Combined slice-4 evidence and independent review](docs/audits/2026-10-17-incumbent-readiness/slice4-combined-qualification/README.md)
+qualify this isolated branch for full verification. Its runtime is experimental and
+must not replace production 87f6831f without final acceptance. The source manifest
+644c6c2c9d7b324d92f86128ecb4b44d6e762f97fccb708d5cf8db84d857a3ba
+covers 809 TS/TSX files before an EOF whitespace correction (recorded separately).
+Exact committed SHA and all full-check outputs are recorded in
+/private/tmp/slice5-qualification. No activation, version or budget change.
+
+Prior 78 native files: 1,060 passes / one preserved contract mismatch; additional
+13 native files: 166 passes. Four frameworks: 274 passes, including eight new
+declaration controls. The registered retention-gc gate passes. The 141 declaration
+contract checks exclude the misuse demonstration. Original 32/34 verdicts retain
+exact source/results and approved reconciliation. Retained/dropped receipt probes
+collect 20/20 each with useful sends and a live control. These
+bounded results do not substitute for full suites, artifacts or measured costs.
+
 ## Slice 3 realization qualification — bounded gate closes
 
 [Source, preserved first failures and independent review](docs/audits/2026-10-17-incumbent-readiness/slice3-realization-qualification/README.md)

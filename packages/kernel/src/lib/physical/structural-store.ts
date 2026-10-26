@@ -1,3 +1,7 @@
+import {
+  EntityPlacementStage,
+  type EntityPlacement,
+} from './entity-placement-stage';
 import type { prepareStructuralTarget } from './prepare-structural-target';
 import { recordProductionSubstrateStat } from '../internals/production-substrate-stats';
 
@@ -77,6 +81,24 @@ export class StructuralStore<K extends string | number> {
   private activeCount = 0;
   private orderFrontier: object = {};
 
+  placementForSubject(subject: number): EntityPlacement<K> {
+    const node = this.activeNodesBySubject.get(subject);
+    return node === undefined
+      ? { present: false }
+      : {
+          present: true,
+          key: node.key,
+          beforeSubject: node.prev?.subjectId,
+          afterSubject: node.next?.subjectId,
+        };
+  }
+  preparePlacement(): EntityPlacementStage<K> {
+    return new EntityPlacementStage(
+      (subject) => this.placementForSubject(subject),
+      this.activeHead?.subjectId,
+      this.activeTail?.subjectId
+    );
+  }
   activeOrderFrontier(): unknown {
     return this.orderFrontier;
   }
@@ -498,6 +520,36 @@ export class StructuralStore<K extends string | number> {
     }
 
     this.appendDetachedNode(node);
+  }
+
+  /** Relocate an active lifetime without retiring it or emitting lifecycle effects. */
+  placeActiveSubject(
+    subjectId: number,
+    beforeSubject?: number,
+    afterSubject?: number
+  ): void {
+    const node = this.activeNodesBySubject.get(subjectId);
+    if (!node) throw new Error('Placement lifetime is not active');
+    if (beforeSubject === subjectId || afterSubject === subjectId)
+      throw new Error('Placement cannot name its own lifetime');
+    const placement = this.resolveSubjectRestorePlacement(
+      beforeSubject,
+      afterSubject
+    );
+    const after =
+      placement.afterSubject === subjectId
+        ? undefined
+        : this.activeNodesBySubject.get(placement.afterSubject as number);
+    const before =
+      placement.beforeSubject === subjectId
+        ? undefined
+        : this.activeNodesBySubject.get(placement.beforeSubject as number);
+    this.detachNode(node);
+    if (after) this.insertDetachedNodeBefore(node, after);
+    else if (before) this.insertDetachedNodeAfter(node, before);
+    else this.appendDetachedNode(node);
+    this.keysCache = undefined;
+    this.orderFrontier = {};
   }
 
   retireSubject(subjectId: number): void {

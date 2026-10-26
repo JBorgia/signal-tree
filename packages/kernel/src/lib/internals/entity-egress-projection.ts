@@ -61,14 +61,19 @@ export type EntityEgressProjection = {
   /** The complete eligible `Row[]`, in eligible order. */
   value(): readonly unknown[];
   /** Advance local order; only authored order may advance eligible authority. */
-  reorder(afterSubjects: readonly number[], inspection: boolean): boolean;
+  reorder(
+    afterSubjects: readonly number[],
+    inspection: boolean,
+    ordinary?: boolean
+  ): boolean;
   /** Apply one notification. Returns true if eligible authority advanced. */
   apply(
     subjectId: number | undefined,
     row: unknown,
     effect: StructuralEffect | undefined,
     inspection: boolean,
-    fields?: readonly string[] | null
+    fields?: readonly string[] | null,
+    ordinary?: boolean
   ): boolean;
   /** Inbound external truth replaces authority and topology alike. */
   reseed(seed: readonly EntityProjectionSeedEntry<Key, unknown>[]): void;
@@ -97,8 +102,24 @@ export function createEntityEgressProjection(
 
   const isEligible = (s: number) => rows.has(s);
 
-  function place(subject: number) {
+  function place(subject: number, effect?: StructuralEffect) {
     if (order.includes(subject)) return;
+    if (effect?.kind === 'add') {
+      if (
+        effect.afterSubject !== undefined &&
+        isEligible(effect.afterSubject)
+      ) {
+        order.splice(order.indexOf(effect.afterSubject), 0, subject);
+        return;
+      }
+      if (
+        effect.beforeSubject !== undefined &&
+        isEligible(effect.beforeSubject)
+      ) {
+        order.splice(order.indexOf(effect.beforeSubject) + 1, 0, subject);
+        return;
+      }
+    }
     const at = topology.placement(subject, isEligible);
     if (at === 'end') return void order.push(subject);
     if ('after' in at)
@@ -131,8 +152,8 @@ export function createEntityEgressProjection(
   return {
     value: () => order.map((s) => rows.get(s)),
 
-    reorder(afterSubjects, inspection) {
-      topology.reorder(afterSubjects);
+    reorder(afterSubjects, inspection, ordinary = false) {
+      if (!ordinary) topology.reorder(afterSubjects);
       if (inspection) return false;
       const present = new Set(afterSubjects);
       const eligible = afterSubjects.filter(isEligible);
@@ -154,9 +175,9 @@ export function createEntityEgressProjection(
       load(entries);
     },
 
-    apply(subjectId, row, effect, inspection, fields) {
+    apply(subjectId, row, effect, inspection, fields, ordinary = false) {
       // Local topology tracks reality, whoever wrote it.
-      if (effect) topology.observe(effect);
+      if (effect && !ordinary) topology.observe(effect);
 
       // Inspection stops here. It has said where things now sit; it has not
       // acquired the right to publish anything.
@@ -164,7 +185,7 @@ export function createEntityEgressProjection(
 
       if (effect?.kind === 'add') {
         reconcileAddress(effect.key, effect.subject);
-        place(effect.subject);
+        place(effect.subject, ordinary ? effect : undefined);
         rows.set(effect.subject, effect.value);
         if (effect.key !== undefined) keyOf.set(effect.subject, effect.key);
         return true;

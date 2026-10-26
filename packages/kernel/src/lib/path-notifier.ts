@@ -1,3 +1,13 @@
+import {
+  entityValueTransition,
+  mergeEntityValueTransition,
+} from './internals/entity-value-transition';
+import {
+  annotate as researchAnnotate,
+  complete as researchComplete,
+  stampSource as researchStampSource,
+  deliverEqual as researchDeliverEqual,
+} from './experimental-publication/private';
 /**
  * PathNotifier - Simple internal notification system for all mutations
  *
@@ -290,7 +300,7 @@ export class PathNotifier {
     // whose tree it belongs to. Folded in here rather than added as a delivery
     // parameter: every consumer already receives `meta`, and the handler
     // signature is enhancer-facing.
-    const meta =
+    let meta =
       ownerId === undefined
         ? metaBeforeOwner
         : { ...(metaBeforeOwner ?? {}), ownerId };
@@ -333,7 +343,12 @@ export class PathNotifier {
         }
       }
     }
-    const fieldKeys = changedSubjectFieldKeys(prev, value, subjectIds);
+    const transition = entityValueTransition(meta);
+    const fieldKeys = changedSubjectFieldKeys(
+      transition ? transition.ordinaryBefore : prev,
+      transition ? transition.ordinaryAfter : value,
+      subjectIds
+    );
     const footprintKeys = subjectFieldFootprint ?? fieldKeys;
     const knownFootprint =
       subjectFieldFootprint === null
@@ -341,6 +356,13 @@ export class PathNotifier {
         : footprintKeys === undefined
         ? undefined
         : Object.freeze([...footprintKeys]);
+    meta = researchAnnotate(
+      researchStampSource(meta, subjectIds, knownFootprint, value, prev),
+      ownerId ?? meta?.ownerId,
+      positionIds,
+      getWriteParticipation(meta) === 'authored',
+      value
+    );
     if (!this.batchingEnabled) {
       // Synchronous path: run subscribers immediately
       const deliveryMeta = materializeDeliveryMeta(meta);
@@ -490,6 +512,9 @@ export class PathNotifier {
     this.pendingBeforeMembership = [];
     this.pending.clear();
     this.pendingFlush = false;
+    for (const slot of toNotify)
+      for (const entry of Array.isArray(slot) ? slot : [slot])
+        researchComplete(entry.meta);
 
     for (const slot of toNotify) {
       const entries = Array.isArray(slot) ? slot : [slot];
@@ -502,9 +527,11 @@ export class PathNotifier {
         // If value didn't change compared to original oldValue, skip
         if (
           entry.newValue === entry.oldValue &&
+          !entry.subjectFieldKeys?.length &&
           !isOwnerOnlyMarkerSignal &&
           !hasStructuralEffect
         ) {
+          researchDeliverEqual(entry);
           continue;
         }
 
@@ -838,9 +865,13 @@ export class PathNotifier {
         : right;
     // Consistent attribution permits coalescing values, but eligibility belongs
     // to the entire authored turn: a later undesignated write cannot erase it.
-    return isMetaDesignated(left)
-      ? { ...merged, ...markMetaDesignated(undefined) }
-      : merged;
+    return mergeEntityValueTransition(
+      left,
+      right,
+      isMetaDesignated(left)
+        ? { ...merged, ...markMetaDesignated(undefined) }
+        : merged
+    );
   }
 
   private getCompositeBatchKey(entry: PendingEntry): string {

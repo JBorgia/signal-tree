@@ -1,3 +1,7 @@
+import { withSelectedEntityDisposition } from '../internals/selected-entity-disposition';
+import type { EntityPlacementStage } from './entity-placement-stage';
+import type { EntityOrdinaryTopology } from './entity-ordinary-topology';
+import { withEntityOrdinaryChanges } from '../internals/entity-value-transition';
 import { prepareStructuralTarget } from './prepare-structural-target';
 import type { Location } from '../internals/cell-runtime';
 import type { EpochHandle } from '../internals/observation-adapter';
@@ -24,6 +28,22 @@ export interface EntityTargetHost<
   readonly positionId: number | undefined;
   readonly structuralStore: StructuralStore<K>;
   readonly valueStore: EntityValueStore<E>;
+  readonly ordinaryTopology: EntityOrdinaryTopology<K>;
+  prepareOrdinaryRealization(
+    effects: readonly import('../internals/causal-runtime/causal-types').ReversalEffect[],
+    physicalAfter?: ReadonlyMap<number, unknown>,
+    physicalEffects?: readonly import('../internals/causal-runtime/causal-types').ReversalEffect[],
+    physicalPlacement?: EntityPlacementStage<K>,
+    ordinaryOrder?: readonly number[]
+  ): {
+    install(): void;
+    changes: readonly import('../internals/mutation-capture-runtime').CommittedEntityMutation[];
+    ordinaryEndpoints?: {
+      readonly before: readonly number[];
+      readonly after: readonly number[];
+      readonly domain?: readonly number[];
+    };
+  };
   readonly activeIdSignal: Location<K | undefined>;
   readonly subjectEpochs: Map<number, EpochHandle>;
   readonly subjectStateSignals: Map<number, WeakRef<Location<number>>>;
@@ -33,7 +53,18 @@ export interface EntityTargetHost<
   readonly basePath: string;
   advanceEpochHandle(epoch: EpochHandle): void;
   updateSignals(): void;
-  publishOrderChange(before: number[], after: number[], beforeFrontier: unknown, afterFrontier: unknown): void;
+  publishOrderChange(
+    before: number[],
+    after: number[],
+    beforeFrontier: unknown,
+    afterFrontier: unknown,
+    ordinaryEndpoints?: {
+      readonly before: readonly number[];
+      readonly after: readonly number[];
+      readonly domain?: readonly number[];
+    },
+    selectedDisposition?: boolean
+  ): void;
   getPositionIdsForNotify(): number[] | undefined;
   createStructuralEffectMeta(effect: StructuralEffect): WriteMetadata;
   ambientMeta(): WriteMetadata | undefined;
@@ -122,6 +153,35 @@ export function prepareEntityTransitionTarget<
     prepareStructuralTarget
   );
   const valueTarget = valueStore.prepareTargetValues(preparedSubjects);
+  const physicalPlacement = structuralStore.preparePlacement();
+  for (const subject of currentSubjects.keys())
+    physicalPlacement.remove(subject);
+  const targetKeys = new Map(
+    preparedSubjects.map((row) => [row.subjectId, row.key])
+  );
+  for (const subject of target.order) {
+    const key = targetKeys.get(subject);
+    if (key === undefined)
+      throw new Error('Prepared target order lacks a lifetime');
+    physicalPlacement.insert(subject, key);
+  }
+  const ordinaryPlan = host.prepareOrdinaryRealization(
+    target.admittedEffects ?? [],
+    new Map(preparedSubjects.map((row) => [row.subjectId, row.value])),
+    [],
+    physicalPlacement,
+    target.admittedOrder
+  );
+  const ordinaryBySubject = new Map<
+    number,
+    import('../internals/mutation-capture-runtime').CommittedEntityMutation[]
+  >();
+  for (const change of ordinaryPlan?.changes ?? []) {
+    let changes = ordinaryBySubject.get(change.subject);
+    if (!changes) ordinaryBySubject.set(change.subject, (changes = []));
+    changes.push(change);
+  }
+
   const affectedSubjects = new Set([
     ...currentSubjects.keys(),
     ...preparedSubjects.map(({ subjectId }) => subjectId),
@@ -170,6 +230,7 @@ export function prepareEntityTransitionTarget<
       try {
         structuralStore.installPreparedTarget(structuralTarget);
         valueStore.installPreparedTargetValues(valueTarget);
+        ordinaryPlan?.install();
         // Selection belongs to the installed unit. Replay taps may author
         // newer selections; publication must never overwrite those writes.
         if (activeIdBefore !== activeIdAfter) {
@@ -182,7 +243,14 @@ export function prepareEntityTransitionTarget<
     publishOrder(): void {
       // Every target is installed before this phase. Capture all installed
       // order transitions before any target callback can author newer order.
-      host.publishOrderChange(beforeOrder, afterOrder, beforeOrderFrontier, target.orderFrontier);
+      host.publishOrderChange(
+        beforeOrder,
+        afterOrder,
+        beforeOrderFrontier,
+        target.orderFrontier,
+        ordinaryPlan.ordinaryEndpoints,
+        target.admittedEffects !== undefined
+      );
     },
     publish(options): void {
       for (const publication of subjectChanges) {
@@ -235,16 +303,32 @@ export function prepareEntityTransitionTarget<
           basePath,
           [publication.subjectId],
           getPositionIdsForNotify(),
-          {
-            ...(structuralEffect
-              ? createStructuralEffectMeta(structuralEffect)
-              : ambientMeta()),
-            // Replay publishes retained storage too. Apply the same exposed
-            // path protocol as the ordinary realization adapter, without
-            // changing the ambient context of subsequent application taps.
-            intent: 'system',
-            participation: 'realized',
-          }
+          (target.admittedEffects === undefined
+            ? withEntityOrdinaryChanges
+            : withSelectedEntityDisposition)(
+            {
+              ...(structuralEffect
+                ? createStructuralEffectMeta(structuralEffect)
+                : ambientMeta()),
+              // Replay publishes retained storage too. Apply the same exposed
+              // path protocol as the ordinary realization adapter, without
+              // changing the ambient context of subsequent application taps.
+              intent: 'system',
+              participation: 'realized',
+            },
+            ordinaryPlan
+              ? ordinaryBySubject.get(publication.subjectId) ?? []
+              : [
+                  {
+                    subject: publication.subjectId,
+                    before: publication.beforeValue,
+                    after: publication.afterValue,
+                    structural: structuralEffect !== undefined,
+                    path: `${basePath}.${String(key)}`,
+                    structuralRecord: structuralEffect,
+                  },
+                ]
+          )
         );
         // Replay taps describe the change actually installed. A rekey has
         // no lifecycle tap, matching changeId; unchanged rows stay silent.
