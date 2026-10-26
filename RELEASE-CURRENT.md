@@ -84,6 +84,37 @@ two fixture accesses. No full qualification, artifact or cost acceptance follows
 Production `87f6831f`, the conservative default, budgets and B closure remain
 unchanged.
 
+## Publication evidence-scope successor — rejected at native input recurrence
+
+[Exact source, unchanged failures, oracle accounting and replay](docs/audits/2026-10-17-incumbent-readiness/link-evidence-scope-successor/README.md)
+freeze isolated `2dacae7b9e9137018d05c4e00382ac9287bc76d4`, from test-only
+`82127362` / rejected runtime `2d71d733`. No successor runtime is integrated here.
+
+The authorized corrected enrollment16 and native18/scope4/membership4 pass their
+42 bounded controls. The four prior scalar membership failures also pass. However,
+independent review isolates a missing native omission input: dependent removal of
+x, independent overwrite of sibling y, then a native updater reading x's absence
+sends0 under declared independence while the owner remains pending. The source
+retains the dependency but input enumeration skips the dormant member. Root
+replay confirms the failure; the truthful dependent control remains useful. This
+is a covered recurrence, not application-hidden-input misuse. Runtime repair stops.
+
+Composition is106pass/5fail: premature default cross-tree output, three private
+membership-hook registration collisions, and preserved mixed-undo stale output.
+Fresh predecessor control holds before confirmation but fails to send afterward;
+the successor fails earlier by sending before confirmation. Do not describe that
+whole predecessor test as passing. Hook collisions prevent later fault assertions
+from executing. The inherited mixed-undo failure is not newly attributed here.
+
+Original enrollment/oracle assertions and all first failures remain archived;
+the owner-authorized corrected copy distinguishes surviving fallback from borrowed
+declared permission. Final source types pass and spec-types passes its unchanged
+ratchet. Full suites, lint, artifacts, cost and collectibility were not run. Cold
+native preparation and retention remain unqualified. Any successor needs complete
+membership-input coverage and an explicit disposition of unobserved-origin
+fallback, not a connection-specific guard. Production `87f6831f`, conservative
+Link, budgets and closed B remain unchanged; no activation or release follows.
+
 ## Publication evidence scopes — design reviewed, runtime still rejected
 
 [Design, source inventory, first failures and independent review](docs/audits/2026-10-17-incumbent-readiness/link-evidence-scope-design/README.md)
