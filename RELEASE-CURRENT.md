@@ -45,9 +45,32 @@ remain historical evidence at their stated source.
 | Artifact cost | Prior new-key cost approved; current two entity budgets fail | Current measured bytes need separate disposition; ceilings unchanged |
 | String-Record direct access (K2 bounded migration) | Reviewed typing patch applied; source hashes match verified copy | Unknown arbitrary access, known/hybrid children and whole writes preserved; migration guidance saved; no lookup/deferred API implemented |
 | Two composed-restoration failures | Repaired at `87f6831f`; reviewed and broader affected checks pass | Preserve first failures and controlled capture limitations; final release verification remains pending |
-| Independent Link progression | Supported blocker; location-disjoint experiment `927ee0d8` rejected and reverted; expanded A0 design reviewed | Conditional declarations require isolated A1/A2 evidence; production conservative gate retained; no activation |
+| Independent Link progression | Supported blocker; location-disjoint experiment `927ee0d8` rejected and reverted; A0 reviewed; native A1 rejected | Resolve source-presence and operation-delivery boundaries before A1/A2 qualification; production conservative gate retained; no activation |
 | Stronger semantic matrix | Scope disposition recorded, not passed | Preserve 188 held / 68 violated / 168 unsupported record and test supported public contract separately |
 | Final exact-SHA qualification | Not yet eligible | Close supported blockers, freeze source, then complete required verification |
+
+## A1 native operation experiment — rejected for integration
+
+[Checkpoint, independent reviews and replay](docs/audits/2026-10-17-incumbent-readiness/link-a1-installed-operations/README.md)
+preserve isolated runtime `d0e7d1659900b18c9a63d280f409c0448a0c1d80`.
+The expanded A0 direction remains the intended capability; its native successor
+has not satisfied it. No runtime from this experiment is integrated here.
+
+No-Link and default-Link controls expose missing ordinary member-presence
+responsibility after inspection reactivation. Separately, mixed undo preserves a
+callback-authored A777 locally but sends stale A11 after settlement. That ordinary
+public reentry failure reproduces in combined A1 and the frozen paired-source
+control. Independent private-port fault injection also skips a later installed
+row's invalidation. These are three distinct boundaries, not a combined count of
+independent product defects.
+
+Scalar installation/completion and paired composition have scoped passing vectors;
+the later unchanged failures block acceptance. The final spec-types ratchet passes
+with existing diagnostics retained. No broad qualification, fresh artifacts, cost
+or collectibility result is claimed. A reviewed source-presence mechanism and
+operation-level delivery chronology are required before dependent runtime repair.
+Aggregate declaration scope remains a separate pending owner decision. Production
+`87f6831f`, the conservative default, budgets and B closure remain unchanged.
 
 ## Expanded Link design A0 — reviewed for bounded native experiment
 
