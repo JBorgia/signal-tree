@@ -69,8 +69,11 @@ the later unchanged failures block acceptance. The final spec-types ratchet pass
 with existing diagnostics retained. No broad qualification, fresh artifacts, cost
 or collectibility result is claimed. A reviewed source-presence mechanism and
 operation-level delivery chronology are required before dependent runtime repair.
-Aggregate declaration scope remains a separate pending owner decision. Production
-`87f6831f`, the conservative default, budgets and B closure remain unchanged.
+The owner subsequently authorized the aggregate experiment and authored-input
+rule; the [successor design and authority](docs/audits/2026-10-17-incumbent-readiness/link-a1-successor-design/README.md)
+record the reviewed source mapping and its bounded gates. Native successor work
+is isolated and unaccepted. Production `87f6831f`, the conservative default,
+budgets and B closure remain unchanged.
 
 ## Expanded Link design A0 — reviewed for bounded native experiment
 
