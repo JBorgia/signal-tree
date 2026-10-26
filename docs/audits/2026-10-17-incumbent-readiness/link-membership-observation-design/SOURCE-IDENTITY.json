@@ -1,0 +1,19 @@
+{
+  "head": "2dacae7b9e9137018d05c4e00382ac9287bc76d4",
+  "status": "",
+  "files": {
+    "packages/kernel/src/lib/experimental-publication/private.ts": "c5b32608354921f465b7a04fd511181a9e3cae315a63a0c610113ce59bad5761",
+    "packages/kernel/src/lib/experimental-publication/lifecycle.ts": "24c2b6c847ad1feb643c9bd6c6985f3f1655d62728fed097757e6113e4bfb648",
+    "packages/kernel/src/lib/internals/intrinsic-mutation.ts": "fe3f6d58db7885c3effc17016aa4b2c867e1bd2f12e85aafa06db9033ce93304",
+    "packages/kernel/src/lib/internals/member-membership.ts": "bfad0d5f63050e5c774d0a903783f5472b44a9e74259e94ce5c09ff80262183b",
+    "packages/kernel/src/lib/internals/commit-consequence.ts": "bfe4abc380b25859d3964dd08e714f199abe6bda881c27fe1165f2ac5f86e523",
+    "packages/kernel/src/lib/internals/location-runtime.ts": "d86fc473ec3c214d4d9db5122a9386b24666b8f89a1722e3cbdf4373081cb29f",
+    "packages/kernel/src/lib/entity-signal.ts": "956d39c81548d5168df8ba40a20ddedd40b89b10b46d26eebb2c37827033b013",
+    "packages/kernel/src/lib/internals/causal-runtime/tree-realization-adapter.ts": "5f8eca17ba6da9f33bc18442ec2cc3a4aeaa01cab5c70ef0eec7733542e067d3",
+    "packages/kernel/src/lib/link.ts": "a55392a625c492c4c48baefcca34a94b0ef1a83f4d61a10711d4a617534848eb",
+    "packages/kernel/src/lib/publication-independent-isolated-omission-input.spec.ts": "f052ecf6a8afaf3007e538c3e70833260ee860c27f65789024373489fee2e6a7",
+    "packages/kernel/src/lib/link-native-address.spec.ts": "a4bd9896281f2a38b556443dc8286266e4419bb6710c06c265f01407b6ce5865",
+    "packages/kernel/src/lib/ordinary-member-publication-facts.spec.ts": "541633e80cba180fae6020593c95b5f88c5ca4de65fde488853ee6e16bfe2c70",
+    "packages/kernel/src/lib/internals/causal-runtime/heterogeneous-reentry-publication.spec.ts": "af6b26df9c06e0c62bc19e97bc0dd1ecded0fef6666547016b0b610380e2feb1"
+  }
+}

@@ -84,6 +84,32 @@ two fixture accesses. No full qualification, artifact or cost acceptance follows
 Production `87f6831f`, the conservative default, budgets and B closure remain
 unchanged.
 
+## Membership observation and fallback — reviewed design, policy gate open
+
+[Read inventory, private mapping, independent review and remaining decision](docs/audits/2026-10-17-incumbent-readiness/link-membership-observation-design/README.md)
+complete a read-only investigation at frozen rejected `2dacae7b`. No runtime or
+test changed and no test/model/benchmark was rerun. The source snapshot builder
+already observes dormant membership reactively; the rejected provenance walker
+omits that domain. Certification must include negative membership facts, exact
+input view/revision and cache support changes without importing dormant payloads
+or changing existing callback arguments/framework timing. A native updater argument
+certificate alone does not prove completeness of the callback's other inputs.
+
+Independent review finds the corrected private mapping coherent for bounded
+implementation planning, not native acceptance. An unobserved ordinary literal
+and a pending foreign getter copy remain indistinguishable at target admission.
+Owner selection is pending on a fixed possible-owner hold for that evidence class
+versus an additional tracked execution/read boundary. Recipient-only uncertainty
+retains its adjudicated fallback; known inputs cannot be erased. Already-approved
+fresh ordinary evaluation after completed rejection needs no extra authoring rule;
+first contrary interpretations and their correction are preserved.
+
+The missing blocker wake index, exclusive membership registration collisions and
+mixed-undo stale prepared publication have separate source findings. None is
+qualified by the absence mapping. Recurrence stays active; no runtime successor,
+activation, public API/semantic expansion, budget change or later qualification
+is authorized by this design. Production `87f6831f` and B closure remain unchanged.
+
 ## Publication evidence-scope successor — rejected at native input recurrence
 
 [Exact source, unchanged failures, oracle accounting and replay](docs/audits/2026-10-17-incumbent-readiness/link-evidence-scope-successor/README.md)
