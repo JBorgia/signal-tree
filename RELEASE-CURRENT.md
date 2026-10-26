@@ -1,6 +1,6 @@
 # Current work — incumbent v16 readiness
 
-Updated October 25, 2026. Branch `codex/v16-incumbent-readiness`.
+Updated October 26, 2026. Branch `codex/v16-incumbent-readiness`.
 Baseline: `8d220643e0d4e34cbdbc6e55e6ef692b25d5e023`.
 Accepted new-key runtime checkpoint: `9917c92fbbdc9dfdd14601f1f5fb7ce21799be71`.
 Version **16.0.0-dev**. **Not release-ready; no final candidate freeze yet.**
@@ -48,6 +48,25 @@ remain historical evidence at their stated source.
 | Independent Link progression | Supported blocker; location-disjoint experiment `927ee0d8` rejected and reverted | Reactive copies need dependency evidence; safe gate retained; no new provenance architecture authorized |
 | Stronger semantic matrix | Scope disposition recorded, not passed | Preserve 188 held / 68 violated / 168 unsupported record and test supported public contract separately |
 | Final exact-SHA qualification | Not yet eligible | Close supported blockers, freeze source, then complete required verification |
+
+## Complete-operation design review — runtime stop retained
+
+[Finite design review and independent scrutiny](docs/audits/2026-10-17-incumbent-readiness/complete-operation-design-review/README.md)
+separate source installation, callback reentry, transaction capture and causal
+history boundaries. The compound-undo defect extends physical endpoints without
+composing ordinary membership/order over the same selected scope. The separate
+leaf-Link trace finds a missing association between ancestor membership, affected
+leaf payload and publication evidence; a wake-up alone cannot repair eligibility.
+
+The reviewed design preserves relationship-relative Link baselines and compares
+extension of existing shared boundary/effect records with enrichment of current
+operation records. No representation is selected. Concrete ordinary continuity,
+noncontiguous selection and retention mappings remain unproved; the inventory is
+not native successor qualification. No runtime/model/test/build or cost run was
+performed for this read-only design investigation. Original reproductions and the
+79/84, 66-failure, four-budget verdict below remain unchanged. Production stays
+`87f6831f`; B remains closed. The recurrence stop is active; no automatic runtime
+repair or later qualification follows this record.
 
 ## Slice 5 frozen integration rejected — recurrence stop active
 
