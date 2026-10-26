@@ -45,24 +45,30 @@ remain historical evidence at their stated source.
 | Artifact cost | Prior new-key cost approved; current two entity budgets fail | Current measured bytes need separate disposition; ceilings unchanged |
 | String-Record direct access (K2 bounded migration) | Reviewed typing patch applied; source hashes match verified copy | Unknown arbitrary access, known/hybrid children and whole writes preserved; migration guidance saved; no lookup/deferred API implemented |
 | Two composed-restoration failures | Repaired at `87f6831f`; reviewed and broader affected checks pass | Preserve first failures and controlled capture limitations; final release verification remains pending |
-| Independent Link progression | Supported blocker; location-disjoint experiment `927ee0d8` rejected and reverted | Reactive copies need dependency evidence; safe gate retained; no new provenance architecture authorized |
+| Independent Link progression | Supported blocker; location-disjoint experiment `927ee0d8` rejected and reverted; expanded A0 design reviewed | Conditional declarations require isolated A1/A2 evidence; production conservative gate retained; no activation |
 | Stronger semantic matrix | Scope disposition recorded, not passed | Preserve 188 held / 68 violated / 168 unsupported record and test supported public contract separately |
 | Final exact-SHA qualification | Not yet eligible | Close supported blockers, freeze source, then complete required verification |
 
-## Declared Link scope comparison — owner selection remains open
+## Expanded Link design A0 — reviewed for bounded native experiment
 
-[Reviewed scope/design comparison and finite acceptance boundaries](docs/audits/2026-10-17-incumbent-readiness/declared-link-release-scope/README.md)
-compare design-only A0 (expanded membership admission, publication-support transfer
-and completion scheduling) with B0 (explicitly defer declared early publication).
-Neither scope is selected; runtime recurrence stop remains active.
+[Operation admission/completion contract and review](docs/audits/2026-10-17-incumbent-readiness/link-a0-operation-contract/README.md)
+complete the requested A0 design against the preserved failures. The owner selected
+the expanded direction; conditional declared progress is not deferred. Native work
+remains an isolated A1 experiment with its own unchanged falsifiers, not acceptance
+of f01 or resumption of release qualification.
 
-Expansion adds a publication-authority representation and native writer/lifecycle
-work; queue reuse does not supply those rules. Deferral changes the conditional
-progress promise but leaves separately approved inspection adoption, rollback,
-ordinary publication and release qualification obligations intact. Neither choice
-establishes production readiness. Historical architecture B remains closed and is
-unrelated to deferral option B. No tests, models, runtime, artifact or cost runs
-accompany this comparison; original failures and budgets retain exact provenance.
+The mechanism installs publication support with source units, preserves partial
+operation/capture timing, composes separate P/O domains across existing selection,
+and registers completion without value events. It replaces the experimental latest
+payload ticket and event-relative admission/completion. Native state and incumbent
+settlement remain authoritative; no historical B work or new API syntax is selected.
+
+Independent review corrected same-value responsibility admission, nested complete
+assertions, baseline initialization and consumer composition. The final text retains
+these corrections and the exact earlier drafts/verdicts. Source destruction remains
+distinct from explicit connection disposal; its held-waiter gap is not an auto-drain
+pass. No runtime/model/test/build/cost result is claimed for A0. Production87 and
+all artifact blockers remain unchanged; full qualification follows only A1/A2.
 
 ## Membership handoff review — additional mechanism required
 
@@ -75,8 +81,9 @@ does not define eligibility for all contributions remaining in a mixed payload.
 A native successor therefore needs a membership-aware writer seam and explicit
 publication-support replacement rules, plus no-event completion mapped to existing
 Link pending work/consequence delivery. These are not supplied by event metadata
-or by reusing a queue. The additional writer/authority scope must be adjudicated;
-the recurrence stop remains active. No runtime/model/test/build/cost run occurred.
+or by reusing a queue. This historical scope boundary is now addressed by A0 above; native acceptance
+still requires its isolated gates. No runtime/model/test/build/cost run occurred
+for this earlier handoff review.
 Production `87f6831f`, rejected `f01ed39a`, original assertions, recorded failures
 and budgets remain unchanged. B stays closed; no new API or product scope selected.
 

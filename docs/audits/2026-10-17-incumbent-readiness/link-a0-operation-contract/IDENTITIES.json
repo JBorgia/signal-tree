@@ -1,0 +1,16 @@
+{
+  "documentationParent": "763b696191b76c405100eeb4c9144cda9f8d14d7",
+  "production": "87f6831fa60cafe87508f0ace84b7638698ca3b0",
+  "rejectedCandidate": "f01ed39a7df8a5de185ebec0773e09e36537dacb",
+  "incumbentCostControl": "8d220643e0d4e34cbdbc6e55e6ef692b25d5e023",
+  "firstReviewedDraftSha256": "14af9c8e7e174a7b7c5d7e73d8620472dd055e20dd42cf6410043510aedce72e",
+  "correctionReviewCandidateSha256": "5dbb7b48ddaecaadf37e33fc8de153e7d96c76653082d75a51df8d11635cef8c",
+  "newExecution": {
+    "runtimeTests": false,
+    "models": false,
+    "builds": false,
+    "costMeasurements": false
+  },
+  "finalA0Sha256": "942c14563096ca29ba90a8a27a5bab65b139fba068cfd10ec96b68aab1365e42",
+  "compositionMapSha256": "0bbcdc8a1cafb16bc0279958fb4bf0b788c81f4310f22f9a625a40c82821ee8d"
+}

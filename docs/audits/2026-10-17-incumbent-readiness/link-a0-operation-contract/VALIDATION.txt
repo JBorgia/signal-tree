@@ -1,0 +1,10 @@
+A0 documentation/source verification only.
+Node v24.15.0.
+Frozen f01 clean; 14/14 source hashes match.
+6/6 contract hashes match git show at documentation parent763b6961.
+Original compound-undo and leaf-Link test hashes unchanged.
+Readiness git diff --check passes; packages diff versus production87 empty.
+Doc-link command: node --loader ./docs/audits/2026-10-17-incumbent-readiness/membership-admission-design/docs-loader.mjs tools/check-doc-links.mjs
+Result: 811/811 links, 191 live surfaces. Loader deprecation warning is not a failed gate.
+No runtime, model, test, build, artifact or cost run for A0.
+Unrelated AGENTS.md and measurement-contract.md edits preserved.
