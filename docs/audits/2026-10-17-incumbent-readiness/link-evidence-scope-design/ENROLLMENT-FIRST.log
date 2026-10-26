@@ -1,0 +1,100 @@
+
+> nx run kernel:test --testFile=packages/kernel/src/lib/publication-enrollment-invariance.spec.ts
+
+> node tools/run-core-vitest.mjs --testFile=packages/kernel/src/lib/publication-enrollment-invariance.spec.ts
+
+(node:52223) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+[43m[33m[[39m[49m[43m[30mWARN[39m[49m[43m[33m][39m[49m The "pnpm" field in package.json is no longer read by pnpm. The following keys were ignored: "pnpm.overrides". See https://pnpm.io/settings for the new home of each setting.
+(node:52228) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/link-evidence-scope-design/checkout/packages/kernel
+
+(node:52235) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ❯ src/lib/publication-enrollment-invariance.spec.ts (16 tests | 8 failed) 32ms
+   × enrollment invariance branch: during-pending 4ms
+   × enrollment invariance branch: enroll-in-updater 1ms
+   × enrollment invariance branch: dispose-in-validation 1ms
+   × enrollment invariance branch: dispose-after-declaration 1ms
+   × enrollment invariance root: during-pending 1ms
+   × enrollment invariance root: enroll-in-updater 1ms
+   × enrollment invariance root: dispose-in-validation 1ms
+   × enrollment invariance root: dispose-after-declaration 1ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 8 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/lib/publication-enrollment-invariance.spec.ts > enrollment invariance branch: during-pending
+ FAIL  src/lib/publication-enrollment-invariance.spec.ts > enrollment invariance branch: enroll-in-updater
+ FAIL  src/lib/publication-enrollment-invariance.spec.ts > enrollment invariance branch: dispose-in-validation
+ FAIL  src/lib/publication-enrollment-invariance.spec.ts > enrollment invariance branch: dispose-after-declaration
+AssertionError: expected { Object (state, basis) } to match object { state: 'started', basis: 'declared' }
+
+- Expected
++ Received
+
+  {
+-   "basis": "declared",
++   "basis": "surviving",
+    "state": "started",
+  }
+
+ ❯ src/lib/publication-enrollment-invariance.spec.ts:34:26
+     32|   expect(mode==='branch'?t.$.pair.x():t.$.x()).toBe(1);
+     33|   expect(sent).toHaveLength(1);expect(sent[0]).toMatchObject({x:1,y:0}…
+     34|   expect(receipt.read()).toMatchObject({state:'started',basis:'declare…
+       |                          ^
+     35|   expect(otherSent).toEqual([]);expect(p.inspect()).toEqual(before);ex…
+     36|  }finally{c.dispose();other?.dispose();p.rollback();t.destroy();owner.…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/8]⎯
+
+ FAIL  src/lib/publication-enrollment-invariance.spec.ts > enrollment invariance root: during-pending
+ FAIL  src/lib/publication-enrollment-invariance.spec.ts > enrollment invariance root: enroll-in-updater
+ FAIL  src/lib/publication-enrollment-invariance.spec.ts > enrollment invariance root: dispose-in-validation
+ FAIL  src/lib/publication-enrollment-invariance.spec.ts > enrollment invariance root: dispose-after-declaration
+AssertionError: expected [] to have a length of 1 but got +0
+
+- Expected
++ Received
+
+- 1
++ 0
+
+ ❯ src/lib/publication-enrollment-invariance.spec.ts:33:16
+     31|   await flush();
+     32|   expect(mode==='branch'?t.$.pair.x():t.$.x()).toBe(1);
+     33|   expect(sent).toHaveLength(1);expect(sent[0]).toMatchObject({x:1,y:0}…
+       |                ^
+     34|   expect(receipt.read()).toMatchObject({state:'started',basis:'declare…
+     35|   expect(otherSent).toEqual([]);expect(p.inspect()).toEqual(before);ex…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/8]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  8 failed | 8 passed (16)
+   Start at  15:05:16
+   Duration  892ms (transform 428ms, setup 0ms, import 513ms, tests 32ms, environment 241ms)
+
+Warning: command "node tools/run-core-vitest.mjs --testFile=packages/kernel/src/lib/publication-enrollment-invariance.spec.ts" exited with non-zero status code
+
+
+ NX   Running target test for project kernel failed
+
+Failed tasks:
+
+- kernel:test
+
+Hint: run the command with --verbose for more details.
+
+  Run duration:      1.6s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     1.6s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    1.6s

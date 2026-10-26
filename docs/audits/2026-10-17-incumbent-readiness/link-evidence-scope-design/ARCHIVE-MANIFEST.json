@@ -1,0 +1,112 @@
+{
+  "source": "/private/tmp/link-evidence-scope-design",
+  "testCheckpoint": "8212736242e1f85f7e3288dbb0ebda99a575e3b2",
+  "rejectedRuntime": "2d71d73305fea23173b3b681c2a897ef1a7dffba",
+  "files": [
+    {
+      "path": "DESIGN-FIRST.md",
+      "sha256": "8b742e183d2c5bc5d014e3130135e0bc0f6cc9fca1cf6193432dca3119e3a753",
+      "bytes": 15217
+    },
+    {
+      "path": "DESIGN-REVIEW.md",
+      "sha256": "383507f03085088e24a2dbca768c23926862c64c3099f4dc7219670b8409bbfb",
+      "bytes": 14543
+    },
+    {
+      "path": "DESIGN.md",
+      "sha256": "c03d7d3840d23b40ef9f89fb2945298d80af0aeeedb632084d3e8c7d648abb9e",
+      "bytes": 15857
+    },
+    {
+      "path": "DOC-LINKS.log",
+      "sha256": "24cebe056f84ea992baadf11722827ec27289310d729cec57d4a8476b4e3cc0e",
+      "bytes": 230
+    },
+    {
+      "path": "ENROLLMENT-FIRST.log",
+      "sha256": "de2a40d215cc80b09442dda07005fa31988b0bf50288c34052168b236150163e",
+      "bytes": 4705
+    },
+    {
+      "path": "ENROLLMENT-PREREG.md",
+      "sha256": "bbf6648b52f010fff3a894dc44014e8653ffe1da2d00633a4d2d0f00e4a76b52",
+      "bytes": 1543
+    },
+    {
+      "path": "ENROLLMENT.spec.ts",
+      "sha256": "e9bc2895302fd4bccd4e1180232d5accd9616e525d0ebdbadc8b8a2b4aad8316",
+      "bytes": 2393
+    },
+    {
+      "path": "FALLBACK-ADJUDICATION.md",
+      "sha256": "fb5248450a4efa65d4f80c2bcd34065f226f107eb5a83cbd103e477e98bb1c87",
+      "bytes": 8508
+    },
+    {
+      "path": "FIXTURE-TYPE-ONLY.patch",
+      "sha256": "47266da59eb103078a6ba19fd340190b88e04b5fc3be8ffd9dc439585104c439",
+      "bytes": 1181
+    },
+    {
+      "path": "README.md",
+      "sha256": "be10c81430fb773745e1f763cde65c2794d4bb4dbf00342078ead8ebc60eea4f",
+      "bytes": 6231
+    },
+    {
+      "path": "REPLAY.md",
+      "sha256": "e9d87fcddae6e579f5c1a8e39f5204f139da906e771ee3c250d1c53fae84d48d",
+      "bytes": 2760
+    },
+    {
+      "path": "SOURCE-LIFECYCLE-MAP.md",
+      "sha256": "89fb03a12a8e6737db92eafe69a733fc4e9d18c47bc2c759bdcacad98e365911",
+      "bytes": 23073
+    },
+    {
+      "path": "SOURCE-MANIFEST.json",
+      "sha256": "5b7c29a08aff2ceb96386d50b96fa67f6a56b6bb17bcf19ec1c9572e019e459b",
+      "bytes": 190126
+    },
+    {
+      "path": "SPEC-TYPES-FINAL.log",
+      "sha256": "d96bf296ada40f7aab19740c790ec23835aeae7f307cf347a059d16fd348a7cb",
+      "bytes": 336
+    },
+    {
+      "path": "TEST-ONLY.patch",
+      "sha256": "f94800d3c7858e3824423ae863e9296cee9a465212728c8bd3baa807fe113ba2",
+      "bytes": 3907
+    },
+    {
+      "path": "fixture/AFTER.spec.ts",
+      "sha256": "b41e1bbd94cd524d2b4a8c65f1efa205ca1f430a99ac126375d70b205cdd4618",
+      "bytes": 3607
+    },
+    {
+      "path": "fixture/BEFORE.spec.ts",
+      "sha256": "eea8e45be5b9809fa55b0e54546f33409ed834870133a9dd80a58b8f54e44bd0",
+      "bytes": 3333
+    },
+    {
+      "path": "fixture/EMISSION.json",
+      "sha256": "dd71161fb01aeb49e16e12775298be3366d4e9fd29404097f41885aca093b79b",
+      "bytes": 267
+    },
+    {
+      "path": "fixture/NX.log",
+      "sha256": "0e70046735386642cb90c53766182567a2bd6a905bff4b37271c3b4994f679f3",
+      "bytes": 20350
+    },
+    {
+      "path": "fixture/SPEC-TYPES.log",
+      "sha256": "d96bf296ada40f7aab19740c790ec23835aeae7f307cf347a059d16fd348a7cb",
+      "bytes": 336
+    },
+    {
+      "path": "test-only.bundle",
+      "sha256": "b2988e951cffbccecd27bd31016c804c99f3a91f75587eb3762608dc196b9957",
+      "bytes": 1997
+    }
+  ]
+}

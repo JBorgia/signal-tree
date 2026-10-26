@@ -84,6 +84,30 @@ two fixture accesses. No full qualification, artifact or cost acceptance follows
 Production `87f6831f`, the conservative default, budgets and B closure remain
 unchanged.
 
+## Publication evidence scopes — design reviewed, runtime still rejected
+
+[Design, source inventory, first failures and independent review](docs/audits/2026-10-17-incumbent-readiness/link-evidence-scope-design/README.md)
+separate native requirements, actual nested validation and recipient coverage.
+Review found no blocking design contradiction; no runtime successor was implemented
+or integrated. Authentic owner identity alone is not dependency proof. Native
+updater source mapping, including updateAndReport, remains an implementation gate.
+
+Test-only checkpoint `82127362` preserves rejected runtime `2d71d733`. New passive
+enrollment matrix:8 pass/8 fail. Four branch cases send under surviving rather than
+declared permission; four root cases install x1 but do not send. The two fixture
+type errors are corrected with identical emitted JavaScript and3/3 passing checks;
+final spec-types passes the existing ratchet without changing its baseline.
+Original scalar/input assertions and their failures remain unchanged.
+
+The sixth historical expectation is separately adjudicated: unknown wider-input
+coverage prevents a declared grant, but unrelated foreign activity alone does not
+extend ordinary tree-local fallback. Its original no-send assertion/red remains
+preserved; this is neither leakage evidence nor a safety pass. Actual foreign
+support and shared validation obligations must still constrain publication.
+The reviewed design supplies a bounded successor basis, not native recurrence
+closure or broader qualification. Production87, conservative Link, budgets and
+closed B remain unchanged. No full suites, artifacts, costs or collectibility ran.
+
 ## Expanded Link design A0 — reviewed for bounded native experiment
 
 [Operation admission/completion contract and review](docs/audits/2026-10-17-incumbent-readiness/link-a0-operation-contract/README.md)

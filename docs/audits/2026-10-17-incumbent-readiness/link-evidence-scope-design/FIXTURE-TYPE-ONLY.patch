@@ -1,0 +1,16 @@
+diff --git a/packages/kernel/src/lib/ordinary-presence-independent.spec.ts b/packages/kernel/src/lib/ordinary-presence-independent.spec.ts
+index bafce98d..ad46f38c 100644
+--- a/packages/kernel/src/lib/ordinary-presence-independent.spec.ts
++++ b/packages/kernel/src/lib/ordinary-presence-independent.spec.ts
+@@ -27,7 +27,10 @@ it('independent no-Link repeated ordinary presence composes original absence wit
+ it('independent no-Link parent inverse does not adopt its inspected-only sibling', () => {
+   const t=signalTree({a:{y:7,keep:9} as {y?:number;keep?:number},other:1} as {a?:{y?:number;keep?:number};other:number},{enhancers:[transactions()]});
+   try {
+-    const a=t.$.a!, y=a.y!;
++    // This fixture constructs a populated branch; optional-parent inference
++    // otherwise describes it as an object-valued leaf. Preserve the concrete
++    // child types used by the same populated shape in make(), only in this test.
++    const a=t.$.a! as ReturnType<typeof make>['$']['a'], y=a.y!;
+     a({keep:9}); withWriteContext({participation:'inspection'},()=>y(99)); flush();
+     expect(a()).toEqual({y:99,keep:9});
+     expect(readOrdinaryMemberPresence(a,'y')).toBe(false);
