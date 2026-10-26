@@ -49,6 +49,22 @@ remain historical evidence at their stated source.
 | Stronger semantic matrix | Scope disposition recorded, not passed | Preserve 188 held / 68 violated / 168 unsupported record and test supported public contract separately |
 | Final exact-SHA qualification | Not yet eligible | Close supported blockers, freeze source, then complete required verification |
 
+## Slice 4 reviewed; isolated full qualification running
+
+[Combined evidence and review](docs/audits/2026-10-17-incumbent-readiness/slice4-combined-qualification/README.md)
+record the bounded matrix: 274 framework passes, 166 additional native passes,
+141 declaration contract checks excluding one misuse demonstration, and the dedicated
+retention gate. The original 32/34 verdict and two reconciled assertions remain
+identified, not rewritten. Sampled retained/dropped receipt graphs collect 20/20 each.
+
+The separate local branch codex/v16-transition-qualification is frozen at
+f01ed39a7df8a5de185ebec0773e09e36537dacb in
+/private/tmp/v16-transition-qualification. Its source matches the reviewed isolated
+candidate except a recorded EOF whitespace correction. Pinned lockfile installation
+completed; no dependency/version/budget changes. Full verification is running with
+logs in /private/tmp/slice5-qualification. This is not acceptance or activation;
+production `87f6831f` and this worktree's runtime remain unchanged.
+
 ## Slice 3 realization qualification — bounded gate closes
 
 [Source, preserved first failures and independent review](docs/audits/2026-10-17-incumbent-readiness/slice3-realization-qualification/README.md)
