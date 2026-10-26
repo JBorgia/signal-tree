@@ -49,6 +49,29 @@ remain historical evidence at their stated source.
 | Stronger semantic matrix | Scope disposition recorded, not passed | Preserve 188 held / 68 violated / 168 unsupported record and test supported public contract separately |
 | Final exact-SHA qualification | Not yet eligible | Close supported blockers, freeze source, then complete required verification |
 
+## Slice 2 prerequisite qualification — bounded gate closes
+
+[Exact source, first failures and independent gate review](docs/audits/2026-10-17-incumbent-readiness/slice2-prerequisite-qualification/README.md)
+record the isolated successor. Missing staged-writer, selection, lifetime, replay and
+large-batch checks now execute. Final focused vector: 695 passes / 1 unchanged adjudicated
+contract mismatch. Both original 130,000-row shards pass: 11 and 16. Earlier terminated
+runs remain incomplete, not assertion failures. No workload/assertion/timeout weakened.
+
+Separately preserved fixes remove first-marker lexical retention and three avoidable
+preparation loops: staged-key lookup, sequential ordinary-anchor queries and repeated
+pending-subject reconstruction. No new authority or public semantics. Final retained/
+dropped-receipt controls collect 20/20 each with useful sends/live control; this is
+bounded collectibility evidence. Types/spec-types pass; three existing lint warnings
+remain, no new warnings. Earlier 4N versus 2N snapshot tradeoff remains unaccepted as
+a production-cost conclusion.
+
+Final 803-file manifest 67869b6525433a7ad5fceb88042cf25b50d2d90d045408a249b2f673aae3caf9
+identifies /private/tmp/pending-set-candidate/candidate. Runtime remains experimental;
+production 87f6831f unchanged. Independent review supports bounded slice 2 closure;
+authorized slice 3 realization/hidden/retirement audit continues. Combined framework/
+lifecycle qualification and full verification/artifact-cost acceptance remain gated.
+B stays closed; no activation, public API expansion, ceiling change or release.
+
 ## Native Link address correction — isolated focused gate improves
 
 [Exact trace, correction, controls and review](docs/audits/2026-10-17-incumbent-readiness/link-native-address/README.md)
