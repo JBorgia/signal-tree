@@ -49,21 +49,31 @@ remain historical evidence at their stated source.
 | Stronger semantic matrix | Scope disposition recorded, not passed | Preserve 188 held / 68 violated / 168 unsupported record and test supported public contract separately |
 | Final exact-SHA qualification | Not yet eligible | Close supported blockers, freeze source, then complete required verification |
 
-## Slice 4 reviewed; isolated full qualification running
+## Slice 5 frozen integration rejected — recurrence stop active
 
-[Combined evidence and review](docs/audits/2026-10-17-incumbent-readiness/slice4-combined-qualification/README.md)
-record the bounded matrix: 274 framework passes, 166 additional native passes,
-141 declaration contract checks excluding one misuse demonstration, and the dedicated
-retention gate. The original 32/34 verdict and two reconciled assertions remain
-identified, not rewritten. Sampled retained/dropped receipt graphs collect 20/20 each.
+[Full qualification, unchanged counterexamples and independent review](docs/audits/2026-10-17-incumbent-readiness/slice5-integration-disposition/README.md)
+reject candidate `f01ed39a7df8a5de185ebec0773e09e36537dacb`, preserved on local branch
+`codex/v16-transition-qualification`. The ordinary registry completed: 79/84 gates
+pass; tests, lint, unreachable exports, release coverage and bundle budgets fail.
+Kernel: 5,965 ordinary passes, 66 failures, five expected failures and 12 skips.
+All four framework suites pass, with Angular's three skips kept separate.
 
-The separate local branch codex/v16-transition-qualification is frozen at
-f01ed39a7df8a5de185ebec0773e09e36537dacb in
-/private/tmp/v16-transition-qualification. Its source matches the reviewed isolated
-candidate except a recorded EOF whitespace correction. Pinned lockfile installation
-completed; no dependency/version/budget changes. Full verification is running with
-logs in /private/tmp/slice5-qualification. This is not acceptance or activation;
-production `87f6831f` and this worktree's runtime remain unchanged.
+The unchanged add-then-prepend undo test fails on the candidate and passes on
+production `87f6831f`. Ordinary order endpoints remain intermediate while physical
+endpoints compose across the full membership interval. This covered missing-facts
+recurrence stops further runtime repair. A separate bare leaf-Link omission test
+times out only on the candidate; branch/collection controls and production pass.
+Original assertions, first failures and 18-group provisional accounting remain.
+
+All four fresh bundle cells exceed unchanged ceilings. No matched cost campaign,
+separate full mutation run or production demo/routes followed the rejection.
+No claim of performance superiority, complete matrix qualification or release readiness.
+The prior [slice-4 evidence](docs/audits/2026-10-17-incumbent-readiness/slice4-combined-qualification/README.md)
+retains scoped validity; it is not whole-system acceptance. Production and this
+worktree's runtime remain `87f6831f`; B stays closed. No API acceptance, activation,
+ceiling increase, merge, push, tag or publication. A successor requires a concrete
+reviewed complete-turn ordinary membership/order and Link lifecycle contract before
+new runtime authorization; do not resume caller-specific repairs automatically.
 
 ## Slice 3 realization qualification — bounded gate closes
 
