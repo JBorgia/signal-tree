@@ -1,6 +1,6 @@
 # Current work — incumbent v16 readiness
 
-Updated October 24, 2026. Branch `codex/v16-incumbent-readiness`.
+Updated October 25, 2026. Branch `codex/v16-incumbent-readiness`.
 Baseline: `8d220643e0d4e34cbdbc6e55e6ef692b25d5e023`.
 Accepted new-key runtime checkpoint: `9917c92fbbdc9dfdd14601f1f5fb7ce21799be71`.
 Version **16.0.0-dev**. **Not release-ready; no final candidate freeze yet.**
@@ -48,6 +48,38 @@ remain historical evidence at their stated source.
 | Independent Link progression | Supported blocker; location-disjoint experiment `927ee0d8` rejected and reverted | Reactive copies need dependency evidence; safe gate retained; no new provenance architecture authorized |
 | Stronger semantic matrix | Scope disposition recorded, not passed | Preserve 188 held / 68 violated / 168 unsupported record and test supported public contract separately |
 | Final exact-SHA qualification | Not yet eligible | Close supported blockers, freeze source, then complete required verification |
+
+## Derive and snapshot successor — bounded corrections survive; integration blocked
+
+[Exact candidate, first failures, reviews and remaining public counterexample](docs/audits/2026-10-17-incumbent-readiness/derive-placement-successor/README.md)
+record the isolated successor. Derive footprint now prepares inside the existing
+revision guard and carries the same staged physical facts through installation,
+capture and publication. Own-property/reference preservation closes the intermediate
+staging regression. Explicit replacement adoption remains unchanged. The scoped W2
+updater defect is corrected in this candidate; the original slice-1 blanket claim
+is not retroactively reinstated.
+
+Final focused union: **477 passes / 9 failures**, 486 cases in 45 files. One unchanged
+combined replacement/no-op assertion retains its c0f55f0d contract-mismatch disposition;
+eight field-Link omission timeouts reproduce on the predecessor. A minimal ordinary
+field control without transactions physically becomes undefined and notifies, but
+Link has unknown eligibility and does not settle; with transactions it sends and
+settles. Owner initialization is the first discriminator; the exact fallback wait
+still needs tracing. No transactions requirement or Link repair is selected.
+
+All four original ordering failures and new derive/reentry/property controls pass.
+Snapshot reuse measures **4N**, down from 6N; comparator remains 2N. This is snapshot
+work, not CPU or aggregate cost acceptance. Final source manifest:
+171d0220bc85054979e88fd11eceea74fc0904f29d4ce033777020ea9c232b9f.
+The only delta after the combined run is new-test compatibility/lint correction;
+that 14-case file reruns successfully. Typecheck and corrected spec-types pass;
+changed-file lint has 0 errors / 3 existing warnings. Original assertions remain unchanged.
+
+Runtime is archived in the experiment only. Production `87f6831f` and the readiness
+runtime are unchanged; integration/later slices remain gated. No full qualification,
+framework/artifact/cost acceptance, activation or budget change. The historical audit
+below retains its exact checkpoint findings; this successor addresses only the
+specified derive and duplicate-traversal defects. B stays closed.
 
 ## Boundary audit — slice-1 W2 acceptance narrowed; prepend duplication traced
 
