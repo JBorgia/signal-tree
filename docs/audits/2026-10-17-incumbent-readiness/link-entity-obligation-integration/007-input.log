@@ -1,0 +1,74 @@
+
+> nx run kernel:test --testFile=src/lib/entity-obligation-matrix.spec.ts --testFile=src/lib/entity-native-input-independent.spec.ts --testFile=src/lib/entity-input-view-contract.spec.ts
+
+> node tools/run-core-vitest.mjs --testFile=src/lib/entity-obligation-matrix.spec.ts --testFile=src/lib/entity-native-input-independent.spec.ts --testFile=src/lib/entity-input-view-contract.spec.ts
+
+(node:9825) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:9836) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/link-entity-obligation-integration/packages/kernel
+
+(node:9849) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:9848) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:9847) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ❯ src/lib/entity-input-view-contract.spec.ts (3 tests | 3 failed) 30ms
+   × inspection input is not certified by ordinary proof: field 21ms
+   × inspection input is not certified by ordinary proof: row 4ms
+   × inspection input is not certified by ordinary proof: root 4ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 3 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/lib/entity-input-view-contract.spec.ts > inspection input is not certified by ordinary proof: field
+ FAIL  src/lib/entity-input-view-contract.spec.ts > inspection input is not certified by ordinary proof: row
+ FAIL  src/lib/entity-input-view-contract.spec.ts > inspection input is not certified by ordinary proof: root
+AssertionError: expected [ 99 ] to deeply equal []
+
+- Expected
++ Received
+
+- []
++ [
++   99,
++ ]
+
+ ❯ src/lib/entity-input-view-contract.spec.ts:32:30
+     30|   expect(calls).toBe(1);expect(receipt.read()).toMatchObject({state:'c…
+     31|   const q=late.transact(()=>late.$.x(9));const pendingQ=q.inspect();
+     32|   await flush();expect(sent).toEqual([]);
+       |                              ^
+     33|   p.confirm();await flush();expect(sent).toEqual([99]);
+     34|   expect(receipt.read()).toMatchObject({state:'started',basis:'survivi…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/3]⎯
+
+
+ Test Files  1 failed | 2 passed (3)
+      Tests  3 failed | 25 passed (28)
+   Start at  14:59:36
+   Duration  1.42s (transform 2.06s, setup 0ms, import 2.60s, tests 116ms, environment 1.07s)
+
+Warning: command "node tools/run-core-vitest.mjs --testFile=src/lib/entity-obligation-matrix.spec.ts --testFile=src/lib/entity-native-input-independent.spec.ts --testFile=src/lib/entity-input-view-contract.spec.ts" exited with non-zero status code
+
+
+ NX   Running target test for project kernel failed
+
+Failed tasks:
+
+- kernel:test
+
+Hint: run the command with --verbose for more details.
+
+  Run duration:      2.0s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     2.0s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    2.0s

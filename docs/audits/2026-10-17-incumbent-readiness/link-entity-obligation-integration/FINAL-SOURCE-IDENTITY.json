@@ -1,0 +1,27 @@
+{
+  "head": "f7a0ffd9e2e34a23ceae85bff3cd8fa45ecaa82d",
+  "status": "",
+  "matches020": true,
+  "sha256": {
+    "packages/angular/src/lib/entity-native-obligation-composition.spec.ts": "f6ef68f812b940e929cd78d64fced2f97ca88d6a37fbdad8b328d24bdcd459fb",
+    "packages/kernel/src/lib/entity-input-view-contract.spec.ts": "029d2177c3dc6e551e99fadbd59e913c7c0fd92f99ae7df316b974b166327f22",
+    "packages/kernel/src/lib/entity-native-input-independent.spec.ts": "f9a7e74cda5b81b478a37b0e259ac2947215b4905541638d19ca1abe4a7247f4",
+    "packages/kernel/src/lib/entity-negative-publication-retirement.spec.ts": "e8edf40cbffd198c09f1f93cc19c8549467efae27c7a0b9609b94fd6aea9f31f",
+    "packages/kernel/src/lib/entity-obligation-matrix.spec.ts": "72d76ddfc858900d27e831d681c8c8b99f09a687b759b5075db4f1254fbd4a55",
+    "packages/kernel/src/lib/entity-publication-work-lifetime.spec.ts": "7ca2ca3c60b332b3cf01752618e409d9a8c0b0fc2d52f97865514dd7c26b6a94",
+    "packages/kernel/src/lib/entity-signal.ts": "fc2cbd159f6740071c466fc266ae22ac1bbe63a1aa3e8b060886ecb0970fab02",
+    "packages/kernel/src/lib/experimental-publication/entity.ts": "02a0eddb8d36141dbb7480e15ad682765ff459c70f9b61639946f69dfa705cec",
+    "packages/kernel/src/lib/experimental-publication/private.ts": "2389d40640ce48f77dcdaed709ffe3b89ed17c98770d894d20dd99694f770356",
+    "packages/kernel/src/lib/internals/causal-runtime/tree-realization-adapter.ts": "f0575e51b91fe9470d0eebf77ff958829145dc8145bb2ddeb1c8e0cc0b425db3",
+    "packages/kernel/src/lib/internals/entity-egress-projection.ts": "e158db8d0d70077bddbef9e13b1d0ea0118e26c5c6dc88a24ab5f51e7f44947f",
+    "packages/kernel/src/lib/internals/entity-publication.ts": "08f9e1ca2793b1921a0bafffc0d0d956a4c495e8001a48ca545138e1f8a027d4",
+    "packages/kernel/src/lib/internals/entity-value-transition.ts": "dcea565d6b1cb4e439e99aab7348146e4da66de7b2a62c781d59e5bd84a86405",
+    "packages/kernel/src/lib/internals/location-runtime.ts": "48d2d0fea71410f02b59c6d513c3d83c7b4d413feafb07178998ce03aa37774c",
+    "packages/kernel/src/lib/internals/native-location-realization.ts": "5ebd303028f50a2e1350807cb3ad1c99966a5eac08b03801a57edcb9e3f2515f",
+    "packages/kernel/src/lib/internals/source-mutation.ts": "bcbd565abcaff9a09912b10e43e1568d2c46162c309f901b8a625cc05e930518",
+    "packages/kernel/src/lib/link.ts": "41408abb0df624dd84dbe06525082cde6cd7aec653f120286006b0f3acbcb142",
+    "packages/react/src/lib/entity-native-obligation-composition.spec.tsx": "627b3c3d674e8290fcbf1c74662c97b5d795e6af63e875aefc158a9b8eb4e60e",
+    "packages/solid/src/lib/entity-native-obligation-composition.spec.ts": "f6ef68f812b940e929cd78d64fced2f97ca88d6a37fbdad8b328d24bdcd459fb",
+    "packages/vue/src/lib/entity-native-obligation-composition.spec.ts": "a04d067f3f91ba84b6d23d69d88f03428309123947e89eb36d475654569bccce"
+  }
+}

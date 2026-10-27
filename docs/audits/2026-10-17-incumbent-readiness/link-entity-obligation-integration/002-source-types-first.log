@@ -1,0 +1,4 @@
+packages/kernel/src/lib/entity-signal.ts(1997,97): error TS2550: Property 'hasOwn' does not exist on type 'ObjectConstructor'. Do you need to change your target library? Try changing the 'lib' compiler option to 'es2022' or later.
+packages/kernel/src/lib/entity-signal.ts(1997,120): error TS2550: Property 'hasOwn' does not exist on type 'ObjectConstructor'. Do you need to change your target library? Try changing the 'lib' compiler option to 'es2022' or later.
+packages/kernel/src/lib/internals/entity-publication.ts(101,19): error TS2353: Object literal may only specify known properties, and '[INSTALLED_UNIT]' does not exist in type 'WriteMetadata'.
+packages/kernel/src/lib/link.ts(588,76): error TS2550: Property 'hasOwn' does not exist on type 'ObjectConstructor'. Do you need to change your target library? Try changing the 'lib' compiler option to 'es2022' or later.

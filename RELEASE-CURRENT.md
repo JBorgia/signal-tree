@@ -84,6 +84,40 @@ two fixture accesses. No full qualification, artifact or cost acceptance follows
 Production `87f6831f`, the conservative default, budgets and B closure remain
 unchanged.
 
+## Entity obligation integration — rejected at covered recurrence
+
+[Exact candidate, independent review, failures and replay](docs/audits/2026-10-17-incumbent-readiness/link-entity-obligation-integration/README.md)
+preserve isolated `f7a0ffd9e2e34a23ceae85bff3cd8fa45ecaa82d` over scalar
+`0135ef18567573fec627667fc58bc3e7819cc29e`. Entity integration was authorized;
+this candidate is rejected and the covered-mechanism recurrence stop is active.
+
+Two unchanged collection/nested-branch controls pass on the predecessor and fail
+here. A connection created after inspection-added X accepts X into its baseline;
+ordinary removal of X must publish its removal. The new packet retains the physical
+remove but drops recipient authorship because source ordinary X was already absent.
+The later connection sends nothing. Independent review and the root replay confirm
+this recurring authored-footprint loss; no caller exception or later repair followed.
+
+Passing scope remains evidence: original entity 26 and native-input 25 controls pass;
+scalar 225 pass with the same two preserved historical assertion conflicts; original
+and new framework composition 24 pass across Angular/React/Vue/Solid. Semantic
+qualification is 95 pass/6 fail, with four failures independently reproduced on the
+predecessor and two new removal regressions. Selected rich capture still observes
+an incomplete inverse on both sources. Bare churn retains an obsolete record;
+negative-window delivery succeeds but its final zero-record oracle needs distinct
+current-uncertainty versus obsolete-lifetime accounting. No GC acceptance is claimed.
+
+The owner additionally requires a fixed authorship possible-owner hold when a
+complete independent declaration consumes unavailable inspection-displayed native
+input. Field/row/root controls reproduce premature fallback in this frozen candidate.
+This approved policy is recorded, not implemented after the recurrence stop. Earlier
+scalar acceptance does not qualify that newly specified combination. Carried old W
+uncertainty must not extend its horizon to later unrelated owners.
+
+Source/spec-type results and command limits are recorded in the archive. Full
+qualification, artifacts, cost and collectibility remain gated. Production `87f6831f`,
+conservative default, budgets, public exports and B closure are unchanged.
+
 ## Terminal-obligation correction — reviewed scalar scope only
 
 [Reviewed mechanism, unchanged falsifiers and exact replay](docs/audits/2026-10-17-incumbent-readiness/link-terminal-obligation-scalar/README.md)
@@ -102,8 +136,9 @@ entity cases filtered out. Final spec-types ratchet passes. Source types retain
 27 warnings after new fixture issues were corrected. No wholly-green claim.
 
 Independent premise and implementation review support this bounded terminal-input
-correction. Entity integration remains gated by the current owner instruction;
-physical/ordinary certificate, entity/mixed-undo coverage, broad qualification,
+correction. Entity integration was subsequently authorized; the candidate above
+was rejected. Physical/ordinary certificate, entity/mixed-undo coverage, broad
+qualification,
 collectibility and costs remain open. Original failures and all fixture corrections
 are preserved. Production87f6831f, conservative hold, budgets and B closure remain
 unchanged; this isolated checkpoint is not integration or activation approval.

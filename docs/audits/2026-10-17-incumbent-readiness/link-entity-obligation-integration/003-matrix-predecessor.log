@@ -1,0 +1,154 @@
+
+> nx run kernel:test src/lib/entity-obligation-matrix.spec.ts
+
+> node tools/run-core-vitest.mjs src/lib/entity-obligation-matrix.spec.ts
+
+(node:87216) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:87218) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/link-terminal-obligation-scalar/packages/kernel
+
+(node:87225) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ❯ src/lib/entity-obligation-matrix.spec.ts (13 tests | 9 failed) 37ms
+   × entity destination keeps input obligation: destination first, saved=false 17ms
+   × entity destination keeps input obligation: destination first, saved=true 3ms
+   × qualified literal entity write inside p progresses while unrelated q remains pending 2ms
+   × field callback captures terminal obligation at consumption: pending 2ms
+   × field callback captures terminal obligation at consumption: confirmed-inside 4ms
+   × row callback captures terminal obligation at consumption: pending 1ms
+   × row callback captures terminal obligation at consumption: confirmed-inside 1ms
+   × rejected foreign input reevaluates ordinary entity truth without publishing inspected display 1ms
+   × native entity input remains source-owned after its only recipient is disposed 1ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 9 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/lib/entity-obligation-matrix.spec.ts > entity destination keeps input obligation: destination first, saved=false
+ FAIL  src/lib/entity-obligation-matrix.spec.ts > entity destination keeps input obligation: destination first, saved=true
+AssertionError: expected [ 7 ] to deeply equal []
+
+- Expected
++ Received
+
+- []
++ [
++   7,
++ ]
+
+ ❯ src/lib/entity-obligation-matrix.spec.ts:28:33
+     26|     await flush(); expect(sent).toEqual([]);
+     27|     if (first === 'destination') p.confirm(); else q.confirm();
+     28|     await flush(); expect(sent).toEqual([]);
+       |                                 ^
+     29|     if (first === 'destination') q.confirm(); else p.confirm();
+     30|     await flush(); expect(sent).toEqual([7]); expect(r.inspect()).toEq…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/9]⎯
+
+ FAIL  src/lib/entity-obligation-matrix.spec.ts > qualified literal entity write inside p progresses while unrelated q remains pending
+AssertionError: expected { state: 'no-write' } to match object { state: 'held' }
+
+- Expected
++ Received
+
+  {
+-   "state": "held",
++   "state": "no-write",
+  }
+
+ ❯ src/lib/entity-obligation-matrix.spec.ts:40:70
+     38|     const q = source.transact(() => source.$.x(7)); const pendingQ = q…
+     39|     const p = target.transact(() => { receipt = c.declare({ kind: 'ind…
+     40|     await flush(); expect(sent).toEqual([]); expect(receipt?.read()).t…
+       |                                                                      ^
+     41|     p.confirm(); await flush(); expect(sent).toEqual([8]); expect(rece…
+     42|     expect(q.inspect()).toEqual(pendingQ); await c.settled();
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/9]⎯
+
+ FAIL  src/lib/entity-obligation-matrix.spec.ts > field callback captures terminal obligation at consumption: pending
+ FAIL  src/lib/entity-obligation-matrix.spec.ts > field callback captures terminal obligation at consumption: confirmed-inside
+ FAIL  src/lib/entity-obligation-matrix.spec.ts > row callback captures terminal obligation at consumption: pending
+ FAIL  src/lib/entity-obligation-matrix.spec.ts > row callback captures terminal obligation at consumption: confirmed-inside
+AssertionError: expected undefined to match object { stage: 'after-callback', …(1) }
+
+- Expected:
+{
+  "reason": "contradiction",
+  "stage": "after-callback",
+}
+
++ Received:
+undefined
+
+ ❯ src/lib/entity-obligation-matrix.spec.ts:64:25
+     62|     expect(calls).toBe(1); expect(target.$.x()).toBe(8);
+     63|     if (timing === 'confirmed-before') expect(caught).toBeUndefined();
+     64|     else expect(caught).toMatchObject({ stage: 'after-callback', reaso…
+       |                         ^
+     65|     const q = late.transact(() => late.$.x(9)); const pendingQ = q.ins…
+     66|     await flush();
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/9]⎯
+
+ FAIL  src/lib/entity-obligation-matrix.spec.ts > rejected foreign input reevaluates ordinary entity truth without publishing inspected display
+AssertionError: expected [ 7 ] to deeply equal []
+
+- Expected
++ Received
+
+- []
++ [
++   7,
++ ]
+
+ ❯ src/lib/entity-obligation-matrix.spec.ts:82:46
+     80|     const r = late.transact(() => late.$.x(9)); const pendingR = r.ins…
+     81|     withWriteContext({ participation: 'inspection' }, () => target.$.r…
+     82|     p.confirm(); await flush(); expect(sent).toEqual([]);
+       |                                              ^
+     83|     q.rollback(); await flush(); expect(target.$.rows.byIdOrFail('a').…
+     84|     expect(sent).toEqual([7]); expect(r.inspect()).toEqual(pendingR); …
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/9]⎯
+
+ FAIL  src/lib/entity-obligation-matrix.spec.ts > native entity input remains source-owned after its only recipient is disposed
+AssertionError: expected function to throw an error, but it didn't
+ ❯ src/lib/entity-obligation-matrix.spec.ts:96:9
+     94|     expect(() => c.declare({ kind: 'independent' }, () => {
+     95|       source.$.rows.byIdOrFail('a')(value => { target.$.x(value.n + 1)…
+     96|     })).toThrow(expect.objectContaining({ reason: 'contradiction' }));
+       |         ^
+     97|     await flush(); expect(sent).toEqual([]); p.confirm(); await flush(…
+     98|   } finally { unused.dispose(); c.dispose(); target.destroy(); source.…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/9]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  9 failed | 4 passed (13)
+   Start at  14:54:01
+   Duration  986ms (transform 493ms, setup 0ms, import 598ms, tests 37ms, environment 252ms)
+
+Warning: command "node tools/run-core-vitest.mjs src/lib/entity-obligation-matrix.spec.ts" exited with non-zero status code
+
+
+ NX   Running target test for project kernel failed
+
+Failed tasks:
+
+- kernel:test
+
+Hint: run the command with --verbose for more details.
+
+  Run duration:      1.4s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     1.4s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    1.4s

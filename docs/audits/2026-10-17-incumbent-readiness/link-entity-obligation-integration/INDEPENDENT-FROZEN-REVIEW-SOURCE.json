@@ -1,0 +1,34 @@
+{
+  "012-focused": {
+    "before_after_equal": true,
+    "current_mismatches": []
+  },
+  "013-semantic": {
+    "before_after_equal": true,
+    "current_mismatches": []
+  },
+  "014-scalar": {
+    "before_after_equal": true,
+    "current_mismatches": []
+  },
+  "017-framework": {
+    "before_after_equal": true,
+    "current_mismatches": []
+  },
+  "018-semantic-predecessor": {
+    "before_after_equal": true
+  },
+  "current": {
+    "packages/kernel/src/lib/entity-signal.ts": "fc2cbd159f6740071c466fc266ae22ac1bbe63a1aa3e8b060886ecb0970fab02",
+    "packages/kernel/src/lib/experimental-publication/entity.ts": "02a0eddb8d36141dbb7480e15ad682765ff459c70f9b61639946f69dfa705cec",
+    "packages/kernel/src/lib/internals/entity-egress-projection.ts": "e158db8d0d70077bddbef9e13b1d0ea0118e26c5c6dc88a24ab5f51e7f44947f",
+    "packages/kernel/src/lib/link.ts": "41408abb0df624dd84dbe06525082cde6cd7aec653f120286006b0f3acbcb142",
+    "packages/kernel/src/lib/experimental-publication/lifecycle.ts": "7fcfd3098cd59bbdd9f07ff9ce46e547e63175d14ff0ea7c265a410b41593dff"
+  },
+  "unchanged_originals": {
+    "packages/kernel/src/lib/ordinary-order-source-boundaries.spec.ts": true,
+    "packages/kernel/src/lib/entity-egress-footprint.spec.ts": true,
+    "packages/kernel/src/lib/entity-semantic-structure-faults.spec.ts": true,
+    "packages/kernel/src/lib/internals/causal-runtime/committed-entity-selected-unit.spec.ts": true
+  }
+}

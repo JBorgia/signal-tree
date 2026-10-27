@@ -1,0 +1,18 @@
+{
+  "base": "0135ef18567573fec627667fc58bc3e7819cc29e",
+  "sha256": {
+    "packages/kernel/src/lib/entity-input-view-contract.spec.ts": "029d2177c3dc6e551e99fadbd59e913c7c0fd92f99ae7df316b974b166327f22",
+    "packages/kernel/src/lib/entity-native-input-independent.spec.ts": "f9a7e74cda5b81b478a37b0e259ac2947215b4905541638d19ca1abe4a7247f4",
+    "packages/kernel/src/lib/entity-obligation-matrix.spec.ts": "72d76ddfc858900d27e831d681c8c8b99f09a687b759b5075db4f1254fbd4a55",
+    "packages/kernel/src/lib/entity-signal.ts": "e6b702eadcc465623cf2130fc9c0d4c60a8fadf3aad9c0cf8cfec3cb7c855b9b",
+    "packages/kernel/src/lib/experimental-publication/entity.ts": "71aa9a00b9db8714edd7674a833b94278c68c5e783b57172f20b658eaf9990aa",
+    "packages/kernel/src/lib/experimental-publication/private.ts": "2389d40640ce48f77dcdaed709ffe3b89ed17c98770d894d20dd99694f770356",
+    "packages/kernel/src/lib/internals/entity-egress-projection.ts": "e158db8d0d70077bddbef9e13b1d0ea0118e26c5c6dc88a24ab5f51e7f44947f",
+    "packages/kernel/src/lib/internals/entity-publication.ts": "4d4b9adb66d79b460c225235b0376f036df9d287818578e29c91c3b6ac4879bb",
+    "packages/kernel/src/lib/internals/entity-value-transition.ts": "dcea565d6b1cb4e439e99aab7348146e4da66de7b2a62c781d59e5bd84a86405",
+    "packages/kernel/src/lib/internals/location-runtime.ts": "48d2d0fea71410f02b59c6d513c3d83c7b4d413feafb07178998ce03aa37774c",
+    "packages/kernel/src/lib/internals/native-location-realization.ts": "5ebd303028f50a2e1350807cb3ad1c99966a5eac08b03801a57edcb9e3f2515f",
+    "packages/kernel/src/lib/internals/source-mutation.ts": "bcbd565abcaff9a09912b10e43e1568d2c46162c309f901b8a625cc05e930518",
+    "packages/kernel/src/lib/link.ts": "9cf682ba1a0e5dacdead70c950b5932522e6a88190fc84496107258761d39cd4"
+  }
+}

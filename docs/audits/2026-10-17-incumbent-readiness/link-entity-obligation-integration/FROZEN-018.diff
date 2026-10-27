@@ -1,0 +1,694 @@
+diff --git a/packages/kernel/src/lib/entity-signal.ts b/packages/kernel/src/lib/entity-signal.ts
+index 963b470d..c752623c 100644
+--- a/packages/kernel/src/lib/entity-signal.ts
++++ b/packages/kernel/src/lib/entity-signal.ts
+@@ -1,3 +1,4 @@
++import { EntityPublicationSource, markEntityPublicationFacts, entityPublicationFactsUnit, defineEntityPublicationBinding, currentEntityPublicationInputs, withEntityPublicationInput, withEntityPublicationUnit, type EntityPublicationEdit } from './internals/entity-publication';
+ import { createPreparedPlacementVisibility } from './physical/prepared-placement-visibility';
+ import { withSelectedEntityDisposition } from './internals/selected-entity-disposition';
+ import { realizationPlacement } from './internals/causal-runtime/ordinary-realization';
+@@ -375,6 +376,7 @@ export function createEntitySignal<
+   }
+ ): EntitySignal<E, K> {
+   const locations = options?.locationRuntime ?? NEUTRAL_LOCATION_RUNTIME;
++  const physicalRowSubjects = new WeakMap<object,number>();
+   // ==================
+   // CLOSURE STATE (no `this` needed)
+   // ==================
+@@ -439,9 +441,10 @@ export function createEntitySignal<
+ 
+   function getProjectedEntity(id: K): E | undefined {
+     const subjectId = structuralStore.subjectIdForKey(id);
+-    return subjectId === undefined
+-      ? undefined
+-      : valueStore.backingForSubject(subjectId);
++    if(subjectId===undefined)return undefined;
++    const row=valueStore.backingForSubject(subjectId);
++    if(row && typeof row==='object')physicalRowSubjects.set(row,subjectId);
++    return row;
+   }
+ 
+   function getProjectedEntries(): Array<readonly [K, E]> {
+@@ -538,10 +541,16 @@ export function createEntitySignal<
+         epoch: subjectEpochs.get(subjectId),
+       };
+     });
++    const publication=prepareEntityPublication(
++      prepared.map(row=>({subject:row.subjectId,before:row.before,after:row.after,fields:publicationFields(row.before,row.after)})),
++      prepared.map(row=>({subject:row.subjectId,before:row.transition.ordinaryBefore,after:row.transition.ordinaryAfter,fields:publicationFields(row.transition.ordinaryBefore,row.transition.ordinaryAfter)})),undefined,undefined,true
++    );
+     return {
+       install(): void {
++        publication.unit?.finalize?.();
+         for (const row of prepared)
+           valueStore.installValueTransition(row.transition);
++        if(publication.unit) installTerminalRecord(publication.unit.record);
+       },
+       invalidate(): void {
+         let failed = false;
+@@ -556,6 +565,7 @@ export function createEntitySignal<
+             }
+           }
+         };
++        if(publication.unit)stage(()=>entityPublication.complete(publication.unit!.completion));
+         for (const row of prepared) {
+           const epoch = row.epoch;
+           if (epoch) stage(() => advanceEpochHandle(epoch));
+@@ -564,7 +574,8 @@ export function createEntitySignal<
+         if (failed) throw firstError;
+       },
+       publish(): void {
+-        for (const row of prepared) {
++        let failed=false;let first:unknown;
++        for (const row of prepared) {try {
+           pathNotifier.notify(
+             `${basePath}.${String(row.key)}`,
+             row.after,
+@@ -578,11 +589,12 @@ export function createEntitySignal<
+                 intent: 'system',
+                 participation: 'realized',
+               },
+-              row.transition
++              {...row.transition,publicationUnit:publication.unit?publication.id:undefined}
+             )
+           );
+           if (row.changed) emitTap('onUpdate', row.key, row.after, row.after);
+-        }
++        } catch(error){if(!failed){failed=true;first=error;}}}
++        if(failed)throw first;
+       },
+     };
+   }
+@@ -838,11 +850,18 @@ export function createEntitySignal<
+             domain: ordinaryOrder,
+           })
+         : undefined;
++    const publication=prepareEntityPublication(
++      physicalEffects.flatMap(effect=>typeof effect.subjectId==='number'?[{subject:effect.subjectId,before:effect.before,after:effect.after,fields:effect.subjectFieldSegments?.length===0?null:effect.subjectFieldSegments??[],structural:effect.structuralContext}]:[]),
++      changes.map(change=>({...change,fields:change.structural?null:publicationFields(change.before,change.after),structural:change.structuralRecord})),
++      undefined,ordinaryEndpoints?.after
++    );
++    if(publication.unit)markEntityPublicationFacts(changes,publication.id);
+     return {
+       changes,
+       ordinaryEndpoints,
+       interval: installPlacement.interval,
+       install: () => {
++        publication.unit?.finalize?.();
+         // Both realization callers install the complete physical unit first.
+         // Preserve its backing; this plan installs only ordinary authority.
+         for (const transition of valueTransitions)
+@@ -850,6 +869,8 @@ export function createEntitySignal<
+         for (const [subject, state] of staged)
+           if (!state.present) valueStore.dischargeOrdinaryValue(subject);
+         installPlacement();
++        if(publication.unit)installTerminalRecord(publication.unit.record);
++        if(publication.unit)entityPublication.complete(publication.unit.completion);
+       },
+     };
+   }
+@@ -1296,6 +1317,19 @@ export function createEntitySignal<
+     });
+     if (structuralFrontier)
+       structuralFrontier.after = topologyUnit.physical.after;
++    const publication=prepareEntityPublication(
++      changes.map(change=>({...change,fields:change.structural?null:publicationFields(change.before,change.after),structural:change.structuralRecord})),
++      ordinaryPlan.changes.map(change=>({...change,fields:change.structural?null:publicationFields(change.before,change.after),structural:change.structuralRecord})),
++      frame.orderEndpoints?.after,ordinaryPlan.ordinaryEndpoints?.after
++    );
++    if(publication.unit){
++      markEntityPublicationFacts(ordinaryPlan.changes,publication.id);
++      markEntityPublicationFacts(topologyUnit,publication.id);
++      for(const facts of ordinaryPlan.byPhysicalSubject.values())markEntityPublicationFacts(facts,publication.id);
++      for(const facts of ordinaryPlan.byStep)markEntityPublicationFacts(facts,publication.id);
++    }
++    for(const [subject,transition] of valueResults) valueResults.set(subject,Object.freeze({...transition,publicationUnit:publication.unit?publication.id:undefined}));
++    for(let i=0;i<valueResultsByStep.length;i++){const transition=valueResultsByStep[i];if(transition)valueResultsByStep[i]=Object.freeze({...transition,publicationUnit:publication.unit?publication.id:undefined});}
+     const responsibility = changes.length
+       ? mutationCaptureRuntime?.prepareEntityResponsibility?.({
+           owner: getPositionIds()?.[0] as number,
+@@ -1315,18 +1349,22 @@ export function createEntitySignal<
+       ordinaryPlan.changes,
+       topologyUnit
+     );
++    publication.unit?.finalize?.();
+     const result = frame.commit(
+       observe ? () => observe(ordinaryPlan.changes) : undefined,
+       responsibility,
+       structuralFrontier,
+       valueTransitions,
+-      ordinaryPlan.install
++      () => { ordinaryPlan.install(); if(publication.unit) installTerminalRecord(publication.unit.record); }
+     );
+     if (options?.advancePhysicalRevision !== false) {
+       physicalCommitClock?.advance();
+     }
+-    // Membership observation: the committed instructions, before publication.
+-    membershipTap?.(MEMBERSHIP_FACTS, frame.mutations);
++    // Delivery cannot preempt installation of the existing minimum responsibility.
++    let publicationFailed=false;let publicationError:unknown;
++    try{if(publication.unit)entityPublication.complete(publication.unit.completion);}catch(error){publicationFailed=true;publicationError=error;}
++    try{membershipTap?.(MEMBERSHIP_FACTS,frame.mutations);}catch(error){if(!publicationFailed){publicationFailed=true;publicationError=error;}}
++    if(publicationFailed)throw publicationError;
+     return {
+       ...result,
+       valueResults,
+@@ -1338,12 +1376,18 @@ export function createEntitySignal<
+     };
+   }
+ 
++  function withSuppliedEntityRow<T>(row:E, body:()=>T):T {
++    return withEntityPublicationInput(entityPublication,physicalRowSubjects.get(row),undefined,body);
++  }
++  function nativePredicate(predicate:(row:E)=>boolean,row:E):boolean {
++    return withSuppliedEntityRow(row,()=>predicate(row));
++  }
+   /** Reactive signals for queries — all derived, none eagerly maintained. */
+   const computeAll = (): E[] => {
+     const entities = presentEntities();
+     // `sortComparer` gives `all`/`ids` a stable sorted order (parity with
+     // @ngrx/entity); `map` keeps insertion order.
+-    if (config.sortComparer) entities.sort(config.sortComparer);
++    if (config.sortComparer) {const compare=config.sortComparer;entities.sort((a,b)=>withSuppliedEntityRow(a,()=>withSuppliedEntityRow(b,()=>compare(a,b))));}
+     return entities;
+   };
+   const allSignal: ReadableCell<E[]> = createVersionedProjection(computeAll);
+@@ -1492,6 +1536,7 @@ export function createEntitySignal<
+   const positionMetadataEnabled = options?.positionMetadataEnabled ?? true;
+   const hasRestorationAuthority = options?.hasRestorationAuthority ?? true;
+   const ownerId = options?.ownerId;
++  const entityPublication = new EntityPublicationSource();
+   const physicalCommitClock = options?.physicalCommitClock;
+   const mutationCaptureRuntime = options?.mutationCaptureRuntime;
+   let positionId = (
+@@ -1818,9 +1863,7 @@ export function createEntitySignal<
+             }
+           : ordinaryEndpoints,
+       topologyUnit,
+-      meta: selectedDisposition
+-        ? withSelectedEntityDisposition(ambientMeta(), [])
+-        : ambientMeta(),
++      meta: (()=>{const meta=selectedDisposition?withSelectedEntityDisposition(ambientMeta(),[]):ambientMeta();const unit=topologyUnit&&entityPublicationFactsUnit(topologyUnit);return unit?withEntityPublicationUnit(meta,unit):meta;})(),
+     });
+   }
+ 
+@@ -1974,6 +2017,17 @@ export function createEntitySignal<
+    * instruction array, a `Set` and an id array per mutation regardless of size.
+    * For a one-field update that machinery is the mutation.
+    */
++  function publicationFields(before: unknown, after: unknown, explicit?: readonly string[] | null): readonly string[] | null {
++    if(explicit !== undefined) return explicit;
++    const a=before && typeof before==='object'?before as Record<string,unknown>:{};
++    const b=after && typeof after==='object'?after as Record<string,unknown>:{};
++    return Object.freeze([...new Set([...Object.keys(a),...Object.keys(b)])].filter(key=>Object.prototype.hasOwnProperty.call(a,key)!==Object.prototype.hasOwnProperty.call(b,key)||!Object.is(a[key],b[key])));
++  }
++  function prepareEntityPublication(physical: readonly EntityPublicationEdit[], ordinary: readonly EntityPublicationEdit[], physicalOrder?: readonly number[], ordinaryOrder?: readonly number[], point=false) {
++    const id=Object.freeze({});
++    const unit=(point?entityPublication.preparePoint.bind(entityPublication):entityPublication.prepare.bind(entityPublication))({id,owner:ownerId??-1,meta:ambientMeta(),physical,ordinary:ambientMeta()?.participation==='inspection'?[]:ordinary,physicalOrder,ordinaryOrder:ambientMeta()?.participation==='inspection'?undefined:ordinaryOrder,inputs:currentEntityPublicationInputs()});
++    return {id,unit};
++  }
+   function commitExistingSubjectValue(
+     subjectId: number,
+     nextValue: E,
+@@ -2006,6 +2060,10 @@ export function createEntitySignal<
+       }),
+       ordinary: ordinaryPlan.interval,
+     });
++    const publication = prepareEntityPublication(
++      [{subject:subjectId,before:transition.physicalBefore,after:transition.physicalAfter,fields:publicationFields(transition.physicalBefore,transition.physicalAfter,fields)}],
++      ordinaryPlan.changes.map(change=>({...change,fields:publicationFields(transition.physicalBefore,transition.physicalAfter,fields),structural:change.structuralRecord}))
++    );
+     const capture = committedEntityObserver(
+       undefined,
+       ordinaryPlan.changes,
+@@ -2022,13 +2080,17 @@ export function createEntitySignal<
+       throw new Error(
+         'Entity responsibility preparation reentered installation'
+       );
++    publication.unit?.finalize?.();
+     valueStore.installValueTransition(transition);
+     ordinaryPlan.install();
+     if (plan) installTerminalRecord(plan);
++    if(publication.unit) installTerminalRecord(publication.unit.record);
+     capture?.(ordinaryPlan.changes);
+     physicalCommitClock?.advance();
++    if(publication.unit)entityPublication.complete(publication.unit.completion);
+     return Object.freeze({
+       ...transition,
++      publicationUnit: publication.unit?publication.id:undefined,
+       ordinaryChanges: ordinaryPlan.changes,
+     });
+   }
+@@ -2984,14 +3046,12 @@ export function createEntitySignal<
+       if (current === undefined) {
+         throw new Error(`Entity with id ${String(key)} not found`);
+       }
+-      const next =
+-        typeof valueOrUpdater === 'function'
+-          ? (valueOrUpdater as (c: E) => E)(current)
+-          : (valueOrUpdater as E);
+-      withCallableWriteIntent(
+-        typeof valueOrUpdater === 'function' ? 'derive' : 'replace',
+-        () => api.replaceOne(key, next)
+-      );
++      const write = () => {
++        const next = typeof valueOrUpdater === 'function' ? (valueOrUpdater as (c:E)=>E)(current) : valueOrUpdater;
++        withCallableWriteIntent(typeof valueOrUpdater === 'function'?'derive':'replace',()=>api.replaceOne(key,next));
++      };
++      if(typeof valueOrUpdater==='function') withEntityPublicationInput(entityPublication,subjectId,undefined,write);
++      else write();
+       return undefined;
+     }) as unknown as EntityNode<E>;
+ 
+@@ -3003,6 +3063,7 @@ export function createEntitySignal<
+       if (!registry || owner === undefined) return;
+       definePositionRegistry(location, registry);
+       defineEntityLocationBinding(location, { owner, subjectId, fieldKey });
++      defineEntityPublicationBinding(location,{source:entityPublication,subject:subjectId,field:fieldKey});
+       if (mutationCaptureRuntime) {
+         Object.defineProperty(location, MUTATION_CAPTURE_RUNTIME, {
+           value: mutationCaptureRuntime,
+@@ -3213,6 +3274,7 @@ export function createEntitySignal<
+     }
+ 
+     const result = commitAndProjectEntityMutationFrame(frame);
++    if(forgetLifetime)entityPublication.retire(prepared.subjectId);
+     for (const changedSubjectId of result.physicallyChangedSubjectIds) {
+       if (forgetLifetime && changedSubjectId === prepared.subjectId) {
+         // NO PUBLISH for a forgotten subject, and this is load-bearing rather
+@@ -3487,7 +3549,7 @@ export function createEntitySignal<
+     },
+ 
+     where(predicate: (entity: E) => boolean): ReadableCell<E[]> {
+-      if (taps.depth) return fresh(() => computeAll().filter(predicate));
++      if (taps.depth) return fresh(() => computeAll().filter(row=>nativePredicate(predicate,row)));
+       const cached = whereCache.get(predicate);
+       if (cached) return cached;
+ 
+@@ -3523,10 +3585,10 @@ export function createEntitySignal<
+       // `version()` is read directly for the same invalidation `allSignal()`
+       // has; the sorted branch gets it transitively.
+       const s = createVersionedProjection(() => {
+-        if (config.sortComparer) return allSignal().filter(predicate);
++        if (config.sortComparer) return allSignal().filter(row=>nativePredicate(predicate,row));
+         const out: E[] = [];
+         for (const entity of presentEntities()) {
+-          if (predicate(entity)) out.push(entity);
++          if (nativePredicate(predicate,entity)) out.push(entity);
+         }
+         return out;
+       });
+@@ -3535,7 +3597,7 @@ export function createEntitySignal<
+     },
+ 
+     find(predicate: (entity: E) => boolean): ReadableCell<E | undefined> {
+-      if (taps.depth) return fresh(() => computeAll().find(predicate));
++      if (taps.depth) return fresh(() => computeAll().find(row=>nativePredicate(predicate,row)));
+       const cached = findCache.get(predicate);
+       if (cached) return cached;
+ 
+@@ -3557,9 +3619,9 @@ export function createEntitySignal<
+       // which is order-dependent, so with a `sortComparer` the sorted array is
+       // the only correct thing to scan. See the note on `where` above.
+       const s = createVersionedProjection(() => {
+-        if (config.sortComparer) return allSignal().find(predicate);
++        if (config.sortComparer) return allSignal().find(row=>nativePredicate(predicate,row));
+         for (const entity of presentEntities()) {
+-          if (predicate(entity)) return entity;
++          if (nativePredicate(predicate,entity)) return entity;
+         }
+         return undefined;
+       });
+@@ -3883,6 +3945,7 @@ export function createEntitySignal<
+       predicate: (entity: E) => boolean,
+       changes: Partial<E>
+     ): number {
++      return withEntityPublicationInput(entityPublication,undefined,undefined,()=>{
+       const idsToUpdate: K[] = [];
+       for (const [id, entity] of presentEntries()) {
+         if (predicate(entity)) {
+@@ -3893,6 +3956,7 @@ export function createEntitySignal<
+         api.updateMany(idsToUpdate, changes);
+       }
+       return idsToUpdate.length;
++      });
+     },
+ 
+     // ==================
+@@ -4085,6 +4149,7 @@ export function createEntitySignal<
+     },
+ 
+     removeWhere(predicate: (entity: E) => boolean): number {
++      return withEntityPublicationInput(entityPublication,undefined,undefined,()=>{
+       const idsToRemove: K[] = [];
+       for (const [id, entity] of presentEntries()) {
+         if (predicate(entity)) {
+@@ -4095,6 +4160,7 @@ export function createEntitySignal<
+         api.removeMany(idsToRemove);
+       }
+       return idsToRemove.length;
++      });
+     },
+ 
+     // ==================
+@@ -4966,6 +5032,7 @@ export function createEntitySignal<
+   // `key` is carried explicitly alongside `subjectId` because it is genuinely
+   // separate information: after `changeId(1, 77)` the row payload still reads
+   // `{ id: 1 }` while the address is 77, so `selectId(row)` cannot recover it.
++  defineEntityPublicationBinding(api as object,{source:entityPublication});
+   defineEntityProjectionSeed(api as object, () => {
+     const seed: Array<{ subjectId: number; key: K; row: E }> = [];
+     // An absent collection seeds an empty projection, as `all()` reads.
+diff --git a/packages/kernel/src/lib/experimental-publication/private.ts b/packages/kernel/src/lib/experimental-publication/private.ts
+index 094ac04f..9d4285c1 100644
+--- a/packages/kernel/src/lib/experimental-publication/private.ts
++++ b/packages/kernel/src/lib/experimental-publication/private.ts
+@@ -1,3 +1,4 @@
++import { currentEntityPublicationInputs, getEntityPublicationBinding } from '../internals/entity-publication';
+ import { isWritableLocation } from '../internals/location-runtime';
+ import { nodeStoreOf, isTraversableNode } from '../internals/node-shape';
+ import { getPositionRegistry, getNodeAddress } from '../internals/position-registry';
+@@ -88,6 +89,8 @@ const negativeViews=new WeakMap<object,Map<object,NativeView>>();
+ const snapshotViews=new WeakMap<object,readonly NativeView[]>();
+ const unavailableInput=():lifecycle.NativeRequirement=>({proof:{owners:[],unknown:true,invalid:false},inputs:[],frames:[],known:[],unknown:true,possible:[],captureWindow:false});
+ function suppliedViews(node:object,supplied?:unknown):NativeView[]{
++ const entity=getEntityPublicationBinding(node);
++ if(entity)return [...entity.source.captureViews(entity.subject,entity.field)] as NativeView[];
+  if(supplied!==null&&typeof supplied==='object'){
+   const certificate=snapshotViews.get(supplied);if(certificate)return [...certificate];
+  }
+@@ -105,6 +108,8 @@ function suppliedViews(node:object,supplied?:unknown):NativeView[]{
+ }
+ registerPublicationSnapshots((node,value)=>{snapshotViews.set(value,Object.freeze(suppliedViews(node,value)));});
+ function nativeInputs(node:object,supplied?:unknown):lifecycle.NativeInput[]{
++ const entity=getEntityPublicationBinding(node);
++ if(entity){const captured=entity.source.captureInput(entity.subject,entity.field) as {native?:readonly lifecycle.NativeInput[]}|undefined;return [...(captured?.native??[])];}
+  return [...new Set(suppliedViews(node,supplied).map(view=>view.requirement))].map(lifecycle.captureNativeInput);
+ }
+ function nativeAuthorship(node:object):{known:Cell[];unknown:boolean}{
+@@ -123,7 +128,7 @@ registerNativePublicationFactory(node=>{
+    if(!mutation.changed&&!lifecycle.isValidating()&&!branchInputs.length)return;
+    const authored=nativeAuthorship(node);
+    const consumed=mutation.intent==='derive'?(input as {native?:readonly lifecycle.NativeInput[]}|undefined)?.native??[]:[];
+-   const prepared=lifecycle.prepareNativeRequirement(authored.known,authored.unknown,[...consumed,...branchInputs.flatMap(scope=>scope.native)]);
++   const prepared=lifecycle.prepareNativeRequirement(authored.known,authored.unknown,[...consumed,...branchInputs.flatMap(scope=>scope.native),...currentEntityPublicationInputs().flatMap(input=>(input as {native?:readonly lifecycle.NativeInput[]}).native??[])]);
+    const existingView=nativeViews.get(node);
+    const view=mutation.changed||!existingView?{requirement:prepared.requirement}:existingView;
+    return {record:combineTerminalRecords(prepared.record,{writes:[{map:nativeValues,key:node,value:prepared.requirement},{map:nativeViews,key:node,value:view},...(!mutation.changed&&existingView?[{map:{set:(_key:unknown,value:unknown)=>{existingView.requirement=value as lifecycle.NativeRequirement;}},key:node,value:prepared.requirement}]:[])],adds:[]})!,completion:{requirement:prepared.requirement},finalize:()=>lifecycle.finalizeNativeRequirement(prepared.requirement)};
+@@ -237,6 +242,19 @@ function prepareScalar(channel:object,mutation:IntrinsicMutation<unknown>,input?
+  const terminalEdits={writes:edits,adds:[{set:b.pending,value:unit},...(clean&&ingress?[{set:consumedIngress,value:ingress}]:[])]};
+  return {record:combineTerminalRecords(plan,terminalEdits)!,completion:{channel,unit,cleanIngress:clean?ingress:undefined}};
+ }
++export function currentNativePublicationInputs(): readonly lifecycle.NativeInput[] { return branchInputs.flatMap(scope=>scope.native); }
++/** Entity sources use the same receipt, validation and delivery lifecycle. */
++export function registerSourceProjectionField(channel:object,field:object,relative:readonly string[]):void {
++ const b=bindings.get(channel);if(!b||b.fields.has(field))return;
++ const address=[...(b.address??[]),...relative];
++ b.fields.set(field,{address,relative});b.fieldFacts.set(field,b.baselineStructure);b.completedFields.set(field,b.baselineStructure);b.initialized.add(field);
++ fieldAt(b.fieldTrie,relative,true)!.field=field;
++ if(exposed(b,address))adjust(b.summary,own(b.baselineStructure,channel),1);
++}
++export function prepareSourceProjection(channel:object,mutation:IntrinsicMutation<unknown>,requirement:lifecycle.NativeRequirement,field?:object):PreparedPublicationUnit|undefined {
++ return prepareScalar(channel,mutation,undefined,field,{requirement});
++}
++export function completeSourceProjection(completion:object):void { completeScalar(completion); }
+ function completeScalar(completion:object):void{
+  const {channel,unit,cleanIngress}=completion as {channel:object;unit:Unit;cleanIngress?:{consumed:boolean}};
+  if(!bindings.get(channel)?.pending.has(unit))return;
+@@ -270,7 +288,7 @@ export function bindSource(channel:object,owner:number,position:number,identity:
+    }
+   };
+   if(binding.aggregate){
+-   const seen=new Set<object>();const visit=(candidate:unknown):void=>{if(!isTraversableNode(candidate)||seen.has(candidate))return;seen.add(candidate);enrollMembership(candidate);if(isWritableLocation(candidate)){const address=getNodeAddress(candidate);const relative=address&&context?relativeSourceAddress(context.address,address):undefined;if(!address||relative===undefined)return;slotNode(binding,address,true);binding.fields.set(candidate,{address,relative});if(pathValue(binding.valuePayload,relative).present)binding.initialized.add(candidate);const requirement=nativeValues.get(candidate);const nativeProof=requirement&&lifecycle.nativeProof(requirement);const fieldFact=nativeProof?Object.freeze({...baseline,revision:++serial}):baseline;if(nativeProof){proofs.set(fieldFact,nativeProof);ownProofs.set(fieldFact,nativeProof);}binding.fieldFacts.set(candidate,fieldFact);binding.completedFields.set(candidate,fieldFact);fieldAt(binding.fieldTrie,relative,true)!.field=candidate;if(exposed(binding,address))adjust(binding.summary,nativeProof??baselineProof,1);const release=preparePublicationMutations(candidate,(m,input,native)=>prepareScalar(channel,m,input,candidate,native),completeScalar,()=>captureValueInput(channel,candidate));if(release)binding.releases.push(release);return;}const storage=nodeStoreOf(candidate)??candidate;for(const key of Object.getOwnPropertyNames(storage)){const descriptor=Object.getOwnPropertyDescriptor(storage,key);if(descriptor&&'value'in descriptor&&isTraversableNode(descriptor.value))visit(descriptor.value);}};visit(source);
++   const seen=new Set<object>();const visit=(candidate:unknown):void=>{if(!isTraversableNode(candidate)||seen.has(candidate))return;seen.add(candidate);enrollMembership(candidate);if(getEntityPublicationBinding(candidate))return;if(isWritableLocation(candidate)){const address=getNodeAddress(candidate);const relative=address&&context?relativeSourceAddress(context.address,address):undefined;if(!address||relative===undefined)return;slotNode(binding,address,true);binding.fields.set(candidate,{address,relative});if(pathValue(binding.valuePayload,relative).present)binding.initialized.add(candidate);const requirement=nativeValues.get(candidate);const nativeProof=requirement&&lifecycle.nativeProof(requirement);const fieldFact=nativeProof?Object.freeze({...baseline,revision:++serial}):baseline;if(nativeProof){proofs.set(fieldFact,nativeProof);ownProofs.set(fieldFact,nativeProof);}binding.fieldFacts.set(candidate,fieldFact);binding.completedFields.set(candidate,fieldFact);fieldAt(binding.fieldTrie,relative,true)!.field=candidate;if(exposed(binding,address))adjust(binding.summary,nativeProof??baselineProof,1);const release=preparePublicationMutations(candidate,(m,input,native)=>prepareScalar(channel,m,input,candidate,native),completeScalar,()=>captureValueInput(channel,candidate));if(release)binding.releases.push(release);return;}const storage=nodeStoreOf(candidate)??candidate;for(const key of Object.getOwnPropertyNames(storage)){const descriptor=Object.getOwnPropertyDescriptor(storage,key);if(descriptor&&'value'in descriptor&&isTraversableNode(descriptor.value))visit(descriptor.value);}};visit(source);
+   }else {const requirement=nativeValues.get(source);if(requirement){const nativeProof=lifecycle.nativeProof(requirement);const fieldFact=Object.freeze({...baseline,revision:++serial});proofs.set(fieldFact,nativeProof);ownProofs.set(fieldFact,nativeProof);binding.valueFact=fieldFact;binding.completedValueFact=fieldFact;}binding.release=preparePublicationMutations(source,(m,input,native)=>prepareScalar(channel,m,input,undefined,native),completeScalar,()=>captureValueInput(channel));}
+  }
+  if(identity.supported&&context&&source){trieFor(context.registry,context.address,true)!.channels.add(channel);indexedBindings++;}
+diff --git a/packages/kernel/src/lib/internals/causal-runtime/tree-realization-adapter.ts b/packages/kernel/src/lib/internals/causal-runtime/tree-realization-adapter.ts
+index 230b4ed3..26669ea4 100644
+--- a/packages/kernel/src/lib/internals/causal-runtime/tree-realization-adapter.ts
++++ b/packages/kernel/src/lib/internals/causal-runtime/tree-realization-adapter.ts
+@@ -1,3 +1,4 @@
++import { withEntityPointPublicationPreparation } from '../entity-publication';
+ import { withSelectedEntityDisposition } from '../selected-entity-disposition';
+ import {
+   prepareOrdinaryRealization,
+@@ -1113,9 +1114,9 @@ function planHeterogeneousFrame(
+   }
+   // One independently contained delivery per lifetime: a callback from one
+   // row cannot starve a later row after the complete frame is installed.
+-  const livePointPlans = [...liveRows].flatMap(([collection, rows]) =>
+-    [...rows.values()].map((row) => collection.__preparePointValues!([row]))
+-  );
++  const livePointPlans = withEntityPointPublicationPreparation(()=>[...liveRows].flatMap(([collection, rows]) =>
++    [...rows.values()].map(row=>collection.__preparePointValues!([row]))
++  ));
+   const preparedSubjectScalarEffects = scalarEffects.filter((effect) =>
+     isPreparedSubjectScalarEffect(effect, preparedContext)
+   );
+diff --git a/packages/kernel/src/lib/internals/entity-egress-projection.ts b/packages/kernel/src/lib/internals/entity-egress-projection.ts
+index 2371f358..8cad048f 100644
+--- a/packages/kernel/src/lib/internals/entity-egress-projection.ts
++++ b/packages/kernel/src/lib/internals/entity-egress-projection.ts
+@@ -1,3 +1,5 @@
++import type { TerminalRecordPlan } from './intrinsic-mutation';
++import type { EntityPublicationPacket } from './entity-publication';
+ import type { EntityProjectionSeedEntry } from './entity-projection-seed';
+ import {
+   createEntityTopology,
+@@ -58,6 +60,8 @@ export function projectEntityFields(
+ }
+ 
+ export type EntityEgressProjection = {
++  /** Prepare eligible changes without touching the installed relationship. */
++  prepare(packet: EntityPublicationPacket): {readonly record: TerminalRecordPlan; readonly value: readonly unknown[]; readonly changed: boolean};
+   /** The complete eligible `Row[]`, in eligible order. */
+   value(): readonly unknown[];
+   /** Advance local order; only authored order may advance eligible authority. */
+@@ -80,9 +84,10 @@ export type EntityEgressProjection = {
+ };
+ 
+ export function createEntityEgressProjection(
+-  seed: readonly EntityProjectionSeedEntry<Key, unknown>[]
+-): EntityEgressProjection {
+-  let topology: EntityTopology = createEntityTopology(seed);
++  seed: readonly EntityProjectionSeedEntry<Key, unknown>[],
++  preparedTopology?: EntityTopology
++): EntityEgressProjection & {state(): {order:number[];rows:Map<number,unknown>;keys:Map<number,Key>;topology:EntityTopology}} {
++  let topology: EntityTopology = preparedTopology ?? createEntityTopology(seed);
+ 
+   let order: number[] = [];
+   const rows = new Map<number, unknown>();
+@@ -150,6 +155,49 @@ export function createEntityEgressProjection(
+   }
+ 
+   return {
++    prepare(packet) {
++      const structural = packet.physical.some(edit => edit.structural !== undefined) ||
++        packet.ordinary.some(edit => edit.structural !== undefined || !rows.has(edit.subject)) ||
++        packet.physicalOrder !== undefined || packet.ordinaryOrder !== undefined;
++      if (!structural) {
++        // Existing-row point writes prepare only touched rows. Rendering a
++        // subscribed collection's complete output is separate, requested work.
++        const touched = new Map<number, unknown>();
++        let changed = false;
++        for (const edit of packet.ordinary) {
++          const before = touched.has(edit.subject) ? touched.get(edit.subject) : rows.get(edit.subject);
++          const after = projectEntityFields(before, edit.after, edit.fields);
++          if (after !== before) { touched.set(edit.subject, after); changed = true; }
++        }
++        return {
++          record: {writes: [...touched].map(([key,value]) => ({map:rows,key,value})), adds: []},
++          value: order.map(subject => touched.has(subject) ? touched.get(subject) : rows.get(subject)),
++          changed,
++        };
++      }
++      // Structural operations already request placement interpretation. Its
++      // private draft retains the relationship's latent inspection topology,
++      // rather than reseeding authority from the source's physical rows.
++      const draft = createEntityEgressProjection(order.map(subjectId => ({
++        subjectId, key: keyOf.get(subjectId)!, row: rows.get(subjectId),
++      })), topology.fork());
++      for (const edit of packet.physical)
++        if (edit.structural) draft.apply(edit.subject,edit.after,edit.structural,true,edit.fields);
++      if (packet.physicalOrder) draft.reorder(packet.physicalOrder,true);
++      let changed = false;
++      for (const edit of packet.ordinary)
++        changed = draft.apply(edit.subject,edit.after,edit.structural,false,edit.fields,true) || changed;
++      if (packet.ordinaryOrder) changed = draft.reorder(packet.ordinaryOrder,false,true) || changed;
++      const prepared = draft.state();
++      const install = {set(_key:unknown,_value:unknown) {
++        order = prepared.order;
++        rows.clear(); for (const [key,value] of prepared.rows) rows.set(key,value);
++        keyOf.clear(); for (const [key,value] of prepared.keys) keyOf.set(key,value);
++        topology = prepared.topology;
++      }};
++      return {record:{writes:[{map:install,key:undefined,value:undefined}],adds:[]},value:draft.value(),changed};
++    },
++    state: () => ({order,rows,keys:keyOf,topology}),
+     value: () => order.map((s) => rows.get(s)),
+ 
+     reorder(afterSubjects, inspection, ordinary = false) {
+diff --git a/packages/kernel/src/lib/internals/entity-value-transition.ts b/packages/kernel/src/lib/internals/entity-value-transition.ts
+index 89fb4b02..c5c1370e 100644
+--- a/packages/kernel/src/lib/internals/entity-value-transition.ts
++++ b/packages/kernel/src/lib/internals/entity-value-transition.ts
+@@ -1,7 +1,9 @@
++import { entityPublicationFactsUnit, withEntityPublicationUnit } from './entity-publication';
+ import type { WriteMetadata } from '../mutation-types';
+ 
+ /** Existing-lifetime prepared evidence; physical display is not ordinary authority. */
+ export interface EntityValueTransition<E = unknown> {
++  readonly publicationUnit?: object;
+   readonly ordinaryChanges?: readonly import('./mutation-capture-runtime').CommittedEntityMutation[];
+   readonly subject: number;
+   readonly physicalBefore: E | undefined;
+@@ -83,7 +85,9 @@ export function getEntityOrdinaryChanges(meta: WriteMetadata | undefined): reado
+   return (meta as OrdinaryChangesMetadata | undefined)?.[ENTITY_ORDINARY_CHANGES] ?? entityValueTransition(meta)?.ordinaryChanges;
+ }
+ export function withEntityOrdinaryChanges(meta: WriteMetadata | undefined, changes: readonly OrdinaryChange[]): WriteMetadata {
+-  return {...meta,[ENTITY_ORDINARY_CHANGES]:changes} as OrdinaryChangesMetadata;
++  const result={...meta,[ENTITY_ORDINARY_CHANGES]:changes} as OrdinaryChangesMetadata;
++  const unit=entityPublicationFactsUnit(changes);
++  return unit?withEntityPublicationUnit(result,unit):result;
+ }
+ export function withoutEntityOrdinaryChanges(meta: WriteMetadata | undefined): WriteMetadata | undefined {
+   if(!meta) return meta;
+diff --git a/packages/kernel/src/lib/internals/location-runtime.ts b/packages/kernel/src/lib/internals/location-runtime.ts
+index 308c811e..cde95b54 100644
+--- a/packages/kernel/src/lib/internals/location-runtime.ts
++++ b/packages/kernel/src/lib/internals/location-runtime.ts
+@@ -1,3 +1,4 @@
++import { withEntityBoundPublicationInput } from './entity-publication';
+ import { markTreeCell } from './cell-identity';
+ import { isLeafDefinition, leafDefinitionValue } from '../leaf';
+ import type {
+@@ -182,7 +183,7 @@ export function createWritableProjection<T>(
+     },
+     derive: (update) => {
+       const before = source.peek();
+-      write(update(before), 'derive');
++      withEntityBoundPublicationInput(location as object,()=>write(update(before), 'derive'));
+       const observer = mutationSource1.observer;
+       if (observer) {
+         const after = source.peek();
+diff --git a/packages/kernel/src/lib/internals/native-location-realization.ts b/packages/kernel/src/lib/internals/native-location-realization.ts
+index 77cc2437..c1c7fbd7 100644
+--- a/packages/kernel/src/lib/internals/native-location-realization.ts
++++ b/packages/kernel/src/lib/internals/native-location-realization.ts
+@@ -1,3 +1,4 @@
++import { withEntityBoundPublicationInput } from './entity-publication';
+ import { markTreeCell } from './cell-identity';
+ import type {
+   Location,
+@@ -190,7 +191,7 @@ export function createNativeLocationRuntime(
+       },
+       derive: (update) => {
+         const before = realized.peek();
+-        write(update(before), 'derive');
++        withEntityBoundPublicationInput(location as object,()=>write(update(before), 'derive'));
+         const observer = mutationSource2.observer;
+         if (observer) {
+           const after = realized.peek();
+diff --git a/packages/kernel/src/lib/internals/source-mutation.ts b/packages/kernel/src/lib/internals/source-mutation.ts
+index 9337c775..73ee2e2a 100644
+--- a/packages/kernel/src/lib/internals/source-mutation.ts
++++ b/packages/kernel/src/lib/internals/source-mutation.ts
+@@ -90,6 +90,8 @@ export type StructuralEffect = {
+  * type is a journal, a replay log, or a causal graph.
+  */
+ export type EntityTopology = {
++  /** Private preparation draft; never used for point-only updates. */
++  fork(): EntityTopology;
+   /** Advance to reflect one structural effect, whoever authored it. */
+   observe(effect: StructuralEffect): void;
+   /** The current address of a subject, which a row payload cannot supply. */
+@@ -132,6 +134,7 @@ export function createEntityTopology(
+   reload(seed);
+ 
+   return {
++    fork: () => createEntityTopology(order.map(subjectId => ({subjectId, key: keys.get(subjectId)!, row: undefined}))),
+     reload,
+     reorder: (afterSubjects) => {
+       order = [...afterSubjects];
+diff --git a/packages/kernel/src/lib/link.ts b/packages/kernel/src/lib/link.ts
+index bffa146a..bfc4a322 100644
+--- a/packages/kernel/src/lib/link.ts
++++ b/packages/kernel/src/lib/link.ts
+@@ -1,3 +1,8 @@
++import './experimental-publication/entity';
++import { entityPublicationUnit, getEntityPublicationBinding } from './internals/entity-publication';
++import { entityValueTransition } from './internals/entity-value-transition';
++import type { NativeRequirement } from './experimental-publication/lifecycle';
++import { combineTerminalRecords } from './internals/intrinsic-mutation';
+ import { getRetainedMembershipPath } from './internals/member-membership';
+ import { hasSelectedEntityDisposition } from './internals/selected-entity-disposition';
+ import type { WriteMetadata } from './mutation-types';
+@@ -561,6 +566,42 @@ export function link<S>(
+     x as object,
+     sourceAddress ? { registry, address: sourceAddress, value: eligible, aggregate: !isWritableLocation(x), presence: getRetainedMembershipPath(x) } : undefined
+   );
++  const releaseEntityPublications: Array<()=>void> = [];
++  const ownEntitySource=getEntityPublicationBinding(x);
++  const registerEntityRecipient=(node:unknown,projection:EntityEgressProjection|undefined,nested?:NestedCollection):void=>{
++    const binding=getEntityPublicationBinding(node); if(!binding)return;
++    if(nested)research.registerSourceProjectionField(consequenceKey,node as object,[...nested.relativeAddress,'all']);
++    releaseEntityPublications.push(binding.source.subscribe({
++      prepare(packet,native){
++        const support=(native as {support?:(subject?:number,field?:string)=>NativeRequirement}|undefined)?.support;
++        const staged=projection?.prepare(packet);
++        let next:unknown=staged?.value;
++        let changed=staged?.changed??false;
++        if(!projection){
++          next=eligible;
++          for(const edit of packet.ordinary){
++            if(edit.subject!==binding.subject)continue;
++            if(edit.structural?.kind==='remove'){next=undefined;changed=true;continue;}
++            if(edit.structural?.kind==='rekey')continue;
++            if(binding.field!==undefined){
++              if(edit.fields!==null&&!edit.fields.includes(binding.field))continue;
++              next=edit.after!==null&&typeof edit.after==='object'&&Object.prototype.hasOwnProperty.call(edit.after,binding.field)?(edit.after as Record<string,unknown>)[binding.field]:undefined;
++            }else next=projectEntityFields(next,edit.after,edit.fields);
++            changed=true;
++          }
++        }
++        const before=eligible;
++        const after=nested?applyAtRelativePath(eligible,nested.relativeAddress,{all:next}):next;
++        const receipt=changed&&support?research.prepareSourceProjection(consequenceKey,{intent:'replace',before:nested?nested.projection.value():before,after:nested?next:after,changed:true},support(binding.subject,binding.field),nested?node as object:undefined):undefined;
++        if(!staged&&!receipt)return;
++        const install={set(_key:unknown,_value:unknown){if(changed){eligible=(nested?applyAtRelativePath(eligible,nested.relativeAddress,{all:next}):next) as T;dirty=true;}}};
++        return {record:combineTerminalRecords(staged?.record,receipt?.record,{writes:[{map:install,key:undefined,value:undefined}],adds:[]})!,completion:{receipt:receipt?.completion},finalize:receipt?.finalize};
++      },
++      complete(value){const receipt=(value as {receipt?:object}).receipt;if(receipt)research.completeSourceProjection(receipt);},
++    }));
++  };
++  if(ownEntitySource)registerEntityRecipient(x,entityProjection);
++  for(const nested of nestedCollections.values())registerEntityRecipient(nested.node,nested.projection,nested);
+   const offSub = research.subscribeProjection(
+     notifier,
+     consequenceKey,
+@@ -578,6 +619,7 @@ export function link<S>(
+       fields
+     ) => {
+       if (disposed || !endpoint.set) return;
++      if(entityValueTransition(meta)?.publicationUnit || entityPublicationUnit(meta)) return;
+       // OWNER-PING-0. Two same-shaped trees give their collections the SAME
+       // local position id, so identity is (registry, position) — never the
+       // position alone.
+@@ -1014,7 +1056,7 @@ export function link<S>(
+     if (!capture?.subscribeCollectionOrder) continue;
+     const releaseCapture = capture.activateCapture();
+     const offOrder = capture.subscribeCollectionOrder((order) => {
+-      if (disposed || order.owner !== getOwnedPositionIds(node)?.[0]) return;
++      if (disposed || order.owner !== getOwnedPositionIds(node)?.[0] || entityPublicationUnit(order.meta)) return;
+       const inspection = isInspectionWrite(order.meta);
+       let resolve!: () => void;
+       const promise = new Promise<void>((r) => (resolve = r));
+@@ -1057,6 +1099,7 @@ export function link<S>(
+     if (disposed) return;
+     disposed = true;
+     offResearchEligibility();
++    for(const release of releaseEntityPublications)release();
+     research.dispose(consequenceKey, sendConsequenceKey);
+     // Release only this relationship's claim; overlapping links stay armed.
+     releaseObservation();

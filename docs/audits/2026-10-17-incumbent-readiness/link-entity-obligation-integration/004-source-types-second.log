@@ -1,0 +1,4 @@
+packages/kernel/src/lib/entity-signal.ts(850,7): error TS2345: Argument of type '{ subject: {}; before: unknown; after: unknown; fields: readonly string[] | null; structural: StructuralEffect | undefined; }[]' is not assignable to parameter of type 'readonly EntityPublicationEdit[]'.
+  Type '{ subject: {}; before: unknown; after: unknown; fields: readonly string[] | null; structural: StructuralEffect | undefined; }' is not assignable to type 'EntityPublicationEdit'.
+    Types of property 'subject' are incompatible.
+      Type '{}' is not assignable to type 'number'.

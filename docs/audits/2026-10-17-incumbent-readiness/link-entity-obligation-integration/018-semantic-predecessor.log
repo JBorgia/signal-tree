@@ -1,0 +1,114 @@
+
+> nx run kernel:test src/lib/entity-egress-footprint.spec.ts src/lib/entity-semantic-structure-faults.spec.ts src/lib/ordinary-order-source-boundaries.spec.ts
+
+> node tools/run-core-vitest.mjs src/lib/entity-egress-footprint.spec.ts src/lib/entity-semantic-structure-faults.spec.ts src/lib/ordinary-order-source-boundaries.spec.ts
+
+(node:69882) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:69885) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/link-terminal-obligation-scalar/packages/kernel
+
+(node:69894) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:69893) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:69895) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ❯ src/lib/entity-semantic-structure-faults.spec.ts (4 tests | 3 failed) 33ms
+     × upsert: failed mixed preparation admits no outer membership or adoption 21ms
+     × setAll: failed mixed preparation admits no outer membership or adoption 2ms
+     × preparation reentry survives a thrown outer structural attempt 3ms
+ ❯ src/lib/entity-egress-footprint.spec.ts (15 tests | 1 failed) 41ms
+     × identical row replacement and identity updater preserve no-op admission 6ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 4 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/lib/entity-egress-footprint.spec.ts > entity egress preserves authored field footprints > identical row replacement and identity updater preserve no-op admission
+AssertionError: expected [ [ { id: 'r', x: 99, y: +0 } ] ] to deeply equal []
+
+- Expected
++ Received
+
+- []
++ [
++   [
++     {
++       "id": "r",
++       "x": 99,
++       "y": 0,
++     },
++   ],
++ ]
+
+ ❯ src/lib/entity-egress-footprint.spec.ts:216:20
+    214|       await flush();
+    215|       await connection.settled();
+    216|       expect(sent).toEqual([]);
+       |                    ^
+    217|     } finally {
+    218|       connection.dispose();
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/4]⎯
+
+ FAIL  src/lib/entity-semantic-structure-faults.spec.ts > slice2 structural preparation faults and reentry > upsert: failed mixed preparation admits no outer membership or adoption
+ FAIL  src/lib/entity-semantic-structure-faults.spec.ts > slice2 structural preparation faults and reentry > setAll: failed mixed preparation admits no outer membership or adoption
+AssertionError: expected function to throw an error, but it didn't
+ ❯ src/lib/entity-semantic-structure-faults.spec.ts:11:174
+      9|   const t=setup(),r=t.$.rows;const error=new Error('prepare');try{
+     10|    r.addOne({id:'a',n:7});await tick();withWriteContext({participation…
+     11|    expect(()=>t.transact(()=>{t.$.x(1);const values=[{id:'a',n:99},{id…
+       |                                                                                                                                                                              ^
+     12|    expect(t.$.x()).toBe(0);expect(r.ids()).toEqual(['a']);expect(r.byI…
+     13|    const p=t.transact(()=>r.updateOne('a',{n:99}));expect(p.inspect().…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/4]⎯
+
+ FAIL  src/lib/entity-semantic-structure-faults.spec.ts > slice2 structural preparation faults and reentry > preparation reentry survives a thrown outer structural attempt
+AssertionError: expected a thrown error to be Error: after reentry
+
+- Expected
++ Received
+
+  Error {
+-   "message": "after reentry",
++   "message": "Entity frame responsibility preparation reentered installation",
+  }
+
+ ❯ src/lib/entity-semantic-structure-faults.spec.ts:19:131
+     17|   const t=setup(),r=t.$.rows;const error=new Error('after reentry');tr…
+     18|    r.addOne({id:'a',n:7});await tick();let entered=false;
+     19|    expect(()=>r.setAll([{id:'a',n:9},{id:'b',get n():number{if(!entere…
+       |                                                                                                                                   ^
+     20|    expect(entered).toBe(true);expect(r.ids()).toEqual(['a']);expect(r.…
+     21|    const p=t.transact(()=>r.updateOne('a',{n:124}));p.rollback();expec…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/4]⎯
+
+
+ Test Files  2 failed | 1 passed (3)
+      Tests  4 failed | 20 passed (24)
+   Start at  15:22:35
+   Duration  2.07s (transform 2.92s, setup 0ms, import 3.70s, tests 134ms, environment 1.59s)
+
+Warning: command "node tools/run-core-vitest.mjs src/lib/entity-egress-footprint.spec.ts src/lib/entity-semantic-structure-faults.spec.ts src/lib/ordinary-order-source-boundaries.spec.ts" exited with non-zero status code
+
+
+ NX   Running target test for project kernel failed
+
+Failed tasks:
+
+- kernel:test
+
+Hint: run the command with --verbose for more details.
+
+  Run duration:      2.9s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     2.9s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    2.9s

@@ -1,0 +1,100 @@
+
+> nx run kernel:test src/lib/entity-input-view-contract.spec.ts src/lib/ordinary-order-source-boundaries.spec.ts
+
+> node tools/run-core-vitest.mjs src/lib/entity-input-view-contract.spec.ts src/lib/ordinary-order-source-boundaries.spec.ts
+
+(node:93330) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:93332) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/link-entity-obligation-integration/packages/kernel
+
+(node:93341) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:93340) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ❯ src/lib/entity-input-view-contract.spec.ts (3 tests | 3 failed) 52ms
+   × inspection input is not certified by ordinary proof: field 36ms
+   × inspection input is not certified by ordinary proof: row 8ms
+   × inspection input is not certified by ordinary proof: root 7ms
+ ❯ src/lib/ordinary-order-source-boundaries.spec.ts (5 tests | 2 failed) 69ms
+     × preserves connection-relative ordinary remove and later adoption (collection) 12ms
+     × preserves connection-relative ordinary remove and later adoption (nested branch) 3ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 5 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/lib/entity-input-view-contract.spec.ts > inspection input is not certified by ordinary proof: field
+ FAIL  src/lib/entity-input-view-contract.spec.ts > inspection input is not certified by ordinary proof: row
+ FAIL  src/lib/entity-input-view-contract.spec.ts > inspection input is not certified by ordinary proof: root
+AssertionError: expected [ 99 ] to deeply equal []
+
+- Expected
++ Received
+
+- []
++ [
++   99,
++ ]
+
+ ❯ src/lib/entity-input-view-contract.spec.ts:32:30
+     30|   expect(calls).toBe(1);expect(receipt.read()).toMatchObject({state:'c…
+     31|   const q=late.transact(()=>late.$.x(9));const pendingQ=q.inspect();
+     32|   await flush();expect(sent).toEqual([]);
+       |                              ^
+     33|   p.confirm();await flush();expect(sent).toEqual([99]);
+     34|   expect(receipt.read()).toMatchObject({state:'started',basis:'survivi…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/5]⎯
+
+ FAIL  src/lib/ordinary-order-source-boundaries.spec.ts > ordinary order source and relationship boundaries > preserves connection-relative ordinary remove and later adoption (collection)
+ FAIL  src/lib/ordinary-order-source-boundaries.spec.ts > ordinary order source and relationship boundaries > preserves connection-relative ordinary remove and later adoption (nested branch)
+AssertionError: expected undefined to deeply equal [ { id: 'a', n: 1 } ]
+
+- Expected:
+[
+  {
+    "id": "a",
+    "n": 1,
+  },
+]
+
++ Received:
+undefined
+
+ ❯ src/lib/ordinary-order-source-boundaries.spec.ts:77:34
+     75|         await Promise.all(connections.map(({ connection }) => connecti…
+     76|         expect(before.sent).toHaveLength(0);
+     77|         expect(after.lastRows()).toEqual([{ id: 'a', n: 1 }]);
+       |                                  ^
+     78|         const publishedBefore = before.sent.length;
+     79|         const publishedAfter = after.sent.length;
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/5]⎯
+
+
+ Test Files  2 failed (2)
+      Tests  5 failed | 3 passed (8)
+   Start at  15:26:32
+   Duration  2.03s (transform 1.84s, setup 0ms, import 2.22s, tests 121ms, environment 1.37s)
+
+Warning: command "node tools/run-core-vitest.mjs src/lib/entity-input-view-contract.spec.ts src/lib/ordinary-order-source-boundaries.spec.ts" exited with non-zero status code
+
+
+ NX   Running target test for project kernel failed
+
+Failed tasks:
+
+- kernel:test
+
+Hint: run the command with --verbose for more details.
+
+  Run duration:      3.0s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     3.0s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    3.0s

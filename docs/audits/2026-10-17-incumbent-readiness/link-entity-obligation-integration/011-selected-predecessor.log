@@ -1,0 +1,79 @@
+
+> nx run kernel:test src/lib/internals/causal-runtime/committed-entity-selected-unit.spec.ts
+
+> node tools/run-core-vitest.mjs src/lib/internals/causal-runtime/committed-entity-selected-unit.spec.ts
+
+(node:51572) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:51574) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/link-terminal-obligation-scalar/packages/kernel
+
+(node:51581) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ❯ src/lib/internals/causal-runtime/committed-entity-selected-unit.spec.ts (1 test | 1 failed) 25ms
+   × rich committed-entity capture sees the complete selected mixed inverse before authoring newer truth 25ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/lib/internals/causal-runtime/committed-entity-selected-unit.spec.ts > rich committed-entity capture sees the complete selected mixed inverse before authoring newer truth
+AssertionError: expected [ { …(2) } ] to deeply equal [ { …(2) } ]
+
+- Expected
++ Received
+
+@@ -7,14 +7,14 @@
+        },
+      ],
+      "right": [
+        {
+          "id": "a",
+-         "n": 11,
++         "n": 50,
+        },
+        {
+          "id": "b",
+-         "n": 12,
++         "n": 60,
+        },
+      ],
+    },
+  ]
+
+ ❯ src/lib/internals/causal-runtime/committed-entity-selected-unit.spec.ts:39:22
+     37|     await drain();
+     38|     expect(armed).toBe(false);
+     39|     expect(observed).toEqual([{
+       |                      ^
+     40|       left: [{ id: 'a', n: 1 }],
+     41|       right: [{ id: 'a', n: 11 }, { id: 'b', n: 12 }],
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed (1)
+   Start at  15:13:38
+   Duration  1.30s (transform 665ms, setup 0ms, import 798ms, tests 25ms, environment 350ms)
+
+Warning: command "node tools/run-core-vitest.mjs src/lib/internals/causal-runtime/committed-entity-selected-unit.spec.ts" exited with non-zero status code
+
+
+ NX   Running target test for project kernel failed
+
+Failed tasks:
+
+- kernel:test
+
+Hint: run the command with --verbose for more details.
+
+  Run duration:      1.9s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     1.9s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    1.9s

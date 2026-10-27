@@ -1,0 +1,118 @@
+
+> nx run kernel:test src/lib/link-native-address.spec.ts src/lib/link-address-lifecycle.spec.ts src/lib/separate-boundary-contract.spec.ts src/lib/internals/causal-runtime/heterogeneous-reentry-publication.spec.ts src/lib/internals/causal-runtime/heterogeneous-independent-invalidation.spec.ts src/lib/internals/causal-runtime/heterogeneous-invalidation-containment.spec.ts src/lib/internals/causal-runtime/committed-entity-selected-unit.spec.ts src/lib/entity-obligation-matrix.spec.ts src/lib/entity-native-input-independent.spec.ts src/lib/entity-publication-work-lifetime.spec.ts
+
+> node tools/run-core-vitest.mjs src/lib/link-native-address.spec.ts src/lib/link-address-lifecycle.spec.ts src/lib/separate-boundary-contract.spec.ts src/lib/internals/causal-runtime/heterogeneous-reentry-publication.spec.ts src/lib/internals/causal-runtime/heterogeneous-independent-invalidation.spec.ts src/lib/internals/causal-runtime/heterogeneous-invalidation-containment.spec.ts src/lib/internals/causal-runtime/committed-entity-selected-unit.spec.ts src/lib/entity-obligation-matrix.spec.ts src/lib/entity-native-input-independent.spec.ts src/lib/entity-publication-work-lifetime.spec.ts
+
+(node:55520) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:55526) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/link-entity-obligation-integration/packages/kernel
+
+(node:55540) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:55537) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:55539) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:55535) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:55534) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:55538) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:55536) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:55533) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:55541) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ❯ src/lib/entity-publication-work-lifetime.spec.ts (3 tests | 1 failed) 137ms
+   × ordinary churn retires new metadata while retained receipts and old references stay detached 11ms
+(node:55552) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ❯ src/lib/internals/causal-runtime/committed-entity-selected-unit.spec.ts (1 test | 1 failed) 37ms
+   × rich committed-entity capture sees the complete selected mixed inverse before authoring newer truth 36ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/lib/entity-publication-work-lifetime.spec.ts > ordinary churn retires new metadata while retained receipts and old references stay detached
+AssertionError: presence after cycle 0: expected 1 to be +0 // Object.is equality
+
+- Expected
++ Received
+
+- 0
++ 1
+
+ ❯ src/lib/entity-publication-work-lifetime.spec.ts:51:83
+     49|    }finally{c.dispose();}
+     50|    await flush();const state=counts(tree.$.rows);
+     51|    for(const key of retained)expect(counter(state,key),`${key} after c…
+       |                                                                                   ^
+     52|    for(const old of held){expect(old()).toBeUndefined();expect(old.n()…
+     53|    expect(receipts.map(receipt=>receipt.read())).toEqual(terminal);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  src/lib/internals/causal-runtime/committed-entity-selected-unit.spec.ts > rich committed-entity capture sees the complete selected mixed inverse before authoring newer truth
+AssertionError: expected [ { …(2) } ] to deeply equal [ { …(2) } ]
+
+- Expected
++ Received
+
+@@ -7,14 +7,14 @@
+        },
+      ],
+      "right": [
+        {
+          "id": "a",
+-         "n": 11,
++         "n": 50,
+        },
+        {
+          "id": "b",
+-         "n": 12,
++         "n": 60,
+        },
+      ],
+    },
+  ]
+
+ ❯ src/lib/internals/causal-runtime/committed-entity-selected-unit.spec.ts:39:22
+     37|     await drain();
+     38|     expect(armed).toBe(false);
+     39|     expect(observed).toEqual([{
+       |                      ^
+     40|       left: [{ id: 'a', n: 1 }],
+     41|       right: [{ id: 'a', n: 11 }, { id: 'b', n: 12 }],
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+ Test Files  2 failed | 8 passed (10)
+      Tests  2 failed | 53 passed (55)
+   Start at  15:15:13
+   Duration  2.82s (transform 9.14s, setup 0ms, import 12.27s, tests 790ms, environment 5.02s)
+
+Warning: command "node tools/run-core-vitest.mjs src/lib/link-native-address.spec.ts src/lib/link-address-lifecycle.spec.ts src/lib/separate-boundary-contract.spec.ts src/lib/internals/causal-runtime/heterogeneous-reentry-publication.spec.ts src/lib/internals/causal-runtime/heterogeneous-independent-invalidation.spec.ts src/lib/internals/causal-runtime/heterogeneous-invalidation-containment.spec.ts src/lib/internals/causal-runtime/committed-entity-selected-unit.spec.ts src/lib/entity-obligation-matrix.spec.ts src/lib/entity-native-input-independent.spec.ts src/lib/entity-publication-work-lifetime.spec.ts" exited with non-zero status code
+
+
+ NX   Running target test for project kernel failed
+
+Failed tasks:
+
+- kernel:test
+
+Hint: run the command with --verbose for more details.
+
+  Run duration:      3.4s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     3.4s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    3.4s

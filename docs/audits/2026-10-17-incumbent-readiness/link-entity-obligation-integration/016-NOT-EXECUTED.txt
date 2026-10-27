@@ -1,0 +1,3 @@
+No tests executed: shell rejected unquoted src/lib/entity-native-obligation-composition.spec.* before invoking Nx in each loop arm.
+zsh:3: no matches found: src/lib/entity-native-obligation-composition.spec.*
+Recorded as command/harness error, not test failure. Corrected017 uses explicit ts/tsx filename.

@@ -1,0 +1,119 @@
+
+> nx run kernel:test --testFile=entity-native-input-independent.spec.ts
+
+> node tools/run-core-vitest.mjs --testFile=entity-native-input-independent.spec.ts
+
+(node:2190) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:2197) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/link-terminal-obligation-scalar/packages/kernel
+
+(node:2204) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ❯ src/lib/entity-native-input-independent.spec.ts (12 tests | 6 failed) 33ms
+   × native root snapshot observes removed entity: none/independent 15ms
+   × native root snapshot observes removed entity: live/independent 2ms
+   × native root snapshot observes removed entity: disposed/independent 3ms
+   × native row argument carries field omission: independent 2ms
+   × native updateWhere supplies nonselected candidate: independent 1ms
+   × native removeWhere supplies nonselected candidate: independent 1ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 6 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/lib/entity-native-input-independent.spec.ts > native root snapshot observes removed entity: none/independent
+ FAIL  src/lib/entity-native-input-independent.spec.ts > native root snapshot observes removed entity: live/independent
+ FAIL  src/lib/entity-native-input-independent.spec.ts > native root snapshot observes removed entity: disposed/independent
+AssertionError: expected undefined to match object { stage: 'after-callback', …(1) }
+
+- Expected:
+{
+  "reason": "contradiction",
+  "stage": "after-callback",
+}
+
++ Received:
+undefined
+
+ ❯ src/lib/entity-native-input-independent.spec.ts:60:48
+     58|     expect(source.$.rows.all()).toEqual([{ id: 'b', n: 2 }]);
+     59|     expect(p.inspect()).toEqual(before);
+     60|     if (claim === 'independent') expect(error).toMatchObject({ stage: …
+       |                                                ^
+     61|     else expect(error).toBeUndefined();
+     62|     const q = late.transact(() => late.$.x(9));
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/6]⎯
+
+ FAIL  src/lib/entity-native-input-independent.spec.ts > native row argument carries field omission: independent
+AssertionError: expected undefined to match object { stage: 'after-callback', …(1) }
+
+- Expected:
+{
+  "reason": "contradiction",
+  "stage": "after-callback",
+}
+
++ Received:
+undefined
+
+ ❯ src/lib/entity-native-input-independent.spec.ts:92:48
+     90|     });
+     91|     expect(calls).toBe(1); expect(target.$.value()).toBe(0); expect(p.…
+     92|     if (claim === 'independent') expect(error).toMatchObject({ stage: …
+       |                                                ^
+     93|     else expect(error).toBeUndefined();
+     94|     await flush(); expect(sent).toEqual([]);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/6]⎯
+
+ FAIL  src/lib/entity-native-input-independent.spec.ts > native updateWhere supplies nonselected candidate: independent
+ FAIL  src/lib/entity-native-input-independent.spec.ts > native removeWhere supplies nonselected candidate: independent
+AssertionError: expected undefined to match object { stage: 'after-callback', …(1) }
+
+- Expected:
+{
+  "reason": "contradiction",
+  "stage": "after-callback",
+}
+
++ Received:
+undefined
+
+ ❯ src/lib/entity-native-input-independent.spec.ts:127:48
+    125|     expect(source.$.rows.all()).toEqual([{ id: 'a', n: 1 }, { id: 'b',…
+    126|     expect(target.$.value()).toBe(7); expect(p.inspect()).toEqual(befo…
+    127|     if (claim === 'independent') expect(error).toMatchObject({ stage: …
+       |                                                ^
+    128|     else expect(error).toBeUndefined();
+    129|     await flush(); expect(sent).toEqual([]);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/6]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  6 failed | 6 passed (12)
+   Start at  14:56:29
+   Duration  1.18s (transform 573ms, setup 0ms, import 694ms, tests 33ms, environment 314ms)
+
+Warning: command "node tools/run-core-vitest.mjs --testFile=entity-native-input-independent.spec.ts" exited with non-zero status code
+
+
+ NX   Running target test for project kernel failed
+
+Failed tasks:
+
+- kernel:test
+
+Hint: run the command with --verbose for more details.
+
+  Run duration:      1.8s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     1.8s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    1.8s

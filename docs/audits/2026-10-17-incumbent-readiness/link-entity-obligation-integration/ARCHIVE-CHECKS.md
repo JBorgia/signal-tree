@@ -1,0 +1,5 @@
+# Archive verification
+
+`node --import /private/tmp/link-a1-doc-loader.mjs tools/check-doc-links.mjs` ran in the readiness checkout: exit0,897/897 relative links resolve across203 live surfaces. The loader only resolves the existing semver dependency. Raw output is in DOC-LINKS.log. The controller-only diff check and staged Markdown diff check passed. The all-file staged diff check reports original CRLF/trailing whitespace in raw logs and archived source/diff evidence; those bytes are intentionally preserved and that check is not reported as passing. These are documentation checks, not runtime qualification.
+
+Unrelated AGENTS.md and docs/performance/measurement-contract.md edits retain their pre-task SHA256 values and are excluded from staging. The first archive attempt stopped before writing because the preservation script mistyped the measurement-file checksum. After comparing the actual hash with the retained original, that local script was corrected; no unrelated file was edited. No automatic approval rejection occurred.

@@ -1,0 +1,12 @@
+{
+  "base": "0135ef18567573fec627667fc58bc3e7819cc29e",
+  "candidate": "f7a0ffd9e2e34a23ceae85bff3cd8fa45ecaa82d",
+  "tree": "b5652973d6ace6c9c57fca75382ca6f3e8a3e6b1",
+  "branch": "codex/link-entity-obligation-integration",
+  "production": "87f6831fa60cafe87508f0ace84b7638698ca3b0",
+  "disposition": "rejected-covered-authored-footprint-recurrence",
+  "clean": true,
+  "node": "v24.15.0",
+  "pnpm": "10.17.0",
+  "sourceManifest": "020-policy-boundary-AFTER.json"
+}

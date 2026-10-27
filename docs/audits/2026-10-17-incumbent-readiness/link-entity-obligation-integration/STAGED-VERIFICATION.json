@@ -1,0 +1,26 @@
+{
+  "files": {
+    "packages/angular/src/lib/entity-native-obligation-composition.spec.ts": true,
+    "packages/kernel/src/lib/entity-input-view-contract.spec.ts": true,
+    "packages/kernel/src/lib/entity-native-input-independent.spec.ts": true,
+    "packages/kernel/src/lib/entity-negative-publication-retirement.spec.ts": true,
+    "packages/kernel/src/lib/entity-obligation-matrix.spec.ts": true,
+    "packages/kernel/src/lib/entity-publication-work-lifetime.spec.ts": true,
+    "packages/kernel/src/lib/entity-signal.ts": true,
+    "packages/kernel/src/lib/experimental-publication/entity.ts": true,
+    "packages/kernel/src/lib/experimental-publication/private.ts": true,
+    "packages/kernel/src/lib/internals/causal-runtime/tree-realization-adapter.ts": true,
+    "packages/kernel/src/lib/internals/entity-egress-projection.ts": true,
+    "packages/kernel/src/lib/internals/entity-publication.ts": true,
+    "packages/kernel/src/lib/internals/entity-value-transition.ts": true,
+    "packages/kernel/src/lib/internals/location-runtime.ts": true,
+    "packages/kernel/src/lib/internals/native-location-realization.ts": true,
+    "packages/kernel/src/lib/internals/source-mutation.ts": true,
+    "packages/kernel/src/lib/link.ts": true,
+    "packages/react/src/lib/entity-native-obligation-composition.spec.tsx": true,
+    "packages/solid/src/lib/entity-native-obligation-composition.spec.ts": true,
+    "packages/vue/src/lib/entity-native-obligation-composition.spec.ts": true
+  },
+  "originalAssertionsModified": false,
+  "lifecycleModified": false
+}

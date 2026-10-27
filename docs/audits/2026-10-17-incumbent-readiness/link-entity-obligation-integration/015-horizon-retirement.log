@@ -1,0 +1,68 @@
+
+> nx run kernel:test src/lib/publication-terminal-horizon-independent.spec.ts src/lib/entity-negative-publication-retirement.spec.ts
+
+> node tools/run-core-vitest.mjs src/lib/publication-terminal-horizon-independent.spec.ts src/lib/entity-negative-publication-retirement.spec.ts
+
+(node:63320) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:63322) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/link-entity-obligation-integration/packages/kernel
+
+(node:63336) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:63337) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ❯ src/lib/entity-negative-publication-retirement.spec.ts (2 tests | 2 failed) 66ms
+   × bare negative membership retains captured foreign obligation until confirm 50ms
+   × bare negative membership retains captured foreign obligation until reject 15ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/lib/entity-negative-publication-retirement.spec.ts > bare negative membership retains captured foreign obligation until confirm
+ FAIL  src/lib/entity-negative-publication-retirement.spec.ts > bare negative membership retains captured foreign obligation until reject
+AssertionError: expected 1 to be +0 // Object.is equality
+
+- Expected
++ Received
+
+- 0
++ 1
+
+ ❯ src/lib/entity-negative-publication-retirement.spec.ts:33:62
+     31|   await flush();expect(sent).toEqual([0]);expect(receipt.read()).toMat…
+     32|   expect(r.inspect()).toEqual(pendingR);expect(source.$.rows.all()).to…
+     33|   expect(sourceBinding.source.inspect()['negativePresence']).toBe(0);
+       |                                                              ^
+     34|  }finally{c.dispose();target.destroy();source.destroy();owner.destroy(…
+     35| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+
+ Test Files  1 failed | 1 passed (2)
+      Tests  2 failed | 2 passed (4)
+   Start at  15:19:49
+   Duration  2.55s (transform 2.93s, setup 0ms, import 3.57s, tests 108ms, environment 1.03s)
+
+Warning: command "node tools/run-core-vitest.mjs src/lib/publication-terminal-horizon-independent.spec.ts src/lib/entity-negative-publication-retirement.spec.ts" exited with non-zero status code
+
+
+ NX   Running target test for project kernel failed
+
+Failed tasks:
+
+- kernel:test
+
+Hint: run the command with --verbose for more details.
+
+  Run duration:      3.6s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     3.5s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    3.5s

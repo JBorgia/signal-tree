@@ -1,0 +1,10 @@
+{
+  "base": "0135ef18567573fec627667fc58bc3e7819cc29e",
+  "files": {
+    "packages/kernel/src/lib/entity-signal.ts": "956d39c81548d5168df8ba40a20ddedd40b89b10b46d26eebb2c37827033b013",
+    "packages/kernel/src/lib/internals/entity-egress-projection.ts": "e68f53f77cf8cd3f67bf4e0be618a4cbb3b3bea71a8b33c10fb7d0bd677b6315",
+    "packages/kernel/src/lib/internals/mutation-capture-runtime.ts": "54260cd194e6e3567acaad5e6045b0a89345d27e4da715f6f1dbacb54fcdb81f",
+    "packages/kernel/src/lib/internals/causal-runtime/tree-realization-adapter.ts": "5f8eca17ba6da9f33bc18442ec2cc3a4aeaa01cab5c70ef0eec7733542e067d3",
+    "packages/kernel/src/lib/link.ts": "a55392a625c492c4c48baefcca34a94b0ef1a83f4d61a10711d4a617534848eb"
+  }
+}

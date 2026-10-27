@@ -1,0 +1,38 @@
+
+> nx run angular:test src/lib/entity-native-obligation-composition.spec.ts
+
+> NODE_OPTIONS=--expose-gc npx vitest run --root packages/angular src/lib/entity-native-obligation-composition.spec.ts
+
+npm warn Unknown env config "verify-deps-before-run". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown project config "auto-install-peers". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown project config "shamefully-hoist". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+(node:66689) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:66714) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/link-entity-obligation-integration/packages/angular
+
+(node:66729) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ Test Files  1 passed (1)
+      Tests  3 passed (3)
+   Start at  15:21:13
+   Duration  3.91s (transform 1.79s, setup 663ms, import 2.16s, tests 96ms, environment 690ms)
+
+
+
+
+ NX   Successfully ran target test for project angular
+
+
+  Run duration:      5.6s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     5.6s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        angular:test    5.6s

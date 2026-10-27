@@ -1,0 +1,24 @@
+{
+  "runtime": "0135ef18567573fec627667fc58bc3e7819cc29e",
+  "original_entity_run": {
+    "log": "001-baseline-entity.log",
+    "pass": 23,
+    "fail": 3
+  },
+  "prewritten_matrix_run": {
+    "log": "003-matrix-predecessor.log",
+    "pass": 4,
+    "fail": 9,
+    "checkout": "/private/tmp/link-terminal-obligation-scalar",
+    "changes": "test-only untracked copy"
+  },
+  "test_sha256": {
+    "link-native-address.spec.ts": "a4bd9896281f2a38b556443dc8286266e4419bb6710c06c265f01407b6ce5865",
+    "link-address-lifecycle.spec.ts": "63148c042c235c5b83d16f621e42a2ff39b220a228e755c54b16659f9085a2a6",
+    "separate-boundary-contract.spec.ts": "ff125e32a692c0a88acaa02eac7256162147a7096fcc030edde86a04f28c6708",
+    "internals/causal-runtime/heterogeneous-reentry-publication.spec.ts": "af6b26df9c06e0c62bc19e97bc0dd1ecded0fef6666547016b0b610380e2feb1",
+    "internals/causal-runtime/heterogeneous-independent-invalidation.spec.ts": "a22e7978157eb600c6d87ee7567f64a2b36fb069d7152c6bacacaf2377f85544",
+    "internals/causal-runtime/heterogeneous-invalidation-containment.spec.ts": "6275794c45a003ec6330cfd31822e7dcc35134751fc8f3868a42e7871ce2ab02",
+    "entity-obligation-matrix.spec.ts": "72d76ddfc858900d27e831d681c8c8b99f09a687b759b5075db4f1254fbd4a55"
+  }
+}

@@ -1,0 +1,170 @@
+
+> nx run kernel:test src/lib/entity-egress-footprint.spec.ts src/lib/entity-semantic-topology.spec.ts src/lib/entity-semantic-transition.spec.ts src/lib/entity-semantic-point-recurrence.spec.ts src/lib/entity-realization-handoff.spec.ts src/lib/entity-semantic-structure-slice.spec.ts src/lib/entity-semantic-structural-inverses.spec.ts src/lib/entity-semantic-composition-slice.spec.ts src/lib/entity-semantic-structure-faults.spec.ts src/lib/entity-semantic-structure-interceptors.spec.ts src/lib/entity-order-carrier.spec.ts src/lib/entity-projection-seed.spec.ts src/lib/entity-update-one-equivalence.spec.ts src/lib/occupancy-successor-point-work.spec.ts src/lib/ordinary-order-indexed-work.spec.ts src/lib/ordinary-order-source-boundaries.spec.ts src/lib/ordinary-order-owner-preparation.spec.ts
+
+> node tools/run-core-vitest.mjs src/lib/entity-egress-footprint.spec.ts src/lib/entity-semantic-topology.spec.ts src/lib/entity-semantic-transition.spec.ts src/lib/entity-semantic-point-recurrence.spec.ts src/lib/entity-realization-handoff.spec.ts src/lib/entity-semantic-structure-slice.spec.ts src/lib/entity-semantic-structural-inverses.spec.ts src/lib/entity-semantic-composition-slice.spec.ts src/lib/entity-semantic-structure-faults.spec.ts src/lib/entity-semantic-structure-interceptors.spec.ts src/lib/entity-order-carrier.spec.ts src/lib/entity-projection-seed.spec.ts src/lib/entity-update-one-equivalence.spec.ts src/lib/occupancy-successor-point-work.spec.ts src/lib/ordinary-order-indexed-work.spec.ts src/lib/ordinary-order-source-boundaries.spec.ts src/lib/ordinary-order-owner-preparation.spec.ts
+
+(node:58226) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:58228) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/link-entity-obligation-integration/packages/kernel
+
+(node:58236) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:58242) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:58238) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:58240) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:58239) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:58241) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:58237) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:58244) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:58243) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:58248) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ❯ src/lib/entity-egress-footprint.spec.ts (15 tests | 1 failed) 142ms
+     × identical row replacement and identity updater preserve no-op admission 10ms
+ ❯ src/lib/ordinary-order-source-boundaries.spec.ts (5 tests | 2 failed) 214ms
+     × preserves connection-relative ordinary remove and later adoption (collection) 31ms
+     × preserves connection-relative ordinary remove and later adoption (nested branch) 19ms
+(node:58250) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:58249) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:58251) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:58253) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:58252) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:58254) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:58255) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ❯ src/lib/entity-semantic-structure-faults.spec.ts (4 tests | 3 failed) 63ms
+     × upsert: failed mixed preparation admits no outer membership or adoption 38ms
+     × setAll: failed mixed preparation admits no outer membership or adoption 6ms
+     × preparation reentry survives a thrown outer structural attempt 6ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 6 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/lib/entity-egress-footprint.spec.ts > entity egress preserves authored field footprints > identical row replacement and identity updater preserve no-op admission
+AssertionError: expected [ [ { id: 'r', x: 99, y: +0 } ] ] to deeply equal []
+
+- Expected
++ Received
+
+- []
++ [
++   [
++     {
++       "id": "r",
++       "x": 99,
++       "y": 0,
++     },
++   ],
++ ]
+
+ ❯ src/lib/entity-egress-footprint.spec.ts:216:20
+    214|       await flush();
+    215|       await connection.settled();
+    216|       expect(sent).toEqual([]);
+       |                    ^
+    217|     } finally {
+    218|       connection.dispose();
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/6]⎯
+
+ FAIL  src/lib/entity-semantic-structure-faults.spec.ts > slice2 structural preparation faults and reentry > upsert: failed mixed preparation admits no outer membership or adoption
+ FAIL  src/lib/entity-semantic-structure-faults.spec.ts > slice2 structural preparation faults and reentry > setAll: failed mixed preparation admits no outer membership or adoption
+AssertionError: expected function to throw an error, but it didn't
+ ❯ src/lib/entity-semantic-structure-faults.spec.ts:11:174
+      9|   const t=setup(),r=t.$.rows;const error=new Error('prepare');try{
+     10|    r.addOne({id:'a',n:7});await tick();withWriteContext({participation…
+     11|    expect(()=>t.transact(()=>{t.$.x(1);const values=[{id:'a',n:99},{id…
+       |                                                                                                                                                                              ^
+     12|    expect(t.$.x()).toBe(0);expect(r.ids()).toEqual(['a']);expect(r.byI…
+     13|    const p=t.transact(()=>r.updateOne('a',{n:99}));expect(p.inspect().…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/6]⎯
+
+ FAIL  src/lib/entity-semantic-structure-faults.spec.ts > slice2 structural preparation faults and reentry > preparation reentry survives a thrown outer structural attempt
+AssertionError: expected a thrown error to be Error: after reentry
+
+- Expected
++ Received
+
+  Error {
+-   "message": "after reentry",
++   "message": "Entity frame responsibility preparation reentered installation",
+  }
+
+ ❯ src/lib/entity-semantic-structure-faults.spec.ts:19:131
+     17|   const t=setup(),r=t.$.rows;const error=new Error('after reentry');tr…
+     18|    r.addOne({id:'a',n:7});await tick();let entered=false;
+     19|    expect(()=>r.setAll([{id:'a',n:9},{id:'b',get n():number{if(!entere…
+       |                                                                                                                                   ^
+     20|    expect(entered).toBe(true);expect(r.ids()).toEqual(['a']);expect(r.…
+     21|    const p=t.transact(()=>r.updateOne('a',{n:124}));p.rollback();expec…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/6]⎯
+
+ FAIL  src/lib/ordinary-order-source-boundaries.spec.ts > ordinary order source and relationship boundaries > preserves connection-relative ordinary remove and later adoption (collection)
+ FAIL  src/lib/ordinary-order-source-boundaries.spec.ts > ordinary order source and relationship boundaries > preserves connection-relative ordinary remove and later adoption (nested branch)
+AssertionError: expected undefined to deeply equal [ { id: 'a', n: 1 } ]
+
+- Expected:
+[
+  {
+    "id": "a",
+    "n": 1,
+  },
+]
+
++ Received:
+undefined
+
+ ❯ src/lib/ordinary-order-source-boundaries.spec.ts:77:34
+     75|         await Promise.all(connections.map(({ connection }) => connecti…
+     76|         expect(before.sent).toHaveLength(0);
+     77|         expect(after.lastRows()).toEqual([{ id: 'a', n: 1 }]);
+       |                                  ^
+     78|         const publishedBefore = before.sent.length;
+     79|         const publishedAfter = after.sent.length;
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/6]⎯
+
+
+ Test Files  3 failed | 14 passed (17)
+      Tests  6 failed | 95 passed (101)
+   Start at  15:16:30
+   Duration  3.40s (transform 8.69s, setup 0ms, import 12.85s, tests 2.21s, environment 9.80s)
+
+Warning: command "node tools/run-core-vitest.mjs src/lib/entity-egress-footprint.spec.ts src/lib/entity-semantic-topology.spec.ts src/lib/entity-semantic-transition.spec.ts src/lib/entity-semantic-point-recurrence.spec.ts src/lib/entity-realization-handoff.spec.ts src/lib/entity-semantic-structure-slice.spec.ts src/lib/entity-semantic-structural-inverses.spec.ts src/lib/entity-semantic-composition-slice.spec.ts src/lib/entity-semantic-structure-faults.spec.ts src/lib/entity-semantic-structure-interceptors.spec.ts src/lib/entity-order-carrier.spec.ts src/lib/entity-projection-seed.spec.ts src/lib/entity-update-one-equivalence.spec.ts src/lib/occupancy-successor-point-work.spec.ts src/lib/ordinary-order-indexed-work.spec.ts src/lib/ordinary-order-source-boundaries.spec.ts src/lib/ordinary-order-owner-preparation.spec.ts" exited with non-zero status code
+
+
+ NX   Running target test for project kernel failed
+
+Failed tasks:
+
+- kernel:test
+
+Hint: run the command with --verbose for more details.
+
+  Run duration:      4.6s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     4.5s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    4.5s
