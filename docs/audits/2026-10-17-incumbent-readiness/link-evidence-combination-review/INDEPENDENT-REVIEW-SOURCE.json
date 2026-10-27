@@ -1,0 +1,19 @@
+{
+  "spec": {
+    "path": "/private/tmp/link-evidence-combination-review-evidence/SPEC.md",
+    "sha256": "4fcf55af11709c23a23ce2642311396131b416892a15f744446be47eafe7ebf5"
+  },
+  "test": {
+    "path": "/private/tmp/link-evidence-combination-review/packages/kernel/src/lib/publication-obligation-combination.spec.ts",
+    "sha256": "758335b2450855bc3050ad16b15f3a56ef1cab395fe383858b17aac7880e0d26"
+  },
+  "preregistered_test": {
+    "path": "/private/tmp/link-evidence-combination-review-evidence/PREREG.spec.ts",
+    "sha256": "758335b2450855bc3050ad16b15f3a56ef1cab395fe383858b17aac7880e0d26"
+  },
+  "first_log": {
+    "path": "/private/tmp/link-evidence-combination-review-evidence/FIRST.log",
+    "sha256": "924ec87a0652182accd0da2fdc3fc3052fe29fc17481260e77739b20909f08d9"
+  },
+  "head": "b9eef50de5cdded79792ac043ab99ce03d0144ee"
+}

@@ -1,0 +1,13 @@
+{
+  "runtime": "b9eef50de5cdded79792ac043ab99ce03d0144ee",
+  "test_only": "9f819662775da6a129e4cf7699e5bc5907e5588f",
+  "runtime_files_unchanged": [
+    "packages/kernel/src/lib/experimental-publication/lifecycle.ts",
+    "packages/kernel/src/lib/experimental-publication/private.ts",
+    "packages/kernel/src/lib/internals/intrinsic-mutation.ts",
+    "packages/kernel/src/lib/signal-tree.ts",
+    "packages/kernel/src/lib/utils.ts"
+  ],
+  "spec_sha256": "f5af6de78e668181100806257989b34f4e168bec62f70fe197c791f49c3591f5",
+  "test_sha256": "250079867ec3c585e054c96adb26eb35bfb34c2ca80dc457669d4585953b07b0"
+}

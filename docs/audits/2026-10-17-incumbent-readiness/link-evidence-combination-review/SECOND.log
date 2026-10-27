@@ -1,0 +1,35 @@
+
+> nx run kernel:test src/lib/publication-obligation-combination.spec.ts --testNamePattern=inherited possible-p
+
+> node tools/run-core-vitest.mjs src/lib/publication-obligation-combination.spec.ts --testNamePattern="inherited possible-p"
+
+(node:75097) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:75099) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/link-evidence-combination-review/packages/kernel
+
+(node:75106) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ Test Files  1 passed (1)
+      Tests  2 passed | 12 skipped (14)
+   Start at  08:20:53
+   Duration  1.21s (transform 694ms, setup 0ms, import 827ms, tests 16ms, environment 262ms)
+
+
+
+
+ NX   Successfully ran target test for project kernel
+
+
+  Run duration:      1.8s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     1.8s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    1.8s

@@ -84,6 +84,31 @@ two fixture accesses. No full qualification, artifact or cost acceptance follows
 Production `87f6831f`, the conservative default, budgets and B closure remain
 unchanged.
 
+## Publication obligation combination — reviewed rule, runtime remains rejected
+
+[Scalar rule, unchanged discriminators and independent review](docs/audits/2026-10-17-incumbent-readiness/link-evidence-combination-review/README.md)
+complete the requested review stage. Test-only `9f819662` adds14 cases on rejected
+scalarb9eef50d and excludes entity draft61689286. Runtime source is unchanged.
+
+The initial12 run has6 passes/6 failures: four p-first premature sends and two
+qualified-independent-in-p declaration contradictions. Q-first controls and
+saved-after-rejection writes pass, but do not prove complete input capture.
+Two review-added inherited-uncertainty controls pass separately with12 filtered
+skips. The first12 executable bodies remain unchanged. Spec-types passes its
+unchanged ratchet; no whole-system result is inferred.
+
+The reviewed rule preserves destination ownership, actual input support, fixed
+possible-owner windows, validation and recipient uncertainty separately. Native
+consumption promotes source ownership to input support; destination ownership alone
+is neither completeness nor an input contradiction. Only newly acquired duplicate
+window identities may normalize; inherited uncertainty cannot be laundered by a
+matching destination, input or declaration. No new policy concession is required.
+
+No scalar successor was implemented and the entity draft remains separate.
+The reviewed rule is a bounded implementation prerequisite, not integration
+acceptance. All first failures and original controls remain required. Production,
+B closure, budgets, APIs and later qualification gates remain unchanged.
+
 ## Membership native successor — rejected at fixed-window recurrence
 
 [Exact source, first failures, independent review and replay](docs/audits/2026-10-17-incumbent-readiness/link-membership-native-successor/README.md)
