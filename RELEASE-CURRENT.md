@@ -1,6 +1,6 @@
 # Current work — incumbent v16 readiness
 
-Updated October 26, 2026. Branch `codex/v16-incumbent-readiness`.
+Updated October 27, 2026. Branch `codex/v16-incumbent-readiness`.
 Baseline: `8d220643e0d4e34cbdbc6e55e6ef692b25d5e023`.
 Accepted new-key runtime checkpoint: `9917c92fbbdc9dfdd14601f1f5fb7ce21799be71`.
 Version **16.0.0-dev**. **Not release-ready; no final candidate freeze yet.**
@@ -84,7 +84,30 @@ two fixture accesses. No full qualification, artifact or cost acceptance follows
 Production `87f6831f`, the conservative default, budgets and B closure remain
 unchanged.
 
-## Membership successor specification — reviewed, runtime authorization pending
+## Membership native successor — rejected at fixed-window recurrence
+
+[Exact source, first failures, independent review and replay](docs/audits/2026-10-17-incumbent-readiness/link-membership-native-successor/README.md)
+record the owner-authorized implementation of contract392fcf46. Rejected scalar
+checkpoint `b9eef50d` and separately committed unconnected entity draft
+`61689286` remain isolated; no runtime from either is integrated here.
+
+The scalar/membership vector passes78 cases, with useful absence capture,
+registration, fixed-window and preparation/reentry controls. The decisive new
+ordinary-input case still leaks: foreign q authors7; target p copies it inside
+its transaction; p confirmation sends7 while q remains pending. Native p ownership
+was incorrectly used to suppress the entire possible-owner window, including q.
+Run010 has3 ordinary passes/1 failure; its post-q progress assertion never runs.
+Independent review confirms the fixed-window contract and covered-recurrence stop.
+
+Earlier first failures and two historically adjudicated oracle differences remain
+unchanged. Registration/reentry run008 is2 passes/4 filtered skips, not6 passes.
+Entity writer/publication integration, mixed undo, work/retention, four-framework
+composition and broad verification are incomplete. No cost or clean final types
+claim is made. The unused entity scaffold is separately preserved, not qualified.
+Production87f6831f, conservative Link, B closure and budgets remain unchanged.
+No further runtime repair or later qualification follows automatically.
+
+## Membership successor specification — historical reviewed authorization gate
 
 [Contract, prewritten tests, independent review and exact baseline](docs/audits/2026-10-17-incumbent-readiness/link-membership-successor-contract/README.md)
 finish the specification stage following the approved possible-owner policy.
@@ -105,9 +128,10 @@ it did not authorize or qualify that implementation. Entity producers, cache/vie
 correspondence, indexed cleanup, live recovery, collectibility and combined framework
 checks remain explicit implementation obligations.
 
-No runtime successor has started. Owner authorization is required before implementing
-this packet; recurrence and later qualification gates remain active. Production
-`87f6831f`, conservative default, B closure and budgets are unchanged.
+This was the pre-implementation authority boundary. The owner subsequently
+approved one bounded implementation; its rejected disposition is recorded above.
+Recurrence and later qualification gates remain active. Production `87f6831f`,
+conservative default, B closure and budgets are unchanged.
 
 ## Membership observation and fallback — reviewed design, policy selected
 

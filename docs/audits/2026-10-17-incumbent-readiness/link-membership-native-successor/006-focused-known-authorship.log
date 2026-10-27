@@ -1,0 +1,41 @@
+
+> nx run kernel:test src/lib/possible-owner-window-contract.spec.ts src/lib/membership-input-contract.spec.ts src/lib/publication-independent-isolated-omission-input.spec.ts src/lib/ordinary-member-publication-facts.spec.ts
+
+> node tools/run-core-vitest.mjs src/lib/possible-owner-window-contract.spec.ts src/lib/membership-input-contract.spec.ts src/lib/publication-independent-isolated-omission-input.spec.ts src/lib/ordinary-member-publication-facts.spec.ts
+
+(node:66372) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:66375) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/link-membership-native-successor/packages/kernel
+
+(node:66390) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:66389) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:66387) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:66388) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ Test Files  4 passed (4)
+      Tests  78 passed (78)
+   Start at  01:41:27
+   Duration  1.37s (transform 2.35s, setup 0ms, import 2.96s, tests 187ms, environment 1.55s)
+
+
+
+
+ NX   Successfully ran target test for project kernel
+
+
+  Run duration:      2.1s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     2.0s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    2.0s

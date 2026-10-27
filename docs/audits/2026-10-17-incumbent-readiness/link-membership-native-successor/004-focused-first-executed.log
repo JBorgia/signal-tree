@@ -1,0 +1,128 @@
+
+> nx run kernel:test src/lib/possible-owner-window-contract.spec.ts src/lib/membership-input-contract.spec.ts src/lib/publication-independent-isolated-omission-input.spec.ts src/lib/ordinary-member-publication-facts.spec.ts
+
+> node tools/run-core-vitest.mjs src/lib/possible-owner-window-contract.spec.ts src/lib/membership-input-contract.spec.ts src/lib/publication-independent-isolated-omission-input.spec.ts src/lib/ordinary-member-publication-facts.spec.ts
+
+(node:61180) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:61183) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/link-membership-native-successor/packages/kernel
+
+(node:61193) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:61194) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:61192) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:61191) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+stdout | src/lib/publication-independent-isolated-omission-input.spec.ts > native omitted-member input after independent sibling overwrite: independent
+OMISSION-INPUT {"claim":"independent","sent":[0],"target":0,"receipt":{"state":"started","basis":"declared"},"source":{"y":1}}
+
+ ❯ src/lib/publication-independent-isolated-omission-input.spec.ts (2 tests | 1 failed) 43ms
+   × native omitted-member input after independent sibling overwrite: independent 35ms
+ ❯ src/lib/membership-input-contract.spec.ts (54 tests | 18 failed) 119ms
+   × supplied absence branch/direct/independent retains source omission after sibling overwrite 28ms
+   × supplied absence branch/hasOwn/independent retains source omission after sibling overwrite 8ms
+   × supplied absence branch/in/independent retains source omission after sibling overwrite 1ms
+   × supplied absence branch/keys/independent retains source omission after sibling overwrite 2ms
+   × supplied absence branch/entries/independent retains source omission after sibling overwrite 2ms
+   × supplied absence branch/spread/independent retains source omission after sibling overwrite 2ms
+   × supplied absence root/direct/independent retains source omission after sibling overwrite 4ms
+   × supplied absence root/hasOwn/independent retains source omission after sibling overwrite 1ms
+   × supplied absence root/in/independent retains source omission after sibling overwrite 1ms
+   × supplied absence root/keys/independent retains source omission after sibling overwrite 4ms
+   × supplied absence root/entries/independent retains source omission after sibling overwrite 1ms
+   × supplied absence root/spread/independent retains source omission after sibling overwrite 1ms
+   × supplied absence updateAndReport/direct/independent retains source omission after sibling overwrite 2ms
+   × supplied absence updateAndReport/hasOwn/independent retains source omission after sibling overwrite 1ms
+   × supplied absence updateAndReport/in/independent retains source omission after sibling overwrite 1ms
+   × supplied absence updateAndReport/keys/independent retains source omission after sibling overwrite 1ms
+   × supplied absence updateAndReport/entries/independent retains source omission after sibling overwrite 1ms
+   × supplied absence updateAndReport/spread/independent retains source omission after sibling overwrite 1ms
+
+⎯⎯⎯⎯⎯⎯ Failed Tests 19 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/lib/membership-input-contract.spec.ts > supplied absence branch/direct/independent retains source omission after sibling overwrite
+ FAIL  src/lib/membership-input-contract.spec.ts > supplied absence branch/hasOwn/independent retains source omission after sibling overwrite
+ FAIL  src/lib/membership-input-contract.spec.ts > supplied absence branch/in/independent retains source omission after sibling overwrite
+ FAIL  src/lib/membership-input-contract.spec.ts > supplied absence branch/keys/independent retains source omission after sibling overwrite
+ FAIL  src/lib/membership-input-contract.spec.ts > supplied absence branch/entries/independent retains source omission after sibling overwrite
+ FAIL  src/lib/membership-input-contract.spec.ts > supplied absence branch/spread/independent retains source omission after sibling overwrite
+ FAIL  src/lib/membership-input-contract.spec.ts > supplied absence root/direct/independent retains source omission after sibling overwrite
+ FAIL  src/lib/membership-input-contract.spec.ts > supplied absence root/hasOwn/independent retains source omission after sibling overwrite
+ FAIL  src/lib/membership-input-contract.spec.ts > supplied absence root/in/independent retains source omission after sibling overwrite
+ FAIL  src/lib/membership-input-contract.spec.ts > supplied absence root/keys/independent retains source omission after sibling overwrite
+ FAIL  src/lib/membership-input-contract.spec.ts > supplied absence root/entries/independent retains source omission after sibling overwrite
+ FAIL  src/lib/membership-input-contract.spec.ts > supplied absence root/spread/independent retains source omission after sibling overwrite
+ FAIL  src/lib/membership-input-contract.spec.ts > supplied absence updateAndReport/direct/independent retains source omission after sibling overwrite
+ FAIL  src/lib/membership-input-contract.spec.ts > supplied absence updateAndReport/hasOwn/independent retains source omission after sibling overwrite
+ FAIL  src/lib/membership-input-contract.spec.ts > supplied absence updateAndReport/in/independent retains source omission after sibling overwrite
+ FAIL  src/lib/membership-input-contract.spec.ts > supplied absence updateAndReport/keys/independent retains source omission after sibling overwrite
+ FAIL  src/lib/membership-input-contract.spec.ts > supplied absence updateAndReport/entries/independent retains source omission after sibling overwrite
+ FAIL  src/lib/membership-input-contract.spec.ts > supplied absence updateAndReport/spread/independent retains source omission after sibling overwrite
+AssertionError: expected undefined to match object { stage: 'after-callback', …(1) }
+
+- Expected:
+{
+  "reason": "contradiction",
+  "stage": "after-callback",
+}
+
++ Received:
+undefined
+
+ ❯ src/lib/membership-input-contract.spec.ts:66:48
+     64|     expect(p.inspect()).toEqual(before);
+     65|     expect(sent).toEqual([]);
+     66|     if (claim === 'independent') expect(error).toMatchObject({ stage: …
+       |                                                ^
+     67|     else {
+     68|       expect(error).toBeUndefined();
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/19]⎯
+
+ FAIL  src/lib/publication-independent-isolated-omission-input.spec.ts > native omitted-member input after independent sibling overwrite: independent
+AssertionError: expected [ +0 ] to deeply equal []
+
+- Expected
++ Received
+
+- []
++ [
++   0,
++ ]
+
+ ❯ src/lib/publication-independent-isolated-omission-input.spec.ts:32:16
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/19]⎯
+
+
+ Test Files  2 failed | 2 passed (4)
+      Tests  19 failed | 59 passed (78)
+   Start at  01:39:32
+   Duration  1.61s (transform 2.75s, setup 0ms, import 3.56s, tests 267ms, environment 1.84s)
+
+Warning: command "node tools/run-core-vitest.mjs src/lib/possible-owner-window-contract.spec.ts src/lib/membership-input-contract.spec.ts src/lib/publication-independent-isolated-omission-input.spec.ts src/lib/ordinary-member-publication-facts.spec.ts" exited with non-zero status code
+
+
+ NX   Running target test for project kernel failed
+
+Failed tasks:
+
+- kernel:test
+
+Hint: run the command with --verbose for more details.
+
+  Run duration:      2.5s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     2.5s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    2.5s

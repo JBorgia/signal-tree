@@ -1,0 +1,104 @@
+diff --git a/packages/kernel/src/lib/internals/entity-egress-projection.ts b/packages/kernel/src/lib/internals/entity-egress-projection.ts
+index 2371f358..8cad048f 100644
+--- a/packages/kernel/src/lib/internals/entity-egress-projection.ts
++++ b/packages/kernel/src/lib/internals/entity-egress-projection.ts
+@@ -1,3 +1,5 @@
++import type { TerminalRecordPlan } from './intrinsic-mutation';
++import type { EntityPublicationPacket } from './entity-publication';
+ import type { EntityProjectionSeedEntry } from './entity-projection-seed';
+ import {
+   createEntityTopology,
+@@ -58,6 +60,8 @@ export function projectEntityFields(
+ }
+ 
+ export type EntityEgressProjection = {
++  /** Prepare eligible changes without touching the installed relationship. */
++  prepare(packet: EntityPublicationPacket): {readonly record: TerminalRecordPlan; readonly value: readonly unknown[]; readonly changed: boolean};
+   /** The complete eligible `Row[]`, in eligible order. */
+   value(): readonly unknown[];
+   /** Advance local order; only authored order may advance eligible authority. */
+@@ -80,9 +84,10 @@ export type EntityEgressProjection = {
+ };
+ 
+ export function createEntityEgressProjection(
+-  seed: readonly EntityProjectionSeedEntry<Key, unknown>[]
+-): EntityEgressProjection {
+-  let topology: EntityTopology = createEntityTopology(seed);
++  seed: readonly EntityProjectionSeedEntry<Key, unknown>[],
++  preparedTopology?: EntityTopology
++): EntityEgressProjection & {state(): {order:number[];rows:Map<number,unknown>;keys:Map<number,Key>;topology:EntityTopology}} {
++  let topology: EntityTopology = preparedTopology ?? createEntityTopology(seed);
+ 
+   let order: number[] = [];
+   const rows = new Map<number, unknown>();
+@@ -150,6 +155,49 @@ export function createEntityEgressProjection(
+   }
+ 
+   return {
++    prepare(packet) {
++      const structural = packet.physical.some(edit => edit.structural !== undefined) ||
++        packet.ordinary.some(edit => edit.structural !== undefined || !rows.has(edit.subject)) ||
++        packet.physicalOrder !== undefined || packet.ordinaryOrder !== undefined;
++      if (!structural) {
++        // Existing-row point writes prepare only touched rows. Rendering a
++        // subscribed collection's complete output is separate, requested work.
++        const touched = new Map<number, unknown>();
++        let changed = false;
++        for (const edit of packet.ordinary) {
++          const before = touched.has(edit.subject) ? touched.get(edit.subject) : rows.get(edit.subject);
++          const after = projectEntityFields(before, edit.after, edit.fields);
++          if (after !== before) { touched.set(edit.subject, after); changed = true; }
++        }
++        return {
++          record: {writes: [...touched].map(([key,value]) => ({map:rows,key,value})), adds: []},
++          value: order.map(subject => touched.has(subject) ? touched.get(subject) : rows.get(subject)),
++          changed,
++        };
++      }
++      // Structural operations already request placement interpretation. Its
++      // private draft retains the relationship's latent inspection topology,
++      // rather than reseeding authority from the source's physical rows.
++      const draft = createEntityEgressProjection(order.map(subjectId => ({
++        subjectId, key: keyOf.get(subjectId)!, row: rows.get(subjectId),
++      })), topology.fork());
++      for (const edit of packet.physical)
++        if (edit.structural) draft.apply(edit.subject,edit.after,edit.structural,true,edit.fields);
++      if (packet.physicalOrder) draft.reorder(packet.physicalOrder,true);
++      let changed = false;
++      for (const edit of packet.ordinary)
++        changed = draft.apply(edit.subject,edit.after,edit.structural,false,edit.fields,true) || changed;
++      if (packet.ordinaryOrder) changed = draft.reorder(packet.ordinaryOrder,false,true) || changed;
++      const prepared = draft.state();
++      const install = {set(_key:unknown,_value:unknown) {
++        order = prepared.order;
++        rows.clear(); for (const [key,value] of prepared.rows) rows.set(key,value);
++        keyOf.clear(); for (const [key,value] of prepared.keys) keyOf.set(key,value);
++        topology = prepared.topology;
++      }};
++      return {record:{writes:[{map:install,key:undefined,value:undefined}],adds:[]},value:draft.value(),changed};
++    },
++    state: () => ({order,rows,keys:keyOf,topology}),
+     value: () => order.map((s) => rows.get(s)),
+ 
+     reorder(afterSubjects, inspection, ordinary = false) {
+diff --git a/packages/kernel/src/lib/internals/source-mutation.ts b/packages/kernel/src/lib/internals/source-mutation.ts
+index 9337c775..73ee2e2a 100644
+--- a/packages/kernel/src/lib/internals/source-mutation.ts
++++ b/packages/kernel/src/lib/internals/source-mutation.ts
+@@ -90,6 +90,8 @@ export type StructuralEffect = {
+  * type is a journal, a replay log, or a causal graph.
+  */
+ export type EntityTopology = {
++  /** Private preparation draft; never used for point-only updates. */
++  fork(): EntityTopology;
+   /** Advance to reflect one structural effect, whoever authored it. */
+   observe(effect: StructuralEffect): void;
+   /** The current address of a subject, which a row payload cannot supply. */
+@@ -132,6 +134,7 @@ export function createEntityTopology(
+   reload(seed);
+ 
+   return {
++    fork: () => createEntityTopology(order.map(subjectId => ({subjectId, key: keys.get(subjectId)!, row: undefined}))),
+     reload,
+     reorder: (afterSubjects) => {
+       order = [...afterSubjects];

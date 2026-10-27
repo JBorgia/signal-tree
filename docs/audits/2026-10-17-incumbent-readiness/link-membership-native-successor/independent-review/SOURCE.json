@@ -1,0 +1,12 @@
+{
+  "head": "2d24966cc457529f876b06d950dd181acb5bfb69",
+  "files": {
+    "packages/kernel/src/lib/experimental-publication/lifecycle.ts": "e73ecac423ca3277539a57945180e44383c597e6f8d5d25a1b5ce29a1a908325",
+    "packages/kernel/src/lib/experimental-publication/private.ts": "a244fad496606c969b6539893c7078f5aac16b48504a96dcfc319eab8d84dada",
+    "packages/kernel/src/lib/internals/intrinsic-mutation.ts": "e1bfbeeb945e3b443bb5e4afe0b7229089911cbbda1e86f4c688079f5cf49013",
+    "packages/kernel/src/lib/signal-tree.ts": "2361130db80fe428ac1017313fca44f90f86ffb2a34b69eefc9cd300d12ee09d",
+    "packages/kernel/src/lib/utils.ts": "307f39dfe11febe766c3d1b30bc30c9f9dec8d93cdf59c1f717479966e95b460",
+    "packages/kernel/src/lib/internals/tree-scalar-slot-runtime.ts": "766a3f606b3f2ff59492c45a0748f69b07739262e213cbd9baa91eb10b3b9165",
+    "packages/kernel/src/lib/native-window-preparation-audit.spec.ts": "e24b6714a2a08407064c3dbb4166ba1bfd3c227d8b52baae7ee00ac1c1f2f042"
+  }
+}

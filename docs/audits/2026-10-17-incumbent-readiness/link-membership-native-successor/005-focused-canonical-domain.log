@@ -1,0 +1,104 @@
+
+> nx run kernel:test src/lib/possible-owner-window-contract.spec.ts src/lib/membership-input-contract.spec.ts src/lib/publication-independent-isolated-omission-input.spec.ts src/lib/ordinary-member-publication-facts.spec.ts
+
+> node tools/run-core-vitest.mjs src/lib/possible-owner-window-contract.spec.ts src/lib/membership-input-contract.spec.ts src/lib/publication-independent-isolated-omission-input.spec.ts src/lib/ordinary-member-publication-facts.spec.ts
+
+(node:65265) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:65267) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/link-membership-native-successor/packages/kernel
+
+(node:65277) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:65278) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:65275) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:65276) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ❯ src/lib/membership-input-contract.spec.ts (54 tests | 6 failed) 81ms
+   × primed branch input refreshes equal-value support while retaining absence (true) 5ms
+   × primed root input refreshes equal-value support while retaining absence (true) 1ms
+   × primed updateAndReport input refreshes equal-value support while retaining absence (true) 1ms
+   × branch distinguishes own undefined from pending ordinary absence (true) 2ms
+   × root distinguishes own undefined from pending ordinary absence (true) 1ms
+   × updateAndReport distinguishes own undefined from pending ordinary absence (true) 1ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 6 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/lib/membership-input-contract.spec.ts > primed branch input refreshes equal-value support while retaining absence (true)
+ FAIL  src/lib/membership-input-contract.spec.ts > primed root input refreshes equal-value support while retaining absence (true)
+ FAIL  src/lib/membership-input-contract.spec.ts > primed updateAndReport input refreshes equal-value support while retaining absence (true)
+AssertionError: expected { state: 'conservative', …(1) } to match object { state: 'held' }
+(1 matching property omitted from actual)
+
+- Expected
++ Received
+
+  {
+-   "state": "held",
++   "state": "conservative",
+  }
+
+ ❯ src/lib/membership-input-contract.spec.ts:109:62
+    107|     if (!complete) expect(error).toMatchObject({ stage: 'after-callbac…
+    108|     else {
+    109|       expect(error).toBeUndefined(); expect(receipt?.read()).toMatchOb…
+       |                                                              ^
+    110|       p.confirm(); await flush(); expect(sent).toEqual([]);
+    111|       q.confirm(); await flush(); expect(sent).toEqual([0]);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/6]⎯
+
+ FAIL  src/lib/membership-input-contract.spec.ts > branch distinguishes own undefined from pending ordinary absence (true)
+ FAIL  src/lib/membership-input-contract.spec.ts > root distinguishes own undefined from pending ordinary absence (true)
+ FAIL  src/lib/membership-input-contract.spec.ts > updateAndReport distinguishes own undefined from pending ordinary absence (true)
+AssertionError: expected { state: 'conservative', …(1) } to match object { state: 'held' }
+(1 matching property omitted from actual)
+
+- Expected
++ Received
+
+  {
+-   "state": "held",
++   "state": "conservative",
+  }
+
+ ❯ src/lib/membership-input-contract.spec.ts:134:30
+    132|     if (omitted) {
+    133|       expect(target.$.value()).toBe(0); expect(sent).toEqual([]);
+    134|       expect(receipt.read()).toMatchObject({ state: 'held' });
+       |                              ^
+    135|       p.confirm(); await flush(); expect(sent).toEqual([0]);
+    136|     } else { expect(target.$.value()).toBe(1); expect(sent).toEqual([1…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/6]⎯
+
+
+ Test Files  1 failed | 3 passed (4)
+      Tests  6 failed | 72 passed (78)
+   Start at  01:40:50
+   Duration  1.59s (transform 3.04s, setup 0ms, import 3.74s, tests 173ms, environment 1.58s)
+
+Warning: command "node tools/run-core-vitest.mjs src/lib/possible-owner-window-contract.spec.ts src/lib/membership-input-contract.spec.ts src/lib/publication-independent-isolated-omission-input.spec.ts src/lib/ordinary-member-publication-facts.spec.ts" exited with non-zero status code
+
+
+ NX   Running target test for project kernel failed
+
+Failed tasks:
+
+- kernel:test
+
+Hint: run the command with --verbose for more details.
+
+  Run duration:      2.2s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     2.1s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    2.1s

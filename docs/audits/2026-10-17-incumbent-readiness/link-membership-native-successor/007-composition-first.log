@@ -1,0 +1,108 @@
+
+> nx run kernel:test src/lib/publication-enrollment-adjudicated.spec.ts src/lib/publication-native-provenance.spec.ts src/lib/publication-evidence-scope-controls.spec.ts src/lib/publication-membership-provenance.spec.ts src/lib/a1-installed-publication.spec.ts src/lib/a1-independent-review.spec.ts src/lib/aggregate-installed-publication.spec.ts src/lib/aggregate-native-input-independent.spec.ts src/lib/ordinary-presence-independent.spec.ts src/lib/nested-absence-independent.spec.ts src/lib/link-async-settlement.spec.ts src/lib/link-inflight-settlement-audit.spec.ts
+
+> node tools/run-core-vitest.mjs src/lib/publication-enrollment-adjudicated.spec.ts src/lib/publication-native-provenance.spec.ts src/lib/publication-evidence-scope-controls.spec.ts src/lib/publication-membership-provenance.spec.ts src/lib/a1-installed-publication.spec.ts src/lib/a1-independent-review.spec.ts src/lib/aggregate-installed-publication.spec.ts src/lib/aggregate-native-input-independent.spec.ts src/lib/ordinary-presence-independent.spec.ts src/lib/nested-absence-independent.spec.ts src/lib/link-async-settlement.spec.ts src/lib/link-inflight-settlement-audit.spec.ts
+
+(node:68594) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:68597) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/link-membership-native-successor/packages/kernel
+
+(node:68611) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:68604) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:68612) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:68608) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:68605) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:68606) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:68607) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:68609) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:68610) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:68615) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ❯ src/lib/aggregate-installed-publication.spec.ts (15 tests | 1 failed) 74ms
+     × ancestor updater argument wider than descendant recipient stays unknown rather than borrowing sibling input proof 7ms
+(node:68616) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:68617) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ❯ src/lib/aggregate-native-input-independent.spec.ts (1 test | 1 failed) 17ms
+   × native ancestor updater cannot publish pending sibling input through a descendant relationship 16ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/lib/aggregate-installed-publication.spec.ts > authorized existing-key branch/root installed publication > ancestor updater argument wider than descendant recipient stays unknown rather than borrowing sibling input proof
+AssertionError: expected [ { x: 1, y: +0 } ] to deeply equal []
+
+- Expected
++ Received
+
+- []
++ [
++   {
++     "x": 1,
++     "y": 0,
++   },
++ ]
+
+ ❯ src/lib/aggregate-installed-publication.spec.ts:131:69
+    129|   try{
+    130|    const receipt=c.declare({kind:'independent'},()=>t.$(input=>({...in…
+    131|    await flush();expect(t.$.pair()).toEqual({x:1,y:0});expect(sent).to…
+       |                                                                     ^
+    132|    expect(owner.$.z()).toBe(7);p.rollback();await flush();expect(sent)…
+    133|   }finally{c.dispose();t.destroy();owner.destroy();}
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  src/lib/aggregate-native-input-independent.spec.ts > native ancestor updater cannot publish pending sibling input through a descendant relationship
+Error: Declaration invalid: contradiction; writes may remain
+ ❯ Module.runDeclaration src/lib/experimental-publication/lifecycle.ts:220:32
+    218|   try{result=work();}catch(error){thrown=true;primary=error;}
+    219|   if(result!==null&&(typeof result==='object'||typeof result==='functi…
+    220|   if(frameInvalid(frame))throw new SignalTreePublicationError(stage,'c…
+       |                                ^
+    221|   if(thrown)throw primary;
+    222|   return receipt;
+ ❯ Module.declare src/lib/experimental-publication/private.ts:300:142
+ ❯ Object.declare src/lib/link.ts:1103:16
+ ❯ src/lib/aggregate-native-input-independent.spec.ts:14:19
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+ Test Files  2 failed | 10 passed (12)
+      Tests  2 failed | 103 passed (105)
+   Start at  01:43:01
+   Duration  2.17s (transform 4.90s, setup 0ms, import 7.24s, tests 565ms, environment 6.15s)
+
+Warning: command "node tools/run-core-vitest.mjs src/lib/publication-enrollment-adjudicated.spec.ts src/lib/publication-native-provenance.spec.ts src/lib/publication-evidence-scope-controls.spec.ts src/lib/publication-membership-provenance.spec.ts src/lib/a1-installed-publication.spec.ts src/lib/a1-independent-review.spec.ts src/lib/aggregate-installed-publication.spec.ts src/lib/aggregate-native-input-independent.spec.ts src/lib/ordinary-presence-independent.spec.ts src/lib/nested-absence-independent.spec.ts src/lib/link-async-settlement.spec.ts src/lib/link-inflight-settlement-audit.spec.ts" exited with non-zero status code
+
+
+ NX   Running target test for project kernel failed
+
+Failed tasks:
+
+- kernel:test
+
+Hint: run the command with --verbose for more details.
+
+  Run duration:      2.7s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     2.7s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    2.7s

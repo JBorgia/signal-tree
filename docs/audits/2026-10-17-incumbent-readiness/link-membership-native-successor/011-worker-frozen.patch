@@ -1,0 +1,511 @@
+diff --git a/packages/kernel/src/lib/experimental-publication/lifecycle.ts b/packages/kernel/src/lib/experimental-publication/lifecycle.ts
+index e498eef8..8d21a5e6 100644
+--- a/packages/kernel/src/lib/experimental-publication/lifecycle.ts
++++ b/packages/kernel/src/lib/experimental-publication/lifecycle.ts
+@@ -42,18 +42,21 @@ type View = {value:State};
+ type Connection={report:(error:unknown)=>void;wake:()=>void;supported:boolean;ops:Map<object,Operation>;disposed:boolean};
+ type Horizon={frames:Set<Frame>;requirements:Set<NativeRequirement>;open:number};
+ type Frame={channel:object;connection:Connection;parents:readonly Frame[];horizon:Horizon;declaredOwners?:readonly OwnerCell[];owners:OwnerCell[];unknown:boolean;invalid:boolean;view:View;last?:object;ops:Set<Operation>;installedOwners:Set<OwnerCell>};
+-export type Proof={owners:readonly OwnerCell[];unknown:boolean;invalid:boolean};
++export type Proof={owners:readonly OwnerCell[];possible?:readonly OwnerCell[];unknown:boolean;invalid:boolean};
+ /** Source-owned facts. Until horizon close only actual executing frames are held. */
+-export type NativeRequirement={proof?:Proof;inputs:readonly NativeRequirement[];frames:readonly Frame[];known:readonly OwnerCell[];unknown:boolean};
++export type NativeRequirement={proof?:Proof;inputs:readonly NativeRequirement[];frames:readonly Frame[];known:readonly OwnerCell[];unknown:boolean;possible:readonly OwnerCell[];captureWindow:boolean};
+ export function nativeProof(requirement: NativeRequirement): Proof {
+  const p=requirement.proof;if(p)return p;
+  const parts=[...requirement.inputs.map(nativeProof),...requirement.frames.map(effective)];
+- return {owners:[...new Set([...requirement.known,...parts.flatMap(p=>p.owners)])],unknown:requirement.unknown||parts.some(p=>p.unknown),invalid:parts.some(p=>p.invalid)};
++ return {owners:[...new Set([...requirement.known,...parts.flatMap(p=>p.owners)])],possible:[...new Set([...requirement.possible,...parts.flatMap(p=>p.possible??[])])],unknown:requirement.unknown||requirement.possible.length>0||parts.some(p=>p.unknown),invalid:parts.some(p=>p.invalid)};
+ }
+-export function initialRequirement():NativeRequirement{return {proof:{owners:[],unknown:false,invalid:false},inputs:[],frames:[],known:[],unknown:false};}
++export function initialRequirement():NativeRequirement{return {proof:{owners:[],unknown:false,invalid:false},inputs:[],frames:[],known:[],unknown:false,possible:[],captureWindow:false};}
+ export function prepareNativeRequirement(known:readonly OwnerCell[], unknown:boolean, inputs:readonly NativeRequirement[]):{requirement:NativeRequirement;record:TerminalRecordPlan}{
+  const active=[...stack];
+- const requirement:NativeRequirement={known:Object.freeze([...known]),unknown,inputs:Object.freeze([...inputs]),frames:active};
++ // Authentic transaction authorship already has a known owner. Possible-origin
++ // windows cover unscoped ordinary writes, not a duplicate of that owner proof.
++ const captureWindow=known.length===0&&(active.length===0||active.some(f=>f.declaredOwners===undefined));
++ const requirement:NativeRequirement={known:Object.freeze([...known]),unknown,inputs:Object.freeze([...inputs]),frames:active,possible:[],captureWindow};
+  const evidence=nativeProof(requirement);
+  const adds:TerminalRecordPlan['adds'][number][]=[];
+  for(const frame of active){
+@@ -63,9 +66,14 @@ export function prepareNativeRequirement(known:readonly OwnerCell[], unknown:boo
+  }
+  const h=active.at(-1)?.horizon;
+  if(h)adds.push({set:h.requirements,value:requirement});
+- else {requirement.proof=evidence;requirement.inputs=[];requirement.frames=[];requirement.known=[];}
++ // Pure window finalization occurs after all callback-capable preparers, before installation.
+  return {requirement,record:{writes:[],adds}};
+ }
++export function finalizeNativeRequirement(requirement:NativeRequirement):void {
++ if(requirement.captureWindow)requirement.possible=Object.freeze([...pending]);
++ // Source inputs are immutable snapshots; only the not-yet-installed unit's own window is refreshed.
++ if(requirement.frames.length===0){requirement.proof=nativeProof(requirement);requirement.inputs=[];requirement.known=[];}
++}
+ type Operation={native?:NativeRequirement;coverageUnknown:boolean;channel:object;dependencies:Set<OwnerCell>;revision:object;frames:Set<Frame>;proof?:Proof;views:Set<View>;started:boolean;surviving:boolean;noopFallbacks:Map<View,Operation>};
+ const connections=new Map<object,Connection>();
+ const stack:Frame[]=[];
+@@ -148,7 +156,7 @@ export function keepRevision(channel:object,revision:object):void{connections.ge
+ export function decision(channel:object,revision:object):{early:boolean;pending:boolean}{
+  const op=connections.get(channel)?.ops.get(revision);if(!op)return {early:false,pending:false};
+  if(op.frames.size)return {early:false,pending:true};
+- const p=op.proof!;return {early:!p.invalid&&!p.unknown&&p.owners.every(x=>x.outcome==='confirmed'),pending:p.owners.some(x=>x.outcome==='pending')};
++ const p=op.proof!;return {early:!p.invalid&&!p.unknown&&p.owners.every(x=>x.outcome==='confirmed'),pending:[...p.owners,...(p.possible??[])].some(x=>x.outcome==='pending'||x.outcome==='abandoned')};
+ }
+ function retire(op:Operation):void{for(const cell of op.dependencies)cell.dependents.delete(op);}
+ export function started(channel:object,revision:object,basis:'declared'|'surviving'='declared'):void{
+@@ -177,8 +185,8 @@ function finish(h:Horizon):void{
+  }
+  for(const op of operations){
+   const proofs=[...op.frames].map(effective);if(op.native)proofs.push(nativeProof(op.native));
+-  op.proof={owners:[...new Set(proofs.flatMap(p=>p.owners))],unknown:op.coverageUnknown||proofs.some(p=>p.unknown),invalid:proofs.some(p=>p.invalid)};
+-  for(const cell of op.proof.owners){op.dependencies.add(cell);cell.dependents.add(op);}
++  op.proof={owners:[...new Set(proofs.flatMap(p=>p.owners))],possible:[...new Set(proofs.flatMap(p=>p.possible??[]))],unknown:op.coverageUnknown||proofs.some(p=>p.unknown),invalid:proofs.some(p=>p.invalid)};
++  for(const cell of [...op.proof.owners,...(op.proof.possible??[])]){op.dependencies.add(cell);cell.dependents.add(op);}
+   op.frames.clear();refresh(op);wake(op.channel);
+  }
+  for(const f of h.frames){f.ops.clear();f.installedOwners.clear();installedLast.delete(f);unknownFrames.delete(f);invalidFrames.delete(f);}
+@@ -230,4 +238,4 @@ export function isValidating():boolean{return stack.length!==0;}
+ 
+ export function completeDeclarationContext(channel:object):boolean{return stack.some(f=>f.channel===channel)&&stack.every(f=>f.declaredOwners!==undefined&&!frameUnknown(f));}
+ 
+-export function projectRevision(channel:object,revision:object,proof:Readonly<Proof>):void{const op=connections.get(channel)?.ops.get(revision);if(op){op.proof=proof;for(const cell of proof.owners){op.dependencies.add(cell);cell.dependents.add(op);}refresh(op);}}
++export function projectRevision(channel:object,revision:object,proof:Readonly<Proof>):void{const op=connections.get(channel)?.ops.get(revision);if(op){op.proof=proof;for(const cell of [...proof.owners,...(proof.possible??[])]){op.dependencies.add(cell);cell.dependents.add(op);}refresh(op);}}
+diff --git a/packages/kernel/src/lib/experimental-publication/private.ts b/packages/kernel/src/lib/experimental-publication/private.ts
+index c9f34b56..991f776c 100644
+--- a/packages/kernel/src/lib/experimental-publication/private.ts
++++ b/packages/kernel/src/lib/experimental-publication/private.ts
+@@ -5,13 +5,13 @@ import { applyAtRelativePath, relativeSourceAddress } from '../internals/source-
+ import { getRetainedMembershipPath } from '../internals/member-membership';
+ import type { WriteMetadata } from '../mutation-types';
+ import { getActiveWriteContext } from '../write-context';
+-import { combineTerminalRecords, preparePublicationMutations, registerMembershipPublication, registerBranchPublicationInputs, registerNativePublicationFactory, type MembershipPublicationEdit, type IntrinsicMutation, type PreparedPublicationUnit } from '../internals/intrinsic-mutation';
++import { combineTerminalRecords, preparePublicationMutations, registerMembershipPublication, registerBranchPublicationInputs, registerNativePublicationFactory, registerPublicationSnapshots, type MembershipPublicationEdit, type IntrinsicMutation, type PreparedPublicationUnit } from '../internals/intrinsic-mutation';
+ import * as projection from './projection';
+ import * as lifecycle from './lifecycle';
+ export {stampSource,subscribeProjection,deliverEqual} from './projection';
+ export {enroll,SignalTreePublicationError} from './lifecycle';
+ type Cell=lifecycle.OwnerCell;
+-type Proof=Readonly<{owners:readonly Cell[];unknown:boolean;invalid:boolean}>;
++type Proof=Readonly<lifecycle.Proof>;
+ type Fact=Readonly<{revision:number;clean:boolean;blockers:readonly Cell[];unknown:boolean}>;
+ type Slot=Readonly<{branch:object;key:string;child:object;address?:readonly string[]}>;
+ type Presence=Readonly<{present:boolean;fact:Fact}>;
+@@ -19,7 +19,7 @@ type Unit={native?:lifecycle.NativeRequirement;coverageUnknown?:boolean;fact:Fac
+ type SlotTrie={children:Map<string,SlotTrie>;slots:Map<object,Slot>};
+ type FieldInfo={relative:readonly string[];address:readonly string[]};
+ type FieldTrie={children:Map<string,FieldTrie>;field?:object};
+-type Summary={owners:Map<Cell,number>;unknown:number;invalid:number};
++type Summary={owners:Map<Cell,number>;possible:Map<Cell,number>;unknown:number;invalid:number};
+ type Binding={aggregate:boolean;initialized:Set<object>;valueInitialized:boolean;slotTrie:SlotTrie;fields:Map<object,FieldInfo>;fieldTrie:FieldTrie;fieldFacts:Map<object,Fact>;completedFields:Map<object,Fact>;summary:Summary;releases:(()=>void)[];owner:number;position:number;current?:Fact;valueFact:Fact;completedValueFact:Fact;valuePayload:unknown;baselineStructure:Fact;presence:Map<Slot,Presence>;completedPresence:Map<Slot,Presence>;source?:object;registry?:object;address?:readonly string[];pending:Set<Unit>;projected?:Readonly<{fact:Fact;payload:unknown}>;release?:()=>void};
+ const bindings=new Map<object,Binding>();
+ const proofs=new WeakMap<Fact,Proof>();
+@@ -38,7 +38,7 @@ export function mode(value:boolean):void{enabled=value;}
+ export function register(owner:number,_source:unknown,token:object):void{lifecycle.registerOwnerSource(owner,token);}
+ export function unregister(owner:number|undefined):void{if(owner!==undefined)lifecycle.unregisterOwnerSource(owner);}
+ export function transition(owner:number|undefined,event:{kind:string;transactionId:number}):void{if(owner!==undefined)lifecycle.ownerTransition(owner,event);}
+-const sameProof=(a:Proof|undefined,b:Proof|undefined):boolean=>!!a&&!!b&&a.unknown===b.unknown&&a.invalid===b.invalid&&a.owners.length===b.owners.length&&a.owners.every(x=>b.owners.includes(x));
++const sameProof=(a:Proof|undefined,b:Proof|undefined):boolean=>!!a&&!!b&&a.unknown===b.unknown&&a.invalid===b.invalid&&a.owners.length===b.owners.length&&a.owners.every(x=>b.owners.includes(x))&&(a.possible??[]).length===(b.possible??[]).length&&(a.possible??[]).every(x=>(b.possible??[]).includes(x));
+ type Trie={children:Map<string,Trie>;channels:Set<object>};
+ const tries=new WeakMap<object,Trie>();
+ let indexedBindings=0;
+@@ -47,8 +47,8 @@ function removeIndex(registry:object,address:readonly string[],channel:object):v
+ function trieFor(registry:object,address:readonly string[],create:boolean):Trie|undefined{let node=tries.get(registry);if(!node&&create)tries.set(registry,node={children:new Map(),channels:new Set()});for(const key of address){let next=node?.children.get(key);if(!next&&create&&node)node.children.set(key,next={children:new Map(),channels:new Set()});node=next;}return node;}
+ function collect(node:Trie|undefined,result:object[]):void{if(!node)return;result.push(...node.channels);for(const child of node.children.values())collect(child,result);}
+ function reaches(child:object,suffix:readonly string[],source:object):boolean{let node:unknown=child;for(const key of suffix){if((typeof node!=='object'||node===null)&&typeof node!=='function')return false;const descriptor=Object.getOwnPropertyDescriptor(node,key);if(!descriptor||!('value'in descriptor))return false;node=descriptor.value;}return node===source;}
+-function combineProofs(parts:readonly (Proof|undefined)[]):Proof{return {owners:Object.freeze([...new Set(parts.flatMap(part=>part?.owners??[]))]),unknown:parts.some(part=>!part||part.unknown),invalid:parts.some(part=>part?.invalid===true)};}
+-function adjust(summary:Summary,proof:Proof|undefined,direction:number):void{if(!proof){summary.unknown+=direction;return;}if(proof.unknown)summary.unknown+=direction;if(proof.invalid)summary.invalid+=direction;for(const owner of proof.owners){const count=(summary.owners.get(owner)??0)+direction;if(count)summary.owners.set(owner,count);else summary.owners.delete(owner);}}
++function combineProofs(parts:readonly (Proof|undefined)[]):Proof{return {owners:Object.freeze([...new Set(parts.flatMap(part=>part?.owners??[]))]),possible:Object.freeze([...new Set(parts.flatMap(part=>part?.possible??[]))]),unknown:parts.some(part=>!part||part.unknown),invalid:parts.some(part=>part?.invalid===true)};}
++function adjust(summary:Summary,proof:Proof|undefined,direction:number):void{if(!proof){summary.unknown+=direction;return;}if(proof.unknown)summary.unknown+=direction;if(proof.invalid)summary.invalid+=direction;for(const owner of proof.owners){const count=(summary.owners.get(owner)??0)+direction;if(count)summary.owners.set(owner,count);else summary.owners.delete(owner);}for(const owner of proof.possible??[]){const count=(summary.possible.get(owner)??0)+direction;if(count)summary.possible.set(owner,count);else summary.possible.delete(owner);}}
+ function own(fact:Fact,channel:object):Proof|undefined{return ownProofs.get(fact)??lifecycle.proof(factChannels.get(fact)??channel,fact);}
+ function fieldAt(root:FieldTrie,path:readonly string[],create=false):FieldTrie|undefined{let node:FieldTrie|undefined=root;for(const key of path){let next:FieldTrie|undefined=node?.children.get(key);if(!next&&create&&node)node.children.set(key,next={children:new Map()});node=next;}return node;}
+ function fieldNodes(node:FieldTrie|undefined,out:object[]):void{if(!node)return;if(node.field)out.push(node.field);for(const child of node.children.values())fieldNodes(child,out);}
+@@ -70,15 +70,35 @@ const branchInputs:BranchInput[]=[];
+ // No payload/history is retained; weak keys release facts with their native source.
+ const nativeValues=new WeakMap<object,lifecycle.NativeRequirement>();
+ const nativeMembers=new WeakMap<object,lifecycle.NativeRequirement>();
+-function nativeInputs(node:object):lifecycle.NativeRequirement[]{
+- const result:lifecycle.NativeRequirement[]=[];const seen=new Set<object>();
+- const visit=(candidate:unknown):void=>{
+-  if(!isTraversableNode(candidate)||seen.has(candidate))return;seen.add(candidate);
+-  for(const entry of getRetainedMembershipPath(candidate)) {const fact=nativeMembers.get(entry.child);if(fact)result.push(fact);}
+-  if(isWritableLocation(candidate)){const fact=nativeValues.get(candidate);if(fact)result.push(fact);return;}
+-  const storage=nodeStoreOf(candidate)??candidate;
+-  for(const key of Object.keys(storage)){const descriptor=Object.getOwnPropertyDescriptor(storage,key);if(descriptor&&'value'in descriptor)visit(descriptor.value);}
+- };visit(node);return [...new Set(result)];
++const nativeNegativeDomains=new WeakMap<object,Map<object,lifecycle.NativeRequirement>>();
++// A physical view identity holds only its support, never a second copy of values.
++// Equal-value support updates replace this cell's requirement; changing physical
++// views creates a new cell, so a cached snapshot cannot borrow current proof.
++type NativeView={requirement:lifecycle.NativeRequirement};
++const nativeViews=new WeakMap<object,NativeView>();
++const memberViews=new WeakMap<object,NativeView>();
++const negativeViews=new WeakMap<object,Map<object,NativeView>>();
++const snapshotViews=new WeakMap<object,readonly NativeView[]>();
++const unavailableInput=():lifecycle.NativeRequirement=>({proof:{owners:[],unknown:true,invalid:false},inputs:[],frames:[],known:[],unknown:true,possible:[],captureWindow:false});
++function suppliedViews(node:object,supplied?:unknown):NativeView[]{
++ if(supplied!==null&&typeof supplied==='object'){
++  const certificate=snapshotViews.get(supplied);if(certificate)return [...certificate];
++ }
++ const own:NativeView[]=[];
++ for(const edge of getRetainedMembershipPath(node)){const view=memberViews.get(edge.child);if(view)own.push(view);if(!edge.present)return own;}
++ if(isWritableLocation(node)){const view=nativeViews.get(node);if(view)own.push(view);return own;}
++ const storage=nodeStoreOf(node)??node;
++ own.push(...(negativeViews.get(storage)?.values()??[]));
++ for(const key of Object.keys(storage)){
++  const descriptor=Object.getOwnPropertyDescriptor(storage,key);if(!descriptor||!('value'in descriptor)||!isTraversableNode(descriptor.value))continue;
++  const value=supplied!==null&&typeof supplied==='object'?(supplied as Record<string,unknown>)[key]:undefined;
++  own.push(...suppliedViews(descriptor.value,value));
++ }
++ return own;
++}
++registerPublicationSnapshots((node,value)=>{snapshotViews.set(value,Object.freeze(suppliedViews(node,value)));});
++function nativeInputs(node:object,supplied?:unknown):lifecycle.NativeRequirement[]{
++ return [...new Set(suppliedViews(node,supplied).map(view=>view.requirement))];
+ }
+ function nativeAuthorship(node:object):{known:Cell[];unknown:boolean}{
+  const meta=getActiveWriteContext();const owner=getPositionRegistry(node)?.id;const id=meta?.transactionId;
+@@ -86,20 +106,25 @@ function nativeAuthorship(node:object):{known:Cell[];unknown:boolean}{
+  return {known:cell?[cell]:[],unknown:meta?.origin!==undefined||(id!==undefined&&(!cell||meta?.transactionOwner!==lifecycle.ownerToken(owner!)))};
+ }
+ registerNativePublicationFactory(node=>{
+- nativeValues.set(node,lifecycle.initialRequirement());
++ const initial=lifecycle.initialRequirement();nativeValues.set(node,initial);nativeViews.set(node,{requirement:initial});
+  return {
+   captureInput:()=>({native:Object.freeze(nativeInputs(node))}),
+   prepare:(mutation,input)=>{
+-   if(getActiveWriteContext()?.participation==='inspection')return;
++   if(getActiveWriteContext()?.participation==='inspection'){
++    return {record:{writes:mutation.changed?[{map:nativeViews,key:node,value:{requirement:unavailableInput()}}]:[],adds:[]},completion:{}};
++   }
++   if(!mutation.changed&&!lifecycle.isValidating()&&!branchInputs.length)return;
+    const authored=nativeAuthorship(node);
+    const consumed=mutation.intent==='derive'?(input as {native?:readonly lifecycle.NativeRequirement[]}|undefined)?.native??[]:[];
+    const prepared=lifecycle.prepareNativeRequirement(authored.known,authored.unknown,[...consumed,...branchInputs.flatMap(scope=>scope.native)]);
+-   return {record:combineTerminalRecords(prepared.record,{writes:[{map:nativeValues,key:node,value:prepared.requirement}],adds:[]})!,completion:{requirement:prepared.requirement}};
++   const existingView=nativeViews.get(node);
++   const view=mutation.changed||!existingView?{requirement:prepared.requirement}:existingView;
++   return {record:combineTerminalRecords(prepared.record,{writes:[{map:nativeValues,key:node,value:prepared.requirement},{map:nativeViews,key:node,value:view},...(!mutation.changed&&existingView?[{map:{set:(_key:unknown,value:unknown)=>{existingView.requirement=value as lifecycle.NativeRequirement;}},key:node,value:prepared.requirement}]:[])],adds:[]})!,completion:{requirement:prepared.requirement},finalize:()=>lifecycle.finalizeNativeRequirement(prepared.requirement)};
+   },
+   complete:()=>{},
+  };
+ });
+-function beginBranchInput(node:object):object|undefined{
++function beginBranchInput(node:object,supplied?:unknown):object|undefined{
+  const registry=getPositionRegistry(node),address=getNodeAddress(node);const recipients=new Map<object,InputEvidence>();
+  if(registry&&address){const keys:object[]=[];let trie=tries.get(registry);if(trie){keys.push(...trie.channels);for(const part of address){trie=trie.children.get(part);if(!trie)break;keys.push(...trie.channels);}collect(trie,keys);}
+   for(const key of new Set(keys)){const b=bindings.get(key);if(!b?.address)continue;const within=relativeSourceAddress(b.address,address);const encloses=relativeSourceAddress(address,b.address);if(within===undefined&&encloses===undefined)continue;const captured:Fact[]=[];let covered=false;
+@@ -108,15 +133,22 @@ function beginBranchInput(node:object):object|undefined{
+    recipients.set(key,{facts:Object.freeze([...new Set(captured)]),unknown:!covered});
+   }
+  }
+- const input:BranchInput={recipients,native:Object.freeze(nativeInputs(node))};branchInputs.push(input);return input;
++ const input:BranchInput={recipients,native:Object.freeze(nativeInputs(node,supplied))};branchInputs.push(input);return input;
+ }
+ function endBranchInput(token:object):void{if(branchInputs.at(-1)!==token)throw new Error('Branch publication input scope mismatch');branchInputs.pop();}
+-function projectionSupport(b:Binding):{proof:Proof;present:boolean}{if(b.aggregate){const base:Proof={owners:Object.freeze([...b.summary.owners.keys()]),unknown:b.summary.unknown>0,invalid:b.summary.invalid>0};const parent=slotsAlong(b,b.address??[]).map(slot=>b.completedPresence.get(slot)).filter((state):state is Presence=>state!==undefined);const absent=parent.filter(state=>!state.present);return {proof:absent.length?combineProofs(absent.map(state=>ownProofs.get(state.fact)??proofs.get(state.fact))):combineProofs([base,ownProofs.get(b.baselineStructure)??proofs.get(b.baselineStructure),...parent.map(state=>ownProofs.get(state.fact)??proofs.get(state.fact))]),present:absent.length===0};}const absent=[...b.completedPresence.values()].filter(state=>!state.present);const contributing=absent.length?absent.map(state=>state.fact):[b.baselineStructure,b.completedValueFact,...[...b.completedPresence.values()].map(state=>state.fact)];return {proof:combineProofs(contributing.map(fact=>ownProofs.get(fact)??proofs.get(fact))),present:absent.length===0};}
++function projectionSupport(b:Binding):{proof:Proof;present:boolean}{if(b.aggregate){const base:Proof={owners:Object.freeze([...b.summary.owners.keys()]),possible:Object.freeze([...b.summary.possible.keys()]),unknown:b.summary.unknown>0,invalid:b.summary.invalid>0};const parent=slotsAlong(b,b.address??[]).map(slot=>b.completedPresence.get(slot)).filter((state):state is Presence=>state!==undefined);const absent=parent.filter(state=>!state.present);return {proof:absent.length?combineProofs(absent.map(state=>ownProofs.get(state.fact)??proofs.get(state.fact))):combineProofs([base,ownProofs.get(b.baselineStructure)??proofs.get(b.baselineStructure),...parent.map(state=>ownProofs.get(state.fact)??proofs.get(state.fact))]),present:absent.length===0};}const absent=[...b.completedPresence.values()].filter(state=>!state.present);const contributing=absent.length?absent.map(state=>state.fact):[b.baselineStructure,b.completedValueFact,...[...b.completedPresence.values()].map(state=>state.fact)];return {proof:combineProofs(contributing.map(fact=>ownProofs.get(fact)??proofs.get(fact))),present:absent.length===0};}
+ function prepareMembership(edit:MembershipPublicationEdit):PreparedPublicationUnit|undefined{
+- const meta=getActiveWriteContext();if(meta?.participation==='inspection')return;
++ const meta=getActiveWriteContext();
++ const domainKey=nodeStoreOf(edit.branch)??edit.branch;
++ const physicalView={requirement:unavailableInput()};
++ const viewDomain=negativeViews.get(domainKey)??new Map<object,NativeView>();
++ const viewWrites=[{map:memberViews,key:edit.child,value:physicalView},{map:negativeViews,key:domainKey,value:viewDomain},...(!edit.present?[{map:viewDomain,key:edit.child,value:physicalView}]:[])];
++ if(meta?.participation==='inspection')return {record:{writes:viewWrites,deletes:edit.present?[{map:viewDomain,key:edit.child}]:[],adds:[]},completion:{parts:[]}};
+  const authored=nativeAuthorship(edit.child);const native=lifecycle.prepareNativeRequirement(authored.known,authored.unknown,branchInputs.flatMap(scope=>scope.native));
+  const address=[...edit.address,edit.key],found:object[]=[];let cursor=tries.get(edit.registry);if(cursor)found.push(...cursor.channels);for(const key of address){cursor=cursor?.children.get(key);if(!cursor)break;found.push(...cursor.channels);}collect(trieFor(edit.registry,address,false),found);const channels=[...new Set(found)];
+- const records=[combineTerminalRecords(native.record,{writes:[{map:nativeMembers,key:edit.child,value:native.requirement}],adds:[]})!];const parts:{channel:object;unit:Unit}[]=[];
++ physicalView.requirement=native.requirement;
++ const domain=nativeNegativeDomains.get(domainKey)??new Map<object,lifecycle.NativeRequirement>();
++ const records=[combineTerminalRecords(native.record,{writes:[...viewWrites,{map:nativeMembers,key:edit.child,value:native.requirement},{map:nativeNegativeDomains,key:domainKey,value:domain},...(!edit.present?[{map:domain,key:edit.child,value:native.requirement}]:[])],deletes:edit.present?[{map:domain,key:edit.child},{map:viewDomain,key:edit.child}]:[],adds:[]})!];const parts:{channel:object;unit:Unit}[]=[];
+  for(const channel of channels){const b=bindings.get(channel);if(!b?.source||!b.address)continue;const inside=relativeSourceAddress(b.address,address);if(inside!==undefined){if(!b.aggregate&&(inside.length!==0||edit.child!==b.source))continue;}else if(!reaches(edit.child,b.address.slice(address.length),b.source))continue;
+   const indexed=slotNode(b,address);if(!indexed)continue;const slot=indexed.slots.get(edit.child)??slotFor(edit.branch,edit.key,edit.child);const previous=b.current;
+   const attributed=meta?.transactionId;const known=typeof attributed==='number'?lifecycle.ownerCell(b.owner,attributed):undefined;
+@@ -128,7 +160,7 @@ function prepareMembership(edit:MembershipPublicationEdit):PreparedPublicationUn
+   const record=lifecycle.prepareRevision(channel,fact,known?[known]:[],unknown,fact.blockers,native.requirement);
+   records.push(combineTerminalRecords(record,{writes:[{map:bindings,key:channel,value:{...b,current:fact}},{map:b.presence,key:slot,value:state},{map:indexed.slots,key:edit.child,value:slot}],adds:[{set:b.pending,value:unit}]})!);parts.push({channel,unit});
+  }
+- const record=combineTerminalRecords(...records);return record?{record,completion:{parts}}:undefined;
++ const record=combineTerminalRecords(...records);return record?{record,completion:{parts},finalize:()=>lifecycle.finalizeNativeRequirement(native.requirement)}:undefined;
+ }
+ function completeMembership(completion:object):void{for(const {channel,unit}of(completion as {parts:{channel:object;unit:Unit}[]}).parts)completeScalar({channel,unit});}
+ function ready(channel:object,b:Binding):void{
+@@ -215,7 +247,7 @@ export function bindSource(channel:object,owner:number,position:number,identity:
+   proofs.set(fact,proof);ownProofs.set(fact,proof);return fact;
+  };
+  const presence=new Map<Slot,Presence>();for(const entry of context?.presence??[])presence.set(slotFor(entry.parent,entry.key,entry.child),{present:entry.present,fact:nativeFact(nativeMembers.get(entry.child))});
+- const binding:Binding={aggregate:context?.aggregate===true,initialized:new Set(),valueInitialized:[...presence.values()].every(state=>state.present),slotTrie:{children:new Map(),slots:new Map()},fields:new Map(),fieldTrie:{children:new Map()},fieldFacts:new Map(),completedFields:new Map(),summary:{owners:new Map(),unknown:0,invalid:0},releases:[],owner,position,current:baseline,valueFact:baseline,completedValueFact:baseline,valuePayload:context?.value,baselineStructure:baseline,presence,completedPresence:new Map(presence),source,registry:context?.registry,address:context?.address,pending:new Set()};bindings.set(channel,binding);for(const slot of presence.keys())indexSlot(binding,slot);if(context)slotNode(binding,context.address,true);
++ const binding:Binding={aggregate:context?.aggregate===true,initialized:new Set(),valueInitialized:[...presence.values()].every(state=>state.present),slotTrie:{children:new Map(),slots:new Map()},fields:new Map(),fieldTrie:{children:new Map()},fieldFacts:new Map(),completedFields:new Map(),summary:{owners:new Map(),possible:new Map(),unknown:0,invalid:0},releases:[],owner,position,current:baseline,valueFact:baseline,completedValueFact:baseline,valuePayload:context?.value,baselineStructure:baseline,presence,completedPresence:new Map(presence),source,registry:context?.registry,address:context?.address,pending:new Set()};bindings.set(channel,binding);for(const slot of presence.keys())indexSlot(binding,slot);if(context)slotNode(binding,context.address,true);
+  if(identity.supported&&source){
+   // Membership has native identity even when it predates every recipient.
+   // Seed only this source's retained paths; never infer from another binding.
+@@ -246,7 +278,7 @@ export function refresh():undefined{return undefined;}
+ function decision(fact:Fact|undefined,channel:object):{early:boolean;pending:boolean}{
+  if(!fact)return {early:false,pending:false};
+  const p=proofs.get(fact);if(!p)return {early:false,pending:true};
+- return {early:!p.invalid&&!p.unknown&&p.owners.every(x=>x.outcome==='confirmed'),pending:p.owners.some(x=>x.outcome==='pending')};
++ return {early:!p.invalid&&!p.unknown&&p.owners.every(x=>x.outcome==='confirmed'),pending:[...p.owners,...(p.possible??[])].some(x=>x.outcome==='pending'||x.outcome==='abandoned')};
+ }
+ export function pendingDecision(fact:Fact|undefined,channel:object):boolean{return (bindings.get(channel)?.pending.size??0)>0||decision(fact,channel).pending;}
+ export function allowed(fact:Fact|undefined,_owner:number,_position:number,channel:object):boolean{
+diff --git a/packages/kernel/src/lib/internals/entity-egress-projection.ts b/packages/kernel/src/lib/internals/entity-egress-projection.ts
+index 2371f358..8cad048f 100644
+--- a/packages/kernel/src/lib/internals/entity-egress-projection.ts
++++ b/packages/kernel/src/lib/internals/entity-egress-projection.ts
+@@ -1,3 +1,5 @@
++import type { TerminalRecordPlan } from './intrinsic-mutation';
++import type { EntityPublicationPacket } from './entity-publication';
+ import type { EntityProjectionSeedEntry } from './entity-projection-seed';
+ import {
+   createEntityTopology,
+@@ -58,6 +60,8 @@ export function projectEntityFields(
+ }
+ 
+ export type EntityEgressProjection = {
++  /** Prepare eligible changes without touching the installed relationship. */
++  prepare(packet: EntityPublicationPacket): {readonly record: TerminalRecordPlan; readonly value: readonly unknown[]; readonly changed: boolean};
+   /** The complete eligible `Row[]`, in eligible order. */
+   value(): readonly unknown[];
+   /** Advance local order; only authored order may advance eligible authority. */
+@@ -80,9 +84,10 @@ export type EntityEgressProjection = {
+ };
+ 
+ export function createEntityEgressProjection(
+-  seed: readonly EntityProjectionSeedEntry<Key, unknown>[]
+-): EntityEgressProjection {
+-  let topology: EntityTopology = createEntityTopology(seed);
++  seed: readonly EntityProjectionSeedEntry<Key, unknown>[],
++  preparedTopology?: EntityTopology
++): EntityEgressProjection & {state(): {order:number[];rows:Map<number,unknown>;keys:Map<number,Key>;topology:EntityTopology}} {
++  let topology: EntityTopology = preparedTopology ?? createEntityTopology(seed);
+ 
+   let order: number[] = [];
+   const rows = new Map<number, unknown>();
+@@ -150,6 +155,49 @@ export function createEntityEgressProjection(
+   }
+ 
+   return {
++    prepare(packet) {
++      const structural = packet.physical.some(edit => edit.structural !== undefined) ||
++        packet.ordinary.some(edit => edit.structural !== undefined || !rows.has(edit.subject)) ||
++        packet.physicalOrder !== undefined || packet.ordinaryOrder !== undefined;
++      if (!structural) {
++        // Existing-row point writes prepare only touched rows. Rendering a
++        // subscribed collection's complete output is separate, requested work.
++        const touched = new Map<number, unknown>();
++        let changed = false;
++        for (const edit of packet.ordinary) {
++          const before = touched.has(edit.subject) ? touched.get(edit.subject) : rows.get(edit.subject);
++          const after = projectEntityFields(before, edit.after, edit.fields);
++          if (after !== before) { touched.set(edit.subject, after); changed = true; }
++        }
++        return {
++          record: {writes: [...touched].map(([key,value]) => ({map:rows,key,value})), adds: []},
++          value: order.map(subject => touched.has(subject) ? touched.get(subject) : rows.get(subject)),
++          changed,
++        };
++      }
++      // Structural operations already request placement interpretation. Its
++      // private draft retains the relationship's latent inspection topology,
++      // rather than reseeding authority from the source's physical rows.
++      const draft = createEntityEgressProjection(order.map(subjectId => ({
++        subjectId, key: keyOf.get(subjectId)!, row: rows.get(subjectId),
++      })), topology.fork());
++      for (const edit of packet.physical)
++        if (edit.structural) draft.apply(edit.subject,edit.after,edit.structural,true,edit.fields);
++      if (packet.physicalOrder) draft.reorder(packet.physicalOrder,true);
++      let changed = false;
++      for (const edit of packet.ordinary)
++        changed = draft.apply(edit.subject,edit.after,edit.structural,false,edit.fields,true) || changed;
++      if (packet.ordinaryOrder) changed = draft.reorder(packet.ordinaryOrder,false,true) || changed;
++      const prepared = draft.state();
++      const install = {set(_key:unknown,_value:unknown) {
++        order = prepared.order;
++        rows.clear(); for (const [key,value] of prepared.rows) rows.set(key,value);
++        keyOf.clear(); for (const [key,value] of prepared.keys) keyOf.set(key,value);
++        topology = prepared.topology;
++      }};
++      return {record:{writes:[{map:install,key:undefined,value:undefined}],adds:[]},value:draft.value(),changed};
++    },
++    state: () => ({order,rows,keys:keyOf,topology}),
+     value: () => order.map((s) => rows.get(s)),
+ 
+     reorder(afterSubjects, inspection, ordinary = false) {
+diff --git a/packages/kernel/src/lib/internals/intrinsic-mutation.ts b/packages/kernel/src/lib/internals/intrinsic-mutation.ts
+index ecbb4265..62c2e154 100644
+--- a/packages/kernel/src/lib/internals/intrinsic-mutation.ts
++++ b/packages/kernel/src/lib/internals/intrinsic-mutation.ts
+@@ -29,6 +29,8 @@ export function combineTerminalRecords(...plans: readonly (TerminalRecordPlan |
+ export interface PreparedPublicationUnit {
+   readonly record: TerminalRecordPlan;
+   readonly completion: object;
++  /** Pure private metadata finalization after all callback-capable preparation. */
++  readonly finalize?: () => void;
+ }
+ type PublicationPreparer = (mutation: IntrinsicMutation<unknown>, input?: object, native?: object) => PreparedPublicationUnit | undefined;
+ type PublicationInputCapture = () => object | undefined;
+@@ -311,6 +313,7 @@ function composePublication(source: SourceRecord): void {
+       const unit = prepare(mutation, captured?.inputs.get(prepare), nativeUnit?.completion);
+       if (unit) { plans.push(unit.record); parts.push({ complete: entry.complete, value: unit.completion }); }
+     }
++    nativeUnit?.finalize?.();
+     const record = combineTerminalRecords(...plans);
+     if (!record) return undefined;
+     const completion = { parts };
+@@ -334,27 +337,42 @@ export interface MembershipPublicationEdit {
+ }
+ type MembershipPublicationPreparer = (edit: MembershipPublicationEdit) => PreparedPublicationUnit | undefined;
+ export let membershipPublicationPreparer: MembershipPublicationPreparer | undefined;
++const membershipParticipants = new Map<MembershipPublicationPreparer, PublicationCompleter>();
++/** Registration order is preparation/completion order; removal affects only that participant. */
+ export function registerMembershipPublication(
+   prepare: MembershipPublicationPreparer,
+   complete: PublicationCompleter
+ ): () => void {
+-  if (membershipPublicationPreparer) throw new Error('Membership publication preparation already registered');
+-  const installed: MembershipPublicationPreparer = edit => {
+-    const unit = prepare(edit);
+-    if(!unit)return;
+-    const completion={parts:[{complete,value:unit.completion}]};
+-    return {record:combineTerminalRecords(unit.record,{writes:[],adds:[{set:installedPublications,value:completion}]})!,completion};
++  if (membershipParticipants.has(prepare)) throw new Error('Membership publication preparation already registered');
++  membershipParticipants.set(prepare, complete);
++  const compose = () => {
++    const participants = [...membershipParticipants];
++    membershipPublicationPreparer = participants.length ? edit => {
++      const units: PreparedPublicationUnit[] = [];
++      const parts: Array<{ complete: PublicationCompleter; value: object }> = [];
++      for (const [prepare, complete] of participants) {
++        const unit = prepare(edit);
++        if (unit) { units.push(unit); parts.push({ complete, value: unit.completion }); }
++      }
++      // Never rerun optional preparation after reentry. Only native metadata has
++      // a pure finalizer, and no record is reachable until the producer installs.
++      for (const unit of units) unit.finalize?.();
++      if (!units.length) return;
++      const completion = { parts };
++      return { record: combineTerminalRecords(...units.map(unit => unit.record),
++        { writes: [], adds: [{ set: installedPublications, value: completion }] })!, completion };
++    } : undefined;
+   };
+-  membershipPublicationPreparer=installed;
+-  return () => {if(membershipPublicationPreparer===installed)membershipPublicationPreparer=undefined;};
++  compose();
++  return () => { if (membershipParticipants.delete(prepare)) compose(); };
+ }
+ export { completePublication as completePreparedPublication };
+ 
+ /** Optional native branch-updater input scope; never a state/settlement owner. */
+-export let beginBranchPublicationInput: ((node: object) => object | undefined) | undefined;
++export let beginBranchPublicationInput: ((node: object, supplied?: unknown) => object | undefined) | undefined;
+ export let endBranchPublicationInput: ((token: object) => void) | undefined;
+ export function registerBranchPublicationInputs(
+-  begin: (node: object) => object | undefined,
++  begin: (node: object, supplied?: unknown) => object | undefined,
+   end: (token: object) => void
+ ): () => void {
+   if (beginBranchPublicationInput) throw new Error('Branch publication input capture already registered');
+@@ -374,3 +392,10 @@ export function hasPublicationPreparation(node: object): boolean {
+   // recording alone is not a live publication recipient.
+   return (SOURCES.get(node)?.publicationPreparers?.size ?? 0) > 0;
+ }
++
++/** Private builder correspondence: records the actual plain snapshot, never replaces it. */
++export let recordPublicationSnapshot: ((node: object, value: object) => void) | undefined;
++export function registerPublicationSnapshots(record: (node: object, value: object) => void): void {
++  if (recordPublicationSnapshot) throw new Error('Publication snapshot recorder already registered');
++  recordPublicationSnapshot = record;
++}
+diff --git a/packages/kernel/src/lib/internals/source-mutation.ts b/packages/kernel/src/lib/internals/source-mutation.ts
+index 9337c775..73ee2e2a 100644
+--- a/packages/kernel/src/lib/internals/source-mutation.ts
++++ b/packages/kernel/src/lib/internals/source-mutation.ts
+@@ -90,6 +90,8 @@ export type StructuralEffect = {
+  * type is a journal, a replay log, or a causal graph.
+  */
+ export type EntityTopology = {
++  /** Private preparation draft; never used for point-only updates. */
++  fork(): EntityTopology;
+   /** Advance to reflect one structural effect, whoever authored it. */
+   observe(effect: StructuralEffect): void;
+   /** The current address of a subject, which a row payload cannot supply. */
+@@ -132,6 +134,7 @@ export function createEntityTopology(
+   reload(seed);
+ 
+   return {
++    fork: () => createEntityTopology(order.map(subjectId => ({subjectId, key: keys.get(subjectId)!, row: undefined}))),
+     reload,
+     reorder: (afterSubjects) => {
+       order = [...afterSubjects];
+diff --git a/packages/kernel/src/lib/signal-tree.ts b/packages/kernel/src/lib/signal-tree.ts
+index f9a271df..b9ac8544 100644
+--- a/packages/kernel/src/lib/signal-tree.ts
++++ b/packages/kernel/src/lib/signal-tree.ts
+@@ -471,7 +471,7 @@ function makeNodeAccessor<T>(
+       // into the branch's store (`recursiveUpdate`), so this is always an
+       // ordinary write.
+       const finishPublicationInput = endBranchPublicationInput;
+-      const publicationInput = typeof arg === 'function' && self.accessor ? beginBranchPublicationInput?.(self.accessor) : undefined;
++      let publicationInput: object | undefined;
+       try {
+       const absent = !isRoot && isAbsentMember(self.accessor);
+       let updates = arg;
+@@ -480,6 +480,7 @@ function makeNodeAccessor<T>(
+         // An absent branch's updater receives its semantic value, as a
+         // dormant leaf's does (`whole-value-membership.spec.ts` 14).
+         const current = (absent ? undefined : unwrap(store)) as T;
++        publicationInput = self.accessor ? beginBranchPublicationInput?.(self.accessor, current) : undefined;
+         updates = updater(current);
+       }
+ 
+@@ -1108,12 +1109,14 @@ function recursiveUpdate(
+       // function name, different semantic decision.
+       if (isNodeAccessor(prop)) {
+         const finishPublicationInput = endBranchPublicationInput;
+-        const publicationInput = typeof value === 'function' ? beginBranchPublicationInput?.(prop) : undefined;
++        let publicationInput: object | undefined;
+         try {
+         if (typeof value === 'function') {
+           const updater = value as (current: unknown) => unknown;
+           // An absent branch's updater receives its semantic value (v16 8d).
+-          value = updater(isAbsentMember(prop) ? undefined : unwrap(prop));
++          const current = isAbsentMember(prop) ? undefined : unwrap(prop);
++          publicationInput = beginBranchPublicationInput?.(prop, current);
++          value = updater(current);
+           const mergeable =
+             isTraversableNode(value) &&
+             typeof value !== 'function' &&
+@@ -2093,13 +2096,12 @@ function create<T extends object>(
+       const out: string[] = [];
+       let updates = arg;
+       const finishPublicationInput = endBranchPublicationInput;
+-      const publicationInput = typeof arg === 'function'
+-        ? beginBranchPublicationInput?.(signalState)
+-        : undefined;
++      let publicationInput: object | undefined;
+       try {
+         if (typeof arg === 'function') {
+           const updater = arg as (current: T) => T;
+           const current = unwrap(signalState) as T;
++          publicationInput = beginBranchPublicationInput?.(signalState, current);
+           updates = updater(current);
+         }
+         materializationContext.locationRuntime.runInvalidationGroup(() => {
+diff --git a/packages/kernel/src/lib/utils.ts b/packages/kernel/src/lib/utils.ts
+index ce6baed6..1c415488 100644
+--- a/packages/kernel/src/lib/utils.ts
++++ b/packages/kernel/src/lib/utils.ts
+@@ -1,3 +1,4 @@
++import { recordPublicationSnapshot } from './internals/intrinsic-mutation';
+ import type { SnapshotValue } from './internals/construction-accessor';
+ // TYPE-ONLY: this transitional package still names Angular's types publicly;
+ // the split rebinds them per package. No Angular VALUE remains in kernel utils.
+@@ -548,6 +549,7 @@ function buildFromStore<T>(node: object, uncachedBranches = false): T {
+     }
+   }
+ 
++  recordPublicationSnapshot?.(node, result);
+   return result as unknown as T;
+ }
+ 

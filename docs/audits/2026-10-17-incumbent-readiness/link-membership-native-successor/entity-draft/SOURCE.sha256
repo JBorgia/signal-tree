@@ -1,0 +1,3 @@
+e158db8d0d70077bddbef9e13b1d0ea0118e26c5c6dc88a24ab5f51e7f44947f  packages/kernel/src/lib/internals/entity-egress-projection.ts
+bcbd565abcaff9a09912b10e43e1568d2c46162c309f901b8a625cc05e930518  packages/kernel/src/lib/internals/source-mutation.ts
+a091a03c379da4fef5556813214002a10cbfef6d75c78f48310d5a7b1769d7a4  packages/kernel/src/lib/internals/entity-publication.ts

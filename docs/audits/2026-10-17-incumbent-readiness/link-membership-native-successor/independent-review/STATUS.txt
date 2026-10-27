@@ -1,0 +1,9 @@
+ M packages/kernel/src/lib/experimental-publication/lifecycle.ts
+ M packages/kernel/src/lib/experimental-publication/private.ts
+ M packages/kernel/src/lib/internals/entity-egress-projection.ts
+ M packages/kernel/src/lib/internals/intrinsic-mutation.ts
+ M packages/kernel/src/lib/internals/source-mutation.ts
+ M packages/kernel/src/lib/signal-tree.ts
+ M packages/kernel/src/lib/utils.ts
+?? packages/kernel/src/lib/internals/entity-publication.ts
+?? packages/kernel/src/lib/native-window-preparation-audit.spec.ts

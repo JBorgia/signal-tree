@@ -1,0 +1,66 @@
+
+> nx run kernel:test src/lib/native-window-preparation-audit.spec.ts
+
+> node tools/run-core-vitest.mjs src/lib/native-window-preparation-audit.spec.ts
+
+(node:88910) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:88927) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/link-membership-native-successor/packages/kernel
+
+(node:88937) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ❯ src/lib/native-window-preparation-audit.spec.ts (4 tests | 1 failed) 38ms
+   × native transaction authorship does not certify independence from a hidden foreign pending input 4ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/lib/native-window-preparation-audit.spec.ts > native transaction authorship does not certify independence from a hidden foreign pending input
+AssertionError: expected [ 7 ] to deeply equal []
+
+- Expected
++ Received
+
+- []
++ [
++   7,
++ ]
+
+ ❯ src/lib/native-window-preparation-audit.spec.ts:72:46
+     70|     const r = later.transact(() => later.$.x(9)); const pendingR = r.i…
+     71|     await flush(); expect(target.$.x()).toBe(7); expect(sent).toEqual(…
+     72|     p.confirm(); await flush(); expect(sent).toEqual([]);
+       |                                              ^
+     73|     q.confirm(); await flush(); expect(sent).toEqual([7]);
+     74|     expect(r.inspect()).toEqual(pendingR); await c.settled();
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 3 passed (4)
+   Start at  01:48:57
+   Duration  1.84s (transform 887ms, setup 0ms, import 1.03s, tests 38ms, environment 608ms)
+
+Warning: command "node tools/run-core-vitest.mjs src/lib/native-window-preparation-audit.spec.ts" exited with non-zero status code
+
+
+ NX   Running target test for project kernel failed
+
+Failed tasks:
+
+- kernel:test
+
+Hint: run the command with --verbose for more details.
+
+  Run duration:      2.6s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     2.6s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    2.6s

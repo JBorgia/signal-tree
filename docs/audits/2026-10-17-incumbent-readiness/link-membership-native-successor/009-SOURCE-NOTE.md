@@ -1,0 +1,1 @@
+The three-case source is reconstructed from the unchanged prefix of the final four-case file; run009 saved a tracked diff which did not include this then-untracked test. The exact final four-case hash was recorded before010; no claim that the reconstructed copy was itself hashed before009. No assertion in the original three cases changed.

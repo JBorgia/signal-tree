@@ -1,0 +1,2446 @@
+import { beginBranchPublicationInput, endBranchPublicationInput, hasPublicationPreparation } from './internals/intrinsic-mutation';
+import {needsLocationAuthorityAdmission} from './internals/location-runtime';
+import { reportContainedObserverError } from './internals/error-reporter';
+import type { TerminalRecordPlan } from './internals/intrinsic-mutation';
+import {
+  PRODUCTION_SUBSTRATE_STATS_ENABLED,
+  recordProductionSubstrateStat,
+} from './internals/production-substrate-stats';
+import type { Location, WritableCell } from './internals/cell-runtime';
+import type { SignalTreeFactory } from './types';
+
+import {
+  bindLocationRuntime,
+  createLocationRuntime,
+  isWritableLocation,
+  replaceLocation,
+  type LocationRuntime,
+} from './internals/location-runtime';
+import {
+  NEUTRAL_OBSERVATION_ADAPTER,
+  type ObservationAdapter,
+} from './internals/observation-adapter';
+
+/**
+ * A writable location is a callable with `.set`.
+ *
+ * This replaced `isSignal(prop) && 'set' in prop` at the merge-write site. The
+ * question there is about a leaf THE KERNEL CREATED, so it must be answerable by
+ * the kernel alone — routing it through the realization made 151 tests fail when
+ * no adapter was installed. Angular's `WritableSignal` and the kernel's own
+ * universal locations satisfy this directly: the kernel checks the shape of
+ * its own contract, not the identity of a framework.
+ *
+ *     THE KERNEL MUST NOT ASK AN OPTIONAL ADAPTER WHETHER ITS OWN STATE EXISTS.
+ */
+const isWritableCell = (
+  v: unknown
+): v is { (): unknown; set(value: unknown): void } =>
+  typeof v === 'function' &&
+  'set' in (v as object) &&
+  typeof (v as { set?: unknown }).set === 'function';
+
+const readWritableCell = <T>(cell: Location<T> | WritableCell<T>): T =>
+  'peek' in cell && typeof cell.peek === 'function' ? cell.peek() : cell();
+
+import { SIGNAL_TREE_MESSAGES } from './constants';
+import {
+  registerContainedReportBudget,
+  releaseContainedReportBudget,
+} from './internals/error-reporter';
+import { resolveEnhancerOrder } from '../enhancers';
+import {
+  beginStructuralWrite,
+  hasDormantMembers,
+  endStructuralWrite,
+  isAbsentMember,
+  reactivatePathOnWrite,
+  readdedDuringStructuralWrite,
+  republishMembers,
+  setMemberPresence,
+  structuralWrites,
+} from './internals/member-membership';
+import { getOwnedPositionIds } from './internals/owned-mutation';
+import { getOwnedOwnerPath } from './internals/owned-metadata';
+import {
+  createMaterializationContext,
+  _recordTreeConstruction,
+  isRegisteredMarker,
+  materializeMarkers,
+  installPreparedMember,
+  setMemberValueApplier,
+  type OrdinaryConstructionAuthority,
+  type OrdinaryStateMaterializer,
+} from './internals/materialize-markers';
+import { captureBranchMembershipIfObserved } from './internals/path-observation-port';
+import {
+  installDormantObservation,
+  inheritObservationForAddedMember,
+} from './internals/observation-substrate';
+import { terminateOwnerInvalidation } from './internals/owner-invalidation-port';
+import { defineRootTree } from './internals/root-source';
+import {
+  definePositionRegistry,
+  childAddressOf,
+  defineNodeAddress,
+  getNodeAddress,
+  type PositionRegistry,
+} from './internals/position-registry';
+import {
+  defineOwnedOwnerPath,
+  defineOwnedOwnerId,
+  defineOwnedPositionIds,
+  wrapOwnedWritableSignal,
+} from './internals/owned-mutation';
+import {
+  createMutationCaptureRuntime,
+  MUTATION_CAPTURE_RUNTIME,
+  type MutationCaptureRuntime,
+} from './internals/mutation-capture-runtime';
+import {
+  defineTreeScalarSlotRuntime,
+  type TreeScalarLeafRuntime,
+} from './internals/tree-scalar-slot-port';
+// Kernel-owned orchestration. The Angular edge is gone: the framework now
+// supplies only an observation adapter, installed with the binding below.
+import { createTreeScalarLeafRuntime } from './internals/tree-scalar-leaf-runtime';
+import {
+  createPhysicalCommitClock,
+  definePhysicalCommitClock,
+} from './internals/physical-commit-clock';
+import {
+  collectRequestedTreeCapabilities,
+  defineTreeCapabilities,
+  resolveTreeCapabilities,
+} from './internals/tree-capabilities';
+import type { MaterializationContext } from './internals/materialize-markers';
+import { applyDerivedFactory } from './internals/merge-derived';
+import { hydrateMarkerNode } from './internals/materialize-markers';
+import { isLeafDefinition, leaf, leafDefinitionValue } from './leaf';
+import {
+  deepEqual,
+  isBuiltInObject,
+  isTraversableNode,
+  materializeNode,
+  unwrap,
+} from './utils';
+import {
+  markTreeStore,
+  observeMembership,
+  publishMembershipChange,
+} from './internals/snapshot-authority';
+import {
+  CALLABLE_SIGNAL_SYMBOL,
+  isNodeAccessor,
+  NODE_STORE_SYMBOL,
+} from './internals/node-shape';
+
+import type {
+  TreeNode,
+  TreeConfig,
+  NodeAccessor,
+  EntityMapMarker,
+  ISignalTree,
+  Enhancer,
+  EnhancerWithMeta,
+  EnhancerMeta,
+  TreeCapability,
+} from './types';
+
+import { ENHANCER_META } from './types';
+
+// Build-time dev flag. Declared locally rather than inherited from
+// a framework's ambient types: it is a bundler convention, not a framework
+// API, and the kernel's declarations must not depend on Angular for it.
+declare const ngDevMode: boolean | undefined;
+
+/** ST2018 tuning — see warnEntityArrayLeaf(). */
+const ENTITY_ARRAY_MIN_LENGTH = 32;
+const ENTITY_ARRAY_SAMPLE = 64;
+const ENTITY_ID_KEYS = ['id', '_id', 'uuid', 'key'] as const;
+/**
+ * ST2018 fires at CONSTRUCTION, and a tree is commonly constructed once per
+ * component instance — so a list rendering 500 rows would print 500 identical
+ * warnings and the console becomes unusable. Deduped by key+identity so the
+ * advice is given once and stays readable. Capped so a pathological app cannot
+ * grow this without bound; past the cap the diagnostic simply goes quiet, which
+ * is the right failure direction for a dev hint.
+ */
+const ENTITY_ARRAY_WARNED = new Set<string>();
+const ENTITY_ARRAY_WARN_CAP = 256;
+/**
+ * @internal Back-reference from an accessor to the TreeNode its call path
+ * closes over. `makeNodeAccessor` COPIES the store's properties onto the
+ * accessor, so the two drift the moment anything replaces a property on one of
+ * them — which is exactly what marker materialization does. Exposing the store
+ * lets `materializeMarkers` update both, instead of leaving the closed-over
+ * store holding a raw marker forever. Non-enumerable so it never reaches a
+ * snapshot.
+ */
+const NODE_ACCESSOR_PEER = Symbol.for('SignalTree:NodeAccessorPeer');
+// =============================================================================
+
+type TreeBuildPlan = {
+  requestedCapabilities: readonly TreeCapability[];
+  capabilities: readonly TreeCapability[];
+  has(capability: TreeCapability): boolean;
+  leafMetadataStorage: 'property' | 'sidecar';
+};
+
+function createTreeBuildPlan(
+  requestedCapabilities: readonly TreeCapability[],
+  leafMetadataStorage: 'property' | 'sidecar'
+): TreeBuildPlan {
+  const resolved = resolveTreeCapabilities(requestedCapabilities);
+  return {
+    requestedCapabilities: resolved.requestedCapabilities,
+    capabilities: resolved.resolvedCapabilities,
+    has(capability: TreeCapability): boolean {
+      return resolved.resolvedCapabilities.includes(capability);
+    },
+    leafMetadataStorage,
+  };
+}
+
+// Public signalTree() now has one default scalar substrate: tree-owned slots
+// with Angular tokens as the reactive adapter. Optional capabilities layer
+// additional metadata/runtime services on top; they no longer choose between
+// fundamentally different scalar storage implementations.
+
+function finalizeLeafSignal<TValue>(
+  leaf: Location<TValue>,
+  path: string,
+  positionIds: readonly number[] | undefined,
+  buildPlan: TreeBuildPlan,
+  captureRuntime: MutationCaptureRuntime,
+  registry: PositionRegistry | undefined,
+  address: readonly string[]
+): void {
+  defineNodeAddress(leaf as object, address);
+  for (const position of positionIds ?? [])
+    registry?.registerPositionAddress(position, address);
+  // A LOCATION MUST BE ABLE TO NAME ITS OWNER. Attaching the registry to the
+  // leaf — not only to `tree` / `tree.$` — is what makes
+  // `resolveScopeKey(leaf)` resolve the SAME scope object as
+  // `resolveScopeKey(tree)`, which is the fact A2-3 measured missing. It needs
+  // no change in `commit-consequence` itself: that code already asks
+  // `getPositionRegistry(node)` and simply never got an answer from a leaf.
+  if (buildPlan.has('position-topology') && registry) {
+    definePositionRegistry(leaf as object, registry);
+  }
+
+  if (buildPlan.has('mutation-capture')) {
+    wrapOwnedWritableSignal(leaf, {
+      path,
+      // `ownerPath: path` sat here until 15.0 (ME-B). The owner-address fact is
+      // still installed on the leaf — it is now derived from `path` inside
+      // owned-mutation rather than passed as a second, identical argument.
+      positionIds,
+      ownerId: registry?.id,
+      metadataStorage: buildPlan.leafMetadataStorage,
+      captureRuntime,
+    });
+    return;
+  }
+
+  if (buildPlan.has('position-topology')) {
+    defineOwnedPositionIds(leaf as object, positionIds);
+    defineOwnedOwnerId(leaf as object, registry?.id);
+  }
+
+  // THE DORMANT OBSERVATION SUBSTRATE, for leaves that received no capture.
+  //
+  // `link()` runs AFTER construction and cannot ask for a capability, so an
+  // ordinary leaf has to be observable on demand. The interception point is
+  // installed here — before any `set`/`update` reference can escape to
+  // application code — and stays dormant until a relationship claims it. The
+  // owner seed is what lets that claim be made from the SOURCE ALONE.
+  //
+  // Reached only when `mutation-capture` is absent: that path already
+  // intercepts and returned above, and wrapping twice would publish twice.
+  if (registry) {
+    definePositionRegistry(leaf as object, registry);
+    defineOwnedOwnerPath(leaf as object, path);
+    installDormantObservation(leaf);
+  }
+}
+
+function getEnhancerMeta(enhancer: unknown): EnhancerMeta | undefined {
+  return (
+    (enhancer as Record<symbol, EnhancerMeta | undefined>)[ENHANCER_META] ??
+    (enhancer as { metadata?: EnhancerMeta }).metadata
+  );
+}
+
+function buildTreePlan(
+  enhancers: EnhancerWithMeta<unknown>[],
+  explicitCapabilities: readonly TreeCapability[] = []
+): TreeBuildPlan {
+  const requestedCapabilities = collectRequestedTreeCapabilities([
+    ...enhancers.map((enhancer) => getEnhancerMeta(enhancer)),
+    // An explicit request is treated as one more declaration, so it goes
+    // through the same dependency resolution rather than bypassing it.
+    { capabilities: [...explicitCapabilities] },
+  ]);
+  // LAYOUT: 'property' is retained deliberately for now. The planned path used
+  // 'sidecar', and switching both construction AND physical metadata layout in
+  // one change would confound them -- a failure could be either. The layout A/B
+  // is its own trial; see docs/architecture/phase-model-blast-radius.md.
+  return createTreeBuildPlan(requestedCapabilities, 'property');
+}
+
+function materializeTreeMarkers<T extends object>(
+  tree: ISignalTree<T>,
+  materializationContext: MaterializationContext,
+  authority?: OrdinaryConstructionAuthority
+): void {
+  materializeMarkers(tree.$, undefined, [], materializationContext, authority);
+  _recordTreeConstruction();
+}
+
+function isEntityMapMarker(
+  value: unknown
+): value is EntityMapMarker<unknown, string | number> {
+  return Boolean(
+    value &&
+      typeof value === 'object' &&
+      (value as Record<string, unknown>)['__isEntityMap'] === true
+  );
+}
+
+// =============================================================================
+// UTILITIES
+// =============================================================================
+
+function createEqualityFn(useShallowComparison: boolean) {
+  return useShallowComparison ? Object.is : deepEqual;
+}
+
+// `estimateObjectSize` and `shouldUseLazy` lived here and are DELETED in 15.0
+// with the lazy feature. They existed only to decide whether to hand
+// construction to the lazy proxy; nothing else ever asked how big a state
+// object was.
+
+// =============================================================================
+// SECURITY VALIDATION — REMOVED IN 15.0 (SEC-DEL)
+// =============================================================================
+//
+// TOMBSTONE: `validateTree()`, `config.security`, `SecurityFeature`, the
+// `security()` helper, `SecurityValidator`, `SecurityPresets` and the
+// `@signal-tree/kernel/security` subpath.
+//
+// SEC-0 measured all three protections it offered:
+//
+//   PROTOTYPE POLLUTION  core already drops a JSON-parsed `__proto__` and does
+//                        not pollute Object.prototype, with no opt-in. What the
+//                        feature added was rejecting `constructor` and
+//                        `prototype` as LITERAL DATA KEYS — harmless
+//                        own-properties that real data contains. Strictly worse
+//                        than core alone.
+//
+//   preventXSS           INERT. `validateValue()` RETURNS a sanitised string
+//                        and the walk discarded the return, and only ran at
+//                        construction. An advertised control that did nothing
+//                        on the path users invoke.
+//
+//   preventFunctions     serializability hygiene, not a security boundary.
+//
+// Core's own prototype-pollution handling stays — that is where the real
+// defence lives, covered by `apply-state-pollution.spec.ts`. Do not reintroduce
+// a construction-time sanitiser: sanitising on the way INTO state corrupts data
+// and does not protect the rendering sink, which is where XSS is decided and
+// which Angular already escapes.
+
+// =============================================================================
+// NODE ACCESSOR CREATION
+// =============================================================================
+
+/**
+ * Creates a NodeAccessor function that wraps a TreeNode.
+ *
+ * NodeAccessors are functions that:
+ * - Can be called with no args to get the unwrapped state
+ * - Can be called with a value to set state
+ * - Can be called with an updater function to transform state
+ * - Have enumerable properties for child nodes (signals or nested accessors)
+ *
+ * **This is a plain function, NOT an Angular signal.** Only leaves are signals.
+ * The accessor deliberately has no `.set()`/`.update()` — being callable for
+ * reads *and* both write forms is the whole point, and adding those methods
+ * would both duplicate the call signatures and collide with any state key
+ * named `set` or `update`. See the `NodeAccessor` docs in ./types.ts for the
+ * leaf-vs-node table — and note that a LEAF takes no such call: calling an
+ * Angular signal is a read, and since 14.0.0 that is a compile error rather
+ * than a silent no-op.
+ *
+ * ## Partial Updates
+ *
+ * ⚠️ THIS SECTION USED TO CLAIM `batchScope` CONSOLIDATED CHANGE DETECTION INTO
+ * A SINGLE CYCLE. It did not. `batchScope` incremented a counter, ran the
+ * callback and decremented — no scheduler, no Angular primitive, no reader.
+ * Deleted in 15.0 (MODULE-STATE-OWNERSHIP-0 / BD-C) along with the claim; if
+ * SignalTree ever consolidates CD cycles, the mechanism that does it will have
+ * to prove it.
+ *
+ * When called with an object argument, each child signal is written directly.
+ *
+ * ```typescript
+ * $.tickets({ startDate, endDate, count });
+ *
+ * // Individual CD cycles (not batched)
+ * $.tickets.startDate.set(startDate);
+ * $.tickets.endDate.set(endDate);
+ * $.tickets.count.set(count);
+ * ```
+ *
+ * ## Writable Properties for Deep Merge
+ *
+ * Properties are defined with `writable: true` to support the deep merge pattern.
+ * When derived state is merged into a namespace and then processed by
+ * materializeMarkers(), it needs to replace markers with their signal forms.
+ */
+function makeNodeAccessor<T>(
+  store: TreeNode<T>,
+  ownerPath?: string,
+  positionIds?: readonly number[],
+  registry?: PositionRegistry,
+  locations?: LocationRuntime
+): NodeAccessor<T> {
+  const isRoot = ownerPath === '';
+  // Declared as a METHOD SHORTHAND, not `function () {}`, and this is
+  // load-bearing. A node carries the user's state keys as its own enumerable
+  // properties, so every own property name a function already has is a name
+  // the user cannot use for state. Ordinary function expressions own a
+  // NON-CONFIGURABLE `prototype`, which made `signalTree({ a: { prototype: 1 } })`
+  // die inside the copy loop below with "Cannot redefine property: prototype".
+  // Concise methods are not constructors and have no `prototype` at all, while
+  // still binding `arguments` (which an arrow function would not). That takes
+  // the reserved-name list for state keys down to zero — `length`, `name`,
+  // `caller` and `arguments` are all configurable and were already fine.
+  // Read INSIDE the method, which only runs after the assignment below — the
+  // same box pattern the leaf uses, for the same reason.
+  const self: { accessor?: NodeAccessor<T> } = {};
+  const applyGrouped = (run: () => void): void => {
+    if (locations) locations.runInvalidationGroup(run);
+    else run();
+  };
+
+  const accessor = {
+    node(arg?: unknown): T | void {
+      // GET - no argument. Memoised per node: a clean subtree comes back BY
+      // REFERENCE instead of being rebuilt, so one leaf write no longer costs
+      // O(state) to observe. See materialized() in utils.ts.
+      if (arguments.length === 0) {
+        // ⚠️ DORMANCY IS ENFORCED AT THE CANONICAL READ BOUNDARY, FOR BRANCHES
+        // AS WELL AS LEAVES.
+        //
+        //     A SEMANTICALLY ABSENT DESCENDANT READS AS ABSENT EVEN IF ITS
+        //     PHYSICAL STORAGE IS RETAINED.
+        //
+        // That was implemented for leaves only. Measured on a plain static tree
+        // with no markers: `box({ keep })` omitting `drop` left BOTH
+        // `box.drop()` returning `{v:2}` AND `box()` still listing `drop` —
+        // because the parent's dormant-child read (M-C2) called the branch,
+        // got its unchanged snapshot back, and propagated nothing.
+        //
+        // Fixing it HERE fixes both symptoms from one place: a dormant branch
+        // now returns a DIFFERENT value, so the parent's retained dependency
+        // propagates and its memo rebuilds without any explicit invalidation.
+        // ⚠️ The read boundary alone is NOT sufficient: a branch has no
+        // publication token, so a held parent consumer sees nothing. The
+        // membership carrier in `publishMembershipChange` is what wakes it.
+        //
+        // ⚠️ ABSENT, NOT ONLY DORMANT. A branch under an omitted member is
+        // absent too, and read its retained storage until v16 8d. The
+        // membership revision is the edge that wakes this read when the
+        // branch, or a member above it, is re-added.
+        if (
+          !isRoot &&
+          self.accessor !== undefined &&
+          isAbsentMember(self.accessor)
+        ) {
+          observeMembership(store as object);
+          return undefined as unknown as T;
+        }
+        return materializeNode(store as object) as unknown as T;
+      }
+
+      // WRITING AN ABSENT BRANCH RE-ADDS IT ALONG ITS PATH (v16 8d). Inside a
+      // structural write the writer reconciles membership itself.
+      // A structural writer never writes a branch through here: it recurses
+      // into the branch's store (`recursiveUpdate`), so this is always an
+      // ordinary write.
+      const finishPublicationInput = endBranchPublicationInput;
+      let publicationInput: object | undefined;
+      try {
+      const absent = !isRoot && isAbsentMember(self.accessor);
+      let updates = arg;
+      if (typeof arg === 'function') {
+        const updater = arg as (current: T) => T;
+        // An absent branch's updater receives its semantic value, as a
+        // dormant leaf's does (`whole-value-membership.spec.ts` 14).
+        const current = (absent ? undefined : unwrap(store)) as T;
+        publicationInput = self.accessor ? beginBranchPublicationInput?.(self.accessor, current) : undefined;
+        updates = updater(current);
+      }
+
+      // WHOLE-VALUE ASSIGNMENT with an object - auto-batch.
+      //
+      // ⚠️ THE MECHANISM DID NOT CHANGE IN 15.0, THE CONTRACT DID. This path
+      // always installed exactly the keys it was handed; "merge" was a
+      // consequence of ACCEPTING a `Partial<T>`, never a separate merging step.
+      // Now that the type requires a whole `T`, the same call installs the whole
+      // value.
+      //
+      // That is deliberate, and it is why the rule reads:
+      //
+      //   WHOLE-VALUE ASSIGNMENT MUST NOT BE IMPLEMENTED AS
+      //   "PARTIAL WRITE WITH OMITTED KEYS CLEARED".
+      //
+      // The GREENFIELD-BRANCH-WRITE-0 probe DID manufacture `undefined` writes
+      // for omitted descendants, and it misbehaved twice: a spurious mutation
+      // event per omitted key, and unknown keys discarded before the
+      // unknown-key diagnostic could see them. Nothing here writes a key the
+      // caller did not supply.
+      //
+      // ⚠️ PERMISSIVE AT RUNTIME. A caller who defeats the type still merges
+      // rather than throwing. No carrier proves a runtime rejection, and adding
+      // one would invent a contract and could break untyped consumers — see the
+      // C8 surface review for whether a dev-mode diagnostic is warranted.
+      applyGrouped(() => {
+        recursiveUpdate(store, updates, undefined, '');
+        // Value first: the supplied whole value is installed and this
+        // branch's own members reconciled; then the path above is re-added.
+        if (absent && updates && typeof updates === 'object')
+          reactivatePathOnWrite(self.accessor);
+      });
+      } finally {
+        if (publicationInput) finishPublicationInput?.(publicationInput);
+      }
+    },
+  }.node as NodeAccessor<T>;
+
+  self.accessor = accessor;
+  (accessor as unknown as Record<symbol, boolean>)[CALLABLE_SIGNAL_SYMBOL] =
+    true;
+  Object.defineProperty(accessor, NODE_STORE_SYMBOL, {
+    value: store,
+    enumerable: false,
+    writable: false,
+    configurable: true,
+  });
+  // ⚠️ AND THE REVERSE EDGE. Membership transitions arrive holding EITHER half
+  // of the pair — `recursiveUpdate` reconciles over the store, dynamic
+  // reacquisition arrives at the accessor — and both descriptors have to move
+  // together. Without this link the store cannot find its accessor, so the
+  // convergence owner could only ever fix one direction. See
+  // `setMemberPresence`.
+  Object.defineProperty(store as object, NODE_ACCESSOR_PEER, {
+    value: accessor,
+    enumerable: false,
+    writable: false,
+    configurable: true,
+  });
+
+  // Copy store properties onto accessor
+  // CRITICAL: Properties must be writable to allow materializeMarkers()
+  // to replace markers with their signal forms. Without writable: true,
+  // this assignment silently fails in non-strict mode, causing runtime errors
+  // like "$.users.upsertOne is not a function".
+  for (const key of Object.keys(store as object)) {
+    Object.defineProperty(accessor, key, {
+      value: (store as Record<string, unknown>)[key],
+      enumerable: true,
+      writable: true,
+      configurable: true,
+    });
+  }
+
+  const address = getNodeAddress(store);
+  if (address) defineNodeAddress(accessor as object, address);
+
+  if (positionIds && positionIds.length > 0) {
+    defineOwnedPositionIds(accessor as object, positionIds);
+  }
+
+  if (ownerPath !== undefined) {
+    defineOwnedOwnerPath(accessor as object, ownerPath);
+  }
+
+  // A BRANCH is a location too. The ownership correction reached `tree`,
+  // `tree.$` and leaves; an intermediate accessor was the one class left
+  // unable to name its owner, which made `getPositionRegistry(tree.$.settings)`
+  // undefined while both the leaf under it and the root above it answered.
+  // Measured by LINK-1 case 1, where branch is a valid X.
+  if (registry) {
+    definePositionRegistry(accessor as object, registry);
+    defineOwnedOwnerId(accessor as object, registry.id);
+    definePositionRegistry(store as object, registry);
+    defineOwnedOwnerId(store as object, registry.id);
+  }
+  if (locations) {
+    bindLocationRuntime(accessor as object, locations);
+    bindLocationRuntime(store as object, locations);
+  }
+
+  return accessor;
+}
+
+/**
+ * @internal Dev-mode notice that a write to a BRANCH position was discarded
+ * because its value is not an object. Reached both directly (`{ user: null }`)
+ * and via an updater that returned one (`{ user: () => null }`) — the second
+ * used to vanish in silence, including the forgotten-`await` case where the
+ * updater returns a Promise.
+ */
+/**
+ * ST2021 — a marker inside an array.
+ *
+ * Array elements are never traversed, so a marker in one is never materialised:
+ * it stays a raw marker object for the life of the tree. `tree.$.list()[0]` is
+ * a plain `{ key, defaultValue }`, not a signal, and every write to it is lost.
+ * Silent, and it looks like it should work.
+ *
+ * "Store the array as a Map so elements CAN be traversed" is the natural fix and
+ * is already built — it is what `entityMap` is, and it measures 28.5x faster
+ * than an immutable store on the keyed-collection task. Applying it to EVERY
+ * array is what does not survive measurement: a per-node Map index cost +12.1%
+ * on subtree reads and 310B/node in this repo (built, measured, reverted), an
+ * index-keyed structure pays O(n) to reindex on any insert or reorder, and
+ * `tree.$()` has to hand back a real Array regardless. Most arrays in a tree are
+ * ordered lists of primitives and would pay that for nothing.
+ *
+ * So: a keyed collection is an `entityMap`; an ordered list is an array leaf;
+ * and a marker in an array is the first case wearing the second's clothes.
+ *
+ * Bounded scan, dev only, deduped per key.
+ */
+const MARKER_IN_ARRAY_WARNED = new Set<string>();
+
+const looksLikeMarker = (item: unknown): boolean =>
+  item !== null &&
+  typeof item === 'object' &&
+  (isEntityMapMarker(item) || isRegisteredMarker(item));
+
+/**
+ * ⚠️ EXTENDED TO Map AND Set BY MARKER-GRAMMAR-DIAGNOSTICS-0, and the GRAMMAR IS
+ * UNCHANGED. A Map value and a Set member are ordinary data exactly as before —
+ * they are not materialised, acquire no marker semantics, and are not recursed
+ * into. Only the diagnostic changed.
+ *
+ * The gap this closes: ST2021 scanned arrays only, so identical misuse warned in
+ * one non-traversable container and was SILENT in the others. `marker-location-
+ * grammar.spec.ts` recorded that with the Map/Set rows asserting zero warnings.
+ *
+ * ⚠️ NO NEW SCAN OF ORDINARY VALUES. This runs at the one branch that already
+ * decided the position becomes a leaf whose interior is never traversed, under
+ * the same dev guard, the same 64-element sample bound and the same per-key
+ * dedupe the array scan always had. A Map or Set that holds no marker costs one
+ * bounded sample in dev and nothing in production.
+ *
+ * ⚠️ THE POSITION IS RENDERED HONESTLY. A Map value is not a property path, so
+ * it is not spelled like one: `m -> Map value at key "a"`, `s -> Set member #0`.
+ * READ THE OBSERVATION, NOT ITS RENDERING — writing `m.a` would name a location
+ * that does not exist and cannot be addressed.
+ */
+function warnMarkerInContainer(key: string, value: unknown): void {
+  if (typeof ngDevMode !== 'undefined' && !ngDevMode) return;
+  if (MARKER_IN_ARRAY_WARNED.has(key)) return;
+
+  let where: string | undefined;
+  let container: string | undefined;
+
+  if (Array.isArray(value)) {
+    const limit = Math.min(value.length, ENTITY_ARRAY_SAMPLE);
+    for (let i = 0; i < limit; i++) {
+      if (looksLikeMarker(value[i])) {
+        where = `"${key}[${i}]"`;
+        container = 'an array. Array elements';
+        break;
+      }
+    }
+  } else if (value instanceof Map) {
+    let i = 0;
+    for (const [k, v] of value) {
+      if (i++ >= ENTITY_ARRAY_SAMPLE) break;
+      if (looksLikeMarker(v)) {
+        where = `"${key}" -> Map value at key ${JSON.stringify(String(k))}`;
+        container = 'a Map. Map values';
+        break;
+      }
+    }
+  } else if (value instanceof Set) {
+    let i = 0;
+    for (const member of value) {
+      if (i >= ENTITY_ARRAY_SAMPLE) break;
+      if (looksLikeMarker(member)) {
+        where = `"${key}" -> Set member #${i}`;
+        container = 'a Set. Set members';
+        break;
+      }
+      i++;
+    }
+  }
+
+  if (where === undefined || container === undefined) return;
+
+  MARKER_IN_ARRAY_WARNED.add(key);
+  console.warn(
+    `SignalTree: ${where} holds a MARKER inside ${container} are never ` +
+      `traversed, so the marker is never materialised — it stays a raw object, ` +
+      `it is not a signal, and writes to it are lost. Markers belong at object ` +
+      `positions; for a keyed collection use entityMap({ selectId }). [ST2021]`
+  );
+}
+
+/**
+ * ST2018 — an array of entities is being stored as a plain array leaf.
+ *
+ * This is the most expensive idiom mistake available in SignalTree, and it does
+ * not look like a mistake. Measured on the same task (1000 updates to a
+ * 50,000-row collection, with a dependent read):
+ *
+ *   entityMap                1.63 ms
+ *   plain array leaf        49.80 ms      <- this
+ *   NgRx SignalStore        46.56 ms
+ *
+ * An array leaf lands at PARITY with the immutable store SignalTree beats 28x
+ * with the right container, because every update rebuilds the array (`slice()`
+ * alone is ~41 ms of that 49.80 ms) and every equality check walks it.
+ * `entityMap` writes one entity in O(1) and reads it back through a per-entity
+ * signal.
+ *
+ * Documentation did not prevent this: SignalTree's OWN demo benchmark shipped
+ * the array-leaf idiom while `docs/guides/entity-collection-cookbook.md` sat in
+ * the repo. Hence a diagnostic rather than another guide.
+ *
+ * Deliberately conservative, because a false positive on every small array
+ * would train developers to ignore it:
+ *   - at least ENTITY_ARRAY_MIN_LENGTH elements (below that, O(N) is noise)
+ *   - every sampled element is a non-null, non-array object
+ *   - every sampled element carries the SAME identity key with a primitive
+ *     value, and no duplicates within the sample
+ * The scan is bounded and runs once per array at construction, in dev only.
+ */
+function warnEntityArrayLeaf(key: string, value: readonly unknown[]): void {
+  if (typeof ngDevMode !== 'undefined' && !ngDevMode) return;
+  if (value.length < ENTITY_ARRAY_MIN_LENGTH) return;
+
+  const first = value[0];
+  if (first === null || typeof first !== 'object' || Array.isArray(first)) {
+    return;
+  }
+
+  const idKey = ENTITY_ID_KEYS.find((candidate) => {
+    const v = (first as Record<string, unknown>)[candidate];
+    return typeof v === 'string' || typeof v === 'number';
+  });
+  if (!idKey) return;
+
+  const sampleSize = Math.min(value.length, ENTITY_ARRAY_SAMPLE);
+  const seen = new Set<unknown>();
+  for (let i = 0; i < sampleSize; i++) {
+    const item = value[i];
+    if (item === null || typeof item !== 'object' || Array.isArray(item)) {
+      return;
+    }
+    const id = (item as Record<string, unknown>)[idKey];
+    if (typeof id !== 'string' && typeof id !== 'number') return;
+    if (seen.has(id)) return; // not a stable identity — say nothing
+    seen.add(id);
+  }
+
+  const seenKey = `${key}:${idKey}`;
+  if (ENTITY_ARRAY_WARNED.has(seenKey)) return;
+  if (ENTITY_ARRAY_WARNED.size >= ENTITY_ARRAY_WARN_CAP) return;
+  ENTITY_ARRAY_WARNED.add(seenKey);
+
+  // Kept SHORT deliberately: this string sits in the dev-mode floor that
+  // tools/check-bundle-budget.mjs measures, and an earlier draft inlining the
+  // full benchmark table cost ~0.8KB gzip across every bundle. The numbers and
+  // the "when an array leaf is right" case live in docs/errors/README.md and
+  // the entity cookbook, which the code points at.
+  console.warn(
+    `SignalTree: "${key}" holds ${value.length} objects with a stable ` +
+      `"${idKey}" — use entityMap({ selectId: (e) => e.${idKey} }). An array ` +
+      `leaf rebuilds and re-compares the whole array on every update — two ` +
+      `orders of magnitude at 50k. Read-only or replaced wholesale? ` +
+      `Leave it plain; otherwise model it as an entityMap. [ST2018]`
+  );
+}
+
+function warnDiscardedBranchWrite(path: string, value: unknown): void {
+  if (typeof ngDevMode === 'undefined' || ngDevMode) {
+    console.error(
+      `SignalTree: write to "${path}" DISCARDED — a branch cannot be replaced ` +
+        `by a non-object value (received ${
+          value === null ? 'null' : typeof value
+        }). Write the leaves, or use a marker if this position should hold a ` +
+        `value. [ST2014]`
+    );
+  }
+}
+
+/**
+ * @internal Dev-mode notice that a configured tree could not forward a method
+ * to its base tree because an enhancer returned a replacement missing it.
+ *
+ * The cause every time so far has been `Object.assign(newTree, tree)` inside an
+ * enhancer: it copies only ENUMERABLE own properties, and every tree method is
+ * defined `enumerable: false`. The forwarder then returned an empty result,
+ * which reads exactly like "nothing changed" — so a dropped write looked
+ * healthy. Fail loudly instead.
+ */
+function warnMissingForward(method: string): void {
+  if (typeof ngDevMode === 'undefined' || ngDevMode) {
+    console.error(
+      `SignalTree: "${method}" could not be forwarded — an enhancer in the ` +
+        `configured set returned a tree without it, so this call did NOTHING. An ` +
+        `enhancer that builds a new tree object must copy own property ` +
+        `DESCRIPTORS, not Object.assign, which skips ` +
+        `non-enumerable methods. [ST2017]`
+    );
+  }
+}
+
+/**
+ * MATRIX-CLOSE S3 — `currentHydrateMode()` IS DELETED.
+ *
+ * It computed `'merge' | 'restore'` from `origin === 'restoration'` and passed
+ * the result to `hydrateMarkerNode`. Its comment claimed a measured corruption
+ * it existed to prevent:
+ *
+ *     n=3 rows=3  ->  undo  ->  n=2 rows=3
+ *
+ * M6 forced it permanently to `'merge'` and the whole 1885-test suite stayed
+ * green. S3-RECOVER then found something stronger than "that defect is gone":
+ *
+ * ```text
+ * currentHydrateMode() produced   'merge' | 'restore'
+ * markers branch only on          'rehydrate'
+ * ```
+ *
+ * `entity-map.ts` and `async-source.ts` each decline exactly one mode —
+ * `mode === 'rehydrate'` — which this function never produced. Both of its return
+ * values therefore fell through the same path in every marker processor. **The
+ * distinction was computed and no consumer could act on it.**
+ *
+ * `s3-hydrate-mode-recovery.spec.ts` holds both halves permanently: the
+ * historical n/rows case does not reproduce, and `'merge'` and `'restore'` are
+ * indistinguishable to a loader-backed marker while `'rehydrate'` is not.
+ *
+ * This deletes a POLICY BRANCH, not the `origin` axis. `origin` remains
+ * provenance with diagnostic consumers (DevTools action metadata, the diagnostic
+ * journal) and one structural justification (DX-NAMES-1.3 Fact 1). What is gone
+ * is the claim that it had a policy consumer.
+ */
+
+/** Dev-mode: paths already warned about for ref-identical no-op writes. */
+const warnedNoopPaths = new Set<string>();
+/** @internal Dedupe for ST2027. Separate from ST2003 — different mistakes. */
+const warnedNoopCopyPaths = new Set<string>();
+
+/**
+ * @internal Is this value big enough that a wasted deep-equal walk matters?
+ *
+ * 32 matches ST2018's collection threshold so the two diagnostics agree on what
+ * counts as "a lot". Deliberately shallow — an O(1) length/key count, never a
+ * walk, because a diagnostic that has to traverse the value to decide whether
+ * traversing the value was wasteful is its own punchline.
+ */
+function isLargeEnoughToMatter(value: object): boolean {
+  if (Array.isArray(value)) return value.length >= 32;
+  if (value instanceof Map || value instanceof Set) return value.size >= 32;
+  return Object.keys(value).length >= 32;
+}
+
+/**
+ * @internal Apply a supplied complete value to an EXISTING dynamic member,
+ * activating its membership if dormant.
+ *
+ *     MEMBERSHIP ACTIVATION IS NEVER A STANDALONE OPERATION.
+ *     IT MUST BE COUPLED TO AN AUTHORITATIVE SUPPLIED VALUE.
+ *
+ * Value first, then membership — the same ordering the leaf write path uses, so
+ * a dormant member's retained storage can never be observable between the two.
+ * The publication is forced when membership changed, because a supplied value
+ * equal to the retained one commits nothing and would otherwise leave an
+ * already-subscribed consumer stuck at absent.
+ */
+setMemberValueApplier(
+  (parent: object, key: string, member: unknown, value: unknown) => {
+    // 1. install the supplied value through the member's ordinary write path.
+    // The supplied value IS the complete value by contract — no shape guard,
+    // because THE LOCATION TYPE DEFINES WHAT CONSTITUTES A COMPLETE VALUE and
+    // second-guessing it here would quietly drop legitimate writes.
+    if (typeof member === 'function') {
+      (member as (v: unknown) => void)(value);
+    }
+
+    // 2. then activate membership. `setMemberPresence` owns both physical
+    // halves of the branch — ACCESSOR/STORE COHERENCE MUST HAVE ONE MUTATION
+    // OWNER — so this site cannot reactivate one and miss the other.
+    const woke = setMemberPresence(parent, key, 'active');
+
+    // One publication for the whole reacquisition, and only when membership
+    // actually changed — an active key taking a new value is a value write, not
+    // a membership event.
+    if (woke) publishMembershipChange(parent);
+  }
+);
+
+// Whole-value writes may introduce ordinary members (owner decision 2026-10-17).
+// Construction remains bound to the original tree; lookup alone creates nothing.
+type PreparedOrdinaryMember = { child: object; responsibility?: TerminalRecordPlan };
+const ordinaryMemberBuilders = new WeakMap<
+  object,
+  (key: string, value: unknown) => PreparedOrdinaryMember
+>();
+type PreparedBranchWrite = {
+  entries: [string, unknown][];
+  additions: Map<string, () => PreparedOrdinaryMember>;
+};
+
+/**
+ * Private construction description: plain branches contain only data properties;
+ * terminal wrappers preserve opaque value identity. All application inspection
+ * (including development diagnostics) finishes before canonical registration.
+ */
+function ordinaryConstructionValue(value: unknown, key: string): unknown {
+  if (isEntityMapMarker(value) || isRegisteredMarker(value)) {
+    throw new TypeError('SignalTree: marker definitions belong in initial state, not ordinary whole-value writes.');
+  }
+  if (isLeafDefinition(value)) {
+    const inner = leafDefinitionValue(value);
+    if (isEntityMapMarker(inner) || isRegisteredMarker(inner)) {
+      throw new TypeError('SignalTree: leaf() cannot wrap a semantic marker.');
+    }
+    return leaf(inner);
+  }
+  if (value === null || typeof value !== 'object') return leaf(value);
+  if (typeof ngDevMode === 'undefined' || ngDevMode) {
+    if (!Array.isArray(value) && Object.getOwnPropertySymbols(value).length > 0) {
+      console.warn(
+        `SignalTree: Object at "${key}" has Symbol keys but doesn't match any ` +
+          `registered marker processor. If this is a custom marker, ensure ` +
+          `registerMarkerProcessor() is called BEFORE creating the tree.`
+      );
+    }
+  }
+  if (Array.isArray(value) || isBuiltInObject(value)) {
+    warnMarkerInContainer(key, value);
+    if (Array.isArray(value)) warnEntityArrayLeaf(key, value);
+    return leaf(value);
+  }
+  const prepared: Record<string, unknown> = {};
+  for (const [childKey, child] of Object.entries(value)) {
+    if (childKey !== '__proto__') prepared[childKey] = ordinaryConstructionValue(child, childKey);
+  }
+  return prepared;
+}
+
+function prepareOrdinaryMembers(
+  target: unknown,
+  updates: unknown,
+  whole: boolean
+): Map<object, PreparedBranchWrite> {
+  const plans = new Map<object, PreparedBranchWrite>();
+  const visit = (target: unknown, updates: unknown, whole: boolean): void => {
+    if (!updates || typeof updates !== 'object') return;
+    const store = (isNodeAccessor(target)
+      ? (target as unknown as Record<symbol, unknown>)[NODE_STORE_SYMBOL]
+      : target) as Record<string, unknown>;
+    const entries = Object.entries(updates as Record<string, unknown>);
+    const additions = new Map<string, () => PreparedOrdinaryMember>();
+    plans.set(store, { entries, additions });
+    const build = whole ? ordinaryMemberBuilders.get(store) : undefined;
+    for (const [key, value] of entries) {
+      if (key === '__proto__') continue;
+      if (build && !Object.prototype.hasOwnProperty.call(store, key)) {
+        const prepared = ordinaryConstructionValue(value, key);
+        additions.set(key, () => build(key, prepared));
+      } else if (isNodeAccessor(store[key]) && value && typeof value === 'object') {
+        visit(store[key], value, true);
+      }
+    }
+  };
+  visit(target, updates, whole);
+  // Descriptions and closures are attempt-local. No slot, position, publication
+  // binding or observation claim exists until a member is actually installed.
+  return plans;
+}
+
+function recursiveUpdate(
+  target: unknown,
+  updates: unknown,
+  out?: string[],
+  pathPrefix = '',
+  reconcileMembership = true,
+  // When this whole value began: its levels share it (`readded`).
+  since = ++structuralWrites.stamp,
+  prepared = prepareOrdinaryMembers(target, updates, reconcileMembership)
+): void {
+  if (!updates || typeof updates !== 'object') return;
+  // A whole value reconciles membership level by level below; a location it
+  // writes must not re-add its own path as well (`structuralWrites`).
+  beginStructuralWrite();
+  let publishMembership: (() => void) | undefined;
+  let applicationFailed = false;
+  let applicationError: unknown;
+  try {
+    const targetObj = (
+      isNodeAccessor(target)
+        ? (target as unknown as Record<symbol, unknown>)[NODE_STORE_SYMBOL]
+        : target
+    ) as Record<string, unknown>;
+    const plan = prepared.get(targetObj);
+    if (!plan) return;
+    const { entries, additions } = plan;
+    const branch =
+      (targetObj as Record<symbol, object>)[NODE_ACCESSOR_PEER] ?? targetObj;
+
+    // ⚠️ A PARTIAL WRITE STILL RE-ADDS WHAT IT SUPPLIES (v16 8d review).
+    // `updateAndReport` scopes the outer level to its supplied keys, so it never
+    // omits there. But a supplied key that is omitted must come back with the
+    // supplied value, or the write lands in hidden storage and vanishes:
+    // measured, `updateAndReport({ a: { b: { keep: 4 } } })` with `a` omitted
+    // returned `[]` and left `a` absent.
+    // ⚠️ A PARTIAL WRITE CHANGES MEMBERSHIP ONLY BY RE-ADDING A DORMANT
+    // MEMBER (v16 8g). With none, its capture and its membership loop below
+    // can change nothing, and both walked every key of the branch on every
+    // write: 82-97x on a 200-key branch whenever anything was observed
+    // (perf-15.4.4, fx5). `hasDormantMembers` is a hint that only errs
+    // towards true. A whole value still reconciles every key.
+    const dormant = hasDormantMembers(targetObj);
+    publishMembership =
+      reconcileMembership || dormant
+        ? captureBranchMembershipIfObserved(
+            (targetObj as Record<symbol, object>)[NODE_ACCESSOR_PEER] ??
+              targetObj,
+            updates,
+            !reconcileMembership
+          )
+        : undefined;
+    // The supplied keys whose value was installed: only they may be re-added.
+    // Only a branch that has omitted a member can have one to re-add, so a
+    // tree that never omits allocates nothing here (v16 8e).
+    const installed = dormant ? new Set<string>() : undefined;
+
+    for (const [key, rawValue] of entries) {
+      // Reassignable: an updater FUNCTION at either a leaf or a branch is
+      // resolved to its result below, and everything downstream then sees one
+      // shape rather than each branch re-implementing the updater case.
+      let value = rawValue;
+      if (key === '__proto__') continue;
+      // A user updater earlier in this write may already have created and
+      // exposed the identity. Apply the outer value through that identity;
+      // never replace an escaped callable with a stale prepared child.
+      const buildAddition = additions.get(key);
+      if (
+        buildAddition &&
+        !Object.prototype.hasOwnProperty.call(targetObj, key)
+      ) {
+        const { child, responsibility } = buildAddition();
+        inheritObservationForAddedMember(branch, child);
+        installPreparedMember(branch, key, child, responsibility);
+        // Invalidate the installed membership before later application equality
+        // or updaters can read it. Native delivery remains owned by the group.
+        publishMembershipChange(branch);
+        installed?.add(key);
+        out?.push(pathPrefix ? `${pathPrefix}.${key}` : key);
+        continue;
+      }
+      const prop = Object.getOwnPropertyDescriptor(targetObj, key)?.value;
+      const childPath = pathPrefix ? `${pathPrefix}.${key}` : key;
+
+      if (prop === undefined) {
+        // A tree's signal graph is built from its INITIAL shape, so a write to a
+        // key that was never in that shape has nowhere to go and is discarded.
+        // Silently, until now: this is what made a guardrails rule look broken
+        // for hours when the demo wrote an optional key it had never seeded.
+        if (typeof ngDevMode === 'undefined' || ngDevMode) {
+          console.error(
+            `SignalTree: write to "${childPath}" DISCARDED — key is not in the ` +
+              `tree's initial shape. [ST2010]`
+          );
+        }
+        continue;
+      }
+
+      // A materialised marker hydrates ITSELF. Without this, a marker whose node
+      // is an unbranded callable (`form`) or a plain object with its own API
+      // (`entityMap`, `status`) falls through to the branch/leaf logic below,
+      // which has no idea how to write it — so `tree(partial)` silently no-ops,
+      // and `restoration` undo silently leaves the marker at its post-change
+      // value, landing the user in a state that never existed and reporting
+      // success. Measured before this: `n=3 rows=3` → undo → `n=2 rows=3`.
+      // The marker's own writes are this whole value's (`structuralWrites`).
+      const ownHydrate = structuralWrites.own;
+      structuralWrites.own = prop;
+      let hydrated: boolean;
+      try {
+        hydrated = hydrateMarkerNode(prop, value, 'restore');
+      } finally {
+        structuralWrites.own = ownHydrate;
+      }
+      if (hydrated) {
+        if (out) out.push(childPath);
+        installed?.add(key);
+        continue;
+      }
+
+      // ⚠️ THIS ASKS ABOUT A LEAF THE KERNEL ITSELF CREATED, and that is why it
+      // does NOT route through the realization predicate. S2b-2 substituted it and
+      // the substitution was reverted on measurement:
+      //
+      //     realization absent, this site direct        18 failures
+      //     realization absent, this site via predicate 169 failures
+      //
+      // The 151-test difference is the whole kernel write path. `isRealizedNode`
+      // answers `false` when no realization is installed, so every merge write
+      // silently did nothing — the canonical state path became contingent on an
+      // OPTIONAL adapter being present.
+      //
+      //     THE KERNEL MUST NOT ASK AN OPTIONAL ADAPTER WHETHER ITS OWN STATE
+      //     EXISTS.
+      //
+      // Line 1430 keeps the neutral predicate because its subject is a
+      // CALLER-SUPPLIED value — the same question `merge-derived` asks. Same
+      // function name, different semantic decision.
+      if (isNodeAccessor(prop)) {
+        const finishPublicationInput = endBranchPublicationInput;
+        let publicationInput: object | undefined;
+        try {
+        if (typeof value === 'function') {
+          const updater = value as (current: unknown) => unknown;
+          // An absent branch's updater receives its semantic value (v16 8d).
+          const current = isAbsentMember(prop) ? undefined : unwrap(prop);
+          publicationInput = beginBranchPublicationInput?.(prop, current);
+          value = updater(current);
+          const mergeable =
+            isTraversableNode(value) &&
+            typeof value !== 'function' &&
+            !isBuiltInObject(value) &&
+            !Array.isArray(value) &&
+            typeof (value as { then?: unknown }).then !== 'function';
+          if (!mergeable) {
+            warnDiscardedBranchWrite(childPath, value);
+            continue;
+          }
+        }
+        if (typeof value === 'function') {
+          warnDiscardedBranchWrite(childPath, value);
+        } else if (value && typeof value === 'object') {
+          recursiveUpdate(
+            prop,
+            value,
+            out,
+            childPath,
+            true,
+            since,
+            prepared.has(
+              (prop as unknown as Record<symbol, object>)[NODE_STORE_SYMBOL]
+            )
+              ? prepared
+              : prepareOrdinaryMembers(prop, value, true)
+          );
+          installed?.add(key);
+        } else if (value === undefined) {
+          continue;
+        } else {
+          warnDiscardedBranchWrite(childPath, value);
+        }
+        } finally {
+          if (publicationInput) finishPublicationInput?.(publicationInput);
+        }
+      } else if (isWritableLocation(prop) || isWritableCell(prop)) {
+        const sig = prop as Location<unknown> | WritableCell<unknown>;
+        // Recursive structural application already knows this is a replacement,
+        // so callable values are stored through the raw ingress rather than
+        // re-entering the authored grammar where a function means updater.
+        // Ref-equality short-circuit: skip the write entirely when the incoming
+        // value is identical to the current value. `peek()` asks the universal
+        // location for the value without enrolling the write path as a reactive
+        // consumer.
+        const current = readWritableCell(sig);
+        if (current === value && !isAbsentMember(sig) && !needsLocationAuthorityAdmission(sig) && !hasPublicationPreparation(sig)) {
+          // Dev-mode footgun guard: a merge write whose value is reference-
+          // identical to the current value is a no-op. For objects/arrays this
+          // almost always means the caller mutated the value in place and re-set
+          // the SAME reference, expecting an update — which silently does
+          // nothing. Warn once per path. (Primitives re-set to the same value
+          // are normal idempotent writes and are not flagged.)
+          if (
+            (typeof ngDevMode === 'undefined' || ngDevMode) &&
+            value !== null &&
+            typeof value === 'object' &&
+            !warnedNoopPaths.has(childPath)
+          ) {
+            warnedNoopPaths.add(childPath);
+            console.warn(
+              `SignalTree: write at "${childPath}" was skipped — the value is ` +
+                `reference-identical to the current value. If you mutated an ` +
+                `object/array in place, create a NEW reference (spread/slice/map) ` +
+                `so the change is observed. [ST2003]`
+            );
+          }
+          continue;
+        }
+        // A leaf under an omitted member reads absent until its path is
+        // re-added after this write, so its re-add is reported as a change.
+        const wasAbsent = out !== undefined && isAbsentMember(sig);
+        const ownWrite = structuralWrites.own;
+        structuralWrites.own = sig;
+        try {
+          if (isWritableLocation(sig)) replaceLocation(sig, value);
+          else sig.set(value);
+        } finally {
+          structuralWrites.own = ownWrite;
+        }
+        installed?.add(key);
+
+        if (out) {
+          // Report only what LANDED. Leaves are created with a deep `equal`, so
+          // a new-reference-but-deep-equal value — the ordinary shape of a
+          // re-fetched server payload — is rejected by the signal and notifies
+          // nobody. Pushing the path anyway told audit trails, change logs and
+          // targeted-persistence callers to do work for a write that never
+          // happened.
+          //
+          // Compare against the PREVIOUS value, not the incoming one: "the leaf
+          // now holds `value`" is also true when the leaf already held it, which
+          // is exactly the no-op case (and Object.is(NaN, NaN) makes that
+          // indistinguishable). "The leaf no longer holds what it held" is the
+          // question actually being asked.
+          if (wasAbsent || !Object.is(readWritableCell(sig), current))
+            out.push(childPath);
+        }
+      }
+      // ST2005 — attempted and REVERTED, deliberately. Recorded here so the
+      // next person does not re-derive it.
+      //
+      // Its 13.x removal note said a diagnostic here "would fire on
+      // `tree.$(tree.$())`, the ordinary snapshot-restore pattern", and that markers
+      // "do not accept merge writes BY DESIGN". Both were true then. Neither is
+      // now: every marker declares `hydrate`, the branch above routes to it, and
+      // `tree.$(tree.$())` is pinned by a round-trip test that reads LIVE node values
+      // (the naive snapshot-vs-snapshot form passes vacuously when both sides
+      // drop the same key).
+      //
+      // So the reasoning did expire — but restoring the diagnostic at THIS site
+      // still cries wolf, measured: it fired on an ordinary leaf write
+      // (`tree.$({known: 2})`) and on `{ user: undefined }`, which is type-legal
+      // `Partial<T>` and exactly what `{ ...defaults, ...patch }` produces for an
+      // absent optional key. This is the tail of the outer dispatch, not the
+      // "matched neither guard" branch the note described.
+      //
+      // RESOLVED — the narrow site is not on this path at all, and the code is
+      // not ST2005. That number is taken: `@signaltree/ng-forms` throws [ST2005]
+      // for a bridged `form()` marker carrying its own `asyncValidators`. It has
+      // shipped since v12 and is documented; reusing it in core would have
+      // collided.
+      //
+      // The real remaining gap was narrower than this note assumed. A marker that
+      // declares `snapshot` but no `hydrate`, whose node is not a writable
+      // signal, snapshots perfectly and silently discards every write — measured:
+      // `tree.$()` gave `{"p":1}`, `tree.$({p: 99})` left it at `1`, nothing reported
+      // at either end. [ST2022] stays quiet because `snapshot` IS declared.
+      //
+      // That is now [ST2023], reported at MATERIALISATION (materialize-markers.ts),
+      // where the node exists so its shape is knowable, once per processor, off
+      // the write path entirely. Its predicate is the exact mirror of this
+      // function's fall-through, which is what keeps it from crying wolf the way
+      // a diagnostic at THIS site did. If the fall-through widens, widen ST2023
+      // with it.
+    }
+
+    // ── MEMBERSHIP RECONCILIATION — GREENFIELD-BRANCH-WRITE-0 ─────────────────
+    //
+    // A whole-value assignment states the COMPLETE next value of this location, so
+    // a key the value omits is not a member of it. Root and branch value/updater
+    // calls reconcile here. `updateAndReport` passes a Partial<T>, so it scopes the
+    // outer call only; an included branch still descends with whole-value semantics.
+    //
+    //     OMISSION IN A WHOLE VALUE CHANGES MEMBERSHIP.
+    //     OMISSION IN A PROJECTION DEFINES SCOPE.
+    //
+    // ⚠️ C4's `acquireScalarProjection` must NEVER route through here. It calls
+    // `subject.set()` directly precisely so that an external acquisition omitting
+    // a key says NOTHING about that key.
+    //
+    // ⚠️ NOTHING IS WRITTEN TO AN OMITTED KEY. Absence is a membership change, not
+    // an `undefined` assignment — the BR-A probe did the latter and produced a
+    // spurious mutation event per omitted key while suppressing the unknown-key
+    // diagnostic. The slot, its identity and its retained value all survive.
+    //
+    // Reactivation is handled by the supplied-key loop above having ALREADY
+    // installed the value: REACTIVATION MUST CARRY THE SUPPLIED VALUE, because
+    // re-enumerating alone resurrects the dormant retained one.
+    const membershipChanged: string[] = [];
+    // A partial write (`updateAndReport`'s outer level) omits nothing, so only
+    // its supplied keys can change presence, and only by re-adding.
+    const supplied =
+      reconcileMembership || installed
+        ? new Set(Object.keys(updates as Record<string, unknown>))
+        : undefined;
+
+    if (supplied)
+      for (const key of reconcileMembership
+        ? Object.getOwnPropertyNames(targetObj)
+        : supplied) {
+        if (PRODUCTION_SUBSTRATE_STATS_ENABLED) {
+          recordProductionSubstrateStat('membershipKeysVisited');
+        }
+        const descriptor = Object.getOwnPropertyDescriptor(targetObj, key);
+        if (!descriptor || !('value' in descriptor)) continue;
+
+        if (!supplied.has(key)) {
+          if (
+            descriptor.enumerable &&
+            // A write made while this whole value ran re-added it: it stays.
+            !readdedDuringStructuralWrite(targetObj, key, since) &&
+            setMemberPresence(targetObj, key, 'dormant')
+          ) {
+            membershipChanged.push(key);
+          }
+        } else if (
+          // Only a member whose supplied value was installed is re-added: a key
+          // supplied as `undefined`, or with a value the loop discarded, would
+          // otherwise come back with its retained storage. Measured before v16 8d:
+          // `$({ a: undefined, count: 0 })` re-added an omitted `a` as `{ v: 1 }`.
+          // "DORMANT STORAGE MUST NOT SUPPLY THE REACTIVATED VALUE" (case 18).
+          !descriptor.enumerable &&
+          installed?.has(key) &&
+          setMemberPresence(targetObj, key, 'active')
+        ) {
+          membershipChanged.push(key);
+        }
+      }
+
+    // One publication for the whole transition. The per-slot tokens the leaves
+    // already depend on are what carries it — no new reactive state exists, and
+    // no first-transition problem, because that dependency edge was established on
+    // each leaf's FIRST computation.
+    if (membershipChanged.length > 0) {
+      republishMembers(targetObj, membershipChanged);
+    }
+  } catch (error) {
+    applicationFailed = true;
+    applicationError = error;
+  } finally {
+    try {
+      // Responsibility is already installed. Deliver the actual membership
+      // even when a later sibling failed; do not turn partial truth invisible
+      // to Link/restoration. Preserve an earlier application error exactly.
+      try { publishMembership?.(); }
+      catch (error) {
+        if (!applicationFailed) {
+          applicationFailed = true;
+          applicationError = error;
+        } else {
+          reportContainedObserverError({ error, operation: 'notify:subscriber' });
+        }
+      }
+    } finally { endStructuralWrite(); }
+  }
+  if (applicationFailed) throw applicationError;
+}
+
+// =============================================================================
+// SIGNAL STORE CREATION
+// =============================================================================
+
+/**
+ * @internal The comparator a LEAF is created with.
+ *
+ * In production this IS `base` — the ternary at each call site folds and this
+ * function becomes unreferenced, so `check-devmode-foldable` reclaims all of
+ * it. In dev it wraps `base` to catch ST2027.
+ *
+ * Why here rather than in `recursiveUpdate`, where ST2003 lives: a direct
+ * `tree.$.rows(v)` goes straight to the canonical location and never enters
+ * `recursiveUpdate` at all. That is the most common write form, and it is the
+ * one the corrupted benchmarks used — a diagnostic that only covers merge
+ * writes would have missed the case that motivated it. The comparator is the
+ * one place every write funnels through, and it already knows both halves of
+ * the answer: whether the values compared equal, and whether the references
+ * differed.
+ */
+function leafEqual(
+  base: (a: unknown, b: unknown) => boolean,
+  path: string
+): (a: unknown, b: unknown) => boolean {
+  return (a: unknown, b: unknown): boolean => {
+    const eq = base(a, b);
+    // A no-op write, and NOT the reference kind (ST2003 covers that): a new
+    // object that deep-equals the current value. `deepEqual` cannot
+    // short-circuit on it, so the whole structure was walked to conclude
+    // nothing changed — and then nothing notifies.
+    if (
+      eq &&
+      a !== b &&
+      a !== null &&
+      typeof a === 'object' &&
+      isLargeEnoughToMatter(a) &&
+      !warnedNoopCopyPaths.has(path)
+    ) {
+      warnedNoopCopyPaths.add(path);
+      console.warn(
+        `SignalTree: a write to "${path || '(root leaf)'}" changed NOTHING — ` +
+          `the new value is a different object but deep-equals the current ` +
+          `one, so the whole structure was compared and the write discarded. ` +
+          `A re-fetched payload does this. Skip the write when the data is ` +
+          `unchanged, or write the smaller changed leaf. [ST2027]`
+      );
+    }
+    return eq;
+  };
+}
+
+/**
+ * @internal THE canonical ordinary child-BRANCH materialization.
+ *
+ * ⚠️ ONE SEMANTIC JOB, ONE AUTHORITY. This was extracted from the ordinary
+ * nested-object case in `createSignalStore`'s parent loop, and that loop now
+ * calls it — so a marker that resolves into ordinary topology cannot silently
+ * diverge from how every inline branch is built.
+ *
+ * `createSignalStore` ALONE IS NOT THIS AUTHORITY. A branch is four steps, and
+ * calling only the second produces a store with no accessor whose descendants
+ * are parented one level too high:
+ *
+ * ```text
+ * 1. allocate the CHILD BRANCH's own PositionId under its parent
+ * 2. createSignalStore(value, …, [childBranchId], childPath)
+ * 3. makeNodeAccessor(store, childPath, [childBranchId], registry)
+ * 4. attach the slot runtime to BOTH accessor and backing store
+ * ```
+ */
+function materializeOrdinaryBranch(
+  value: unknown,
+  equalityFn: (a: unknown, b: unknown) => boolean,
+  materializationContext: MaterializationContext,
+  buildPlan: TreeBuildPlan,
+  captureRuntime: MutationCaptureRuntime,
+  scalarSlotRuntime: TreeScalarLeafRuntime | undefined,
+  childPositionIds: number[] | undefined,
+  childPath: string,
+  address: readonly string[],
+  preparedOrdinary = false
+): unknown {
+  const nested = createSignalStore(
+    value,
+    equalityFn,
+    materializationContext,
+    buildPlan,
+    captureRuntime,
+    scalarSlotRuntime,
+    childPositionIds,
+    childPath,
+    address,
+    preparedOrdinary
+  );
+  const accessor = makeNodeAccessor(
+    nested as TreeNode<object>,
+    childPath,
+    childPositionIds,
+    materializationContext.positionRegistry,
+    materializationContext.locationRuntime
+  );
+  // Membership reconciliation runs at EVERY branch, not just the root, so the
+  // publication runtime has to be reachable from each branch accessor. One
+  // non-enumerable symbol per BRANCH — branches are far fewer than leaves, and
+  // this buys membership invalidation with no per-leaf state at all.
+  if (scalarSlotRuntime) {
+    // BOTH the accessor and its backing store: membership reconciliation
+    // targets whichever object the write path holds, and those differ between
+    // the branch callable (store) and an outside caller (accessor).
+    defineTreeScalarSlotRuntime(accessor as object, scalarSlotRuntime);
+    defineTreeScalarSlotRuntime(nested as object, scalarSlotRuntime);
+  }
+  return accessor;
+}
+
+function createSignalStore<T>(
+  obj: T,
+  equalityFn: (a: unknown, b: unknown) => boolean,
+  materializationContext: MaterializationContext,
+  buildPlan: TreeBuildPlan,
+  captureRuntime: MutationCaptureRuntime,
+  scalarSlotRuntime: TreeScalarLeafRuntime | undefined,
+  positionIds?: readonly number[],
+  /**
+   * Canonical ownership path. Link and mutation capture use it in production;
+   * development diagnostics also use it to identify the affected leaf.
+   * Removing parent segments for diagnostics would corrupt nested egress.
+   */
+  path = '',
+  address: readonly string[] = [],
+  preparedOrdinary = false
+): TreeNode<T> {
+  for (const position of positionIds ?? []) {
+    materializationContext.positionRegistry.registerPositionAddress(
+      position,
+      address
+    );
+  }
+  const createLeafSignal = <TValue>(
+    value: TValue,
+    leafPositionIds: readonly number[] | undefined,
+    equal: (a: unknown, b: unknown) => boolean
+  ): Location<TValue> => {
+    if (scalarSlotRuntime) {
+      // The scalar substrate retains causal slot storage while exposing the
+      // same universal writable-location contract as ordinary leaves.
+      return scalarSlotRuntime.createLeaf(
+        value,
+        equal as (current: TValue, next: TValue) => boolean,
+        leafPositionIds?.[0]
+      );
+    }
+
+    return materializationContext.locationRuntime.createCell(value, equal);
+  };
+
+  // Primitives, null, undefined
+  if (obj === null || obj === undefined || typeof obj !== 'object') {
+    const equal =
+      typeof ngDevMode === 'undefined' || ngDevMode
+        ? leafEqual(equalityFn, path)
+        : equalityFn;
+    const leaf = createLeafSignal(obj, positionIds, equal);
+    finalizeLeafSignal(
+      leaf,
+      path,
+      positionIds,
+      buildPlan,
+      captureRuntime,
+      materializationContext.positionRegistry,
+      address
+    );
+    return leaf as unknown as TreeNode<T>;
+  }
+
+  // Arrays
+  if (Array.isArray(obj)) {
+    const equal =
+      typeof ngDevMode === 'undefined' || ngDevMode
+        ? leafEqual(equalityFn, path)
+        : equalityFn;
+    const leaf = createLeafSignal(obj, positionIds, equal);
+    finalizeLeafSignal(
+      leaf,
+      path,
+      positionIds,
+      buildPlan,
+      captureRuntime,
+      materializationContext.positionRegistry,
+      address
+    );
+    return leaf as unknown as TreeNode<T>;
+  }
+
+  // Built-in objects (Date, Map, Set, etc.)
+  if (isBuiltInObject(obj)) {
+    const equal =
+      typeof ngDevMode === 'undefined' || ngDevMode
+        ? leafEqual(equalityFn, path)
+        : equalityFn;
+    const leaf = createLeafSignal(obj, positionIds, equal);
+    finalizeLeafSignal(
+      leaf,
+      path,
+      positionIds,
+      buildPlan,
+      captureRuntime,
+      materializationContext.positionRegistry,
+      address
+    );
+    return leaf as unknown as TreeNode<T>;
+  }
+
+  // Regular object - recursive
+  const store: Record<string, unknown> = {};
+  defineNodeAddress(store, address);
+  ordinaryMemberBuilders.set(store, (key, value) => {
+    // Use the same child classification/finalization as initial construction,
+    // including primitive/undefined leaves and structured literal addresses.
+    const prepared = createSignalStore(
+      { [key]: value },
+      equalityFn,
+      materializationContext,
+      buildPlan,
+      captureRuntime,
+      scalarSlotRuntime,
+      positionIds,
+      path,
+      address,
+      true
+    );
+    const child = (prepared as Record<string, object>)[key];
+    const branch = (store as Record<symbol, object>)[NODE_ACCESSOR_PEER] ?? store;
+    return { child, responsibility: captureRuntime.prepareMemberResponsibility?.(branch, key, child) };
+  });
+
+  for (const [key, definedValue] of Object.entries(
+    obj as Record<string, unknown>
+  )) {
+    const childAddress = childAddressOf(address, key);
+    const childPath = path ? `${path}.${key}` : key;
+    const terminal = isLeafDefinition(definedValue);
+    const value = terminal ? leafDefinitionValue(definedValue) : definedValue;
+    if (!preparedOrdinary && terminal && (isEntityMapMarker(value) || isRegisteredMarker(value))) {
+      throw new Error(
+        `SignalTree: leaf() cannot wrap a semantic marker at "${childPath}".`
+      );
+    }
+    let childPositionIds: number[] | undefined;
+    const getChildPositionIds = (): number[] | undefined => {
+      if (!materializationContext.positionTopologyEnabled) {
+        return undefined;
+      }
+
+      return (childPositionIds ??= [
+        materializationContext.allocatePositionId(positionIds?.[0]),
+      ]);
+    };
+    // SECURITY: every `store[key] = …` below is a plain assignment, so a key
+    // named `__proto__` invokes the Object.prototype SETTER on the store rather
+    // than adding a property. `JSON.parse` creates a real own `__proto__` key,
+    // and rehydrating from localStorage / SSR transfer state / a fetch body is
+    // the ordinary way that input reaches `signalTree()`.
+    //
+    // The damage is contained but real: the ROOT store IS `tree.$`, so its
+    // prototype became an attacker-controlled node. `tree.$.isAdmin` then read
+    // back a live signal holding `true` while `tree.$()` reported only the
+    // legitimate keys — invisible to snapshots, serialization, persistence,
+    // devtools and restoration — and a later `tree.$({ isAdmin: … })` wrote
+    // THROUGH to it, bypassing the ST2010 not-in-initial-shape discard.
+    // Nested branches were safe (each accessor gets a fresh Function.prototype);
+    // the root is the only victim, which is exactly why it was easy to miss.
+    if (key === '__proto__') {
+      if (typeof ngDevMode === 'undefined' || ngDevMode) {
+        console.error(
+          `SignalTree: dropped a "__proto__" key from the initial state — it ` +
+            `cannot be a state key. If this came from JSON.parse, the payload ` +
+            `is attempting prototype pollution. [ST2016]`
+        );
+      }
+      continue;
+    }
+
+    // Entity map markers - preserve for entities() enhancer
+    if (!preparedOrdinary && isEntityMapMarker(value)) {
+      store[key] = value;
+      continue;
+    }
+
+    // All markers (built-in stored/asyncSource + user-registered)
+    // are caught here via the dynamic processor registry. Built-in markers
+    // self-register when their factory runs — and the factory always runs
+    // inside the state literal (`signalTree({ x: stored(...) })` evaluates
+    // `stored()` before `signalTree()`), so the processor is registered before
+    // this check. Detecting them through the registry (instead of importing
+    // `isStoredMarker` directly) keeps `markers/stored` out of the bundle when
+    // that marker is never used.
+    if (!preparedOrdinary && isRegisteredMarker(value)) {
+      store[key] = value;
+      continue;
+    }
+
+    // Dev-mode warning: object has Symbol keys but no registered processor
+    // This catches the common mistake of forgetting to register before tree creation
+    if (typeof ngDevMode === 'undefined' || ngDevMode) {
+      if (
+        !preparedOrdinary &&
+        !terminal &&
+        value !== null &&
+        typeof value === 'object' &&
+        !Array.isArray(value) &&
+        Object.getOwnPropertySymbols(value).length > 0
+      ) {
+        console.warn(
+          `SignalTree: Object at "${key}" has Symbol keys but doesn't match any ` +
+            `registered marker processor. If this is a custom marker, ensure ` +
+            `registerMarkerProcessor() is called BEFORE creating the tree.`
+        );
+      }
+    }
+
+    // Null, undefined, primitives
+    if (
+      terminal ||
+      value === null ||
+      value === undefined ||
+      typeof value !== 'object'
+    ) {
+      const childPositionIds = getChildPositionIds();
+      const equal =
+        typeof ngDevMode === 'undefined' || ngDevMode
+          ? leafEqual(equalityFn, childPath)
+          : equalityFn;
+      const leaf = createLeafSignal(value, childPositionIds, equal);
+      finalizeLeafSignal(
+        leaf,
+        childPath,
+        childPositionIds,
+        buildPlan,
+        captureRuntime,
+        materializationContext.positionRegistry,
+        childAddress
+      );
+      store[key] = leaf;
+      continue;
+    }
+
+    // Arrays, built-ins
+    if (Array.isArray(value) || isBuiltInObject(value)) {
+      // The one branch that already knows BOTH facts the diagnostic needs:
+      // the value looks like a marker, and this position is not marker-
+      // admissible because its interior is never traversed.
+      warnMarkerInContainer(key, value);
+      if (Array.isArray(value)) {
+        warnEntityArrayLeaf(key, value);
+      }
+      const childPositionIds = getChildPositionIds();
+      const equal =
+        typeof ngDevMode === 'undefined' || ngDevMode
+          ? leafEqual(equalityFn, childPath)
+          : equalityFn;
+      const leaf = createLeafSignal(value, childPositionIds, equal);
+      finalizeLeafSignal(
+        leaf,
+        childPath,
+        childPositionIds,
+        buildPlan,
+        captureRuntime,
+        materializationContext.positionRegistry,
+        childAddress
+      );
+      store[key] = leaf;
+      continue;
+    }
+
+    // Nested object — THE canonical child-branch authority. Extracted so the
+    // marker ordinary-branch request cannot diverge from it.
+    store[key] = materializeOrdinaryBranch(
+      value,
+      equalityFn,
+      materializationContext,
+      buildPlan,
+      captureRuntime,
+      scalarSlotRuntime,
+      getChildPositionIds(),
+      childPath,
+      childAddress,
+      preparedOrdinary
+    );
+  }
+
+  // Register as memoisable. Only stores built here are reactive all the way
+  // down, which is the precondition for caching their materialisation in a
+  // computed — see isMemoisable() in utils.ts.
+  markTreeStore(store as object);
+
+  return store as TreeNode<T>;
+}
+
+// =============================================================================
+// CORE CREATE FUNCTION
+// =============================================================================
+
+/**
+ * @internal What `create` hands back to its single caller.
+ *
+ * ⚠️ CONSTRUCTION AUTHORITY NEED NOT SURVIVE AS RUNTIME TREE STATE WHEN ONLY
+ * CONSTRUCTION-TIME CLOSURES REQUIRE IT.
+ *
+ * An earlier revision attached the materializer to the tree under a
+ * module-private symbol, because `create` owns equality/slot runtime while
+ * `signalTree` owns the marker dispatcher. That worked, but it made the runtime
+ * object an incidental capability transport — and `create` has exactly ONE
+ * caller, so the private return shape costs nothing. The authority stops being
+ * reachable once the dispatcher and configured-tree closures have captured it.
+ *
+ * Owner decision 2026-10-17 authorizes ordinary whole-value member creation.
+ * Its branch-bound builders now retain these construction inputs for the tree
+ * lifetime in `ordinaryMemberBuilders`; no capability is exposed on the tree.
+ * Marker definition finalization remains construction-only.
+ */
+interface TreeConstructionResult<T extends object> {
+  activateReporting(): void;
+  readonly tree: ISignalTree<T>;
+  readonly authority: OrdinaryConstructionAuthority;
+}
+
+function create<T extends object>(
+  initialState: T,
+  config: TreeConfig,
+  materializationContext: MaterializationContext,
+  buildPlan: TreeBuildPlan,
+  captureRuntime: MutationCaptureRuntime = createMutationCaptureRuntime(),
+  createScalarLeafRuntime: (
+    physicalCommitClock:
+      | ReturnType<typeof createPhysicalCommitClock>
+      | undefined,
+    locations: LocationRuntime
+  ) => TreeScalarLeafRuntime = createTreeScalarLeafRuntime
+): TreeConstructionResult<T> {
+  if (initialState === null || initialState === undefined) {
+    throw new Error(SIGNAL_TREE_MESSAGES.NULL_OR_UNDEFINED);
+  }
+
+  const equalityFn = createEqualityFn(config.useShallowComparison ?? false);
+
+  // Create signal store
+  const scalarSlotRuntime = createScalarLeafRuntime(
+    materializationContext.physicalCommitClock,
+    materializationContext.locationRuntime
+  );
+
+  /**
+   * The canonical construction authority, for the marker DISPATCHER only.
+   *
+   * A processor returns `ordinaryState(value)` to REQUEST this; it never
+   * receives the ability to perform it. The subtree is built by the same
+   * `createSignalStore` that builds every inline branch — same equality, build
+   * plan, capture runtime, slot runtime, position registry and path — so its
+   * descendants ARE ordinary canonical locations, not a parallel store.
+   *
+   * ⚠️ NO EXTRA TOPOLOGY LEVEL: it materializes AT the marker's own location
+   * and parent position, so `users: dyn({ alice })` yields `users`,
+   * `users.alice`, `users.alice.name` with nothing hidden in between.
+   */
+  const materializeOrdinaryState: OrdinaryStateMaterializer = (
+    value,
+    path,
+    parentPositionId,
+    address
+  ) => {
+    // ⚠️ ALLOCATE THE BRANCH'S OWN POSITION FIRST. An earlier revision passed
+    // `[parentPositionId]` straight through and returned `createSignalStore`'s
+    // raw store. That produced BOTH defects at once: the marker's own branch had
+    // no PositionId, so its seeded descendants were parented one level too high
+    // (root -> alice instead of root -> users -> alice), and the location was a
+    // store rather than a callable NodeAccessor.
+    const childPositionIds = materializationContext.positionTopologyEnabled
+      ? [materializationContext.allocatePositionId(parentPositionId)]
+      : undefined;
+
+    return materializeOrdinaryBranch(
+      value,
+      equalityFn,
+      materializationContext,
+      buildPlan,
+      captureRuntime,
+      scalarSlotRuntime,
+      childPositionIds,
+      path,
+      address
+    );
+  };
+
+  /**
+   * ⚠️ THE SHARED LIFETIME CHILD-CONSTRUCTION RUNTIME.
+   *
+   *     CONSTRUCTION AUTHORITY SURVIVES ONLY FOR SUBJECTS WHOSE CONTRACT
+   *     INCLUDES POST-CONSTRUCTION TOPOLOGY ACQUISITION.
+   *
+   * `equalityFn`, `buildPlan`, `captureRuntime`, `scalarSlotRuntime` and the
+   * materialization context are TREE-WIDE constants. Capturing them once here
+   * and sharing the reference means a second or tenth dynamic branch adds only
+   * its owner identity — not another four captures each.
+   *
+   * ⚠️ These four are the inputs `createSignalStore` currently requires. They are
+   * NOT frozen as the permanent representation: a later retention/churn pass may
+   * show, for instance, that `buildPlan` can shrink to a smaller derived runtime
+   * plan. That is representation optimization, not Step-E semantics.
+   *
+   * ⚠️ LAZY BY CONSTRUCTION: `bindMember` is called only by the dispatcher, only
+   * for a branch that requested keyed lookup. A tree with zero dynamic branches
+   * never invokes it, so it acquires no lifetime materialization state merely
+   * because SignalTree supports dynamic branches.
+   */
+  const constructionAuthority: OrdinaryConstructionAuthority = {
+    materialize: materializeOrdinaryState,
+    bindMember: (ownerBranch: object) => {
+      // OWNER IDENTITY DEFINES THE MATERIALIZATION DOMAIN. Both facts are read
+      // from the canonical branch itself, so no caller can supply either.
+      const ownerPositionId = getOwnedPositionIds(ownerBranch)?.[0];
+      const ownerPath = getOwnedOwnerPath(ownerBranch) ?? '';
+      const ownerAddress = getNodeAddress(ownerBranch);
+      if (!ownerAddress)
+        throw new Error('Missing dynamic branch construction address.');
+      return (key: string, value: unknown) => {
+        const childPositionIds = materializationContext.positionTopologyEnabled
+          ? [materializationContext.allocatePositionId(ownerPositionId)]
+          : undefined;
+        const childPath = ownerPath ? `${ownerPath}.${key}` : key;
+        return materializeOrdinaryBranch(
+          value,
+          equalityFn,
+          materializationContext,
+          buildPlan,
+          captureRuntime,
+          scalarSlotRuntime,
+          childPositionIds,
+          childPath,
+          childAddressOf(ownerAddress, key)
+        );
+      };
+    },
+  };
+  const rootPositionIds = materializationContext.positionTopologyEnabled
+    ? [materializationContext.allocatePositionId()]
+    : undefined;
+
+  // ONE construction path. The lazy proxy was the other one, and it is gone —
+  // see the tombstone on `TreeConfig` in types.ts.
+  const signalState: TreeNode<T> = createSignalStore(
+    initialState,
+    equalityFn,
+    materializationContext,
+    buildPlan,
+    captureRuntime,
+    scalarSlotRuntime,
+    rootPositionIds
+  );
+
+  const rootAccessor = makeNodeAccessor(
+    signalState,
+    '',
+    rootPositionIds,
+    materializationContext.positionRegistry,
+    materializationContext.locationRuntime
+  );
+
+  const tree = {} as ISignalTree<T>;
+  defineNodeAddress(tree, []);
+
+  bindLocationRuntime(tree as object, materializationContext.locationRuntime);
+  bindLocationRuntime(
+    signalState as object,
+    materializationContext.locationRuntime
+  );
+  bindLocationRuntime(
+    rootAccessor as object,
+    materializationContext.locationRuntime
+  );
+
+  (tree as unknown as Record<symbol, MutationCaptureRuntime>)[
+    MUTATION_CAPTURE_RUNTIME
+  ] = captureRuntime;
+  if (rootPositionIds) {
+    defineOwnedPositionIds(tree as object, rootPositionIds);
+    defineOwnedPositionIds(signalState as object, rootPositionIds);
+    defineOwnedPositionIds(rootAccessor as object, rootPositionIds);
+  }
+  // Construction-time truth, so a tool can ask what this tree was built with
+  // instead of probing behaviour to find out. See tree-capabilities.ts.
+  defineTreeCapabilities(tree as object, buildPlan.capabilities);
+  if (buildPlan.has('mutation-capture')) {
+    defineOwnedOwnerPath(tree as object, '');
+    defineOwnedOwnerPath(signalState as object, '');
+    defineOwnedOwnerPath(rootAccessor as object, '');
+  }
+  if (materializationContext.positionTopologyEnabled) {
+    definePositionRegistry(
+      tree as object,
+      materializationContext.positionRegistry
+    );
+    definePositionRegistry(
+      signalState as object,
+      materializationContext.positionRegistry
+    );
+    definePositionRegistry(
+      rootAccessor as object,
+      materializationContext.positionRegistry
+    );
+  }
+  // THE ROOT AS A SUPPORTED LINK SOURCE.
+  //
+  // `link(tree.$, endpoint)` typechecks, so the root is supported — but its
+  // owner carriers were capability-gated exactly as ordinary leaves' were, so a
+  // plain tree rejected it as unowned. Attached unconditionally for the same
+  // reason the dormant substrate seeds leaves: a post-construction operation
+  // cannot ask for a capability.
+  if (materializationContext.positionRegistry) {
+    definePositionRegistry(
+      signalState as object,
+      materializationContext.positionRegistry
+    );
+    defineOwnedOwnerPath(signalState as object, '');
+    defineOwnedOwnerPath(rootAccessor as object, '');
+  }
+  defineRootTree(rootAccessor as object, {
+    read: () => rootAccessor(),
+    replace: (value) => rootAccessor(value as T),
+    derive: (update) => rootAccessor(update as (current: T) => T),
+  });
+
+  if (materializationContext.physicalCommitClock) {
+    definePhysicalCommitClock(
+      tree as object,
+      materializationContext.physicalCommitClock
+    );
+    definePhysicalCommitClock(
+      signalState as object,
+      materializationContext.physicalCommitClock
+    );
+    definePhysicalCommitClock(
+      rootAccessor as object,
+      materializationContext.physicalCommitClock
+    );
+  }
+  // ⚠️ EVERY ROOT, EVEN ONE WITHOUT A SCALAR LEAF, as at every branch below.
+  // Membership reconciliation reaches the runtime from the branch it changes:
+  // a root holding only entity collections had none, so omitting a collection
+  // there woke nothing and a write re-adding it never reached the snapshot,
+  // and undo of the omission threw (v16 8e review, M1).
+  if (scalarSlotRuntime) {
+    defineTreeScalarSlotRuntime(tree as object, scalarSlotRuntime);
+    defineTreeScalarSlotRuntime(signalState as object, scalarSlotRuntime);
+    defineTreeScalarSlotRuntime(rootAccessor as object, scalarSlotRuntime);
+  }
+
+  // Lifecycle: cleanup registry and destroyed flag
+  const cleanupFns: Array<() => void> = [];
+  const destroyedSig = materializationContext.locationRuntime.createCell(false);
+
+  // Add core properties
+  Object.defineProperty(tree, '$', {
+    value: rootAccessor,
+    enumerable: false,
+    writable: false,
+    configurable: true,
+  });
+
+  // destroy()
+  Object.defineProperty(tree, 'destroy', {
+    value: function (): void {
+      if (destroyedSig()) return; // Already destroyed
+      try {
+        replaceLocation(destroyedSig, true);
+      } finally {
+        terminateOwnerInvalidation(tree as object);
+        // Run registered cleanup functions (enhancers, subscriptions, etc.)
+        for (const fn of cleanupFns) {
+          try {
+            fn();
+          } catch {
+            // Swallow errors during cleanup to ensure all cleanups run
+          }
+        }
+        cleanupFns.length = 0;
+        releaseContainedReportBudget(
+          materializationContext.positionRegistry.id
+        );
+      }
+      if (config.debugMode) {
+        console.log(SIGNAL_TREE_MESSAGES.TREE_DESTROYED);
+      }
+    },
+    enumerable: false,
+    // Allow enhancers (like guardrails) to override/replace `destroy` at runtime.
+    writable: true,
+    configurable: true,
+  });
+
+  // destroyed (readonly signal)
+  Object.defineProperty(tree, 'destroyed', {
+    value: destroyedSig.asReadonly(),
+    enumerable: false,
+    writable: false,
+    configurable: true,
+  });
+
+  // registerCleanup()
+  Object.defineProperty(tree, 'registerCleanup', {
+    value: function (fn: () => void): void {
+      if (typeof fn === 'function') {
+        cleanupFns.push(fn);
+      }
+    },
+    enumerable: false,
+    writable: false,
+    configurable: true,
+  });
+
+  // clearCache(): compatibility stub for older DX and enhancers that expect
+  // a global clearCache helper on the tree. Enhancers may replace this with
+  // a real implementation (e.g. memoization). Default is a no-op.
+  Object.defineProperty(tree, 'clearCache', {
+    value: () => {
+      /* no-op default */
+    },
+    enumerable: false,
+    writable: true,
+    configurable: true,
+  });
+
+  // `batchUpdate()` was REMOVED in 14.1.1. Its body was
+  // `recursiveUpdate(signalState, arg)` — exactly what the tree callable
+  // `tree(partial)` / `tree(updater)` already does. With `batching()` attached it
+  // additionally wrapped in `batch()`, so `tree.batchUpdate(x)` was precisely
+  // `tree.batch(() => tree(x))`. MEASURED equivalent before removal: 0.921 vs
+  // 0.925 us at 10 fields, 16.585 vs 16.475 us at 100 (medians of 9 x 2000).
+
+  // updateAndReport(): apply a partial update and return the dot-paths of
+  // signals that actually changed (after ref-equality short-circuit).
+  // Useful for partial server-payload sync, change-log/audit trails, and
+  // targeted persistence without pulling in the @signaltree/enterprise
+  // diff engine.
+  Object.defineProperty(tree, 'updateAndReport', {
+    value: function (arg?: unknown): string[] {
+      if (arguments.length === 0) return [];
+      const out: string[] = [];
+      let updates = arg;
+      const finishPublicationInput = endBranchPublicationInput;
+      let publicationInput: object | undefined;
+      try {
+        if (typeof arg === 'function') {
+          const updater = arg as (current: T) => T;
+          const current = unwrap(signalState) as T;
+          publicationInput = beginBranchPublicationInput?.(signalState, current);
+          updates = updater(current);
+        }
+        materializationContext.locationRuntime.runInvalidationGroup(() => {
+          recursiveUpdate(signalState, updates, out, '', false);
+        });
+        return out;
+      } finally {
+        if (publicationInput) finishPublicationInput?.(publicationInput);
+      }
+    },
+    enumerable: false,
+    writable: true,
+    configurable: true,
+  });
+
+  return {
+    tree,
+    authority: constructionAuthority,
+    activateReporting() {
+      if (!readWritableCell(destroyedSig)) {
+        registerContainedReportBudget(
+          materializationContext.positionRegistry.id
+        );
+      }
+    },
+  };
+}
+
+// =============================================================================
+// PUBLIC API
+// =============================================================================
+
+/**
+ * Apply the resolved enhancer list, adopting identity replacements.
+ *
+ * THE ONLY PLACE AN ENHANCER IS EVER INVOKED. The former incremental
+ * composition path carried separate duplicate and requirement checks, so two
+ * construction engines could disagree on one configuration. Declarative
+ * construction validates the complete set once before this function is
+ * reached.
+ *
+ * Enhancer application still has to ADOPT A REPLACEMENT. `batching`,
+ * `restoration` and `devTools` each return a
+ * NEW callable rather than mutating the tree they were given, and everything
+ * after must see that one — hence the reassignment rather than a fixed
+ * receiver. `enhancer-protocol-continuity.spec.ts` row F is the falsifier.
+ *
+ * A throwing enhancer propagates. Construction fails as a whole, so there is no
+ * partially enhanced tree to reason about and nothing to unwind.
+ */
+function applyEnhancers<T extends object>(
+  tree: ISignalTree<T>,
+  ordered: readonly EnhancerWithMeta<unknown>[]
+): ISignalTree<T> {
+  let current = tree;
+  for (const enhancer of ordered) {
+    if (typeof enhancer !== 'function') {
+      throw new Error('Enhancer must be a function');
+    }
+    const result = (enhancer as Enhancer<unknown>)(
+      current as never
+    ) as unknown as ISignalTree<T>;
+    if (result !== (current as unknown) && isTraversableNode(result)) {
+      current = result;
+    }
+  }
+  return current;
+}
+
+/**
+ * Create a minimal SignalTree.
+ *
+ * Returns the configured tree contract.
+ *
+ * @example
+ * ```typescript
+ * // a derived value from whatever runtime the consumer installed
+ * import { signalTree } from '@signal-tree/kernel';
+ *
+ * // Minimal tree
+ * const tree = signalTree({ count: 0 });
+ *
+ * // Enhancers and derived state share one declarative construction plan.
+ * const tree = signalTree(
+ *   { count: 0 },
+ *   {
+ *     enhancers: [restoration(), batching()],
+ *     derived: ($) => ({
+ *       doubled: computed(() => $.count() * 2)
+ *     })
+ *   }
+ * );
+ * ```
+ */
+/**
+ * THE RETURN TYPE ACCUMULATES DECLARED ENHANCER SURFACES.
+ *
+ * A declared array recovers that information from its tuple, which is
+ * what `AccumulatedEnhancerAdditions` does — and it only works if the tuple
+ * survives inference, which is what `const E` is for. Without `const`, the
+ * argument widens to `Enhancer<unknown>[]` and every added method is lost,
+ * silently.
+ *
+ * The overloads cover the optional fields that change the result type, most
+ * specific first.
+ */
+
+// Implementation
+function signalTreeImpl<T extends object>(
+  initialState: T,
+  config: TreeConfig = {},
+  observation: ObservationAdapter = NEUTRAL_OBSERVATION_ADAPTER,
+  createScalarLeafRuntime: (
+    physicalCommitClock:
+      | ReturnType<typeof createPhysicalCommitClock>
+      | undefined,
+    locations: LocationRuntime
+  ) => TreeScalarLeafRuntime = createTreeScalarLeafRuntime,
+  createLocations: (
+    observation: ObservationAdapter
+  ) => LocationRuntime = createLocationRuntime
+): ISignalTree<T> {
+  // CONFIGURE -> FINALIZE. The whole enhancer set is known here, so the plan
+  // can be truthful. Incremental composition had to materialize before the
+  // complete enhancer set was known, forcing a maximal plan onto every tree.
+  const declared = (config.enhancers ?? []) as EnhancerWithMeta<unknown>[];
+
+  const ordered = resolveEnhancerOrder(
+    [...declared],
+    new Set<string>(),
+    Boolean(config.debugMode)
+  );
+  const buildPlan = buildTreePlan(ordered, config.capabilities);
+
+  const physicalCommitClock = buildPlan.has('causal-runtime')
+    ? createPhysicalCommitClock()
+    : undefined;
+  const captureRuntime = createMutationCaptureRuntime();
+  const materializationContext = createMaterializationContext(
+    buildPlan.has('position-topology'),
+    (capability) => buildPlan.has(capability),
+    physicalCommitClock,
+    createLocations(observation)
+  );
+  materializationContext.mutationCaptureRuntime = captureRuntime;
+
+  const constructed = create(
+    initialState,
+    config,
+    materializationContext,
+    buildPlan,
+    captureRuntime,
+    createScalarLeafRuntime
+  );
+  let tree: ISignalTree<T> = constructed.tree;
+  const authority = constructed.authority;
+
+  // Markers such as entityMap() must exist before enhancers run because
+  // enhancers attach to their materialized surfaces. Doing this once, after the
+  // complete configuration is known, keeps the plan truthful.
+  //
+  // Only when there is something to attach, though. With no enhancers there is
+  // nothing that needs markers up front, and materializing anyway would make
+  // construction eager for every tree and destroy incremental materialization
+  // -- markers are supposed to realize on the access path that first needs
+  // them. The configured tree still materializes lazily in that case.
+  const hasEnhancers = ordered.length > 0;
+  if (hasEnhancers) {
+    materializeTreeMarkers(tree, materializationContext, authority);
+
+    // Hand the entity collections to the tree so the reclamation sink can
+    // broadcast to them. The ARRAY REFERENCE is attached, not a copy of its
+    // contents: markers materialize lazily when nothing forces them, so a
+    // collection can register after this line and must still be visible.
+    //
+    // Placed here rather than in `create()` for two reasons. Markers have not
+    // materialized yet at that point, so the list is always empty there — the
+    // first version of this attached an empty array and the sink silently
+    // reclaimed nothing. And `hasEnhancers` gates it, so a bare tree pays
+    // nothing.
+    //
+    // A bare `Symbol.for` rather than an import from the sink module,
+    // deliberately: `signal-tree.ts` is the bare bundle's entry point and that
+    // edge would ship the sink to trees that can never restore, which is the
+    // defect `bundle-budget` caught when the claim registry was constructed
+    // here. The sink resolves the same global symbol.
+    Object.defineProperty(
+      tree.$ as object,
+      Symbol.for('SignalTree:SubjectPhysicalOwners'),
+      {
+        value: materializationContext.physicalOwners,
+        enumerable: false,
+        configurable: true,
+      }
+    );
+
+    tree = applyEnhancers(tree, ordered);
+  }
+
+  const configured = createConfiguredTree<T, TreeNode<T>>(
+    tree as ISignalTree<T>,
+    materializationContext,
+    hasEnhancers,
+    authority,
+    config.derived
+  );
+  // Do not retain an ID for construction that failed in an enhancer.
+  constructed.activateReporting();
+  return configured;
+}
+
+// =============================================================================
+// CONFIGURED TREE
+// =============================================================================
+
+/**
+ * Wraps the tree with lazy finalization for configured derived state.
+ */
+function createConfiguredTree<
+  TSource extends object,
+  TAccum = TreeNode<TSource>
+>(
+  baseTree: ISignalTree<TSource>,
+  materializationContext: MaterializationContext,
+  /**
+   * signalTree() materializes before applying enhancers, because enhancers
+   * attach to markers. Telling the wrapper so keeps `materializeOnly()`
+   * idempotent instead of walking an already-materialized tree again.
+   */
+  alreadyMaterialized = false,
+  authority?: OrdinaryConstructionAuthority,
+  derivedFactory?: ($: never) => object
+): ISignalTree<TSource, TAccum> {
+  let isFinalized = false;
+
+  let markersMaterialized = alreadyMaterialized;
+
+  /**
+   * Materialize markers only — idempotent, and deliberately does NOT latch
+   * `isFinalized`. Snapshot reads need materialized state but do not need
+   * configured derived state applied because it is not snapshot data.
+   */
+  const materializeOnly = () => {
+    if (markersMaterialized) return;
+    markersMaterialized = true;
+    materializeMarkers(
+      baseTree.$,
+      undefined,
+      [],
+      materializationContext,
+      authority
+    );
+    _recordTreeConstruction();
+  };
+
+  const finalize = () => {
+    if (isFinalized) return;
+    isFinalized = true;
+
+    // Step 1: Materialize ALL markers (entityMap, status, stored, etc.)
+    // This must happen BEFORE derived processing so that derived factories
+    // can reference entity methods, status signals, and stored signals.
+    materializeOnly();
+
+    // Step 2: Apply the configured derived factory
+    if (derivedFactory) {
+      applyDerivedFactory(
+        baseTree.$ as Record<string, unknown>,
+        derivedFactory as ($: Record<string, unknown>) => object,
+        materializationContext.locationRuntime
+      );
+    }
+  };
+
+  const rootAccessor = baseTree.$;
+  Object.defineProperty(baseTree, '$', {
+    get() {
+      finalize();
+      Object.defineProperty(baseTree, '$', {
+        value: rootAccessor,
+        enumerable: false,
+        configurable: true,
+      });
+      return rootAccessor;
+    },
+    enumerable: false,
+    configurable: true,
+  });
+
+  const updateAndReport = baseTree.updateAndReport?.bind(baseTree);
+  Object.defineProperty(baseTree, 'updateAndReport', {
+    value: function (arg?: unknown): string[] {
+      finalize();
+      if (!updateAndReport) {
+        warnMissingForward('updateAndReport');
+        return [];
+      }
+      return updateAndReport(arg as never);
+    },
+    enumerable: false,
+    writable: false,
+    configurable: true,
+  });
+  return baseTree as unknown as ISignalTree<TSource, TAccum>;
+}
+
+/**
+ * The canonical public overload set lives in `SignalTreeFactory`.
+ */
+export const signalTree: SignalTreeFactory =
+  signalTreeImpl as unknown as SignalTreeFactory;
+
+/** @internal CBR discriminator: package binding without application config. */
+export const createSignalTreeFactory = (
+  observation: ObservationAdapter = NEUTRAL_OBSERVATION_ADAPTER,
+  createScalarLeafRuntime: (
+    physicalCommitClock:
+      | ReturnType<typeof createPhysicalCommitClock>
+      | undefined,
+    locations: LocationRuntime
+  ) => TreeScalarLeafRuntime = createTreeScalarLeafRuntime,
+  createLocations: (
+    observation: ObservationAdapter
+  ) => LocationRuntime = createLocationRuntime
+): SignalTreeFactory => {
+  const boundObservation: ObservationAdapter = {
+    createToken: observation.createToken.bind(observation),
+    createWritableCell: observation.createWritableCell?.bind(observation),
+    createWritableProjection:
+      observation.createWritableProjection?.bind(observation),
+    createReadonlyCell: observation.createReadonlyCell?.bind(observation),
+    runInvalidationGroup: observation.runInvalidationGroup.bind(observation),
+  };
+  return ((initialState: object, config?: TreeConfig) =>
+    signalTreeImpl(
+      initialState,
+      config,
+      boundObservation,
+      createScalarLeafRuntime,
+      createLocations
+    )) as SignalTreeFactory;
+};

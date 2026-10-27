@@ -1,0 +1,3 @@
+e73ecac423ca3277539a57945180e44383c597e6f8d5d25a1b5ce29a1a908325  packages/kernel/src/lib/experimental-publication/lifecycle.ts
+a244fad496606c969b6539893c7078f5aac16b48504a96dcfc319eab8d84dada  packages/kernel/src/lib/experimental-publication/private.ts
+e24b6714a2a08407064c3dbb4166ba1bfd3c227d8b52baae7ee00ac1c1f2f042  packages/kernel/src/lib/native-window-preparation-audit.spec.ts
