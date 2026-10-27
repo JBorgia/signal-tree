@@ -1,0 +1,13 @@
+{
+  "command": [
+    "corepack",
+    "pnpm",
+    "exec",
+    "tsc",
+    "--noEmit",
+    "-p",
+    "tsconfig.typecheck-all.json"
+  ],
+  "cwd": "/private/tmp/link-authored-removal-successor",
+  "exit": 0
+}

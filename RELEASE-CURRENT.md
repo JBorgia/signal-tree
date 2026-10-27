@@ -84,6 +84,36 @@ two fixture accesses. No full qualification, artifact or cost acceptance follows
 Production `87f6831f`, the conservative default, budgets and B closure remain
 unchanged.
 
+## Authored removal runtime successor — forward controls pass; integration blocked
+
+[Candidate, reviewed disposition and exact replay](docs/audits/2026-10-17-incumbent-readiness/link-authored-removal-successor/README.md)
+preserve isolated `75416029be1e0c1d9735ed3bdc0f4e8e6c02f775` over `f7a0ffd9`.
+The owner authorized this bounded implementation; no production runtime is applied
+here. Ordered authored removals now reach relationship-relative projections when
+source ordinary membership was already absent. Original five source-boundary cases,
+eight removal-route controls and eight independent preparation/reentry controls pass.
+
+The combined focused vector is 24 pass / 2 fail. Collection removal still sends after
+its destination owner confirms while a captured possible foreign owner remains
+pending. Independent review identifies the existing unsupported-source gate bypass;
+separately, whole-collection native proof is omitted during aggregate composition.
+Qualified collection declaration rejects before callback. No surface enablement or
+connection-specific workaround followed. These remain explicit coverage/correctness
+blockers, not native-owner loss inferred solely from output.
+
+Final frozen controls: entity 51 pass; semantic 97 pass / 4 inherited failures; scalar
+225 pass and 2 preserved historical assertion conflicts; four-framework 24 pass. Source types
+and spec-types ratchet pass, with existing spec diagnostics retained. Retirement,
+selected rich capture and unavailable-inspected-input gates are 2 pass / 7 fail. Churn
+fails at cycle 0; the two negative-window cases deliver correctly before their final
+zero-record assertions fail, so current uncertainty and obsolete records remain
+separate. Selected capture still observes an incomplete mixed inverse.
+
+Retain the forward-removal gain, but reject integration. No broader qualification,
+artifacts, runtime-cost or collectibility acceptance is claimed. Production
+`87f6831f`, conservative hold, budgets and B closure remain unchanged; later slices
+stay gated. Complete raw evidence and first failures are archived with checksums.
+
 ## Authored removal responsibility — bounded design review complete
 
 [Mechanism, independent reviews and prewritten gates](docs/audits/2026-10-17-incumbent-readiness/link-authored-removal-design/README.md)

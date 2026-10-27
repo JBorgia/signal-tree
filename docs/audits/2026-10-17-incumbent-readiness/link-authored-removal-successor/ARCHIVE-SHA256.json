@@ -1,0 +1,16 @@
+{
+  "008-source-trace.md": "2b645a5885a975f5b773906839e69ddf09265e7f6c247de5fb386ede1776c244",
+  "ARCHIVE-CHECKS.md": "b1ea13528b502d1b4bdbcf417f4c3bdbd8a205dc9b8cc79b92953a3019faa132",
+  "DOC-LINKS.log": "4ef803608746f890a585bb0a05b8540676a2ca8c2b786c68c40e0daed6452368",
+  "PREREGISTRATION.md": "88a516f846aad40cab63eccc6dc0255e8e0b509be7b021483f7a1fd35a3f02e2",
+  "README.md": "a6abf20f7876394398bf0dad759409a710794cfce4be87e87df252505070a7c5",
+  "ROOT-VERIFICATION.md": "96a185cba943574c91ae2920abe78f6ef6307162c584bd19ed27d2c47f0e15b3",
+  "RUNTIME-REVIEW.md": "09cd0d5ab167c18222bf0fb9279b965300bf354401a3bd2c94fa1b5509430128",
+  "SOURCE.json": "4e3f50b2d59330153d4c6bcdad9858c3f17e5dea199cc5564a48012d8395470e",
+  "authored-removal-contract.spec.ts": "d1610e1535d32e2d94cabc652070fb0e2501a0a2e564a4255991a3c1eb733286",
+  "authored-removal-independent.spec.ts": "4b936b1bdd9894118d87b53a16b9d82d94edf7677aaaca0b18d5a475fc0e174c",
+  "authored-removal-obligations.spec.ts": "8782bc80b6df36321e7d85d65017b1a943deed4291188b6b573ff97fd595bf79",
+  "final-spec-types.log": "d96bf296ada40f7aab19740c790ec23835aeae7f307cf347a059d16fd348a7cb",
+  "final-types-result.json": "3fda0200dc922f29c4b36c9542e7084664a77b9d6b9a01e4b336c1b733ce87ca",
+  "raw-evidence.tar.gz": "e312da3b9eb625d821a9b0750994c389dd988afe12ef52c0426e2835ba41b4ae"
+}

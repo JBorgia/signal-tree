@@ -1,0 +1,13 @@
+# Central verification
+
+Root inspected the private source/consumer handoff, staged diff, original assertions and raw output. Independent reviewer received the design/preserved tests/raw source, not an expected disposition. The implementer and reviewer source findings were checked directly.
+
+- `entity-signal.ts`1320–1329 pairs explicit tombstones with `ordinaryPlan.byStep`. The separate responsibility call still takes only `ordinaryPlan.changes`. Supplemental effects never enter transaction capture through this patch.
+- `entity-publication.ts`19–25 deduplicates only the same step/lifetime removal. Source and recipients use the same stream. This is representational evidence plus the executed removal-route controls, not proof of every unexecuted compound sequence.
+- Link552–555 excludes collection sources from supported experimental publication; private `allowed` and `admit`309–314 bypass that gate for unsupported channels. Root inspected these branches and the destination-first raw failure. This is the first sufficient causal explanation. The worker's initial aggregate-reducer theory was corrected explicitly in008-source-trace.md, not silently replaced.
+- Separately Link567 marks collection aggregate; own source receipt has no field (nested only registers at573); private ready stores its own revision in completedValueFact, while aggregate projectionSupport151 omits it. Root verified this independent review finding as source-derived. No gate enablement test was run, and no counterfactual runtime success/failure is claimed.
+- Selected structural commits carry an explicit physical-only marker; only new supplemental removal derivation is suppressed. Inherited ordinary-by-step effects and callback-capable commit preparation still exist. The unchanged rich-capture failure remains a blocking execution result.
+- Final source types0 and spec-ratchet0 are distinct. No ratchet update. Every final before/after packages source manifest matches byte-for-byte; commit source file hashes match those tested. Existing tests differ from parent only by adding the three prewritten files, not assertion edits.
+- Exact lifecycle.ts SHA256 remains7fcfd3098cd59bbdd9f07ff9ce46e547e63175d14ff0ea7c265a410b41593dff. No lifecycle/retirement edits, public export/API enablement or production checkout changes.
+
+Disposition: retain the bounded forward-removal correction and source evidence. Reject integration. Current source cannot claim collection D/I/W enforcement, retirement survival or complete selected inversion. Addressing aggregate proof composition/enforcement is separate from adding another removal guard. No dependent runtime successor or larger migration is implicitly authorized by these passing vectors.
