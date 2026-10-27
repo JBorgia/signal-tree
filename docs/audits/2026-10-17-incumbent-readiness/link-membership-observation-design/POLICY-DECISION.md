@@ -1,11 +1,12 @@
-# One remaining owner decision: unobserved-origin admission
+# Selected policy: unobserved-origin admission
 
-This is a proposed specification direction, not runtime authorization or acceptance.
+The owner selected this specification direction; see [authority](AUTHORITY.md).
+It is not runtime authorization or acceptance.
 The original hold-before-confirm / send-after-confirm control stays unchanged.
 Root and independent review distinguish this question from already-approved fresh
 ordinary reevaluation after rejection.
 
-## Recommended bounded option
+## Owner-selected bounded option
 
 For an authored ordinary revision whose complete input origin is not covered by
 an applicable complete declaration plus native input evidence, create a separate
@@ -66,11 +67,10 @@ Keeping unconditional tree-local fallback for both indistinguishable undeclared
 expressions cannot also satisfy the original cross-tree safety control. Removing
 that assertion is not an authorized alternative in this investigation.
 
-## Why selection is required
+## Compatibility decision and authority limit
 
 commit-consequence.ts currently states that a transaction on tree B never delays
 tree A. The bounded option qualifies that liveness statement for unobserved
-undeclared origin. The user has authorized the design comparison and requires safe
-cross-tree holding, but has not yet selected this false-positive-hold tradeoff.
-Approval would select the scope/specification, not implement or activate it and
-not clear the remaining certificate, lifecycle and composition qualification gates.
+undeclared origin. The owner explicitly selected this false-positive-hold tradeoff on 2026-10-26.
+Approval selects the scope/specification only; it does not implement or activate
+it or clear the remaining certificate, lifecycle and composition qualification gates.

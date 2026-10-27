@@ -1,4 +1,4 @@
-# Membership observation and fallback: reviewed design, policy gate open
+# Membership observation and fallback: reviewed design, policy selected
 
 Read-only investigation completed against rejected runtime
 `2dacae7b9e9137018d05c4e00382ac9287bc76d4`, from readiness
@@ -57,18 +57,19 @@ delivery after reentry; neither is repaired by absence certification.
 
 The [design](DESIGN.md) separates certified native input, recipient uncertainty,
 known foreign support and unobserved origin. The [policy decision](POLICY-DECISION.md)
-presents one finite option: a fixed possible-owner hold for unobserved undeclared
+now records the owner-selected option: a fixed possible-owner hold for unobserved undeclared
 writes, with exact-revision wake/retirement. It is not proof of actual dependency.
 It would delay some unrelated literal writes while foreign owners are pending.
 Qualified complete declarations retain conditional progress; unrelated recipient
 uncertainty does not become a global hold. No per-write scan of registered trees is
 proposed. Possible-owner index/capture cost still requires measurement.
 
-**Owner selection is pending:** may that bounded hold qualify the existing tree-local
-liveness contract for unobserved origins, or should a new tracked execution/read
-boundary be specified instead? This is the actual remaining semantic choice, not a
-request for routine continuation. Approval of the specification direction alone
-would not activate or accept the API or implement a runtime successor.
+**Owner selection is recorded in [AUTHORITY.md](AUTHORITY.md):** approve the bounded
+possible-owner hold. This qualifies tree-local liveness for unobserved undeclared
+origins; the additional tracked-execution alternative is not selected. Approval
+covers specification only, not runtime implementation, API acceptance or activation.
+The reviewed design and first review files remain unchanged historical records;
+the authority record supersedes their pending-selection wording.
 
 ## Rejection does not need another policy decision
 
@@ -96,8 +97,9 @@ mixed-undo publisher, wake index and governing rejection records. Review claims
 are source-derived; no new runtime trace is represented as an executed finding.
 
 Review found the corrected input mapping coherent for bounded implementation
-planning, with explicit unknown entity coverage and costs. It does not clear
-recurrence while fallback admission is unselected. A future successor must preserve
+planning, with explicit unknown entity coverage and costs. The owner has now
+selected fallback admission, but specification-only approval does not authorize
+a runtime successor or clear the recurrence stop. A future successor must preserve
 all unchanged falsifiers and cover enrollment, native membership inputs, lifecycle,
 cache support changes, inspection, queued/in-flight sends and useful wake together.
 The collision and mixed-undo gates remain separate. No stronger performance,

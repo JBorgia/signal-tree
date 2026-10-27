@@ -84,9 +84,9 @@ two fixture accesses. No full qualification, artifact or cost acceptance follows
 Production `87f6831f`, the conservative default, budgets and B closure remain
 unchanged.
 
-## Membership observation and fallback — reviewed design, policy gate open
+## Membership observation and fallback — reviewed design, policy selected
 
-[Read inventory, private mapping, independent review and remaining decision](docs/audits/2026-10-17-incumbent-readiness/link-membership-observation-design/README.md)
+[Read inventory, private mapping, independent review and owner selection](docs/audits/2026-10-17-incumbent-readiness/link-membership-observation-design/README.md)
 complete a read-only investigation at frozen rejected `2dacae7b`. No runtime or
 test changed and no test/model/benchmark was rerun. The source snapshot builder
 already observes dormant membership reactively; the rejected provenance walker
@@ -98,8 +98,10 @@ certificate alone does not prove completeness of the callback's other inputs.
 Independent review finds the corrected private mapping coherent for bounded
 implementation planning, not native acceptance. An unobserved ordinary literal
 and a pending foreign getter copy remain indistinguishable at target admission.
-Owner selection is pending on a fixed possible-owner hold for that evidence class
-versus an additional tracked execution/read boundary. Recipient-only uncertainty
+The owner selected a fixed possible-owner hold for that evidence class: unobserved
+undeclared writes may wait for instrumented owners pending at authorship, including
+unrelated foreign owners; settlement wakes fresh ordinary evaluation. This is
+specification-only approval, not runtime implementation or activation. Recipient-only uncertainty
 retains its adjudicated fallback; known inputs cannot be erased. Already-approved
 fresh ordinary evaluation after completed rejection needs no extra authoring rule;
 first contrary interpretations and their correction are preserved.
