@@ -1,0 +1,80 @@
+diff --git a/packages/kernel/src/lib/experimental-publication/lifecycle.ts b/packages/kernel/src/lib/experimental-publication/lifecycle.ts
+index aa511f57..42d9c838 100644
+--- a/packages/kernel/src/lib/experimental-publication/lifecycle.ts
++++ b/packages/kernel/src/lib/experimental-publication/lifecycle.ts
+@@ -63,14 +63,21 @@ export function combineProofs(parts:readonly (Readonly<Proof>|undefined)[]):Proo
+   unknown:parts.some(p=>!p||p.unknown),invalid:parts.some(p=>p?.invalid===true)};
+ }
+ /** Source-owned facts. Until horizon close only actual executing frames are held. */
+-export type NativeRequirement={proof?:Proof;inputs:readonly NativeRequirement[];frames:readonly Frame[];known:readonly OwnerCell[];unknown:boolean;possible:readonly OwnerCell[];captureWindow:boolean};
++export type NativeInput={readonly requirement:NativeRequirement;readonly owners:readonly OwnerCell[]};
++export type NativeRequirement={proof?:Proof;inputs:readonly NativeInput[];frames:readonly Frame[];known:readonly OwnerCell[];unknown:boolean;possible:readonly OwnerCell[];captureWindow:boolean};
++/** Capture before user code: later confirmation cannot rewrite consumed input.
++ * Keep the source requirement for uncertainty and unfinished validation; only
++ * already-confirmed actual owners are discharged from this new consumption. */
++export function captureNativeInput(requirement:NativeRequirement):NativeInput {
++ return Object.freeze({requirement,owners:Object.freeze(nativeProof(requirement).owners.filter(owner=>owner.outcome!=='confirmed'))});
++}
+ export function nativeProof(requirement: NativeRequirement): Proof {
+  const p=requirement.proof;if(p)return p;
+- const inputs=requirement.inputs.map(nativeProof);
++ const inputs=requirement.inputs.map(input=>nativeProof(input.requirement));
+  const validation=requirement.frames.map(effective);
+  // Every actual source obligation, including its destination authorship,
+  // becomes an input lower bound at this consumption boundary. W stays W.
+- const input=uniqueOwners(inputs.flatMap(p=>p.owners));
++ const input=uniqueOwners(requirement.inputs.flatMap(input=>input.owners));
+  const declared=uniqueOwners(validation.flatMap(p=>p.owners));
+  const ownWindow=requirement.captureWindow||requirement.frames.some(frameInvalid)
+   ?requirement.possible:[];
+@@ -81,7 +88,7 @@ export function nativeProof(requirement: NativeRequirement): Proof {
+   invalid:inputs.some(p=>p.invalid)||validation.some(p=>p.invalid)};
+ }
+ export function initialRequirement():NativeRequirement{return {proof:{owners:[],unknown:false,invalid:false},inputs:[],frames:[],known:[],unknown:false,possible:[],captureWindow:false};}
+-export function prepareNativeRequirement(known:readonly OwnerCell[], unknown:boolean, inputs:readonly NativeRequirement[]):{requirement:NativeRequirement;record:TerminalRecordPlan}{
++export function prepareNativeRequirement(known:readonly OwnerCell[], unknown:boolean, inputs:readonly NativeInput[]):{requirement:NativeRequirement;record:TerminalRecordPlan}{
+  const active=[...stack];
+  // Input completeness, not destination ownership, decides whether W applies.
+  const captureWindow=active.length===0||active.some(f=>f.declaredOwners===undefined);
+@@ -101,7 +108,7 @@ export function prepareNativeRequirement(known:readonly OwnerCell[], unknown:boo
+ export function finalizeNativeRequirement(requirement:NativeRequirement):void {
+  // Normalize ONLY this installation's newly acquired candidate window. An
+  // inherited W with the same identity as D/I/V remains in the input proof.
+- const actualInputs=new Set(requirement.inputs.flatMap(input=>nativeProof(input).owners));
++ const actualInputs=new Set(requirement.inputs.flatMap(input=>input.owners));
+  const destination=new Set(requirement.known);
+  requirement.possible=Object.freeze([...pending].filter(owner=>!destination.has(owner)&&!actualInputs.has(owner)));
+  // Source inputs are immutable snapshots; only the not-yet-installed unit's own window is refreshed.
+diff --git a/packages/kernel/src/lib/experimental-publication/private.ts b/packages/kernel/src/lib/experimental-publication/private.ts
+index 0537d602..094ac04f 100644
+--- a/packages/kernel/src/lib/experimental-publication/private.ts
++++ b/packages/kernel/src/lib/experimental-publication/private.ts
+@@ -71,7 +71,7 @@ function pathValue(value:unknown,path:readonly string[]):{present:boolean;value:
+ function maskPayload(b:Binding):unknown{let result=b.valuePayload;for(const [slot,state]of b.completedPresence){if(state.present||!slot.address)continue;const relative=relativeSourceAddress(b.address??[],slot.address);if(!relative?.length)continue;const omit=(value:unknown,depth:number):unknown=>{if(value===null||typeof value!=='object')return value;const row={...value};const key=relative[depth];if(depth===relative.length-1)delete(row as Record<string,unknown>)[key];else if(Object.prototype.hasOwnProperty.call(row,key))Object.defineProperty(row,key,{value:omit((row as Record<string,unknown>)[key],depth+1),enumerable:true,configurable:true,writable:true});return row;};result=omit(result,0);}return result;}
+ 
+ type InputEvidence={facts:readonly Fact[];unknown:boolean};
+-type BranchInput={recipients:ReadonlyMap<object,InputEvidence>;native:readonly lifecycle.NativeRequirement[]};
++type BranchInput={recipients:ReadonlyMap<object,InputEvidence>;native:readonly lifecycle.NativeInput[]};
+ const branchInputs:BranchInput[]=[];
+ // One current requirement per native value identity, independent of subscribers.
+ // No payload/history is retained; weak keys release facts with their native source.
+@@ -104,8 +104,8 @@ function suppliedViews(node:object,supplied?:unknown):NativeView[]{
+  return own;
+ }
+ registerPublicationSnapshots((node,value)=>{snapshotViews.set(value,Object.freeze(suppliedViews(node,value)));});
+-function nativeInputs(node:object,supplied?:unknown):lifecycle.NativeRequirement[]{
+- return [...new Set(suppliedViews(node,supplied).map(view=>view.requirement))];
++function nativeInputs(node:object,supplied?:unknown):lifecycle.NativeInput[]{
++ return [...new Set(suppliedViews(node,supplied).map(view=>view.requirement))].map(lifecycle.captureNativeInput);
+ }
+ function nativeAuthorship(node:object):{known:Cell[];unknown:boolean}{
+  const meta=getActiveWriteContext();const owner=getPositionRegistry(node)?.id;const id=meta?.transactionId;
+@@ -122,7 +122,7 @@ registerNativePublicationFactory(node=>{
+    }
+    if(!mutation.changed&&!lifecycle.isValidating()&&!branchInputs.length)return;
+    const authored=nativeAuthorship(node);
+-   const consumed=mutation.intent==='derive'?(input as {native?:readonly lifecycle.NativeRequirement[]}|undefined)?.native??[]:[];
++   const consumed=mutation.intent==='derive'?(input as {native?:readonly lifecycle.NativeInput[]}|undefined)?.native??[]:[];
+    const prepared=lifecycle.prepareNativeRequirement(authored.known,authored.unknown,[...consumed,...branchInputs.flatMap(scope=>scope.native)]);
+    const existingView=nativeViews.get(node);
+    const view=mutation.changed||!existingView?{requirement:prepared.requirement}:existingView;

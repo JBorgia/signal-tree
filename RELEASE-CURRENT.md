@@ -84,6 +84,30 @@ two fixture accesses. No full qualification, artifact or cost acceptance follows
 Production `87f6831f`, the conservative default, budgets and B closure remain
 unchanged.
 
+## Terminal-obligation correction — reviewed scalar scope only
+
+[Reviewed mechanism, unchanged falsifiers and exact replay](docs/audits/2026-10-17-incumbent-readiness/link-terminal-obligation-scalar/README.md)
+freeze isolated `0135ef18567573fec627667fc58bc3e7819cc29e` over `440ead9f`.
+The two confirmed-input failures now pass. Native capture fixes the outstanding
+actual-owner set before updater execution; only already-confirmed owners are
+excluded from that new input. Source evidence and active validation remain intact.
+Confirmation inside updater/preparation cannot retroactively validate an omitted
+pending input. No public API or settlement-ownership change.
+
+Combined scalar execution:225 passes and the same two preserved historical
+assertion conflicts. Independent higher-hop/horizon controls2 pass; scalar
+registration2 pass. Angular/React/Vue/Solid each pass two scalar controls, with
+entity cases filtered out. Final spec-types ratchet passes. Source types retain
+11 identical predecessor diagnostics; targeted lint retains the same9 errors and
+27 warnings after new fixture issues were corrected. No wholly-green claim.
+
+Independent premise and implementation review support this bounded terminal-input
+correction. Entity integration remains gated by the current owner instruction;
+physical/ordinary certificate, entity/mixed-undo coverage, broad qualification,
+collectibility and costs remain open. Original failures and all fixture corrections
+are preserved. Production87f6831f, conservative hold, budgets and B closure remain
+unchanged; this isolated checkpoint is not integration or activation approval.
+
 ## Scalar obligation successor — qualification withheld
 
 [Implementation, independent review and exact replay](docs/audits/2026-10-17-incumbent-readiness/link-obligation-scalar-successor/README.md)

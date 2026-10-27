@@ -1,0 +1,11 @@
+{
+  "head": "440ead9f1b4d45c63f7ec8cbf50fc15944f101b2",
+  "files": {
+    "packages/kernel/src/lib/experimental-publication/lifecycle.ts": "6502aad6bc889649f1252c75a3dfb06551c8822d6652ff99ae456e3fe64e4d64",
+    "packages/kernel/src/lib/experimental-publication/private.ts": "d872d97d38a5ffca82f33aabf56fdb0e129d277f30fbedc6752759a8897f6a62",
+    "packages/kernel/src/lib/internals/intrinsic-mutation.ts": "e1bfbeeb945e3b443bb5e4afe0b7229089911cbbda1e86f4c688079f5cf49013",
+    "packages/kernel/src/lib/internals/location-runtime.ts": "d86fc473ec3c214d4d9db5122a9386b24666b8f89a1722e3cbdf4373081cb29f",
+    "packages/kernel/src/lib/internals/native-tree-scalar-leaf-runtime.ts": "eaa9850c22851a0d8887e9f69060e8724f2b7c6f12d577d847439ee3cfc4ada4",
+    "packages/kernel/src/lib/signal-tree.ts": "2361130db80fe428ac1017313fca44f90f86ffb2a34b69eefc9cd300d12ee09d"
+  }
+}

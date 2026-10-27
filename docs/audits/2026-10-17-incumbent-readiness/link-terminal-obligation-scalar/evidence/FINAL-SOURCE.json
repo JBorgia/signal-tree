@@ -1,0 +1,14 @@
+{
+  "base": "440ead9f1b4d45c63f7ec8cbf50fc15944f101b2",
+  "final": "0135ef18567573fec627667fc58bc3e7819cc29e",
+  "files": {
+    "packages/angular/src/lib/declared-publication-composition.spec.ts": "2256465d7f3f7cb5316126c302acef63f42d08be1ebc60fce87626faf44fee46",
+    "packages/kernel/src/lib/experimental-publication/lifecycle.ts": "7fcfd3098cd59bbdd9f07ff9ce46e547e63175d14ff0ea7c265a410b41593dff",
+    "packages/kernel/src/lib/experimental-publication/private.ts": "2fff7f940ef0a6e35879adb2e504ab91d5cb20a7bb7cac637bd8a5f80a1a1597",
+    "packages/kernel/src/lib/publication-terminal-horizon-independent.spec.ts": "9736816d0e980a3be2b5d7901381b19bc7ed6e77a27e903478789570dd81e4cf",
+    "packages/kernel/src/lib/publication-terminal-obligation.spec.ts": "0725a41669d33ea0358fc7559f63436cb9c235abdd8ed8ca5131bc888276f91e",
+    "packages/react/src/lib/declared-publication-composition.spec.tsx": "1618f81ddb5077e5b04325963c1b6c8f3e8ba044064b237170395a2e02af1bab",
+    "packages/solid/src/lib/declared-publication-composition.spec.ts": "2256465d7f3f7cb5316126c302acef63f42d08be1ebc60fce87626faf44fee46",
+    "packages/vue/src/lib/declared-publication-composition.spec.ts": "372939242e3aa63333d2ee42c59444ea6e72340643ff5ead3d44549dbfc42232"
+  }
+}

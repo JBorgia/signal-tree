@@ -1,0 +1,43 @@
+
+/private/tmp/link-obligation-scalar-successor/packages/kernel/src/lib/experimental-publication/lifecycle.ts
+   93:108  warning  Forbidden non-null assertion                                                                                                                                @typescript-eslint/no-non-null-assertion
+  174:114  error    Unexpected empty function 'attachRevision'                                                                                                                  @typescript-eslint/no-empty-function
+  184:20   warning  Forbidden non-null assertion                                                                                                                                @typescript-eslint/no-non-null-assertion
+  187:30   warning  Forbidden non-null assertion                                                                                                                                @typescript-eslint/no-non-null-assertion
+  194:10   warning  Forbidden non-null assertion                                                                                                                                @typescript-eslint/no-non-null-assertion
+  205:13   warning  Forbidden non-null assertion                                                                                                                                @typescript-eslint/no-non-null-assertion
+  241:29   error    Hand-rolled 'object or function' walker guard — use isTraversableNode() from kernel internals instead. See docs/rfcs/0004-v12-optimal-iteration.md §3 V-P1  no-restricted-syntax
+  254:38   error    Hand-rolled 'object or function' walker guard — use isTraversableNode() from kernel internals instead. See docs/rfcs/0004-v12-optimal-iteration.md §3 V-P1  no-restricted-syntax
+
+/private/tmp/link-obligation-scalar-successor/packages/kernel/src/lib/experimental-publication/private.ts
+   45:5    error    'indexedBindings' is assigned a value but never used. Allowed unused vars must match /^_/u                                                                  @typescript-eslint/no-unused-vars
+   46:136  warning  Forbidden non-null assertion                                                                                                                                @typescript-eslint/no-non-null-assertion
+   50:145  error    Hand-rolled 'object or function' walker guard — use isTraversableNode() from kernel internals instead. See docs/rfcs/0004-v12-optimal-iteration.md §3 V-P1  no-restricted-syntax
+   63:62   warning  Forbidden non-null assertion                                                                                                                                @typescript-eslint/no-non-null-assertion
+   67:114  warning  Forbidden non-null assertion                                                                                                                                @typescript-eslint/no-non-null-assertion
+  113:136  warning  Forbidden non-null assertion                                                                                                                                @typescript-eslint/no-non-null-assertion
+  129:19   warning  Forbidden non-null assertion                                                                                                                                @typescript-eslint/no-non-null-assertion
+  131:16   error    Unexpected empty method 'complete'                                                                                                                          @typescript-eslint/no-empty-function
+  138:204  warning  Forbidden non-null assertion                                                                                                                                @typescript-eslint/no-non-null-assertion
+  138:384  warning  Forbidden non-null assertion                                                                                                                                @typescript-eslint/no-non-null-assertion
+  158:17   warning  Forbidden non-null assertion                                                                                                                                @typescript-eslint/no-non-null-assertion
+  168:16   warning  Forbidden non-null assertion                                                                                                                                @typescript-eslint/no-non-null-assertion
+  181:44   warning  Forbidden non-null assertion                                                                                                                                @typescript-eslint/no-non-null-assertion
+  181:113  warning  Forbidden non-null assertion                                                                                                                                @typescript-eslint/no-non-null-assertion
+  183:132  warning  Forbidden non-null assertion                                                                                                                                @typescript-eslint/no-non-null-assertion
+  187:120  warning  Forbidden non-null assertion                                                                                                                                @typescript-eslint/no-non-null-assertion
+  191:140  warning  Forbidden non-null assertion                                                                                                                                @typescript-eslint/no-non-null-assertion
+  192:44   warning  Forbidden non-null assertion                                                                                                                                @typescript-eslint/no-non-null-assertion
+  192:113  warning  Forbidden non-null assertion                                                                                                                                @typescript-eslint/no-non-null-assertion
+  194:66   warning  Forbidden non-null assertion                                                                                                                                @typescript-eslint/no-non-null-assertion
+  218:381  warning  Forbidden non-null assertion                                                                                                                                @typescript-eslint/no-non-null-assertion
+  238:17   warning  Forbidden non-null assertion                                                                                                                                @typescript-eslint/no-non-null-assertion
+  246:158  error    Unexpected empty arrow function                                                                                                                             @typescript-eslint/no-empty-function
+  265:62   warning  Forbidden non-null assertion                                                                                                                                @typescript-eslint/no-non-null-assertion
+  273:929  warning  Forbidden non-null assertion                                                                                                                                @typescript-eslint/no-non-null-assertion
+  276:42   warning  Forbidden non-null assertion                                                                                                                                @typescript-eslint/no-non-null-assertion
+  283:45   error    Unexpected empty function 'complete'                                                                                                                        @typescript-eslint/no-empty-function
+  285:39   error    'channel' is defined but never used. Allowed unused args must match /^_/u                                                                                   @typescript-eslint/no-unused-vars
+
+✖ 36 problems (9 errors, 27 warnings)
+

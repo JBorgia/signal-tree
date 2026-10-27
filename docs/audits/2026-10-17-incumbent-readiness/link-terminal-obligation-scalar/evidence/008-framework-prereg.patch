@@ -1,0 +1,108 @@
+diff --git a/packages/angular/src/lib/declared-publication-composition.spec.ts b/packages/angular/src/lib/declared-publication-composition.spec.ts
+index faf77b67..5a89d427 100644
+--- a/packages/angular/src/lib/declared-publication-composition.spec.ts
++++ b/packages/angular/src/lib/declared-publication-composition.spec.ts
+@@ -111,3 +111,22 @@ it('declared entity inspection adoption publishes ordinary authority through the
+     tree.destroy();
+   }
+ });
++
++// Terminal-obligation regression: native supplied input is confirmed before
++// capture. An unrelated open transaction must not become a publication gate.
++it('confirmed scalar input permits declared progress through the facade', async () => {
++  const source = signalTree({ x: 0 }, { enhancers: [transactions()] });
++  const target = signalTree({ x: 0 }, { enhancers: [transactions()] });
++  const late = signalTree({ x: 0 }, { enhancers: [transactions()] });
++  const sent: unknown[] = [];
++  const c = declared(link(target.$.x, { set: value => { sent.push(value); } }));
++  try {
++    const p = source.transact(() => { source.$.x.set(7); }); p.confirm(); await drain();
++    const q = late.transact(() => { late.$.x.set(9); }); const pendingQ = q.inspect();
++    const receipt = c.declare({ kind: 'independent' }, () => {
++      source.updateAndReport(input => { target.$.x.set(input.x + 1); return {}; });
++    });
++    await drain(); expect(sent).toEqual([8]); expect(receipt.read().state).toBe('started');
++    expect(q.inspect()).toEqual(pendingQ); await c.settled();
++  } finally { c.dispose(); target.destroy(); source.destroy(); late.destroy(); }
++});
+diff --git a/packages/react/src/lib/declared-publication-composition.spec.tsx b/packages/react/src/lib/declared-publication-composition.spec.tsx
+index 5e9941bf..f7b9f88a 100644
+--- a/packages/react/src/lib/declared-publication-composition.spec.tsx
++++ b/packages/react/src/lib/declared-publication-composition.spec.tsx
+@@ -111,3 +111,22 @@ it('declared entity inspection adoption publishes ordinary authority through the
+     tree.destroy();
+   }
+ });
++
++// Terminal-obligation regression: native supplied input is confirmed before
++// capture. An unrelated open transaction must not become a publication gate.
++it('confirmed scalar input permits declared progress through the facade', async () => {
++  const source = signalTree({ x: 0 }, { enhancers: [transactions()] });
++  const target = signalTree({ x: 0 }, { enhancers: [transactions()] });
++  const late = signalTree({ x: 0 }, { enhancers: [transactions()] });
++  const sent: unknown[] = [];
++  const c = declared(link(target.$.x, { set: value => { sent.push(value); } }));
++  try {
++    const p = source.transact(() => { source.$.x(7); }); p.confirm(); await drain();
++    const q = late.transact(() => { late.$.x(9); }); const pendingQ = q.inspect();
++    const receipt = c.declare({ kind: 'independent' }, () => {
++      source.updateAndReport(input => { target.$.x(input.x + 1); return {}; });
++    });
++    await drain(); expect(sent).toEqual([8]); expect(receipt.read().state).toBe('started');
++    expect(q.inspect()).toEqual(pendingQ); await c.settled();
++  } finally { c.dispose(); target.destroy(); source.destroy(); late.destroy(); }
++});
+diff --git a/packages/solid/src/lib/declared-publication-composition.spec.ts b/packages/solid/src/lib/declared-publication-composition.spec.ts
+index faf77b67..5a89d427 100644
+--- a/packages/solid/src/lib/declared-publication-composition.spec.ts
++++ b/packages/solid/src/lib/declared-publication-composition.spec.ts
+@@ -111,3 +111,22 @@ it('declared entity inspection adoption publishes ordinary authority through the
+     tree.destroy();
+   }
+ });
++
++// Terminal-obligation regression: native supplied input is confirmed before
++// capture. An unrelated open transaction must not become a publication gate.
++it('confirmed scalar input permits declared progress through the facade', async () => {
++  const source = signalTree({ x: 0 }, { enhancers: [transactions()] });
++  const target = signalTree({ x: 0 }, { enhancers: [transactions()] });
++  const late = signalTree({ x: 0 }, { enhancers: [transactions()] });
++  const sent: unknown[] = [];
++  const c = declared(link(target.$.x, { set: value => { sent.push(value); } }));
++  try {
++    const p = source.transact(() => { source.$.x.set(7); }); p.confirm(); await drain();
++    const q = late.transact(() => { late.$.x.set(9); }); const pendingQ = q.inspect();
++    const receipt = c.declare({ kind: 'independent' }, () => {
++      source.updateAndReport(input => { target.$.x.set(input.x + 1); return {}; });
++    });
++    await drain(); expect(sent).toEqual([8]); expect(receipt.read().state).toBe('started');
++    expect(q.inspect()).toEqual(pendingQ); await c.settled();
++  } finally { c.dispose(); target.destroy(); source.destroy(); late.destroy(); }
++});
+diff --git a/packages/vue/src/lib/declared-publication-composition.spec.ts b/packages/vue/src/lib/declared-publication-composition.spec.ts
+index a74043c1..08142695 100644
+--- a/packages/vue/src/lib/declared-publication-composition.spec.ts
++++ b/packages/vue/src/lib/declared-publication-composition.spec.ts
+@@ -111,3 +111,22 @@ it('declared entity inspection adoption publishes ordinary authority through the
+     tree.destroy();
+   }
+ });
++
++// Terminal-obligation regression: native supplied input is confirmed before
++// capture. An unrelated open transaction must not become a publication gate.
++it('confirmed scalar input permits declared progress through the facade', async () => {
++  const source = signalTree({ x: 0 }, { enhancers: [transactions()] });
++  const target = signalTree({ x: 0 }, { enhancers: [transactions()] });
++  const late = signalTree({ x: 0 }, { enhancers: [transactions()] });
++  const sent: unknown[] = [];
++  const c = declared(link(target.$.x, { set: value => { sent.push(value); } }));
++  try {
++    const p = source.transact(() => { source.$.x.value = 7; }); p.confirm(); await drain();
++    const q = late.transact(() => { late.$.x.value = 9; }); const pendingQ = q.inspect();
++    const receipt = c.declare({ kind: 'independent' }, () => {
++      source.updateAndReport(input => { target.$.x.value = input.x + 1; return {}; });
++    });
++    await drain(); expect(sent).toEqual([8]); expect(receipt.read().state).toBe('started');
++    expect(q.inspect()).toEqual(pendingQ); await c.settled();
++  } finally { c.dispose(); target.destroy(); source.destroy(); late.destroy(); }
++});

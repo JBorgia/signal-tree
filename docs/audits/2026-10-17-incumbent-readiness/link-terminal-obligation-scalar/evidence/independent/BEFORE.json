@@ -1,0 +1,5 @@
+{
+  "packages/kernel/src/lib/experimental-publication/lifecycle.ts": "7fcfd3098cd59bbdd9f07ff9ce46e547e63175d14ff0ea7c265a410b41593dff",
+  "packages/kernel/src/lib/experimental-publication/private.ts": "2fff7f940ef0a6e35879adb2e504ab91d5cb20a7bb7cac637bd8a5f80a1a1597",
+  "packages/kernel/src/lib/publication-terminal-horizon-independent.spec.ts": "39a8af6327648584cac5f78099a770884cac6ec333633b1f9a17754e0e177d72"
+}

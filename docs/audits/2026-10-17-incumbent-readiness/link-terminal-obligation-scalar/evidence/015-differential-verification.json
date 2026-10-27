@@ -1,0 +1,9 @@
+{
+  "base": "440ead9f1b4d45c63f7ec8cbf50fc15944f101b2",
+  "runtime": {
+    "packages/kernel/src/lib/experimental-publication/lifecycle.ts": "7fcfd3098cd59bbdd9f07ff9ce46e547e63175d14ff0ea7c265a410b41593dff",
+    "packages/kernel/src/lib/experimental-publication/private.ts": "2fff7f940ef0a6e35879adb2e504ab91d5cb20a7bb7cac637bd8a5f80a1a1597"
+  },
+  "lint_matching_diagnostics": 36,
+  "source_types_identical_to_preserved_base_log": true
+}
