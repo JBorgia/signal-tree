@@ -84,6 +84,30 @@ two fixture accesses. No full qualification, artifact or cost acceptance follows
 Production `87f6831f`, the conservative default, budgets and B closure remain
 unchanged.
 
+## Collection path — covered recurrence; runtime successor stopped
+
+[Coverage adjudication, independent reviews and prewritten outcomes](docs/audits/2026-10-17-incumbent-readiness/link-collection-coverage-review/README.md)
+verify that collection sources were already included in the approved aggregate
+experiment and the reviewed removal mechanism. `supported:false` records missing
+implementation coverage; it does not exclude collections from the reviewed safety
+contract or require another owner decision to approve the same experiment.
+
+The `75416029` destination-first failure is a covered D/W recurrence: p confirmation
+releases collection output while foreign q, pending at authorship, remains open.
+This fixture asserts the approved possible-owner hold, not an observed read of q.
+The separate declaration rejection happens before its callback and establishes no
+publication coverage. Original assertions, first failures and passing forward-removal
+controls remain frozen. The recurrence stop remains active; no new runtime was
+implemented in this read-only assessment.
+
+Both the unsupported-channel gate bypass and whole-collection proof-composition
+omission are source-verified. A complete successor must also satisfy the existing
+inspected-input, selected-inverse, retirement and completion gates; fixing either
+immediate defect alone is insufficient. The recorded matrix requires useful delivery
+after discharge in both settlement orders, valid declaration execution with retained
+structural obligations, and fresh ordinary truth after rejection. No broad suites,
+performance campaign, production activation, budget change or B work was performed.
+
 ## Authored removal runtime successor — forward controls pass; integration blocked
 
 [Candidate, reviewed disposition and exact replay](docs/audits/2026-10-17-incumbent-readiness/link-authored-removal-successor/README.md)

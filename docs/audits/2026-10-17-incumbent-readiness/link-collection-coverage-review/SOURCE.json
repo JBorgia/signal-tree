@@ -1,0 +1,25 @@
+{
+  "runtime": "75416029be1e0c1d9735ed3bdc0f4e8e6c02f775",
+  "runtime_status": "",
+  "readiness_before": "92ada3b6364689ae5f6a5ed951f3d75857459a35",
+  "governing_design": "3c8bbaff0d9663d7e8a0962e881c2f570161d60b",
+  "aggregate_authority_commit": "30b398d4aff3885a03516fdf1eb99bddc99c6c8d",
+  "tests_run": false,
+  "runtime_edits": false,
+  "all_prior_tested_candidate_hashes_unchanged": true,
+  "unrelated_dirty_files": {
+    "AGENTS.md": "a5092146c949b18cb94f14f4fa9173c066f8fd9a9329bad1766a7e93adc3e473",
+    "docs/performance/measurement-contract.md": "138c5e9783e926daf8ece2c8a08527c087f222f81525eb834857bf215283f2ad"
+  },
+  "source_files": {
+    "packages/kernel/src/lib/link.ts": "b583bef6b6b006126baf4531377edb0128164035c4b295499d5c36adace9afaa",
+    "packages/kernel/src/lib/experimental-publication/private.ts": "b50e0ef118b9e9f87f25654feb5bf8950f0938326a6e921bb80e92909cfe7383",
+    "packages/kernel/src/lib/experimental-publication/entity.ts": "47f8e14c3280e0fbf81bfb34149d76a120873b836ad2fed13771d5146e74a74b",
+    "packages/kernel/src/lib/experimental-publication/lifecycle.ts": "7fcfd3098cd59bbdd9f07ff9ce46e547e63175d14ff0ea7c265a410b41593dff",
+    "packages/kernel/src/lib/authored-removal-obligations.spec.ts": "8782bc80b6df36321e7d85d65017b1a943deed4291188b6b573ff97fd595bf79"
+  },
+  "raw_results": {
+    "/private/tmp/link-authored-removal-evidence/final-focused.log": "2dd967c2db25c417c92ed5c20dd755e0c6c098560bd8959a6598000e1ab9fefc",
+    "/private/tmp/link-authored-removal-evidence/002-baseline-obligations.log": "dfa7c5e07b6384c7f2e78c5e66bbb8fe4ead5a50899209d7f4b60ad12c3ec3d4"
+  }
+}
