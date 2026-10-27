@@ -1,0 +1,31 @@
+# Prewritten removal handoff acceptance cases
+
+Design expectations only, 2026-10-27. No new execution or passing count. Preserve original assertions and first failures at f7a0ffd9. Each extension must first run against that frozen source; new fixtures cannot replace unchanged regression files.
+
+| Case | Required outcome / discriminator | Basis |
+| --- | --- | --- |
+| R1 early and late collection recipients around inspection-add X, then ordinary remove X | Early remains silent; late sends only A; subsequent inspected recreation is silent and ordinary update publishes new X to both | Unchanged ordinary-order-source-boundaries |
+| R2 same through nested branch | Identical per-baseline result with correct aggregate structure | Same unchanged file |
+| R3 selected field rollback with divergent baselines | Early sends A1, late retains X9 plus A1 | Same unchanged file; source O snapshot replacement is invalid |
+| R4 inspection-only removal | Advance latent physical topology; do not publish removal to either existing baseline | A0 inspection participation |
+| R5 point held row and field recipients | Ordinary authored removal of their exact lifetime publishes absence when their baseline had a value; receipt/support completion still occurs for meaningful support change at equal undefined | Native lifetime identity plus A0 value/support distinction; new execution required |
+| R6 same-key recreation | Old X1 removal cannot remove X2; held X1 never retargets; later completion cannot overwrite X2's eligible revision | Entity projection seed/held-reference contract |
+| R7 remove/re-add same lifetime in a supported selected sequence | Preserve source-step chronology and selected authority; do not net the operations away by final membership or key | Existing inverse authority; exact supported producer required, no synthetic public resurrection API |
+| R8 removeMany and predicate-selected removal | Only accepted target lifetimes disappear; nonselected predicate input still contributes its existing native evidence | Shared frame + source-input contract |
+| R9 clear and setAll omissions with an unrelated physically absent, recipient-latent row | Use the existing producer's exact target domain; no new blanket purge of latent baseline entries | Existing route mapping; preregister concrete fixtures before implementation |
+| R10 source O already lacks target, removal authored in p | Removal remains a publication operation governed by D(p), but creates no invented native O undo effect | Separation of publication and compensation authority |
+| R11 p confirms while consumed input q remains pending | No send; after q discharge, fresh useful delivery without another setter | Preserved D/I/W rules |
+| R12 qualified independent removal in p, unrelated q pending | Useful publication after p confirms; don't promote D to input contradiction or acquire q merely from recipient enrollment | Preserved scalar role controls |
+| R13 p rejects O-neutral removal | Follow unchanged selected ordinary topology; don't restore inspection-created membership for a receipt. Fresh surviving-basis delivery only after applicable gates clear | Existing structural inverse test plus approved surviving-write rule; recipient composition must be executed |
+| R14 preparation throws / source reenters | No outer uninstalled state, source proof, recipient proof or reachable index record survives; retain any already-authored reentrant work and useful retry | Admission contract; preserve first thrown value |
+| R15 connection added/disposed during callback-capable preparation | No stale recipient draft overwrites a newer baseline; passive enrollment never changes another recipient's native obligations | Enrollment invariance; participant index must be validated or pure metadata reprepared without replaying user code |
+| R16 onRemove re-add / nested declaration | Callback operation is a newer unit. Retain its work and enclosing validation; no older completion overwrite | Existing reentry/validation controls |
+| R17 queued old send vs already-started send | Queued stale ticket is superseded; started send is followed by current eligible correction, serialized | Existing delivery contract; no new cancellation promise |
+| R18 no enrolled recipient when O-neutral removal occurs | A later native snapshot consumer observes the removal's real absence evidence, not a fabricated clean baseline | Source-owned membership evidence |
+| R19 retirement with foreign W pending or historical uncertainty | Physical forget/disposal cannot delete current/captured proof. Later owners do not extend the inherited window | Existing negative-retirement and terminal-history controls; zero record count alone is not the acceptance oracle |
+| R20 no-W/no-recovery churn | Do not retain obsolete lifetime metadata after drain; held handles stay detached | Existing failed work-lifetime test; no heap/GC inference |
+| R21 fixed-local support work as collection grows | Visits affected membership facts and their indexed dependencies; full serialized output measured separately | Existing point-work/measurement contract; no CPU claim from counters |
+
+Mandatory unchanged vectors before any acceptance: original entity26; native input25; combined scalar225 passes plus two separately preserved historical assertion conflicts; original and new framework24; original ordinary-order five; selected-rich-capture failure; the original semantic101 verdict ledger; unavailable-inspected-input fixed-owner controls. Do not sum these overlapping vectors as unique coverage or require historical oracle changes merely to make a total green.
+
+A future forward-removal experiment may test the established early/late-baseline subtraction and per-lifetime proof preparation. Report only named capabilities actually executed. No case range is assumed to pass: selected inverses, preparation faults, reentry, enrollment/disposal and proof-only completion remain gates to execute. Native evidence survival across physical forgetting additionally requires obligation-aware retirement on both routes. General compaction/GC remains separately unqualified. The newly approved unavailable-input W rule is separately required and must not be implemented as blanket recapture of all historical unknowns. No runtime successor is authorized by this case table.

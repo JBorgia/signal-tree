@@ -84,6 +84,28 @@ two fixture accesses. No full qualification, artifact or cost acceptance follows
 Production `87f6831f`, the conservative default, budgets and B closure remain
 unchanged.
 
+## Authored removal responsibility — bounded design review complete
+
+[Mechanism, independent reviews and prewritten gates](docs/audits/2026-10-17-incumbent-readiness/link-authored-removal-design/README.md)
+separate an operation's authored removal from its source ordinary delta. A removal
+can leave source O unchanged while requiring a corrected projection for a recipient
+that adopted the lifetime at creation. The reviewed mechanism preserves source-step
+order, lifetime identity and the authored footprint alongside separate P/O effects;
+it neither copies inspected rows nor creates native undo contributions for O no-ops.
+
+Premise and mechanism review support this bounded representation. The final scope
+incorporates and independently verifies two corrections: native negative-evidence
+survival depends on obligation-aware handling of both retirement routes, and no
+case range is presumed qualified while selected preparation/reentry/completion gates
+remain unexecuted or failing. The existing rich-capture, retirement, unavailable-input
+owner-hold and qualification obligations remain visible; no new public policy was
+selected. A0's O-delta shorthand is clarified, not used to erase relationship baselines.
+
+No runtime successor, tests, models, builds or cost measurements ran in this review.
+The rejected candidate and recurrence stop below remain intact. Production hold,
+budgets, APIs and B closure are unchanged. This is a reviewed basis for a bounded
+forward-removal/proof-preparation experiment, not integration or activation approval.
+
 ## Entity obligation integration — rejected at covered recurrence
 
 [Exact candidate, independent review, failures and replay](docs/audits/2026-10-17-incumbent-readiness/link-entity-obligation-integration/README.md)

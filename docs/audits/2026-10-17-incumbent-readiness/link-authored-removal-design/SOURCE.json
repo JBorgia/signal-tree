@@ -1,0 +1,17 @@
+{
+  "head": "f7a0ffd9e2e34a23ceae85bff3cd8fa45ecaa82d",
+  "status": "",
+  "sha256": {
+    "packages/kernel/src/lib/entity-signal.ts": "fc2cbd159f6740071c466fc266ae22ac1bbe63a1aa3e8b060886ecb0970fab02",
+    "packages/kernel/src/lib/internals/entity-egress-projection.ts": "e158db8d0d70077bddbef9e13b1d0ea0118e26c5c6dc88a24ab5f51e7f44947f",
+    "packages/kernel/src/lib/internals/entity-publication.ts": "08f9e1ca2793b1921a0bafffc0d0d956a4c495e8001a48ca545138e1f8a027d4",
+    "packages/kernel/src/lib/link.ts": "41408abb0df624dd84dbe06525082cde6cd7aec653f120286006b0f3acbcb142",
+    "packages/kernel/src/lib/ordinary-order-source-boundaries.spec.ts": "6fb7bef72f755f56ea1bcac2384974205e4b34cda899b1408661fd3be8bbbef5",
+    "packages/kernel/src/lib/entity-semantic-structural-inverses.spec.ts": "3d4227b0b520a8fe3b0216f8573d2ce74da58adeedac79626560672d0617f2c2",
+    "packages/kernel/src/lib/entity-projection-seed.spec.ts": "c260333c5daf3c0a5afe99dcef403a295eb10a462c1783803205a4af061430ab",
+    "packages/kernel/src/lib/experimental-publication/entity.ts": "02a0eddb8d36141dbb7480e15ad682765ff459c70f9b61639946f69dfa705cec",
+    "packages/kernel/src/lib/experimental-publication/lifecycle.ts": "7fcfd3098cd59bbdd9f07ff9ce46e547e63175d14ff0ea7c265a410b41593dff"
+  },
+  "testsRun": false,
+  "runtimeEdits": false
+}
