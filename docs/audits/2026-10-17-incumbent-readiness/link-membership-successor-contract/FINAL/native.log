@@ -1,0 +1,473 @@
+
+> nx run kernel:test --testFile=packages/kernel/src/lib/membership-input-contract.spec.ts --testFile=packages/kernel/src/lib/possible-owner-window-contract.spec.ts --testFile=packages/kernel/src/lib/separate-boundary-contract.spec.ts --testFile=packages/kernel/src/lib/publication-independent-isolated-omission-input.spec.ts
+
+> node tools/run-core-vitest.mjs --testFile=packages/kernel/src/lib/membership-input-contract.spec.ts --testFile=packages/kernel/src/lib/possible-owner-window-contract.spec.ts --testFile=packages/kernel/src/lib/separate-boundary-contract.spec.ts --testFile=packages/kernel/src/lib/publication-independent-isolated-omission-input.spec.ts
+
+(node:26974) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+[43m[33m[[39m[49m[43m[30mWARN[39m[49m[43m[33m][39m[49m The "pnpm" field in package.json is no longer read by pnpm. The following keys were ignored: "pnpm.overrides". See https://pnpm.io/settings for the new home of each setting.
+(node:26979) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/link-membership-successor-contract/packages/kernel
+
+(node:26986) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:26988) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:26987) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:26989) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+stdout | src/lib/publication-independent-isolated-omission-input.spec.ts > native omitted-member input after independent sibling overwrite: independent
+OMISSION-INPUT {"claim":"independent","sent":[0],"target":0,"receipt":{"state":"started","basis":"declared"},"source":{"y":1}}
+
+ ❯ src/lib/publication-independent-isolated-omission-input.spec.ts (2 tests | 1 failed) 45ms
+   × native omitted-member input after independent sibling overwrite: independent 39ms
+ ❯ src/lib/possible-owner-window-contract.spec.ts (19 tests | 13 failed) 73ms
+     × literal waits for already-pending p, not foreign q opened before delivery 40ms
+     × direct-copy waits for already-pending p, not foreign q opened before delivery 3ms
+     × hidden-updater waits for already-pending p, not foreign q opened before delivery 2ms
+     × waits for every captured owner, but not a subsequently opened foreign owner 4ms
+     × successful foreign rejection reevaluates an ordinary copied value that survives 2ms
+     × owner settlement evaluates ordinary truth rather than an inspection overlay 1ms
+     × replacement captures its own later window instead of inheriting the old grant 1ms
+     × a qualified independent replacement does not inherit the superseded unknown window 1ms
+     × endpoint reentry authors a new window without changing the old send eligibility 4ms
+     × disposing held queued work settles its waiter and prevents later delivery 2ms
+     × destroying an unresolved captured source is not confirmation or successful rejection 1ms
+   × native consumption preserves inherited uncertainty; new declared context=true 1ms
+   × native consumption preserves inherited uncertainty; new declared context=false 1ms
+ ❯ src/lib/separate-boundary-contract.spec.ts (6 tests | 3 failed) 73ms
+   × in-flight forward packet is followed serially by current mixed-undo callback truth 5ms
+   × private membership participants coexist and release independently of the native Link consumer 2ms
+   × membership preparation reentry is included before the authored unit installs 6ms
+ ❯ src/lib/membership-input-contract.spec.ts (54 tests | 36 failed) 100ms
+   × supplied absence branch/direct/independent retains source omission after sibling overwrite 28ms
+   × supplied absence branch/direct/dependent retains source omission after sibling overwrite 3ms
+   × supplied absence branch/hasOwn/independent retains source omission after sibling overwrite 4ms
+   × supplied absence branch/hasOwn/dependent retains source omission after sibling overwrite 4ms
+   × supplied absence branch/in/independent retains source omission after sibling overwrite 1ms
+   × supplied absence branch/in/dependent retains source omission after sibling overwrite 1ms
+   × supplied absence branch/keys/independent retains source omission after sibling overwrite 1ms
+   × supplied absence branch/keys/dependent retains source omission after sibling overwrite 1ms
+   × supplied absence branch/entries/independent retains source omission after sibling overwrite 2ms
+   × supplied absence branch/entries/dependent retains source omission after sibling overwrite 2ms
+   × supplied absence branch/spread/independent retains source omission after sibling overwrite 1ms
+   × supplied absence branch/spread/dependent retains source omission after sibling overwrite 6ms
+   × supplied absence root/direct/independent retains source omission after sibling overwrite 2ms
+   × supplied absence root/direct/dependent retains source omission after sibling overwrite 1ms
+   × supplied absence root/hasOwn/independent retains source omission after sibling overwrite 1ms
+   × supplied absence root/hasOwn/dependent retains source omission after sibling overwrite 1ms
+   × supplied absence root/in/independent retains source omission after sibling overwrite 1ms
+   × supplied absence root/in/dependent retains source omission after sibling overwrite 1ms
+   × supplied absence root/keys/independent retains source omission after sibling overwrite 1ms
+   × supplied absence root/keys/dependent retains source omission after sibling overwrite 1ms
+   × supplied absence root/entries/independent retains source omission after sibling overwrite 1ms
+   × supplied absence root/entries/dependent retains source omission after sibling overwrite 1ms
+   × supplied absence root/spread/independent retains source omission after sibling overwrite 2ms
+   × supplied absence root/spread/dependent retains source omission after sibling overwrite 2ms
+   × supplied absence updateAndReport/direct/independent retains source omission after sibling overwrite 2ms
+   × supplied absence updateAndReport/direct/dependent retains source omission after sibling overwrite 1ms
+   × supplied absence updateAndReport/hasOwn/independent retains source omission after sibling overwrite 1ms
+   × supplied absence updateAndReport/hasOwn/dependent retains source omission after sibling overwrite 1ms
+   × supplied absence updateAndReport/in/independent retains source omission after sibling overwrite 1ms
+   × supplied absence updateAndReport/in/dependent retains source omission after sibling overwrite 1ms
+   × supplied absence updateAndReport/keys/independent retains source omission after sibling overwrite 1ms
+   × supplied absence updateAndReport/keys/dependent retains source omission after sibling overwrite 1ms
+   × supplied absence updateAndReport/entries/independent retains source omission after sibling overwrite 1ms
+   × supplied absence updateAndReport/entries/dependent retains source omission after sibling overwrite 1ms
+   × supplied absence updateAndReport/spread/independent retains source omission after sibling overwrite 1ms
+   × supplied absence updateAndReport/spread/dependent retains source omission after sibling overwrite 1ms
+
+⎯⎯⎯⎯⎯⎯ Failed Tests 53 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/lib/membership-input-contract.spec.ts > supplied absence branch/direct/independent retains source omission after sibling overwrite
+ FAIL  src/lib/membership-input-contract.spec.ts > supplied absence branch/hasOwn/independent retains source omission after sibling overwrite
+ FAIL  src/lib/membership-input-contract.spec.ts > supplied absence branch/in/independent retains source omission after sibling overwrite
+ FAIL  src/lib/membership-input-contract.spec.ts > supplied absence branch/keys/independent retains source omission after sibling overwrite
+ FAIL  src/lib/membership-input-contract.spec.ts > supplied absence branch/entries/independent retains source omission after sibling overwrite
+ FAIL  src/lib/membership-input-contract.spec.ts > supplied absence branch/spread/independent retains source omission after sibling overwrite
+ FAIL  src/lib/membership-input-contract.spec.ts > supplied absence root/direct/independent retains source omission after sibling overwrite
+ FAIL  src/lib/membership-input-contract.spec.ts > supplied absence root/hasOwn/independent retains source omission after sibling overwrite
+ FAIL  src/lib/membership-input-contract.spec.ts > supplied absence root/in/independent retains source omission after sibling overwrite
+ FAIL  src/lib/membership-input-contract.spec.ts > supplied absence root/keys/independent retains source omission after sibling overwrite
+ FAIL  src/lib/membership-input-contract.spec.ts > supplied absence root/entries/independent retains source omission after sibling overwrite
+ FAIL  src/lib/membership-input-contract.spec.ts > supplied absence root/spread/independent retains source omission after sibling overwrite
+ FAIL  src/lib/membership-input-contract.spec.ts > supplied absence updateAndReport/direct/independent retains source omission after sibling overwrite
+ FAIL  src/lib/membership-input-contract.spec.ts > supplied absence updateAndReport/hasOwn/independent retains source omission after sibling overwrite
+ FAIL  src/lib/membership-input-contract.spec.ts > supplied absence updateAndReport/in/independent retains source omission after sibling overwrite
+ FAIL  src/lib/membership-input-contract.spec.ts > supplied absence updateAndReport/keys/independent retains source omission after sibling overwrite
+ FAIL  src/lib/membership-input-contract.spec.ts > supplied absence updateAndReport/entries/independent retains source omission after sibling overwrite
+ FAIL  src/lib/membership-input-contract.spec.ts > supplied absence updateAndReport/spread/independent retains source omission after sibling overwrite
+AssertionError: expected [ +0 ] to deeply equal []
+
+- Expected
++ Received
+
+- []
++ [
++   0,
++ ]
+
+ ❯ src/lib/membership-input-contract.spec.ts:65:18
+     63|     expect(source.$.pair()).toEqual({ y: 1 });
+     64|     expect(p.inspect()).toEqual(before);
+     65|     expect(sent).toEqual([]);
+       |                  ^
+     66|     if (claim === 'independent') expect(error).toMatchObject({ stage: …
+     67|     else {
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/53]⎯
+
+ FAIL  src/lib/membership-input-contract.spec.ts > supplied absence branch/direct/dependent retains source omission after sibling overwrite
+ FAIL  src/lib/membership-input-contract.spec.ts > supplied absence branch/hasOwn/dependent retains source omission after sibling overwrite
+ FAIL  src/lib/membership-input-contract.spec.ts > supplied absence branch/in/dependent retains source omission after sibling overwrite
+ FAIL  src/lib/membership-input-contract.spec.ts > supplied absence branch/keys/dependent retains source omission after sibling overwrite
+ FAIL  src/lib/membership-input-contract.spec.ts > supplied absence branch/entries/dependent retains source omission after sibling overwrite
+ FAIL  src/lib/membership-input-contract.spec.ts > supplied absence branch/spread/dependent retains source omission after sibling overwrite
+ FAIL  src/lib/membership-input-contract.spec.ts > supplied absence root/direct/dependent retains source omission after sibling overwrite
+ FAIL  src/lib/membership-input-contract.spec.ts > supplied absence root/hasOwn/dependent retains source omission after sibling overwrite
+ FAIL  src/lib/membership-input-contract.spec.ts > supplied absence root/in/dependent retains source omission after sibling overwrite
+ FAIL  src/lib/membership-input-contract.spec.ts > supplied absence root/keys/dependent retains source omission after sibling overwrite
+ FAIL  src/lib/membership-input-contract.spec.ts > supplied absence root/entries/dependent retains source omission after sibling overwrite
+ FAIL  src/lib/membership-input-contract.spec.ts > supplied absence root/spread/dependent retains source omission after sibling overwrite
+ FAIL  src/lib/membership-input-contract.spec.ts > supplied absence updateAndReport/direct/dependent retains source omission after sibling overwrite
+ FAIL  src/lib/membership-input-contract.spec.ts > supplied absence updateAndReport/hasOwn/dependent retains source omission after sibling overwrite
+ FAIL  src/lib/membership-input-contract.spec.ts > supplied absence updateAndReport/in/dependent retains source omission after sibling overwrite
+ FAIL  src/lib/membership-input-contract.spec.ts > supplied absence updateAndReport/keys/dependent retains source omission after sibling overwrite
+ FAIL  src/lib/membership-input-contract.spec.ts > supplied absence updateAndReport/entries/dependent retains source omission after sibling overwrite
+ FAIL  src/lib/membership-input-contract.spec.ts > supplied absence updateAndReport/spread/dependent retains source omission after sibling overwrite
+AssertionError: expected { state: 'held', …(1) } to match object { state: 'conservative', …(1) }
+
+- Expected
++ Received
+
+  {
+-   "reason": "unknown",
+-   "state": "conservative",
++   "reason": "pending-dependency",
++   "state": "held",
+  }
+
+ ❯ src/lib/membership-input-contract.spec.ts:69:31
+     67|     else {
+     68|       expect(error).toBeUndefined();
+     69|       expect(receipt?.read()).toMatchObject({ state: 'conservative', r…
+       |                               ^
+     70|       p.confirm(); await flush();
+     71|       expect(sent).toEqual([0]);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/53]⎯
+
+ FAIL  src/lib/possible-owner-window-contract.spec.ts > fixed possible-owner window at ordinary authorship > literal waits for already-pending p, not foreign q opened before delivery
+ FAIL  src/lib/possible-owner-window-contract.spec.ts > fixed possible-owner window at ordinary authorship > direct-copy waits for already-pending p, not foreign q opened before delivery
+ FAIL  src/lib/possible-owner-window-contract.spec.ts > fixed possible-owner window at ordinary authorship > hidden-updater waits for already-pending p, not foreign q opened before delivery
+AssertionError: expected [ 7 ] to deeply equal []
+
+- Expected
++ Received
+
+- []
++ [
++   7,
++ ]
+
+ ❯ src/lib/possible-owner-window-contract.spec.ts:45:52
+     43|         const pendingQ = q.inspect();
+     44|         await flush();
+     45|         expect(target.$.y()).toBe(7); expect(sent).toEqual([]);
+       |                                                    ^
+     46|         expect(p.inspect()).toEqual(pendingP); expect(q.inspect()).toE…
+     47|         let done = false; const wait = c.settled().then(() => { done =…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/53]⎯
+
+ FAIL  src/lib/possible-owner-window-contract.spec.ts > fixed possible-owner window at ordinary authorship > waits for every captured owner, but not a subsequently opened foreign owner
+AssertionError: expected [ 7 ] to deeply equal []
+
+- Expected
++ Received
+
+- []
++ [
++   7,
++ ]
+
+ ❯ src/lib/possible-owner-window-contract.spec.ts:76:35
+     74|       target.$.y(7);
+     75|       const q = late.transact(() => late.$.x(9)); const pendingQ = q.i…
+     76|       await flush(); expect(sent).toEqual([]);
+       |                                   ^
+     77|       p.confirm(); await flush(); expect(sent).toEqual([]);
+     78|       r.confirm(); await flush(); expect(sent).toEqual([7]);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/53]⎯
+
+ FAIL  src/lib/possible-owner-window-contract.spec.ts > fixed possible-owner window at ordinary authorship > successful foreign rejection reevaluates an ordinary copied value that survives
+AssertionError: expected [ 7 ] to deeply equal []
+
+- Expected
++ Received
+
+- []
++ [
++   7,
++ ]
+
+ ❯ src/lib/possible-owner-window-contract.spec.ts:90:35
+     88|       target.$.y(source.$.x());
+     89|       const q = late.transact(() => late.$.x(9)); const pendingQ = q.i…
+     90|       await flush(); expect(sent).toEqual([]);
+       |                                   ^
+     91|       p.rollback(); await flush();
+     92|       expect(source.$.x()).toBe(0); expect(target.$.y()).toBe(7);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/53]⎯
+
+ FAIL  src/lib/possible-owner-window-contract.spec.ts > fixed possible-owner window at ordinary authorship > owner settlement evaluates ordinary truth rather than an inspection overlay
+AssertionError: expected [ 7 ] to deeply equal []
+
+- Expected
++ Received
+
+- []
++ [
++   7,
++ ]
+
+ ❯ src/lib/possible-owner-window-contract.spec.ts:117:66
+    115|       const p = source.transact(() => source.$.x(7)); target.$.y(7);
+    116|       withWriteContext({ participation: 'inspection' }, () => target.$…
+    117|       await flush(); expect(target.$.y()).toBe(99); expect(sent).toEqu…
+       |                                                                  ^
+    118|       p.confirm(); await flush();
+    119|       expect(target.$.y()).toBe(99); expect(sent).toEqual([7]); await …
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/53]⎯
+
+ FAIL  src/lib/possible-owner-window-contract.spec.ts > fixed possible-owner window at ordinary authorship > replacement captures its own later window instead of inheriting the old grant
+AssertionError: expected [ 8 ] to deeply equal []
+
+- Expected
++ Received
+
+- []
++ [
++   8,
++ ]
+
+ ❯ src/lib/possible-owner-window-contract.spec.ts:129:35
+    127|       const p = source.transact(() => source.$.x(1)); target.$.y(7);
+    128|       const q = late.transact(() => late.$.x(9)); target.$.y(8);
+    129|       await flush(); expect(sent).toEqual([]);
+       |                                   ^
+    130|       p.confirm(); await flush(); expect(sent).toEqual([]); expect(tar…
+    131|       q.confirm(); await flush(); expect(sent).toEqual([8]); await c.s…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/53]⎯
+
+ FAIL  src/lib/possible-owner-window-contract.spec.ts > fixed possible-owner window at ordinary authorship > a qualified independent replacement does not inherit the superseded unknown window
+AssertionError: expected [ 7 ] to deeply equal []
+
+- Expected
++ Received
+
+- []
++ [
++   7,
++ ]
+
+ ❯ src/lib/possible-owner-window-contract.spec.ts:140:35
+    138|     try {
+    139|       const p = source.transact(() => source.$.x(1)); target.$.y(7);
+    140|       await flush(); expect(sent).toEqual([]);
+       |                                   ^
+    141|       const q = late.transact(() => late.$.x(9));
+    142|       const receipt = c.declare({ kind: 'independent' }, () => target.…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[8/53]⎯
+
+ FAIL  src/lib/possible-owner-window-contract.spec.ts > fixed possible-owner window at ordinary authorship > endpoint reentry authors a new window without changing the old send eligibility
+AssertionError: expected [ 7, 8 ] to deeply equal []
+
+- Expected
++ Received
+
+- []
++ [
++   7,
++   8,
++ ]
+
+ ❯ src/lib/possible-owner-window-contract.spec.ts:173:35
+    171|       const p = source.transact(() => source.$.x(1)); target.$.y(7);
+    172|       const q = late.transact(() => late.$.x(9));
+    173|       await flush(); expect(sent).toEqual([]);
+       |                                   ^
+    174|       p.confirm(); await flush(); expect(sent).toEqual([7]); expect(ta…
+    175|       q.confirm(); await flush(); expect(sent).toEqual([7, 8]); await …
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[9/53]⎯
+
+ FAIL  src/lib/possible-owner-window-contract.spec.ts > fixed possible-owner window at ordinary authorship > disposing held queued work settles its waiter and prevents later delivery
+AssertionError: expected true to be false // Object.is equality
+
+- Expected
++ Received
+
+- false
++ true
+
+ ❯ src/lib/possible-owner-window-contract.spec.ts:201:35
+    199|       const p = source.transact(() => source.$.x(7)); target.$.y(7); a…
+    200|       let done = false; const wait = c.settled().then(() => { done = t…
+    201|       await flush(); expect(done).toBe(false); expect(sent).toEqual([]…
+       |                                   ^
+    202|       c.dispose(); await flush(); expect(done).toBe(true); await wait;
+    203|       p.confirm(); await flush(); expect(sent).toEqual([]); await c.se…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[10/53]⎯
+
+ FAIL  src/lib/possible-owner-window-contract.spec.ts > fixed possible-owner window at ordinary authorship > destroying an unresolved captured source is not confirmation or successful rejection
+AssertionError: expected [ 7 ] to deeply equal []
+
+- Expected
++ Received
+
+- []
++ [
++   7,
++ ]
+
+ ❯ src/lib/possible-owner-window-contract.spec.ts:228:88
+    226|     const c = link(target.$.y, { set: value => { sent.push(value); } }…
+    227|     try {
+    228|       source.transact(() => source.$.x(7)); target.$.y(7); await flush…
+       |                                                                                        ^
+    229|       let done = false; const wait = c.settled().then(() => { done = t…
+    230|       source.destroy(); await flush(); expect(sent).toEqual([]); expec…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[11/53]⎯
+
+ FAIL  src/lib/possible-owner-window-contract.spec.ts > native consumption preserves inherited uncertainty; new declared context=true
+ FAIL  src/lib/possible-owner-window-contract.spec.ts > native consumption preserves inherited uncertainty; new declared context=false
+AssertionError: expected [ 8 ] to deeply equal []
+
+- Expected
++ Received
+
+- []
++ [
++   8,
++ ]
+
+ ❯ src/lib/possible-owner-window-contract.spec.ts:263:63
+    261|     if (qualified) expect(() => { receipt = c.declare({ kind: 'indepen…
+    262|     else consume();
+    263|     await flush(); expect(target.$.y()).toBe(8); expect(sent).toEqual(…
+       |                                                               ^
+    264|     if (qualified) expect(receipt?.read()).toMatchObject({ state: 'con…
+    265|     p.confirm(); await flush();
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[12/53]⎯
+
+ FAIL  src/lib/publication-independent-isolated-omission-input.spec.ts > native omitted-member input after independent sibling overwrite: independent
+AssertionError: expected [ +0 ] to deeply equal []
+
+- Expected
++ Received
+
+- []
++ [
++   0,
++ ]
+
+ ❯ src/lib/publication-independent-isolated-omission-input.spec.ts:32:16
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[13/53]⎯
+
+ FAIL  src/lib/separate-boundary-contract.spec.ts > in-flight forward packet is followed serially by current mixed-undo callback truth
+AssertionError: expected [ [ …(2) ], [ …(2) ] ] to deeply equal [ [ …(2) ], [ …(2) ] ]
+
+- Expected
++ Received
+
+@@ -12,11 +12,11 @@
+      },
+    ],
+    [
+      {
+        "id": "a",
+-       "n": 777,
++       "n": 11,
+        "note": 1,
+      },
+      {
+        "id": "b",
+        "n": 12,
+
+ ❯ src/lib/separate-boundary-contract.spec.ts:95:18
+     93|     expect(tree.$.right.all()).toEqual(expected(777)); expect(sent).to…
+     94|     acknowledge(); await flush(); await c.settled();
+     95|     expect(sent).toEqual([forward, expected(777)]); expect(maximumActi…
+       |                  ^
+     96|   } finally { acknowledge(); off(); c.dispose(); tree.destroy(); }
+     97| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[14/53]⎯
+
+ FAIL  src/lib/separate-boundary-contract.spec.ts > private membership participants coexist and release independently of the native Link consumer
+Error: Membership publication preparation already registered
+ ❯ registerMembershipPublication src/lib/internals/intrinsic-mutation.ts:341:44
+    339|   complete: PublicationCompleter
+    340| ): () => void {
+    341|   if (membershipPublicationPreparer) throw new Error('Membership publi…
+       |                                            ^
+    342|   const installed: MembershipPublicationPreparer = edit => {
+    343|     const unit = prepare(edit);
+ ❯ participant src/lib/separate-boundary-contract.spec.ts:106:45
+ ❯ src/lib/separate-boundary-contract.spec.ts:112:16
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[15/53]⎯
+
+ FAIL  src/lib/separate-boundary-contract.spec.ts > membership preparation reentry is included before the authored unit installs
+Error: Membership publication preparation already registered
+ ❯ registerMembershipPublication src/lib/internals/intrinsic-mutation.ts:341:44
+    339|   complete: PublicationCompleter
+    340| ): () => void {
+    341|   if (membershipPublicationPreparer) throw new Error('Membership publi…
+       |                                            ^
+    342|   const installed: MembershipPublicationPreparer = edit => {
+    343|     const unit = prepare(edit);
+ ❯ src/lib/separate-boundary-contract.spec.ts:139:15
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[16/53]⎯
+
+
+ Test Files  4 failed (4)
+      Tests  53 failed | 28 passed (81)
+   Start at  20:06:06
+   Duration  1.42s (transform 2.88s, setup 0ms, import 3.71s, tests 290ms, environment 1.05s)
+
+Warning: command "node tools/run-core-vitest.mjs --testFile=packages/kernel/src/lib/membership-input-contract.spec.ts --testFile=packages/kernel/src/lib/possible-owner-window-contract.spec.ts --testFile=packages/kernel/src/lib/separate-boundary-contract.spec.ts --testFile=packages/kernel/src/lib/publication-independent-isolated-omission-input.spec.ts" exited with non-zero status code
+
+
+ NX   Running target test for project kernel failed
+
+Failed tasks:
+
+- kernel:test
+
+Hint: run the command with --verbose for more details.
+
+  Run duration:      2.1s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     2.1s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    2.1s

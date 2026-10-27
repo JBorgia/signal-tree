@@ -84,6 +84,31 @@ two fixture accesses. No full qualification, artifact or cost acceptance follows
 Production `87f6831f`, the conservative default, budgets and B closure remain
 unchanged.
 
+## Membership successor specification — reviewed, runtime authorization pending
+
+[Contract, prewritten tests, independent review and exact baseline](docs/audits/2026-10-17-incumbent-readiness/link-membership-successor-contract/README.md)
+finish the specification stage following the approved possible-owner policy.
+Test-only `2d24966c` adds79 cases; with unchanged omission2 the exact frozen-runtime
+baseline records28 ordinary passes and53 failures. No expected failures or skips.
+The failures are preserved discriminators, not53 independent product defects.
+First results and reviewed new-fixture corrections remain archived. Existing
+runtime and assertions are unchanged; source types and final spec-types ratchet
+pass within their recorded limits.
+
+The contract covers source-owned negative membership, exact supplied-input views,
+fixed per-installation authorship windows, independent completion wake-up and fresh
+ordinary-state evaluation. Native input uncertainty propagates without becoming
+proven causation; qualified literal replacement remains distinct. Registration
+composition and mixed-undo chronology retain separate mandatory repairs. Independent
+review found the corrected packet sufficient to request one bounded implementation;
+it did not authorize or qualify that implementation. Entity producers, cache/view
+correspondence, indexed cleanup, live recovery, collectibility and combined framework
+checks remain explicit implementation obligations.
+
+No runtime successor has started. Owner authorization is required before implementing
+this packet; recurrence and later qualification gates remain active. Production
+`87f6831f`, conservative default, B closure and budgets are unchanged.
+
 ## Membership observation and fallback — reviewed design, policy selected
 
 [Read inventory, private mapping, independent review and owner selection](docs/audits/2026-10-17-incumbent-readiness/link-membership-observation-design/README.md)

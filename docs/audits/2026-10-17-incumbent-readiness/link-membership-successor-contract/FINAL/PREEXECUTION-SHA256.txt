@@ -1,0 +1,4 @@
+6dcfb29d6ea327ac59a4913e1ad25d3fe40824fc8fe53ca20b34bc0681b04997  packages/kernel/src/lib/membership-input-contract.spec.ts
+c8a0443f9ba33971ef0459a65d3106b9d19f5dcbc076770592240d9a91d67a72  packages/kernel/src/lib/possible-owner-window-contract.spec.ts
+ff125e32a692c0a88acaa02eac7256162147a7096fcc030edde86a04f28c6708  packages/kernel/src/lib/separate-boundary-contract.spec.ts
+f052ecf6a8afaf3007e538c3e70833260ee860c27f65789024373489fee2e6a7  packages/kernel/src/lib/publication-independent-isolated-omission-input.spec.ts

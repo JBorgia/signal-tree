@@ -1,0 +1,71 @@
+# Independent successor contract / prewritten-test review
+
+## Scope and disposition
+
+Read-only review against runtime `2dacae7b9e9137018d05c4e00382ac9287bc76d4` and owner AUTHORITY at `75c645eb71e4a03e5c84491ce8078debfe797e19`. Runtime was unchanged; the only later checkout additions observed were new test files. I read the governing raw authority, SPEC, the two membership/window plans and executable drafts, and the subsequently supplied separate-boundary plan/spec. No other reviewer verdicts, implementation edits, executions or models by this reviewer. The earlier omission falsifier was my work; that prior involvement is disclosed.
+
+**No unresolved contract or prewritten-oracle blocker is demonstrated in the final corrected packet for proposing one bounded implementation.** The fixed-window policy is authorized at specification level. The final correction closes per-unit authorship, entity-read boundaries and native-input window transfer without selecting arbitrary getter tracking or cross-source scalar callback handoff. Implementation still requires the owner’s separate authorization; this is not integration, activation or release approval.
+
+First review is preserved verbatim in REVIEW-FIRST.md. Initial central SPEC hash `a8d6cb9cf95a5a6e73e4282e27d600a71e22a2bf7fec50ef23e48dedb474bf49`. Reviewed corrected membership draft `f46aeef375e5a4f193b13e3edcff62ddbf4f8afa1d4689490df56fc3d5212d3e`, window draft `6c7ccb3592089f0d8fb4e25bc7f751378fcee081d86ad53122717610f92359d8`, separate-boundary draft `67cbeaee99c14287d4b59532edfe50bce5035a53f45873d55aaf8f64a4bd7966`. Review changes should preserve this first review.
+
+## 1. Possible-window transfer: initial gap, now closed
+
+SPEC's record table says native facts constrain projections containing **or consuming** them, but windows constrain “that revision and projections containing it.” The later replacement rule is not sufficient to distinguish genuine fresh literal replacement from a new value that consumes an unresolved input.
+
+Small discriminator: source ordinary x7 is authored with unobserved inputs while foreign p is pending, hence receives a possible-p window. A later qualified target declaration consumes that x through a supported native updater argument and writes a derived value. Does its resulting fact retain the input window, or can a complete independent label clear it? The window must not become a proven native p dependency merely because the input was consumed; that would manufacture a declaration contradiction from possible origin. Conversely, treating it as recipient-only uncertainty and dropping it can erase the intended conservative obligation. A fresh literal replacement that does not consume x is a different operation.
+
+The original 17 window cases did not cover this composition. Final SPEC now states the transfer rule, inherited-versus-new window distinction and conservative/unknown→started/surviving receipt mapping. The final two added cases use the existing same-leaf derive route, with the existing literal replacement case as contrast. This closes the specification/test-design gap without turning a possible owner into a known causal dependency. Their final corrected source has not been executed as part of this review.
+
+## 2. Per-unit authorship correction verified
+
+SPEC admission3 correctly rejects delivery-time owner sampling, callback replay and new public refusal policy. Its “reprepare metadata” sentence needs a precise unit boundary:
+
+- Use the existing native installation unit. An ordinary outer branch call may already have installed earlier constituents; their windows cannot be enlarged by preparation reentry for a later constituent. A selected atomic realization retains its existing selected-unit boundary.
+- Keep the updater's original supplied descriptor and returned value. Refresh only uninstalled pure metadata against the validated source/owner epochs immediately before callback-free installation.
+- Do not silently rerun callback-capable participant preparation or reclassify already-installed facts. A source-identity conflict follows the existing validation/refusal contract; a new retry/refusal semantic requires stopping.
+
+Corrected SPEC `cbb11bfad738863ae3360e7b34f70b683eb247f4b05f70c982186db211444821` now includes the unit, immutable argument/result, pure-metadata-only and nonreplayed-participant restrictions. Separate-boundary draft `ff125e32a692c0a88acaa02eac7256162147a7096fcc030edde86a04f28c6708` adds an actual membership-preparer callback opening q before installation: p confirmation must remain held, q confirmation sends, and callback count stays1. Source `registerMembershipPublication`/`setMemberPresence` supports that seam. It is valid prewritten coverage and differs from q opened after installation before delivery. Earlier-installed sibling invariance remains future coverage. None of this is a newly demonstrated runtime failure or a run by this reviewer.
+
+## 3. Entity boundary correction verified
+
+MEMBERSHIP-TEST-PLAN correctly says ordinary `rows.ids/all/count/empty/activeEntity` or held-reference reads inside an arbitrary declaration are not automatically supplied native arguments. The corrected central SPEC now explicitly retains that limitation. A native producer can describe its result, but that does not prove a later setter consumed the result or carry a hidden callback's completeness.
+
+The existing row updater really supplies a row argument (`entity-signal.ts:2975–2994`); that port can require row value/membership/lifetime certification. Direct query getters and cached projections do not become an ambient publication read port merely because a declaration is executing. Selection, sorted order, query predicates and saved results therefore need either an actual supported supplied-input route or an explicit unavailable/hidden-input classification. No fake collection callback API is justified by the inventory. Entity integration is an explicit future obligation, not coverage established by these scalar/branch tests.
+
+## Membership fixture correction verified
+
+The initial reactivation fixture left a confounding possible known p requirement on y: a live source connection existed while p's replacement explicitly supplied equal y0. `signal-tree.ts:1163` avoids the equality shortcut when publication preparation is enrolled; native preparation attributes the installed support to p. Reactivating only x cannot clear y's support, and the next whole-object input includes y.
+
+The corrected fixture explicitly independently authors y1 alongside held x7 before consumption. This isolates positive membership supersession while retaining the held identity assertion and useful target1/declared outcome. That is a justified new-fixture correction, not weakening the unchanged omission falsifier. The plan also correctly stopped calling identity-return probes necessarily nonauthoring: they may install support-only units. The own-key helper change preserves semantics while accommodating the project's existing library target. FIRST retains original source and results.
+
+## Prewritten coverage and evidence limits
+
+The drafts contain **54 membership + 19 window + 6 separate-boundary cases** after the propagation/preparation additions. The original omission2, registration3 and mixed-undo1 are inherited unchanged cases, not newly invented coverage. TESTS.md appropriately lists additional native entity, retention/work, framework, failure/reentry and internal-ticket checks as future obligations. The exact new-case count is79; adding the preserved omission2 makes81. Listing and counting cases does not establish their runtime coverage.
+
+The membership vector is useful: three real native supplied-input writers, six absence observations, enrollment variations, equal-support primed cache, undefined/presence distinction, dormant-payload exclusion and corrected same-member reactivation. It does not cover never-present keys directly, symbols/prototype boundaries, nested absent ancestor combinations, P/O cache mismatch, entity lifetime/order, or framework-native cached inputs by itself. These are not disproven by the draft, but must remain explicit planned coverage rather than be credited to 54 cases.
+
+The window vector faithfully includes fixed p/write/q capture, empty window, multiple owners, successful rejection with surviving value, restoration, inspection exclusion, replacement, qualified progress, reentry, queued/in-flight serialization and disposal. Its explicit late target-local gate preserves the authorized exception to late-foreign-owner exclusion. The raw rejection oracles agree with approved surviving-write semantics: fresh coherent O may send the same number without a new setter, but never by confirming an old proof. The unresolved destruction case asserts no false confirmation and permits disposal to end the waiter; it is not an auto-drain claim.
+
+The separate-boundary tests exercise reverse constituent order, disjoint-field callback authorship, queued stale preflight, in-flight serialization and multiple optional participant release. They preserve useful sends and current physical state. The participant test does not establish throwing preparation atomicity or deterministic prepare order; inherited refusal tests and additional before/after-native controls remain necessary. Tap callback tests do not replace native invalidation/effect or synchronous observer reentry controls. Their plan acknowledges those limits.
+
+Parent's FIRST/native.log was inspected: **40 passed / 33 failed across73**, frozen runtime, original membership54 + window17 + omission2. This is baseline evidence, not33 independent defects: three initial reactivation cases were fixture-confounded, and six new Object.hasOwn diagnostics were fixture type errors. No result from that run qualifies the corrected fixture. No baseline result permits changing inherited assertions. This reviewer ran nothing and made no implementation or activation recommendation.
+
+
+## Possible-window propagation adjudication
+
+I read raw POLICY-DECISION.md at75c645eb after the first review. Keeping an actually consumed input’s certified possible-window obligation follows the approved contributor/native-input contract; it does not require new owner policy. A known consumption edge is not proof that possible owner p actually caused the input, so it must not manufacture a contradiction. A qualified independent literal replacement can remove the overwritten value’s uncertainty if it does not consume that input; required structural support remains.
+
+Distinguish inherited and new windows. A consuming write under a qualified complete declaration retains inherited exact p, without adding later unrelated q merely because it exists now. An undeclared new derived write also captures its own authorship window, which may include q; that does not mutate the inherited p window. The governing event table requires fresh surviving-basis reevaluation after the applicable possible obligations end. Do not convert confirmation of possible owners into retroactive declared completeness.
+
+A minimal concrete oracle can use one scalar source: unobserved x7 captures p; open unrelated q; declare independently and call x(old=>old+1). It must retain inherited p without falsely throwing, remain unsent while p is pending, then reevaluate usefully despite q. The literal x8 replacement variant can establish new declared progress without consuming x7. A third undeclared updater variant must additionally capture its own q. The final two added tests now use this same-leaf input boundary and result8; the existing literal replacement case supplies the contrast. They are prewritten executable coverage, not implementation passes.
+
+
+## Final packet and remaining implementation obligations
+
+Final SPEC SHA256: `2f3b878369cd8c3ca6c46a438dd7696246818ca26b51b467e65e350aa3a71a5c`. Final membership draft: `f46aeef375e5a4f193b13e3edcff62ddbf4f8afa1d4689490df56fc3d5212d3e`; window19: `c8a0443f9ba33971ef0459a65d3106b9d19f5dcbc076770592240d9a91d67a72`; separate6: `ff125e32a692c0a88acaa02eac7256162147a7096fcc030edde86a04f28c6708`. REVIEW-FIRST.md remains unchanged.
+
+The first propagation drafts used a scalar callback’s input to write another source. Frozen scalar capture is attached to its own derive unit, unlike the branch input scope. The corrected same-leaf cases remove that additional handoff premise, retain the intended p-versus-late-q discriminator, and explicitly distinguish possible uncertainty from known pending-dependency proof. This is a justified setup/state-oracle correction, not evidence that the original early sends were safe. Parent’s raw REVISED/native.log shows46 passed/35 failed across81 for the preceding fixture version; those results remain separately preserved and do not qualify the final two corrections. No implementation changed and this reviewer ran no tests.
+
+The packet is adequate to request a **single bounded implementation under its named gates and recurrence stop**. Remaining obligations are implementation work with tests to be written before the relevant slice, not claims already established by the 81 cases: actual entity supplied-input producers and exact domain mapping; cached P/O correspondence and equal-support revision invalidation; earlier-installed-sibling windows; preparation failure before/after native participation; native invalidation/synchronous-observer chronology; ticket preflight/reverse-edge retirement; negative-domain/recovery cleanup and independent retention measurements; combined framework/types/work gates. No future producer may be credited by an unrelated getter call or by conservative refusal alone.
+
+A concrete contradiction, API/selection expansion or recurrence in an already-covered mechanism still requires the specified stop. The authorizing decision remains with the owner; a passing test-only baseline is neither required nor claimed for the intentionally rejected runtime. No broad suite, implementation execution, integration or release acceptance is supplied by this review.

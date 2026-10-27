@@ -1,0 +1,633 @@
+diff --git a/packages/kernel/src/lib/membership-input-contract.spec.ts b/packages/kernel/src/lib/membership-input-contract.spec.ts
+new file mode 100644
+index 00000000..8c56aae3
+--- /dev/null
++++ b/packages/kernel/src/lib/membership-input-contract.spec.ts
+@@ -0,0 +1,184 @@
++import { expect, it } from 'vitest';
++import { link, signalTree, transactions } from '../index';
++import { getPathNotifier } from './path-notifier';
++
++type Receipt = { read(): Readonly<{ state: string; reason?: string; basis?: string }> };
++type Experimental = ReturnType<typeof link> & {
++  declare(input: { kind: 'independent' } | { kind: 'dependent'; owners: readonly object[] }, work: () => unknown): Receipt;
++};
++type Pair = { x?: number | undefined; y: number };
++const writers = ['branch', 'root', 'updateAndReport'] as const;
++type Writer = typeof writers[number];
++const observations = ['direct', 'hasOwn', 'in', 'keys', 'entries', 'spread'] as const;
++type Observation = typeof observations[number];
++const flush = async () => {
++  getPathNotifier().flushSync();
++  for (let i = 0; i < 48; i++) await Promise.resolve();
++};
++const makeSource = (x: number | undefined) => signalTree(
++  { pair: { x, y: 0 } as Pair }, { enhancers: [transactions()] }
++);
++const hasOwn = (value: object, key: PropertyKey): boolean => Object.prototype.hasOwnProperty.call(value, key);
++const caught = (work: () => void): unknown => { try { work(); } catch (error) { return error; } return undefined; };
++const runInput = (source: ReturnType<typeof makeSource>, writer: Writer, consume: (pair: Pair) => void): void => {
++  if (writer === 'branch') source.$.pair(input => { consume(input); return input; });
++  else if (writer === 'root') source.$(input => { consume(input.pair); return input; });
++  else source.updateAndReport(input => { consume(input.pair); return {}; });
++};
++const present = (pair: Pair, observation: Observation): number => {
++  if (observation === 'direct') return pair.x === undefined ? 0 : 1;
++  if (observation === 'hasOwn') return hasOwn(pair, 'x') ? 1 : 0;
++  if (observation === 'in') return 'x' in pair ? 1 : 0;
++  if (observation === 'keys') return Object.keys(pair).includes('x') ? 1 : 0;
++  if (observation === 'entries') return Object.entries(pair).some(([key]) => key === 'x') ? 1 : 0;
++  return hasOwn({ ...pair }, 'x') ? 1 : 0;
++};
++
++for (const writer of writers)
++for (const observation of observations)
++for (const claim of ['independent', 'dependent'] as const)
++it(`supplied absence ${writer}/${observation}/${claim} retains source omission after sibling overwrite`, async () => {
++  const source = makeSource(7);
++  const target = signalTree({ value: -1 });
++  const sent: number[] = [];
++  const c = link(target.$.value, { set: value => { sent.push(value); } }) as Experimental;
++  const enrollment = observation === 'direct' || observation === 'keys' ? 'none'
++    : observation === 'hasOwn' || observation === 'entries' ? 'live' : 'disposed';
++  const p = source.transact(() => source.$.pair({ y: 0 }));
++  const passive = enrollment === 'none' ? undefined : link(source.$, { set: () => {} });
++  try {
++    source.$.pair.y(1);
++    if (enrollment === 'disposed') passive?.dispose();
++    await flush();
++    expect(source.$.pair()).toEqual({ y: 1 });
++    const before = p.inspect();
++    let receipt: Receipt | undefined;
++    const error = caught(() => {
++      receipt = c.declare(claim === 'independent' ? { kind: claim } : { kind: claim, owners: [p] }, () => {
++        runInput(source, writer, input => target.$.value(present(input, observation)));
++      });
++    });
++    await flush();
++    expect(target.$.value()).toBe(0);
++    expect(source.$.pair()).toEqual({ y: 1 });
++    expect(p.inspect()).toEqual(before);
++    expect(sent).toEqual([]);
++    if (claim === 'independent') expect(error).toMatchObject({ stage: 'after-callback', reason: 'contradiction' });
++    else {
++      expect(error).toBeUndefined();
++      expect(receipt?.read()).toMatchObject({ state: 'held', reason: 'pending-dependency' });
++      p.confirm(); await flush();
++      expect(sent).toEqual([0]);
++      expect(receipt?.read()).toMatchObject({ state: 'started', basis: 'declared' });
++      await c.settled();
++    }
++  } finally { passive?.dispose(); c.dispose(); target.destroy(); source.destroy(); }
++});
++
++for (const writer of writers)
++for (const complete of [false, true])
++it(`primed ${writer} input refreshes equal-value support while retaining absence (${complete})`, async () => {
++  const source = makeSource(7);
++  const owner = signalTree({ z: 0 }, { enhancers: [transactions()] });
++  const target = signalTree({ value: -1 });
++  const sent: number[] = [];
++  const c = link(target.$.value, { set: value => { sent.push(value); } }) as Experimental;
++  const p = source.transact(() => source.$.pair({ y: 0 }));
++  source.$.pair.y(1);
++  const sourceConnection = link(source.$.pair, { set: () => {} }) as Experimental;
++  let release: () => void = () => undefined;
++  try {
++    await flush();
++    const primedPair = source.$.pair(); source.$();
++    const q = owner.transact(() => owner.$.z(9));
++    const events: unknown[] = [];
++    release = getPathNotifier().subscribe('pair.y', value => { events.push(value); });
++    sourceConnection.declare({ kind: 'dependent', owners: [q] }, () => source.$.pair.y(1));
++    await flush();
++    expect(events).toEqual([]);
++    expect(source.$.pair()).toBe(primedPair);
++    let receipt: Receipt | undefined;
++    const error = caught(() => {
++      receipt = c.declare({ kind: 'dependent', owners: complete ? [p, q] : [p] }, () => {
++        runInput(source, writer, input => target.$.value(hasOwn(input, 'x') ? 1 : 0));
++      });
++    });
++    await flush(); expect(target.$.value()).toBe(0); expect(sent).toEqual([]);
++    if (!complete) expect(error).toMatchObject({ stage: 'after-callback', reason: 'contradiction' });
++    else {
++      expect(error).toBeUndefined(); expect(receipt?.read()).toMatchObject({ state: 'held' });
++      p.confirm(); await flush(); expect(sent).toEqual([]);
++      q.confirm(); await flush(); expect(sent).toEqual([0]);
++      expect(receipt?.read()).toMatchObject({ state: 'started', basis: 'declared' });
++      await c.settled();
++    }
++  } finally { release(); sourceConnection.dispose(); c.dispose(); target.destroy(); source.destroy(); owner.destroy(); }
++});
++
++for (const writer of writers)
++for (const omitted of [false, true])
++it(`${writer} distinguishes own undefined from pending ordinary absence (${omitted})`, async () => {
++  const source = makeSource(undefined);
++  const owner = signalTree({ z: 0 }, { enhancers: [transactions()] });
++  const target = signalTree({ value: -1 });
++  const sent: number[] = [];
++  const c = link(target.$.value, { set: value => { sent.push(value); } }) as Experimental;
++  const p = omitted ? source.transact(() => source.$.pair({ y: 0 })) : owner.transact(() => owner.$.z(9));
++  try {
++    const receipt = c.declare(omitted ? { kind: 'dependent', owners: [p] } : { kind: 'independent' }, () => {
++      runInput(source, writer, input => { expect(input.x).toBeUndefined(); target.$.value(hasOwn(input, 'x') ? 1 : 0); });
++    });
++    await flush();
++    if (omitted) {
++      expect(target.$.value()).toBe(0); expect(sent).toEqual([]);
++      expect(receipt.read()).toMatchObject({ state: 'held' });
++      p.confirm(); await flush(); expect(sent).toEqual([0]);
++    } else { expect(target.$.value()).toBe(1); expect(sent).toEqual([1]); }
++    expect(receipt.read()).toMatchObject({ state: 'started', basis: 'declared' });
++    await c.settled();
++  } finally { c.dispose(); target.destroy(); source.destroy(); owner.destroy(); }
++});
++
++for (const writer of writers)
++it(`${writer} excludes an independently masked dormant pending payload`, async () => {
++  const source = makeSource(7);
++  const target = signalTree({ value: -1 });
++  const sent: number[] = [];
++  const c = link(target.$.value, { set: value => { sent.push(value); } }) as Experimental;
++  const sourceConnection = link(source.$.pair, { set: () => {} }) as Experimental;
++  const x = source.$.pair.x;
++  if (!x) throw new Error('Seeded child unavailable');
++  const p = source.transact(() => x(77));
++  try {
++    sourceConnection.declare({ kind: 'independent' }, () => source.$.pair({ y: 0 }));
++    await flush(); expect(source.$.pair()).toEqual({ y: 0 });
++    const receipt = c.declare({ kind: 'independent' }, () => {
++      runInput(source, writer, input => target.$.value(hasOwn(input, 'x') ? 1 : 0));
++    });
++    await flush(); expect(target.$.value()).toBe(0); expect(sent).toEqual([0]);
++    expect(receipt.read()).toMatchObject({ state: 'started', basis: 'declared' });
++    expect(() => p.inspect()).not.toThrow(); await c.settled();
++  } finally { sourceConnection.dispose(); c.dispose(); target.destroy(); source.destroy(); }
++});
++
++for (const writer of writers)
++it(`${writer} observes independently reactivated same retained member`, async () => {
++  const source = makeSource(7);
++  const held = source.$.pair.x;
++  if (!held) throw new Error('Seeded child unavailable');
++  const target = signalTree({ value: -1 });
++  const sent: number[] = [];
++  const c = link(target.$.value, { set: value => { sent.push(value); } }) as Experimental;
++  const sourceConnection = link(source.$.pair, { set: () => {} }) as Experimental;
++  const p = source.transact(() => source.$.pair({ y: 0 }));
++  try {
++    sourceConnection.declare({ kind: 'independent' }, () => { held(7); source.$.pair.y(1); });
++    await flush(); expect(source.$.pair()).toEqual({ x: 7, y: 1 }); expect(source.$.pair.x).toBe(held);
++    const receipt = c.declare({ kind: 'independent' }, () => {
++      runInput(source, writer, input => target.$.value(hasOwn(input, 'x') ? 1 : 0));
++    });
++    await flush(); expect(target.$.value()).toBe(1); expect(sent).toEqual([1]);
++    expect(receipt.read()).toMatchObject({ state: 'started', basis: 'declared' });
++    expect(() => p.inspect()).not.toThrow(); await c.settled();
++  } finally { sourceConnection.dispose(); c.dispose(); target.destroy(); source.destroy(); }
++});
+diff --git a/packages/kernel/src/lib/possible-owner-window-contract.spec.ts b/packages/kernel/src/lib/possible-owner-window-contract.spec.ts
+new file mode 100644
+index 00000000..ccee2bfe
+--- /dev/null
++++ b/packages/kernel/src/lib/possible-owner-window-contract.spec.ts
+@@ -0,0 +1,276 @@
++// Prewritten specification draft. NOT EXECUTED. Intended destination:
++// packages/kernel/src/lib/possible-owner-window-contract.spec.ts
++// Owner-selected policy at readiness 75c645eb; frozen runtime 2dacae7b unchanged.
++import { describe, expect, it } from 'vitest';
++import { link, signalTree, transactions } from '../index';
++import { getPathNotifier } from './path-notifier';
++import { withWriteContext } from './write-context';
++
++type Receipt = { read(): Readonly<{ state: string; reason?: string; basis?: string }> };
++type Declaration = { kind: 'independent' | 'unknown' } | { kind: 'dependent'; owners: readonly object[] };
++type Experimental = ReturnType<typeof link> & {
++  declare(input: Declaration, work: () => unknown): Receipt;
++};
++const experimental = (connection: ReturnType<typeof link>) => connection as Experimental;
++const flush = async () => {
++  getPathNotifier().flushSync();
++  for (let i = 0; i < 48; i++) await Promise.resolve();
++};
++const make = () => signalTree({ x: 0, y: 0, z: 0 }, { enhancers: [transactions()] });
++function deferred() {
++  let resolve!: () => void;
++  const promise = new Promise<void>(done => { resolve = done; });
++  return { promise, resolve };
++}
++
++// No observed read port is implied by any of these three expressions.
++// An updater's supplied old argument does not certify its hidden closure inputs.
++describe('fixed possible-owner window at ordinary authorship', () => {
++  it.each(['literal', 'direct-copy', 'hidden-updater'] as const)(
++    '%s waits for already-pending p, not foreign q opened before delivery',
++    async mode => {
++      const source = make(); const late = make(); const target = make();
++      const sent: number[] = [];
++      const c = link(target.$.y, { set: value => { sent.push(value); } });
++      try {
++        const p = source.transact(() => source.$.x(7));
++        const pendingP = p.inspect();
++        if (mode === 'literal') target.$.y(7);
++        else if (mode === 'direct-copy') target.$.y(source.$.x());
++        else target.$.y(() => source.$.x());
++        // Deliberately no await/flush between authorship and q's admission.
++        const q = late.transact(() => late.$.x(9));
++        const pendingQ = q.inspect();
++        await flush();
++        expect(target.$.y()).toBe(7); expect(sent).toEqual([]);
++        expect(p.inspect()).toEqual(pendingP); expect(q.inspect()).toEqual(pendingQ);
++        let done = false; const wait = c.settled().then(() => { done = true; });
++        await flush(); expect(done).toBe(false);
++        p.confirm(); await flush();
++        expect(sent).toEqual([7]); expect(done).toBe(true);
++        expect(q.inspect()).toEqual(pendingQ); expect(late.$.x()).toBe(9);
++        await wait;
++      } finally { c.dispose(); target.destroy(); late.destroy(); source.destroy(); }
++    }
++  );
++
++  it('an empty authored window stays empty when foreign q opens before the queued send', async () => {
++    const late = make(); const target = make(); const sent: number[] = [];
++    const c = link(target.$.y, { set: value => { sent.push(value); } });
++    try {
++      target.$.y(7);
++      getPathNotifier().flushSync(); // Queue delivery, without starting its promise continuation.
++      const q = late.transact(() => late.$.x(9)); const pendingQ = q.inspect();
++      await flush(); expect(sent).toEqual([7]);
++      expect(q.inspect()).toEqual(pendingQ); await c.settled();
++    } finally { c.dispose(); target.destroy(); late.destroy(); }
++  });
++
++  it('waits for every captured owner, but not a subsequently opened foreign owner', async () => {
++    const a = make(); const b = make(); const late = make(); const target = make();
++    const sent: number[] = []; const c = link(target.$.y, { set: value => { sent.push(value); } });
++    try {
++      const p = a.transact(() => a.$.x(1)); const r = b.transact(() => b.$.x(2));
++      target.$.y(7);
++      const q = late.transact(() => late.$.x(9)); const pendingQ = q.inspect();
++      await flush(); expect(sent).toEqual([]);
++      p.confirm(); await flush(); expect(sent).toEqual([]);
++      r.confirm(); await flush(); expect(sent).toEqual([7]);
++      expect(q.inspect()).toEqual(pendingQ); await c.settled();
++    } finally { c.dispose(); target.destroy(); late.destroy(); b.destroy(); a.destroy(); }
++  });
++
++  it('successful foreign rejection reevaluates an ordinary copied value that survives', async () => {
++    const source = make(); const late = make(); const target = make(); const sent: number[] = [];
++    const c = link(target.$.y, { set: value => { sent.push(value); } });
++    try {
++      const p = source.transact(() => source.$.x(7));
++      target.$.y(source.$.x());
++      const q = late.transact(() => late.$.x(9)); const pendingQ = q.inspect();
++      await flush(); expect(sent).toEqual([]);
++      p.rollback(); await flush();
++      expect(source.$.x()).toBe(0); expect(target.$.y()).toBe(7);
++      expect(sent).toEqual([7]); expect(q.inspect()).toEqual(pendingQ); await c.settled();
++    } finally { c.dispose(); target.destroy(); late.destroy(); source.destroy(); }
++  });
++
++  it('rejection publishes the fresh restored aggregate, not the old speculative payload', async () => {
++    const target = make(); const sent: Array<{ x: number; y: number; z: number }> = [];
++    const c = link(target.$, { set: value => { sent.push({ ...value }); } });
++    try {
++      const p = target.transact(() => target.$.y(7));
++      target.$.z(8); // Independent surviving ordinary fact makes the final payload useful.
++      await flush(); expect(sent).toEqual([]);
++      p.rollback(); await flush();
++      expect(target.$()).toEqual({ x: 0, y: 0, z: 8 });
++      expect(sent).toEqual([{ x: 0, y: 0, z: 8 }]);
++      await c.settled();
++    } finally { c.dispose(); target.destroy(); }
++  });
++
++  it('owner settlement evaluates ordinary truth rather than an inspection overlay', async () => {
++    const source = make(); const target = make(); const sent: number[] = [];
++    const c = link(target.$.y, { set: value => { sent.push(value); } });
++    try {
++      const p = source.transact(() => source.$.x(7)); target.$.y(7);
++      withWriteContext({ participation: 'inspection' }, () => target.$.y(99));
++      await flush(); expect(target.$.y()).toBe(99); expect(sent).toEqual([]);
++      p.confirm(); await flush();
++      expect(target.$.y()).toBe(99); expect(sent).toEqual([7]); await c.settled();
++    } finally { c.dispose(); target.destroy(); source.destroy(); }
++  });
++
++  it('replacement captures its own later window instead of inheriting the old grant', async () => {
++    const source = make(); const late = make(); const target = make(); const sent: number[] = [];
++    const c = link(target.$.y, { set: value => { sent.push(value); } });
++    try {
++      const p = source.transact(() => source.$.x(1)); target.$.y(7);
++      const q = late.transact(() => late.$.x(9)); target.$.y(8);
++      await flush(); expect(sent).toEqual([]);
++      p.confirm(); await flush(); expect(sent).toEqual([]); expect(target.$.y()).toBe(8);
++      q.confirm(); await flush(); expect(sent).toEqual([8]); await c.settled();
++    } finally { c.dispose(); target.destroy(); late.destroy(); source.destroy(); }
++  });
++
++  it('a qualified independent replacement does not inherit the superseded unknown window', async () => {
++    const source = make(); const late = make(); const target = make(); const sent: number[] = [];
++    const c = experimental(link(target.$.y, { set: value => { sent.push(value); } }));
++    try {
++      const p = source.transact(() => source.$.x(1)); target.$.y(7);
++      await flush(); expect(sent).toEqual([]);
++      const q = late.transact(() => late.$.x(9));
++      const receipt = c.declare({ kind: 'independent' }, () => target.$.y(8));
++      await flush(); expect(sent).toEqual([8]);
++      expect(receipt.read()).toMatchObject({ state: 'started', basis: 'declared' });
++      const terminal = receipt.read();
++      p.confirm(); q.rollback(); await flush(); expect(sent).toEqual([8]);
++      expect(receipt.read()).toEqual(terminal); await c.settled();
++    } finally { c.dispose(); target.destroy(); late.destroy(); source.destroy(); }
++  });
++
++  it('a qualified dependent write waits only for its declared and actual inputs', async () => {
++    const source = make(); const other = make(); const target = make(); const sent: number[] = [];
++    const c = experimental(link(target.$.y, { set: value => { sent.push(value); } }));
++    try {
++      const p = source.transact(() => source.$.x(7));
++      const q = other.transact(() => other.$.x(9)); const pendingQ = q.inspect();
++      const receipt = c.declare({ kind: 'dependent', owners: [p] }, () => target.$.y(source.$.x()));
++      await flush(); expect(sent).toEqual([]); expect(receipt.read().state).toBe('held');
++      p.confirm(); await flush(); expect(sent).toEqual([7]);
++      expect(receipt.read()).toMatchObject({ state: 'started', basis: 'declared' });
++      expect(q.inspect()).toEqual(pendingQ); await c.settled();
++    } finally { c.dispose(); target.destroy(); other.destroy(); source.destroy(); }
++  });
++
++  it('endpoint reentry authors a new window without changing the old send eligibility', async () => {
++    const source = make(); const late = make(); const target = make(); const sent: number[] = [];
++    const c = link(target.$.y, { set: value => {
++      sent.push(value); if (value === 7) target.$.y(8);
++    } });
++    try {
++      const p = source.transact(() => source.$.x(1)); target.$.y(7);
++      const q = late.transact(() => late.$.x(9));
++      await flush(); expect(sent).toEqual([]);
++      p.confirm(); await flush(); expect(sent).toEqual([7]); expect(target.$.y()).toBe(8);
++      q.confirm(); await flush(); expect(sent).toEqual([7, 8]); await c.settled();
++    } finally { c.dispose(); target.destroy(); late.destroy(); source.destroy(); }
++  });
++
++  it('eligible queued work progresses after an in-flight request despite a late foreign owner', async () => {
++    const source = make(); const late = make(); const target = make(); const first = deferred();
++    const sent: number[] = []; const c = link(target.$.y, { set: value => {
++      sent.push(value); return value === 1 ? first.promise : undefined;
++    } });
++    try {
++      target.$.y(1); await flush(); expect(sent).toEqual([1]);
++      const p = source.transact(() => source.$.x(7)); target.$.y(7);
++      const q = late.transact(() => late.$.x(9)); const pendingQ = q.inspect();
++      await flush(); expect(sent).toEqual([1]);
++      p.confirm(); await flush(); expect(sent).toEqual([1]);
++      first.resolve(); await flush(); expect(sent).toEqual([1, 7]);
++      expect(q.inspect()).toEqual(pendingQ); await c.settled();
++    } finally { first.resolve(); c.dispose(); target.destroy(); late.destroy(); source.destroy(); }
++  });
++
++  it('disposing held queued work settles its waiter and prevents later delivery', async () => {
++    const source = make(); const target = make(); const sent: number[] = [];
++    const c = link(target.$.y, { set: value => { sent.push(value); } });
++    try {
++      const p = source.transact(() => source.$.x(7)); target.$.y(7); await flush();
++      let done = false; const wait = c.settled().then(() => { done = true; });
++      await flush(); expect(done).toBe(false); expect(sent).toEqual([]);
++      c.dispose(); await flush(); expect(done).toBe(true); await wait;
++      p.confirm(); await flush(); expect(sent).toEqual([]); await c.settled();
++    } finally { c.dispose(); target.destroy(); source.destroy(); }
++  });
++
++  it('disposing in-flight work settles local waiters without resurrecting its queued revision', async () => {
++    const source = make(); const target = make(); const first = deferred();
++    const sent: number[] = []; const completed: number[] = [];
++    const c = link(target.$.y, { set: async value => {
++      sent.push(value); if (value === 1) await first.promise; completed.push(value);
++    } });
++    try {
++      target.$.y(1); await flush(); expect(sent).toEqual([1]);
++      const p = source.transact(() => source.$.x(7)); target.$.y(7); await flush();
++      let done = false; const wait = c.settled().then(() => { done = true; });
++      await flush(); expect(done).toBe(false);
++      c.dispose(); await flush(); expect(done).toBe(true); expect(completed).toEqual([]); await wait;
++      p.confirm(); first.resolve(); await flush();
++      expect(sent).toEqual([1]); expect(completed).toEqual([1]); await c.settled();
++    } finally { first.resolve(); c.dispose(); target.destroy(); source.destroy(); }
++  });
++
++  it('destroying an unresolved captured source is not confirmation or successful rejection', async () => {
++    const source = make(); const target = make(); const sent: number[] = [];
++    const c = link(target.$.y, { set: value => { sent.push(value); } });
++    try {
++      source.transact(() => source.$.x(7)); target.$.y(7); await flush(); expect(sent).toEqual([]);
++      let done = false; const wait = c.settled().then(() => { done = true; });
++      source.destroy(); await flush(); expect(sent).toEqual([]); expect(done).toBe(false);
++      c.dispose(); await flush(); expect(done).toBe(true); await wait;
++    } finally { c.dispose(); target.destroy(); source.destroy(); }
++  });
++
++  it('a late target-local owner still gates ordinary delivery after the foreign window clears', async () => {
++    const source = make(); const target = make(); const sent: number[] = [];
++    const c = link(target.$.y, { set: value => { sent.push(value); } });
++    try {
++      const p = source.transact(() => source.$.x(1)); target.$.y(7);
++      const q = target.transact(() => target.$.z(9)); const pendingQ = q.inspect();
++      await flush(); expect(sent).toEqual([]);
++      p.confirm(); await flush(); expect(sent).toEqual([]); expect(q.inspect()).toEqual(pendingQ);
++      q.confirm(); await flush(); expect(sent).toEqual([7]); await c.settled();
++    } finally { c.dispose(); target.destroy(); source.destroy(); }
++  });
++});
++
++// A supplied input can carry a fixed uncertainty window without proving that it
++// actually consumed the possible owner. Consumption preserves that uncertainty.
++for (const qualified of [true, false])
++it(`native consumption preserves inherited uncertainty; new declared context=${qualified}`, async () => {
++  const owner = make(); const late = make(); const target = make();
++  const sent: number[] = [];
++  const c = experimental(link(target.$.y, { set: value => { sent.push(value); } }));
++  try {
++    const p = owner.transact(() => owner.$.x(1));
++    target.$.y(7);
++    const q = late.transact(() => late.$.x(9)); const pendingQ = q.inspect();
++    const consume = () => target.$.y(input => input + 1);
++    let receipt: Receipt | undefined;
++    if (qualified) expect(() => { receipt = c.declare({ kind: 'independent' }, consume); }).not.toThrow();
++    else consume();
++    await flush(); expect(target.$.y()).toBe(8); expect(sent).toEqual([]);
++    if (qualified) expect(receipt?.read()).toMatchObject({ state: 'conservative', reason: 'unknown' });
++    p.confirm(); await flush();
++    if (qualified) {
++      expect(sent).toEqual([8]);
++      expect(receipt?.read()).toMatchObject({ state: 'started', basis: 'surviving' });
++      expect(q.inspect()).toEqual(pendingQ);
++    } else {
++      expect(sent).toEqual([]);
++      q.confirm(); await flush(); expect(sent).toEqual([8]);
++    }
++    await c.settled();
++  } finally { c.dispose(); target.destroy(); late.destroy(); owner.destroy(); }
++});
+diff --git a/packages/kernel/src/lib/separate-boundary-contract.spec.ts b/packages/kernel/src/lib/separate-boundary-contract.spec.ts
+new file mode 100644
+index 00000000..bac5b83a
+--- /dev/null
++++ b/packages/kernel/src/lib/separate-boundary-contract.spec.ts
+@@ -0,0 +1,155 @@
++import { expect, it } from 'vitest';
++import { entityMap, link, restoration, signalTree, transactions, undoable } from '../index';
++import { getPathNotifier } from './path-notifier';
++import { registerMembershipPublication } from './internals/intrinsic-mutation';
++
++const flush = async () => { for (let i = 0; i < 48; i++) await Promise.resolve(); };
++type Row = { id: string; n: number; note: number };
++const make = () => signalTree({
++  left: entityMap<Row, string>(), right: entityMap<Row, string>(),
++}, { enhancers: [restoration()] });
++const baseline = [{ id: 'a', n: 11, note: 1 }, { id: 'b', n: 12, note: 2 }];
++const initial = async (tree: ReturnType<typeof make>) => {
++  tree.$.left.addOne({ id: 'a', n: 1, note: 0 });
++  tree.$.right.setAll(baseline.map(row => ({ ...row }))); await flush();
++};
++const author = (tree: ReturnType<typeof make>, reverse = false) => undoable(() => {
++  tree.$.left.removeOne('a');
++  if (reverse) { tree.$.right.byIdOrFail('b').n(60); tree.$.right.byIdOrFail('a').n(50); }
++  else { tree.$.right.byIdOrFail('a').n(50); tree.$.right.byIdOrFail('b').n(60); }
++});
++const expected = (n: number) => [{ id: 'a', n, note: 1 }, { id: 'b', n: 12, note: 2 }];
++
++it('mixed undo preserves newer callback row with reverse authored constituent order', async () => {
++  const tree = make(); let off: () => void = () => undefined;
++  const sent: unknown[] = [];
++  await initial(tree);
++  const c = link(tree.$.right, { set: value => { sent.push(value); } });
++  try {
++    author(tree, true); await flush(); await c.settled();
++    const observed: unknown[] = []; let armed = true;
++    off = tree.$.right.tap({ onUpdate() {
++      if (!armed) return; armed = false;
++      observed.push({ left: tree.$.left.all(), right: tree.$.right.all() });
++      tree.$.right.byIdOrFail('a').n(777);
++    } });
++    tree.undo(); await flush(); await c.settled();
++    expect(observed).toEqual([{ left: [{ id: 'a', n: 1, note: 0 }], right: baseline }]);
++    expect(tree.$.right.all()).toEqual(expected(777)); expect(sent.at(-1)).toEqual(expected(777));
++  } finally { off(); c.dispose(); tree.destroy(); }
++});
++
++it('mixed undo cannot replace a callback-authored disjoint row field with an older row image', async () => {
++  const tree = make(); let off: () => void = () => undefined;
++  const sent: unknown[] = [];
++  await initial(tree);
++  const c = link(tree.$.right, { set: value => { sent.push(value); } });
++  try {
++    author(tree); await flush(); await c.settled(); let armed = true;
++    const observed: unknown[] = [];
++    off = tree.$.right.tap({ onUpdate() {
++      if (!armed) return; armed = false; observed.push(tree.$.right.all());
++      tree.$.right.byIdOrFail('a').note(99);
++    } });
++    tree.undo(); await flush(); await c.settled();
++    const after = [{ id: 'a', n: 11, note: 99 }, { id: 'b', n: 12, note: 2 }];
++    expect(observed).toEqual([baseline]); expect(tree.$.right.all()).toEqual(after); expect(sent.at(-1)).toEqual(after);
++  } finally { off(); c.dispose(); tree.destroy(); }
++});
++
++it('queued mixed-undo delivery rechecks a newer row authored before first I/O', async () => {
++  const tree = make(); let off: () => void = () => undefined;
++  const sent: unknown[] = [];
++  await initial(tree);
++  const c = link(tree.$.right, { set: value => { sent.push(value); } });
++  try {
++    author(tree); await flush(); await c.settled(); const sentBefore = sent.length; let armed = true;
++    off = tree.$.right.tap({ onUpdate() { if (!armed) return; armed = false; tree.$.right.byIdOrFail('a').n(777); } });
++    tree.undo(); getPathNotifier().flushSync();
++    expect(armed).toBe(false); expect(sent).toHaveLength(sentBefore);
++    tree.$.right.byIdOrFail('a').n(888);
++    await flush(); await c.settled();
++    expect(tree.$.right.all()).toEqual(expected(888)); expect(sent.slice(sentBefore)).toEqual([expected(888)]);
++  } finally { off(); c.dispose(); tree.destroy(); }
++});
++
++it('in-flight forward packet is followed serially by current mixed-undo callback truth', async () => {
++  const tree = make(); let off: () => void = () => undefined;
++  const sent: unknown[] = []; let acknowledge: () => void = () => undefined;
++  const first = new Promise<void>(resolve => { acknowledge = resolve; });
++  let active = 0; let maximumActive = 0;
++  await initial(tree);
++  const c = link(tree.$.right, { set: value => {
++    sent.push(value); active++; maximumActive = Math.max(maximumActive, active);
++    if (sent.length === 1) return first.finally(() => { active--; });
++    active--;
++  } });
++  try {
++    author(tree); await flush();
++    const forward = [{ id: 'a', n: 50, note: 1 }, { id: 'b', n: 60, note: 2 }];
++    expect(sent).toEqual([forward]); let armed = true;
++    off = tree.$.right.tap({ onUpdate() { if (!armed) return; armed = false; tree.$.right.byIdOrFail('a').n(777); } });
++    tree.undo(); await flush();
++    expect(tree.$.right.all()).toEqual(expected(777)); expect(sent).toEqual([forward]);
++    acknowledge(); await flush(); await c.settled();
++    expect(sent).toEqual([forward, expected(777)]); expect(maximumActive).toBe(1); expect(active).toBe(0);
++  } finally { acknowledge(); off(); c.dispose(); tree.destroy(); }
++});
++
++it('private membership participants coexist and release independently of the native Link consumer', async () => {
++  const tree = signalTree({ a: { x: 7, y: 0 } as { x?: number; y: number } });
++  const x = tree.$.a.x; if (!x) throw new Error('Seeded child unavailable');
++  const sent: unknown[] = [];
++  const c = link(tree.$.a, { set: value => { sent.push(value); } });
++  const records = new Map<string, number>(); const prepared = { a: 0, b: 0 }; const completed = { a: 0, b: 0 };
++  let releaseA: () => void = () => undefined; let releaseB: () => void = () => undefined;
++  const participant = (label: 'a' | 'b') => registerMembershipPublication(edit => {
++    if (edit.key !== 'x') return undefined;
++    const count = ++prepared[label];
++    return { record: { writes: [{ map: records, key: label, value: count }], adds: [] }, completion: { label } };
++  }, () => { completed[label]++; });
++  try {
++    releaseA = participant('a'); releaseB = participant('b');
++    tree.$.a({ y: 0 }); await flush(); await c.settled();
++    expect(records.get('a')).toBeGreaterThan(0); expect(records.get('b')).toBeGreaterThan(0);
++    expect(completed).toEqual(prepared); expect(sent.at(-1)).toEqual({ y: 0 });
++    releaseA(); const aBefore = prepared.a; const bBefore = prepared.b;
++    x(7); await flush(); await c.settled();
++    expect(prepared.a).toBe(aBefore); expect(prepared.b).toBeGreaterThan(bBefore);
++    expect(completed).toEqual(prepared); expect(sent.at(-1)).toEqual({ x: 7, y: 0 });
++    releaseB(); const bAfter = prepared.b;
++    tree.$.a({ y: 0 }); await flush(); await c.settled();
++    expect(prepared.a).toBe(aBefore); expect(prepared.b).toBe(bAfter); expect(sent.at(-1)).toEqual({ y: 0 });
++  } finally { releaseA(); releaseB(); c.dispose(); tree.destroy(); }
++});
++
++// A pending owner introduced by callback-capable preparation exists at install;
++// it is not the later-delivery owner excluded by the fixed-window control.
++it('membership preparation reentry is included before the authored unit installs', async () => {
++  const source = signalTree({ z: 0 }, { enhancers: [transactions()] });
++  const reentrant = signalTree({ z: 0 }, { enhancers: [transactions()] });
++  const target = signalTree({ a: { x: 7, y: 0 } as { x?: number; y: number } });
++  const sent: unknown[] = [];
++  const c = link(target.$.a, { set: value => { sent.push(value); } });
++  let release: () => void = () => undefined;
++  let q: { confirm(): void; inspect(): unknown } | undefined;
++  let callbacks = 0;
++  try {
++    const p = source.transact(() => source.$.z(1));
++    release = registerMembershipPublication(edit => {
++      if (edit.key === 'x' && !edit.present) {
++        callbacks++;
++        if (!q) q = reentrant.transact(() => reentrant.$.z(9));
++      }
++      return undefined;
++    }, () => {});
++    target.$.a({ y: 0 });
++    expect(callbacks).toBe(1); expect(q).toBeDefined();
++    expect(target.$.a()).toEqual({ y: 0 });
++    await flush(); expect(sent).toEqual([]);
++    p.confirm(); await flush(); expect(sent).toEqual([]);
++    expect(() => q?.inspect()).not.toThrow();
++    q?.confirm(); await flush();
++    expect(sent).toEqual([{ y: 0 }]); await c.settled();
++  } finally { release(); c.dispose(); target.destroy(); reentrant.destroy(); source.destroy(); }
++});

@@ -1,0 +1,15 @@
+check-spec-types: 1 spec file(s) got WORSE.
+A new type error in a spec usually means the spec's premise no longer
+compiles as written — the shape that let a renamed config option pass
+silently and made an assertion vacuous.
+
+  packages/kernel/src/lib/membership-input-contract.spec.ts: 6 error(s), baseline allows 0
+
+Full tsc output:
+
+packages/kernel/src/lib/membership-input-contract.spec.ts(29,47): error TS2550: Property 'hasOwn' does not exist on type 'ObjectConstructor'. Do you need to change your target library? Try changing the 'lib' compiler option to 'es2022' or later.
+packages/kernel/src/lib/membership-input-contract.spec.ts(33,17): error TS2550: Property 'hasOwn' does not exist on type 'ObjectConstructor'. Do you need to change your target library? Try changing the 'lib' compiler option to 'es2022' or later.
+packages/kernel/src/lib/membership-input-contract.spec.ts(102,65): error TS2550: Property 'hasOwn' does not exist on type 'ObjectConstructor'. Do you need to change your target library? Try changing the 'lib' compiler option to 'es2022' or later.
+packages/kernel/src/lib/membership-input-contract.spec.ts(128,98): error TS2550: Property 'hasOwn' does not exist on type 'ObjectConstructor'. Do you need to change your target library? Try changing the 'lib' compiler option to 'es2022' or later.
+packages/kernel/src/lib/membership-input-contract.spec.ts(155,63): error TS2550: Property 'hasOwn' does not exist on type 'ObjectConstructor'. Do you need to change your target library? Try changing the 'lib' compiler option to 'es2022' or later.
+packages/kernel/src/lib/membership-input-contract.spec.ts(177,63): error TS2550: Property 'hasOwn' does not exist on type 'ObjectConstructor'. Do you need to change your target library? Try changing the 'lib' compiler option to 'es2022' or later.
