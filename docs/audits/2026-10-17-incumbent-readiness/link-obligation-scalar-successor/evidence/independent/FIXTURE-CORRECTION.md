@@ -1,0 +1,1 @@
+Added the existing private Experimental test interface and a type assertion for the experimental declare method after spec-types008 reported TS2339. Original CONFIRMED-PREREG.spec.ts and both first logs remain unchanged; all executable statements/assertions are unchanged. No runtime edits.

@@ -1,0 +1,6 @@
+6502aad6bc889649f1252c75a3dfb06551c8822d6652ff99ae456e3fe64e4d64  packages/kernel/src/lib/experimental-publication/lifecycle.ts
+d872d97d38a5ffca82f33aabf56fdb0e129d277f30fbedc6752759a8897f6a62  packages/kernel/src/lib/experimental-publication/private.ts
+250079867ec3c585e054c96adb26eb35bfb34c2ca80dc457669d4585953b07b0  packages/kernel/src/lib/publication-obligation-combination.spec.ts
+e24b6714a2a08407064c3dbb4166ba1bfd3c227d8b52baae7ee00ac1c1f2f042  packages/kernel/src/lib/native-window-preparation-audit.spec.ts
+eae5c11466234782135259651fc610042b6334fbbbaf3287fe9167027bad6d5b  packages/kernel/src/lib/publication-role-overlap-audit.spec.ts
+03dfd4c7266f84fbff3b50216d733de71b5d177473788ab29fc463a836f906e4  packages/kernel/src/lib/publication-validation-window-audit.spec.ts

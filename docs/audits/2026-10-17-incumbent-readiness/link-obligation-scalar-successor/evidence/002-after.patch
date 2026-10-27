@@ -1,0 +1,181 @@
+diff --git a/packages/kernel/src/lib/experimental-publication/lifecycle.ts b/packages/kernel/src/lib/experimental-publication/lifecycle.ts
+index 8d21a5e6..aa511f57 100644
+--- a/packages/kernel/src/lib/experimental-publication/lifecycle.ts
++++ b/packages/kernel/src/lib/experimental-publication/lifecycle.ts
+@@ -42,26 +42,55 @@ type View = {value:State};
+ type Connection={report:(error:unknown)=>void;wake:()=>void;supported:boolean;ops:Map<object,Operation>;disposed:boolean};
+ type Horizon={frames:Set<Frame>;requirements:Set<NativeRequirement>;open:number};
+ type Frame={channel:object;connection:Connection;parents:readonly Frame[];horizon:Horizon;declaredOwners?:readonly OwnerCell[];owners:OwnerCell[];unknown:boolean;invalid:boolean;view:View;last?:object;ops:Set<Operation>;installedOwners:Set<OwnerCell>};
+-export type Proof={owners:readonly OwnerCell[];possible?:readonly OwnerCell[];unknown:boolean;invalid:boolean};
++export type Proof={
++ readonly owners:readonly OwnerCell[];
++ /** D gates delivery; it is promoted to I only when a source input is consumed. */
++ readonly destination?:readonly OwnerCell[];
++ readonly input?:readonly OwnerCell[];
++ readonly validation?:readonly OwnerCell[];
++ readonly possible?:readonly OwnerCell[];
++ readonly unknown:boolean;
++ readonly invalid:boolean;
++};
++const uniqueOwners=(owners:readonly OwnerCell[]):readonly OwnerCell[]=>Object.freeze([...new Set(owners)]);
++/** Combine reasons without normalizing inherited uncertainty against actual owners. */
++export function combineProofs(parts:readonly (Readonly<Proof>|undefined)[]):Proof {
++ return {owners:uniqueOwners(parts.flatMap(p=>p?.owners??[])),
++  destination:uniqueOwners(parts.flatMap(p=>p?.destination??[])),
++  input:uniqueOwners(parts.flatMap(p=>p?.input??[])),
++  validation:uniqueOwners(parts.flatMap(p=>p?.validation??[])),
++  possible:uniqueOwners(parts.flatMap(p=>p?.possible??[])),
++  unknown:parts.some(p=>!p||p.unknown),invalid:parts.some(p=>p?.invalid===true)};
++}
+ /** Source-owned facts. Until horizon close only actual executing frames are held. */
+ export type NativeRequirement={proof?:Proof;inputs:readonly NativeRequirement[];frames:readonly Frame[];known:readonly OwnerCell[];unknown:boolean;possible:readonly OwnerCell[];captureWindow:boolean};
+ export function nativeProof(requirement: NativeRequirement): Proof {
+  const p=requirement.proof;if(p)return p;
+- const parts=[...requirement.inputs.map(nativeProof),...requirement.frames.map(effective)];
+- return {owners:[...new Set([...requirement.known,...parts.flatMap(p=>p.owners)])],possible:[...new Set([...requirement.possible,...parts.flatMap(p=>p.possible??[])])],unknown:requirement.unknown||requirement.possible.length>0||parts.some(p=>p.unknown),invalid:parts.some(p=>p.invalid)};
++ const inputs=requirement.inputs.map(nativeProof);
++ const validation=requirement.frames.map(effective);
++ // Every actual source obligation, including its destination authorship,
++ // becomes an input lower bound at this consumption boundary. W stays W.
++ const input=uniqueOwners(inputs.flatMap(p=>p.owners));
++ const declared=uniqueOwners(validation.flatMap(p=>p.owners));
++ const ownWindow=requirement.captureWindow||requirement.frames.some(frameInvalid)
++  ?requirement.possible:[];
++ return {destination:requirement.known,input,validation:declared,
++  owners:uniqueOwners([...requirement.known,...input,...declared]),
++  possible:uniqueOwners([...ownWindow,...inputs.flatMap(p=>p.possible??[])]),
++  unknown:requirement.unknown||ownWindow.length>0||inputs.some(p=>p.unknown)||validation.some(p=>p.unknown),
++  invalid:inputs.some(p=>p.invalid)||validation.some(p=>p.invalid)};
+ }
+ export function initialRequirement():NativeRequirement{return {proof:{owners:[],unknown:false,invalid:false},inputs:[],frames:[],known:[],unknown:false,possible:[],captureWindow:false};}
+ export function prepareNativeRequirement(known:readonly OwnerCell[], unknown:boolean, inputs:readonly NativeRequirement[]):{requirement:NativeRequirement;record:TerminalRecordPlan}{
+  const active=[...stack];
+- // Authentic transaction authorship already has a known owner. Possible-origin
+- // windows cover unscoped ordinary writes, not a duplicate of that owner proof.
+- const captureWindow=known.length===0&&(active.length===0||active.some(f=>f.declaredOwners===undefined));
++ // Input completeness, not destination ownership, decides whether W applies.
++ const captureWindow=active.length===0||active.some(f=>f.declaredOwners===undefined);
+  const requirement:NativeRequirement={known:Object.freeze([...known]),unknown,inputs:Object.freeze([...inputs]),frames:active,possible:[],captureWindow};
+  const evidence=nativeProof(requirement);
+  const adds:TerminalRecordPlan['adds'][number][]=[];
+  for(const frame of active){
+-  for(const owner of evidence.owners)adds.push({set:frame.installedOwners,value:owner});
+-  if(frame.declaredOwners!==undefined&&evidence.owners.some(owner=>!frame.declaredOwners!.includes(owner)))adds.push({set:invalidFrames,value:frame});
++  for(const owner of [...(evidence.input??[]),...(evidence.validation??[])])adds.push({set:frame.installedOwners,value:owner});
++  if(frame.declaredOwners!==undefined&&[...(evidence.input??[]),...(evidence.validation??[])].some(owner=>!frame.declaredOwners!.includes(owner)))adds.push({set:invalidFrames,value:frame});
+   if(evidence.unknown)adds.push({set:unknownFrames,value:frame});
+  }
+  const h=active.at(-1)?.horizon;
+@@ -70,7 +99,11 @@ export function prepareNativeRequirement(known:readonly OwnerCell[], unknown:boo
+  return {requirement,record:{writes:[],adds}};
+ }
+ export function finalizeNativeRequirement(requirement:NativeRequirement):void {
+- if(requirement.captureWindow)requirement.possible=Object.freeze([...pending]);
++ // Normalize ONLY this installation's newly acquired candidate window. An
++ // inherited W with the same identity as D/I/V remains in the input proof.
++ const actualInputs=new Set(requirement.inputs.flatMap(input=>nativeProof(input).owners));
++ const destination=new Set(requirement.known);
++ requirement.possible=Object.freeze([...pending].filter(owner=>!destination.has(owner)&&!actualInputs.has(owner)));
+  // Source inputs are immutable snapshots; only the not-yet-installed unit's own window is refreshed.
+  if(requirement.frames.length===0){requirement.proof=nativeProof(requirement);requirement.inputs=[];requirement.known=[];}
+ }
+@@ -95,7 +128,7 @@ export function registerConnection(channel:object,options:{report:(error:unknown
+  connections.set(channel,{...options,ops:new Map(),disposed:false});
+ }
+ function state(view:View,value:State):void {if(['started','superseded','disposed','no-write'].includes(view.value.state))return;view.value=Object.freeze(value);}
+-function effective(frame:Frame):Proof{const all=[...frame.parents,frame];return {owners:[...new Set(all.flatMap(frameOwners))],unknown:all.some(frameUnknown),invalid:all.some(frameInvalid)};}
++function effective(frame:Frame):Proof{const all=[...frame.parents,frame];const validation=uniqueOwners(all.flatMap(frameOwners));return {owners:validation,validation,unknown:all.some(frameUnknown),invalid:all.some(frameInvalid)};}
+ function setOperationState(op:Operation,value:State):void{for(const view of op.views)state(view,value);}
+ function refresh(op:Operation):void{
+  if(op.started)return;
+@@ -114,9 +147,11 @@ export function prepareRevision(channel:object,revision:object,known:readonly Ow
+  if(!c||c.disposed)return {writes,adds};
+  const active=[...stack];
+  const matches=active.filter(f=>f.channel===channel);
+- const required=[...new Set([...active.flatMap(frameOwners),...known])];
+- const op:Operation={native,coverageUnknown:unknown,channel,dependencies:new Set([...required,...blockers]),revision,frames:new Set(),views:new Set(),started:false,surviving:false,noopFallbacks:new Map()};
+- if(matches.length===0)op.proof={owners:Object.freeze([...known]),unknown:true,invalid:false};
++ const nativeEvidence=native?nativeProof(native):undefined;
++ // Recipient enrollment must not turn destination D into a declaration input.
++ const required=uniqueOwners([...active.flatMap(frameOwners),...(nativeEvidence?.input??[]),...(nativeEvidence?.validation??[])]);
++ const op:Operation={native,coverageUnknown:unknown,channel,dependencies:new Set([...known,...required,...(nativeEvidence?.owners??[]),...(nativeEvidence?.possible??[]),...blockers]),revision,frames:new Set(),views:new Set(),started:false,surviving:false,noopFallbacks:new Map()};
++ if(matches.length===0)op.proof={owners:Object.freeze([...known]),destination:Object.freeze([...known]),unknown:true,invalid:false};
+  writes.push({map:c.ops,key:revision,value:op});
+  for(const cell of op.dependencies)adds.push({set:cell.dependents,value:op});
+  for(const frame of active){
+@@ -185,7 +220,7 @@ function finish(h:Horizon):void{
+  }
+  for(const op of operations){
+   const proofs=[...op.frames].map(effective);if(op.native)proofs.push(nativeProof(op.native));
+-  op.proof={owners:[...new Set(proofs.flatMap(p=>p.owners))],possible:[...new Set(proofs.flatMap(p=>p.possible??[]))],unknown:op.coverageUnknown||proofs.some(p=>p.unknown),invalid:proofs.some(p=>p.invalid)};
++  op.proof={...combineProofs(proofs),unknown:op.coverageUnknown||proofs.some(p=>p.unknown)};
+   for(const cell of [...op.proof.owners,...(op.proof.possible??[])]){op.dependencies.add(cell);cell.dependents.add(op);}
+   op.frames.clear();refresh(op);wake(op.channel);
+  }
+diff --git a/packages/kernel/src/lib/experimental-publication/private.ts b/packages/kernel/src/lib/experimental-publication/private.ts
+index 991f776c..0537d602 100644
+--- a/packages/kernel/src/lib/experimental-publication/private.ts
++++ b/packages/kernel/src/lib/experimental-publication/private.ts
+@@ -19,7 +19,7 @@ type Unit={native?:lifecycle.NativeRequirement;coverageUnknown?:boolean;fact:Fac
+ type SlotTrie={children:Map<string,SlotTrie>;slots:Map<object,Slot>};
+ type FieldInfo={relative:readonly string[];address:readonly string[]};
+ type FieldTrie={children:Map<string,FieldTrie>;field?:object};
+-type Summary={owners:Map<Cell,number>;possible:Map<Cell,number>;unknown:number;invalid:number};
++type Summary={owners:Map<Cell,number>;destination:Map<Cell,number>;input:Map<Cell,number>;validation:Map<Cell,number>;possible:Map<Cell,number>;unknown:number;invalid:number};
+ type Binding={aggregate:boolean;initialized:Set<object>;valueInitialized:boolean;slotTrie:SlotTrie;fields:Map<object,FieldInfo>;fieldTrie:FieldTrie;fieldFacts:Map<object,Fact>;completedFields:Map<object,Fact>;summary:Summary;releases:(()=>void)[];owner:number;position:number;current?:Fact;valueFact:Fact;completedValueFact:Fact;valuePayload:unknown;baselineStructure:Fact;presence:Map<Slot,Presence>;completedPresence:Map<Slot,Presence>;source?:object;registry?:object;address?:readonly string[];pending:Set<Unit>;projected?:Readonly<{fact:Fact;payload:unknown}>;release?:()=>void};
+ const bindings=new Map<object,Binding>();
+ const proofs=new WeakMap<Fact,Proof>();
+@@ -38,7 +38,8 @@ export function mode(value:boolean):void{enabled=value;}
+ export function register(owner:number,_source:unknown,token:object):void{lifecycle.registerOwnerSource(owner,token);}
+ export function unregister(owner:number|undefined):void{if(owner!==undefined)lifecycle.unregisterOwnerSource(owner);}
+ export function transition(owner:number|undefined,event:{kind:string;transactionId:number}):void{if(owner!==undefined)lifecycle.ownerTransition(owner,event);}
+-const sameProof=(a:Proof|undefined,b:Proof|undefined):boolean=>!!a&&!!b&&a.unknown===b.unknown&&a.invalid===b.invalid&&a.owners.length===b.owners.length&&a.owners.every(x=>b.owners.includes(x))&&(a.possible??[]).length===(b.possible??[]).length&&(a.possible??[]).every(x=>(b.possible??[]).includes(x));
++const sameOwners=(a:readonly Cell[]|undefined,b:readonly Cell[]|undefined):boolean=>(a??[]).length===(b??[]).length&&(a??[]).every(x=>(b??[]).includes(x));
++const sameProof=(a:Proof|undefined,b:Proof|undefined):boolean=>!!a&&!!b&&a.unknown===b.unknown&&a.invalid===b.invalid&&(['owners','destination','input','validation','possible'] as const).every(role=>sameOwners(a[role],b[role]));
+ type Trie={children:Map<string,Trie>;channels:Set<object>};
+ const tries=new WeakMap<object,Trie>();
+ let indexedBindings=0;
+@@ -47,8 +48,14 @@ function removeIndex(registry:object,address:readonly string[],channel:object):v
+ function trieFor(registry:object,address:readonly string[],create:boolean):Trie|undefined{let node=tries.get(registry);if(!node&&create)tries.set(registry,node={children:new Map(),channels:new Set()});for(const key of address){let next=node?.children.get(key);if(!next&&create&&node)node.children.set(key,next={children:new Map(),channels:new Set()});node=next;}return node;}
+ function collect(node:Trie|undefined,result:object[]):void{if(!node)return;result.push(...node.channels);for(const child of node.children.values())collect(child,result);}
+ function reaches(child:object,suffix:readonly string[],source:object):boolean{let node:unknown=child;for(const key of suffix){if((typeof node!=='object'||node===null)&&typeof node!=='function')return false;const descriptor=Object.getOwnPropertyDescriptor(node,key);if(!descriptor||!('value'in descriptor))return false;node=descriptor.value;}return node===source;}
+-function combineProofs(parts:readonly (Proof|undefined)[]):Proof{return {owners:Object.freeze([...new Set(parts.flatMap(part=>part?.owners??[]))]),possible:Object.freeze([...new Set(parts.flatMap(part=>part?.possible??[]))]),unknown:parts.some(part=>!part||part.unknown),invalid:parts.some(part=>part?.invalid===true)};}
+-function adjust(summary:Summary,proof:Proof|undefined,direction:number):void{if(!proof){summary.unknown+=direction;return;}if(proof.unknown)summary.unknown+=direction;if(proof.invalid)summary.invalid+=direction;for(const owner of proof.owners){const count=(summary.owners.get(owner)??0)+direction;if(count)summary.owners.set(owner,count);else summary.owners.delete(owner);}for(const owner of proof.possible??[]){const count=(summary.possible.get(owner)??0)+direction;if(count)summary.possible.set(owner,count);else summary.possible.delete(owner);}}
++const combineProofs=lifecycle.combineProofs;
++function adjust(summary:Summary,proof:Proof|undefined,direction:number):void {
++ if(!proof){summary.unknown+=direction;return;}
++ if(proof.unknown)summary.unknown+=direction;if(proof.invalid)summary.invalid+=direction;
++ for(const role of ['owners','destination','input','validation','possible'] as const){
++  for(const owner of proof[role]??[]){const count=(summary[role].get(owner)??0)+direction;if(count)summary[role].set(owner,count);else summary[role].delete(owner);}
++ }
++}
+ function own(fact:Fact,channel:object):Proof|undefined{return ownProofs.get(fact)??lifecycle.proof(factChannels.get(fact)??channel,fact);}
+ function fieldAt(root:FieldTrie,path:readonly string[],create=false):FieldTrie|undefined{let node:FieldTrie|undefined=root;for(const key of path){let next:FieldTrie|undefined=node?.children.get(key);if(!next&&create&&node)node.children.set(key,next={children:new Map()});node=next;}return node;}
+ function fieldNodes(node:FieldTrie|undefined,out:object[]):void{if(!node)return;if(node.field)out.push(node.field);for(const child of node.children.values())fieldNodes(child,out);}
+@@ -136,7 +143,7 @@ function beginBranchInput(node:object,supplied?:unknown):object|undefined{
+  const input:BranchInput={recipients,native:Object.freeze(nativeInputs(node,supplied))};branchInputs.push(input);return input;
+ }
+ function endBranchInput(token:object):void{if(branchInputs.at(-1)!==token)throw new Error('Branch publication input scope mismatch');branchInputs.pop();}
+-function projectionSupport(b:Binding):{proof:Proof;present:boolean}{if(b.aggregate){const base:Proof={owners:Object.freeze([...b.summary.owners.keys()]),possible:Object.freeze([...b.summary.possible.keys()]),unknown:b.summary.unknown>0,invalid:b.summary.invalid>0};const parent=slotsAlong(b,b.address??[]).map(slot=>b.completedPresence.get(slot)).filter((state):state is Presence=>state!==undefined);const absent=parent.filter(state=>!state.present);return {proof:absent.length?combineProofs(absent.map(state=>ownProofs.get(state.fact)??proofs.get(state.fact))):combineProofs([base,ownProofs.get(b.baselineStructure)??proofs.get(b.baselineStructure),...parent.map(state=>ownProofs.get(state.fact)??proofs.get(state.fact))]),present:absent.length===0};}const absent=[...b.completedPresence.values()].filter(state=>!state.present);const contributing=absent.length?absent.map(state=>state.fact):[b.baselineStructure,b.completedValueFact,...[...b.completedPresence.values()].map(state=>state.fact)];return {proof:combineProofs(contributing.map(fact=>ownProofs.get(fact)??proofs.get(fact))),present:absent.length===0};}
++function projectionSupport(b:Binding):{proof:Proof;present:boolean}{if(b.aggregate){const base:Proof={owners:Object.freeze([...b.summary.owners.keys()]),destination:Object.freeze([...b.summary.destination.keys()]),input:Object.freeze([...b.summary.input.keys()]),validation:Object.freeze([...b.summary.validation.keys()]),possible:Object.freeze([...b.summary.possible.keys()]),unknown:b.summary.unknown>0,invalid:b.summary.invalid>0};const parent=slotsAlong(b,b.address??[]).map(slot=>b.completedPresence.get(slot)).filter((state):state is Presence=>state!==undefined);const absent=parent.filter(state=>!state.present);return {proof:absent.length?combineProofs(absent.map(state=>ownProofs.get(state.fact)??proofs.get(state.fact))):combineProofs([base,ownProofs.get(b.baselineStructure)??proofs.get(b.baselineStructure),...parent.map(state=>ownProofs.get(state.fact)??proofs.get(state.fact))]),present:absent.length===0};}const absent=[...b.completedPresence.values()].filter(state=>!state.present);const contributing=absent.length?absent.map(state=>state.fact):[b.baselineStructure,b.completedValueFact,...[...b.completedPresence.values()].map(state=>state.fact)];return {proof:combineProofs(contributing.map(fact=>ownProofs.get(fact)??proofs.get(fact))),present:absent.length===0};}
+ function prepareMembership(edit:MembershipPublicationEdit):PreparedPublicationUnit|undefined{
+  const meta=getActiveWriteContext();
+  const domainKey=nodeStoreOf(edit.branch)??edit.branch;
+@@ -220,7 +227,7 @@ function prepareScalar(channel:object,mutation:IntrinsicMutation<unknown>,input?
+  const ownInput=mutation.intent==='derive'?(input as {facts?:readonly Fact[]}|undefined)?.facts:undefined;
+  const scopes=branchInputs.map(scope=>scope.recipients.get(channel)??{facts:[],unknown:false});const captured=ownInput||scopes.length?Object.freeze([...new Set([...(ownInput??[]),...scopes.flatMap(scope=>scope.facts)])]):undefined;
+  const native=(nativeUnit as {requirement?:lifecycle.NativeRequirement}|undefined)?.requirement;
+- const nativeKnown=native?lifecycle.nativeProof(native).owners:known?[known]:[];
++ const nativeKnown=native?lifecycle.nativeProof(native).destination??[]:known?[known]:[];
+  const unknown=!clean&&(!valid||meta?.origin!==undefined||(mutation.intent==='derive'&&!ownInput)||scopes.some(scope=>scope.unknown));
+  const fact:Fact=Object.freeze({revision:++serial,clean,blockers:Object.freeze([]),unknown});facts.add(fact);factChannels.set(fact,channel);
+  let resolve!:()=>void;const promise=new Promise<void>(r=>{resolve=r;});
+@@ -247,7 +254,7 @@ export function bindSource(channel:object,owner:number,position:number,identity:
+   proofs.set(fact,proof);ownProofs.set(fact,proof);return fact;
+  };
+  const presence=new Map<Slot,Presence>();for(const entry of context?.presence??[])presence.set(slotFor(entry.parent,entry.key,entry.child),{present:entry.present,fact:nativeFact(nativeMembers.get(entry.child))});
+- const binding:Binding={aggregate:context?.aggregate===true,initialized:new Set(),valueInitialized:[...presence.values()].every(state=>state.present),slotTrie:{children:new Map(),slots:new Map()},fields:new Map(),fieldTrie:{children:new Map()},fieldFacts:new Map(),completedFields:new Map(),summary:{owners:new Map(),possible:new Map(),unknown:0,invalid:0},releases:[],owner,position,current:baseline,valueFact:baseline,completedValueFact:baseline,valuePayload:context?.value,baselineStructure:baseline,presence,completedPresence:new Map(presence),source,registry:context?.registry,address:context?.address,pending:new Set()};bindings.set(channel,binding);for(const slot of presence.keys())indexSlot(binding,slot);if(context)slotNode(binding,context.address,true);
++ const binding:Binding={aggregate:context?.aggregate===true,initialized:new Set(),valueInitialized:[...presence.values()].every(state=>state.present),slotTrie:{children:new Map(),slots:new Map()},fields:new Map(),fieldTrie:{children:new Map()},fieldFacts:new Map(),completedFields:new Map(),summary:{owners:new Map(),destination:new Map(),input:new Map(),validation:new Map(),possible:new Map(),unknown:0,invalid:0},releases:[],owner,position,current:baseline,valueFact:baseline,completedValueFact:baseline,valuePayload:context?.value,baselineStructure:baseline,presence,completedPresence:new Map(presence),source,registry:context?.registry,address:context?.address,pending:new Set()};bindings.set(channel,binding);for(const slot of presence.keys())indexSlot(binding,slot);if(context)slotNode(binding,context.address,true);
+  if(identity.supported&&source){
+   // Membership has native identity even when it predates every recipient.
+   // Seed only this source's retained paths; never infer from another binding.

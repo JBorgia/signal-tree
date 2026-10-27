@@ -1,0 +1,35 @@
+
+> nx run kernel:test src/lib/separate-boundary-contract.spec.ts --testNamePattern=private membership|membership preparation
+
+> node tools/run-core-vitest.mjs src/lib/separate-boundary-contract.spec.ts --testNamePattern="private membership|membership preparation"
+
+(node:96329) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:96432) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/link-obligation-scalar-successor/packages/kernel
+
+(node:96591) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ Test Files  1 passed (1)
+      Tests  2 passed | 4 skipped (6)
+   Start at  12:54:47
+   Duration  1.15s (transform 627ms, setup 0ms, import 752ms, tests 16ms, environment 260ms)
+
+
+
+
+ NX   Successfully ran target test for project kernel
+
+
+  Run duration:      1.7s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     1.7s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    1.7s

@@ -1,0 +1,12 @@
+{
+  "packages/kernel/src/lib/experimental-publication/lifecycle.ts": {
+    "base9f": "e73ecac423ca3277539a57945180e44383c597e6f8d5d25a1b5ce29a1a908325",
+    "predecessor": "e73ecac423ca3277539a57945180e44383c597e6f8d5d25a1b5ce29a1a908325",
+    "candidate": "6502aad6bc889649f1252c75a3dfb06551c8822d6652ff99ae456e3fe64e4d64"
+  },
+  "packages/kernel/src/lib/experimental-publication/private.ts": {
+    "base9f": "a244fad496606c969b6539893c7078f5aac16b48504a96dcfc319eab8d84dada",
+    "predecessor": "a244fad496606c969b6539893c7078f5aac16b48504a96dcfc319eab8d84dada",
+    "candidate": "d872d97d38a5ffca82f33aabf56fdb0e129d277f30fbedc6752759a8897f6a62"
+  }
+}

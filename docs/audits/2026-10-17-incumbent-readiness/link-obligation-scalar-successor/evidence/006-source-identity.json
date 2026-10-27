@@ -1,0 +1,8 @@
+{
+  "base": "9f819662775da6a129e4cf7699e5bc5907e5588f",
+  "files": {
+    "packages/kernel/src/lib/experimental-publication/lifecycle.ts": "6502aad6bc889649f1252c75a3dfb06551c8822d6652ff99ae456e3fe64e4d64",
+    "packages/kernel/src/lib/experimental-publication/private.ts": "d872d97d38a5ffca82f33aabf56fdb0e129d277f30fbedc6752759a8897f6a62"
+  },
+  "patch_sha256": "59e8d8e61f79df8518fc79afe5c68dad063a96f6bd2bb62721e8081dae648af9"
+}

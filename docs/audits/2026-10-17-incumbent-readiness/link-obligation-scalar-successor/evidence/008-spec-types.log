@@ -1,0 +1,11 @@
+check-spec-types: 1 spec file(s) got WORSE.
+A new type error in a spec usually means the spec's premise no longer
+compiles as written — the shape that let a renamed config option pass
+silently and made an assertion vacuous.
+
+  packages/kernel/src/lib/publication-confirmed-input-independent.spec.ts: 2 error(s), baseline allows 0
+
+Full tsc output:
+
+packages/kernel/src/lib/publication-confirmed-input-independent.spec.ts(13,35): error TS2339: Property 'declare' does not exist on type 'Link'.
+packages/kernel/src/lib/publication-confirmed-input-independent.spec.ts(14,25): error TS2339: Property 'declare' does not exist on type 'Link'.

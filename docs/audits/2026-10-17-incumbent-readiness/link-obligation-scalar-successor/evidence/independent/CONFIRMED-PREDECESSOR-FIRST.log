@@ -1,0 +1,66 @@
+
+> nx run kernel:test --testFile=src/lib/publication-confirmed-input-independent.spec.ts
+
+> node tools/run-core-vitest.mjs --testFile=src/lib/publication-confirmed-input-independent.spec.ts
+
+(node:19462) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:19469) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/link-evidence-combination-review/packages/kernel
+
+(node:19479) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ❯ src/lib/publication-confirmed-input-independent.spec.ts (2 tests | 2 failed) 23ms
+   × confirmed destination proof is settled native input: scalar 17ms
+   × confirmed destination proof is settled native input: branch 5ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/lib/publication-confirmed-input-independent.spec.ts > confirmed destination proof is settled native input: scalar
+ FAIL  src/lib/publication-confirmed-input-independent.spec.ts > confirmed destination proof is settled native input: branch
+AssertionError: expected [Function] to not throw an error but 'Error: Declaration invalid: contradic…' was thrown
+
+- Expected:
+undefined
+
++ Received:
+"Error: Declaration invalid: contradiction; writes may remain"
+
+ ❯ src/lib/publication-confirmed-input-independent.spec.ts:14:67
+     12|   const work=()=>{if(route==='scalar')source.$.x(v=>v+1);else source.u…
+     13|   let receipt:ReturnType<typeof c.declare>|undefined;
+     14|   expect(()=>{receipt=c.declare({kind:'independent'},work);}).not.toTh…
+       |                                                                   ^
+     15|   await flush();expect((route==='scalar'?source:target).$.x()).toBe(8)…
+     16|   expect(receipt?.read()).toMatchObject({state:'started',basis:'declar…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  2 failed (2)
+   Start at  12:57:55
+   Duration  2.95s (transform 1.28s, setup 0ms, import 1.56s, tests 23ms, environment 1.03s)
+
+Warning: command "node tools/run-core-vitest.mjs --testFile=src/lib/publication-confirmed-input-independent.spec.ts" exited with non-zero status code
+
+
+ NX   Running target test for project kernel failed
+
+Failed tasks:
+
+- kernel:test
+
+Hint: run the command with --verbose for more details.
+
+  Run duration:      3.9s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     3.9s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    3.9s

@@ -84,6 +84,30 @@ two fixture accesses. No full qualification, artifact or cost acceptance follows
 Production `87f6831f`, the conservative default, budgets and B closure remain
 unchanged.
 
+## Scalar obligation successor — qualification withheld
+
+[Implementation, independent review and exact replay](docs/audits/2026-10-17-incumbent-readiness/link-obligation-scalar-successor/README.md)
+freeze isolated `440ead9f1b4d45c63f7ec8cbf50fc15944f101b2`, based on test-only
+`9f819662`. The two-file role correction passes the original14 discriminators
+and same-identity/preparation controls. Combined scalar execution:211 pass and
+two preserved historical oracle failures; separate registration2 and corrected
+validation-window1 pass. Source types retain11 existing diagnostics; spec-types
+passes its unchanged ratchet after a type-only review-fixture correction.
+
+Independent review adds two concrete confirmed-input failures: after p confirms,
+an independent native updater still treats p as an omitted unresolved input and
+throws. Both candidate and predecessor reproduce them; this is an inherited
+contract gap, not an introduced regression. Later useful-delivery assertions in
+those tests were not reached. Original first failures and the invalid nested-
+transaction fixture are preserved with their distinct dispositions.
+
+The pending-owner safety/progress gains remain bounded evidence. The scalar gate
+is not complete; entity integration and broader qualification remain stopped.
+No additional runtime repair was applied after this finding. Production
+`87f6831f`, conservative hold, budgets and B closure are unchanged. The next
+mechanism must handle successful discharge consistently at native consumption
+and admission without erasing rejection, inherited uncertainty or validation.
+
 ## Publication obligation combination — reviewed rule, runtime remains rejected
 
 [Scalar rule, unchanged discriminators and independent review](docs/audits/2026-10-17-incumbent-readiness/link-evidence-combination-review/README.md)
