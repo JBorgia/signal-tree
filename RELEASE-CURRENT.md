@@ -84,6 +84,19 @@ two fixture accesses. No full qualification, artifact or cost acceptance follows
 Production `87f6831f`, the conservative default, budgets and B closure remain
 unchanged.
 
+## Authorized production route — execution started
+
+The owner approved the [full production-route proposal](docs/audits/2026-10-17-incumbent-readiness/production-route/AUTHORITY.md)
+on October29. Continue in dependency order without routine check-ins: complete
+and independently review collection binding; qualify one bounded successor;
+exercise public installed-package workflows; then freeze and run full verification
+and matched costs. Pilot/release authority remains separate.
+
+The collection recurrence stop below stays active during design review. Runtime
+75416029 is frozen. Parallel application/HTTP fixture preparation does not qualify
+that runtime or close publication, selected-inverse, input-view or retirement gates.
+Production87f6831f, existing budgets and B closure remain unchanged.
+
 ## Collection path — covered recurrence; runtime successor stopped
 
 [Coverage adjudication, independent reviews and prewritten outcomes](docs/audits/2026-10-17-incumbent-readiness/link-collection-coverage-review/README.md)
