@@ -1,0 +1,947 @@
+diff --git a/packages/kernel/src/lib/entity-signal.ts b/packages/kernel/src/lib/entity-signal.ts
+index fe68facd..6a50f496 100644
+--- a/packages/kernel/src/lib/entity-signal.ts
++++ b/packages/kernel/src/lib/entity-signal.ts
+@@ -1,3 +1,4 @@
++import type { EntityProjectionSeedEntry } from './internals/entity-projection-seed';
+ import { EntityPublicationSource, markEntityPublicationFacts, entityPublicationFactsUnit, defineEntityPublicationBinding, currentEntityPublicationInputs, withEntityPublicationInput, withEntityPublicationUnit, type EntityPublicationEdit, type EntityPublicationStep } from './internals/entity-publication';
+ import { createPreparedPlacementVisibility } from './physical/prepared-placement-visibility';
+ import { withSelectedEntityDisposition } from './internals/selected-entity-disposition';
+@@ -1178,6 +1179,7 @@ export function createEntitySignal<
+         ? undefined
+         : structuralStore.subjectIdForKey(tailKey);
+     const changeIndexByMutation = new Map<unknown, number>();
++    const physicalValuesByStep=new Map<number,EntityValueTransition<E>>();
+     for (const m of frame.mutations) {
+       changeIndexByMutation.set(m, changes.length);
+       const key =
+@@ -1186,6 +1188,7 @@ export function createEntitySignal<
+       const path = `${basePath}.${String(key)}`;
+       if (m.kind === 'replace-value') {
+         const transition = valueTransitions.get(m)!;
++        physicalValuesByStep.set(changes.length,transition);
+         changes.push({
+           subject: m.subjectId,
+           before: transition.ordinaryBefore,
+@@ -1318,7 +1321,7 @@ export function createEntitySignal<
+     if (structuralFrontier)
+       structuralFrontier.after = topologyUnit.physical.after;
+     const publication=prepareEntityPublication(
+-      changes.map(change=>({...change,fields:change.structural?null:publicationFields(change.before,change.after),structural:change.structuralRecord})),
++      changes.map((change,ordinal)=>{const physical=physicalValuesByStep.get(ordinal);return {...change,before:physical?physical.physicalBefore:change.before,after:physical?physical.physicalAfter:change.after,fields:change.structural?null:publicationFields(physical?physical.physicalBefore:change.before,physical?physical.physicalAfter:change.after),structural:change.structuralRecord};}),
+       ordinaryPlan.changes.map(change=>({...change,fields:change.structural?null:publicationFields(change.before,change.after),structural:change.structuralRecord})),
+       frame.orderEndpoints?.after,ordinaryPlan.ordinaryEndpoints?.after,false,
+       changes.map((change, ordinal) => ({
+@@ -1326,7 +1329,15 @@ export function createEntitySignal<
+         authoredRemoval: options?.publication !== 'physical' && change.structuralRecord?.kind === 'remove'
+           ? {...change, fields:null, structural:change.structuralRecord} : undefined,
+         ordinary: (ordinaryPlan.byStep[ordinal] ?? []).map(effect => ({...effect,fields:effect.structural?null:publicationFields(effect.before,effect.after),structural:effect.structuralRecord})),
+-      }))
++      })),
++      entityPublication.requestsSeed()?(()=>{
++        const fresh=new Map(frame.mutations.flatMap(mutation=>mutation.kind==='create-fresh-subject'?[[mutation.subjectId,mutation.nextValue] as const]:[]));
++        return physicalPlacement.snapshot().map(subjectId=>{
++          const placement=physicalPlacement.read(subjectId);if(!placement.present)throw new Error('Prepared acquisition seed is absent');
++          const row=valueResults.get(subjectId)?.physicalAfter??fresh.get(subjectId)??valueStore.backingForSubject(subjectId);
++          return {subjectId,key:placement.key,row};
++        });
++      })():undefined
+     );
+     if(publication.unit){
+       markEntityPublicationFacts(ordinaryPlan.changes,publication.id);
+@@ -2029,9 +2040,9 @@ export function createEntitySignal<
+     const b=after && typeof after==='object'?after as Record<string,unknown>:{};
+     return Object.freeze([...new Set([...Object.keys(a),...Object.keys(b)])].filter(key=>Object.prototype.hasOwnProperty.call(a,key)!==Object.prototype.hasOwnProperty.call(b,key)||!Object.is(a[key],b[key])));
+   }
+-  function prepareEntityPublication(physical: readonly EntityPublicationEdit[], ordinary: readonly EntityPublicationEdit[], physicalOrder?: readonly number[], ordinaryOrder?: readonly number[], point=false, steps?: readonly EntityPublicationStep[]) {
++  function prepareEntityPublication(physical: readonly EntityPublicationEdit[], ordinary: readonly EntityPublicationEdit[], physicalOrder?: readonly number[], ordinaryOrder?: readonly number[], point=false, steps?: readonly EntityPublicationStep[],seed?:readonly EntityProjectionSeedEntry<K,E|undefined>[]) {
+     const id=Object.freeze({});
+-    const unit=(point?entityPublication.preparePoint.bind(entityPublication):entityPublication.prepare.bind(entityPublication))({id,owner:ownerId??-1,meta:ambientMeta(),physical,steps:ambientMeta()?.participation==='inspection'?undefined:steps,ordinary:ambientMeta()?.participation==='inspection'?[]:ordinary,physicalOrder,ordinaryOrder:ambientMeta()?.participation==='inspection'?undefined:ordinaryOrder,inputs:currentEntityPublicationInputs()});
++    const unit=(point?entityPublication.preparePoint.bind(entityPublication):entityPublication.prepare.bind(entityPublication))({id,owner:ownerId??-1,meta:ambientMeta(),seed,physical,steps:ambientMeta()?.participation==='inspection'?undefined:steps?.map(step=>({...step,physical:step.physical??physical.slice(step.ordinal,step.ordinal+1)})),ordinary:ambientMeta()?.participation==='inspection'?[]:ordinary,physicalOrder,ordinaryOrder:ambientMeta()?.participation==='inspection'?undefined:ordinaryOrder,inputs:currentEntityPublicationInputs()});
+     return {id,unit};
+   }
+   function commitExistingSubjectValue(
+diff --git a/packages/kernel/src/lib/experimental-publication/entity.ts b/packages/kernel/src/lib/experimental-publication/entity.ts
+index afd2753d..8503fef5 100644
+--- a/packages/kernel/src/lib/experimental-publication/entity.ts
++++ b/packages/kernel/src/lib/experimental-publication/entity.ts
+@@ -1,13 +1,15 @@
+ import { getActiveWriteContext } from '../write-context';
+ import { combineTerminalRecords, type TerminalRecordPlan } from '../internals/intrinsic-mutation';
+-import { entityPublicationOrdinary, currentEntityPublicationInputs, registerEntityPublicationFactory } from '../internals/entity-publication';
++import { entityPublicationOrdinary, currentEntityPublicationInputs, registerEntityPublicationFactory, type EntityPublicationEvidence, type EntityPublicationEdit } from '../internals/entity-publication';
+ import * as lifecycle from './lifecycle';
+ import { currentNativePublicationInputs } from './private';
+ 
+ type Requirement = lifecycle.NativeRequirement;
++type Lookup<V>=Pick<ReadonlyMap<number,V>,'get'>;
++const overlay=<V>(base:Lookup<V>,next:Lookup<V>,removed?:ReadonlySet<number>):Lookup<V>=>({get:key=>next.get(key)??(removed?.has(key)?undefined:base.get(key))});
+ type View = {requirement:Requirement; present?:boolean};
+ type Member = {readonly present:boolean;readonly requirement:Requirement};
+-const unavailable = ():Requirement=>({proof:{owners:[],unknown:true,invalid:false},inputs:[],frames:[],known:[],unknown:true,possible:[],captureWindow:false});
++const unavailable = lifecycle.unavailableRequirement;
+ const own = (row:unknown,key:string):boolean=>row!==null&&typeof row==='object'&&Object.prototype.hasOwnProperty.call(row,key);
+ const fieldValue = (row:unknown,key:string):unknown=>own(row,key)?(row as Record<string,unknown>)[key]:undefined;
+ 
+@@ -19,6 +21,15 @@ registerEntityPublicationFactory(() => {
+   const views=new Map<number,Map<string,View>>();
+   const visible=new Map<number,View>();
+   const placementViews=new Map<number,View>();
++  const mappings=new Map<number,Requirement>();
++  const mappingViews=new Map<number,View>();
++  const missing=unavailable();
++  const evidence=(ordinaryFields:Lookup<Map<string,Requirement>>=fields,physicalFields:Lookup<Map<string,View>>=views,ordinaryMembers:Lookup<Member>=members,physicalMembers:Lookup<View>=visible,ordinaryPlacements:Lookup<Requirement>=placements,physicalPlacements:Lookup<View>=placementViews,ordinaryMappings:Lookup<Requirement>=mappings,physicalMappings:Lookup<View>=mappingViews):EntityPublicationEvidence=>({
++    member:(id,view)=>view==='ordinary'?ordinaryMembers.get(id)?.requirement??missing:physicalMembers.get(id)?.requirement??missing,
++    field:(id,key,view)=>view==='ordinary'?ordinaryFields.get(id)?.get(key)??missing:physicalFields.get(id)?.get(key)?.requirement??missing,
++    placement:(id,view)=>view==='ordinary'?ordinaryPlacements.get(id)??missing:physicalPlacements.get(id)?.requirement??missing,
++    keyMapping:(id,view)=>view==='ordinary'?ordinaryMappings.get(id)??missing:physicalMappings.get(id)?.requirement??missing,
++  });
+   let acquisitions=0,retirements=0,inputVisits=0;
+   const physicalViews=(subject?:number,field?:string):View[]=>{
+     if(subject!==undefined){
+@@ -34,6 +45,12 @@ registerEntityPublicationFactory(() => {
+   };
+   return {
+     captureViews:physicalViews,
++    evidence:()=>({...evidence(),exclusions:()=>{
++      const result=new Map<number,object>();
++      for(const [id,member]of members)if(!member.present)result.set(id,member.requirement);
++      for(const [id,view]of visible)if(view.present===false)result.set(id,view.requirement);
++      return [...result];
++    }}),
+     captureInput(subject,field){return {native:Object.freeze([...new Set(physicalViews(subject,field).map(view=>view.requirement))].map(lifecycle.captureNativeInput))};},
+     inspect(){return {rows:fields.size,fields:[...fields.values()].reduce((n,row)=>n+row.size,0),presence:members.size,negativePresence:[...members.values()].filter(member=>!member.present).length,placements:placements.size,viewRows:views.size,viewFields:[...views.values()].reduce((n,row)=>n+row.size,0),negativeViewFields:[...views.values()].reduce((n,row)=>n+[...row.values()].filter(view=>view.present===false).length,0),visible:visible.size,negativeVisible:[...visible.values()].filter(view=>view.present===false).length,placementViews:placementViews.size,preparedFieldEdits:acquisitions,retireCalls:retirements,inputFactVisits:inputVisits};},
+     prepare(packet){
+@@ -51,22 +68,36 @@ registerEntityPublicationFactory(() => {
+       const nextMembers=new Map<number,Member>();
+       const nextPlacements=new Map<number,Requirement>();
+       const removed=new Set<number>();
++      const nextMappings=new Map<number,Requirement>(),nextMappingViews=new Map<number,View>();
++      const physicalMembers=new Map<number,View>(),physicalPlacements=new Map<number,View>();
++      const paired=new Map<EntityPublicationEdit,EntityPublicationEdit>();
++      for(const step of packet.steps??[]) for(const edit of [...step.ordinary,...(step.authoredRemoval?[step.authoredRemoval]:[])]) {
++        const physical=step.physical?.find(value=>value.subject===edit.subject);
++        if(physical)paired.set(edit,physical);
++      }
++      // Packets with no explicit steps are one point unit, never a flattened multi-step unit.
++      if(!packet.steps)for(const edit of packet.ordinary){const physical=packet.physical.find(value=>value.subject===edit.subject);if(physical)paired.set(edit,physical);}
++      const physicalAt=new Map<EntityPublicationEdit,Map<string,View>>();
++      const selectedAt=new Map<EntityPublicationEdit,EntityPublicationEvidence>();
+       const rowFields=(id:number):Map<string,Requirement>=>{let row=nextFields.get(id);if(!row)nextFields.set(id,row=new Map(fields.get(id)));return row;};
+       const rowViews=(id:number):Map<string,View>=>{let row=nextViews.get(id);if(!row)nextViews.set(id,row=new Map(views.get(id)));return row;};
+       // Physical support is distinct from ordinary eligibility. Inspection
+       // changes only the physical certificate, including negative membership.
+       for(const edit of packet.physical){
+         if(edit.structural?.kind==='remove'){
++          physicalMembers.set(edit.subject,{requirement,present:false});
+           writes.push({map:visible,key:edit.subject,value:{requirement,present:false}});
+           deletes.push({map:placementViews,key:edit.subject});continue;
+         }
+-        if(edit.structural?.kind==='rekey')continue;
++        if(edit.structural?.kind==='rekey'){nextMappingViews.set(edit.subject,{requirement});continue;}
+         const row=rowViews(edit.subject);
+         const keys=edit.fields===null?[...new Set([...row.keys(),...Object.keys(edit.after??{})])]:edit.fields;
+         for(const key of keys)row.set(key,{requirement,present:own(edit.after,key)});
++        physicalAt.set(edit,new Map(row));
++        if(edit.structural?.kind==='add'){nextMappingViews.set(edit.subject,{requirement});physicalMembers.set(edit.subject,{requirement,present:true});physicalPlacements.set(edit.subject,{requirement});}
+         if(edit.structural?.kind==='add')writes.push({map:visible,key:edit.subject,value:{requirement,present:true}},{map:placementViews,key:edit.subject,value:{requirement}});
+       }
+-      if(packet.physicalOrder)for(const subject of packet.physicalOrder)writes.push({map:placementViews,key:subject,value:{requirement}});
++      if(packet.physicalOrder)for(const subject of packet.physicalOrder){physicalPlacements.set(subject,{requirement});writes.push({map:placementViews,key:subject,value:{requirement}});}
+       for(const edit of entityPublicationOrdinary(packet)){
+         if(edit.structural?.kind==='remove'){
+           removed.add(edit.subject);nextFields.delete(edit.subject);nextViews.delete(edit.subject);
+@@ -74,15 +105,15 @@ registerEntityPublicationFactory(() => {
+           writes.push({map:visible,key:edit.subject,value:{requirement,present:false}});
+           deletes.push({map:fields,key:edit.subject},{map:views,key:edit.subject},{map:placements,key:edit.subject},{map:placementViews,key:edit.subject});continue;
+         }
+-        if(edit.structural?.kind==='rekey')continue;
++        if(edit.structural?.kind==='rekey'){nextMappings.set(edit.subject,requirement);continue;}
+         removed.delete(edit.subject);
+         const row=rowFields(edit.subject),view=rowViews(edit.subject);
+         if(edit.structural?.kind==='add'){
+-          nextMembers.set(edit.subject,{present:true,requirement});nextPlacements.set(edit.subject,requirement);
++          nextMembers.set(edit.subject,{present:true,requirement});nextPlacements.set(edit.subject,requirement);nextMappings.set(edit.subject,requirement);
+           writes.push({map:visible,key:edit.subject,value:{requirement,present:true}},{map:placementViews,key:edit.subject,value:{requirement}});
+         }
+         const keys=edit.fields===null?[...new Set([...row.keys(),...Object.keys(edit.after??{})])]:edit.fields;
+-        const physical=packet.physical.find(change=>change.subject===edit.subject);
++        const physical=paired.get(edit);
+         for(const key of keys){
+           row.set(key,requirement);
+           const previous=views.get(edit.subject)?.get(key);
+@@ -93,12 +124,25 @@ registerEntityPublicationFactory(() => {
+           }else view.set(key,{requirement,present:own(physical?.after??edit.after,key)});
+           acquisitions++;
+         }
++        const ordinaryRow=new Map(row),physicalRow=new Map(physical&&physicalAt.get(physical)||view);
++        const member=nextMembers.get(edit.subject)??members.get(edit.subject),placement=nextPlacements.get(edit.subject)??placements.get(edit.subject);
++        const ordinaryKey=nextMappings.get(edit.subject)??mappings.get(edit.subject)??missing,physicalKey=nextMappingViews.get(edit.subject)?.requirement??mappingViews.get(edit.subject)?.requirement??missing;
++        selectedAt.set(edit,{
++          member:(id,kind)=>id===edit.subject&&kind==='ordinary'?(member?.requirement??missing):evidence().member(id,kind),
++          field:(id,key,kind)=>id===edit.subject?(kind==='ordinary'?ordinaryRow.get(key)??missing:physicalRow.get(key)?.requirement??missing):evidence().field(id,key,kind),
++          placement:(id,kind)=>id===edit.subject&&kind==='ordinary'?(placement??missing):evidence().placement(id,kind),
++          keyMapping:(id,kind)=>id===edit.subject?(kind==='ordinary'?ordinaryKey:physicalKey):evidence().keyMapping(id,kind),
++        });
+       }
+       if(packet.ordinaryOrder)for(const subject of packet.ordinaryOrder)nextPlacements.set(subject,requirement);
+       for(const [key,value]of nextFields)if(!removed.has(key))writes.push({map:fields,key,value});
+       for(const [key,value]of nextViews)if(!removed.has(key))writes.push({map:views,key,value});
+       for(const [key,value]of nextMembers)writes.push({map:members,key,value});
+       for(const [key,value]of nextPlacements)writes.push({map:placements,key,value});
++      for(const [key,value]of nextMappings)if(value!==mappings.get(key))writes.push({map:mappings,key,value});
++      for(const [key,value]of nextMappingViews)if(value!==mappingViews.get(key))writes.push({map:mappingViews,key,value});
++      const selected=evidence(overlay(fields,nextFields,removed),overlay(views,nextViews,removed),overlay(members,nextMembers),overlay(visible,physicalMembers),overlay(placements,nextPlacements,removed),overlay(placementViews,physicalPlacements,removed),overlay(mappings,nextMappings),overlay(mappingViews,nextMappingViews));
++      selected.forEdit=edit=>selectedAt.get(edit)??selected;
+       const support=(subject?:number,field?:string):Requirement=>{
+         const sources:Requirement[]=[];
+         const selected=subject===undefined?[...new Set([...members.keys(),...fields.keys(),...entityPublicationOrdinary(packet).map(edit=>edit.subject)])]:[subject];
+@@ -113,7 +157,7 @@ registerEntityPublicationFactory(() => {
+         // Transport D/I/W unchanged; actual native consumption alone maps D→I.
+         return {get proof(){return lifecycle.combineProofs(sources.map(lifecycle.nativeProof));},known:[],unknown:false,possible:[],captureWindow:false,frames:[],inputs:[]};
+       };
+-      return {record:combineTerminalRecords(prepared?.record,{writes,deletes,adds:[]})!,completion:inspection?{}:{requirement,support},finalize:prepared?()=>lifecycle.finalizeNativeRequirement(requirement):undefined};
++      return {record:combineTerminalRecords(prepared?.record,{writes,deletes,adds:[]})!,completion:inspection?{}:{requirement,support,facts:selected},finalize:prepared?()=>lifecycle.finalizeNativeRequirement(requirement):undefined};
+     },
+     complete(){},
+     retire(subject){fields.delete(subject);members.delete(subject);placements.delete(subject);views.delete(subject);visible.delete(subject);placementViews.delete(subject);retirements++;},
+diff --git a/packages/kernel/src/lib/experimental-publication/lifecycle.ts b/packages/kernel/src/lib/experimental-publication/lifecycle.ts
+index 42d9c838..72346249 100644
+--- a/packages/kernel/src/lib/experimental-publication/lifecycle.ts
++++ b/packages/kernel/src/lib/experimental-publication/lifecycle.ts
+@@ -49,6 +49,12 @@ export type Proof={
+  readonly input?:readonly OwnerCell[];
+  readonly validation?:readonly OwnerCell[];
+  readonly possible?:readonly OwnerCell[];
++ /** Terminal role bits preserve rejected obligations without fake owner identities. */
++ readonly terminalRejectedRoles?:number;
++ /** Missing evidence for this exact input; consuming it acquires a new window. */
++ readonly unavailableInput?:boolean;
++ /** A fixed authorship window existed; terminal cleanup must not rebase it. */
++ readonly historicalWindow?:boolean;
+  readonly unknown:boolean;
+  readonly invalid:boolean;
+ };
+@@ -60,16 +66,20 @@ export function combineProofs(parts:readonly (Readonly<Proof>|undefined)[]):Proo
+   input:uniqueOwners(parts.flatMap(p=>p?.input??[])),
+   validation:uniqueOwners(parts.flatMap(p=>p?.validation??[])),
+   possible:uniqueOwners(parts.flatMap(p=>p?.possible??[])),
++  terminalRejectedRoles:parts.reduce((bits,p)=>bits|(p?.terminalRejectedRoles??0),0),
++  unavailableInput:parts.some(p=>p?.unavailableInput===true),
++  historicalWindow:parts.some(p=>p?.historicalWindow===true),
+   unknown:parts.some(p=>!p||p.unknown),invalid:parts.some(p=>p?.invalid===true)};
+ }
+ /** Source-owned facts. Until horizon close only actual executing frames are held. */
+-export type NativeInput={readonly requirement:NativeRequirement;readonly owners:readonly OwnerCell[]};
++export type NativeInput={readonly requirement:NativeRequirement;readonly owners:readonly OwnerCell[];readonly terminalRejectedRoles?:number};
+ export type NativeRequirement={proof?:Proof;inputs:readonly NativeInput[];frames:readonly Frame[];known:readonly OwnerCell[];unknown:boolean;possible:readonly OwnerCell[];captureWindow:boolean};
+ /** Capture before user code: later confirmation cannot rewrite consumed input.
+  * Keep the source requirement for uncertainty and unfinished validation; only
+  * already-confirmed actual owners are discharged from this new consumption. */
+ export function captureNativeInput(requirement:NativeRequirement):NativeInput {
+- return Object.freeze({requirement,owners:Object.freeze(nativeProof(requirement).owners.filter(owner=>owner.outcome!=='confirmed'))});
++ const proof=nativeProof(requirement);
++ return Object.freeze({requirement,owners:Object.freeze(proof.owners.filter(owner=>owner.outcome!=='confirmed')),terminalRejectedRoles:proof.terminalRejectedRoles??0});
+ }
+ export function nativeProof(requirement: NativeRequirement): Proof {
+  const p=requirement.proof;if(p)return p;
+@@ -84,20 +94,30 @@ export function nativeProof(requirement: NativeRequirement): Proof {
+  return {destination:requirement.known,input,validation:declared,
+   owners:uniqueOwners([...requirement.known,...input,...declared]),
+   possible:uniqueOwners([...ownWindow,...inputs.flatMap(p=>p.possible??[])]),
++  // Authorship consumes unavailable input into this installation's fixed W.
++  // Selecting/combining a contributor does not pass through this boundary.
++  terminalRejectedRoles:requirement.inputs.some(input=>(input.terminalRejectedRoles??0)!==0)?2:0,
++  unavailableInput:false,
++  historicalWindow:requirement.captureWindow||inputs.some(p=>p.historicalWindow===true),
+   unknown:requirement.unknown||ownWindow.length>0||inputs.some(p=>p.unknown)||validation.some(p=>p.unknown),
+   invalid:inputs.some(p=>p.invalid)||validation.some(p=>p.invalid)};
+ }
+ export function initialRequirement():NativeRequirement{return {proof:{owners:[],unknown:false,invalid:false},inputs:[],frames:[],known:[],unknown:false,possible:[],captureWindow:false};}
++/** An exact physical input whose ordinary authorship cannot be certified. */
++export function unavailableRequirement():NativeRequirement {
++ return {proof:{owners:[],unknown:true,invalid:false,unavailableInput:true},inputs:[],frames:[],known:[],unknown:true,possible:[],captureWindow:false};
++}
+ export function prepareNativeRequirement(known:readonly OwnerCell[], unknown:boolean, inputs:readonly NativeInput[]):{requirement:NativeRequirement;record:TerminalRecordPlan}{
+  const active=[...stack];
+  // Input completeness, not destination ownership, decides whether W applies.
+- const captureWindow=active.length===0||active.some(f=>f.declaredOwners===undefined);
++ const captureWindow=active.length===0||active.some(f=>f.declaredOwners===undefined)
++  ||inputs.some(input=>nativeProof(input.requirement).unavailableInput===true);
+  const requirement:NativeRequirement={known:Object.freeze([...known]),unknown,inputs:Object.freeze([...inputs]),frames:active,possible:[],captureWindow};
+  const evidence=nativeProof(requirement);
+  const adds:TerminalRecordPlan['adds'][number][]=[];
+  for(const frame of active){
+   for(const owner of [...(evidence.input??[]),...(evidence.validation??[])])adds.push({set:frame.installedOwners,value:owner});
+-  if(frame.declaredOwners!==undefined&&[...(evidence.input??[]),...(evidence.validation??[])].some(owner=>!frame.declaredOwners!.includes(owner)))adds.push({set:invalidFrames,value:frame});
++  if(frame.declaredOwners!==undefined&&((evidence.terminalRejectedRoles??0)!==0||[...(evidence.input??[]),...(evidence.validation??[])].some(owner=>!frame.declaredOwners!.includes(owner))))adds.push({set:invalidFrames,value:frame});
+   if(evidence.unknown)adds.push({set:unknownFrames,value:frame});
+  }
+  const h=active.at(-1)?.horizon;
+@@ -114,7 +134,7 @@ export function finalizeNativeRequirement(requirement:NativeRequirement):void {
+  // Source inputs are immutable snapshots; only the not-yet-installed unit's own window is refreshed.
+  if(requirement.frames.length===0){requirement.proof=nativeProof(requirement);requirement.inputs=[];requirement.known=[];}
+ }
+-type Operation={native?:NativeRequirement;coverageUnknown:boolean;channel:object;dependencies:Set<OwnerCell>;revision:object;frames:Set<Frame>;proof?:Proof;views:Set<View>;started:boolean;surviving:boolean;noopFallbacks:Map<View,Operation>};
++type Operation={projectionPending:boolean;native?:NativeRequirement;coverageUnknown:boolean;channel:object;dependencies:Set<OwnerCell>;revision:object;frames:Set<Frame>;proof?:Proof;views:Set<View>;started:boolean;surviving:boolean;noopFallbacks:Map<View,Operation>};
+ const connections=new Map<object,Connection>();
+ const stack:Frame[]=[];
+ const installedLast=new Map<Frame,object>();
+@@ -139,14 +159,14 @@ function effective(frame:Frame):Proof{const all=[...frame.parents,frame];const v
+ function setOperationState(op:Operation,value:State):void{for(const view of op.views)state(view,value);}
+ function refresh(op:Operation):void{
+  if(op.started)return;
+- if(op.frames.size){for(const view of op.views)state(view,{state:'validating'});return;}
++ if(op.frames.size||op.projectionPending){for(const view of op.views)state(view,{state:'validating'});return;}
+  const p=op.proof;if(!p)return;
+  if(p.invalid||p.unknown){setOperationState(op,{state:'conservative',reason:p.invalid?'invalid-declaration':'unknown'});return;}
+- if(p.owners.some(x=>x.outcome==='rolled-back'||x.outcome==='abandoned')){setOperationState(op,{state:'conservative',reason:'rejected-dependency'});return;}
++ if((p.terminalRejectedRoles??0)!==0||p.owners.some(x=>x.outcome==='rolled-back'||x.outcome==='abandoned')){setOperationState(op,{state:'conservative',reason:'rejected-dependency'});return;}
+  setOperationState(op,p.owners.some(x=>x.outcome==='pending')?{state:'held',reason:'pending-dependency'}:{state:'eligible',basis:'declared'});
+ }
+ /** Snapshot declaration responsibility before native installation, never at delivery. */
+-export function prepareRevision(channel:object,revision:object,known:readonly OwnerCell[],unknown=false,blockers:readonly OwnerCell[]=[],native?:NativeRequirement):TerminalRecordPlan {
++export function prepareRevision(channel:object,revision:object,known:readonly OwnerCell[],unknown=false,blockers:readonly OwnerCell[]=[],native?:NativeRequirement,projectionPending=false):TerminalRecordPlan {
+  const c=connections.get(channel);
+  const writes:TerminalRecordPlan['writes'][number][]=[];
+  const adds:TerminalRecordPlan['adds'][number][]=[];
+@@ -157,7 +177,7 @@ export function prepareRevision(channel:object,revision:object,known:readonly Ow
+  const nativeEvidence=native?nativeProof(native):undefined;
+  // Recipient enrollment must not turn destination D into a declaration input.
+  const required=uniqueOwners([...active.flatMap(frameOwners),...(nativeEvidence?.input??[]),...(nativeEvidence?.validation??[])]);
+- const op:Operation={native,coverageUnknown:unknown,channel,dependencies:new Set([...known,...required,...(nativeEvidence?.owners??[]),...(nativeEvidence?.possible??[]),...blockers]),revision,frames:new Set(),views:new Set(),started:false,surviving:false,noopFallbacks:new Map()};
++ const op:Operation={projectionPending,native,coverageUnknown:unknown,channel,dependencies:new Set([...known,...required,...(nativeEvidence?.owners??[]),...(nativeEvidence?.possible??[]),...blockers]),revision,frames:new Set(),views:new Set(),started:false,surviving:false,noopFallbacks:new Map()};
+  if(matches.length===0)op.proof={owners:Object.freeze([...known]),destination:Object.freeze([...known]),unknown:true,invalid:false};
+  writes.push({map:c.ops,key:revision,value:op});
+  for(const cell of op.dependencies)adds.push({set:cell.dependents,value:op});
+@@ -197,8 +217,8 @@ export function noWrite(channel:object,revision:object):void {
+ export function keepRevision(channel:object,revision:object):void{connections.get(channel)?.ops.get(revision)?.noopFallbacks.clear();}
+ export function decision(channel:object,revision:object):{early:boolean;pending:boolean}{
+  const op=connections.get(channel)?.ops.get(revision);if(!op)return {early:false,pending:false};
+- if(op.frames.size)return {early:false,pending:true};
+- const p=op.proof!;return {early:!p.invalid&&!p.unknown&&p.owners.every(x=>x.outcome==='confirmed'),pending:[...p.owners,...(p.possible??[])].some(x=>x.outcome==='pending'||x.outcome==='abandoned')};
++ if(op.frames.size||op.projectionPending)return {early:false,pending:true};
++ const p=op.proof!;return {early:!p.invalid&&!p.unknown&&!(p.terminalRejectedRoles??0)&&p.owners.every(x=>x.outcome==='confirmed'),pending:[...p.owners,...(p.possible??[])].some(x=>x.outcome==='pending'||x.outcome==='abandoned')};
+ }
+ function retire(op:Operation):void{for(const cell of op.dependencies)cell.dependents.delete(op);}
+ export function started(channel:object,revision:object,basis:'declared'|'surviving'='declared'):void{
+@@ -280,4 +300,4 @@ export function isValidating():boolean{return stack.length!==0;}
+ 
+ export function completeDeclarationContext(channel:object):boolean{return stack.some(f=>f.channel===channel)&&stack.every(f=>f.declaredOwners!==undefined&&!frameUnknown(f));}
+ 
+-export function projectRevision(channel:object,revision:object,proof:Readonly<Proof>):void{const op=connections.get(channel)?.ops.get(revision);if(op){op.proof=proof;for(const cell of [...proof.owners,...(proof.possible??[])]){op.dependencies.add(cell);cell.dependents.add(op);}refresh(op);}}
++export function projectRevision(channel:object,revision:object,proof:Readonly<Proof>):void{const op=connections.get(channel)?.ops.get(revision);if(op){op.projectionPending=false;op.proof=proof;for(const cell of [...proof.owners,...(proof.possible??[])]){op.dependencies.add(cell);cell.dependents.add(op);}refresh(op);}}
+diff --git a/packages/kernel/src/lib/experimental-publication/private.ts b/packages/kernel/src/lib/experimental-publication/private.ts
+index ec588588..bc2ebdce 100644
+--- a/packages/kernel/src/lib/experimental-publication/private.ts
++++ b/packages/kernel/src/lib/experimental-publication/private.ts
+@@ -1,4 +1,5 @@
+-import { currentEntityPublicationInputs, getEntityPublicationBinding } from '../internals/entity-publication';
++import type { EntityContributorEdit } from '../internals/entity-egress-projection';
++import { currentEntityPublicationInputs, getEntityPublicationBinding, type EntityPublicationEvidence } from '../internals/entity-publication';
+ import { isWritableLocation } from '../internals/location-runtime';
+ import { nodeStoreOf, isTraversableNode } from '../internals/node-shape';
+ import { getPositionRegistry, getNodeAddress } from '../internals/position-registry';
+@@ -16,12 +17,13 @@ type Proof=Readonly<lifecycle.Proof>;
+ type Fact=Readonly<{revision:number;clean:boolean;blockers:readonly Cell[];unknown:boolean}>;
+ type Slot=Readonly<{branch:object;key:string;child:object;address?:readonly string[]}>;
+ type Presence=Readonly<{present:boolean;fact:Fact}>;
+-type Unit={native?:lifecycle.NativeRequirement;coverageUnknown?:boolean;fact:Fact;previous?:Fact;payload:unknown;changed:boolean;inputs:readonly Fact[];field?:object;relative?:readonly string[];presence?:{slot:Slot;state:Presence;ordinary?:MembershipPublicationEdit['ordinary']};complete:boolean;resolve:()=>void;promise:Promise<void>};
++type Unit={collection?:{key:object;edits:readonly EntityContributorEdit[];acquired?:boolean};selected?:lifecycle.NativeRequirement;native?:lifecycle.NativeRequirement;coverageUnknown?:boolean;fact:Fact;previous?:Fact;payload:unknown;changed:boolean;inputs:readonly Fact[];field?:object;relative?:readonly string[];presence?:{slot:Slot;state:Presence;ordinary?:MembershipPublicationEdit['ordinary']};complete:boolean;resolve:()=>void;promise:Promise<void>};
+ type SlotTrie={children:Map<string,SlotTrie>;slots:Map<object,Slot>};
+ type FieldInfo={relative:readonly string[];address:readonly string[]};
+ type FieldTrie={children:Map<string,FieldTrie>;field?:object};
+-type Summary={owners:Map<Cell,number>;destination:Map<Cell,number>;input:Map<Cell,number>;validation:Map<Cell,number>;possible:Map<Cell,number>;unknown:number;invalid:number};
+-type Binding={aggregate:boolean;initialized:Set<object>;valueInitialized:boolean;slotTrie:SlotTrie;fields:Map<object,FieldInfo>;fieldTrie:FieldTrie;fieldFacts:Map<object,Fact>;completedFields:Map<object,Fact>;summary:Summary;releases:(()=>void)[];owner:number;position:number;current?:Fact;valueFact:Fact;completedValueFact:Fact;valuePayload:unknown;baselineStructure:Fact;presence:Map<Slot,Presence>;completedPresence:Map<Slot,Presence>;source?:object;registry?:object;address?:readonly string[];pending:Set<Unit>;projected?:Readonly<{fact:Fact;payload:unknown;changed:boolean}>;release?:()=>void};
++type Summary={rejected:Map<number,number>;unavailableInput:number;historicalWindow:number;owners:Map<Cell,number>;destination:Map<Cell,number>;input:Map<Cell,number>;validation:Map<Cell,number>;possible:Map<Cell,number>;unknown:number;invalid:number};
++type CollectionSupport={relative:readonly string[]|undefined;entries:Map<string,{requirement:lifecycle.NativeRequirement;proof:Proof}>;summary:Summary};
++type Binding={collections:Map<object,CollectionSupport>;aggregate:boolean;initialized:Set<object>;valueInitialized:boolean;slotTrie:SlotTrie;fields:Map<object,FieldInfo>;fieldTrie:FieldTrie;fieldFacts:Map<object,Fact>;completedFields:Map<object,Fact>;summary:Summary;releases:(()=>void)[];owner:number;position:number;current?:Fact;valueFact:Fact;completedValueFact:Fact;valuePayload:unknown;baselineStructure:Fact;presence:Map<Slot,Presence>;completedPresence:Map<Slot,Presence>;source?:object;registry?:object;address?:readonly string[];pending:Set<Unit>;projected?:Readonly<{fact:Fact;payload:unknown;changed:boolean}>;release?:()=>void};
+ const bindings=new Map<object,Binding>();
+ const proofs=new WeakMap<Fact,Proof>();
+ const ownProofs=new WeakMap<Fact,Proof>();
+@@ -32,7 +34,7 @@ const facts=new WeakSet<object>();
+ const grants=new WeakMap<Fact,Set<object>>();
+ const callbacks=new Map<object,()=>void>();
+ const consumedIngress=new Set<object>();
+-let serial=0;let ingress:{owner:number;position:number;consumed:boolean}|undefined;
++let serial=0;let ingress:{owner:number;position:number;consumed:boolean;collections:Set<object>}|undefined;
+ export const stamp=Symbol('unused notification publication stamp');
+ export const receipts:unknown[]=[];export let enabled=true;
+ export function mode(value:boolean):void{enabled=value;}
+@@ -40,7 +42,7 @@ export function register(owner:number,_source:unknown,token:object):void{lifecyc
+ export function unregister(owner:number|undefined):void{if(owner!==undefined)lifecycle.unregisterOwnerSource(owner);}
+ export function transition(owner:number|undefined,event:{kind:string;transactionId:number}):void{if(owner!==undefined)lifecycle.ownerTransition(owner,event);}
+ const sameOwners=(a:readonly Cell[]|undefined,b:readonly Cell[]|undefined):boolean=>(a??[]).length===(b??[]).length&&(a??[]).every(x=>(b??[]).includes(x));
+-const sameProof=(a:Proof|undefined,b:Proof|undefined):boolean=>!!a&&!!b&&a.unknown===b.unknown&&a.invalid===b.invalid&&(['owners','destination','input','validation','possible'] as const).every(role=>sameOwners(a[role],b[role]));
++const sameProof=(a:Proof|undefined,b:Proof|undefined):boolean=>!!a&&!!b&&a.unknown===b.unknown&&a.invalid===b.invalid&&!!a.unavailableInput===!!b.unavailableInput&&!!a.historicalWindow===!!b.historicalWindow&&(a.terminalRejectedRoles??0)===(b.terminalRejectedRoles??0)&&(['owners','destination','input','validation','possible'] as const).every(role=>sameOwners(a[role],b[role]));
+ type Trie={children:Map<string,Trie>;channels:Set<object>};
+ const tries=new WeakMap<object,Trie>();
+ let indexedBindings=0;
+@@ -52,6 +54,8 @@ function reaches(child:object,suffix:readonly string[],source:object):boolean{le
+ const combineProofs=lifecycle.combineProofs;
+ function adjust(summary:Summary,proof:Proof|undefined,direction:number):void {
+  if(!proof){summary.unknown+=direction;return;}
++ for(const bit of [1,2,4,8])if((proof.terminalRejectedRoles??0)&bit){const count=(summary.rejected.get(bit)??0)+direction;if(count)summary.rejected.set(bit,count);else summary.rejected.delete(bit);}
++ if(proof.unavailableInput)summary.unavailableInput+=direction;if(proof.historicalWindow)summary.historicalWindow+=direction;
+  if(proof.unknown)summary.unknown+=direction;if(proof.invalid)summary.invalid+=direction;
+  for(const role of ['owners','destination','input','validation','possible'] as const){
+   for(const owner of proof[role]??[]){const count=(summary[role].get(owner)??0)+direction;if(count)summary[role].set(owner,count);else summary[role].delete(owner);}
+@@ -87,7 +91,7 @@ const nativeViews=new WeakMap<object,NativeView>();
+ const memberViews=new WeakMap<object,NativeView>();
+ const negativeViews=new WeakMap<object,Map<object,NativeView>>();
+ const snapshotViews=new WeakMap<object,readonly NativeView[]>();
+-const unavailableInput=():lifecycle.NativeRequirement=>({proof:{owners:[],unknown:true,invalid:false},inputs:[],frames:[],known:[],unknown:true,possible:[],captureWindow:false});
++const unavailableInput=lifecycle.unavailableRequirement;
+ function suppliedViews(node:object,supplied?:unknown):NativeView[]{
+  const entity=getEntityPublicationBinding(node);
+  if(entity)return [...entity.source.captureViews(entity.subject,entity.field)] as NativeView[];
+@@ -148,7 +152,9 @@ function beginBranchInput(node:object,supplied?:unknown):object|undefined{
+  const input:BranchInput={recipients,native:Object.freeze(nativeInputs(node,supplied))};branchInputs.push(input);return input;
+ }
+ function endBranchInput(token:object):void{if(branchInputs.at(-1)!==token)throw new Error('Branch publication input scope mismatch');branchInputs.pop();}
+-function projectionSupport(b:Binding):{proof:Proof;present:boolean}{if(b.aggregate){const base:Proof={owners:Object.freeze([...b.summary.owners.keys()]),destination:Object.freeze([...b.summary.destination.keys()]),input:Object.freeze([...b.summary.input.keys()]),validation:Object.freeze([...b.summary.validation.keys()]),possible:Object.freeze([...b.summary.possible.keys()]),unknown:b.summary.unknown>0,invalid:b.summary.invalid>0};const parent=slotsAlong(b,b.address??[]).map(slot=>b.completedPresence.get(slot)).filter((state):state is Presence=>state!==undefined);const absent=parent.filter(state=>!state.present);return {proof:absent.length?combineProofs(absent.map(state=>ownProofs.get(state.fact)??proofs.get(state.fact))):combineProofs([base,ownProofs.get(b.baselineStructure)??proofs.get(b.baselineStructure),...parent.map(state=>ownProofs.get(state.fact)??proofs.get(state.fact))]),present:absent.length===0};}const absent=[...b.completedPresence.values()].filter(state=>!state.present);const contributing=absent.length?absent.map(state=>state.fact):[b.baselineStructure,b.completedValueFact,...[...b.completedPresence.values()].map(state=>state.fact)];return {proof:combineProofs(contributing.map(fact=>ownProofs.get(fact)??proofs.get(fact))),present:absent.length===0};}
++const emptySummary=():Summary=>({rejected:new Map(),owners:new Map(),destination:new Map(),input:new Map(),validation:new Map(),possible:new Map(),unknown:0,invalid:0,unavailableInput:0,historicalWindow:0});
++const summaryProof=(summary:Summary):Proof=>({terminalRejectedRoles:[...summary.rejected.keys()].reduce((all,bit)=>all|bit,0),owners:[...summary.owners.keys()],destination:[...summary.destination.keys()],input:[...summary.input.keys()],validation:[...summary.validation.keys()],possible:[...summary.possible.keys()],unknown:summary.unknown>0,invalid:summary.invalid>0,unavailableInput:summary.unavailableInput>0,historicalWindow:summary.historicalWindow>0});
++function projectionSupport(b:Binding):{proof:Proof;present:boolean}{if(b.aggregate){const base=combineProofs([summaryProof(b.summary),...[...b.collections.values()].map(value=>summaryProof(value.summary))]);const parent=slotsAlong(b,b.address??[]).map(slot=>b.completedPresence.get(slot)).filter((state):state is Presence=>state!==undefined);const absent=parent.filter(state=>!state.present);return {proof:absent.length?combineProofs(absent.map(state=>ownProofs.get(state.fact)??proofs.get(state.fact))):combineProofs([base,ownProofs.get(b.baselineStructure)??proofs.get(b.baselineStructure),...parent.map(state=>ownProofs.get(state.fact)??proofs.get(state.fact))]),present:absent.length===0};}const absent=[...b.completedPresence.values()].filter(state=>!state.present);const contributing=absent.length?absent.map(state=>state.fact):[b.baselineStructure,b.completedValueFact,...[...b.completedPresence.values()].map(state=>state.fact)];return {proof:combineProofs(contributing.map(fact=>ownProofs.get(fact)??proofs.get(fact))),present:absent.length===0};}
+ function prepareMembership(edit:MembershipPublicationEdit):PreparedPublicationUnit|undefined{
+  const meta=getActiveWriteContext();
+  const domainKey=nodeStoreOf(edit.branch)??edit.branch;
+@@ -181,7 +187,14 @@ function ready(channel:object,b:Binding):void{
+   const proof=proofs.get(unit.fact)??lifecycle.proof(channel,unit.fact);
+   if(!proof)break; // The captured horizon has not finalized; no mutable stack lookup.
+   const authoredProof=combineProofs([proof,...(unit.native?[lifecycle.nativeProof(unit.native)]:[])]);ownProofs.set(unit.fact,authoredProof);
+-  if(unit.presence){
++  if(unit.collection){
++   const collection=b.collections.get(unit.collection.key);
++   if(collection){for(const edit of unit.collection.edits){
++     const old=collection.entries.get(edit.key);if(old)adjust(collection.summary,old.proof,-1);
++     if(edit.after){const requirement=edit.after as lifecycle.NativeRequirement;const proof=lifecycle.nativeProof(requirement);collection.entries.set(edit.key,{requirement,proof});adjust(collection.summary,proof,1);}else collection.entries.delete(edit.key);
++   }
++   b.valuePayload=collection.relative?applyAtRelativePath(b.valuePayload,collection.relative,{all:unit.payload}):unit.payload;}
++  }else if(unit.presence){
+    const slot=unit.presence.slot;const relative=slot.address&&relativeSourceAddress(b.address??[],slot.address);const affected:object[]=[];if(b.aggregate&&relative!==undefined)fieldNodes(fieldAt(b.fieldTrie,relative),affected);
+    for(const field of affected){const info=b.fields.get(field)!;if(exposed(b,info.address))adjust(b.summary,own(b.completedFields.get(field)!,channel),-1);}
+    const affectedSlots:Slot[]=[];if(b.aggregate&&slot.address)descendantSlots(slotNode(b,slot.address),affectedSlots);
+@@ -199,7 +212,7 @@ function ready(channel:object,b:Binding):void{
+    const previous=b.completedFields.get(unit.field);if(exposed(b,b.fields.get(unit.field)!.address)){if(previous)adjust(b.summary,own(previous,channel),-1);adjust(b.summary,authoredProof,1);}
+    b.completedFields.set(unit.field,unit.fact);b.initialized.add(unit.field);b.valuePayload=applyAtRelativePath(b.valuePayload,unit.relative??[],unit.payload);
+   }else{b.completedValueFact=unit.fact;b.valuePayload=unit.payload;}
+-  const support=projectionSupport(b);const effective=support.proof;
++  const support=projectionSupport(b);const effective=unit.selected?combineProofs([support.proof,lifecycle.nativeProof(unit.selected)]):support.proof;
+   proofs.set(unit.fact,effective);lifecycle.projectRevision(channel,unit.fact,effective);
+   const prior=unit.previous&&proofs.get(unit.previous);
+   const noop=!unit.changed&&unit.fact.clean===(unit.previous?.clean??false)&&sameProof(prior,effective);
+@@ -237,11 +250,18 @@ function prepareScalar(channel:object,mutation:IntrinsicMutation<unknown>,input?
+  const fact:Fact=Object.freeze({revision:++serial,clean,blockers:Object.freeze([]),unknown});facts.add(fact);factChannels.set(fact,channel);
+  let resolve!:()=>void;const promise=new Promise<void>(r=>{resolve=r;});
+  const unit:Unit={native,coverageUnknown:unknown,fact,previous,payload:mutation.after,changed:mutation.changed,inputs:captured??[],field,relative:field?b.fields.get(field)?.relative:undefined,complete:false,resolve,promise};
+- const plan=lifecycle.prepareRevision(channel,fact,nativeKnown,unknown,fact.blockers,native);
++ const plan=lifecycle.prepareRevision(channel,fact,nativeKnown,unknown,fact.blockers,native,b.aggregate);
+  const edits:import('../internals/intrinsic-mutation').TerminalRecordPlan['writes'][number][]=[{map:bindings,key:channel,value:{...b,current:fact,...(!field?{valueFact:fact}:{})}}];if(field)edits.push({map:b.fieldFacts,key:field,value:fact});
+  const terminalEdits={writes:edits,adds:[{set:b.pending,value:unit},...(clean&&ingress?[{set:consumedIngress,value:ingress}]:[])]};
+  return {record:combineTerminalRecords(plan,terminalEdits)!,completion:{channel,unit,cleanIngress:clean?ingress:undefined}};
+ }
++export function acquiringCollection(channel:object,source:object):boolean {
++ const binding=bindings.get(channel);return !!ingress&&!!binding&&binding.owner===ingress.owner&&binding.position===ingress.position&&!ingress.collections.has(source);
++}
++/** The acquisition certifies its own relationship baseline, not native input evidence. */
++export function acquiredEntityEvidence():EntityPublicationEvidence {
++ const permission=lifecycle.initialRequirement();return {member:()=>permission,field:()=>permission,placement:()=>permission,keyMapping:()=>permission};
++}
+ export function currentNativePublicationInputs(): readonly lifecycle.NativeInput[] { return branchInputs.flatMap(scope=>scope.native); }
+ /** Entity sources use the same receipt, validation and delivery lifecycle. */
+ export function registerSourceProjectionField(channel:object,field:object,relative:readonly string[]):void {
+@@ -251,8 +271,29 @@ export function registerSourceProjectionField(channel:object,field:object,relati
+  fieldAt(b.fieldTrie,relative,true)!.field=field;
+  if(exposed(b,address))adjust(b.summary,own(b.baselineStructure,channel),1);
+ }
+-export function prepareSourceProjection(channel:object,mutation:IntrinsicMutation<unknown>,requirement:lifecycle.NativeRequirement,field?:object):PreparedPublicationUnit|undefined {
+- return prepareScalar(channel,mutation,undefined,field,{requirement});
++export function prepareSourceProjection(channel:object,mutation:IntrinsicMutation<unknown>,requirement:lifecycle.NativeRequirement,field?:object,collection?:{key:object;edits:readonly EntityContributorEdit[];acquired?:boolean},selected?:lifecycle.NativeRequirement):PreparedPublicationUnit|undefined {
++ const prepared=prepareScalar(channel,mutation,undefined,field,{requirement});
++ if(prepared){const unit=(prepared.completion as {unit:Unit}).unit;unit.collection=collection;unit.selected=selected;
++  if(collection?.acquired&&ingress)return {...prepared,record:combineTerminalRecords(prepared.record,{writes:[],adds:[{set:ingress.collections,value:collection.key}]})!};
++ }
++ return prepared;
++}
++/** Seed permission belongs only to this relationship, never to native reads. */
++export function baselineEntityEvidence(source:EntityPublicationEvidence|undefined,owner:number):EntityPublicationEvidence|undefined {
++ if(!source)return undefined;
++ const cache=new Map<object,object>();
++ const baseline=(reference:object):object=>{let value=cache.get(reference);if(value)return value;
++  const requirement=reference as lifecycle.NativeRequirement,proof=lifecycle.nativeProof(requirement);
++  const safe=!proof.invalid&&!proof.terminalRejectedRoles&&proof.owners.every(cell=>cell.outcome==='confirmed')&&(proof.possible??[]).every(cell=>cell.outcome==='confirmed'||cell.outcome==='rolled-back')&&!lifecycle.pendingOwners().some(cell=>cell.owner===owner);
++  value=safe?lifecycle.initialRequirement():requirement;cache.set(reference,value);return value;
++ };
++ return {exclusions:()=>source.exclusions?.().map(([id,fact])=>[id,baseline(fact)] as const)??[],member:(id,view)=>baseline(source.member(id,view)),field:(id,key,view)=>baseline(source.field(id,key,view)),placement:(id,view)=>baseline(source.placement(id,view)),keyMapping:(id,view)=>baseline(source.keyMapping(id,view))};
++}
++export function registerCollectionProjection(channel:object,key:object,relative:readonly string[]|undefined,initial:ReadonlyMap<string,object>):void {
++ const b=bindings.get(channel);if(!b)return;
++ const support:CollectionSupport={relative,entries:new Map(),summary:emptySummary()};
++ for(const [slot,reference]of initial){const requirement=reference as lifecycle.NativeRequirement;const proof=lifecycle.nativeProof(requirement);support.entries.set(slot,{requirement,proof});adjust(support.summary,proof,1);}
++ b.collections.set(key,support);
+ }
+ export function completeSourceProjection(completion:object):void { completeScalar(completion); }
+ function completeScalar(completion:object):void{
+@@ -272,7 +313,7 @@ export function bindSource(channel:object,owner:number,position:number,identity:
+   proofs.set(fact,proof);ownProofs.set(fact,proof);return fact;
+  };
+  const presence=new Map<Slot,Presence>();for(const entry of context?.presence??[])presence.set(slotFor(entry.parent,entry.key,entry.child),{present:entry.present,fact:nativeFact(nativeMembers.get(entry.child))});
+- const binding:Binding={aggregate:context?.aggregate===true,initialized:new Set(),valueInitialized:[...presence.values()].every(state=>state.present),slotTrie:{children:new Map(),slots:new Map()},fields:new Map(),fieldTrie:{children:new Map()},fieldFacts:new Map(),completedFields:new Map(),summary:{owners:new Map(),destination:new Map(),input:new Map(),validation:new Map(),possible:new Map(),unknown:0,invalid:0},releases:[],owner,position,current:baseline,valueFact:baseline,completedValueFact:baseline,valuePayload:context?.value,baselineStructure:baseline,presence,completedPresence:new Map(presence),source,registry:context?.registry,address:context?.address,pending:new Set()};bindings.set(channel,binding);for(const slot of presence.keys())indexSlot(binding,slot);if(context)slotNode(binding,context.address,true);
++ const binding:Binding={collections:new Map(),aggregate:context?.aggregate===true,initialized:new Set(),valueInitialized:[...presence.values()].every(state=>state.present),slotTrie:{children:new Map(),slots:new Map()},fields:new Map(),fieldTrie:{children:new Map()},fieldFacts:new Map(),completedFields:new Map(),summary:emptySummary(),releases:[],owner,position,current:baseline,valueFact:baseline,completedValueFact:baseline,valuePayload:context?.value,baselineStructure:baseline,presence,completedPresence:new Map(presence),source,registry:context?.registry,address:context?.address,pending:new Set()};bindings.set(channel,binding);for(const slot of presence.keys())indexSlot(binding,slot);if(context)slotNode(binding,context.address,true);
+  if(identity.supported&&source){
+   // Membership has native identity even when it predates every recipient.
+   // Seed only this source's retained paths; never infer from another binding.
+@@ -294,7 +335,7 @@ export function bindSource(channel:object,owner:number,position:number,identity:
+  if(identity.supported&&context&&source){trieFor(context.registry,context.address,true)!.channels.add(channel);indexedBindings++;}
+ }
+ export function onEligibility(_owner:number,cb:()=>void,channel:object):()=>void{callbacks.set(channel,cb);return()=>{callbacks.delete(channel);};}
+-export function acquire(owner:number,position:number,work:()=>void):void{const prev=ingress;ingress={owner,position,consumed:false};try{work();}finally{if(ingress)consumedIngress.delete(ingress);ingress=prev;}}
++export function acquire(owner:number,position:number,work:()=>void):void{const prev=ingress;ingress={owner,position,consumed:false,collections:new Set()};try{work();}finally{if(ingress)consumedIngress.delete(ingress);ingress=prev;}}
+ /** Notification metadata no longer admits publication responsibility. */
+ export function annotate(meta:WriteMetadata|undefined,_owner:number|undefined,_positions:number[]|undefined,_authored:boolean,_payload:unknown):WriteMetadata{return {...meta};}
+ export function evidence(_meta:unknown):Fact|undefined{return undefined;}
+@@ -303,15 +344,17 @@ export function refresh():undefined{return undefined;}
+ function decision(fact:Fact|undefined,channel:object):{early:boolean;pending:boolean}{
+  if(!fact)return {early:false,pending:false};
+  const p=proofs.get(fact);if(!p)return {early:false,pending:true};
+- return {early:!p.invalid&&!p.unknown&&p.owners.every(x=>x.outcome==='confirmed'),pending:[...p.owners,...(p.possible??[])].some(x=>x.outcome==='pending'||x.outcome==='abandoned')};
++ return {early:!p.invalid&&!p.unknown&&!p.terminalRejectedRoles&&p.owners.every(x=>x.outcome==='confirmed'),pending:[...p.owners,...(p.possible??[])].some(x=>x.outcome==='pending'||x.outcome==='abandoned')};
+ }
+ export function pendingDecision(fact:Fact|undefined,channel:object):boolean{return (bindings.get(channel)?.pending.size??0)>0||decision(fact,channel).pending;}
+ export function allowed(fact:Fact|undefined,_owner:number,_position:number,channel:object):boolean{
+- return !enabled||!projection.supported(channel)||!lifecycle.isValidating()&&!!fact&&bindings.get(channel)?.current===fact&&!bindings.get(channel)?.pending.size&&(fact.clean||decision(fact,channel).early||grants.get(fact)?.has(channel)===true);
++ return !enabled||!lifecycle.isValidating()&&!!fact&&bindings.get(channel)?.current===fact&&!bindings.get(channel)?.pending.size&&(fact.clean||decision(fact,channel).early||grants.get(fact)?.has(channel)===true);
+ }
+ type Request={claimant:unknown;key:object;run:()=>void};
+ export function admit(original:(r:Request)=>void,fact:Fact|undefined,_owner:number,_position:number,channel:object,r:Request):boolean{
+- if(!enabled||!projection.supported(channel)){original(r);return true;}
++ if(!enabled){original(r);return true;}
++ if(!bindings.has(channel))throw new Error("Enabled publication source has no binding");
++ if(!fact)return false;
+  if(lifecycle.isValidating()||bindings.get(channel)?.pending.size)return false;
+  const d=decision(fact,channel);
+  if(fact&&(fact.clean||d.early)&&bindings.get(channel)?.current===fact){r.run();return true;}
+diff --git a/packages/kernel/src/lib/internals/entity-egress-projection.ts b/packages/kernel/src/lib/internals/entity-egress-projection.ts
+index 46b686bb..680e944e 100644
+--- a/packages/kernel/src/lib/internals/entity-egress-projection.ts
++++ b/packages/kernel/src/lib/internals/entity-egress-projection.ts
+@@ -1,5 +1,5 @@
+ import type { TerminalRecordPlan } from './intrinsic-mutation';
+-import { entityPublicationOrdinary, type EntityPublicationPacket } from './entity-publication';
++import { entityPublicationOrdinary, type EntityPublicationPacket, type EntityPublicationEvidence, type EntityPublicationEdit } from './entity-publication';
+ import type { EntityProjectionSeedEntry } from './entity-projection-seed';
+ import {
+   createEntityTopology,
+@@ -59,16 +59,20 @@ export function projectEntityFields(
+   return next;
+ }
+ 
++export type EntityContributorEdit={readonly key:string;readonly before?:object;readonly after?:object};
+ export type EntityEgressProjection = {
++  support():ReadonlyMap<string,object>;
++  prepareSeed(seed:readonly EntityProjectionSeedEntry<Key,unknown>[],evidence:EntityPublicationEvidence):ReturnType<EntityEgressProjection['prepare']>;
+   /** Prepare eligible changes without touching the installed relationship. */
+-  prepare(packet: EntityPublicationPacket): {readonly record: TerminalRecordPlan; readonly value: readonly unknown[]; readonly changed: boolean};
++  prepare(packet: EntityPublicationPacket, evidence?:EntityPublicationEvidence): {readonly record: TerminalRecordPlan; readonly value: readonly unknown[]; readonly changed: boolean; readonly supportEdits:readonly EntityContributorEdit[]};
+   /** The complete eligible `Row[]`, in eligible order. */
+   value(): readonly unknown[];
+   /** Advance local order; only authored order may advance eligible authority. */
+   reorder(
+     afterSubjects: readonly number[],
+     inspection: boolean,
+-    ordinary?: boolean
++    ordinary?: boolean,
++    evidence?:EntityPublicationEvidence
+   ): boolean;
+   /** Apply one notification. Returns true if eligible authority advanced. */
+   apply(
+@@ -77,7 +81,8 @@ export type EntityEgressProjection = {
+     effect: StructuralEffect | undefined,
+     inspection: boolean,
+     fields?: readonly string[] | null,
+-    ordinary?: boolean
++    ordinary?: boolean,
++    evidence?:EntityPublicationEvidence
+   ): boolean;
+   /** Inbound external truth replaces authority and topology alike. */
+   reseed(seed: readonly EntityProjectionSeedEntry<Key, unknown>[]): void;
+@@ -85,7 +90,9 @@ export type EntityEgressProjection = {
+ 
+ export function createEntityEgressProjection(
+   seed: readonly EntityProjectionSeedEntry<Key, unknown>[],
+-  preparedTopology?: EntityTopology
++  preparedTopology?: EntityTopology,
++  seedEvidence?:EntityPublicationEvidence,
++  inheritedSupport?:ReadonlyMap<string,object>
+ ): EntityEgressProjection & {state(): {order:number[];rows:Map<number,unknown>;keys:Map<number,Key>;topology:EntityTopology}} {
+   let topology: EntityTopology = preparedTopology ?? createEntityTopology(seed);
+ 
+@@ -104,6 +111,26 @@ export function createEntityEgressProjection(
+     }
+   }
+   load(seed);
++  const contributors=new Map<string,object>(inheritedSupport);
++  const slot=(subject:number,dimension:string)=>`${subject}:${dimension}`;
++  const setField=(subject:number,key:string,fact:object)=>contributors.set(slot(subject,`f:${key}`),fact);
++  const seedSupport=(entries:readonly EntityProjectionSeedEntry<Key,unknown>[],facts:EntityPublicationEvidence)=>{
++    const present=new Set(entries.map(entry=>entry.subjectId));
++    for(const [subject,fact]of facts.exclusions?.()??[])if(!present.has(subject))contributors.set(slot(subject,'m'),fact);
++    for(const entry of entries){
++      contributors.set(slot(entry.subjectId,'m'),facts.member(entry.subjectId,'physical'));
++      contributors.set(slot(entry.subjectId,'p'),facts.placement(entry.subjectId,'physical'));
++      for(const key of Object.keys(entry.row??{}))setField(entry.subjectId,key,facts.field(entry.subjectId,key,'physical'));
++    }
++  };
++  if(!inheritedSupport&&seedEvidence)seedSupport(seed,seedEvidence);
++  const removeSupport=(subject:number)=>{for(const key of [...contributors.keys()])if(key.startsWith(`${subject}:`))contributors.delete(key);};
++  const editsFrom=(after:ReadonlyMap<string,object>):EntityContributorEdit[]=>{
++    const edits:EntityContributorEdit[]=[];
++    for(const [key,before]of contributors)if(after.get(key)!==before)edits.push({key,before,after:after.get(key)});
++    for(const [key,value]of after)if(!contributors.has(key))edits.push({key,after:value});
++    return edits;
++  };
+ 
+   const isEligible = (s: number) => rows.has(s);
+ 
+@@ -155,7 +182,18 @@ export function createEntityEgressProjection(
+   }
+ 
+   return {
+-    prepare(packet) {
++    support:()=>contributors,
++    prepareSeed(seed,evidence){
++      const prepared=createEntityEgressProjection(seed,undefined,evidence);
++      const state=prepared.state(),supportEdits=editsFrom(prepared.support());
++      const install={set(_key:unknown,_value:unknown){
++        order=state.order;rows.clear();for(const [key,value]of state.rows)rows.set(key,value);
++        keyOf.clear();for(const [key,value]of state.keys)keyOf.set(key,value);topology=state.topology;
++        contributors.clear();for(const [key,value]of prepared.support())contributors.set(key,value);
++      }};
++      return {record:{writes:[{map:install,key:undefined,value:undefined}],adds:[]},value:prepared.value(),changed:true,supportEdits};
++    },
++    prepare(packet,evidence) {
+       const structural = packet.physical.some(edit => edit.structural !== undefined) ||
+         entityPublicationOrdinary(packet).some(edit => edit.structural !== undefined || !rows.has(edit.subject)) ||
+         packet.physicalOrder !== undefined || packet.ordinaryOrder !== undefined;
+@@ -164,15 +202,19 @@ export function createEntityEgressProjection(
+         // subscribed collection's complete output is separate, requested work.
+         const touched = new Map<number, unknown>();
+         let changed = false;
++        const supportEdits:EntityContributorEdit[]=[];
+         for (const edit of entityPublicationOrdinary(packet)) {
+           const before = touched.has(edit.subject) ? touched.get(edit.subject) : rows.get(edit.subject);
+           const after = projectEntityFields(before, edit.after, edit.fields);
+           if (after !== before) { touched.set(edit.subject, after); changed = true; }
++          if(evidence){const facts=evidence.forEdit?.(edit)??evidence;const keys=edit.fields??[...new Set([...Object.keys(before??{}),...Object.keys(after??{})])];
++            for(const key of keys){const address=slot(edit.subject,`f:${key}`);supportEdits.push({key:address,before:contributors.get(address),after:facts.field(edit.subject,key,'ordinary')});}
++          }
+         }
+         return {
+-          record: {writes: [...touched].map(([key,value]) => ({map:rows,key,value})), adds: []},
++          record: {writes: [...[...touched].map(([key,value]) => ({map:rows,key,value})),...supportEdits.map(edit=>({map:contributors,key:edit.key,value:edit.after!}))], adds: []},
+           value: order.map(subject => touched.has(subject) ? touched.get(subject) : rows.get(subject)),
+-          changed,
++          changed,supportEdits,
+         };
+       }
+       // Structural operations already request placement interpretation. Its
+@@ -180,31 +222,33 @@ export function createEntityEgressProjection(
+       // rather than reseeding authority from the source's physical rows.
+       const draft = createEntityEgressProjection(order.map(subjectId => ({
+         subjectId, key: keyOf.get(subjectId)!, row: rows.get(subjectId),
+-      })), topology.fork());
++      })), topology.fork(),undefined,contributors);
+       for (const edit of packet.physical)
+         if (edit.structural) draft.apply(edit.subject,edit.after,edit.structural,true,edit.fields);
+       if (packet.physicalOrder) draft.reorder(packet.physicalOrder,true);
+       let changed = false;
+       for (const edit of entityPublicationOrdinary(packet))
+-        changed = draft.apply(edit.subject,edit.after,edit.structural,false,edit.fields,true) || changed;
+-      if (packet.ordinaryOrder) changed = draft.reorder(packet.ordinaryOrder,false,true) || changed;
++        changed = draft.apply(edit.subject,edit.after,edit.structural,false,edit.fields,true,evidence?.forEdit?.(edit)??evidence) || changed;
++      if (packet.ordinaryOrder) changed = draft.reorder(packet.ordinaryOrder,false,true,evidence) || changed;
+       const prepared = draft.state();
+       const install = {set(_key:unknown,_value:unknown) {
+         order = prepared.order;
+         rows.clear(); for (const [key,value] of prepared.rows) rows.set(key,value);
+         keyOf.clear(); for (const [key,value] of prepared.keys) keyOf.set(key,value);
+         topology = prepared.topology;
++        contributors.clear();for(const [key,value]of draft.support())contributors.set(key,value);
+       }};
+-      return {record:{writes:[{map:install,key:undefined,value:undefined}],adds:[]},value:draft.value(),changed};
++      return {record:{writes:[{map:install,key:undefined,value:undefined}],adds:[]},value:draft.value(),changed,supportEdits:editsFrom(draft.support())};
+     },
+     state: () => ({order,rows,keys:keyOf,topology}),
+     value: () => order.map((s) => rows.get(s)),
+ 
+-    reorder(afterSubjects, inspection, ordinary = false) {
++    reorder(afterSubjects, inspection, ordinary = false,evidence) {
+       if (!ordinary) topology.reorder(afterSubjects);
+       if (inspection) return false;
+       const present = new Set(afterSubjects);
+       const eligible = afterSubjects.filter(isEligible);
++      if(evidence)for(const subject of eligible)contributors.set(slot(subject,'p'),evidence.placement(subject,'ordinary'));
+       let cursor = 0;
+       let changed = false;
+       // Inspection may have removed a still-eligible lifetime. Reordering the
+@@ -223,7 +267,7 @@ export function createEntityEgressProjection(
+       load(entries);
+     },
+ 
+-    apply(subjectId, row, effect, inspection, fields, ordinary = false) {
++    apply(subjectId, row, effect, inspection, fields, ordinary = false,evidence) {
+       // Local topology tracks reality, whoever wrote it.
+       if (effect && !ordinary) topology.observe(effect);
+ 
+@@ -232,6 +276,13 @@ export function createEntityEgressProjection(
+       if (inspection) return false;
+ 
+       if (effect?.kind === 'add') {
++        if(evidence){
++          for(const [old,key]of keyOf)if(old!==effect.subject&&key===effect.key&&!topology.has(old)){removeSupport(old);contributors.set(slot(old,'m'),evidence.member(old,'physical'));contributors.set(slot(effect.subject,'k'),evidence.keyMapping(effect.subject,'ordinary'));}
++          removeSupport(effect.subject);
++          contributors.set(slot(effect.subject,'m'),evidence.member(effect.subject,'ordinary'));
++          contributors.set(slot(effect.subject,'p'),evidence.placement(effect.subject,'ordinary'));
++          for(const key of Object.keys(effect.value??{}))setField(effect.subject,key,evidence.field(effect.subject,key,'ordinary'));
++        }
+         reconcileAddress(effect.key, effect.subject);
+         place(effect.subject, ordinary ? effect : undefined);
+         rows.set(effect.subject, effect.value);
+@@ -240,7 +291,8 @@ export function createEntityEgressProjection(
+       }
+ 
+       if (effect?.kind === 'remove') {
+-        if (!isEligible(effect.subject)) return false;
++        if (!isEligible(effect.subject)){if(evidence&&contributors.has(slot(effect.subject,'m')))contributors.set(slot(effect.subject,'m'),evidence.member(effect.subject,'ordinary'));return false;}
++        removeSupport(effect.subject);if(evidence)contributors.set(slot(effect.subject,'m'),evidence.member(effect.subject,'ordinary'));
+         remove(effect.subject);
+         return true;
+       }
+@@ -249,6 +301,7 @@ export function createEntityEgressProjection(
+         // Address moves; lifetime, payload and order do not. A collection key
+         // is not part of the `Row[]` this relationship publishes.
+         if (!isEligible(effect.subject)) return false;
++        if(evidence&&contributors.has(slot(effect.subject,'k')))contributors.set(slot(effect.subject,'k'),evidence.keyMapping(effect.subject,'ordinary'));
+         if (effect.afterKey !== undefined)
+           keyOf.set(effect.subject, effect.afterKey);
+         return true;
+@@ -258,6 +311,7 @@ export function createEntityEgressProjection(
+       if (isEligible(subjectId)) {
+         const previous = rows.get(subjectId);
+         const next = projectEntityFields(previous, row, fields);
++        if(evidence&&fields!==undefined)for(const key of fields??[...new Set([...Object.keys(previous??{}),...Object.keys(row??{})])])setField(subjectId,key,evidence.field(subjectId,key,'ordinary'));
+         if (next === previous) return false;
+         rows.set(subjectId, next);
+         return true;
+@@ -266,6 +320,13 @@ export function createEntityEgressProjection(
+       if (!isEligible(subjectId)) {
+         if (!topology.has(subjectId)) return false;
+         const k = topology.keyOf(subjectId);
++        if(evidence){
++          contributors.set(slot(subjectId,'m'),evidence.member(subjectId,'physical'));
++          contributors.set(slot(subjectId,'p'),evidence.placement(subjectId,'physical'));
++          contributors.set(slot(subjectId,'k'),evidence.keyMapping(subjectId,'physical'));
++          for(const key of Object.keys(row??{}))setField(subjectId,key,evidence.field(subjectId,key,fields===null||fields?.includes(key)?'ordinary':'physical'));
++          for(const [old,key]of keyOf)if(old!==subjectId&&key===k&&!topology.has(old)){removeSupport(old);contributors.set(slot(old,'m'),evidence.member(old,'physical'));}
++        }
+         reconcileAddress(k, subjectId);
+         place(subjectId);
+         if (k !== undefined) keyOf.set(subjectId, k);
+diff --git a/packages/kernel/src/lib/internals/entity-publication.ts b/packages/kernel/src/lib/internals/entity-publication.ts
+index 8ebfbbd9..fe892c94 100644
+--- a/packages/kernel/src/lib/internals/entity-publication.ts
++++ b/packages/kernel/src/lib/internals/entity-publication.ts
+@@ -1,3 +1,4 @@
++import type { EntityProjectionSeedEntry } from './entity-projection-seed';
+ import type { WriteMetadata } from '../mutation-types';
+ import { combineTerminalRecords, installTerminalRecord, type PreparedPublicationUnit } from './intrinsic-mutation';
+ import type { StructuralEffect } from './source-mutation';
+@@ -14,6 +15,7 @@ export interface EntityPublicationStep {
+   readonly ordinal: number;
+   readonly authoredRemoval?: EntityPublicationEdit;
+   readonly ordinary: readonly EntityPublicationEdit[];
++  readonly physical?: readonly EntityPublicationEdit[];
+ }
+ /** Preserve authored tombstones even when source ordinary membership was absent. */
+ export function entityPublicationOrdinary(packet: EntityPublicationPacket): readonly EntityPublicationEdit[] {
+@@ -28,6 +30,7 @@ export interface EntityPublicationPacket {
+   readonly owner: number;
+   readonly id: object;
+   readonly inputs?: readonly object[];
++  readonly seed?:readonly EntityProjectionSeedEntry<string|number,unknown>[];
+   readonly meta: WriteMetadata | undefined;
+   readonly physical: readonly EntityPublicationEdit[];
+   readonly ordinary: readonly EntityPublicationEdit[];
+@@ -35,12 +38,23 @@ export interface EntityPublicationPacket {
+   readonly physicalOrder?: readonly number[];
+   readonly ordinaryOrder?: readonly number[];
+ }
++/** Opaque source-issued support; the reducer transports, never interprets, it. */
++export interface EntityPublicationEvidence {
++  exclusions?():readonly (readonly [number,object])[];
++  member(subject:number, view:'physical'|'ordinary'): object;
++  field(subject:number, key:string, view:'physical'|'ordinary'): object;
++  placement(subject:number, view:'physical'|'ordinary'): object;
++  keyMapping(subject:number, view:'physical'|'ordinary'): object;
++  forEdit?(edit:EntityPublicationEdit):EntityPublicationEvidence;
++}
+ export interface EntityPublicationParticipant {
++  seedRequested?():boolean;
+   prepare(packet: EntityPublicationPacket, native?: object): PreparedPublicationUnit | undefined;
+   complete(completion: object): void;
+   captureInput?(subject?: number, field?: string): object | undefined;
+   retire?(subject: number): void;
+   captureViews?(subject?: number,field?: string): readonly object[];
++  evidence?():EntityPublicationEvidence;
+   inspect?(): Readonly<Record<string,number>>;
+ }
+ let factory: ((source: EntityPublicationSource) => EntityPublicationParticipant) | undefined;
+@@ -53,14 +67,16 @@ export class EntityPublicationSource {
+   private native: EntityPublicationParticipant | undefined;
+   private readonly recipients = new Set<EntityPublicationParticipant>();
+   private recipientRevision = 0;
++  private revisionToken:object={};
++  revision():object { return this.revisionToken; }
+   private nativeParticipant(): EntityPublicationParticipant | undefined {
+     return this.native ??= factory?.(this);
+   }
+   subscribe(participant: EntityPublicationParticipant): () => void {
+     this.nativeParticipant();
+     this.recipients.add(participant);
+-    this.recipientRevision++;
+-    return () => { if(this.recipients.delete(participant))this.recipientRevision++; };
++    this.recipientRevision++;this.revisionToken={};
++    return () => { if(this.recipients.delete(participant)){this.recipientRevision++;this.revisionToken={};} };
+   }
+   captureInput(subject?: number, field?: string): object | undefined {
+     return this.nativeParticipant()?.captureInput?.(subject, field);
+@@ -79,7 +95,7 @@ export class EntityPublicationSource {
+     group.state.packets.push(packet);return group.publication;
+   }
+   prepare(packet: EntityPublicationPacket): PreparedPublicationUnit | undefined {
+-    const recipientRevision = this.recipientRevision;
++    const recipientRevision = this.recipientRevision,sourceRevision=this.revisionToken;
+     const parts: { participant: EntityPublicationParticipant; unit: PreparedPublicationUnit }[] = [];
+     const native = this.nativeParticipant();
+     const nativeUnit = native?.prepare(packet);
+@@ -88,14 +104,17 @@ export class EntityPublicationSource {
+       const unit = participant.prepare(packet, nativeUnit?.completion);
+       if (unit) parts.push({ participant, unit });
+     }
++    if(sourceRevision!==this.revisionToken&&recipientRevision===this.recipientRevision)throw new Error("Entity publication source changed during preparation");
+     if (recipientRevision !== this.recipientRevision) throw new Error('Entity publication recipients changed during preparation');
+     if (!parts.length) return undefined;
+     return {
+-      record: combineTerminalRecords(...parts.map(part => part.unit.record))!,
++      record: combineTerminalRecords(...parts.map(part => part.unit.record),{writes:[{map:{set:(_key:unknown,value:unknown)=>{this.revisionToken=value as object;}},key:undefined,value:{}}],adds:[]})!,
+       completion: { parts },
+       finalize: () => { for (const part of parts) part.unit.finalize?.(); },
+     };
+   }
++  requestsSeed():boolean { return [...this.recipients].some(participant=>participant.seedRequested?.()); }
++  evidence():EntityPublicationEvidence|undefined { return this.nativeParticipant()?.evidence?.(); }
+   captureViews(subject?:number,field?:string): readonly object[] { return this.nativeParticipant()?.captureViews?.(subject,field)??[]; }
+   inspect(): Readonly<Record<string,number>> { return {...(this.native?.inspect?.()??{}),recipients:this.recipients.size,native:this.native?1:0}; }
+   retire(subject: number): void { this.native?.retire?.(subject); }
+diff --git a/packages/kernel/src/lib/link.ts b/packages/kernel/src/lib/link.ts
+index 615756f4..55dde1b6 100644
+--- a/packages/kernel/src/lib/link.ts
++++ b/packages/kernel/src/lib/link.ts
+@@ -1,5 +1,5 @@
+ import './experimental-publication/entity';
+-import { entityPublicationOrdinary, entityPublicationUnit, getEntityPublicationBinding } from './internals/entity-publication';
++import { entityPublicationOrdinary, entityPublicationUnit, getEntityPublicationBinding, type EntityPublicationEvidence } from './internals/entity-publication';
+ import { entityValueTransition } from './internals/entity-value-transition';
+ import type { NativeRequirement } from './experimental-publication/lifecycle';
+ import { combineTerminalRecords } from './internals/intrinsic-mutation';
+@@ -377,9 +377,18 @@ export function link<S>(
+    * Seeded here, at the same RELATIONSHIP-CREATION ADOPTION boundary as
+    * `eligible` above and from the same current truth.
+    */
++  const seedCollectionProjection=(node:unknown):EntityEgressProjection=>{
++    const source=getEntityPublicationBinding(node)?.source,revision=source?.revision();
++    const seed=getEntityProjectionSeed(node)??[];
++    const facts=research.baselineEntityEvidence(source?.evidence(),registry.id);
++    const result=createEntityEgressProjection(seed,undefined,facts);
++    if(source?.revision()!==revision)throw new Error('Collection seed changed during preparation');
++    return result;
++  };
+   const entityProjection: EntityEgressProjection | undefined = collection
+-    ? createEntityEgressProjection(getEntityProjectionSeed(x) ?? [])
++    ? seedCollectionProjection(x)
+     : undefined;
++  if(entityProjection)eligible=entityProjection.value() as T;
+ 
+   /**
+    * Scalar and branch sources advance their eligible value through shared
+@@ -434,7 +443,7 @@ export function link<S>(
+             ? relativeSourceAddress(sourceAddress, address)
+             : undefined;
+         if (position === undefined || relative === undefined) return;
+-        const projection = createEntityEgressProjection(seed);
++        const projection = seedCollectionProjection(node);
+         nestedCollections.set(position, {
+           node,
+           projection,
+@@ -531,7 +540,7 @@ export function link<S>(
+     // the leaf notifications that applying it will generate. External truth is
+     // authoritative for this relationship — it is not inspection, and it is not
+     // an authored mutation to be reduced.
+-    eligible = value;
++    if(!entityProjection)eligible = value;
+     research.acquire(registry.id, publicationPosition, () =>
+       external(() => write(value))
+     );
+@@ -539,9 +548,8 @@ export function link<S>(
+     // may emit no notification at all when it coincides with what is already
+     // shown (the I4 case), so the shadow is rebuilt from the post-apply
+     // topology rather than inferred from events that may never arrive.
+-    if (entityProjection) {
+-      entityProjection.reseed(getEntityProjectionSeed(x) ?? []);
+-    }
++    // Collection acquisition installs its prepared seed in the source unit.
++    // A post-write read could overwrite callback-authored newer truth.
+   };
+ 
+   research.bindSource(
+@@ -549,10 +557,7 @@ export function link<S>(
+     registry.id,
+     publicationPosition,
+     {
+-      supported:
+-        !collection &&
+-        (isWritableLocation(x) || ((isNodeAccessor(x) || !!getRootTree(x)) && collectionSources.size === 0)) &&
+-        (!entityLocation || entityLocation.fieldKey !== undefined),
++      supported:collection||isWritableLocation(x)||isNodeAccessor(x)||!!getRootTree(x),
+       subject: entityLocation?.subjectId,
+       field: entityLocation?.fieldKey,
+     },
+@@ -570,11 +575,14 @@ export function link<S>(
+   const ownEntitySource=getEntityPublicationBinding(x);
+   const registerEntityRecipient=(node:unknown,projection:EntityEgressProjection|undefined,nested?:NestedCollection):void=>{
+     const binding=getEntityPublicationBinding(node); if(!binding)return;
+-    if(nested)research.registerSourceProjectionField(consequenceKey,node as object,[...nested.relativeAddress,'all']);
++    if(projection)research.registerCollectionProjection(consequenceKey,node as object,nested?.relativeAddress,projection.support());
+     releaseEntityPublications.push(binding.source.subscribe({
++      seedRequested:()=>!!projection&&research.acquiringCollection(consequenceKey,node as object),
+       prepare(packet,native){
+         const support=(native as {support?:(subject?:number,field?:string)=>NativeRequirement}|undefined)?.support;
+-        const staged=projection?.prepare(packet);
++        const prepared=native as {requirement?:NativeRequirement;facts?:EntityPublicationEvidence}|undefined;
++        const acquired=!!projection&&research.acquiringCollection(consequenceKey,node as object)&&packet.seed!==undefined;
++        const staged=acquired?projection!.prepareSeed(packet.seed!,research.acquiredEntityEvidence()):projection?.prepare(packet,prepared?.facts);
+         let next:unknown=staged?.value;
+         let changed=staged?.changed??false;
+         if(!projection){
+@@ -592,8 +600,8 @@ export function link<S>(
+         }
+         const before=eligible;
+         const after=nested?applyAtRelativePath(eligible,nested.relativeAddress,{all:next}):next;
+-        const affected=entityPublicationOrdinary(packet).some(edit=>binding.subject===undefined||edit.subject===binding.subject&&(edit.structural?.kind==='remove'||binding.field===undefined||edit.fields===null||edit.fields.includes(binding.field)));
+-        const receipt=affected&&support?research.prepareSourceProjection(consequenceKey,{intent:'replace',before:nested?nested.projection.value():before,after:nested?next:after,changed},support(binding.subject,binding.field),nested?node as object:undefined):undefined;
++        const affected=acquired||!!staged?.supportEdits.length||!!packet.ordinaryOrder||entityPublicationOrdinary(packet).some(edit=>binding.subject===undefined||edit.subject===binding.subject&&(edit.structural?.kind==='remove'||binding.field===undefined||edit.fields===null||edit.fields.includes(binding.field)));
++        const receipt=affected&&prepared?.requirement?research.prepareSourceProjection(consequenceKey,{intent:'replace',before:nested?nested.projection.value():before,after:nested?next:after,changed},prepared.requirement,undefined,projection?{key:node as object,edits:staged?.supportEdits??[],acquired}:undefined,!projection?support?.(binding.subject,binding.field):undefined):undefined;
+         if(!staged&&!receipt)return;
+         const install={set(_key:unknown,_value:unknown){if(changed){eligible=(nested?applyAtRelativePath(eligible,nested.relativeAddress,{all:next}):next) as T;dirty=true;}}};
+         return {record:combineTerminalRecords(staged?.record,receipt?.record,{writes:[{map:install,key:undefined,value:undefined}],adds:[]})!,completion:{receipt:receipt?.completion},finalize:receipt?.finalize};

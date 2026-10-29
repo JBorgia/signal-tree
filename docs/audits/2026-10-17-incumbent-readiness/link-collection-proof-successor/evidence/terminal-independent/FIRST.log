@@ -1,0 +1,43 @@
+
+> nx run kernel:test src/lib/publication-terminal-consumer-independent.spec.ts src/lib/publication-proof-retirement.spec.ts src/lib/publication-uncertainty-provenance.spec.ts src/lib/publication-terminal-obligation.spec.ts src/lib/publication-terminal-horizon-independent.spec.ts
+
+> node tools/run-core-vitest.mjs src/lib/publication-terminal-consumer-independent.spec.ts src/lib/publication-proof-retirement.spec.ts src/lib/publication-uncertainty-provenance.spec.ts src/lib/publication-terminal-obligation.spec.ts src/lib/publication-terminal-horizon-independent.spec.ts
+
+(node:88186) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:88197) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/link-collection-proof-successor/packages/kernel
+
+(node:88210) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:88209) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:88207) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:88208) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:88211) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ Test Files  5 passed (5)
+      Tests  27 passed (27)
+   Start at  09:28:13
+   Duration  1.51s (transform 1.63s, setup 0ms, import 2.02s, tests 64ms, environment 2.50s)
+
+
+
+
+ NX   Successfully ran target test for project kernel
+
+
+  Run duration:      2.2s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     2.1s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    2.1s

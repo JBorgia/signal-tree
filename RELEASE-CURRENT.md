@@ -84,18 +84,25 @@ two fixture accesses. No full qualification, artifact or cost acceptance follows
 Production `87f6831f`, the conservative default, budgets and B closure remain
 unchanged.
 
-## Authorized production route — execution started
+## Authorized production route — bounded successor rejected
 
-The owner approved the [full production-route proposal](docs/audits/2026-10-17-incumbent-readiness/production-route/AUTHORITY.md)
-on October29. Continue in dependency order without routine check-ins: complete
-and independently review collection binding; qualify one bounded successor;
-exercise public installed-package workflows; then freeze and run full verification
-and matched costs. Pilot/release authority remains separate.
+The owner-approved [production route](docs/audits/2026-10-17-incumbent-readiness/production-route/AUTHORITY.md)
+reached one reviewed isolated implementation. The [rejected checkpoint and replays](docs/audits/2026-10-17-incumbent-readiness/link-collection-proof-successor/README.md)
+preserve `87ddcfde` over frozen `75416029`. Open-validation enrollment loses later
+support, omitted ancestors retain excluded collection proof, and incoming acquisition
+permission reaches peer connections. These are covered recurrence failures; no
+further runtime patch or broader qualification follows automatically.
 
-The collection recurrence stop below stays active during design review. Runtime
-75416029 is frozen. Parallel application/HTTP fixture preparation does not qualify
-that runtime or close publication, selected-inverse, input-view or retirement gates.
-Production87f6831f, existing budgets and B closure remain unchanged.
+The independent terminal-helper vector passed27/27 at its recorded source, not as
+final combined qualification or native retirement evidence. Identical public
+framework probes also fail on754 and production87: Angular callback selection is
+stale; Vue tap ids loses its ref carrier. These inherited findings remain separate.
+HTTP fixture preparation passed2/2; installed consumer compilation is blocked, and
+the localhost lab remains a source diagnostic. Full suites, artifacts, costs,
+collectibility and selected-inverse qualification remain unexecuted/open.
+
+Production `87f6831f`, the conservative default, existing budgets and B closure are
+unchanged. Pilot/release authority remains separate. The recurrence stop is active.
 
 ## Collection path — covered recurrence; runtime successor stopped
 

@@ -1,0 +1,100 @@
+
+> nx run kernel:test --testFile=src/lib/collection-contributor-core.spec.ts
+
+> node tools/run-core-vitest.mjs --testFile=src/lib/collection-contributor-core.spec.ts
+
+(node:92672) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:92684) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/link-collection-proof-successor/packages/kernel
+
+(node:92691) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ❯ src/lib/collection-contributor-core.spec.ts (11 tests | 2 failed) 61ms
+   × incoming full replacement has local support and does not certify another recipient 6ms
+   × incoming equal replacement has local support and does not certify another recipient 4ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/lib/collection-contributor-core.spec.ts > incoming full replacement has local support and does not certify another recipient
+AssertionError: expected [ [ { id: 'a', x: 10, y: 11 } ] ] to deeply equal []
+
+- Expected
++ Received
+
+- []
++ [
++   [
++     {
++       "id": "a",
++       "x": 10,
++       "y": 11,
++     },
++   ],
++ ]
+
+ ❯ src/lib/collection-contributor-core.spec.ts:81:45
+     79|   const q=tree.transact(()=>tree.$.branch.rows.updateOne('a',{x:7}));a…
+     80|   const x=equal?7:10,y=equal?0:11;incoming([{id:'a',x,y}]);await flush…
+     81|   expect(sent).toEqual([]);expect(peerSent).toEqual([]);
+       |                                             ^
+     82|   const before=q.inspect();const receipt=c.declare({kind:'independent'…
+     83|   expect(sent).toEqual([[{id:'a',x,y:8}]]);expect(receipt.read()).toMa…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  src/lib/collection-contributor-core.spec.ts > incoming equal replacement has local support and does not certify another recipient
+AssertionError: expected [ [ { id: 'a', x: 7, y: +0 } ] ] to deeply equal []
+
+- Expected
++ Received
+
+- []
++ [
++   [
++     {
++       "id": "a",
++       "x": 7,
++       "y": 0,
++     },
++   ],
++ ]
+
+ ❯ src/lib/collection-contributor-core.spec.ts:81:45
+     79|   const q=tree.transact(()=>tree.$.branch.rows.updateOne('a',{x:7}));a…
+     80|   const x=equal?7:10,y=equal?0:11;incoming([{id:'a',x,y}]);await flush…
+     81|   expect(sent).toEqual([]);expect(peerSent).toEqual([]);
+       |                                             ^
+     82|   const before=q.inspect();const receipt=c.declare({kind:'independent'…
+     83|   expect(sent).toEqual([[{id:'a',x,y:8}]]);expect(receipt.read()).toMa…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  2 failed | 9 passed (11)
+   Start at  09:29:48
+   Duration  1.94s (transform 931ms, setup 0ms, import 1.11s, tests 61ms, environment 524ms)
+
+Warning: command "node tools/run-core-vitest.mjs --testFile=src/lib/collection-contributor-core.spec.ts" exited with non-zero status code
+
+
+ NX   Running target test for project kernel failed
+
+Failed tasks:
+
+- kernel:test
+
+Hint: run the command with --verbose for more details.
+
+  Run duration:      2.9s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     2.9s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    2.9s

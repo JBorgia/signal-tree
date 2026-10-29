@@ -1,0 +1,43 @@
+
+> nx run kernel:test --testFile=src/lib/collection-contributor-core.spec.ts --testFile=src/lib/authored-removal-contract.spec.ts --testFile=src/lib/authored-removal-independent.spec.ts --testFile=src/lib/authored-removal-obligations.spec.ts --testFile=src/lib/ordinary-order-source-boundaries.spec.ts
+
+> node tools/run-core-vitest.mjs --testFile=src/lib/collection-contributor-core.spec.ts --testFile=src/lib/authored-removal-contract.spec.ts --testFile=src/lib/authored-removal-independent.spec.ts --testFile=src/lib/authored-removal-obligations.spec.ts --testFile=src/lib/ordinary-order-source-boundaries.spec.ts
+
+(node:47696) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:47707) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/link-collection-proof-successor/packages/kernel
+
+(node:47731) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:47727) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:47729) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:47728) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:47732) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ Test Files  5 passed (5)
+      Tests  31 passed (31)
+   Start at  09:14:30
+   Duration  1.37s (transform 2.81s, setup 0ms, import 3.68s, tests 351ms, environment 1.87s)
+
+
+
+
+ NX   Successfully ran target test for project kernel
+
+
+  Run duration:      2.2s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     2.2s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    2.2s

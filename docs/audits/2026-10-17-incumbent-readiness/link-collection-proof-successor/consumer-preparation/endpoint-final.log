@@ -1,0 +1,10 @@
+✔ real HTTP log, hold, release, fail-before-apply, explicit retry and reset (31.343459ms)
+✔ shutdown terminates held request without applying it (5.836917ms)
+ℹ tests 2
+ℹ suites 0
+ℹ pass 2
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 86.688875

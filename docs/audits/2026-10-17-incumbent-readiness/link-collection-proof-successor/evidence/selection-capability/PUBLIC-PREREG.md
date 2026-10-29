@@ -1,0 +1,5 @@
+# Public selected callback discriminator, pre-execution
+
+Warm library-owned activeId, ids, all and row lookup atA. Transaction rekeysA→X and addsD. Warm pending activeIdX + idsX,C,D. On rollback's onRemove(D), record direct library activeId/ids/all/byId(A), then selectC. After rollback and framework settle, require callback snapshot selectionA and rowsA,C (direct A exists), final selectionC, and final watcher snapshot exactly current coherentC. No app-owned computed and no freshness assertion inside raw/private install interval. Record observations before assertions.
+
+Basis: selected unit's public tap runs after its underlying disposition, original complete selected-unit contract, existing selection rekey-follows-lifetime rule, Vue prepared-selection-publication callbackC survival/final delivered coherence. No new arbitrary-order rollback promise. A failure specifically at callback snapshot is distinct from final watcher failure. Preserve original tests and private capability reds; use -t public callback discriminator to execute only this new case. Compare exactproduction87 if unchanged control checkout available; no broad suite.

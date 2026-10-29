@@ -1,0 +1,35 @@
+
+> nx run kernel:test src/lib/publication-uncertainty-provenance.spec.ts
+
+> node tools/run-core-vitest.mjs src/lib/publication-uncertainty-provenance.spec.ts
+
+(node:15569) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:15573) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/link-collection-proof-successor/packages/kernel
+
+(node:15907) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ Test Files  1 passed (1)
+      Tests  4 passed (4)
+   Start at  09:05:11
+   Duration  1.35s (transform 66ms, setup 0ms, import 81ms, tests 6ms, environment 1.05s)
+
+
+
+
+ NX   Successfully ran target test for project kernel
+
+
+  Run duration:      2.5s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     2.5s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    2.5s

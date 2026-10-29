@@ -1,0 +1,165 @@
+import { getActiveWriteContext } from '../write-context';
+import { combineTerminalRecords, type TerminalRecordPlan } from '../internals/intrinsic-mutation';
+import { entityPublicationOrdinary, currentEntityPublicationInputs, registerEntityPublicationFactory, type EntityPublicationEvidence, type EntityPublicationEdit } from '../internals/entity-publication';
+import * as lifecycle from './lifecycle';
+import { currentNativePublicationInputs } from './private';
+
+type Requirement = lifecycle.NativeRequirement;
+type Lookup<V>=Pick<ReadonlyMap<number,V>,'get'>;
+const overlay=<V>(base:Lookup<V>,next:Lookup<V>,removed?:ReadonlySet<number>):Lookup<V>=>({get:key=>next.get(key)??(removed?.has(key)?undefined:base.get(key))});
+type View = {requirement:Requirement; present?:boolean};
+type Member = {readonly present:boolean;readonly requirement:Requirement};
+const unavailable = lifecycle.unavailableRequirement;
+const own = (row:unknown,key:string):boolean=>row!==null&&typeof row==='object'&&Object.prototype.hasOwnProperty.call(row,key);
+const fieldValue = (row:unknown,key:string):unknown=>own(row,key)?(row as Record<string,unknown>)[key]:undefined;
+
+/** Only current support identities; values and placement remain native kernel truth. */
+registerEntityPublicationFactory(() => {
+  const fields=new Map<number,Map<string,Requirement>>();
+  const members=new Map<number,Member>();
+  const placements=new Map<number,Requirement>();
+  const views=new Map<number,Map<string,View>>();
+  const visible=new Map<number,View>();
+  const placementViews=new Map<number,View>();
+  const mappings=new Map<number,Requirement>();
+  const mappingViews=new Map<number,View>();
+  const missing=unavailable();
+  const evidence=(ordinaryFields:Lookup<Map<string,Requirement>>=fields,physicalFields:Lookup<Map<string,View>>=views,ordinaryMembers:Lookup<Member>=members,physicalMembers:Lookup<View>=visible,ordinaryPlacements:Lookup<Requirement>=placements,physicalPlacements:Lookup<View>=placementViews,ordinaryMappings:Lookup<Requirement>=mappings,physicalMappings:Lookup<View>=mappingViews):EntityPublicationEvidence=>({
+    member:(id,view)=>view==='ordinary'?ordinaryMembers.get(id)?.requirement??missing:physicalMembers.get(id)?.requirement??missing,
+    field:(id,key,view)=>view==='ordinary'?ordinaryFields.get(id)?.get(key)??missing:physicalFields.get(id)?.get(key)?.requirement??missing,
+    placement:(id,view)=>view==='ordinary'?ordinaryPlacements.get(id)??missing:physicalPlacements.get(id)?.requirement??missing,
+    keyMapping:(id,view)=>view==='ordinary'?ordinaryMappings.get(id)??missing:physicalMappings.get(id)?.requirement??missing,
+  });
+  let acquisitions=0,retirements=0,inputVisits=0;
+  const physicalViews=(subject?:number,field?:string):View[]=>{
+    if(subject!==undefined){
+      const member=visible.get(subject),row=views.get(subject);
+      if(member?.present===false)return [member];
+      if(!row)return [member??{requirement:unavailable()}];
+      inputVisits+=field===undefined?row.size:1;
+      return [...(member?[member]:[]),...(field===undefined?row.values():[row.get(field)??{requirement:lifecycle.initialRequirement()}])];
+    }
+    const result:View[]=[...visible.values(),...placementViews.values()];
+    for(const [id,row]of views)if(visible.get(id)?.present!==false)result.push(...row.values());
+    inputVisits+=result.length;return result;
+  };
+  return {
+    captureViews:physicalViews,
+    evidence:()=>({...evidence(),exclusions:()=>{
+      const result=new Map<number,object>();
+      for(const [id,member]of members)if(!member.present)result.set(id,member.requirement);
+      for(const [id,view]of visible)if(view.present===false)result.set(id,view.requirement);
+      return [...result];
+    }}),
+    captureInput(subject,field){return {native:Object.freeze([...new Set(physicalViews(subject,field).map(view=>view.requirement))].map(lifecycle.captureNativeInput))};},
+    inspect(){return {rows:fields.size,fields:[...fields.values()].reduce((n,row)=>n+row.size,0),presence:members.size,negativePresence:[...members.values()].filter(member=>!member.present).length,placements:placements.size,viewRows:views.size,viewFields:[...views.values()].reduce((n,row)=>n+row.size,0),negativeViewFields:[...views.values()].reduce((n,row)=>n+[...row.values()].filter(view=>view.present===false).length,0),visible:visible.size,negativeVisible:[...visible.values()].filter(view=>view.present===false).length,placementViews:placementViews.size,preparedFieldEdits:acquisitions,retireCalls:retirements,inputFactVisits:inputVisits};},
+    prepare(packet){
+      const inspection=packet.meta?.participation==='inspection';
+      const meta=getActiveWriteContext()??packet.meta,id=meta?.transactionId;
+      const owner=typeof id==='number'?lifecycle.ownerCell(packet.owner,id):undefined;
+      const valid=id===undefined||!!owner&&meta?.transactionOwner===lifecycle.ownerToken(packet.owner);
+      const inputs=[...currentNativePublicationInputs(),...currentEntityPublicationInputs().flatMap(input=>(input as {native?:readonly lifecycle.NativeInput[]}).native??[])];
+      const prepared=inspection?undefined:lifecycle.prepareNativeRequirement(owner?[owner]:[],!valid||meta?.origin!==undefined,inputs);
+      const requirement=prepared?.requirement??unavailable();
+      const writes:TerminalRecordPlan['writes'][number][]=[];
+      const deletes:NonNullable<TerminalRecordPlan['deletes']>[number][]=[];
+      const nextFields=new Map<number,Map<string,Requirement>>();
+      const nextViews=new Map<number,Map<string,View>>();
+      const nextMembers=new Map<number,Member>();
+      const nextPlacements=new Map<number,Requirement>();
+      const removed=new Set<number>();
+      const nextMappings=new Map<number,Requirement>(),nextMappingViews=new Map<number,View>();
+      const physicalMembers=new Map<number,View>(),physicalPlacements=new Map<number,View>();
+      const paired=new Map<EntityPublicationEdit,EntityPublicationEdit>();
+      for(const step of packet.steps??[]) for(const edit of [...step.ordinary,...(step.authoredRemoval?[step.authoredRemoval]:[])]) {
+        const physical=step.physical?.find(value=>value.subject===edit.subject);
+        if(physical)paired.set(edit,physical);
+      }
+      // Packets with no explicit steps are one point unit, never a flattened multi-step unit.
+      if(!packet.steps)for(const edit of packet.ordinary){const physical=packet.physical.find(value=>value.subject===edit.subject);if(physical)paired.set(edit,physical);}
+      const physicalAt=new Map<EntityPublicationEdit,Map<string,View>>();
+      const selectedAt=new Map<EntityPublicationEdit,EntityPublicationEvidence>();
+      const rowFields=(id:number):Map<string,Requirement>=>{let row=nextFields.get(id);if(!row)nextFields.set(id,row=new Map(fields.get(id)));return row;};
+      const rowViews=(id:number):Map<string,View>=>{let row=nextViews.get(id);if(!row)nextViews.set(id,row=new Map(views.get(id)));return row;};
+      // Physical support is distinct from ordinary eligibility. Inspection
+      // changes only the physical certificate, including negative membership.
+      for(const edit of packet.physical){
+        if(edit.structural?.kind==='remove'){
+          physicalMembers.set(edit.subject,{requirement,present:false});
+          writes.push({map:visible,key:edit.subject,value:{requirement,present:false}});
+          deletes.push({map:placementViews,key:edit.subject});continue;
+        }
+        if(edit.structural?.kind==='rekey'){nextMappingViews.set(edit.subject,{requirement});continue;}
+        const row=rowViews(edit.subject);
+        const keys=edit.fields===null?[...new Set([...row.keys(),...Object.keys(edit.after??{})])]:edit.fields;
+        for(const key of keys)row.set(key,{requirement,present:own(edit.after,key)});
+        physicalAt.set(edit,new Map(row));
+        if(edit.structural?.kind==='add'){nextMappingViews.set(edit.subject,{requirement});physicalMembers.set(edit.subject,{requirement,present:true});physicalPlacements.set(edit.subject,{requirement});}
+        if(edit.structural?.kind==='add')writes.push({map:visible,key:edit.subject,value:{requirement,present:true}},{map:placementViews,key:edit.subject,value:{requirement}});
+      }
+      if(packet.physicalOrder)for(const subject of packet.physicalOrder){physicalPlacements.set(subject,{requirement});writes.push({map:placementViews,key:subject,value:{requirement}});}
+      for(const edit of entityPublicationOrdinary(packet)){
+        if(edit.structural?.kind==='remove'){
+          removed.add(edit.subject);nextFields.delete(edit.subject);nextViews.delete(edit.subject);
+          nextMembers.set(edit.subject,{present:false,requirement});
+          writes.push({map:visible,key:edit.subject,value:{requirement,present:false}});
+          deletes.push({map:fields,key:edit.subject},{map:views,key:edit.subject},{map:placements,key:edit.subject},{map:placementViews,key:edit.subject});continue;
+        }
+        if(edit.structural?.kind==='rekey'){nextMappings.set(edit.subject,requirement);continue;}
+        removed.delete(edit.subject);
+        const row=rowFields(edit.subject),view=rowViews(edit.subject);
+        if(edit.structural?.kind==='add'){
+          nextMembers.set(edit.subject,{present:true,requirement});nextPlacements.set(edit.subject,requirement);nextMappings.set(edit.subject,requirement);
+          writes.push({map:visible,key:edit.subject,value:{requirement,present:true}},{map:placementViews,key:edit.subject,value:{requirement}});
+        }
+        const keys=edit.fields===null?[...new Set([...row.keys(),...Object.keys(edit.after??{})])]:edit.fields;
+        const physical=paired.get(edit);
+        for(const key of keys){
+          row.set(key,requirement);
+          const previous=views.get(edit.subject)?.get(key);
+          const same=!!previous&&!!physical&&own(physical.before,key)===own(physical.after,key)&&Object.is(fieldValue(physical.before,key),fieldValue(physical.after,key));
+          if(same){
+            view.set(key,previous);
+            writes.push({map:{set(_key:unknown,value:unknown){previous.requirement=value as Requirement;}},key:undefined,value:requirement});
+          }else view.set(key,{requirement,present:own(physical?.after??edit.after,key)});
+          acquisitions++;
+        }
+        const ordinaryRow=new Map(row),physicalRow=new Map(physical&&physicalAt.get(physical)||view);
+        const member=nextMembers.get(edit.subject)??members.get(edit.subject),placement=nextPlacements.get(edit.subject)??placements.get(edit.subject);
+        const ordinaryKey=nextMappings.get(edit.subject)??mappings.get(edit.subject)??missing,physicalKey=nextMappingViews.get(edit.subject)?.requirement??mappingViews.get(edit.subject)?.requirement??missing;
+        selectedAt.set(edit,{
+          member:(id,kind)=>id===edit.subject&&kind==='ordinary'?(member?.requirement??missing):evidence().member(id,kind),
+          field:(id,key,kind)=>id===edit.subject?(kind==='ordinary'?ordinaryRow.get(key)??missing:physicalRow.get(key)?.requirement??missing):evidence().field(id,key,kind),
+          placement:(id,kind)=>id===edit.subject&&kind==='ordinary'?(placement??missing):evidence().placement(id,kind),
+          keyMapping:(id,kind)=>id===edit.subject?(kind==='ordinary'?ordinaryKey:physicalKey):evidence().keyMapping(id,kind),
+        });
+      }
+      if(packet.ordinaryOrder)for(const subject of packet.ordinaryOrder)nextPlacements.set(subject,requirement);
+      for(const [key,value]of nextFields)if(!removed.has(key))writes.push({map:fields,key,value});
+      for(const [key,value]of nextViews)if(!removed.has(key))writes.push({map:views,key,value});
+      for(const [key,value]of nextMembers)writes.push({map:members,key,value});
+      for(const [key,value]of nextPlacements)writes.push({map:placements,key,value});
+      for(const [key,value]of nextMappings)if(value!==mappings.get(key))writes.push({map:mappings,key,value});
+      for(const [key,value]of nextMappingViews)if(value!==mappingViews.get(key))writes.push({map:mappingViews,key,value});
+      const selected=evidence(overlay(fields,nextFields,removed),overlay(views,nextViews,removed),overlay(members,nextMembers),overlay(visible,physicalMembers),overlay(placements,nextPlacements,removed),overlay(placementViews,physicalPlacements,removed),overlay(mappings,nextMappings),overlay(mappingViews,nextMappingViews));
+      selected.forEdit=edit=>selectedAt.get(edit)??selected;
+      const support=(subject?:number,field?:string):Requirement=>{
+        const sources:Requirement[]=[];
+        const selected=subject===undefined?[...new Set([...members.keys(),...fields.keys(),...entityPublicationOrdinary(packet).map(edit=>edit.subject)])]:[subject];
+        if(subject===undefined){const order=new Map(placements);for(const id of removed)order.delete(id);for(const [id,value]of nextPlacements)order.set(id,value);sources.push(...order.values());}
+        for(const id of selected){
+          const member=nextMembers.get(id)??members.get(id);if(member)sources.push(member.requirement);
+          if(member?.present===false)continue;
+          const row=nextFields.get(id)??fields.get(id);
+          if(field!==undefined){const value=row?.get(field);if(value)sources.push(value);}
+          else if(row)sources.push(...row.values());
+        }
+        // Transport D/I/W unchanged; actual native consumption alone maps D→I.
+        return {get proof(){return lifecycle.combineProofs(sources.map(lifecycle.nativeProof));},known:[],unknown:false,possible:[],captureWindow:false,frames:[],inputs:[]};
+      };
+      return {record:combineTerminalRecords(prepared?.record,{writes,deletes,adds:[]})!,completion:inspection?{}:{requirement,support,facts:selected},finalize:prepared?()=>lifecycle.finalizeNativeRequirement(requirement):undefined};
+    },
+    complete(){},
+    retire(subject){fields.delete(subject);members.delete(subject);placements.delete(subject);views.delete(subject);visible.delete(subject);placementViews.delete(subject);retirements++;},
+  };
+});

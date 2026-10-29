@@ -1,0 +1,78 @@
+
+> nx run angular:test src/lib/selected-active-id-preparation.spec.ts -t public callback discriminator
+
+> NODE_OPTIONS=--expose-gc npx vitest run --root packages/angular src/lib/selected-active-id-preparation.spec.ts -t "public callback discriminator"
+
+npm warn Unknown env config "verify-deps-before-run". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown project config "auto-install-peers". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown project config "shamefully-hoist". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+(node:59857) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:59879) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/slice5-production-control/packages/angular
+
+(node:59886) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+stdout | src/lib/selected-active-id-preparation.spec.ts > public callback discriminator sees restored library selection before choosing newer C
+selection-public-angular {"callbacks":[{"activeId":"X","ids":["A","C"],"all":[{"id":"A","n":1},{"id":"C","n":3}],"directA":1}],"final":{"activeId":"C","ids":["A","C"],"all":[{"id":"A","n":1},{"id":"C","n":3}],"directA":1},"seen":[{"activeId":"A","ids":["A","C"],"all":[{"id":"A","n":1},{"id":"C","n":3}],"directA":1},{"activeId":"X","ids":["X","C","D"],"all":[{"id":"A","n":1},{"id":"C","n":3},{"id":"D","n":4}],"directA":null},{"activeId":"C","ids":["A","C"],"all":[{"id":"A","n":1},{"id":"C","n":3}],"directA":1}]}
+
+ ❯ src/lib/selected-active-id-preparation.spec.ts (2 tests | 1 failed | 1 skipped) 19ms
+   × public callback discriminator sees restored library selection before choosing newer C 19ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/lib/selected-active-id-preparation.spec.ts > public callback discriminator sees restored library selection before choosing newer C
+AssertionError: expected [ { activeId: 'X', …(3) } ] to deeply equal [ { activeId: 'A', …(3) } ]
+
+- Expected
++ Received
+
+@@ -1,8 +1,8 @@
+  [
+    {
+-     "activeId": "A",
++     "activeId": "X",
+      "all": [
+        {
+          "id": "A",
+          "n": 1,
+        },
+
+ ❯ src/lib/selected-active-id-preparation.spec.ts:54:21
+     52|   const final=read();
+     53|   console.log('selection-public-angular',JSON.stringify({callbacks,fin…
+     54|   expect(callbacks).toEqual([{activeId:'A',ids:['A','C'],all:[{id:'A',…
+       |                     ^
+     55|   expect(final).toEqual({activeId:'C',ids:['A','C'],all:[{id:'A',n:1},…
+     56|   expect(seen.at(-1)).toEqual(final);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 1 skipped (2)
+   Start at  09:18:30
+   Duration  1.10s (transform 438ms, setup 198ms, import 499ms, tests 19ms, environment 241ms)
+
+Warning: command "NODE_OPTIONS=--expose-gc npx vitest run --root packages/angular src/lib/selected-active-id-preparation.spec.ts -t "public callback discriminator"" exited with non-zero status code
+
+
+ NX   Running target test for project angular failed
+
+Failed tasks:
+
+- angular:test
+
+Hint: run the command with --verbose for more details.
+
+  Run duration:      1.8s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     1.7s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        angular:test    1.7s

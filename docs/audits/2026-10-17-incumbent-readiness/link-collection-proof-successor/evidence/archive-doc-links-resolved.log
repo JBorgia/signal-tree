@@ -1,0 +1,17 @@
+node:internal/errors:537
+  function wrappedFn(...args) {
+                    ^
+
+RangeError: Maximum call stack size exceeded
+    at wrappedFn (node:internal/errors:537:21)
+    at require.resolve (node:internal/modules/helpers:163:5)
+    at resolve (file:///private/tmp/collection-doc-deps.mjs:5:60)
+    at nextStep (node:internal/modules/customization_hooks:189:26)
+    at resolveWithHooks (node:internal/modules/customization_hooks:417:10)
+    at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1137:25)
+    at require.resolve (node:internal/modules/helpers:171:31)
+    at resolve (file:///private/tmp/collection-doc-deps.mjs:5:60)
+    at nextStep (node:internal/modules/customization_hooks:189:26)
+    at resolveWithHooks (node:internal/modules/customization_hooks:417:10)
+
+Node.js v24.15.0

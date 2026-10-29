@@ -1,0 +1,79 @@
+
+> nx run kernel:test --testFile=src/lib/collection-contributor-core.spec.ts --testFile=src/lib/authored-removal-contract.spec.ts --testFile=src/lib/authored-removal-independent.spec.ts --testFile=src/lib/authored-removal-obligations.spec.ts --testFile=src/lib/ordinary-order-source-boundaries.spec.ts --testFile=src/lib/aggregate-installed-publication.spec.ts
+
+> node tools/run-core-vitest.mjs --testFile=src/lib/collection-contributor-core.spec.ts --testFile=src/lib/authored-removal-contract.spec.ts --testFile=src/lib/authored-removal-independent.spec.ts --testFile=src/lib/authored-removal-obligations.spec.ts --testFile=src/lib/ordinary-order-source-boundaries.spec.ts --testFile=src/lib/aggregate-installed-publication.spec.ts
+
+(node:54591) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:54635) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/link-collection-proof-successor/packages/kernel
+
+(node:54649) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:54650) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:54645) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:54647) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:54648) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:54646) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ❯ src/lib/aggregate-installed-publication.spec.ts (15 tests | 1 failed) 115ms
+     × ancestor updater argument wider than descendant recipient stays unknown rather than borrowing sibling input proof 9ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/lib/aggregate-installed-publication.spec.ts > authorized existing-key branch/root installed publication > ancestor updater argument wider than descendant recipient stays unknown rather than borrowing sibling input proof
+AssertionError: expected [ { x: 1, y: +0 } ] to deeply equal []
+
+- Expected
++ Received
+
+- []
++ [
++   {
++     "x": 1,
++     "y": 0,
++   },
++ ]
+
+ ❯ src/lib/aggregate-installed-publication.spec.ts:131:69
+    129|   try{
+    130|    const receipt=c.declare({kind:'independent'},()=>t.$(input=>({...in…
+    131|    await flush();expect(t.$.pair()).toEqual({x:1,y:0});expect(sent).to…
+       |                                                                     ^
+    132|    expect(owner.$.z()).toBe(7);p.rollback();await flush();expect(sent)…
+    133|   }finally{c.dispose();t.destroy();owner.destroy();}
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed | 5 passed (6)
+      Tests  1 failed | 46 passed (47)
+   Start at  09:16:32
+   Duration  2.25s (transform 6.29s, setup 0ms, import 7.93s, tests 502ms, environment 3.85s)
+
+Warning: command "node tools/run-core-vitest.mjs --testFile=src/lib/collection-contributor-core.spec.ts --testFile=src/lib/authored-removal-contract.spec.ts --testFile=src/lib/authored-removal-independent.spec.ts --testFile=src/lib/authored-removal-obligations.spec.ts --testFile=src/lib/ordinary-order-source-boundaries.spec.ts --testFile=src/lib/aggregate-installed-publication.spec.ts" exited with non-zero status code
+
+
+ NX   Running target test for project kernel failed
+
+Failed tasks:
+
+- kernel:test
+
+Hint: run the command with --verbose for more details.
+
+  Run duration:      3.0s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     2.9s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    2.9s

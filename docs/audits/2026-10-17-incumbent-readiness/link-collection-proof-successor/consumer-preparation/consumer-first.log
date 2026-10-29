@@ -1,0 +1,3 @@
+../../../../private/tmp/v16-company-workflow-preparation/workflow.ts(1,84): error TS2307: Cannot find module '@signal-tree/angular' or its corresponding type declarations.
+../../../../private/tmp/v16-company-workflow-preparation/workflow.ts(16,52): error TS7006: Parameter 'item' implicitly has an 'any' type.
+../../../../private/tmp/v16-company-workflow-preparation/workflow.ts(32,54): error TS7006: Parameter 'rows' implicitly has an 'any' type.

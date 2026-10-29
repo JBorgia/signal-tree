@@ -1,0 +1,5 @@
+# Independent terminal proof consumer discriminators
+
+Pre-execution. Private source-preparation bridge only; no native-retirement wiring/memory claim. (1) Compacted rejected actualinput passes through prepareSourceProjection/complete; lifecycle early=false and private allowed=false without a surviving grant; admit must use conservative original scheduler rather than direct early run. (2) Same terminalinput retained in aggregate contributor index must survive role-count summary to projected proof; ordinary unrelated writer does not clean it. (3) Fresh native input captured before compaction remains original identity/owners despite source changing current certificate, including later-confirmed capture. Existing root helper tests already cover this last case; no duplicate needed unless source review gap. First two tests use existing private exported seams, no production hooks or fictitious public behavior.
+
+Do not execute until root confirms stable runtime. Runtime currently changing outside this review, so exact hashes must be captured before/after run; first testfile body preserved here before copying.

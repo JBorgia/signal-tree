@@ -1,0 +1,38 @@
+✖ real HTTP log, hold, release, fail-before-apply, explicit retry and reset (4.384083ms)
+✖ shutdown terminates held request without applying it (1.697709ms)
+ℹ tests 2
+ℹ suites 0
+ℹ pass 0
+ℹ fail 2
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 53.938625
+
+✖ failing tests:
+
+test at ../../../../private/tmp/v16-company-workflow-preparation/endpoint.test.mjs:6:1
+✖ real HTTP log, hold, release, fail-before-apply, explicit retry and reset (4.384083ms)
+  Error: listen EPERM: operation not permitted 127.0.0.1
+      at Server.setupListenHandle [as _listen2] (node:net:1986:21)
+      at listenInCluster (node:net:2065:12)
+      at node:net:2274:7
+      at process.processTicksAndRejections (node:internal/process/task_queues:90:21) {
+    code: 'EPERM',
+    errno: -1,
+    syscall: 'listen',
+    address: '127.0.0.1'
+  }
+
+test at ../../../../private/tmp/v16-company-workflow-preparation/endpoint.test.mjs:47:1
+✖ shutdown terminates held request without applying it (1.697709ms)
+  Error: listen EPERM: operation not permitted 127.0.0.1
+      at Server.setupListenHandle [as _listen2] (node:net:1986:21)
+      at listenInCluster (node:net:2065:12)
+      at node:net:2274:7
+      at process.processTicksAndRejections (node:internal/process/task_queues:90:21) {
+    code: 'EPERM',
+    errno: -1,
+    syscall: 'listen',
+    address: '127.0.0.1'
+  }

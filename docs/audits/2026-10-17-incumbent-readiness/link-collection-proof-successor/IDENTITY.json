@@ -1,0 +1,24 @@
+{
+  "baseline": "75416029be1e0c1d9735ed3bdc0f4e8e6c02f775",
+  "candidate": "87ddcfdedcb5d91e700d812bd6cbee2f77038510",
+  "production": "87f6831fa60cafe87508f0ace84b7638698ca3b0",
+  "preservedUnrelated": {
+    "AGENTS.md": "a5092146c949b18cb94f14f4fa9173c066f8fd9a9329bad1766a7e93adc3e473",
+    "docs/performance/measurement-contract.md": "138c5e9783e926daf8ece2c8a08527c087f222f81525eb834857bf215283f2ad"
+  },
+  "changedFiles": [
+    "packages/kernel/src/lib/collection-contributor-core.spec.ts",
+    "packages/kernel/src/lib/core-independent-review.spec.ts",
+    "packages/kernel/src/lib/entity-signal.ts",
+    "packages/kernel/src/lib/experimental-publication/entity.ts",
+    "packages/kernel/src/lib/experimental-publication/lifecycle.ts",
+    "packages/kernel/src/lib/experimental-publication/private.ts",
+    "packages/kernel/src/lib/experimental-publication/proof-retirement.ts",
+    "packages/kernel/src/lib/internals/entity-egress-projection.ts",
+    "packages/kernel/src/lib/internals/entity-publication.ts",
+    "packages/kernel/src/lib/link.ts",
+    "packages/kernel/src/lib/publication-proof-retirement.spec.ts",
+    "packages/kernel/src/lib/publication-terminal-consumer-independent.spec.ts",
+    "packages/kernel/src/lib/publication-uncertainty-provenance.spec.ts"
+  ]
+}

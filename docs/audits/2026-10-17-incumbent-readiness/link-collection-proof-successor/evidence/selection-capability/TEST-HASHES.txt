@@ -1,0 +1,4 @@
+a03ab7c732b3b8126ab00d05a321b31b84a5ca536af97dba448b2773a9eca92e  /private/tmp/link-collection-proof-evidence/selection-capability/ANGULAR-EXECUTED.spec.ts
+87c8178fa1f0a0412d6e2296d57aee08df065772d44899ae2936f4b278e83a8c  /private/tmp/link-collection-proof-evidence/selection-capability/REACT-EXECUTED.spec.tsx
+f4f9fcc9535534ea4edcb9e21b52ed9d720966676e40813e3de786ad0a7b68a6  /private/tmp/link-collection-proof-evidence/selection-capability/SOLID-EXECUTED.spec.ts
+bae2b6f3a0fc741250cad4107c18d1dcf41b1b4c930b222a3b51cc041122720a  /private/tmp/link-collection-proof-evidence/selection-capability/VUE-EXECUTED.spec.ts

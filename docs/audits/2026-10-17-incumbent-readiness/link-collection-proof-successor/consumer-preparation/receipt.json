@@ -1,0 +1,23 @@
+{
+  "candidate": "75416029be1e0c1d9735ed3bdc0f4e8e6c02f775",
+  "files": {
+    "endpoint.mjs": "434b81bec0a4cd34e407f763a2b977ed1ba5267fc4c4b057594cb42c0b516744",
+    "endpoint.test.mjs": "eff83c962e4809d22ff60b163866ab3e848258d40ae8621d775b5e5360262e14",
+    "workflow.ts": "e38cd27205ed90bb0c2a8b87a752eedd1e38bb0b15f795ee5511ed8fe7f7d5a3",
+    "declaration-blocker.ts": "f1db3ee9d634f929b464c7bbb8d2f9b1511119b5c4b48218e546ae865343d6b7",
+    "SCENARIOS.md": "1a705317bc398482c95fa80e177dba124001ef3bf0804c0c127d8497f2dc9c71",
+    "README.md": "ada55dd9ec9cc2175819d3382d77cd8a0e3a95d7efad15b47f49af8fcd7a845b",
+    "tsconfig.json": "aaf539fed4d9e50e8f254a1c014bf14d72a6fe4d96a5ea9dc2d273f1173eb8a8",
+    "tsconfig.blocker.json": "719f16a3f58901beb2af77903922ae843de71c63031d33da3a93b9f7d378532b",
+    "package.json": "4b9c33100d62024607c1bf452703cbd77220e47dc88518ff4b17c6a6210e60a2"
+  },
+  "inspectedSourceInputs": {
+    "packages/kernel/src/lib/link.ts": "b583bef6b6b006126baf4531377edb0128164035c4b295499d5c36adace9afaa",
+    "packages/angular/src/index.ts": "f9ac2cf8cfbcd92dcdce4e7cd356257ae4c434b786d5c0dc9754af21c2736c2a",
+    "packages/kernel/src/lib/types.ts": "f4b10a8d051bc8f2a766c426c61897d5bf4f5c50349a8989deea6fd282b36b33",
+    "packages/kernel/src/enhancers/transactions/transactions.types.ts": "54da27b77edd640d19bc134a53966b999db869efc79fd65995f35e0e28d3de14",
+    "apps/demo/src/app/store/tree/app-tree.ts": "517f4764368de158a61d77266a46257e27ec5d68ac5c90a3967d58d197a9705d",
+    "apps/demo/src/app/store/ops/post.ops.ts": "9dcd994871db6c9f4c59a94274021c0b2cdda6e1c7aebf3d2c40617ef0e6fb64",
+    "package.json": "7d43fe562e3532b093ffe03a0844b83e071314b949294ce6aa3c2a2e81f48c2b"
+  }
+}

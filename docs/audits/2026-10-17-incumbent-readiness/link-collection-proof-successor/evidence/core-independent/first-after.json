@@ -1,0 +1,13 @@
+{
+  "head": "75416029be1e0c1d9735ed3bdc0f4e8e6c02f775",
+  "files": {
+    "packages/kernel/src/lib/entity-signal.ts": "c067b3fb92b3b4ea1cce8296a280b0136296afd2d1361e485bad3ad30183e096",
+    "packages/kernel/src/lib/experimental-publication/entity.ts": "a856635b5dc28fe9ab7d33ffcc71136e67f888cde35f0d44e14a511d0430861b",
+    "packages/kernel/src/lib/experimental-publication/lifecycle.ts": "4c788a106968031a2f3782790a86431384599901e0ea9eb3c9f06acd29bbb7cd",
+    "packages/kernel/src/lib/experimental-publication/private.ts": "94b0e0077c7124a1b43005969bc5fc32712b7a11aee5853ec9b2f1591a03a868",
+    "packages/kernel/src/lib/internals/entity-egress-projection.ts": "381f1a8dbb515c6d29af62cac6a3f77c94c4a131ec755bc7fbed031bc2c4aa42",
+    "packages/kernel/src/lib/internals/entity-publication.ts": "92e02a26869866912e551725cd22d9e1b06dc437a6005d622dbbac13f60975ef",
+    "packages/kernel/src/lib/link.ts": "606adbfe289ea42eaf42e194e4310c75ec268cb8d7de8c54903d3a4629006e77",
+    "packages/kernel/src/lib/core-independent-review.spec.ts": "a784b59acac28fb58c22f661b53e7e02f10854ba9b2e1478147502a2fd14a512"
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "name": "signaltree-company-workflow-preparation",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "endpoint": "node endpoint.mjs",
+    "test:endpoint": "node --test endpoint.test.mjs",
+    "check:consumer": "tsc -p tsconfig.json",
+    "check:declaration": "tsc -p tsconfig.blocker.json",
+    "bundle:consumer": "esbuild workflow.ts --bundle --format=esm --platform=browser --outfile=consumer.js"
+  }
+}

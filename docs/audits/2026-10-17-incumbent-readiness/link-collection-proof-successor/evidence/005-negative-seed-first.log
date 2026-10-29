@@ -1,0 +1,72 @@
+
+> nx run kernel:test --testFile=src/lib/collection-contributor-core.spec.ts
+
+> node tools/run-core-vitest.mjs --testFile=src/lib/collection-contributor-core.spec.ts
+
+(node:50241) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:50249) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/link-collection-proof-successor/packages/kernel
+
+(node:50256) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ❯ src/lib/collection-contributor-core.spec.ts (6 tests | 1 failed) 58ms
+   × connection seed retains a pending native absence excluded from its positive rows 6ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/lib/collection-contributor-core.spec.ts > connection seed retains a pending native absence excluded from its positive rows
+AssertionError: expected [ [ { id: 'a', x: +0, y: 8 } ] ] to deeply equal []
+
+- Expected
++ Received
+
+- []
++ [
++   [
++     {
++       "id": "a",
++       "x": 0,
++       "y": 8,
++     },
++   ],
++ ]
+
+ ❯ src/lib/collection-contributor-core.spec.ts:68:120
+     66|  const sent:unknown[]=[];const c=link(tree.$.branch.rows,{set:v=>{sent…
+     67|  try{
+     68|   const receipt=c.declare({kind:'independent'},()=>tree.$.branch.rows.…
+       |                                                                                                                        ^
+     69|   q.confirm();await flush();expect(sent).toEqual([[{id:'a',x:0,y:8}]])…
+     70|  }finally{c.dispose();tree.destroy();foreign.destroy();}
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 5 passed (6)
+   Start at  09:15:10
+   Duration  1.56s (transform 820ms, setup 0ms, import 992ms, tests 58ms, environment 384ms)
+
+Warning: command "node tools/run-core-vitest.mjs --testFile=src/lib/collection-contributor-core.spec.ts" exited with non-zero status code
+
+
+ NX   Running target test for project kernel failed
+
+Failed tasks:
+
+- kernel:test
+
+Hint: run the command with --verbose for more details.
+
+  Run duration:      2.2s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     2.2s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    2.2s

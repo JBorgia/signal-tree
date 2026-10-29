@@ -1,0 +1,20 @@
+{
+  "head": "75416029be1e0c1d9735ed3bdc0f4e8e6c02f775",
+  "branch": "codex/link-collection-proof-successor",
+  "status": "frozen after covered core counterexamples; no acceptance",
+  "files": {
+    "packages/kernel/src/lib/collection-contributor-core.spec.ts": "b6520ced389a5d28c22c1503f2420e77c854d0102012efd71cd1dc68fe238edf",
+    "packages/kernel/src/lib/core-independent-review.spec.ts": "a784b59acac28fb58c22f661b53e7e02f10854ba9b2e1478147502a2fd14a512",
+    "packages/kernel/src/lib/entity-signal.ts": "c067b3fb92b3b4ea1cce8296a280b0136296afd2d1361e485bad3ad30183e096",
+    "packages/kernel/src/lib/experimental-publication/entity.ts": "a856635b5dc28fe9ab7d33ffcc71136e67f888cde35f0d44e14a511d0430861b",
+    "packages/kernel/src/lib/experimental-publication/lifecycle.ts": "4c788a106968031a2f3782790a86431384599901e0ea9eb3c9f06acd29bbb7cd",
+    "packages/kernel/src/lib/experimental-publication/private.ts": "94b0e0077c7124a1b43005969bc5fc32712b7a11aee5853ec9b2f1591a03a868",
+    "packages/kernel/src/lib/experimental-publication/proof-retirement.ts": "e94f688db30bfa63224286c4436668734fa7864a04ecd9d2383ab64edfb9faf4",
+    "packages/kernel/src/lib/internals/entity-egress-projection.ts": "381f1a8dbb515c6d29af62cac6a3f77c94c4a131ec755bc7fbed031bc2c4aa42",
+    "packages/kernel/src/lib/internals/entity-publication.ts": "92e02a26869866912e551725cd22d9e1b06dc437a6005d622dbbac13f60975ef",
+    "packages/kernel/src/lib/link.ts": "606adbfe289ea42eaf42e194e4310c75ec268cb8d7de8c54903d3a4629006e77",
+    "packages/kernel/src/lib/publication-proof-retirement.spec.ts": "42802bc7648ee70fc638a5459b476964dd782ace61e89605e4d3a86410f8f90c",
+    "packages/kernel/src/lib/publication-terminal-consumer-independent.spec.ts": "fd719835e389f508cde80c44d432e5a82274d8b168bef57b4d3d6cb0b3e64483",
+    "packages/kernel/src/lib/publication-uncertainty-provenance.spec.ts": "6906a1db3ba371275ab7f8e86b75267453ef5404e701b89889736be8142aec83"
+  }
+}

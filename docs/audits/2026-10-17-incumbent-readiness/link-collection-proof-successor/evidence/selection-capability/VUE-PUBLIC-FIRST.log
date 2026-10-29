@@ -1,0 +1,71 @@
+
+> nx run vue:test src/lib/selected-active-id-preparation.spec.ts -t public callback discriminator
+
+> pnpm exec tsc --noEmit -p packages/vue/tsconfig.spec.json && npx vitest run --config packages/vue/vitest.config.ts src/lib/selected-active-id-preparation.spec.ts -t "public callback discriminator"
+
+(node:55625) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+npm warn Unknown env config "verify-deps-before-run". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown project config "auto-install-peers". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown project config "shamefully-hoist". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+(node:55641) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:55663) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/link-authored-removal-successor/packages/vue
+
+(node:55670) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ❯ src/lib/selected-active-id-preparation.spec.ts (2 tests | 1 failed | 1 skipped) 19ms
+   × public callback discriminator sees restored library selection before choosing newer C 19ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/lib/selected-active-id-preparation.spec.ts > public callback discriminator sees restored library selection before choosing newer C
+TypeError: rows.ids.value is not iterable
+ ❯ read src/lib/selected-active-id-preparation.spec.ts:37:65
+     35|  const rows=tree.$.rows;
+     36|  rows.setAll([{id:'A',n:1},{id:'C',n:3}]); rows.setActiveId('A');
+     37|  const read=()=>({activeId:rows.activeId.value,ids:[...rows.ids.value]…
+       |                                                                 ^
+     38|  expect(read()).toEqual({activeId:'A',ids:['A','C'],all:[{id:'A',n:1},…
+     39|  const seen:ReturnType<typeof read>[]=[];
+ ❯ Object.onRemove src/lib/selected-active-id-preparation.spec.ts:42:73
+ ❯ emitTap ../kernel/src/lib/entity-signal.ts:2934:24
+ ❯ Object.publish ../kernel/src/lib/entity-signal.ts:2385:9
+ ❯ ../kernel/src/lib/internals/causal-runtime/tree-realization-adapter.ts:1501:22
+ ❯ run ../kernel/src/lib/internals/causal-runtime/tree-realization-adapter.ts:1491:9
+ ❯ Object.publish ../kernel/src/lib/internals/causal-runtime/tree-realization-adapter.ts:1501:7
+ ❯ ../kernel/src/lib/internals/causal-runtime/tree-realization-adapter.ts:784:33
+ ❯ run ../kernel/src/lib/internals/causal-runtime/tree-realization-adapter.ts:773:13
+ ❯ Object.publish ../kernel/src/lib/internals/causal-runtime/tree-realization-adapter.ts:784:9
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 1 skipped (2)
+   Start at  09:17:02
+   Duration  752ms (transform 460ms, setup 0ms, import 577ms, tests 19ms, environment 0ms)
+
+Warning: command "pnpm exec tsc --noEmit -p packages/vue/tsconfig.spec.json && npx vitest run --config packages/vue/vitest.config.ts src/lib/selected-active-id-preparation.spec.ts -t "public callback discriminator"" exited with non-zero status code
+
+
+ NX   Running target test for project vue failed
+
+Failed tasks:
+
+- vue:test
+
+Hint: run the command with --verbose for more details.
+
+  Run duration:      4.9s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     4.8s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        vue:test    4.8s
