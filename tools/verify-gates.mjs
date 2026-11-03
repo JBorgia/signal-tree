@@ -225,8 +225,10 @@ const GATES = [
     needsBuild: true,
     mutation: {
       file: 'tools/check-devmode-foldable.mjs',
-      find: "const WARN_ONLY_CODES = ['ST2001', 'ST2002', 'ST2003', 'ST2007'];",
-      replace: 'const WARN_ONLY_CODES = [];',
+      // Disable the detector, not one historical catalogue spelling. Advisory
+      // codes grow; the companion must still reject a surviving literal.
+      find: 'return WARN_ONLY_CODES.filter((code) => text.includes(`[${code}]`));',
+      replace: 'return [];',
     },
   },
   // REMOVED WITH THE PACKAGE: 'angular-compat'.
