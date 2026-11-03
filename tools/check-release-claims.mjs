@@ -300,32 +300,33 @@ function symbolsAt(
  *
  * So: resolve which exported names are interfaces, then diff their members too.
  */
-function membersAt(rev, exportedNames) {
-  const files = git('ls-tree', '-r', '--name-only', rev, 'packages/')
-    .split('\n')
-    .filter((f) => f.endsWith('.ts') && !f.includes('.spec.'));
-  const members = new Map();
-  for (const f of files) {
-    const text = showAt(rev, f);
-    if (!text || !text.includes('export interface')) continue;
-    const sf = ts.createSourceFile(f, text, ts.ScriptTarget.Latest, true);
-    const pkg = f.split('/')[1] ?? 'unknown';
-    for (const st of sf.statements) {
-      if (!ts.isInterfaceDeclaration(st)) continue;
-      const mods = ts.canHaveModifiers(st) ? ts.getModifiers(st) ?? [] : [];
-      if (!mods.some((m) => m.kind === ts.SyntaxKind.ExportKeyword)) continue;
-      if (!exportedNames.has(st.name.text)) continue;
-      for (const m of st.members) {
-        if (!m.name || !ts.isIdentifier(m.name)) continue;
-        // `__`-prefixed members are internal plumbing by convention.
-        if (m.name.text.startsWith('__')) continue;
-        if (!members.has(m.name.text)) {
-          members.set(m.name.text, { kind: 'member', pkg, on: st.name.text });
-        }
-      }
+function harvestInterfaceMembers(file, text, exportedNames, members) {
+  if (!text || !text.includes('export interface')) return;
+  const sf = ts.createSourceFile(file, text, ts.ScriptTarget.Latest, true);
+  const pkg = file.split('/')[1] ?? 'unknown';
+  for (const st of sf.statements) {
+    if (!ts.isInterfaceDeclaration(st)) continue;
+    const mods = ts.canHaveModifiers(st) ? ts.getModifiers(st) ?? [] : [];
+    if (!mods.some((m) => m.kind === ts.SyntaxKind.ExportKeyword)) continue;
+    if (!exportedNames.has(st.name.text)) continue;
+    for (const member of st.members) {
+      if (!member.name || !ts.isIdentifier(member.name)) continue;
+      const name = member.name.text;
+      if (name.startsWith('__')) continue;
+      const key = `${pkg}:${st.name.text}.${name}`;
+      members.set(key, { name, kind: 'member', pkg, on: st.name.text });
     }
   }
+}
+function membersAt(rev, exportedNames) {
+  const files = git('ls-tree', '-r', '--name-only', rev, 'packages/')
+    .split('\n').filter((file) => file.endsWith('.ts') && !file.includes('.spec.'));
+  const members = new Map();
+  for (const file of files) harvestInterfaceMembers(file, showAt(rev, file), exportedNames, members);
   return members;
+}
+function addedMembers(before, after) {
+  return [...after].filter(([key]) => !before.has(key)).map(([, member]) => member);
 }
 
 /** Diagnostic codes present in package sources at a revision. */
@@ -449,6 +450,68 @@ const EXEMPT = new Map(
   })
 );
 
+// Transitive type harvesting intentionally over-includes private interfaces.
+// Scope new dispositions by package AND owner; a same-named app/SDK member or
+// root value must still reach its documentation surfaces.
+const INTERNAL_MEMBER_DISPOSITIONS = new Map([
+  ['kernel:LocationRuntime.createCurrentReadonly',
+    'Kernel-internal LocationRuntime reader construction; adapter authors supply the documented ObservationAdapter.createCurrentReadonlyCell capability instead.'],
+  ['kernel:InternalTransactionRuntime.getSourceAdmissionCountsForTesting',
+    'Internal count-only test probe for admission metadata; not application mutation, review or delivery authority.'],
+  ['kernel:WritableLocationBinding.needsAuthorityAdmission',
+    'Private writable-location admission guard used by the kernel before physical writes; applications use the documented transaction and declaration APIs.'],
+  ['kernel:TreeScalarSlotRuntime.needsAuthorityAdmission',
+    'Private scalar-slot inspection/admission guard; not an adapter port or an application command.'],
+  ['kernel:WritableLocationBinding.replaceSelected',
+    'Private one-shot selected-write continuation with opaque kernel-owned invocation; not an application replacement API.'],
+  ['kernel:EntityPublicationBinding.replaceSelected',
+    'Private entity projection continuation carrying kernel-owned field selection; not an application mutation API.'],
+]);
+function exemptionFor(rec) {
+  return EXEMPT.get(rec.name) ?? (rec.kind === 'member'
+    ? INTERNAL_MEMBER_DISPOSITIONS.get(`${rec.pkg}:${rec.on}.${rec.name}`)
+    : undefined);
+}
+function verifyInternalDispositionBoundaries() {
+  for (const key of INTERNAL_MEMBER_DISPOSITIONS.keys()) {
+    const [pkg, qualified] = key.split(':');
+    const [on, name] = qualified.split('.');
+    if (!exemptionFor({pkg, on, name, kind: 'member'})) throw new Error(`Missing disposition: ${key}`);
+    for (const rec of [
+      {pkg, on: 'PublicApplicationApi', name, kind: 'member'},
+      {pkg: 'react', on, name, kind: 'member'},
+      {pkg, on, name, kind: 'value'},
+    ]) if (exemptionFor(rec)) throw new Error(`Disposition leaked beyond internal member: ${key}`);
+  }
+  if (exemptionFor({pkg: 'kernel', on: 'ObservationAdapter', name: 'createCurrentReadonlyCell', kind: 'member'})) {
+    throw new Error('Public adapter migration must retain documentation coverage');
+  }
+  // Exercise the actual harvester and delta comparator, not only lookup.
+  // The private owner is deliberately visited first, as in the failing design.
+  const before = new Map(), after = new Map();
+  const types = new Set(['WritableLocationBinding', 'TreeConfig']);
+  for (const [file, owner] of [
+    ['packages/kernel/src/private.ts', 'WritableLocationBinding'],
+    ['packages/kernel/src/types.ts', 'TreeConfig'],
+    ['packages/react/src/types.ts', 'TreeConfig'],
+  ]) {
+    harvestInterfaceMembers(file, `export interface ${owner} { existing(): void; }`, types, before);
+    harvestInterfaceMembers(file, `export interface ${owner} { existing(): void; needsAuthorityAdmission(): boolean; }`, types, after);
+  }
+  const additions = addedMembers(before, after);
+  const publicMembers = additions.filter((member) => !exemptionFor(member));
+  if (additions.length !== 3 || publicMembers.length !== 2 ||
+      !publicMembers.some((member) => member.pkg === 'kernel' && member.on === 'TreeConfig') ||
+      !publicMembers.some((member) => member.pkg === 'react' && member.on === 'TreeConfig')) {
+    throw new Error('Member harvesting or delta comparison hid a same-named public member');
+  }
+}
+verifyInternalDispositionBoundaries();
+if (process.argv.includes('--self-test-internal-dispositions')) {
+  console.log('Harvesting, delta and disposition controls preserve package/owner/member identity and public adapter coverage.');
+  process.exit(0);
+}
+
 // ── run ─────────────────────────────────────────────────────────────────────
 
 const BASE = resolveBase();
@@ -506,9 +569,8 @@ const added = [
   ...[...after.entries()]
     .filter(([name]) => !before.has(name))
     .map(([name, meta]) => ({ name, ...meta, isCode: false })),
-  ...[...membersAfter.entries()]
-    .filter(([name]) => !membersBefore.has(name) && !after.has(name))
-    .map(([name, meta]) => ({ name, ...meta, isCode: false })),
+  ...addedMembers(membersBefore, membersAfter)
+    .map((meta) => ({ ...meta, isCode: false })),
   ...[...codesAfter]
     .filter((c) => !codesBefore.has(c))
     .map((name) => ({ name, kind: 'value', pkg: 'core', isCode: true })),
@@ -589,7 +651,7 @@ for (const rec of added) {
       missing.push(surface.name);
     }
   }
-  const exemptReason = EXEMPT.get(rec.name);
+  const exemptReason = exemptionFor(rec);
   rows.push({ ...rec, missing, applicable, exemptReason });
   if (missing.length && !exemptReason) gaps.push(rec.name);
 }
