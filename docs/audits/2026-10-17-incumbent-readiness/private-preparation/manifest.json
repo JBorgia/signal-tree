@@ -1,0 +1,28 @@
+{
+  "parent": "cc20fcbe75a74a8d2f65a89a08d07a08068e0da7",
+  "archive_sha256": "92f6f540e31b841e7f9edbf85d19471d25b829fd6d71bcceceba998730e150fa",
+  "sources": {
+    "packages/kernel/src/lib/signal-tree.ts": "608f8b149428adcc623118e9138e66f89e159eeea58babb8718aba2c1eb7f7c2",
+    "packages/kernel/src/lib/whole-value-new-keys.spec.ts": "e6bf5e55da33e6772fff45e2145a481846dd2b48a3bb16ac6a5fc5d903d0384c"
+  },
+  "files": {
+    "incumbent-new-keys-private-capture-final.log": "c2c90ef876051c18ca180e3f29d9be4fa97c557feaf5b402a23fa30577245502",
+    "incumbent-new-keys-private-capture-first.log": "269dd68cc7d8efdbadb8b4b377d4f0c8a3b310cf623c8c13e7d378abc9f0a9e2",
+    "incumbent-new-keys-private-first.log": "72fb5c7f321a94cdaaa31579246e514716c1528e437bb1756367bdc92b85db1d",
+    "incumbent-new-keys-private-focused.log": "f2fd80c69f1097311507b48b50a3ddce78374cb1e5f923f5494645f14ecbaf8c",
+    "incumbent-new-keys-private-full.log": "7df982d0307014b8477f3d8618e7716d97c01c586267ae3f9a72cc9b11cc2110",
+    "incumbent-new-keys-private-original-replay.log": "8de6d2f7905a1b39c4624967ddd896d353d6fe8a2eadbbc348027281fa834335",
+    "incumbent-new-keys-private-spec-types.log": "3b694cf90518007a2f1f1236d024a9736f2c348255cc399db4a9e8325a4f1035",
+    "incumbent-new-keys-private-spec-types2.log": "ff9bc43e41e96a015542e5b420887fdaa8dd835dc56d87e766e3198be5789540",
+    "incumbent-new-keys-private-spec-types3.log": "d96bf296ada40f7aab19740c790ec23835aeae7f307cf347a059d16fd348a7cb",
+    "incumbent-new-keys-private-types.log": "9d47711daf77024b8b83fec7ff979ad3fa7ee159e6200f01d168940bc6de8815",
+    "readiness-review-construction-reentry.mjs": "f46e643ec35ea7e5762a2ff65da1e03714331582d54085c58c9f45f2e1560558",
+    "readiness-review-construction-reentry.ts": "0a027a9769de55a50fca74b500e1e8eb3980b332f34d0c3613d119be59bac5fe",
+    "readiness-review-construction-throw.mjs": "42b331065679f34d6d909a8d0e186f47c5bfe3e9212725d62ef6d1c90b46c0fb",
+    "readiness-review-construction-throw.ts": "766de0c4b1ff2f2b69bda2315baa313e693f6847297a7d326e7d2c7a08455c6f",
+    "readiness-review-partial-capture-control.mjs": "28b16428d04480b17c2302d1f6747ddd661629b81b2353bcfedbfbc2a9124727",
+    "readiness-review-partial-capture-control.ts": "fbc4be84b3714dd59fe87207884cf9369bad53b8fbbc4118085e8a9c00f2ba0c",
+    "readiness-review-partial-capture.mjs": "137522dc53f8a06c524270be17a806aaf74b42ce0ce7b78116438c1a329894f9",
+    "readiness-review-partial-capture.ts": "552492088978fbcd594a87d15045e48fc95475b3b6dc572b89f1239a02458aa1"
+  }
+}

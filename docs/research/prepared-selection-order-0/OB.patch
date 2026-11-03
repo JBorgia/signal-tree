@@ -1,0 +1,44 @@
+--- a/packages/kernel/src/lib/entity-signal.ts
++++ b/packages/kernel/src/lib/entity-signal.ts
+@@ -7,6 +7,7 @@
+ import {
+   createWritableProjection,
+   deriveLocation,
++  interceptLocationWrites,
+   NEUTRAL_LOCATION_RUNTIME,
+   replaceLocation,
+   type LocationRuntime,
+@@ -502,6 +503,7 @@
+     }
+
+     const currentSubjects = new Map<number, { key: K; value: E }>();
++    const activeIdRevisionBefore = activeIdWriteRevision;
+     const activeIdBefore = activeIdSignal();
+     const activeSubjectBefore =
+       activeIdBefore === undefined
+@@ -651,7 +653,10 @@
+           else if (!kind && !deepEqual(beforeValue, afterValue))
+             emitTap('onUpdate', key, afterValue as E, afterValue as E);
+         }
+-        if (activeIdBefore !== activeIdAfter) {
++        if (
++          activeIdWriteRevision === activeIdRevisionBefore &&
++          activeIdBefore !== activeIdAfter
++        ) {
+           replaceLocation(activeIdSignal, activeIdAfter);
+         }
+         updateSignals();
+@@ -1204,6 +1209,13 @@
+
+   /** Active-entity selection. See the `activeId`/`activeEntity` accessors. */
+   const activeIdSignal = locations.createCell<K | undefined>(undefined);
++  let activeIdWriteRevision = 0;
++  // Count write identity, including ABA and no-op intent, at the existing
++  // location write boundary shared by public and internal selection writers.
++  interceptLocationWrites(activeIdSignal, (_operation, proceed) => {
++    activeIdWriteRevision += 1;
++    proceed();
++  });
+   let cachedActiveEntity: ReadableCell<E | undefined> | undefined;
+
+   function publishOrderChange(

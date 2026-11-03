@@ -1,0 +1,10 @@
+{
+  "compilerOptions": {
+    "target": "ES2023", "lib": ["ES2023", "DOM"], "module": "ESNext", "moduleResolution": "Bundler",
+    "strict": true, "noEmit": true, "skipLibCheck": true, "esModuleInterop": true,
+    "types": ["node"],
+    "typeRoots": ["/Users/jonathanborgia/.codex/worktrees/v16-incumbent-readiness/signaltree/node_modules/@types"],
+    "paths": { "@signal-tree/kernel": ["/Users/jonathanborgia/.codex/worktrees/v16-incumbent-readiness/signaltree/packages/kernel/src/index.ts"] }
+  },
+  "files": ["editor.ts", "scenario.ts"]
+}

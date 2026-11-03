@@ -48,6 +48,14 @@ export interface ObservationAdapter {
   };
   createReadonlyCell?<T>(compute: () => T): ReadableCell<T>;
   /**
+   * Realize a lazy, source-current readonly reader with the adapter's native
+   * shape and stable same-source metadata. Each direct read evaluates the
+   * source once, without publishing or advancing application computed caches.
+   * Required for v16 adapters selected by the existing three-factory native
+   * classification; portable adapters may retain a neutral callable.
+   */
+  createCurrentReadonlyCell?<T>(readCurrent: () => T): ReadableCell<T>;
+  /**
    * `ANGULAR-NATIVE-EPOCH-0`. The framework's cheapest read-dependency
    * primitive, for a per-subject invalidation anchor that carries no value
    * anyone reads.

@@ -1,0 +1,54 @@
+[
+  {
+    "command": [
+      "node",
+      "docs/research/prepared-selection-order-0/run.mjs",
+      "DSK1",
+      "order-trace.mjs",
+      "C",
+      "first"
+    ],
+    "exit": 1,
+    "stdout": "{\"lane\":\"DSK1\",\"entry\":\"order-trace.mjs\",\"control\":\"C\",\"exit\":1,\"stable\":true,\"out\":\"/private/tmp/st-prepared-selection-replay/runs/DSK1-order-trace.mjs-C-first\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/prepared-selection-order-0/run.mjs",
+      "OA",
+      "order-trace.mjs",
+      "C",
+      "first"
+    ],
+    "exit": 0,
+    "stdout": "{\"lane\":\"OA\",\"entry\":\"order-trace.mjs\",\"control\":\"C\",\"exit\":0,\"stable\":true,\"out\":\"/private/tmp/st-prepared-selection-replay/runs/OA-order-trace.mjs-C-first\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/prepared-selection-order-0/run.mjs",
+      "OB",
+      "order-trace.mjs",
+      "C",
+      "first"
+    ],
+    "exit": 0,
+    "stdout": "{\"lane\":\"OB\",\"entry\":\"order-trace.mjs\",\"control\":\"C\",\"exit\":0,\"stable\":true,\"out\":\"/private/tmp/st-prepared-selection-replay/runs/OB-order-trace.mjs-C-first\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/prepared-selection-order-0/run.mjs",
+      "OAP",
+      "order-trace.mjs",
+      "C",
+      "first"
+    ],
+    "exit": 0,
+    "stdout": "{\"lane\":\"OAP\",\"entry\":\"order-trace.mjs\",\"control\":\"C\",\"exit\":0,\"stable\":true,\"out\":\"/private/tmp/st-prepared-selection-replay/runs/OAP-order-trace.mjs-C-first\"}\n",
+    "stderr": ""
+  }
+]

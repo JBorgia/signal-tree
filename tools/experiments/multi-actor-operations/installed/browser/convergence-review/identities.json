@@ -1,0 +1,36 @@
+{
+  "work": "/private/tmp/st-p4-browser-fLlJQx",
+  "original12Unchanged": true,
+  "outcome": "15/15 DOM PASS, no page errors; strict full AOT PASS",
+  "sourceHashes": {
+    "app.ts": "675eed2658fb972f78f7d126570b58911122c47a688a569338f3b31b69700849",
+    "checks.mjs": "23df3eb321bf3dcc736a31dae6d1ac81f03145b9f20e29dc55a94e8cdad8ed96",
+    "run.mjs": "2818d1c4156f164f257828f7c0d78f7e96dbb49069599578be468d6c989a3031",
+    "ag-ui.d.mts": "b865e04a188d51ae7d364dbc32a8028798e60fa01b29b9eb118e91d1466eed8e",
+    "review-fixture.d.mts": "9774e3d955500dc3d464d2114589785fba67db85879c844652fca969213b87aa"
+  },
+  "manifestHashes": {
+    "packs/angular-common-22.0.7.tgz": "86a088d61b39cd0963d2db901ba7fac5ef7ba603822608618c89b5ab774b8aa4",
+    "packs/angular-compiler-22.0.7.tgz": "90a583439606a9fa8eb9a89439440f6b74bbe5ae1e0286b7f102b7ea474b2dba",
+    "packs/angular-core-22.0.7.tgz": "c21ec1e85edd670c1eb3848679df406586acda492b4bd4a9be1d3cab6313fad1",
+    "packs/angular-platform-browser-22.0.7.tgz": "6a7f9978ea5fa10eb42aa95529ec0d537d8b7e691f38f0d44469d00d627a4926",
+    "packs/rxjs-7.8.2.tgz": "5de2d7488d8f484e88b133e4327c3c422f222029bb32a9dfbc4f18f4e41b0128",
+    "packs/signal-tree-angular-16.0.0-dev.tgz": "da6bf34cd1769f323ef26c43acd0cf388028e348a34a8fbbc8e976b01a800993",
+    "packs/signal-tree-kernel-16.0.0-dev.tgz": "64cfcda4aa980a4e27322693edf28d22c9aae54905d2e1d1b0c821ad455ac019",
+    "packs/tslib-2.8.1.tgz": "66f635d5eeabae44807534976913a102cf615b9a045368359c9f79ae6ee2119e",
+    "consumer/browser/ag-ui.d.mts": "b865e04a188d51ae7d364dbc32a8028798e60fa01b29b9eb118e91d1466eed8e",
+    "consumer/browser/ag-ui.mjs": "e6b3ccd93c9b2019e46e0bface3dc2812218bfe3e293c1258665f1d417870aef",
+    "consumer/browser/app.ts": "675eed2658fb972f78f7d126570b58911122c47a688a569338f3b31b69700849",
+    "consumer/browser/main.ts": "24d29c03d422d958d5da5aa20f9d2740c14b223264048685413cdd3d65b847af",
+    "consumer/browser/review-fixture.d.mts": "9774e3d955500dc3d464d2114589785fba67db85879c844652fca969213b87aa",
+    "consumer/browser/review-fixture.mjs": "653ae035ff584c4832b7b817431c5dd314920b75890de937e8e54d8ba287326f",
+    "consumer/coordinator.d.mts": "52c51ae3eb3efcfc299775f6860228510b4c512f8b9d2987e31f568d5a4dfefc",
+    "consumer/coordinator.mjs": "096140d4460b8b8e51148444bc4e7c6f5bf3f80f4373f6b0586d46ecd1fa539c",
+    "consumer/dispatch-fixture.d.mts": "59f924bc4701a203e4f2cfd7cf350ccc9096826406b3a17367cd73d570bbd525",
+    "consumer/dispatch-fixture.mjs": "3ba8cd1b48cdfd8c0dbc4936ac4ed806421be2a123813363d9fae70ea008dcb6",
+    "consumer/package-lock.json": "a1ed206e923084c7bb979c8caf87b42c5bc7a037e523cbb80a1695663d38a73a",
+    "consumer/package.json": "95c9c898de7f18de85ff77e845835bc8d0a52145ef228bac05c719eb28326526",
+    "site/app.js": "d95ca596a0cf429f075bc9599cb87de7e8917c34e145c8e1a0307fd28d039f0b",
+    "site/index.html": "1f483e0ba63a13baf2bc49ff87ed6a4555331be9e0028ed04f5c9d813b805c58"
+  }
+}

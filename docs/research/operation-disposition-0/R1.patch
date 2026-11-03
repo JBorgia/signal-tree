@@ -1,0 +1,36 @@
+--- a/packages/kernel/src/enhancers/transactions/transactions.ts
++++ b/packages/kernel/src/enhancers/transactions/transactions.ts
+@@ -2438,7 +2438,23 @@
+                       'Transaction scalar published before installation'
+                     );
+                   }
+-                  scalarSlotRuntime.publishPrepared(result);
++                  let failed = false;
++                  let first: unknown;
++                  try { scalarSlotRuntime.publishPrepared(result); }
++                  catch (error) { failed = true; first = error; }
++                  // The prepared route publishes the same realized path facts as
++                  // the existing realization port, after the complete unit installs.
++                  for (const effect of reversalEffects) {
++                    if (effect.subjectId !== undefined || effect.plainBranchMembership || !scalars.has(effect.owner)) continue;
++                    const descriptor = realizationDescriptors.get(effect.owner);
++                    const path = effect.path ?? descriptor?.ownerPath;
++                    if (!path) continue;
++                    try {
++                      notifier.notify(path, effect.after, effect.before, effect.ownerPath ?? descriptor?.ownerPath ?? path,
++                        undefined, [effect.owner], {...getActiveWriteContext(), intent: 'system', participation: 'realized'}, treeOwnerId);
++                    } catch (error) { if (!failed) { failed = true; first = error; } }
++                  }
++                  if (failed) throw first;
+                 },
+               };
+             },
+@@ -2616,6 +2632,8 @@
+                 }
+               )
+             ) {
++              const refusal = realizationPort.validateEffects?.(placeFieldReversalsWhileRowsExist(effects.map(toRollbackEffect)));
++              if (refusal) return { ok: false as const, refusal };
+               rollbackPendingTarget(effects, orderDeltas, completion);
+               return { ok: true as const };
+             }

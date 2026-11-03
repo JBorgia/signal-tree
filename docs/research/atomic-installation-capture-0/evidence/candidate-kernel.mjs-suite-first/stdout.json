@@ -1,0 +1,99 @@
+[
+  {
+    "mode": "install",
+    "value": 1,
+    "record": 1,
+    "recordCount": 1,
+    "ids": [
+      "slot"
+    ],
+    "hits": 1,
+    "prep": 1,
+    "threw": false,
+    "primary": false,
+    "status": "pass"
+  },
+  {
+    "mode": "equal",
+    "value": 0,
+    "recordCount": 0,
+    "ids": [],
+    "hits": 1,
+    "prep": 0,
+    "threw": false,
+    "primary": false,
+    "status": "pass"
+  },
+  {
+    "mode": "equal-error",
+    "value": 0,
+    "recordCount": 0,
+    "ids": [],
+    "hits": 1,
+    "prep": 0,
+    "threw": true,
+    "primary": true,
+    "status": "pass"
+  },
+  {
+    "mode": "equal-undefined",
+    "value": 0,
+    "recordCount": 0,
+    "ids": [],
+    "hits": 1,
+    "prep": 0,
+    "threw": true,
+    "primary": true,
+    "status": "pass"
+  },
+  {
+    "mode": "equal-reentry",
+    "value": 7,
+    "record": 7,
+    "recordCount": 1,
+    "ids": [
+      "slot"
+    ],
+    "hits": 2,
+    "prep": 0,
+    "threw": true,
+    "primary": false,
+    "status": "pass"
+  },
+  {
+    "mode": "prepare-error",
+    "value": 0,
+    "recordCount": 0,
+    "ids": [],
+    "hits": 1,
+    "prep": 1,
+    "threw": true,
+    "primary": true,
+    "status": "pass"
+  },
+  {
+    "mode": "prepare-undefined",
+    "value": 0,
+    "recordCount": 0,
+    "ids": [],
+    "hits": 1,
+    "prep": 1,
+    "threw": true,
+    "primary": true,
+    "status": "pass"
+  },
+  {
+    "mode": "prepare-reentry",
+    "value": 7,
+    "record": 7,
+    "recordCount": 1,
+    "ids": [
+      "slot"
+    ],
+    "hits": 2,
+    "prep": 1,
+    "threw": true,
+    "primary": false,
+    "status": "pass"
+  }
+]

@@ -17,6 +17,8 @@ export default defineConfig({
       'src/lib/internals/diagnostics/diag-journal-1-eviction.spec.ts',
       'src/lib/link-lifetime.spec.ts',
       'src/lib/internals/location-runtime-retention.spec.ts',
+      'src/lib/forwarding-retention-probe.spec.ts',
+      'src/lib/held-continuation-probe.spec.ts',
     ],
   },
   define: { __DEV__: true },

@@ -215,6 +215,92 @@ that turn settles: call undo from a later user action, not immediately after
 `undoable()` in the same synchronous function. The tree owner calls `destroy()`
 when this store is no longer needed.
 
+#### Locations an omission has hidden
+
+A whole-value write that leaves out a key omits that member: it and everything
+under it are absent, even though their storage is retained. Reading a location
+under an omitted member gives `undefined`, through a handle held from before
+the omission too, and held consumers follow the omission and a later re-add.
+Writing such a location re-adds its path: after `a` is omitted,
+`$.a.b.keep(9)` makes `a` equal `{ b: { keep: 9 } }`, and `a`'s other members
+stay absent. An updater there receives `undefined`. Undo, redo, `jumpTo()` and
+`rollback()` of that write make the path absent again.
+
+An entity collection under an omitted member, or omitted itself, follows the
+same rules. It reads as an absent, empty collection: `all()` is `[]`,
+`byId()` is `undefined`, `count()` is `0`, and held row nodes read
+`undefined`. A write that adds rows (`addOne()`, `setAll()`, `upsertOne()`,
+`clear()` and the rest) re-adds the path carrying only the written rows; the
+retained rows never come back. A write that names a row (`updateOne()`,
+`removeOne()`, `changeId()` and the rest) throws "Entity with id ... not
+found", as on an empty collection, and changes nothing. Undo, redo,
+`jumpTo()` and `rollback()` of a re-adding write make the collection absent
+again.
+
+Some details of that rule:
+- **Retained rows are removed silently.** A re-adding write removes the
+  retained rows before it adds its own. Taps do not see that removal, but
+  history records it, so a reversal restores the rows.
+- **It is checked first, as on an empty collection.** A re-adding write is
+  validated and intercepted as it would be on an empty collection before
+  anything changes. Input that makes it throw (a missing row, a `selectId`
+  that throws, a duplicate id in strict mode), or an interceptor that blocks
+  it, throws with nothing changed and nothing in history. Its interceptors
+  run once per row. A call that adds nothing (`addMany([])`) changes nothing.
+  Once its rows are written, the path is re-added before any tap hears of
+  them: a tap reads the collection present, its own writes are ordinary ones,
+  and a tap that throws leaves the written rows, as on a present collection.
+- **Link and path observers see what the tree exposes.** A Link endpoint
+  whose location is absent receives `undefined` (`[]` for a collection), and
+  a re-add sends what the location then reads. Undo, redo, `jumpTo()` and
+  `rollback()` write an absent location's retained storage without
+  publishing it.
+- **The selection is kept.** `activeId()` keeps its value and `activeEntity()`
+  reads `undefined`. A re-adding write clears the selection, as `clear()`
+  does.
+- **Taps read the collection as it is.** A tap reads rows absent-aware, even
+  while undo, redo, `jumpTo()` or `rollback()` writes an absent collection's
+  retained rows. Its projections (`all()`, `count()`, `where()` and the rest)
+  are read fresh when the tap reads them through the collection, so inside a
+  transaction or a reversal they include the change the tap reports. A
+  retained SignalTree reader (`const all = rows.all`) also reads current
+  installed state when invoked in the tap. Acquisition time does not change
+  this guarantee. Application-created native computed values and effects keep
+  their framework scheduling; reading a SignalTree snapshot does not flush them.
+- **Writes from inside a whole value or a reversal.** A tap or sync effect
+  that runs while a whole value or a reversal is being applied may write any
+  tree, including the same one. That write is an ordinary write: an absent
+  location's path is re-added, and the whole value does not omit it again.
+  A member that is still present when written goes with the rest if that
+  whole value then omits it, because a whole value applies its omissions
+  after its own writes. A whole value the tap starts itself decides for
+  itself: it omits what it leaves out.
+
+Undo, redo and `jumpTo()` treat a location under an omitted member like this:
+
+- **Omitted by external truth** (inside `external()`): the reversal refuses
+  with ST1034, names the omitted member and the location, and changes
+  nothing.
+- **Omitted by an ordinary write**: the reversal restores its own locations
+  over that write, as it would over any later ordinary write. It re-adds
+  only the members on the way to those locations; every other member the
+  omission removed stays absent. Retained storage never supplies a value.
+- **Not re-addable** (an omitted entity collection, for example): the
+  reversal refuses and says why.
+
+An entity collection that the reversed operation omitted or re-added, itself
+or inside a branch, is restored: undo, redo, `jumpTo()` and `rollback()` put
+back its membership, and its rows are the ones it held when it was hidden.
+If something other than the reversal changed those rows while it was hidden
+(a write through a handle held on it), the reversal refuses, names the
+collection and changes nothing. The same holds for a collection inside a
+branch that a reversal re-adds for an earlier write.
+
+A pending transaction's `rollback()` reverses its writes even when a later
+omission has hidden them: under an omitted branch it restores the retained
+storage and leaves the branch absent. Nothing a rejected transaction wrote can
+come back later, whether through undo, redo, `jumpTo()` or a re-add.
+
 ### `transactions()`
 
 Adds an explicit pending operation that can be confirmed or rolled back. Use it
@@ -268,7 +354,8 @@ changes with values. Splitting paths on dots is not a universal resolver.
 `rollback()` throws `SignalTreeRollbackError` when the reversal cannot be applied
 without destroying newer truth — for example when a server write now depends on
 a row the turn created. Catch it and offer reconciliation rather than
-treating rejection as always available.
+treating rejection as always available. When several transactions are open,
+settle the newest first; see [Lifetime](#lifetime) for the retryable refusal.
 
 Acceptance is **not** undo history. Restoration stays a separate decision, and
 `undoable()` wraps the turn's writes rather than the settlement, because it
@@ -331,6 +418,74 @@ the classification scope ends when the callback returns.
 the kernel's authority and causal-turn semantics. Use it for genuine ongoing
 synchronization, not as a request wrapper or migration bridge.
 
+### Declaring publication inputs (v16)
+
+Use `connection.declare(declaration, work)` when you can describe the complete
+inputs to synchronous writes to that connection's owned source:
+
+- `{ kind: 'independent' }`: the authored result has no pending-owner inputs.
+- `{ kind: 'dependent', owners: [pending] }`: list every contributing transaction
+  owner. Pending contributors can hold publication until settlement.
+- `{ kind: 'unknown' }`: input completeness is not known; retain conservative
+  publication handling rather than claiming independence.
+
+Owners identify inputs; they do not transfer write ownership. The surrounding
+transaction still owns its writes. Native reads supply additional evidence; declarations do not cancel known native
+dependencies or failed native validation. Hidden inputs,
+saved values and cached application computations remain the application's
+responsibility; an incomplete declaration can publish speculative data. Do not
+mark a result independent merely because its value is a
+literal by the time the callback runs.
+
+```typescript
+import { link, signalTree, transactions } from '@signal-tree/kernel';
+
+const input = signalTree({ quantity: 1 }, { enhancers: [transactions()] });
+const output = signalTree({ quantity: 0 });
+const connection = link(output.$.quantity, { set: value => { console.log(value); } });
+try {
+  const pending = input.transact(() => input.$.quantity(2));
+  const receipt = connection.declare({ kind: 'dependent', owners: [pending] }, () => {
+    output.$.quantity(input.$.quantity());
+  });
+  console.log(receipt.read()); // Current admission status, not delivery acknowledgment.
+  pending.confirm();
+  await connection.settled(); // Wait before disposing; endpoint errors use onTreeError.
+} finally {
+  connection.dispose();
+  output.destroy();
+  input.destroy();
+}
+```
+
+The callback is synchronous only: no `async`, returned thenable or declaration
+across `await`. Its return value is discarded. Invalid declarations can throw
+after the callback has written; those writes may remain. Catch
+`SignalTreePublicationError` to inspect its `stage` (`before-callback` or
+`after-callback`) and `reason`; inspect current state before deciding recovery.
+Declaration validation is not an atomic rollback wrapper.
+
+A receipt's `read()` returns a current immutable status snapshot, not a signal,
+subscription or delivery promise. `no-write` means this declaration created no
+new publication obligation; it does not clear or approve an existing obligation.
+Equal values alone do not prove equal publication support. `held` reports a
+pending dependency; `eligible` or `started` does not prove remote acceptance.
+Even `connection.settled()` resolving is not application delivery acknowledgment:
+endpoint failures are reported through `onTreeError()`.
+
+After successful dependency rejection, the old declaration is not approved.
+Publication reevaluates the current ordinary state under its current gates;
+a surviving value may still be sent. It does not rerun the application's recipe
+or certify that a saved input is fresh. Confirm, reject, unavailable owners and
+connection disposal are distinct outcomes.
+
+Use only supported owned SignalTree sources: leaves (including atomic object
+leaves), supported branches/roots, entity fields, rows and collections. A root
+or branch containing an EntityMap is not a supported Link source; link the
+collection itself. Structural TypeScript compatibility does not authorize an
+unowned function, native computed or standalone native signal. Use your
+framework facade consistently. These v16 additions do not change stable v15.
+
 ## Errors
 
 Observe library-reported diagnostics through `onTreeError()`:
@@ -386,8 +541,15 @@ errors.
 A refusal is atomic: it changes no state, retires nothing, and leaves the
 transaction **pending**, so `confirm()` and a retried `rollback()` both remain
 available. Reversing an older transaction while a newer overlapping one is
-still open refuses (`cause.kind === 'later-pending-dependency'`); settle the
-newer one first.
+still open refuses (`cause.kind === 'later-confirmed-dependency'`, which this
+line also uses for a newer *pending* overlap); settle the newer one first.
+
+The same retryable refusal applies when the newer pending transaction omitted,
+or re-added, a plain branch that encloses a location the older one wrote. The
+newer transaction's before-image of that branch holds the older value. So
+reversing the older one first would let the newer one's rollback bring the
+rejected value back. Once the newer one settles (confirmed or rolled back),
+retrying the older rollback succeeds.
 
 ## Exports
 
@@ -421,6 +583,28 @@ An `ObservationAdapter` supplies dependency tokens and
 `runInvalidationGroup(run)` so transactions and restoration can apply all
 changes before framework observers are notified. It never owns or mirrors
 location state.
+
+### Native custom adapter migration (v16)
+
+A native `ObservationAdapter` supplying all three of `createWritableCell`,
+`createWritableProjection` and `createReadonlyCell` must also implement callable
+`createCurrentReadonlyCell(readCurrent)`. Factory construction rejects a missing
+capability before reading initial state or allocating a tree. Token-only and
+partial portable adapters keep their routing; adding only this member does not
+select native realization.
+
+Return a lazy readonly carrier with the promised native shape, stable identity,
+dependency tracking, cleanup and fresh error propagation. Every direct read must
+consult the supplied current source, including repeated reads of a reader acquired
+before a callback and after nested writes while publication is held. Do not reuse
+a stale cached readonly factory or return a bare function in place of a promised
+native carrier. Keep the ordinary `createReadonlyCell` contract unchanged.
+
+SignalTree-provided held readers stay current; application-owned native computeds
+retain framework timing. Do not flush application computeds to implement this
+capability, or assume their cached results become fresh inside a declaration.
+The kernel owns current state; the adapter owns representation and tracking.
+Stable v15 adapters are unchanged.
 
 An adapter may also supply an epoch, which lets a framework invalidate a whole
 subject through one native primitive instead of one carrier per field:
@@ -463,6 +647,32 @@ projection. Tools consume `confirmedTurnReader`; the raw internal transaction
 runtime accessor is not the supported inspection contract.
 
 Studio is a separate private product with an explicit development-only attachment. Its adapter and query engine are not public npm packages. Tooling must retain unknown/unsupported distinctions and must not infer causality from event timing.
+
+### Read-only runtime observation
+
+Tooling can import `stateLocationReader`, `entityMembershipReader`,
+`linkStateReader`, `transactionLifecycleReader` and `restorationReader` from
+`@signal-tree/kernel/internals`. These observe the constructed tree; they do not
+install enhancers or confer mutation/settlement authority. Use the appropriate
+framework facade for application state, and reserve this entry point for tooling.
+
+- `stateLocationReader` resolves structured property/entity addresses and current
+  entity lifetimes. Do not parse dotted display paths as identity.
+- `entityMembershipReader` exposes current collection membership and changes.
+- `linkStateReader` observes Link state; local completion is not proof of remote
+  durable persistence beyond the endpoint's contract.
+- `transactionLifecycleReader` exposes pending transactions and settlement/refusal
+  observations, including whether pending authority remains.
+- `restorationReader` exposes history entries, recorded transaction lineage and undo/redo/jump outcomes.
+
+Check optional-reader availability before use; readers do not enable missing
+capabilities. Release subscriptions when the owning view/session ends, and destroy
+owned trees at teardown. Readers are not a retained audit log.
+`ConfirmedTurnEffectView.fieldSegments` preserves producer-known entity-field
+address segments; `plainBranchMembership` distinguishes member presence before
+and after an effect. Neither display paths nor an absent value can replace those
+facts. Confirmed-history access remains subject to configured retention.
+
 
 ## License
 

@@ -1,0 +1,4 @@
+check-spec-types: OK — and 3 file(s) improved. Ratchet down with `node tools/check-spec-types.mjs --update`:
+  packages/kernel/src/lib/entity-bare-array-hydrate.spec.ts: 0 now, baseline 5
+  packages/kernel/src/lib/marker-snapshot-memo.spec.ts: 0 now, baseline 15
+  packages/kernel/src/lib/mut-participation.spec.ts: 6 now, baseline 7

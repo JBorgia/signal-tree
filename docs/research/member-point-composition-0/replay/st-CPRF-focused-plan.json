@@ -1,0 +1,1 @@
+{"jobs": [{"label": "solid-native-publication", "command": ["pnpm", "nx", "test", "solid", "native-publication-error-boundary.spec.ts", "--maxWorkers=1"]}]}

@@ -1,0 +1,106 @@
+
+> nx run kernel:test independent-prepared-boundary.spec.ts
+
+> node tools/run-core-vitest.mjs independent-prepared-boundary.spec.ts
+
+(node:63274) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:63281) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-prepared-unit-review/run-_ffeoj9w/candidate/packages/kernel
+
+(node:63288) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ❯ src/lib/independent-prepared-boundary.spec.ts (6 tests | 4 failed) 30ms
+   × selected field plus surviving-row order restores the complete transaction 18ms
+   × producer ordinary images exclude untouched inspection sibling xy 3ms
+   × producer ordinary images exclude untouched inspection sibling yx 2ms
+   × certified absence row transport preserves actual replacement scope equal 2ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 4 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/lib/independent-prepared-boundary.spec.ts > selected field plus surviving-row order restores the complete transaction
+AssertionError: expected [ { id: 'b', x: +0 }, …(1) ] to deeply equal [ { id: 'a', x: +0 }, …(1) ]
+
+- Expected
++ Received
+
+  [
+    {
+-     "id": "a",
++     "id": "b",
+      "x": 0,
+    },
+    {
+-     "id": "b",
++     "id": "a",
+      "x": 0,
+    },
+  ]
+
+ ❯ src/lib/independent-prepared-boundary.spec.ts:14:100
+     12|   let confirmError:unknown;try{q.confirm();}catch(e){confirmError=e;}
+     13|   writeFileSync(process.env['ST_PREPARED_REVIEW_OUTPUT']+'/field-order…
+     14|   expect(pending).toEqual([{id:'b',x:0},{id:'a',x:7}]);expect(error).t…
+       |                                                                                                    ^
+     15|  }finally{t.destroy();}
+     16| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/4]⎯
+
+ FAIL  src/lib/independent-prepared-boundary.spec.ts > producer ordinary images exclude untouched inspection sibling xy
+ FAIL  src/lib/independent-prepared-boundary.spec.ts > producer ordinary images exclude untouched inspection sibling yx
+AssertionError: expected 99 to be 7 // Object.is equality
+
+- Expected
++ Received
+
+- 7
++ 99
+
+ ❯ src/lib/independent-prepared-boundary.spec.ts:27:91
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/4]⎯
+
+ FAIL  src/lib/independent-prepared-boundary.spec.ts > certified absence row transport preserves actual replacement scope equal
+AssertionError: expected true to be false // Object.is equality
+
+- Expected
++ Received
+
+- false
++ true
+
+ ❯ src/lib/independent-prepared-boundary.spec.ts:37:142
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/4]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  4 failed | 2 passed (6)
+   Start at  15:24:07
+   Duration  807ms (transform 447ms, setup 0ms, import 534ms, tests 30ms, environment 168ms)
+
+Warning: command "node tools/run-core-vitest.mjs independent-prepared-boundary.spec.ts" exited with non-zero status code
+
+
+ NX   Running target test for project kernel failed
+
+Failed tasks:
+
+- kernel:test
+
+Hint: run the command with --verbose for more details.
+
+  Run duration:      1.2s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     1.2s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    1.2s

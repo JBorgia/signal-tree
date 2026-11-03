@@ -33,36 +33,6 @@ const DEV_MESSAGES = {
   // a runtime diagnostic giving advice that could not be followed.
 } as const;
 
-// Production messages use the same short readable strings as dev.
-// The numeric-code approach was abandoned: bare integers ('0','1','2') are
-// completely opaque in production stack traces and tooling. The dev strings
-// are already concise (<25 chars each) so bundle impact is negligible.
-const PROD_MESSAGES = DEV_MESSAGES;
-
-// Prefer Angular's compile-time `ngDevMode` flag. When `ngDevMode` is false
-// in production builds, DEV_MESSAGES can be tree-shaken. Fallback to
-// process.env when ngDevMode is not present.
-declare const ngDevMode: boolean | undefined;
-// Avoid referencing the bare `process` identifier to keep builds free of Node
-// type assumptions; use globalThis to check env when available.
-const _isProdByEnv = Boolean(
-  typeof globalThis === 'object' &&
-    globalThis !== null &&
-    'process' in globalThis &&
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    typeof (globalThis as any).process === 'object' &&
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    'env' in (globalThis as any).process &&
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (globalThis as any).process.env.NODE_ENV === 'production'
-);
-
-const _isDev =
-  typeof ngDevMode !== 'undefined' ? Boolean(ngDevMode) : !_isProdByEnv;
-
-
-export const SIGNAL_TREE_MESSAGES = Object.freeze(
-  _isDev
-    ? (DEV_MESSAGES as typeof DEV_MESSAGES)
-    : (PROD_MESSAGES as typeof DEV_MESSAGES)
-);
+// Production and development use the same readable, stable messages.
+// Selecting between aliases only introduced unnecessary environment reads.
+export const SIGNAL_TREE_MESSAGES = Object.freeze(DEV_MESSAGES);

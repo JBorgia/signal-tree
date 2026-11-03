@@ -83,6 +83,18 @@ export const appRoutes: Route[] = [
     },
   },
   {
+    path: 'independent-publication',
+    loadComponent: () =>
+      import('./pages/independent-publication/independent-publication.component').then(
+        (c) => c.IndependentPublicationComponent
+      ),
+    data: {
+      title: 'Independent publication · v16 development preview (unreleased)',
+      description:
+        'Publish a literal note while a route proposal stays pending. Local state, admission receipts and an in-memory endpoint remain distinct.',
+    },
+  },
+  {
     path: 'async',
     redirectTo: 'external-truth',
     pathMatch: 'full',

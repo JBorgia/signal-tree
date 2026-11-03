@@ -64,6 +64,9 @@ export default defineConfig({
       '**/diag-journal-1-eviction.spec.ts',
       '**/link-lifetime.spec.ts',
       '**/location-runtime-retention.spec.ts',
+      '**/forwarding-retention-probe.spec.ts',
+      // All three unchanged arms are required by forwarding-retention-gc.
+      '**/held-continuation-probe.spec.ts',
     ],
     coverage: {
       provider: 'v8',

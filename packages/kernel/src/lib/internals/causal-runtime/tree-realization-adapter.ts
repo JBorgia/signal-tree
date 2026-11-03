@@ -1,3 +1,27 @@
+import { getEntityPreparationReader } from '../entity-preparation-reader';
+import {withScalarSelections} from '../native-scalar-selection';
+import { PublicationPreparation } from '../publication-preparation';
+import { completeScalarFrame } from '../tree-scalar-slot-runtime';
+import type { EntityStructureOperation, PreparedEntityStructure } from '../prepared-entity-structure';
+import {scalarFrameMetadata} from '../scalar-publication-coverage';
+import { orderRestoresForPlacement } from '../../physical/order-restores-for-placement';
+import {openSelected,consumeSelected,closeSelected,type SelectedPreparation,type SelectedRowIntent,type SelectedOutcome} from '../selected-write-operation';
+import { replaceSelectedLocation } from '../location-runtime';
+import {fieldEndpoints} from '../native-field-selection';
+import {getEntityPublicationBinding} from '../entity-publication';
+import { withEntityPointPublicationPreparation } from '../entity-publication';
+import { withSelectedEntityDisposition } from '../selected-entity-disposition';
+import {
+  prepareOrdinaryRealization,
+  ordinaryRealization,
+  realizationPlacement,
+} from './ordinary-realization';
+import type { EntityRealizationEdit } from '../entity-value-transition';
+import type { CommittedEntityMutation } from '../mutation-capture-runtime';
+import {
+  canRealizePlainBranchMember,
+  preparePlainBranchMembers,
+} from '../plain-branch-membership';
 import type {
   ISignalTree,
   PositionId,
@@ -20,6 +44,8 @@ import { markOwnerInvalidatedFrom } from '../owner-invalidation-port';
 import { getLocationRuntime } from '../location-runtime';
 
 import type { ReversalEffect, ReversalRefusal } from './causal-types';
+import { applyInInvalidationGroup } from './post-application-failure';
+import { holdEntityMembershipDelivery } from '../entity-membership-source';
 import { normalizeScopedValuePath } from './scoped-value-addressing';
 
 type StructuralDriftRefusal = Extract<
@@ -33,6 +59,25 @@ const TREE_REALIZATION_DESCRIPTORS = Symbol.for(
 const TREE_REALIZATION_PORT = Symbol.for('SignalTree:TreeRealizationPort');
 
 type CollectionNode = {
+  __validateOrdinaryStructure?(effects: readonly ReversalEffect[]): boolean;
+  __prepareOrdinaryRealization?(
+    effects: readonly ReversalEffect[],
+    physicalAfter?: ReadonlyMap<number, unknown>,
+    physicalEffects?: readonly ReversalEffect[], _placement?:never,_order?:never,publicationPhase?:PublicationPreparation
+  ): { install(): void; complete():void; changes: readonly CommittedEntityMutation[] };
+  __preparePointValues?(
+    values: readonly {
+      subjectId: number;
+      key: string | number;
+      value: unknown;
+      edits: readonly EntityRealizationEdit[];
+    }[], _selected?:never, publicationPhase?:PublicationPreparation
+  ): {
+    complete():void;
+    install(): void;
+    invalidate(): void;
+    publish(): void;
+  };
   byIdOrFail(id: string | number): unknown;
   changeId(from: string | number, to: string | number): void;
   removeOne(id: string | number): void;
@@ -41,16 +86,17 @@ type CollectionNode = {
     entity: unknown,
     subjectId: number
   ): {
-    commit(options?: { advancePhysicalRevision?: boolean }): void;
+    commit(options?: { advancePhysicalRevision?: boolean; publication?: 'physical' }): void;
     publish(metaOverride?: WriteMetadata): void;
   };
   __planRemove?(
     key: string | number,
     subjectId: number
   ): {
-    commit(options?: { advancePhysicalRevision?: boolean }): void;
+    commit(options?: { advancePhysicalRevision?: boolean; publication?: 'physical' }): void;
     publish(metaOverride?: WriteMetadata): void;
   };
+  __prepareStructuralUnit?(operations: readonly EntityStructureOperation[], publicationPhase?:PublicationPreparation): PreparedEntityStructure;
   __planRestore?(
     key: string | number,
     entity: unknown,
@@ -64,23 +110,27 @@ type CollectionNode = {
      */
     vacatingKeys?: ReadonlySet<string | number>
   ): {
-    commit(options?: { advancePhysicalRevision?: boolean }): void;
+    commit(options?: { advancePhysicalRevision?: boolean; publication?: 'physical' }): void;
     publish(metaOverride?: WriteMetadata): void;
   };
   __planRekey?(
     from: string | number,
-    to: string | number
+    to: string | number,
+    vacatingKeys?: ReadonlySet<string | number>
   ): {
-    commit(options?: { advancePhysicalRevision?: boolean }): void;
+    readonly recipe:EntityStructureOperation;
+    commit(options?: { advancePhysicalRevision?: boolean; publication?: 'physical' }): void;
     publish(metaOverride?: WriteMetadata): void;
   };
   __planPreparedRekey?(
     from: string | number,
     to: string | number,
     subjectId: number,
-    entity: unknown
+    entity: unknown,
+    placement?: { beforeSubject?: number; afterSubject?: number }
   ): {
-    commit(options?: { advancePhysicalRevision?: boolean }): void;
+    readonly recipe:EntityStructureOperation;
+    commit(options?: { advancePhysicalRevision?: boolean; publication?: 'physical' }): void;
     publish(metaOverride?: WriteMetadata): void;
   };
   __findKeyBySubjectId?(subjectId: number): string | number | undefined;
@@ -106,6 +156,8 @@ type WritableEntityNode = {
 
 type PreparedSubjectRealization = {
   collectionPath: string;
+  /** The collection node this subject belongs to; the scope of its key. */
+  scope: object;
   subjectId: number;
   reachable: boolean;
   currentKey: string | number | undefined;
@@ -114,64 +166,88 @@ type PreparedSubjectRealization = {
 
 type PreparedOccupancyState = number | 'vacant';
 
+/**
+ * Subject lifetimes are allocated per collection, so two collections routinely
+ * hold the same lifetime ID, and two collections can share a path label (a
+ * literal `'a.b'` key beside a nested `a.b`). Prepared subjects and key
+ * occupancy are therefore scoped by the collection NODE each effect resolves
+ * to, by owner position where the effect states one. A bare lifetime once let
+ * one collection's restored row absorb another collection's field reversal.
+ */
 class PreparedRealizationContext {
-  private readonly subjects = new Map<number, PreparedSubjectRealization>();
+  constructor(
+    private readonly scopeOf: (effect: ReversalEffect) => object | undefined
+  ) {}
+
+  private readonly subjects = new Map<
+    object,
+    Map<number, PreparedSubjectRealization>
+  >();
   private readonly occupancy = new Map<
-    string,
+    object,
     Map<string | number, PreparedOccupancyState>
   >();
 
-  private occupancyEntries(
-    collectionPath: string,
-    createIfMissing = false
-  ): Map<string | number, PreparedOccupancyState> | undefined {
-    let entries = this.occupancy.get(collectionPath);
-    if (!entries && createIfMissing) {
-      entries = new Map<string | number, PreparedOccupancyState>();
-      this.occupancy.set(collectionPath, entries);
-    }
-
-    return entries;
-  }
-
   private setOccupancy(
-    collectionPath: string,
+    scope: object,
     key: string | number,
     state: PreparedOccupancyState
   ): void {
-    this.occupancyEntries(collectionPath, true)?.set(key, state);
+    let entries = this.occupancy.get(scope);
+    if (!entries) {
+      entries = new Map<string | number, PreparedOccupancyState>();
+      this.occupancy.set(scope, entries);
+    }
+    entries.set(key, state);
+  }
+
+  private subjectsIn(scope: object): Map<number, PreparedSubjectRealization> {
+    let subjects = this.subjects.get(scope);
+    if (!subjects) {
+      subjects = new Map();
+      this.subjects.set(scope, subjects);
+    }
+    return subjects;
   }
 
   rememberRestoredSubject(
+    effect: ReversalEffect,
     subjectId: number,
     collectionPath: string,
     key: string | number,
     value: unknown
   ): void {
-    this.subjects.set(subjectId, {
+    const scope = this.scopeOf(effect);
+    if (!scope) return;
+    this.subjectsIn(scope).set(subjectId, {
       collectionPath,
+      scope,
       subjectId,
       reachable: true,
       currentKey: key,
       value,
     });
-    this.setOccupancy(collectionPath, key, subjectId);
+    this.setOccupancy(scope, key, subjectId);
   }
 
-  rememberRekeyedSubject(subjectId: number, key: string | number): void {
-    const existing = this.subjects.get(subjectId);
+  rememberRekeyedSubject(
+    effect: ReversalEffect,
+    subjectId: number,
+    key: string | number
+  ): void {
+    const existing = this.resolveSubject(effect, subjectId);
     if (!existing) {
       return;
     }
 
     this.setOccupancy(
-      existing.collectionPath,
+      existing.scope,
       existing.currentKey as string | number,
       'vacant'
     );
-    this.setOccupancy(existing.collectionPath, key, subjectId);
+    this.setOccupancy(existing.scope, key, subjectId);
 
-    this.subjects.set(subjectId, {
+    this.subjectsIn(existing.scope).set(subjectId, {
       ...existing,
       reachable: true,
       currentKey: key,
@@ -179,22 +255,22 @@ class PreparedRealizationContext {
   }
 
   rememberRemovedSubject(
+    effect: ReversalEffect,
     subjectId: number,
     collectionPath: string,
     key: string | number,
     value: unknown
   ): void {
-    const existing = this.subjects.get(subjectId);
+    const scope = this.scopeOf(effect);
+    if (!scope) return;
+    const existing = this.subjectsIn(scope).get(subjectId);
     const currentValue = existing?.value ?? value;
 
-    if (existing?.currentKey !== undefined) {
-      this.setOccupancy(existing.collectionPath, existing.currentKey, 'vacant');
-    } else {
-      this.setOccupancy(collectionPath, key, 'vacant');
-    }
+    this.setOccupancy(scope, existing?.currentKey ?? key, 'vacant');
 
-    this.subjects.set(subjectId, {
+    this.subjectsIn(scope).set(subjectId, {
       collectionPath,
+      scope,
       subjectId,
       reachable: false,
       currentKey: undefined,
@@ -202,15 +278,21 @@ class PreparedRealizationContext {
     });
   }
 
-  resolveSubject(subjectId: number): PreparedSubjectRealization | undefined {
-    return this.subjects.get(subjectId);
+  resolveSubject(
+    effect: ReversalEffect,
+    subjectId: number
+  ): PreparedSubjectRealization | undefined {
+    const scope = this.scopeOf(effect);
+    return scope === undefined
+      ? undefined
+      : this.subjects.get(scope)?.get(subjectId);
   }
 
   resolveOccupancy(
-    collectionPath: string,
+    scope: object,
     key: string | number
   ): PreparedOccupancyState | undefined {
-    return this.occupancyEntries(collectionPath)?.get(key);
+    return this.occupancy.get(scope)?.get(key);
   }
 }
 
@@ -269,6 +351,15 @@ export interface CreateTreeRealizationAdapterOptions {
 }
 
 export interface TreeRealizationPort {
+  /** Uses this adapter's retained source identities, including hidden collections.
+   * Lifetime validation and public visibility remain the installer's responsibility.
+   */
+  prepareSelectedUnit?(
+    effects: readonly ReversalEffect[]
+  ): { install(): void; publish(options?:{deferCompletion?:boolean}): void; complete():void };
+  prepareOrdinaryEffects?(
+    effects: readonly ReversalEffect[]
+  ): readonly ReversalEffect[];
   validateEffects(
     effects: readonly ReversalEffect[]
   ): StructuralDriftRefusal | undefined;
@@ -400,9 +491,75 @@ export function createTreeRealizationAdapter(
     getPhysicalCommitClock(options.tree) ??
     getPhysicalCommitClock(options.tree.$);
   const structuralOwnerPaths = indexStructuralOwnerPaths(options.tree.$);
+  // The exact returned array is an invocation-local admitted operation, not a
+  // reusable current-key rewrite. Legacy unlowered callers retain validation.
+  const admissions = new WeakMap<readonly ReversalEffect[], {
+    valid: boolean; revision: number | undefined; consumed: boolean;
+  }>();
+  const admissionCurrent = (effects: readonly ReversalEffect[]): boolean => {
+    const admission = admissions.get(effects);
+    return !admission || (admission.valid && !admission.consumed &&
+      admission.revision === physicalCommitClock?.revision());
+  };
 
   return {
+    prepareSelectedUnit(effects) {
+      return prepareSelectedOperation(options.tree, effects, structuralOwnerPaths);
+    },
+    prepareOrdinaryEffects(effects) {
+      const revision = physicalCommitClock?.revision();
+      const groups = new Map<PositionId, ReversalEffect[]>();
+      for (const effect of effects) {
+        if (!effect.structural || typeof effect.subjectId !== 'number') continue;
+        let group = groups.get(effect.owner);
+        if (!group) groups.set(effect.owner, group = []);
+        group.push(effect);
+      }
+      let valid = true;
+      // Retain the authentic recipe resolved at admission. Physical lowering
+      // must not erase an ordinary contribution or defer descriptor lookup.
+      const resolved = new Map<ReversalEffect, ReversalEffect>();
+      for (const [owner, group] of groups) {
+        const node = resolveCollectionNode(options.tree, options.descriptors.get(owner), structuralOwnerPaths, group[0]);
+        if (!node?.__validateOrdinaryStructure ||
+          !node.__prepareOrdinaryRealization ||
+          !node.__validateOrdinaryStructure(group)) {
+          valid = false;
+          break;
+        }
+        for (const effect of group) {
+          if (effect.structural === 'rekey') continue;
+          const context = effect.structural === 'add'
+            ? getStructuralAddEffect(options.descriptors.get(owner), effect)
+            : effect.structuralContext;
+          // The existing ordinary installer requires an existence recipe.
+          // Without it, refuse the entire paired operation before lowering.
+          // Legacy unlowered physical routes retain subject-based removal.
+          if (!context || context.kind === 'rekey' ||
+            context.subject !== effect.subjectId ||
+            !Object.prototype.hasOwnProperty.call(context, 'value') ||
+            (effect.structural === 'add' && !node.__restoreOne)) {
+            valid = false;
+            break;
+          }
+          resolved.set(effect, context === effect.structuralContext ? effect :
+            Object.freeze({ ...effect, structuralContext: context }));
+        }
+        if (!valid) break;
+      }
+      const byOwner = new Map(effects.map(effect => [effect.owner, effect]));
+      // Failed semantic admission is returned for the existing typed refusal
+      // path; it must not be lowered or partially installed.
+      const ordinary = effects.map(effect => resolved.get(effect) ?? effect);
+      const physical = valid ? prepareOrdinaryRealization(ordinary, (owner, subject) => {
+        const effect = byOwner.get(owner);
+        return effect ? resolveCollectionNode(options.tree, options.descriptors.get(owner), structuralOwnerPaths, effect)?.__findKeyBySubjectId?.(subject) : undefined;
+      }).physical : Object.freeze([...effects]);
+      admissions.set(physical, { valid: valid && revision === physicalCommitClock?.revision(), revision, consumed: false });
+      return physical;
+    },
     validateEffects(effects) {
+      if (!admissionCurrent(effects)) return { kind: 'structural-drift' };
       const preparedContext = buildPreparedRealizationContext(
         options.tree,
         options.descriptors,
@@ -430,49 +587,156 @@ export function createTreeRealizationAdapter(
       return undefined;
     },
     applyAtomically(effects) {
+      const admission = admissions.get(effects);
+      if (admission) {
+        if (!admissionCurrent(effects) || !buildPreparedRealizationContext(
+          options.tree, options.descriptors, structuralOwnerPaths, scalarSlotRuntime, effects
+        )) throw new Error('Ordinary structural admission refused at structural-drift');
+        admission.consumed = true;
+      }
+      const memberTargets = new Map<
+        number,
+        { present: boolean; value: unknown; turn?: number }
+      >();
+      const authoredValueEffects: ReversalEffect[] = [];
+      for (const effect of effects) {
+        if (effect.plainBranchMembership) {
+          // Last-write order, as `deriveDeclarativeTransitionTarget` keeps it:
+          // a jump concatenates every turn it crosses into one application.
+          memberTargets.delete(effect.owner);
+          memberTargets.set(effect.owner, {
+            present: effect.plainBranchMembership.after,
+            value: effect.after,
+            ...(effect.turn === undefined ? {} : { turn: effect.turn }),
+          });
+        } else {
+          authoredValueEffects.push(effect);
+        }
+      }
+      const publicationPhase = new PublicationPreparation();
+      const members = memberTargets.size
+        ? preparePlainBranchMembers(options.tree.$, memberTargets, authoredValueEffects.filter(effect=>
+            !effect.structural && effect.subjectId===undefined && effect.subjectFieldSegments===undefined &&
+            !hasInlineScopedAddress(effect) && !hasInlineSubjectAddress(effect) &&
+            scalarSlotRuntime?.resolveScalarSlot(effect.owner)!==undefined).map(effect=>({owner:effect.owner,after:effect.after,turn:effect.turn})), publicationPhase, 'realized')
+        : undefined;
+      // A scalar value an earlier turn left is superseded where a later
+      // turn's member write staged its location (`withoutSupersededScalars`).
+      const staged = members?.staged;
+      const remainingValueEffects = members ? authoredValueEffects.filter(effect=>
+        effect.structural || effect.subjectId!==undefined || effect.subjectFieldSegments!==undefined ||
+        hasInlineScopedAddress(effect) || hasInlineSubjectAddress(effect) ||
+        scalarSlotRuntime?.resolveScalarSlot(effect.owner)===undefined) : authoredValueEffects;
+      const valueEffects = staged?.size
+        ? remainingValueEffects.filter(
+            (effect) =>
+              effect.turn === undefined ||
+              effect.structural !== undefined ||
+              typeof effect.subjectId === 'number' ||
+              (staged.get(effect.owner) ?? effect.turn) <= effect.turn
+          )
+        : remainingValueEffects;
+      const detachedCompletions:Array<()=>void>=[];
       const apply = () => {
-        const heterogeneousFrame = planHeterogeneousFrame(
-          options.tree,
-          options.descriptors,
-          structuralOwnerPaths,
-          scalarSlotRuntime,
-          physicalCommitClock,
-          effects
-        );
-        if (heterogeneousFrame) {
-          heterogeneousFrame.commit();
-          return;
-        }
-
-        const scalarFrame = planScalarFrame(
-          options.tree,
-          options.descriptors,
-          structuralOwnerPaths,
-          scalarSlotRuntime,
-          effects
-        );
-        if (scalarFrame) {
-          scalarFrame.commit();
-          return;
-        }
-
-        for (const effect of effects) {
-          applyEffect(
-            options.tree,
-            options.descriptors,
-            structuralOwnerPaths,
-            scalarSlotRuntime,
-            effect
+        // Prepare the remaining frame before any member is installed. All member
+        // values and presence are installed before any effect is published.
+        const heterogeneousFrame = valueEffects.length || ordinaryRealization(effects)?.ordinary.some(effect => !!effect.structural)
+          ? planHeterogeneousFrame(
+              options.tree,
+              options.descriptors,
+              structuralOwnerPaths,
+              scalarSlotRuntime,
+              physicalCommitClock,
+              valueEffects,
+              ordinaryRealization(effects)?.ordinary,
+              publicationPhase
+            )
+          : undefined;
+        let scalarFrame =
+          !heterogeneousFrame && valueEffects.length
+            ? planScalarFrame(
+                options.tree,
+                options.descriptors,
+                structuralOwnerPaths,
+                scalarSlotRuntime,
+                valueEffects,
+                publicationPhase
+              )
+            : undefined;
+        // ⚠️ SLOT SCALARS NEVER TAKE THE AUTHORED WRITE. A mixed reversal whose
+        // collection cannot be planned yet (it lies under a member this
+        // reversal re-adds) applies effect by effect. An authored scalar write
+        // under a member the reversal hides re-adds that member's path
+        // (`reactivatePathOnWrite`): a jump back over a path re-add, a
+        // `setAll` and an omission came back with the member present and one
+        // child (v16 8g, generated jump-vs-undo histories). Membership is the
+        // membership targets' to decide; the slot frame writes values only.
+        let perEffect: readonly ReversalEffect[] =
+          heterogeneousFrame || scalarFrame ? [] : valueEffects;
+        if (perEffect.length) {
+          const slotScalars = valueEffects.filter(
+            (effect) =>
+              effect.structural === undefined &&
+              effect.subjectId === undefined &&
+              effect.subjectFieldSegments === undefined &&
+              !hasInlineScopedAddress(effect) &&
+              !hasInlineSubjectAddress(effect) &&
+              scalarSlotRuntime?.resolveScalarSlot(effect.owner) !== undefined
           );
+          scalarFrame = slotScalars.length
+            ? planScalarFrame(
+                options.tree,
+                options.descriptors,
+                structuralOwnerPaths,
+                scalarSlotRuntime,
+                slotScalars,
+                publicationPhase
+              )
+            : undefined;
+          if (scalarFrame) {
+            const framed = new Set(slotScalars);
+            perEffect = valueEffects.filter((effect) => !framed.has(effect));
+          }
         }
+        publicationPhase.seal();
+        publicationPhase.validate();
+        if (admission && admission.revision !== physicalCommitClock?.revision())
+          throw new Error('Ordinary structural admission revision is stale');
+        members?.install();
+        if(members)detachedCompletions.push(()=>members.complete());
+        // A membership-only frame has no value frame to advance the shared
+        // physical clock. Publish its installed presence under a new revision.
+        if (members && valueEffects.length === 0)
+          physicalCommitClock?.advance();
+        if (heterogeneousFrame) {
+          heterogeneousFrame.commit(detachedCompletions);
+        } else {
+          scalarFrame?.commit(detachedCompletions);
+          for (const effect of perEffect) {
+            applyEffect(
+              options.tree,
+              options.descriptors,
+              structuralOwnerPaths,
+              scalarSlotRuntime,
+              effect
+            );
+          }
+        }
+        members?.publish();
       };
 
-      const locations = getLocationRuntime(options.tree.$);
-      if (locations) {
-        locations.runInvalidationGroup(apply);
-      } else {
-        apply();
-      }
+      // Membership listeners run once the whole reversal is installed and
+      // published, in commit order, whatever throws on the way out.
+      const releaseMembership = holdEntityMembershipDelivery(options.tree.$);
+      let failed=false,first:unknown;
+      try { applyInInvalidationGroup(options.tree.$, apply,()=>{
+        let failed=false,first:unknown;
+        for(const complete of detachedCompletions)try{complete();}catch(error){if(!failed){failed=true;first=error;}}
+        if(failed)throw first;
+      }); }
+      catch(error){failed=true;first=error;}
+      try{releaseMembership();}catch(error){if(!failed){failed=true;first=error;}}
+      if(failed)throw first;
     },
   };
 }
@@ -526,17 +790,341 @@ export function getTreeRealizationPort(
   ];
 }
 
+/**
+ * Point-only realization for scalar slots and existing entity lifetimes.
+ * The caller retains admission and the encompassing invalidation group.
+ * Undefined means the effects require the existing structural/member planner.
+ */
+/** Bounded source-owned preparation for selected top-level entity fields and scalar slots. */
+/** Admission sees the complete compensation, before invoking any preparation. */
+export function admitSelectedOperation<O extends {
+ readonly effects:readonly ReversalEffect[];
+ readonly orderDeltas:readonly unknown[];
+ readonly frontiers:ReadonlyMap<number,unknown>;
+ readonly structuralRequired:boolean;
+}>(tree:ISignalTree<object>,operation:O):{operation:O;prepare:()=>{install():void;publish(options?:{deferCompletion?:boolean}):void;complete():void}} | undefined {
+ const effects=operation.effects;
+ // This bounded producer has no order, structural or frontier installer.
+ // Return inapplicable for the entire description; the complete route owns it.
+ if(operation.orderDeltas.length || operation.frontiers.size || operation.structuralRequired)return undefined;
+ if(!effects.some(effect=>!!fieldEndpoints(effect)) || !effects.every(effect=>!effect.structural&&!effect.plainBranchMembership && (typeof effect.subjectId==='number'?effect.subjectFieldSegments?.length===1&&!!fieldEndpoints(effect):effect.subjectFieldSegments===undefined)))return undefined;
+ const port = getTreeRealizationPort(tree.$) ?? getTreeRealizationPort(tree);
+ const prepare = port?.prepareSelectedUnit;
+ if (!prepare) return undefined;
+ return {operation,prepare:()=>prepare.call(port, operation.effects)};
+}
+function prepareWithScalarSelections<T>(slots:NonNullable<ReturnType<typeof getTreeScalarSlotRuntime>>,effects:readonly ReversalEffect[],work:()=>T):T {
+ const selections=new Map<object,import('../native-field-selection').NativeFieldEndpoint>();
+ for(const effect of effects){if(effect.subjectId!==undefined)continue;const endpoint=fieldEndpoints(effect)?.after;const leaf=slots.resolveScalarLeaf(effect.owner);if(endpoint&&leaf)selections.set(leaf,endpoint);}
+ return withScalarSelections(selections,work);
+}
+function prepareSelectedOperation(tree:ISignalTree<object>,effects:readonly ReversalEffect[],owners:StructuralOwnerIndex):{install():void;publish(options?:{deferCompletion?:boolean}):void;complete():void} {
+ const descriptors=getTreeRealizationDescriptors(tree.$);
+ const slots=getTreeScalarSlotRuntime(tree.$)??getTreeScalarSlotRuntime(tree);
+ const clock=getPhysicalCommitClock(tree.$)??getPhysicalCommitClock(tree);
+ if(!descriptors||!slots||!clock)throw new Error('Selected operation source unavailable');
+ const revision=clock.revision();
+ const edits:SelectedRowIntent[]=[];const deliveries:Array<()=>void>=[];const publicationPhase=new PublicationPreparation();
+ const scalarEffects:ReversalEffect[]=[];const frame=slots.beginFrame();
+ let active=true;
+ const preparation:SelectedPreparation={stage(edit){if(!active)throw new Error('Selected preparation closed');edits.push(edit);},defer(delivery){if(!active)throw new Error('Selected preparation closed');deliveries.push(delivery);}};
+ try {
+   for(const effect of effects){
+     if(typeof effect.subjectId!=='number'){
+       const slot=slots.resolveScalarSlot(effect.owner);if(slot===undefined)throw new Error('Selected scalar slot unavailable');
+       frame.set(slot,effect.after);scalarEffects.push(effect);continue;
+     }
+     const count=edits.length;applyEffect(tree,descriptors,owners,slots,effect,preparation);
+     if(edits.length!==count+1)throw new Error('Selected continuation did not prepare exactly one operation');
+   }
+   const groups=new Map<object,SelectedRowIntent[]>();for(const edit of edits){let group=groups.get(edit.source);if(!group)groups.set(edit.source,group=[]);group.push(edit);}
+   const plans=[...groups.values()].map(group=>group[0]!.prepare(group,publicationPhase));
+   if(!frame.prepareCommit)throw new Error('Selected scalar preparation unavailable');
+   const installScalars=prepareWithScalarSelections(slots,scalarEffects,()=>frame.prepareCommit!({advanceRevision:false,publish:false,publicationPhase,admissionParticipation:'realized'}));
+   publicationPhase.seal();
+   if(clock.revision()!==revision)throw new Error('Selected operation preparation reentered installation');
+   active=false;edits.length=0;groups.clear();let installed=false;let scalarResult:ReturnType<typeof installScalars>|undefined;
+   return {
+     install(){if(installed||clock.revision()!==revision)throw new Error('Selected operation revision changed');publicationPhase.validate();scalarResult=installScalars();for(const plan of plans)plan.install();clock.advance();installed=true;},
+     complete(){let failed=false,first:unknown;for(const work of [()=>{if(scalarResult)completeScalarFrame(scalarResult);},...plans.map(plan=>()=>plan.complete())])try{work();}catch(error){if(!failed){failed=true;first=error;}}plans.length=0;if(failed)throw first;},
+     publish(options){if(!installed||!scalarResult)throw new Error('Selected operation not installed');let failed=false;let first:unknown;const run=(body:()=>void)=>{try{body();}catch(error){if(!failed){failed=true;first=error;}}};
+       try{for(const plan of plans)run(()=>plan.invalidate());run(()=>slots.publishPrepared({...scalarResult!,publication:undefined}));for(const plan of plans)run(()=>plan.publish());for(const delivery of deliveries)run(delivery);
+         for(const effect of scalarEffects)run(()=>{const descriptor=descriptors.get(effect.owner);const path=resolveNotifyPath(tree,descriptor,owners,effect);if(path)getPathNotifier().notify(path,effect.after,effect.before,descriptor?.ownerPath??path,undefined,[effect.owner],scalarFrameMetadata(scalarResult,slots.resolveScalarSlot(effect.owner),{...getActiveWriteContext(),intent:'system',participation:'realized'}));});
+       }finally{deliveries.length=0;scalarEffects.length=0;}
+       if(!options?.deferCompletion)run(()=>this.complete());
+       if(failed)throw first;
+     }
+   };
+ } catch(error){active=false;edits.length=0;deliveries.length=0;try{frame.discard();}catch{/* prepareCommit already closed this temporary frame; retain the primary refusal. */}throw error;}
+}
+
+export function preparePointRealization(
+  tree: ISignalTree<object>,
+  effects: readonly ReversalEffect[]
+): { install(): void; publish(options?:{deferCompletion?:boolean}): void; complete():void } | undefined {
+  if (
+    !effects.length ||
+    !effects.some((effect) => typeof effect.subjectId === 'number')
+  )
+    return undefined;
+  const descriptors = getTreeRealizationDescriptors(tree.$);
+  const slots =
+    getTreeScalarSlotRuntime(tree) ?? getTreeScalarSlotRuntime(tree.$);
+  const clock = getPhysicalCommitClock(tree.$) ?? getPhysicalCommitClock(tree);
+  if (!descriptors || !slots || !clock) return undefined;
+  const baseRevision = clock.revision();
+  const owners = effects.some(
+    (effect) => effect.structural || effect.plainBranchMembership
+  )
+    ? indexStructuralOwnerPaths(tree.$)
+    : indexPointOwnerPaths(tree.$, effects);
+  const memberTargets = new Map<
+    number,
+    { present: boolean; value: unknown; turn?: number }
+  >();
+  for (const effect of effects)
+    if (effect.plainBranchMembership) {
+      memberTargets.delete(effect.owner);
+      memberTargets.set(effect.owner, {
+        present: effect.plainBranchMembership.after,
+        value: effect.after,
+        ...(effect.turn === undefined ? {} : { turn: effect.turn }),
+      });
+    }
+  const publicationPhase = new PublicationPreparation();
+  if (effects.some((effect) => effect.structural)) {
+    const scalarEffects = effects.filter(
+      (effect) =>
+        !effect.plainBranchMembership &&
+        !effect.structural &&
+        typeof effect.subjectId !== 'number'
+    );
+    const members = memberTargets.size
+      ? preparePlainBranchMembers(tree.$, memberTargets, scalarEffects, publicationPhase, 'realized')
+      : undefined;
+    const entityEffects = effects.filter(
+      (effect) =>
+        !effect.plainBranchMembership &&
+        (!members || effect.structural || typeof effect.subjectId === 'number')
+    );
+    const heterogeneous = planHeterogeneousFrame(
+      tree,
+      descriptors,
+      owners,
+      slots,
+      clock,
+      entityEffects,
+      ordinaryRealization(effects)?.ordinary,
+      publicationPhase
+    );
+    if (!heterogeneous) return undefined;
+    publicationPhase.seal();
+    if (clock.revision() !== baseRevision)
+      throw new Error('Point realization preparation reentered installation');
+    let installed = false;
+    return {
+      complete(){let failed=false,first:unknown;for(const work of [()=>members?.complete(),()=>heterogeneous.complete()])try{work();}catch(error){if(!failed){failed=true;first=error;}}if(failed)throw first;},
+      install(): void {
+        if (installed || clock.revision() !== baseRevision)
+          throw new Error('Point realization base revision is stale');
+        publicationPhase.validate();
+        members?.install();
+        // Existing structural commits resolve anchors in their established order.
+        // The surrounding invalidation group defers native delivery until all install.
+        heterogeneous.install();
+        installed = true;
+      },
+      publish(options): void {
+        if (!installed)
+          throw new Error('Point realization published before installation');
+        let failed = false;
+        let firstError: unknown;
+        const run = (fn: () => void): void => {
+          try {
+            fn();
+          } catch (error) {
+            if (!failed) {
+              failed = true;
+              firstError = error;
+            }
+          }
+        };
+        run(() => heterogeneous.invalidate());
+        if (members) run(() => members.invalidate());
+        if (members) run(() => members.publish());
+        run(() => heterogeneous.publish());
+        if(!options?.deferCompletion)run(()=>this.complete());
+        if (failed) throw firstError;
+      },
+    };
+  }
+  // The transaction producer supplies whole-row or top-level effects. Deeper
+  // synthetic inputs retain the existing general adapter, without selecting an
+  // ordinary missing-parent policy here. Decline before target preparation.
+  const pointPaths = new Map<ReversalEffect, readonly string[]>();
+  for (const effect of effects) {
+    if (effect.plainBranchMembership || typeof effect.subjectId !== 'number')
+      continue;
+    const path = resolveSubjectFieldPath(
+      descriptors.get(effect.owner),
+      effect,
+      getPositionRegistry(tree.$)
+    );
+    if (path === undefined || path.length > 1) return undefined;
+    pointPaths.set(effect, path);
+  }
+  const rows = new Map<
+    CollectionNode,
+    Map<
+      number,
+      {
+        subjectId: number;
+        key: string | number;
+        value: unknown;
+        edits: EntityRealizationEdit[];
+      }
+    >
+  >();
+  const scalarEffects: ReversalEffect[] = [];
+  const frame = slots.beginFrame();
+  for (const effect of effects) {
+    if (effect.plainBranchMembership) continue;
+    if (typeof effect.subjectId !== 'number') {
+      if (
+        effect.subjectFieldSegments !== undefined ||
+        hasInlineScopedAddress(effect) ||
+        hasInlineSubjectAddress(effect)
+      )
+        return undefined;
+      const slot = slots.resolveScalarSlot(effect.owner);
+      if (slot === undefined) return undefined;
+      frame.set(slot, effect.after);
+      scalarEffects.push(effect);
+      continue;
+    }
+    const descriptor = descriptors.get(effect.owner);
+    const collection = resolveCollectionNode(tree, descriptor, owners, effect);
+    if (!collection?.__preparePointValues) return undefined;
+    const key = collection.__findKeyBySubjectId?.(effect.subjectId);
+    if (key === undefined) return undefined;
+    let bySubject = rows.get(collection);
+    if (!bySubject) rows.set(collection, (bySubject = new Map()));
+    let row = bySubject.get(effect.subjectId);
+    if (!row) {
+      row = {
+        subjectId: effect.subjectId,
+        key,
+        value: deepClone(snapshotCollectionEntityValue(collection, key)),
+        edits: [],
+      };
+      bySubject.set(effect.subjectId, row);
+    }
+    const path = pointPaths.get(effect);
+    if (path === undefined) return undefined;
+    // Read user-provided effect payload once. The physical target and ordered
+    // ordinary edit must not alias each other or mutate the caller's payload.
+    const after = deepClone(effect.after);
+    const present = effect.fieldPresence?.after !== false;
+    if (path.length === 0) row.edits.push({ kind: 'row', value: after });
+    else
+      row.edits.push({ kind: 'field', field: path[0]!, present, value: after, selection:fieldEndpoints(effect)?.after });
+    if (path.length === 0) row.value = deepClone(after);
+    else if (!present) row.value = withoutFieldAtSegments(row.value, path);
+    else assignPreparedSubjectValue(row.value, path, deepClone(after));
+  }
+  const members = memberTargets.size
+    ? preparePlainBranchMembers(tree.$, memberTargets, scalarEffects, publicationPhase, 'realized')
+    : undefined;
+  const collections = [...rows].map(([collection, subjects]) => {
+    const prepare = collection.__preparePointValues;
+    if (!prepare)
+      throw new Error('Point realization preparation is unavailable');
+    return prepare.call(collection, [...subjects.values()],undefined,publicationPhase);
+  });
+  if (!frame.prepareCommit) return undefined;
+  const installScalars = members
+    ? () => undefined
+    : frame.prepareCommit({ advanceRevision: false, publish: false,publicationPhase,admissionParticipation:'realized' });
+  publicationPhase.seal();
+  if (clock.revision() !== baseRevision)
+    throw new Error('Point realization preparation reentered installation');
+  let result: ReturnType<typeof frame.commit> | undefined;
+  let installed = false;
+  return {
+    complete(){let failed=false,first:unknown;for(const work of [()=>members?.complete(),()=>{if(result)completeScalarFrame(result);},...collections.map(plan=>()=>plan.complete())])try{work();}catch(error){if(!failed){failed=true;first=error;}}if(failed)throw first;},
+    install(): void {
+      if (installed || clock.revision() !== baseRevision)
+        throw new Error('Point realization base revision is stale');
+      publicationPhase.validate();
+      if (members) members.install();
+      else result = installScalars();
+      for (const collection of collections) collection.install();
+      clock.advance();
+      installed = true;
+    },
+    publish(options): void {
+      const installedScalars = result;
+      if (!installed || (!members && !installedScalars))
+        throw new Error('Point realization published before installation');
+      // Complete all owned invalidation staging before any path or replay callback.
+      let failed = false;
+      let firstError: unknown;
+      const run = (fn: () => void) => {
+        try {
+          fn();
+        } catch (error) {
+          if (!failed) {
+            failed = true;
+            firstError = error;
+          }
+        }
+      };
+      for (const collection of collections) run(() => collection.invalidate());
+      if (members) run(() => members.invalidate());
+      else if (installedScalars)
+        run(() => slots.publishPrepared({...installedScalars,publication:undefined}));
+      if (members) run(() => members.publish());
+      for (const collection of collections) run(() => collection.publish());
+      for (const effect of members ? [] : scalarEffects)
+        run(() => {
+          const descriptor = descriptors.get(effect.owner);
+          const path = resolveNotifyPath(tree, descriptor, owners, effect);
+          if (path)
+            getPathNotifier().notify(
+              path,
+              effect.after,
+              effect.before,
+              descriptor?.ownerPath ?? path,
+              undefined,
+              [effect.owner],
+              scalarFrameMetadata(installedScalars, slots.resolveScalarSlot(effect.owner), {
+                ...(getActiveWriteContext() ?? {}),
+                intent: 'system',
+                participation: 'realized',
+              })
+            );
+        });
+      run(() => markOwnerInvalidatedFrom(tree as object));
+      if(!options?.deferCompletion)run(()=>this.complete());
+      if (failed) throw firstError;
+    },
+  };
+}
+
 function planHeterogeneousFrame(
   tree: ISignalTree<object>,
   descriptors: ReadonlyMap<PositionId, TreeRealizationDescriptor>,
   structuralOwnerPaths: StructuralOwnerIndex,
   scalarSlotRuntime: ReturnType<typeof getTreeScalarSlotRuntime>,
   physicalCommitClock: ReturnType<typeof getPhysicalCommitClock>,
-  effects: readonly ReversalEffect[]
-): { commit(): void } | undefined {
+  effects: readonly ReversalEffect[],
+  ordinaryEffects?: readonly ReversalEffect[],
+  outerPhase?: PublicationPreparation
+):
+  | { commit(detachedCompletions?:Array<()=>void>): void; validate(): void; install(): void; invalidate(): void; publish(): void; complete():void }
+  | undefined {
   if (
-    effects.length === 0 ||
-    !effects.some(
+    !(ordinaryEffects ?? effects).some(
       (effect) =>
         effect.structural === 'rekey' ||
         effect.structural === 'add' ||
@@ -553,6 +1141,8 @@ function planHeterogeneousFrame(
     return undefined;
   }
 
+  const publicationPhase=outerPhase ?? new PublicationPreparation();
+  const basePhysicalRevision = physicalCommitClock?.revision();
   const scalarEffects = effects.filter((effect) => !effect.structural);
   const preparedContext = buildPreparedRealizationContext(
     tree,
@@ -569,7 +1159,9 @@ function planHeterogeneousFrame(
     ReversalEffect & { structural: 'remove'; subjectId: number },
     string | number
   >();
-  const planningPreparedContext = new PreparedRealizationContext();
+  const planningPreparedContext = new PreparedRealizationContext(
+    preparedSubjectScope(tree, descriptors, structuralOwnerPaths)
+  );
   for (const effect of effects) {
     const removeEffect =
       effect.structural === 'remove' && typeof effect.subjectId === 'number'
@@ -632,11 +1224,83 @@ function planHeterogeneousFrame(
     keys.add(removedKey);
   }
 
+  // An existing entity lifetime is not a scalar slot merely because this
+  // structural frame did not first revive it. Prepare its authored point edits
+  // through the same lifetime-indexed port used by point-only realization.
+  const liveSubjectEffects = new Set<ReversalEffect>();
+  const liveRows = new Map<
+    CollectionNode,
+    Map<
+      number,
+      {
+        subjectId: number;
+        key: string | number;
+        value: unknown;
+        edits: EntityRealizationEdit[];
+      }
+    >
+  >();
+  for (const effect of scalarEffects) {
+    if (
+      typeof effect.subjectId !== 'number' ||
+      isPreparedSubjectScalarEffect(effect, preparedContext)
+    )
+      continue;
+    const collection = resolveCollectionNode(
+      tree,
+      descriptors.get(effect.owner),
+      structuralOwnerPaths,
+      effect
+    );
+    const key = collection?.__findKeyBySubjectId?.(effect.subjectId);
+    const path = resolveSubjectFieldPath(
+      descriptors.get(effect.owner),
+      effect,
+      getPositionRegistry(tree.$)
+    );
+    if (
+      !collection?.__preparePointValues ||
+      key === undefined ||
+      path === undefined ||
+      path.length > 1
+    )
+      return undefined;
+    let subjects = liveRows.get(collection);
+    if (!subjects) liveRows.set(collection, (subjects = new Map()));
+    let row = subjects.get(effect.subjectId);
+    if (!row) {
+      row = {
+        subjectId: effect.subjectId,
+        key,
+        value: deepClone(snapshotCollectionEntityValue(collection, key)),
+        edits: [],
+      };
+      subjects.set(effect.subjectId, row);
+    }
+    const value = deepClone(effect.after);
+    if (!path.length) {
+      row.value = value;
+      row.edits.push({ kind: 'row', value });
+    } else {
+      const present = effect.fieldPresence?.after !== false;
+      row.edits.push({ kind: 'field', field: path[0]!, present, value, selection:fieldEndpoints(effect)?.after });
+      if (present) assignPreparedSubjectValue(row.value, path, value);
+      else row.value = withoutFieldAtSegments(row.value, path);
+    }
+    liveSubjectEffects.add(effect);
+  }
+  // One independently contained delivery per lifetime: a callback from one
+  // row cannot starve a later row after the complete frame is installed.
+  const livePointPlans = withEntityPointPublicationPreparation(()=>[...liveRows].flatMap(([collection, rows]) =>
+    [...rows.values()].map(row=>collection.__preparePointValues!([row],undefined,publicationPhase))
+  ));
   const preparedSubjectScalarEffects = scalarEffects.filter((effect) =>
     isPreparedSubjectScalarEffect(effect, preparedContext)
   );
   const framedScalarEffects = scalarEffects.filter(
-    (effect) => !isPreparedSubjectScalarEffect(effect, preparedContext)
+    (effect) =>
+      !liveSubjectEffects.has(effect) &&
+      !isPreparedSubjectScalarEffect(effect, preparedContext)
   );
   const rekeyEffects = effects.filter(
     (effect): effect is ReversalEffect & { structural: 'rekey' } =>
@@ -648,7 +1312,17 @@ function planHeterogeneousFrame(
     ): effect is ReversalEffect & { structural: 'add'; subjectId: number } =>
       effect.structural === 'add' && typeof effect.subjectId === 'number'
   );
-  const baseRevision = scalarSlotRuntime?.revision();
+  // Sequential simulation retains execution dependencies. Only installation
+  // placement is ordered against the complete proposed topology.
+  const placementEffects = orderPhysicalPlacements(
+    tree,
+    descriptors,
+    structuralOwnerPaths,
+    effects
+  ).filter(
+    (effect) =>
+      effect.structural === 'add' || realizationPlacement(effect) !== undefined
+  );
   const scalarFrameRuntime =
     framedScalarEffects.length > 0 ? scalarSlotRuntime : undefined;
 
@@ -663,32 +1337,38 @@ function planHeterogeneousFrame(
   const plannedRestores: Array<{
     effect: ReversalEffect & { structural: 'add'; subjectId: number };
     plan: {
-      commit(options?: { advancePhysicalRevision?: boolean }): void;
+      commit(options?: { advancePhysicalRevision?: boolean; publication?: 'physical' }): void;
       publish(metaOverride?: WriteMetadata): void;
     };
   }> = [];
   const plannedFreshAdds: Array<{
     effect: ReversalEffect & { structural: 'add'; subjectId: number };
     plan: {
-      commit(options?: { advancePhysicalRevision?: boolean }): void;
+      commit(options?: { advancePhysicalRevision?: boolean; publication?: 'physical' }): void;
       publish(metaOverride?: WriteMetadata): void;
     };
   }> = [];
   const plannedRekeys: Array<{
     effect: ReversalEffect & { structural: 'rekey' };
     plan: {
-      commit(options?: { advancePhysicalRevision?: boolean }): void;
+      readonly recipe:EntityStructureOperation;
+      commit(options?: { advancePhysicalRevision?: boolean; publication?: 'physical' }): void;
       publish(metaOverride?: WriteMetadata): void;
     };
   }> = [];
   const plannedRemoves: Array<{
     effect: ReversalEffect & { structural: 'remove'; subjectId: number };
     plan: {
-      commit(options?: { advancePhysicalRevision?: boolean }): void;
+      commit(options?: { advancePhysicalRevision?: boolean; publication?: 'physical' }): void;
       publish(metaOverride?: WriteMetadata): void;
     };
   }> = [];
 
+  type PhysicalPlan = {
+    commit(options?: { advancePhysicalRevision?: boolean; publication?: 'physical' }): void;
+    publish(metaOverride?: WriteMetadata): void;
+  };
+  const placementPlans = new Map<ReversalEffect, PhysicalPlan>();
   for (const effect of restoreEffects) {
     const descriptor = descriptors.get(effect.owner);
     const collectionNode = resolveCollectionNode(
@@ -719,7 +1399,10 @@ function planHeterogeneousFrame(
       return undefined;
     }
 
-    const preparedSubject = preparedContext.resolveSubject(effect.subjectId);
+    const preparedSubject = preparedContext.resolveSubject(
+      effect,
+      effect.subjectId
+    );
     if (!preparedSubject) {
       scalarFrame?.discard();
       return undefined;
@@ -797,7 +1480,7 @@ function planHeterogeneousFrame(
 
     const preparedSubject =
       typeof effect.subjectId === 'number'
-        ? preparedContext.resolveSubject(effect.subjectId)
+        ? preparedContext.resolveSubject(effect, effect.subjectId)
         : undefined;
     const plan =
       preparedSubject &&
@@ -806,12 +1489,16 @@ function planHeterogeneousFrame(
             effect.before as string | number,
             effect.after as string | number,
             effect.subjectId as number,
-            preparedSubject.value
+            preparedSubject.value,
+            realizationPlacement(effect)?.structuralContext as
+              | { beforeSubject?: number; afterSubject?: number }
+              | undefined
           )
         : typeof collectionNode.__planRekey === 'function'
         ? collectionNode.__planRekey(
             effect.before as string | number,
-            effect.after as string | number
+            effect.after as string | number,
+            vacatingKeysByOwner.get(effect.owner)
           )
         : undefined;
     if (!plan) {
@@ -826,6 +1513,7 @@ function planHeterogeneousFrame(
 
     if (typeof effect.subjectId === 'number') {
       preparedContext.rememberRekeyedSubject(
+        effect,
         effect.subjectId,
         effect.after as string | number
       );
@@ -864,118 +1552,252 @@ function planHeterogeneousFrame(
     });
   }
 
+  for (const { effect, plan } of [...plannedFreshAdds, ...plannedRestores])
+    placementPlans.set(effect, plan);
+  for (const { effect, plan } of plannedRekeys)
+    if (realizationPlacement(effect)) placementPlans.set(effect, plan);
+
+  const ordinaryPlans = new Map<
+    PositionId,
+    { install(): void; complete():void; changes: readonly CommittedEntityMutation[] }
+  >();
+  if (ordinaryEffects) {
+    const groups = new Map<PositionId, ReversalEffect[]>();
+    for (const effect of ordinaryEffects) {
+      if (typeof effect.subjectId !== 'number') continue;
+      let group = groups.get(effect.owner);
+      if (!group) groups.set(effect.owner, (group = []));
+      group.push(effect);
+    }
+    for (const [owner, group] of groups) {
+      const node = resolveCollectionNode(
+        tree,
+        descriptors.get(owner),
+        structuralOwnerPaths,
+        group[0]
+      );
+      if (!node?.__prepareOrdinaryRealization)
+        throw new Error('Ordinary realization binding is unavailable');
+      // Source-owned preparation receives the exact physical execution order;
+      // ordinary authority remains the separately selected group.
+      const physicalGroup = [
+        ...removeEffects,
+        ...placementEffects,
+        ...plannedRekeys
+          .filter(({ effect }) => !realizationPlacement(effect))
+          .map(({ effect }) => effect),
+      ].filter((effect) => effect.owner === owner);
+      ordinaryPlans.set(
+        owner,
+        node.__prepareOrdinaryRealization(group, undefined, physicalGroup,undefined,undefined,publicationPhase)
+      );
+    }
+  }
+  // The prepared ordinary plan is stable for this unit. Index once rather than
+  // scanning every lifetime's changes for each publication effect.
+  const dispositionByOwner = new Map<PositionId, Map<number, CommittedEntityMutation[]>>();
+  for (const [owner, plan] of ordinaryPlans) {
+    const subjects = new Map<number, CommittedEntityMutation[]>();
+    for (const change of plan.changes) {
+      // Match the previous strict-equality filter even for malformed NaN IDs.
+      if (change.subject !== change.subject) continue;
+      const group = subjects.get(change.subject);
+      if (group) group.push(change);
+      else subjects.set(change.subject, [change]);
+    }
+    dispositionByOwner.set(owner, subjects);
+  }
+  const publicationMeta = (effect: ReversalEffect): WriteMetadata => {
+    const meta: WriteMetadata = {
+      ...(getActiveWriteContext() ?? {}),
+      intent: 'system',
+      participation: 'realized',
+    };
+    const plan = ordinaryPlans.get(effect.owner);
+    if (!plan) return meta;
+    const subjects = dispositionByOwner.get(effect.owner)!;
+    // Preserve the old per-call array identity; metadata consumers never share
+    // a mutable grouping array, and same-lifetime edit order stays unchanged.
+    return withSelectedEntityDisposition(meta,
+      typeof effect.subjectId === 'number'
+        ? subjects.get(effect.subjectId)?.slice() ?? []
+        : []);
+
+  };
+
+  const installScalarFrame = scalarFrame?.prepareCommit?.({advanceRevision:false,publish:false,publicationPhase,admissionParticipation:'realized'});
+  if (scalarFrame && !installScalarFrame) throw new Error('Scalar realization preparation unavailable');
+  // One source frame sees this unit's complete ordered occupancy proposal.
+  const structuralGroups = new Map<CollectionNode, EntityStructureOperation[]>();
+  const physicalOrder = [...removeEffects, ...placementEffects, ...plannedRekeys.filter(({effect})=>!realizationPlacement(effect)).map(({effect})=>effect)];
+  for(const effect of physicalOrder) {
+    const node=resolveCollectionNode(tree,descriptors.get(effect.owner),structuralOwnerPaths,effect);
+    if(!node?.__prepareStructuralUnit || typeof effect.subjectId!=='number')throw new Error('Structural source preparation unavailable');
+    let group=structuralGroups.get(node);if(!group)structuralGroups.set(node,group=[]);
+    if(effect.structural==='remove')group.push({kind:'remove',subject:effect.subjectId,key:removeKeysByEffect.get(effect as ReversalEffect & {structural:'remove';subjectId:number})!});
+    else {
+      if(effect.structural==='rekey'){const recipe=plannedRekeys.find(entry=>entry.effect===effect)?.plan.recipe;if(!recipe)throw new Error('Prepared rekey recipe missing');group.push(recipe);}
+      else {
+        const subject=preparedContext.resolveSubject(effect,effect.subjectId);
+        if(!subject)throw new Error('Prepared structural subject missing');
+        const context=getStructuralAddEffect(descriptors.get(effect.owner),effect);
+        if(!context)throw new Error('Prepared structural context missing');
+        group.push({kind:node.__inspectSubjectResources?.(effect.subjectId)===undefined?'fresh':'restore',subject:effect.subjectId,key:effect.after as string|number,value:subject.value,beforeSubject:context.beforeSubject,afterSubject:context.afterSubject});
+      }
+    }
+  }
+  const structuralUnits=[...structuralGroups].map(([node,operations])=>node.__prepareStructuralUnit!(operations,publicationPhase));
+
+  if(!outerPhase)publicationPhase.seal();
+  if(physicalCommitClock&&physicalCommitClock.revision()!==basePhysicalRevision)throw new Error('Joint preparation reentered installation');
+  let scalarCommitResult:
+    | ReturnType<NonNullable<typeof scalarFrame>['commit']>
+    | undefined;
+  const install = (): void => {
+    if (
+      physicalCommitClock &&
+      physicalCommitClock.revision() !== basePhysicalRevision
+    ) {
+      throw new Error('Heterogeneous realization base revision is stale.');
+    }
+
+    if(!outerPhase)publicationPhase.validate();
+    scalarCommitResult = installScalarFrame?.();
+
+    for (const unit of structuralUnits) unit.install();
+
+    for (const plan of livePointPlans) plan.install();
+    for (const plan of ordinaryPlans.values()) plan.install();
+    physicalCommitClock?.advance();
+  };
+  const invalidate = (): void => {
+    // All these lifetimes are already installed. A delivery failure cannot
+    // abandon the remaining invalidations, including a mixed scalar frame.
+    let failed = false;
+    let firstError: unknown;
+    const run = (fn: () => void): void => {
+      try {
+        fn();
+      } catch (error) {
+        if (!failed) {
+          failed = true;
+          firstError = error;
+        }
+      }
+    };
+    for (const unit of structuralUnits) run(() => unit.invalidate());
+    for (const plan of livePointPlans) run(() => plan.invalidate());
+    if (scalarCommitResult && scalarSlotRuntime) {
+      run(() => scalarSlotRuntime.publishPrepared({...scalarCommitResult!,publication:undefined}));
+    }
+    if (failed) throw firstError;
+  };
+  const complete=():void=>{
+    let failed=false,first:unknown;
+    if(scalarCommitResult)try{completeScalarFrame(scalarCommitResult);}catch(error){failed=true;first=error;}
+    for(const body of [...ordinaryPlans.values(),...livePointPlans,...structuralUnits])try{body.complete();}catch(error){if(!failed){failed=true;first=error;}}
+    if(failed)throw first;
+  };
+  const publish = (): void => {
+    let failed = false;
+    let firstError: unknown;
+    const run = (fn: () => void): void => {
+      try {
+        fn();
+      } catch (error) {
+        if (!failed) {
+          failed = true;
+          firstError = error;
+        }
+      }
+    };
+
+    for (const { plan, effect } of plannedRemoves) {
+      run(() => plan.publish(publicationMeta(effect)));
+    }
+
+    for (const { plan, effect } of plannedRestores) {
+      run(() => plan.publish(publicationMeta(effect)));
+    }
+
+    for (const { plan, effect } of plannedFreshAdds) {
+      run(() => plan.publish(publicationMeta(effect)));
+    }
+
+    for (const { plan, effect } of plannedRekeys) {
+      run(() => plan.publish(publicationMeta(effect)));
+    }
+
+    for (const plan of livePointPlans) run(() => plan.publish());
+    for (const effect of [
+      ...preparedSubjectScalarEffects,
+      ...framedScalarEffects,
+    ]) {
+      const descriptor = descriptors.get(effect.owner);
+      const notifyPath = resolveNotifyPath(
+        tree,
+        descriptor,
+        structuralOwnerPaths,
+        effect
+      );
+      if (!notifyPath) {
+        continue;
+      }
+
+      run(() =>
+        getPathNotifier().notify(
+          notifyPath,
+          effect.after,
+          effect.before,
+          descriptor?.ownerPath ?? notifyPath,
+          typeof effect.subjectId === 'number' ? [effect.subjectId] : undefined,
+          [effect.owner],
+          scalarFrameMetadata(scalarCommitResult, scalarSlotRuntime?.resolveScalarSlot(effect.owner), publicationMeta(effect))
+        )
+      );
+    }
+
+    run(() => markOwnerInvalidatedFrom(tree as object));
+    if (failed) throw firstError;
+  };
   return {
-    commit(): void {
-      if (
-        scalarFrame &&
-        physicalCommitClock &&
-        physicalCommitClock.revision() !== baseRevision
-      ) {
-        throw new Error('Heterogeneous realization base revision is stale.');
-      }
-
+    validate:()=>publicationPhase.validate(),
+    install,
+    invalidate,
+    publish,
+    complete,
+    commit(detachedCompletions?:Array<()=>void>): void {
+      let installed=false;
       const commitAndPublish = () => {
-        const scalarCommitResult = scalarFrame?.commit({
-          advanceRevision: false,
-          publish: false,
-        });
-
-        for (const { plan } of plannedRemoves) {
-          plan.commit({ advancePhysicalRevision: false });
+        install();installed=true;
+        if(detachedCompletions)detachedCompletions.push(complete);
+        let failed = false;
+        let firstError: unknown;
+        try {
+          invalidate();
+        } catch (error) {
+          failed = true;
+          firstError = error;
         }
-
-        for (const { plan } of plannedFreshAdds) {
-          plan.commit({ advancePhysicalRevision: false });
-        }
-
-        for (const { plan } of plannedRestores) {
-          plan.commit({ advancePhysicalRevision: false });
-        }
-
-        for (const { plan } of plannedRekeys) {
-          plan.commit({ advancePhysicalRevision: false });
-        }
-
-        physicalCommitClock?.advance();
-        if (scalarCommitResult && scalarSlotRuntime) {
-          scalarSlotRuntime.publishPrepared(scalarCommitResult);
-        }
-
-        for (const { plan } of plannedRemoves) {
-          plan.publish({
-            ...(getActiveWriteContext() ?? {}),
-            intent: 'system',
-            participation: 'realized',
-          });
-        }
-
-        for (const { plan } of plannedRestores) {
-          plan.publish({
-            ...(getActiveWriteContext() ?? {}),
-            intent: 'system',
-            participation: 'realized',
-          });
-        }
-
-        for (const { plan } of plannedFreshAdds) {
-          plan.publish({
-            ...(getActiveWriteContext() ?? {}),
-            intent: 'system',
-            participation: 'realized',
-          });
-        }
-
-        for (const { plan } of plannedRekeys) {
-          plan.publish({
-            ...(getActiveWriteContext() ?? {}),
-            intent: 'system',
-            participation: 'realized',
-          });
-        }
-
-        for (const effect of [
-          ...preparedSubjectScalarEffects,
-          ...framedScalarEffects,
-        ]) {
-          const descriptor = descriptors.get(effect.owner);
-          const notifyPath = resolveNotifyPath(
-            tree,
-            descriptor,
-            structuralOwnerPaths,
-            effect
-          );
-          if (!notifyPath) {
-            continue;
+        try {
+          publish();
+        } catch (error) {
+          if (!failed) {
+            failed = true;
+            firstError = error;
           }
-
-          getPathNotifier().notify(
-            notifyPath,
-            effect.after,
-            effect.before,
-            descriptor?.ownerPath ?? notifyPath,
-            typeof effect.subjectId === 'number'
-              ? [effect.subjectId]
-              : undefined,
-            [effect.owner],
-            {
-              ...(getActiveWriteContext() ?? {}),
-              intent: 'system',
-              participation: 'realized',
-            }
-          );
         }
-
-        markOwnerInvalidatedFrom(tree as object);
+        if (failed) throw firstError;
       };
-
       const locations = getLocationRuntime(tree.$);
-      if (locations) {
-        locations.runInvalidationGroup(commitAndPublish);
-      } else if (scalarSlotRuntime) {
-        scalarSlotRuntime.runInvalidationGroup(commitAndPublish);
-      } else {
-        commitAndPublish();
-      }
+      let failed=false,first:unknown;
+      try{
+        if (locations) locations.runInvalidationGroup(commitAndPublish);
+        else if (scalarSlotRuntime)scalarSlotRuntime.runInvalidationGroup(commitAndPublish);
+        else commitAndPublish();
+      }catch(error){failed=true;first=error;}
+      if(installed&&!detachedCompletions)try{complete();}catch(error){if(!failed){failed=true;first=error;}}
+      if(failed)throw first;
     },
   };
 }
@@ -985,8 +1807,9 @@ function planScalarFrame(
   descriptors: ReadonlyMap<PositionId, TreeRealizationDescriptor>,
   structuralOwnerPaths: StructuralOwnerIndex,
   scalarSlotRuntime: ReturnType<typeof getTreeScalarSlotRuntime>,
-  effects: readonly ReversalEffect[]
-): { commit(): void } | undefined {
+  effects: readonly ReversalEffect[],
+  outerPhase?: PublicationPreparation
+): { commit(detachedCompletions?:Array<()=>void>): void } | undefined {
   void tree;
   void descriptors;
   void structuralOwnerPaths;
@@ -1017,9 +1840,13 @@ function planScalarFrame(
     frame.set(slotIndex, effect.after);
   }
 
+  const install = prepareWithScalarSelections(scalarSlotRuntime,effects,()=>frame.prepareCommit?.({publish:false,publicationPhase:outerPhase,admissionParticipation:'realized'}));
+  if (!install) throw new Error('Scalar realization preparation unavailable');
   return {
-    commit(): void {
-      frame.commit();
+    commit(detachedCompletions): void {
+      const installedScalars = install();
+      if(detachedCompletions)detachedCompletions.push(()=>completeScalarFrame(installedScalars));
+      scalarSlotRuntime.publishPrepared({...installedScalars,...(detachedCompletions?{publication:undefined}:{})});
 
       for (const effect of effects) {
         const descriptor = descriptors.get(effect.owner);
@@ -1040,11 +1867,11 @@ function planScalarFrame(
           descriptor?.ownerPath ?? notifyPath,
           typeof effect.subjectId === 'number' ? [effect.subjectId] : undefined,
           [effect.owner],
-          {
+          scalarFrameMetadata(installedScalars, scalarSlotRuntime.resolveScalarSlot(effect.owner), {
             ...(getActiveWriteContext() ?? {}),
             intent: 'system',
             participation: 'realized',
-          }
+          })
         );
       }
     },
@@ -1059,6 +1886,8 @@ function canApplyEffect(
   effect: ReversalEffect,
   preparedContext?: PreparedRealizationContext
 ): boolean {
+  if (effect.plainBranchMembership)
+    return canRealizePlainBranchMember(tree.$, effect.owner);
   const descriptor = descriptors.get(effect.owner);
   if (
     !descriptor &&
@@ -1108,19 +1937,14 @@ function canApplyEffect(
       ? resolvePreparedOrLiveSubjectKey(
           ownerNode,
           preparedContext,
+          effect,
           effect.subjectId
         )
       : undefined;
-  const collectionPath = resolveCollectionPath(
-    descriptor,
-    structuralOwnerPaths,
-    effect
-  );
   const destinationOccupied =
     effect.structural === 'rekey' || effect.structural === 'add'
       ? isCollectionKeyOccupied(
           ownerNode,
-          collectionPath,
           effect.after as string | number,
           preparedContext
         )
@@ -1154,7 +1978,9 @@ function canApplyEffect(
           : hasCollectionKey(ownerNode, effect.before as string | number)) &&
         (typeof effect.subjectId !== 'number' ||
           currentSubjectKey === effect.before) &&
-        !destinationOccupied
+        (!destinationOccupied ||
+          (realizationPlacement(effect) !== undefined &&
+            currentSubjectKey === effect.after))
       );
     case 'add': {
       if (
@@ -1176,7 +2002,8 @@ function applyEffect(
   descriptors: ReadonlyMap<PositionId, TreeRealizationDescriptor>,
   structuralOwnerPaths: StructuralOwnerIndex,
   scalarSlotRuntime: ReturnType<typeof getTreeScalarSlotRuntime>,
-  effect: ReversalEffect
+  effect: ReversalEffect,
+  preparation?:SelectedPreparation
 ): void {
   const descriptor = descriptors.get(effect.owner);
   if (
@@ -1192,6 +2019,23 @@ function applyEffect(
     );
   }
 
+  const invoke = (target:object,value:unknown,body:()=>void):void => {
+    const endpoint=fieldEndpoints(effect)?.after;
+    if(!endpoint){body();return;}
+    if(effect.subjectId===undefined){withScalarSelections(new Map([[target,endpoint]]),body);return;}
+    const binding=getEntityPublicationBinding(target),path=effect.subjectFieldSegments;
+    if(!binding||binding.subject!==effect.subjectId||path?.length!==1||binding.field!==undefined&&binding.field!==path[0])
+      throw new Error('Inverse endpoint does not match resolved source field');
+    const selection = Object.freeze({source:binding.source,subject:binding.subject!,field:path[0]!,endpoint,preparation});
+    if (binding.field !== undefined) replaceSelectedLocation(target as import('../cell-runtime').Location<unknown>, value, selection);
+    else {
+      if (!binding.replaceSelected) throw new Error('Selected row replacement has no private continuation');
+      const outcome:SelectedOutcome={failed:false};
+      const invocation=openSelected(value,selection,outcome);
+      try{const request=consumeSelected(invocation);binding.replaceSelected(request.value,request.selection);}finally{closeSelected(invocation);outcome.error=undefined;}
+    }
+  };
+
   withWriteContext(
     {
       ...(getActiveWriteContext() ?? {}),
@@ -1199,6 +2043,28 @@ function applyEffect(
       participation: 'realized',
     },
     () => {
+      if (
+        !effect.structural &&
+        effect.fieldPresence?.after === false &&
+        typeof effect.subjectId === 'number' &&
+        effect.subjectFieldSegments?.length
+      ) {
+        // The field was absent at the target endpoint: remove the key from the
+        // row rather than writing undefined into it.
+        const row = resolveCurrentSubjectTarget(
+          tree,
+          descriptor,
+          effect.subjectId,
+          { ...effect, subjectFieldSegments: [] },
+          structuralOwnerPaths
+        );
+        if (isWritableEntityNode(row)) {
+          const read = row as unknown as () => unknown;
+          const value=withoutFieldAtSegments(read(), effect.subjectFieldSegments);
+          invoke(row,value,()=>row(value));
+          return;
+        }
+      }
       if (!effect.structural) {
         const target = resolveLiveScalarNode(
           tree,
@@ -1208,12 +2074,12 @@ function applyEffect(
           structuralOwnerPaths
         );
         if (isWritableLeaf(target)) {
-          target.set(effect.after);
+          invoke(target,effect.after,()=>target.set(effect.after));
           return;
         }
 
         if (isWritableEntityNode(target)) {
-          target(effect.after);
+          invoke(target,effect.after,()=>target(effect.after));
           return;
         }
 
@@ -1337,7 +2203,10 @@ function canResolvePreparedSubjectTarget(
     return false;
   }
 
-  const preparedSubject = preparedContext?.resolveSubject(effect.subjectId);
+  const preparedSubject = preparedContext?.resolveSubject(
+    effect,
+    effect.subjectId
+  );
   if (!preparedSubject) {
     return false;
   }
@@ -1355,12 +2224,12 @@ function canResolvePreparedSubjectTarget(
     return false;
   }
 
-  return (
-    resolveNodeAtSegments(
-      preparedSubject.value as Record<string, unknown>,
-      fieldPathFromRow
-    ) !== undefined
-  );
+  const value = preparedSubject.value as Record<string, unknown>;
+  return effect.fieldPresence?.after === true && fieldPathFromRow.length > 0
+    ? isTraversableNode(
+        resolveNodeAtSegments(value, fieldPathFromRow.slice(0, -1))
+      )
+    : resolveNodeAtSegments(value, fieldPathFromRow) !== undefined;
 }
 
 function resolveCollectionNode(
@@ -1402,21 +2271,15 @@ function resolveCollectionPath(
 
 function isCollectionKeyOccupied(
   ownerNode: CollectionNode,
-  collectionPath: string | undefined,
   key: string | number,
   preparedContext: PreparedRealizationContext | undefined
 ): boolean {
-  if (collectionPath) {
-    const preparedOccupancy = preparedContext?.resolveOccupancy(
-      collectionPath,
-      key
-    );
-    if (preparedOccupancy === 'vacant') {
-      return false;
-    }
-    if (preparedOccupancy !== undefined) {
-      return true;
-    }
+  const preparedOccupancy = preparedContext?.resolveOccupancy(ownerNode, key);
+  if (preparedOccupancy === 'vacant') {
+    return false;
+  }
+  if (preparedOccupancy !== undefined) {
+    return true;
   }
 
   return hasCollectionKey(ownerNode, key);
@@ -1425,9 +2288,10 @@ function isCollectionKeyOccupied(
 function resolvePreparedOrLiveSubjectKey(
   ownerNode: CollectionNode,
   preparedContext: PreparedRealizationContext | undefined,
+  effect: ReversalEffect,
   subjectId: number
 ): string | number | undefined {
-  const preparedSubject = preparedContext?.resolveSubject(subjectId);
+  const preparedSubject = preparedContext?.resolveSubject(effect, subjectId);
   if (preparedSubject) {
     return preparedSubject.currentKey;
   }
@@ -1443,6 +2307,7 @@ function resolveEffectiveRemoveKey(
   return resolvePreparedOrLiveSubjectKey(
     ownerNode,
     preparedContext,
+    effect,
     effect.subjectId
   );
 }
@@ -1451,6 +2316,8 @@ function snapshotCollectionEntityValue(
   collectionNode: CollectionNode,
   key: string | number
 ): unknown {
+  const reader = getEntityPreparationReader(collectionNode);
+  if (reader !== undefined) return reader(key);
   const rowNode = collectionNode.byIdOrFail(key);
   return typeof rowNode === 'function' ? rowNode() : rowNode;
 }
@@ -1464,7 +2331,10 @@ function updatePreparedRealizationContext(
 ): void {
   if (typeof effect.subjectId === 'number' && !effect.structural) {
     const descriptor = descriptors.get(effect.owner);
-    const preparedSubject = preparedContext.resolveSubject(effect.subjectId);
+    const preparedSubject = preparedContext.resolveSubject(
+      effect,
+      effect.subjectId
+    );
     const fieldPathFromRow = resolveSubjectFieldPath(
       descriptor,
       effect,
@@ -1472,6 +2342,15 @@ function updatePreparedRealizationContext(
     );
     if (preparedSubject && fieldPathFromRow?.length === 0) {
       preparedSubject.value = effect.after;
+    } else if (
+      preparedSubject &&
+      fieldPathFromRow &&
+      effect.fieldPresence?.after === false
+    ) {
+      preparedSubject.value = withoutFieldAtSegments(
+        preparedSubject.value,
+        fieldPathFromRow
+      );
     } else if (preparedSubject && fieldPathFromRow) {
       assignPreparedSubjectValue(
         preparedSubject.value,
@@ -1503,6 +2382,7 @@ function updatePreparedRealizationContext(
       }
       const preparedValue = deepClone(structuralEffect.value);
       preparedContext.rememberRestoredSubject(
+        effect,
         effect.subjectId,
         collectionPath,
         effect.after as string | number,
@@ -1511,12 +2391,43 @@ function updatePreparedRealizationContext(
 
       return;
     }
-    case 'rekey':
+    case 'rekey': {
+      if (
+        realizationPlacement(effect) &&
+        !preparedContext.resolveSubject(effect, effect.subjectId)
+      ) {
+        const collectionNode = resolveCollectionNode(
+          tree,
+          descriptor,
+          structuralOwnerPaths,
+          effect
+        );
+        const path = resolveCollectionPath(
+          descriptor,
+          structuralOwnerPaths,
+          effect
+        );
+        if (collectionNode && path)
+          preparedContext.rememberRestoredSubject(
+            effect,
+            effect.subjectId,
+            path,
+            effect.before as string | number,
+            deepClone(
+              snapshotCollectionEntityValue(
+                collectionNode,
+                effect.before as string | number
+              )
+            )
+          );
+      }
       preparedContext.rememberRekeyedSubject(
+        effect,
         effect.subjectId,
         effect.after as string | number
       );
       return;
+    }
     case 'remove': {
       const collectionPath = resolveCollectionPath(
         descriptor,
@@ -1559,6 +2470,7 @@ function updatePreparedRealizationContext(
       }
 
       preparedContext.rememberRemovedSubject(
+        effect,
         effect.subjectId,
         collectionPath,
         effectiveRemoveKey,
@@ -1569,6 +2481,20 @@ function updatePreparedRealizationContext(
   }
 }
 
+function preparedSubjectScope(
+  tree: ISignalTree<object>,
+  descriptors: ReadonlyMap<PositionId, TreeRealizationDescriptor>,
+  structuralOwnerPaths: StructuralOwnerIndex
+): (effect: ReversalEffect) => object | undefined {
+  return (effect) =>
+    resolveCollectionNode(
+      tree,
+      descriptors.get(effect.owner),
+      structuralOwnerPaths,
+      effect
+    );
+}
+
 function buildPreparedRealizationContext(
   tree: ISignalTree<object>,
   descriptors: ReadonlyMap<PositionId, TreeRealizationDescriptor>,
@@ -1576,7 +2502,9 @@ function buildPreparedRealizationContext(
   scalarSlotRuntime: ReturnType<typeof getTreeScalarSlotRuntime>,
   effects: readonly ReversalEffect[]
 ): PreparedRealizationContext | undefined {
-  const preparedContext = new PreparedRealizationContext();
+  const preparedContext = new PreparedRealizationContext(
+    preparedSubjectScope(tree, descriptors, structuralOwnerPaths)
+  );
   for (const effect of effects) {
     if (
       !canApplyEffect(
@@ -1617,7 +2545,11 @@ function resolveSubjectFieldPath(
     descriptor?.subjectDescriptors?.get(String(effect.subjectId))
       ?.fieldPathFromRow ??
     descriptor?.fieldPathFromRow;
-  return legacy === undefined ? undefined : legacy === '' ? [] : legacy.split('.');
+  return legacy === undefined
+    ? undefined
+    : legacy === ''
+    ? []
+    : legacy.split('.');
 }
 
 function assignPreparedSubjectValue(
@@ -1657,8 +2589,52 @@ function isPreparedSubjectScalarEffect(
   return (
     typeof effect.subjectId === 'number' &&
     !effect.structural &&
-    preparedContext.resolveSubject(effect.subjectId) !== undefined
+    preparedContext.resolveSubject(effect, effect.subjectId) !== undefined
   );
+}
+
+/** Resolve visible point owners without visiting unrelated branches. Unsupported
+ * addresses retain the incumbent traversal and its omission semantics. */
+function indexPointOwnerPaths(
+  root: unknown,
+  effects: readonly ReversalEffect[]
+): StructuralOwnerIndex {
+  const registry = getPositionRegistry(root);
+  const owners = Object.assign(new Map<PositionId, string>(), {
+    nodes: new Map<PositionId, CollectionNode>(),
+  });
+  for (const effect of effects) {
+    if (typeof effect.subjectId !== 'number' || owners.nodes.has(effect.owner))
+      continue;
+    const address = registry?.addressFor(effect.owner);
+    if (!address || address.length > 32) return indexStructuralOwnerPaths(root);
+    let node: unknown = root;
+    for (const key of address) {
+      if (
+        !isTraversableNode(node) ||
+        key === 'set' ||
+        key === 'update' ||
+        key.startsWith('_')
+      ) {
+        return indexStructuralOwnerPaths(root);
+      }
+      const property = Object.getOwnPropertyDescriptor(node, key);
+      if (!property?.enumerable || !('value' in property))
+        return indexStructuralOwnerPaths(root);
+      node = property.value;
+    }
+    if (
+      !isCollectionNode(node) ||
+      getOwnedPositionIds(node)?.[0] !== effect.owner
+    ) {
+      return indexStructuralOwnerPaths(root);
+    }
+    const path = getOwnedOwnerPath(node);
+    if (path === undefined) return indexStructuralOwnerPaths(root);
+    owners.set(effect.owner, path);
+    owners.nodes.set(effect.owner, node);
+  }
+  return owners;
 }
 
 function indexStructuralOwnerPaths(root: unknown): StructuralOwnerIndex {
@@ -1875,7 +2851,11 @@ export function deriveFieldSegmentsFromEffect(
     return effect.subjectFieldSegments;
   }
   const legacy = deriveFieldPathFromEffect(effect, registry);
-  return legacy === undefined ? undefined : legacy === '' ? [] : legacy.split('.');
+  return legacy === undefined
+    ? undefined
+    : legacy === ''
+    ? []
+    : legacy.split('.');
 }
 
 export function deriveFieldPathFromEffect(
@@ -1947,6 +2927,22 @@ function resolveCurrentScopedTarget(
   );
 }
 
+/** A copy of `value` without the field at `segments`; other keys untouched. */
+function withoutFieldAtSegments(
+  value: unknown,
+  segments: readonly string[]
+): unknown {
+  if (segments.length === 0 || !isTraversableNode(value)) return value;
+  const [head, ...tail] = segments;
+  const record = value as Record<string, unknown>;
+  if (!Object.prototype.hasOwnProperty.call(record, head)) return value;
+  if (tail.length === 0) {
+    const { [head]: _removed, ...rest } = record;
+    return rest;
+  }
+  return { ...record, [head]: withoutFieldAtSegments(record[head], tail) };
+}
+
 function resolveNodeAtSegments(
   root: unknown,
   segments: readonly string[]
@@ -1972,7 +2968,8 @@ function resolveStructuredSubjectTarget(
   if (!isTraversableNode(parent)) return undefined;
   // Entity fields can be opaque object leaves. Realize a nested value through
   // the owned row's replacement operation rather than inventing a native leaf.
-  return (value: unknown) => row(replaceValueAtSegments(read(), segments, value));
+  return (value: unknown) =>
+    row(replaceValueAtSegments(read(), segments, value));
 }
 
 function replaceValueAtSegments(
@@ -1983,7 +2980,7 @@ function replaceValueAtSegments(
   if (segments.length === 0) return next;
   const [key, ...rest] = segments;
   const record = isTraversableNode(value)
-    ? value as Record<string, unknown>
+    ? (value as Record<string, unknown>)
     : {};
   return { ...record, [key]: replaceValueAtSegments(record[key], rest, next) };
 }
@@ -2006,6 +3003,61 @@ function resolveNodeAtPath(
 
   return cursor;
 }
+
+const rowScope = (owner: unknown, subject: unknown): string =>
+  `${String(owner)}\u0000${String(subject)}`;
+
+/** The same placement order is used by validation and installation planning. */
+function orderPhysicalPlacements(
+  tree: ISignalTree<object>,
+  descriptors: ReadonlyMap<PositionId, TreeRealizationDescriptor>,
+  ownerPaths: StructuralOwnerIndex,
+  effects: readonly ReversalEffect[]
+): readonly ReversalEffect[] {
+  const placements = effects.filter(
+    (effect): effect is ReversalEffect & { subjectId: number } =>
+      typeof effect.subjectId === 'number' &&
+      (effect.structural === 'add' ||
+        realizationPlacement(effect) !== undefined)
+  );
+  if (placements.length < 2) return effects;
+  const removed = new Set(
+    effects
+      .filter((effect) => effect.structural === 'remove')
+      .map((effect) => rowScope(effect.owner, effect.subjectId))
+  );
+  const nodes = new Map<PositionId, CollectionNode | undefined>();
+  const ordered = orderRestoresForPlacement(
+    placements,
+    (effect) =>
+      getStructuralAddEffect(
+        descriptors.get(effect.owner),
+        realizationPlacement(effect) ?? effect
+      ),
+    (effect, subject) => {
+      if (removed.has(rowScope(effect.owner, subject))) return false;
+      if (!nodes.has(effect.owner))
+        nodes.set(
+          effect.owner,
+          resolveCollectionNode(
+            tree,
+            descriptors.get(effect.owner),
+            ownerPaths,
+            effect
+          )
+        );
+      return (
+        nodes.get(effect.owner)?.__findKeyBySubjectId?.(subject) !== undefined
+      );
+    }
+  );
+  const placementSet = new Set<ReversalEffect>(placements);
+  let next = 0;
+  return effects.map((effect) =>
+    placementSet.has(effect) ? ordered[next++] : effect
+  );
+}
+
 
 function getStructuralAddEffect(
   descriptor: TreeRealizationDescriptor | undefined,

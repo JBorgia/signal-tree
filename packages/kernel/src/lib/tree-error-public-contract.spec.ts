@@ -230,12 +230,14 @@ describe('PUBLIC: delivery semantics', () => {
     cap.stop();
   });
 
-  it('the Link handle is still exactly three members', async () => {
+  it('the approved Link handle has exactly four callable members', async () => {
     const tree = makeTree();
     await flush();
     const l = link(tree.$.settings.theme, { set: failing });
 
-    expect(Object.keys(l).sort()).toEqual(['dispose', 'retrieve', 'settled']);
+    expect(Object.keys(l).sort()).toEqual(['declare', 'dispose', 'retrieve', 'settled']);
+    for (const member of ['declare', 'dispose', 'retrieve', 'settled'] as const)
+      expect(typeof l[member]).toBe('function');
     l.dispose();
   });
 });

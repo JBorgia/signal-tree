@@ -1,0 +1,27 @@
+# C19 clear-find guard successor: test-only, frozen for review
+
+Candidate runtime unchanged. One changed test file; no root/frozen input edits, no public surface, size/performance ceiling or activation change. No promotion pending independent review. Base C19 manifest b8eace4025ff735988dee88db512a2e9ceb5ac9e1302683d68d6900acea17576. Frozen SNAPSHOT-TESTS.json67be7d9620ff5ce4e426e2b489dd69e1dd6e26f030611d77d3e6036d09275d71; TESTS.patch exact diff. All3065 baseline candidate files checked; only entity-large-batches-v16-controls.spec.ts differs. Original file and original six failing256/1024 logs/commands/exits preserved as ORIGINAL-*.
+
+## What changes and why
+
+The existing public transaction replacement/clear cases now assert physical IDs, complete physical row values, and the real ordinary EntityEgressProjection's rows/order before the work assertion. The ordinary projection is seeded from exact subject identities and subscribes to source publication using its actual prepare/install records; no fake facade, new authority, or caller patch. Both views are also checked in the changed state before rollback. Scope remains the same public setAll/transact/rollback operations, same256/1024 sizes and three enhancer orders; this adds observation/assertions. Cleanup destroys every tree and releases the projection subscriber.
+
+Clear's partial global find-predicate limit becomes2N+1, matching the unchanged replacement limit. The source-derived cause is physical restoration head search N + ordinary restoration head search N + final-adjacency replay head1 for this contiguous restored chain. The final pass remains untouched: later insertions can change the adjacency to replay. This is a calibrated operation-work contract for a fixed fixture, not a release-size budget, whole-planner linearity claim, or authority to change point<2000. Originalcomments explicitly scoped this guard to search work.
+
+Current public rollback passes selectedCompensation and bypasses legacy createPendingRollbackEffects. Two direct helper tests therefore exercise the still-supported rollbackPendingTurnAt route WITHOUT selectedCompensation, using actual TurnStore, AppliedTurnProjection, position topology and realization context. They assert success, exact inverse structural add subjects/values/order, pending discard, and at mostN find visits. This preserves the old dominance protection on a reachable helper path instead of claiming the public fixture still covers it.
+
+## Adversarial sensitivity actually executed
+
+The exact same final test source SHA256208f460fa23b0e2349bdcccaf453a6ef50992c09b3b48364c3624aab123ce06a exists in candidate and both separate mutant copies. No assertion/fixture changes per mutant.
+
+- Candidate-first:15pass/3 large cases deliberately skipped. Spec-types and affected test lint exit0; no ratchet edit. Final formatted replay candidate-final also passes15/15 selected cases, with3 large cases deliberately skipped.
+- CURRENT-ROUTE-MUTANT.patch changes only physical/order-restores-for-placement.ts in current-route-mutant. It replaces ready-queue retrieval with searches of the complete restores domain for each tier on every selection. It does not add a dummy counting loop or remove final adjacency resolution; it reinstates repeated full-domain candidate selection. Same public12 cases fail at the WORK assertion, after both physical and ordinary semantic assertions have passed. Counts295296>513 at256 and4720128>2049 at1024. Original instrumentation calibration and two legacy cases pass. Raw current-mutant-first:12fail/3pass/3skip.
+- LEGACY-MUTANT.patch changes only causal-runtime/pending-rollback.ts in legacy-mutant. It replaces per-subject candidate lookup with turn.effects.find for the same structural/scope predicate. Both direct helper cases fail at the WORK assertion after inverse/discard assertions:32896>256 and524800>1024, exactlyN(N+1)/2. Raw legacy-mutant-first:2fail/16skip. This closes the previously identified mutant-reachability gap; the public selected route is not falsely credited with killing this dormant-path mutation.
+
+Each runtime mutation is temporary, separately preserved and excluded from TESTS.patch/candidate. MUTANT-IDENTITIES.json gives exact changed runtime/test identities; *-EXPECTED-SNAPSHOT.json are construction-derived expected manifests, not represented as an additional full postmutation audit. The candidate itself was fully audited against C19.
+
+## Validation limits and authority
+
+Pinned Node24.15.0/pnpm10.17.0, Nx kernel, maxWorkers1, own workspace with root working dependency symlink. Exact command/cwd/environment and subprocess exit are NAME-command.json/log/exit.json. Runner itself prints logs and exits0; use recorded subprocess exit. Archived audit tsconfig warnings may precede tests; actual selected tests execute. No130k cases, full suite, framework/build/cost profiling or release verification run. Temporary copy preparation and host contention have no speed interpretation.
+
+Original six failures remain red against unchanged C19; this is a successor oracle, not retroactively changing their result. Meaningful mutation coverage supports reviewing this narrow calibration; it does not prove all rollback planner work linear or justify any other budget relaxation. Independent review requested from McClintock before promotion, with exact source/diffs/raw results and no preferred verdict. Final verdict remains in reviewer's own report.

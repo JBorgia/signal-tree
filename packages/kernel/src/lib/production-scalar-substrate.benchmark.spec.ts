@@ -35,7 +35,6 @@ const ENTITY_UPDATE_ITERATIONS = 2_000;
 const ENTITY_STRUCTURAL_ITERATIONS = 200;
 const WARMUP_RUNS = 1;
 const MEASURE_RUNS = 3;
-const TIMING_RATIO_LIMIT = 40;
 const MAX_FRAME_WIDTH = FRAME_WIDTHS[FRAME_WIDTHS.length - 1];
 
 type ScalarLeaf = Location<number>;
@@ -389,6 +388,7 @@ function createProjectionFrameHarness(size: number): ProjectionFrameHarness {
       const frame = new EntityMutationFrame(valueStore, structuralStore);
       frame.stageValueReplacement({
         kind: 'replace-value',
+      authoredFields: null,
         key: stableKey,
         subjectId: stableSubjectId,
         nextValue: { id: stableKey, value },
@@ -435,6 +435,7 @@ function createProjectionFrameHarness(size: number): ProjectionFrameHarness {
       });
       frame.stageValueReplacement({
         kind: 'replace-value',
+      authoredFields: null,
         key: transferredKey,
         subjectId: stableSubjectId,
         nextValue: { id: transferredKey, value: transferredKey },
@@ -672,21 +673,6 @@ function collectFrameSlots(
     slots.push(resolveLeafSlot(runtime, tree.$[`leaf_${index}`]));
   }
   return slots;
-}
-
-function scaleRatio<T extends { positions: number; perOperationUs: number }>(
-  rows: readonly T[],
-  positions: readonly number[]
-): number {
-  const smallest = rows.find((row) => row.positions === positions[0]);
-  const largest = rows.find(
-    (row) => row.positions === positions[positions.length - 1]
-  );
-  if (!smallest || !largest) {
-    throw new Error('Missing benchmark rows for scaling ratio.');
-  }
-
-  return largest.perOperationUs / Math.max(smallest.perOperationUs, 0.0001);
 }
 
 function measureScalarTimingRows(sizes: readonly number[]): ScalarTimingRow[] {
@@ -1118,7 +1104,7 @@ describe('Complexity guard: production scalar substrate', () => {
       try {
         resetProductionSubstrateStatsForTesting(stats);
         expect(harness.readTarget()).toBe(Math.floor(size / 2));
-        expect(stats).toEqual<ProductionSubstrateStats>({
+        expect({ ...stats }).toEqual<ProductionSubstrateStats>({
           slotReads: 1,
           slotWrites: 0,
           equalityChecks: 0,
@@ -1138,12 +1124,14 @@ describe('Complexity guard: production scalar substrate', () => {
           publicUndoPositionEntriesExamined: 0,
           turnIndexLookups: 0,
           publicUndoTurnEffectsExamined: 0,
+          absenceWalks: 0,
+          membershipKeysVisited: 0,
         });
 
         resetProductionSubstrateStatsForTesting(stats);
         harness.setTarget(size + 1);
-        expect(stats).toEqual<ProductionSubstrateStats>({
-          slotReads: 1,
+        expect({ ...stats }).toEqual<ProductionSubstrateStats>({
+          slotReads: 0,
           slotWrites: 1,
           equalityChecks: 1,
           revisionIncrements: 1,
@@ -1162,6 +1150,8 @@ describe('Complexity guard: production scalar substrate', () => {
           publicUndoPositionEntriesExamined: 0,
           turnIndexLookups: 0,
           publicUndoTurnEffectsExamined: 0,
+          absenceWalks: 0,
+          membershipKeysVisited: 0,
         });
       } finally {
         harness.destroy();
@@ -1176,7 +1166,7 @@ describe('Complexity guard: production scalar substrate', () => {
         try {
           resetProductionSubstrateStatsForTesting(stats);
           frameHarness.commitFrame(width, size * 10_000 + width);
-          expect(stats).toEqual<ProductionSubstrateStats>({
+          expect({ ...stats }).toEqual<ProductionSubstrateStats>({
             slotReads: 0,
             slotWrites: width,
             equalityChecks: width,
@@ -1196,6 +1186,8 @@ describe('Complexity guard: production scalar substrate', () => {
             publicUndoPositionEntriesExamined: 0,
             turnIndexLookups: 0,
             publicUndoTurnEffectsExamined: 0,
+            absenceWalks: 0,
+            membershipKeysVisited: 0,
           });
         } finally {
           frameHarness.destroy();
@@ -1383,27 +1375,163 @@ describe('Complexity audit: public undo-of-remove realization', () => {
   }, 20_000);
 });
 
-describe('Timing guard: production scalar substrate', () => {
-  it('rejects catastrophic total-size scaling for compiled scalar operations', () => {
-    const rows = measureScalarTimingRows(COMPLEXITY_SIZES);
-
-    for (const operation of ['compiled-read', 'compiled-write'] as const) {
-      const operationRows = rows.filter((row) => row.operation === operation);
-      expect(scaleRatio(operationRows, COMPLEXITY_SIZES)).toBeLessThan(
-        TIMING_RATIO_LIMIT
-      );
-    }
-
-    for (const width of FRAME_WIDTHS) {
-      const supportedSizes = COMPLEXITY_SIZES.filter((size) => size >= width);
-      const operationRows = rows.filter(
-        (row) => row.operation === (`frame-${width}` as ScalarTimingOperation)
-      );
-      expect(scaleRatio(operationRows, supportedSizes)).toBeLessThan(
-        TIMING_RATIO_LIMIT
-      );
-    }
+/**
+ * Elements visited while `run` executes, counted where an O(size) walk or
+ * copy goes: Map and Set iteration, `Array.from`, `Object.keys`, `values` and
+ * `entries`, and the Array methods that build, search or walk arrays. An
+ * indexed loop that builds nothing is not counted.
+ */
+function countIteratedElements(run: () => void): number {
+  let visited = 0;
+  const restore: Array<() => void> = [];
+  const patch = (
+    target: object,
+    key: PropertyKey,
+    wrap: (original: (...args: unknown[]) => unknown) => unknown
+  ): void => {
+    const descriptor = Object.getOwnPropertyDescriptor(target, key);
+    if (!descriptor) throw new Error(`nothing to count at ${String(key)}`);
+    restore.push(() => Object.defineProperty(target, key, descriptor));
+    Object.defineProperty(target, key, {
+      ...descriptor,
+      value: wrap(descriptor.value),
+    });
+  };
+  const counting = (iterator: Iterator<unknown>): IterableIterator<unknown> => ({
+    next() {
+      const step = iterator.next();
+      if (!step.done) visited++;
+      return step;
+    },
+    [Symbol.iterator]() {
+      return this;
+    },
   });
+  for (const proto of [Map.prototype, Set.prototype, Array.prototype])
+    for (const key of ['keys', 'values', 'entries', Symbol.iterator])
+      patch(proto, key, (original) =>
+        function (this: unknown, ...args: unknown[]) {
+          return counting(original.apply(this, args) as Iterator<unknown>);
+        }
+      );
+  for (const proto of [Map.prototype, Set.prototype])
+    patch(proto, 'forEach', (original) =>
+      function (this: { size: number }, ...args: unknown[]) {
+        visited += this.size;
+        return original.apply(this, args);
+      }
+    );
+  // Whole-array walks, counted at their full length: a search that stops
+  // early still scales with the array it searches.
+  for (const key of [
+    'map',
+    'filter',
+    'forEach',
+    'slice',
+    'concat',
+    'reduce',
+    'indexOf',
+    'lastIndexOf',
+    'includes',
+    'find',
+    'findIndex',
+    'some',
+    'every',
+    'splice',
+    'sort',
+    'join',
+  ])
+    patch(Array.prototype, key, (original) =>
+      function (this: unknown[], ...args: unknown[]) {
+        visited += this.length;
+        return original.apply(this, args);
+      }
+    );
+  for (const key of ['keys', 'values', 'entries'])
+    patch(Object, key, (original) =>
+      function (this: unknown, ...args: unknown[]) {
+        const result = original.apply(this, args) as unknown[];
+        visited += result.length;
+        return result;
+      }
+    );
+  patch(Array.prototype, 'push', (original) =>
+    function (this: unknown[], ...args: unknown[]) {
+      visited += args.length;
+      return original.apply(this, args);
+    }
+  );
+  patch(Array, 'from', (original) =>
+    function (this: unknown, ...args: unknown[]) {
+      const result = original.apply(this, args) as unknown[];
+      visited += result.length;
+      return result;
+    }
+  );
+  let counted: number;
+  try {
+    visited = 0;
+    run();
+    counted = visited;
+  } finally {
+    for (let i = restore.length - 1; i >= 0; i--) restore[i]();
+  }
+  return counted;
+}
+
+describe('Scale guard: production scalar substrate', () => {
+  // Counted, not timed (v16 integration slice 8d). The wall-clock version
+  // required each operation's median time at 100,000 positions to stay within
+  // 40x of its time at 10, and timed out under machine load. The intent is
+  // unchanged: compiled scalar operations must not scale with the tree's
+  // total size. Each operation's substrate work, and every element it
+  // iterates, must be identical at every size it applies to.
+  it('rejects total-size scaling for compiled scalar operations', () => {
+    const stats = installProductionSubstrateStatsForTesting();
+    const work = new Map<string, Array<{ size: number; work: object }>>();
+    const measure = (operation: string, size: number, run: () => void) => {
+      resetProductionSubstrateStatsForTesting(stats);
+      const iterated = countIteratedElements(run);
+      let rows = work.get(operation);
+      if (!rows) work.set(operation, (rows = []));
+      rows.push({ size, work: { ...stats, iterated } });
+    };
+
+    for (const size of COMPLEXITY_SIZES) {
+      const harness = createScalarHarness(size);
+      try {
+        harness.readTarget();
+        measure('compiled-read', size, () => harness.readTarget());
+        measure('compiled-write', size, () => harness.setTarget(size + 1));
+        for (const width of FRAME_WIDTHS) {
+          if (width > size) continue;
+          measure(`frame-${width}`, size, () =>
+            harness.commitFrame(width, size * 1_000 + width)
+          );
+        }
+      } finally {
+        harness.destroy();
+      }
+    }
+
+    expect([...work.keys()]).toEqual([
+      'compiled-read',
+      'compiled-write',
+      'frame-2',
+      'frame-10',
+      'frame-100',
+    ]);
+    for (const [operation, rows] of work) {
+      const [smallest, ...larger] = rows;
+      expect(larger.length).toBeGreaterThan(0);
+      for (const { size, work: measured } of larger)
+        expect({ operation, size, work: measured }).toEqual({
+          operation,
+          size,
+          work: smallest.work,
+        });
+    }
+  }, 20_000);
 });
 
 timingDescribe('Performance report: production substrate', () => {

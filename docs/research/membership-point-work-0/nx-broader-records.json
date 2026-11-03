@@ -1,0 +1,30 @@
+[
+  {
+    "label": "full-kernel",
+    "command": [
+      "pnpm",
+      "nx",
+      "test",
+      "kernel",
+      "--maxWorkers=1"
+    ],
+    "exit": -15,
+    "timeout": true,
+    "seconds": 600.034,
+    "runtime": {
+      "packages/kernel/src/enhancers/transactions/transactions.ts": "7122ff9f6f8d69d6936ae5a9027cdeedbcf210a9a63a1ad910482218363988b9",
+      "packages/kernel/src/lib/entity-signal.ts": "933649ccd877f0d69b01f475f694f4a2c7f4effb9ded7e24b773ff8421e133d7",
+      "packages/kernel/src/lib/internals/causal-runtime/target-transition.ts": "51bce15a6d9805f9d783c1d281cc7405385a43e6c26e93e0f6ed8ac3227ad6c2",
+      "packages/kernel/src/lib/internals/intercept-leaf-signals.ts": "2ac52a3b9b32bd9ab7ff32bbbe4e356383ba1c2b087c2867b6bda6fe3b792bd8",
+      "packages/kernel/src/lib/internals/intrinsic-mutation.ts": "602bfb23807a5c455336d317b8b2a129adbfe102c1e9334419f9a0b8447d44e0",
+      "packages/kernel/src/lib/internals/location-runtime.ts": "0b97cf252ea781e365cdc9a8d8202c4cc1076805fd4ba3fac3bcaeb98a44b5a6",
+      "packages/kernel/src/lib/internals/mutation-capture-runtime.ts": "2eb2ea8511cbd26b5f414d1da61ed54f8fc9519fa09c506aa91d7e783f2777bb",
+      "packages/kernel/src/lib/internals/native-tree-scalar-leaf-runtime.ts": "4c2077142cd3f69c475221abe0a0a45f605f14d304d73ef256980a2c661da876",
+      "packages/kernel/src/lib/internals/tree-scalar-leaf-runtime.ts": "cc5569bab774c535de00cdbe05b6969990bf7b3333f49c8577af9dfe59b75935",
+      "packages/kernel/src/lib/internals/tree-scalar-slot-port.ts": "4581209ac479bc50b0ee6dc2ee8b8bcf15dae6596636a3fb1694c42f26fbdfa9",
+      "packages/kernel/src/lib/internals/tree-scalar-slot-runtime.ts": "de97762a39c8ecb7b8854ceedbf6c731612d5c6213ece65bbc3b9394b551b2f9",
+      "packages/kernel/src/lib/physical/entity-mutation-frame.ts": "138c7930f05e66ba1ec964bede42a396751939ecc05361247b550d59fb8bec4a",
+      "packages/vue/src/lib/vue-observation.ts": "c4678206e2bd3be2c5d4353e411c4f4c8615b31023bbea210d530ce2e50a3bc4"
+    }
+  }
+]

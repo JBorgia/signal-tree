@@ -1,0 +1,106 @@
+[
+  {
+    "command": [
+      "node",
+      "docs/research/settlement-publication-boundary-0/run.mjs",
+      "base",
+      "timing.mjs",
+      "suite",
+      "portable-first"
+    ],
+    "exit": 1,
+    "stable": true,
+    "manifest": "/private/tmp/st-publication-replay/runs/base-timing.mjs-suite-portable-first/manifest.json"
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/settlement-publication-boundary-0/run.mjs",
+      "D2",
+      "timing.mjs",
+      "suite",
+      "portable-first"
+    ],
+    "exit": 1,
+    "stdout": "{\"lane\":\"D2\",\"entry\":\"timing.mjs\",\"control\":\"suite\",\"exit\":1,\"stable\":true,\"out\":\"/private/tmp/st-publication-replay/runs/D2-timing.mjs-suite-portable-first\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/settlement-publication-boundary-0/run.mjs",
+      "P",
+      "timing.mjs",
+      "suite",
+      "portable-first"
+    ],
+    "exit": 0,
+    "stdout": "{\"lane\":\"P\",\"entry\":\"timing.mjs\",\"control\":\"suite\",\"exit\":0,\"stable\":true,\"out\":\"/private/tmp/st-publication-replay/runs/P-timing.mjs-suite-portable-first\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/settlement-publication-boundary-0/run.mjs",
+      "P",
+      "owned-read-controls.mjs",
+      "reentry",
+      "portable-first"
+    ],
+    "exit": 1,
+    "stdout": "{\"lane\":\"P\",\"entry\":\"owned-read-controls.mjs\",\"control\":\"reentry\",\"exit\":1,\"stable\":true,\"out\":\"/private/tmp/st-publication-replay/runs/P-owned-read-controls.mjs-reentry-portable-first\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/settlement-publication-boundary-0/run.mjs",
+      "P2",
+      "timing.mjs",
+      "suite",
+      "portable-first"
+    ],
+    "exit": 0,
+    "stdout": "{\"lane\":\"P2\",\"entry\":\"timing.mjs\",\"control\":\"suite\",\"exit\":0,\"stable\":true,\"out\":\"/private/tmp/st-publication-replay/runs/P2-timing.mjs-suite-portable-first\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/settlement-publication-boundary-0/run.mjs",
+      "P2",
+      "owned-read-controls-v2.mjs",
+      "reentry",
+      "portable-first"
+    ],
+    "exit": 0,
+    "stdout": "{\"lane\":\"P2\",\"entry\":\"owned-read-controls-v2.mjs\",\"control\":\"reentry\",\"exit\":0,\"stable\":true,\"out\":\"/private/tmp/st-publication-replay/runs/P2-owned-read-controls-v2.mjs-reentry-portable-first\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/settlement-publication-boundary-0/run.mjs",
+      "base",
+      "review-readonly-memo.mjs",
+      "suite",
+      "portable-first"
+    ],
+    "exit": 0,
+    "stdout": "{\"lane\":\"base\",\"entry\":\"review-readonly-memo.mjs\",\"control\":\"suite\",\"exit\":0,\"stable\":true,\"out\":\"/private/tmp/st-publication-replay/runs/base-review-readonly-memo.mjs-suite-portable-first\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/settlement-publication-boundary-0/run.mjs",
+      "P2",
+      "review-readonly-memo.mjs",
+      "suite",
+      "portable-first"
+    ],
+    "exit": 1,
+    "stdout": "{\"lane\":\"P2\",\"entry\":\"review-readonly-memo.mjs\",\"control\":\"suite\",\"exit\":1,\"stable\":true,\"out\":\"/private/tmp/st-publication-replay/runs/P2-review-readonly-memo.mjs-suite-portable-first\"}\n",
+    "stderr": ""
+  }
+]

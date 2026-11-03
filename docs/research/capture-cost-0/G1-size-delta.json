@@ -1,0 +1,34 @@
+{
+  "signaltree-bare-prod": {
+    "originalGzipBytes": 11920,
+    "optimizedGzipBytes": 11930,
+    "deltaGzipBytes": 10,
+    "originalMinifiedBytes": 35453,
+    "optimizedMinifiedBytes": 35434,
+    "deltaMinifiedBytes": -19
+  },
+  "signaltree-bare-dev": {
+    "originalGzipBytes": 14322,
+    "optimizedGzipBytes": 14334,
+    "deltaGzipBytes": 12,
+    "originalMinifiedBytes": 41783,
+    "optimizedMinifiedBytes": 41764,
+    "deltaMinifiedBytes": -19
+  },
+  "signaltree-entities-prod": {
+    "originalGzipBytes": 27419,
+    "optimizedGzipBytes": 27431,
+    "deltaGzipBytes": 12,
+    "originalMinifiedBytes": 91558,
+    "optimizedMinifiedBytes": 91539,
+    "deltaMinifiedBytes": -19
+  },
+  "signaltree-entities-dev": {
+    "originalGzipBytes": 30284,
+    "optimizedGzipBytes": 30295,
+    "deltaGzipBytes": 11,
+    "originalMinifiedBytes": 99209,
+    "optimizedMinifiedBytes": 99190,
+    "deltaMinifiedBytes": -19
+  }
+}

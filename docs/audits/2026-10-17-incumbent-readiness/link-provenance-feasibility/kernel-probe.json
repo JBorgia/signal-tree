@@ -1,0 +1,178 @@
+{
+  "inputs": {
+    "packages/kernel/src/lib/write-context.ts": "8bb6f9dd964192f2ef92f399f2866e1577c2eb594bdff24fa060a357ab0129ad",
+    "packages/kernel/src/lib/path-notifier.ts": "016d3ad005ce360c8e3ae83520a064cff99fd2e4dbbabb077fb2ba075c0e8799",
+    "packages/kernel/src/lib/internals/observation-substrate.ts": "2db4780106eb7faa09c33fd04e2f56a96476b2e178d998471039cac8c3349026",
+    "packages/kernel/src/index.ts": "180b166b80796e9519188f694e29a4fff2a66a92256e2858557e1d7a7b7d2388",
+    "packages/kernel/src/lib/internals/owned-metadata.ts": "192ca95912014282eca73f56005df91a565ec048b558dee8c88a02883e86a376",
+    "packages/kernel/src/lib/internals/intrinsic-mutation.ts": "b813247b331d44cd6cb0566b572118ab1bac4fb774deb7ad7b35dd95837103fd",
+    "packages/kernel/src/lib/internals/owned-mutation.ts": "8491afa231ffef3734a5be76bbb541631913dbc77cd81b02578af2b22080ca24",
+    "packages/kernel/src/lib/internals/position-registry.ts": "e86ed017e11d69ee5cdf625082309bef976b2528227367f652a762998f0f89b6",
+    "packages/kernel/src/lib/internals/node-shape.ts": "435224e100d4a45f7a52691236b3a9289d05cfb11100eb26fd5fc7275921c5d1",
+    "packages/kernel/src/lib/internals/member-membership.ts": "e748154443c4769a66572cf7eff6f4224ba7e1619f2d542fe301ebaf64283906",
+    "packages/kernel/src/enhancers/devtools/devtools.ts": "a70ae3062de88cd4cbd6c817271309f7aaacaa560a9cf14b11389c185392a48e",
+    "packages/kernel/src/lib/signal-tree.ts": "28c6016585c4f3f260df9ce4adef53a53f6573a7304961af6afdfad54d6814e4",
+    "packages/kernel/src/lib/internals/error-reporter.ts": "042d4b3def7842348ca633c631fd758fcbfe68d7756b9dbac71f48f521a8d95f",
+    "packages/kernel/src/lib/link.ts": "d16e5f14cd4ad52d2b4b4f22466208004d73e7f464318cc910adfa7889bd6901",
+    "packages/kernel/src/enhancers/batching/batching.ts": "0e674d16c26114ea2959364c0e277229e708dad8456755c6d765e18d253f42f3",
+    "packages/kernel/src/lib/types.ts": "f4b10a8d051bc8f2a766c426c61897d5bf4f5c50349a8989deea6fd282b36b33",
+    "packages/kernel/src/lib/external.ts": "dea4c23ea9ef115ea0200561068d6a1e64da0ba9e0ce53161f66a413cbf9d704",
+    "packages/kernel/src/lib/leaf.ts": "c2a8c94a23b8adab93e21961b3835fc99a4e39af559de1d7d177a699e7e1d30e",
+    "packages/kernel/src/enhancers/restoration/restoration.ts": "c8eff760937ac975de308013ca891afe2ebedb3249a20ed5e735dffe9f8eef7a",
+    "packages/kernel/src/lib/undoable.ts": "c77dc84b015f025a4b83b79d63bf33e0e706078ff555e0913989de78c34c47db",
+    "packages/kernel/src/lib/internals/plain-branch-membership.ts": "4116ebdd4e7d300bf47e6f14260c914e6698116f6fbae3a30279fd7aceec12d7",
+    "packages/kernel/src/lib/internals/restoration-eligibility.ts": "e78e31933f34e842bf355249c404a11d02750700eddeaf09737f7c2bbde880ba",
+    "packages/kernel/src/lib/internals/path-observation-port.ts": "096b86e4630bfeffaee645ab48870c8cc185911f601f8444113f5e457f2805ce",
+    "packages/kernel/src/enhancers/transactions/transactions.ts": "487b4e2a693395b37572991484a66a3cd36f5748098e5d4ab21b2673c85bd536",
+    "packages/kernel/src/lib/readonly.ts": "fa280db2ab5bc3a91e21021944108d829efa35723e20adb22ddf7748c311d8ec",
+    "packages/kernel/src/lib/write-participation.ts": "874604cae15f14835731ed26a7f7b7bc65ec138ae966a2db2c9fb93032b7fb6e",
+    "packages/kernel/src/lib/internals/write-observation-scope.ts": "3cd7be31fe6a76ef174912c8281f0b22e4e7236888fb63c54a8f90d68b046406",
+    "packages/kernel/src/lib/audit/audit.ts": "7723acc97ab475103d9c0e3963ca373005732433e28b050021976942011f0385",
+    "packages/kernel/src/lib/internals/owner-invalidation-port.ts": "8e1a2ace8ffc3640649449944e99905ee239fec53c9e375bd011556d30c315f7",
+    "packages/kernel/src/lib/internals/tree-scalar-slot-port.ts": "4581209ac479bc50b0ee6dc2ee8b8bcf15dae6596636a3fb1694c42f26fbdfa9",
+    "packages/kernel/src/lib/internals/snapshot-authority.ts": "d082605b6c48613dc08db6a066d4657c5f43622712bab23bff095fd162b32954",
+    "packages/kernel/src/lib/internals/production-substrate-stats.ts": "de67f70c33be1fd2082d961c4d636ec1e4b6409495ff1c6895ab2b56349d857f",
+    "packages/kernel/src/lib/internals/location-runtime.ts": "0b97cf252ea781e365cdc9a8d8202c4cc1076805fd4ba3fac3bcaeb98a44b5a6",
+    "packages/kernel/src/enhancers/devtools/devtools-impl.ts": "3cc54d7b0e4f552cbbf81dda85358496df11f815d569643ba6b16443570313c9",
+    "packages/kernel/src/lib/internals/observation-adapter.ts": "cc505e5d8951e6b25a17b6741cdcd9d9070fe76bdcf73e3ceabb2c028efd1016",
+    "packages/kernel/src/lib/constants.ts": "0198acd1d2d8325d846b80cadefdf53db12df2d7843fd6bb41b47fd0fb93da00",
+    "packages/kernel/src/lib/internals/merge-derived.ts": "a4bd3d4bbc0d4d5739d6c728cac4585d2eed9384274f4c2095b4ff7b14f59968",
+    "packages/kernel/src/lib/internals/tree-scalar-leaf-runtime.ts": "d03cd01b1b0037756027daad3c10961596626ae41bf2eebe7dd00d5b9e3e2030",
+    "packages/kernel/src/lib/internals/physical-commit-clock.ts": "44466c7b0b6bdde4d7a24b7d324c575a8cf782c5b60c2b85bf08c9c12442119e",
+    "packages/kernel/src/lib/internals/materialize-markers.ts": "67c7bf8e90248c56427abc2690f746f7d7f437631f3bcc2986ac49976e9e1235",
+    "packages/kernel/src/lib/internals/tree-capabilities.ts": "e11c6e045c7e88e19458ee841936a3e3afe50de74b17cf9279c3e2e5fc37e9d9",
+    "packages/kernel/src/lib/utils.ts": "3a631f9381e564a964474e7e86c0eeac5809c5da8b4658c6f105927828d89e53",
+    "packages/kernel/src/lib/internals/root-source.ts": "96ce05e9464bb874f09c6e418b0cf68ebe36e8d3995bcab30e2d9fa4fbc279c2",
+    "packages/kernel/src/enhancers/index.ts": "b3f2d8805cd540733e58950d1673e8f6b7ebe850f8589d3067680b2c2b94768f",
+    "packages/kernel/src/lib/internals/mutation-capture-runtime.ts": "3f2621c3d489d6cb04356bb6cac3b68b46f9587ea82a380316f56098e9a1c88b",
+    "packages/kernel/src/lib/internals/link-state-source.ts": "a2655a67f8af24b4811cefedf32d17bdc3eb792bac1b972e65371c5ac2c4df60",
+    "packages/kernel/src/lib/internals/entity-projection-seed.ts": "044549e0abf060cfee14c26a13e013d22f2a4fbe6ad4db37206247d88d7eecd6",
+    "packages/kernel/src/lib/internals/source-mutation.ts": "cc24db10b21def186cca62d23a27224e09edb7ffe8991bdd8e8ebb094b8b5a87",
+    "packages/kernel/src/lib/internals/commit-consequence.ts": "bfe4abc380b25859d3964dd08e714f199abe6bda881c27fe1165f2ac5f86e523",
+    "packages/kernel/src/lib/internals/entity-egress-projection.ts": "f071541ff79537b0fde69d4d85554b37c1a586942964a26cdcdd816bb111a115",
+    "packages/kernel/src/lib/internals/visit-tree.ts": "1c542d5082a0b4acb2f627eb70e88fcfabd4f49acb2b120d43d90f25b6199078",
+    "packages/kernel/src/lib/markers/entity-map.ts": "dcd89d2b8f2afc3931dcce3ddf935578d9c98dc1762f1b4a49041e1b275d182e",
+    "packages/kernel/src/lib/enhancer-types.ts": "7583d38293a9853af8bfb3e534f3bd4bb1361d75eb0cfb1b6a5b8802ad7cf8d0",
+    "packages/kernel/src/lib/internals/canonical-snapshot.ts": "51b8ca59737c3b3c082a12926925b526fcb2182bb345a15eb189320209741d50",
+    "packages/kernel/src/lib/internals/utilities/get-changes.ts": "33eb6af992af9f44089bbca066b4200bbb5263ff40eb15c805548dfed882f072",
+    "packages/kernel/src/lib/internals/tree-scalar-slot-runtime.ts": "3d609a913f82055ea18bdc03e10af7a07f3de38c09e5ea229ec8a4cd44b623df",
+    "packages/kernel/src/lib/internals/cell-identity.ts": "60a94340b3830b8f9a6efe2ec0b2206b141f64aae7ce46593a1517f9f964c492",
+    "packages/kernel/src/lib/internals/runtime-tree-plan.ts": "e407dd6b87df6b8cb9ea674f5c93321c9f38447740cd782a4ca32ebf4e160272",
+    "packages/kernel/src/lib/internals/utilities/is-built-in-object.ts": "6690b24d9e52fe23c1d01d296826b44aa4c79b457ada685307697012d9846111",
+    "packages/kernel/src/lib/internals/utilities/deep-equal.ts": "d3281de95e87aab27bc493810e4b3e1b13c9ce874d9e68c8435140c94f48271c",
+    "packages/kernel/src/lib/entity-signal.ts": "4459d2ad9dfdf690388ce38f8421234ae8bb3a10266b65125287388cc674aebc",
+    "packages/kernel/src/lib/internals/utilities/append-all.ts": "26576cf769d69c5d9090262bd51657cc7710d98e928ceb6e36653b389dae14b5",
+    "packages/kernel/src/lib/internals/intercept-leaf-signals.ts": "164c87dc9405b74f52a1d3eb08dd899745492fb141bfdcf9010f88b22383584c",
+    "packages/kernel/src/enhancers/restoration/order-boundary-evidence.ts": "f86b63862d73df0a64e0b11ddb4ae11380c350710e739e265109dc334594537a",
+    "packages/kernel/src/lib/internals/causal-runtime/pending-rollback.ts": "6b70aaeec9d3c6355f144d26e671460af30484e933e47a829bf6e30f7f707e83",
+    "packages/kernel/src/lib/internals/causal-runtime/transient-rows.ts": "434971128a52abda9365b7581aaf49a00536dcd719640db7815e732ff0cb94be",
+    "packages/kernel/src/lib/internals/exposed-publication.ts": "1edaeed30249341f57170df22c21fb9921a4c0b9ddf53327098d5e50daa1ca5f",
+    "packages/kernel/src/lib/internals/entity-membership-source.ts": "099b2d5ad23ae5f7a75f691577bf45221aa18c1276d09ca1dacf2324b3eb6dc1",
+    "packages/kernel/src/lib/internals/causal-runtime/post-application-failure.ts": "3912c42c51186907cfdc9201d26200930c0afb8478c7dd9779bcd825424a214f",
+    "packages/kernel/src/lib/internals/restoration-source.ts": "9d14e6393b381289a7dab186b1b4ef60da5b8c993135d9f0437145cdc659d600",
+    "packages/kernel/src/lib/internals/physical-rows.ts": "b5ba4a48f620b2776edad5bdec2aa21c5c4044e683ebcf6673f29432c77dc48b",
+    "packages/kernel/src/lib/internals/subject-restoration-claims.ts": "78da09b87c6e0a902b6ed7353a04ddd382fc7c5b8e8c4ed66de8634b87298cbf",
+    "packages/kernel/src/lib/internals/causal-runtime/tree-realization-adapter.ts": "c3fec9f52a71aba93314cb1715003b27084548cf4f9914b4deb548299e2faea0",
+    "packages/kernel/src/lib/internals/causal-runtime/target-transition.ts": "f9dbf57611f70c3e41ca8b5d0163bf62cea2d0bfbd0ffbbf419d6f993f7e0e8a",
+    "packages/kernel/src/lib/internals/causal-runtime/transaction-lifecycle.ts": "2beca18cdf035ee8227c5026f401d61161cf6a1460276ce632966ae0e94cedd2",
+    "packages/kernel/src/lib/internals/subject-reclamation-sink.ts": "84f269cd29df0dbcd7c0e3ca198ba0f1386ea18292b304528a6f4dd7fb745345",
+    "packages/kernel/src/lib/internals/transaction-lifecycle-source.ts": "63283ef073b6fa156b90c5e9cf8c78c3fdfc6153bf25e36c4813030d3d6c25c7",
+    "packages/kernel/src/lib/internals/causal-runtime/applied-turn-projection.ts": "d4b0314fdb72f518740ab3db6c90dc011d42abe94a4e3f17d995d3ac538dd5c8",
+    "packages/kernel/src/lib/internals/causal-runtime/turn-store.ts": "49520bc9420ebd430b982edf9a0a21f4a8ca889539a54b5198d205a9bd8f667f",
+    "packages/kernel/src/lib/internals/causal-runtime/realization-context.ts": "6ec5b9efd721421f6766d7ceaa81c3e7441cb59c93b36b3ca3a924a9855229da",
+    "packages/kernel/src/lib/physical/prepare-entity-target.ts": "5eb02667ae8e30e5b7d450bc2f4b376c83ed592d3b941d49f49be698061c1cce",
+    "packages/kernel/src/lib/internals/utilities/deep-clone.ts": "4d4052a19f5bc484792d3cfc2d821890ce255d69d0640565ccbeda18b81b2635",
+    "packages/kernel/src/lib/internals/causal-runtime/scoped-value-addressing.ts": "1505a2da26081d0f282e034277cc6ada8abca342f19e13a2f369cb3402132456",
+    "packages/kernel/src/lib/physical/prepare-structural-target.ts": "33642f4fdef5306d2768e21871daa4318e7b281b709909708c3cb4c1ec1340fb",
+    "packages/kernel/src/lib/physical/entity-handle-resolution.ts": "8ac798d660e0050bc864c6c09b199ccd0f3c069ebd7abf07d311d74529931005",
+    "packages/kernel/src/lib/physical/structural-store.ts": "36d7005b9c44bc98776c1b05e4b381a2fcc4e9777caf552ca23514412204243a",
+    "packages/kernel/src/lib/physical/entity-value-store.ts": "f6400264ea2fc4f54091f13c1c0004cca68b75eb40cd011ee4e4f85efe264e6f",
+    "packages/kernel/src/lib/physical/entity-mutation-frame.ts": "d18cda629dca7ada76b2a7f9b5d621bd2b5f04acd3b229487d50230b59d4c4d6"
+  },
+  "direct": {
+    "pending": {
+      "events": [
+        {
+          "path": "x",
+          "value": 7,
+          "prev": 0,
+          "meta": {
+            "transactionId": "pending-owner",
+            "transactionOwner": {},
+            "mutationIntent": "replace",
+            "ownerId": "tree"
+          },
+          "active": null
+        },
+        {
+          "path": "y",
+          "value": 7,
+          "prev": 0,
+          "meta": {
+            "mutationIntent": "replace",
+            "ownerId": "tree"
+          },
+          "active": null
+        }
+      ],
+      "sent": [],
+      "state": {
+        "x": 7,
+        "y": 7
+      },
+      "active": null
+    },
+    "afterConfirm": {
+      "sent": [
+        7
+      ],
+      "state": {
+        "x": 7,
+        "y": 7
+      }
+    }
+  },
+  "copy": {
+    "pending": {
+      "events": [
+        {
+          "path": "x",
+          "value": 7,
+          "prev": 0,
+          "meta": {
+            "transactionId": "pending-owner",
+            "transactionOwner": {},
+            "mutationIntent": "replace",
+            "ownerId": "tree"
+          },
+          "active": null
+        },
+        {
+          "path": "y",
+          "value": 7,
+          "prev": 0,
+          "meta": {
+            "mutationIntent": "replace",
+            "ownerId": "tree"
+          },
+          "active": null
+        }
+      ],
+      "sent": [],
+      "state": {
+        "x": 7,
+        "y": 7
+      },
+      "active": null
+    },
+    "afterConfirm": {
+      "sent": [
+        7
+      ],
+      "state": {
+        "x": 7,
+        "y": 7
+      }
+    }
+  }
+}

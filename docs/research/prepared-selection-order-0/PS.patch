@@ -1,0 +1,26 @@
+--- a/packages/kernel/src/lib/entity-signal.ts
++++ b/packages/kernel/src/lib/entity-signal.ts
+@@ -608,6 +608,12 @@
+               deriveLocation(publication.stateSignal, (value) => value + 1);
+             }
+           }
++        }
++        updateSignals();
++        if (options?.advancePhysicalRevision !== false) {
++          physicalCommitClock?.advance();
++        }
++        for (const publication of subjectChanges) {
+           const key = publication.afterKey ?? publication.beforeKey;
+           if (key === undefined) {
+             continue;
+@@ -655,10 +661,6 @@
+           else if (kind === 'remove') emitTap('onRemove', key, beforeValue as E);
+           else if (!kind && !deepEqual(beforeValue, afterValue))
+             emitTap('onUpdate', key, afterValue as E, afterValue as E);
+-        }
+-        updateSignals();
+-        if (options?.advancePhysicalRevision !== false) {
+-          physicalCommitClock?.advance();
+         }
+       },
+     };

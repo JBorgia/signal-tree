@@ -1,0 +1,184 @@
+diff --git a/packages/kernel/src/lib/entity-signal.ts b/packages/kernel/src/lib/entity-signal.ts
+index 30dc51f0..4abd575f 100644
+--- a/packages/kernel/src/lib/entity-signal.ts
++++ b/packages/kernel/src/lib/entity-signal.ts
+@@ -410,15 +410,18 @@ export function createEntitySignal<
+     let projectedVersion = -1;
+     let initialized = false;
+     let value: TValue;
+-    return locations.createDerived(() => {
+-      const currentVersion = version();
+-      if (!initialized || projectedVersion !== currentVersion) {
+-        value = compute();
+-        projectedVersion = currentVersion;
+-        initialized = true;
+-      }
+-      return value;
+-    });
++    return locations.createDerived(
++      () => {
++        const currentVersion = version();
++        if (!initialized || projectedVersion !== currentVersion) {
++          value = compute();
++          projectedVersion = currentVersion;
++          initialized = true;
++        }
++        return value;
++      },
++      () => initialized && projectedVersion === version()
++    );
+   };
+
+   function getProjectedEntity(id: K): E | undefined {
+diff --git a/packages/kernel/src/lib/internals/location-runtime.ts b/packages/kernel/src/lib/internals/location-runtime.ts
+index 30f4b6ce..ec25979e 100644
+--- a/packages/kernel/src/lib/internals/location-runtime.ts
++++ b/packages/kernel/src/lib/internals/location-runtime.ts
+@@ -291,7 +291,10 @@ export interface LocationRuntime {
+     initial: T,
+     equal?: (left: T, right: T) => boolean
+   ): Location<T>;
+-  createDerived<T>(compute: () => T): ReadonlyLocation<T>;
++  createDerived<T>(
++    compute: () => T,
++    isCurrent?: () => boolean
++  ): ReadonlyLocation<T>;
+   createWritable<T>(
+     /**
+      * The location's read. `stored` asks for the stored value whatever the
+diff --git a/packages/kernel/src/lib/internals/native-location-realization.ts b/packages/kernel/src/lib/internals/native-location-realization.ts
+index 77cc2437..360b57f1 100644
+--- a/packages/kernel/src/lib/internals/native-location-realization.ts
++++ b/packages/kernel/src/lib/internals/native-location-realization.ts
+@@ -209,8 +209,11 @@ export function createNativeLocationRuntime(
+     return location;
+   };
+
+-  const createDerived = <T>(compute: () => T): ReadonlyLocation<T> => {
+-    const native = observation.createReadonlyCell?.(compute);
++  const createDerived = <T>(
++    compute: () => T,
++    isCurrent?: () => boolean
++  ): ReadonlyLocation<T> => {
++    const native = observation.createReadonlyCell?.(compute, isCurrent);
+     if (!native) throw new Error('Expected a native readonly cell realization');
+     return markTreeCell(native as unknown as ReadonlyLocation<T>);
+   };
+diff --git a/packages/kernel/src/lib/internals/observation-adapter.ts b/packages/kernel/src/lib/internals/observation-adapter.ts
+index b353a7cc..e1576bd0 100644
+--- a/packages/kernel/src/lib/internals/observation-adapter.ts
++++ b/packages/kernel/src/lib/internals/observation-adapter.ts
+@@ -46,7 +46,19 @@ export interface ObservationAdapter {
+     readonly cell: WritableCell<T>;
+     readonly peek: () => T;
+   };
+-  createReadonlyCell?<T>(compute: () => T): ReadableCell<T>;
++  /**
++   * Realize a readonly computation. Experimental `isCurrent` describes whether
++   * the kernel's last successful projection matches its published version.
++   * During invalidation delivery, outside a grouped callback, a realization
++   * may refresh a stale owned projection without refreshing application-owned
++   * native computed cells. Never invoke it to force reads inside grouped work.
++   * Omission preserves native memoization; already coherent realizations may
++   * ignore it. Existing one-argument implementations remain compatible.
++   */
++  createReadonlyCell?<T>(
++    compute: () => T,
++    isCurrent?: () => boolean
++  ): ReadableCell<T>;
+   /**
+    * `ANGULAR-NATIVE-EPOCH-0`. The framework's cheapest read-dependency
+    * primitive, for a per-subject invalidation anchor that carries no value
+diff --git a/packages/vue/src/lib/vue-observation.ts b/packages/vue/src/lib/vue-observation.ts
+index 9eacded6..b1ef4ed3 100644
+--- a/packages/vue/src/lib/vue-observation.ts
++++ b/packages/vue/src/lib/vue-observation.ts
+@@ -33,13 +33,16 @@ interface VueWritableCell<T> extends VueReadonlyCell<T> {
+   asReadonly(): VueReadonlyCell<T>;
+ }
+
+-const wrapReadonlyCell = <T>(source: ComputedRef<T>): VueReadonlyCell<T> => {
+-  const cell = (() => source.value) as VueReadonlyCell<T>;
++const wrapReadonlyCell = <T>(
++  source: ComputedRef<T>,
++  read: () => T = () => source.value
++): VueReadonlyCell<T> => {
++  const cell = (() => read()) as VueReadonlyCell<T>;
+   Object.defineProperties(cell, {
+     __v_isRef: { value: true },
+     __v_isReadonly: { value: true },
+     effect: { value: source.effect },
+-    value: { get: () => source.value },
++    value: { get: read },
+   });
+   return cell;
+ };
+@@ -65,6 +68,7 @@ const createWritableCell = <T>(read: () => T): VueWritableCell<T> => {
+
+ export const createVueObservationAdapter = (): ObservationAdapter => {
+   let invalidationGroupDepth = 0;
++  let deliveryDepth = 0;
+   const pendingInvalidations = new Set<() => void>();
+
+   const scheduleInvalidation = (invalidate: () => void): void => {
+@@ -146,9 +150,29 @@ export const createVueObservationAdapter = (): ObservationAdapter => {
+       peek: computeValue,
+     }),
+
+-    createReadonlyCell: <T>(computeValue: () => T) => {
+-      const source = computed(computeValue);
+-      return wrapReadonlyCell(source);
++    createReadonlyCell: <T>(
++      computeValue: () => T,
++      isCurrent?: () => boolean
++    ) => {
++      if (!isCurrent) return wrapReadonlyCell(computed(computeValue));
++      let evaluations = 0;
++      let current: T;
++      const source = computed(() => {
++        evaluations += 1;
++        current = computeValue();
++        return current;
++      });
++      return wrapReadonlyCell(source, () => {
++        const before = evaluations;
++        const value = source.value;
++        if (evaluations !== before) return value;
++        if (deliveryDepth === 0 || invalidationGroupDepth > 0) return current;
++        // Serial native delivery may reach an observer before this projection's
++        // own invalidation. Its kernel cache decides whether a refresh is needed.
++        // Keep the successful value through reentry until native catch-up.
++        if (!isCurrent()) current = computeValue();
++        return current;
++      });
+     },
+
+     runInvalidationGroup(run): void {
+@@ -165,15 +189,20 @@ export const createVueObservationAdapter = (): ObservationAdapter => {
+         if (invalidationGroupDepth === 0 && pendingInvalidations.size > 0) {
+           const invalidations = [...pendingInvalidations];
+           pendingInvalidations.clear();
+-          for (const invalidate of invalidations) {
+-            try {
+-              invalidate();
+-            } catch (error) {
+-              if (!hasFailure) {
+-                failure = error;
+-                hasFailure = true;
++          deliveryDepth += 1;
++          try {
++            for (const invalidate of invalidations) {
++              try {
++                invalidate();
++              } catch (error) {
++                if (!hasFailure) {
++                  failure = error;
++                  hasFailure = true;
++                }
+               }
+             }
++          } finally {
++            deliveryDepth -= 1;
+           }
+         }
+       }

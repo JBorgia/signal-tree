@@ -1,0 +1,10 @@
+{
+  "candidateManifestSha256": "73e4ecfde64ee05a1eed1eb1362e8ca6f18755b1192a3583454440ef4ad68c27",
+  "sourceFiles": 1738,
+  "uncompressedFileBytes": 18231369,
+  "archiveBytes": 4626150,
+  "archiveSha256": "a548f69b83d8016f808b8bb6c692a097aea5315f750173187a35555a2355100d",
+  "scope": "source/build/test subset; excludes historical documentation; no offline dependency guarantee",
+  "baselineProvenance": "87f6831fa60cafe87508f0ace84b7638698ca3b0",
+  "baselineRequiredForReconstruction": false
+}

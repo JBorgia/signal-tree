@@ -1,0 +1,18 @@
+{
+  "sourceHead": "5727cd8fcf701128358674411400c019b137a5e4",
+  "evidence": "public-source-bundle, simulated backend, kernel only",
+  "results": [
+    {
+      "name": "accepted reviewed backend command and local transaction have separate terminality",
+      "outcome": "PASS"
+    },
+    {
+      "name": "backend input revision rejects ABA while native rollback preserves an independent note",
+      "outcome": "PASS"
+    },
+    {
+      "name": "lost acknowledgment retains local settlement authority until correlated retry",
+      "outcome": "PASS"
+    }
+  ]
+}

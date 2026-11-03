@@ -1,0 +1,55 @@
+{
+  "frozenAtUTC": "2026-10-29T19:26:57.919948+00:00",
+  "sourceIdentity": "/private/tmp/st-current-read-capability-proof/proof-evidence/SOURCE-IDENTITY.json",
+  "sourceIdentitySha256": "10a5d0a4548e7e2da88328d072e0b6b3878633298bd356aee8849ab973614d72",
+  "sourceFilesVerified": 21,
+  "sourcePatchSha256": "98e4180b0700ade7a90fc5263552ce998522b9830fd25bc760fad550661089fa",
+  "candidatePatchSha256": "c8db0ed469e42b425b3299204bca86965f59cf4880c3b7e06707ceb24d9b048c",
+  "canonicalBuildExit": 0,
+  "tarballs": {
+    "kernel": {
+      "path": "/private/tmp/st-current-read-capability-proof/proof-evidence/tarballs/signal-tree-kernel-16.0.0-dev.tgz",
+      "sha256": "82a290a27e3f6ad238cada0cc84a86c4160e3d405157ba67eb093baa059b8293",
+      "filesVerifiedAgainstCanonicalDist": 111
+    },
+    "angular": {
+      "path": "/private/tmp/st-current-read-capability-proof/proof-evidence/tarballs/signal-tree-angular-16.0.0-dev.tgz",
+      "sha256": "f45b5424ecd0ca1c50eed61ffb377f423475fe7a9c51e7467cf0be8da7abc25d",
+      "filesVerifiedAgainstCanonicalDist": 16
+    },
+    "vue": {
+      "path": "/private/tmp/st-current-read-capability-proof/proof-evidence/tarballs/signal-tree-vue-16.0.0-dev.tgz",
+      "sha256": "528c6a40340b9b4bcfa1cdc0eed38dba174c5d8bd1712ba205a941fcd0d71867",
+      "filesVerifiedAgainstCanonicalDist": 12
+    },
+    "solid": {
+      "path": "/private/tmp/st-current-read-capability-proof/proof-evidence/tarballs/signal-tree-solid-16.0.0-dev.tgz",
+      "sha256": "2884903516acaa28bcd5ad95db1b8d9595f99bdd3a425b6a3aee18a1642d3e92",
+      "filesVerifiedAgainstCanonicalDist": 12
+    }
+  },
+  "declarations": {
+    "dist/packages/kernel/dist/_adapter-CJ_ISqBl.d.ts": "b83bfa571433adde7adb1361ad4832b07fa586b5c4c1f43fd6aa0740183e4499",
+    "dist/packages/kernel/dist/_position-registry-D8dCXLAS.d.ts": "5fa73d43d0525919b2731e54adbe1a2cb1adaafc6fe014c536b4dc75a69bfab6",
+    "dist/packages/kernel/dist/adapter.d.ts": "a83cf5a6b9119ff778d43ad8cbf8686cb59406c097d750a259842aef4a789bc3",
+    "dist/packages/kernel/dist/index.d.ts": "37d41d4d1fd51508eaf0f1f51854e9b71856cfc011b87c78999e487357484177",
+    "dist/packages/kernel/dist/internals.d.ts": "564af3573a8a6ffb9fb57fdd6bf375e85e5a897c9c990e207c467d9d112aad1a",
+    "dist/packages/angular/dist/index.d.ts": "6453348bfc587bf67d5854ca3077db6dd6d21d59cb2e4d49e68ffba96b86e1ff",
+    "dist/packages/angular/src/index.d.ts": "2daf5ab5a11970ee0ee2265124de7a91e507b60ee851eb3b0b43c35345144b38",
+    "dist/packages/angular/src/lib/carrier.d.ts": "2f288f2515523b91f92a8443986d4e5a91ece9c3852121bb7c7b9376ce3472a3",
+    "dist/packages/angular/src/lib/construction-input.d.ts": "c48903a8e799c49f3a67b79dc5355f4166fbb8f9e3cdb5cba588ba44da689804",
+    "dist/packages/angular/src/lib/define-store.d.ts": "c363131c635463bf9a4fe497c88db5c8a91bc2373a2f30b3bce880ed6879ef17",
+    "dist/packages/angular/src/lib/observation-adapter.d.ts": "4a1c38eacb6b3d10ee268268924966944682d904197299b9ff32ccbe2879ab9f",
+    "dist/packages/angular/src/lib/to-writable-signal.d.ts": "a0b9327dcbce2fbf5306f5e6b3290adb70ce8ce9a6e0e8876922efc9e03ec77d",
+    "dist/packages/vue/dist/index.d.ts": "6453348bfc587bf67d5854ca3077db6dd6d21d59cb2e4d49e68ffba96b86e1ff",
+    "dist/packages/vue/src/index.d.ts": "17ae4feda5d1dd047831b5063db4f19da6cd101c35ac30cc4c2eacd94a7c90aa",
+    "dist/packages/vue/src/lib/carrier.d.ts": "2a2fde3319ea3836caf069c8d5a7048f71c6acc778fe75ed3c1ac3df58b986d7",
+    "dist/packages/vue/src/lib/construction-input.d.ts": "6251df16aeba37e923d2374708386bc9a2fd32c2114ad133cdc8f3884e27a523",
+    "dist/packages/vue/src/lib/vue-observation.d.ts": "410c2ede972d45164ce942e4bf54d8fabb57d6522fd6fde6dc2bc5935af4b46e",
+    "dist/packages/solid/dist/index.d.ts": "6453348bfc587bf67d5854ca3077db6dd6d21d59cb2e4d49e68ffba96b86e1ff",
+    "dist/packages/solid/src/index.d.ts": "96a28b7c9d9ab7e00433f54de3e5f213d95298668834a69372baf578b1d71aee",
+    "dist/packages/solid/src/lib/carrier.d.ts": "3b018bddaf82a8b6b9a2e55a921ff80c6e22c17a890c72c05f6e30344a8097e2",
+    "dist/packages/solid/src/lib/construction-input.d.ts": "84e4b8b6f9f5ed7170d9d16daa55bcabdce51756e87c2b64c320eb170095f1fc",
+    "dist/packages/solid/src/lib/solid-observation.d.ts": "c8d66235153b6b83d926d7c7f37a796d288e77ec611acaa73de7d3cc6a83634d"
+  }
+}

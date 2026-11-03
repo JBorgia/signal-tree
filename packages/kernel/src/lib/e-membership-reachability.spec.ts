@@ -3,13 +3,15 @@ import { undoable } from '../lib/undoable';
 
 import { signalTree } from './signal-tree';
 
+// The seed below constructs a before these runtime assertions.
+type SeededRow = { n: { (): number; (value: number): void } };
+
 /**
  * DERIVATION E — is dynamic membership over a GRANULAR shape reachable at all?
  *
- * A record gives granular observation but its membership is fixed at
- * construction. Before concluding the conjunction is unreachable in ordinary
- * canonical state, exhaust the tree's own write paths: if ANY of them can add a
- * position to a record after construction, the gap closes.
+ * The pre-authorization discard observations remain in 8d220643 and the first
+ * full-suite log. Owner decision 2026-10-17 permits new ordinary keys through
+ * whole-value writes; these routes now assert that affirmative behavior.
  */
 describe('E — can any tree API add a record key after construction?', () => {
   const seed = () =>
@@ -18,37 +20,41 @@ describe('E — can any tree API add a record key after construction?', () => {
       other: 0,
     });
 
-  it('nested accessor merge: NO', () => {
+  it('nested whole value creates new keys', () => {
     const tree = seed();
     (tree.$.rows as unknown as (v: object) => void)({ b: { n: 2 } });
-    expect((tree.$.rows() as Record<string, unknown>)['b']).toBeUndefined();
+    expect((tree.$.rows() as Record<string, unknown>)['b']).toEqual({ n: 2 });
+    tree.destroy();
   });
 
-  it('root callable merge: NO', () => {
+  it('root whole value creates new keys', () => {
     const tree = seed();
     tree.$({ rows: { b: { n: 2 } } } as never);
-    expect((tree.$.rows() as Record<string, unknown>)['b']).toBeUndefined();
+    expect((tree.$.rows() as Record<string, unknown>)['b']).toEqual({ n: 2 });
+    tree.destroy();
   });
 
-  it('updater form through the root: NO', () => {
+  it('root updater creates new keys', () => {
     const tree = seed();
     tree.$((current) => ({
       ...current,
       rows: { a: { n: 1 }, b: { n: 2 } },
     }));
-    expect((tree.$.rows() as Record<string, unknown>)['b']).toBeUndefined();
+    expect((tree.$.rows() as Record<string, unknown>)['b']).toEqual({ n: 2 });
+    tree.destroy();
   });
 
-  it('a TOP-LEVEL record has the same constraint — it is not about nesting depth', () => {
+  it('top-level records create new keys too', () => {
     const tree = signalTree({ a: { n: 1 } } as Record<string, { n: number }>);
     tree.$({ b: { n: 2 } });
-    expect((tree.$() as Record<string, unknown>)['b']).toBeUndefined();
+    expect((tree.$() as Record<string, unknown>)['b']).toEqual({ n: 2 });
+    tree.destroy();
   });
 
   it('the granular positions that DO exist keep working', () => {
     const tree = seed();
-    undoable(() => tree.$.rows.a.n(9));
-    expect(tree.$.rows.a.n()).toBe(9);
+    undoable(() => (tree.$.rows.a as SeededRow).n(9));
+    expect((tree.$.rows.a as SeededRow).n()).toBe(9);
     expect(tree.$()).toEqual({ rows: { a: { n: 9 } }, other: 0 });
   });
 });
@@ -62,7 +68,9 @@ describe('E — can any tree API add a record key after construction?', () => {
 describe('E — is the conjunction delivered over canonical truth?', () => {
   it('an entity write is captured by undo', async () => {
     const { entityMap } = await import('./types');
-    const { restoration } = await import('../enhancers/restoration/restoration');
+    const { restoration } = await import(
+      '../enhancers/restoration/restoration'
+    );
 
     const tree = signalTree(
       {

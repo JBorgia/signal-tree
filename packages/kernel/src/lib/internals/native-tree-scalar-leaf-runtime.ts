@@ -1,11 +1,21 @@
+import { bindSnapshotInstalledReader } from './snapshot-installation';
+import type {ConstructionAllocation} from './construction-allocation';
+import { PublicationPreparation } from './publication-preparation';
+import { completeScalarFrame } from './tree-scalar-slot-runtime';
+import { reportContainedObserverError as reportFrameError } from './error-reporter';
 import type { PositionId } from '../types';
 import { markTreeCell } from './cell-identity';
-import { registerIntrinsicMutationSource } from './intrinsic-mutation';
+import {
+  registerIntrinsicMutationSource,
+  combineTerminalRecords,
+  type PreparedPublicationUnit,
+  type TerminalRecordPlan,
+} from './intrinsic-mutation';
+import { reportContainedObserverError } from './error-reporter';
 import {
   registerWritableLocationBinding,
   type WritableLocationBinding,
 } from './location-runtime';
-import { isDormantMember, reactivateOnWrite } from './member-membership';
 import type {
   ObservationAdapter,
   ObservationToken,
@@ -17,6 +27,7 @@ import {
 } from './production-substrate-stats';
 import type { Location } from './cell-runtime';
 import type {
+  MemberAbsence,
   ScalarSlotMutationFrame,
   SlotIndex,
   TreeScalarLeafRuntime,
@@ -38,14 +49,47 @@ class NativeScalarSlotPublication {
   }
 
   publish(result: ScalarSlotCommitResult): void {
+    let failed = false;
+    let first: unknown;
+    try { this.invalidate(result); }
+    catch (error) { failed = true; first = error; }
+    finally {
+      try { completeScalarFrame(result); }
+      catch (error) {
+        if (!failed) { failed = true; first = error; }
+        else reportFrameError({error,operation:'notify:subscriber'});
+      }
+    }
+    // Completion must run even when the primary thrown value is undefined.
+    if (failed) throw first;
+  }
+
+  private invalidate(result: ScalarSlotCommitResult): void {
     if (PRODUCTION_SUBSTRATE_STATS_ENABLED) {
       recordProductionSubstrateStat('publications', result.changedSlots.length);
     }
-    this.observation.runInvalidationGroup(() => {
-      for (const slotIndex of result.changedSlots) {
-        this.token(slotIndex).invalidate();
+    let failed = false;
+    let first: unknown;
+    try {
+      this.observation.runInvalidationGroup(() => {
+        for (const slotIndex of result.changedSlots) {
+          try {
+            this.token(slotIndex).invalidate();
+          } catch (error) {
+            if (!failed) {
+              failed = true;
+              first = error;
+            }
+          }
+        }
+      });
+    } catch (error) {
+      if (!failed) {
+        failed = true;
+        first = error;
       }
-    });
+    }
+    if (failed) throw first;
   }
 
   publishSlot(result: {
@@ -82,12 +126,26 @@ class NativeScalarSlotMutationFrame implements ScalarSlotMutationFrame {
     this.frame.discard();
   }
 
+  prepareCommit(options?: {
+    advanceRevision?: boolean; publicationPhase?: PublicationPreparation; admissionParticipation?: 'realized';
+    publish?: boolean;
+  }): () => ScalarSlotCommitResult {
+    const install = this.frame.prepareCommit({
+      advanceRevision: options?.advanceRevision, publicationPhase: options?.publicationPhase, admissionParticipation: options?.admissionParticipation,
+    });
+    return () => {
+      const result = install();
+      if (options?.publish !== false) this.publication.publish(result);
+      return result;
+    };
+  }
+
   commit(options?: {
-    advanceRevision?: boolean;
+    advanceRevision?: boolean; publicationPhase?: PublicationPreparation; admissionParticipation?: 'realized';
     publish?: boolean;
   }): ScalarSlotCommitResult {
     const result = this.frame.commit({
-      advanceRevision: options?.advanceRevision,
+      advanceRevision: options?.advanceRevision, publicationPhase: options?.publicationPhase, admissionParticipation: options?.admissionParticipation,
     });
     if (options?.publish !== false) {
       this.publication.publish(result);
@@ -100,12 +158,14 @@ function createNativeScalarLeaf<T>(
   kernel: TreeScalarSlotRuntime,
   publication: NativeScalarSlotPublication,
   observation: ObservationAdapter,
-  slotIndex: SlotIndex
-): Location<T> {
+  slotIndex: SlotIndex,
+  liveness: { absence?: MemberAbsence }
+): {leaf:Location<T>;token:ObservationToken;attach(nextKernel:TreeScalarSlotRuntime,nextPublication:NativeScalarSlotPublication,nextSlot:SlotIndex,nextLiveness:{absence?:MemberAbsence}):void} {
   const holder: { leaf?: Location<T> } = {};
   const realized = observation.createWritableCell?.(() => {
-    const leaf = holder.leaf;
-    if (leaf && isDormantMember(leaf)) return undefined as T;
+    // Absent when this leaf or a member above it is omitted (v16 8d). One
+    // empty slot until this tree's first omission (v16 8e).
+    if (liveness.absence?.isAbsent(holder.leaf)) return undefined as T;
     return kernel.readSlot<T>(slotIndex);
   });
   if (!realized) throw new Error('Expected a native writable cell realization');
@@ -114,14 +174,18 @@ function createNativeScalarLeaf<T>(
   publication.bind(slotIndex, realized.token);
   const leaf = markTreeCell(native as unknown as Location<T>);
   holder.leaf = leaf;
+  bindSnapshotInstalledReader(leaf, () => liveness.absence?.isAbsent(leaf) ? undefined : kernel.readSlot<T>(slotIndex));
   const mutationSource = registerIntrinsicMutationSource<T>(leaf as object);
 
+  // `reAdd` re-adds and announces an absent leaf's path, and says whether it
+  // did (`reactivatePathOnWrite`). No per-leaf closure: the slot is read
+  // inline (v16 8e).
   const publishResult = (
     result: ReturnType<TreeScalarSlotRuntime['commitSlot']>
   ): void => {
-    const reactivated = reactivateOnWrite(leaf);
+    const reAdded = liveness.absence?.reAdd(leaf) === true;
     publication.publishSlot(
-      reactivated && !result.changed
+      reAdded && !result.changed
         ? { ...result, changed: true, slot: slotIndex }
         : result
     );
@@ -138,8 +202,8 @@ function createNativeScalarLeaf<T>(
    */
   const commitNative = realized.commit;
   const publishChanged = (changed: boolean, committed?: { value: T }): void => {
-    const reactivated = reactivateOnWrite(leaf);
-    if (!changed && !reactivated) return;
+    const reAdded = liveness.absence?.reAdd(leaf) === true;
+    if (!changed && !reAdded) return;
     if (committed !== undefined && commitNative !== undefined) {
       commitNative(committed.value);
       if (PRODUCTION_SUBSTRATE_STATS_ENABLED) {
@@ -152,58 +216,177 @@ function createNativeScalarLeaf<T>(
 
   const binding: WritableLocationBinding<T> = {
     location: leaf,
+    needsAuthorityAdmission: () =>
+      kernel.needsAuthorityAdmission(slotIndex) ||
+      liveness.absence?.needsAdmission?.(leaf) === true,
     notify: () => publication.publishSlot({ changed: true, slot: slotIndex }),
     replace: (value) => {
-      const observer = mutationSource.observer;
-      const dormant = observer ? isDormantMember(leaf) : false;
-      const before = observer ? realized.peek() : undefined;
-      // The authoritative commit primitive: no result object on the hot path.
-      const changed = kernel.commitSlotValue(slotIndex, value);
-      publishChanged(changed, { value });
-      if (observer) {
-        observer({
+      const observer = mutationSource.observer,
+        capture = mutationSource.capture;
+      const publicationPrepare = mutationSource.preparePublication;
+      const publicationComplete = mutationSource.completePublication;
+      const observing = observer || capture;
+      const dormant = observing
+        ? liveness.absence?.isAbsent(leaf) === true
+        : false;
+      const before =
+        observing || publicationPrepare
+          ? kernel.readRecordSlot<T>(slotIndex)
+          : undefined;
+      let unit: PreparedPublicationUnit | undefined;
+      let terminal: TerminalRecordPlan | undefined;
+      const preparePublication = (
+        changed: boolean,
+        retained: T = before as T,
+        physicalChanged=changed
+      ) => {
+        unit = publicationPrepare?.({
           intent: 'replace',
           before: before as T,
-          after: changed || dormant ? value : (before as T),
-          changed: changed || dormant,
+          after: changed ? value : retained,
+          changed,
+          physicalChanged,preparedTerminal:terminal,
         });
+        return unit?.record;
+      };
+      let failed = false;
+      let first: unknown;
+      try {
+        const resultCommit = kernel.commitRecorded(
+          slotIndex,
+          value,
+          physicalChanged =>
+            combineTerminalRecords(
+              terminal = mutationSource.prepareTerminal?.({
+                intent: 'replace',
+                before: before as T,
+                after: value,
+                changed: true,
+              }),
+              preparePublication(true,before as T,physicalChanged)
+            ),
+          publicationPrepare
+            ? (current,physicalChanged) => preparePublication(false, current,physicalChanged)
+            : undefined
+        );
+        const changed = resultCommit.changed;
+        const mutation = observing
+          ? {
+              intent: 'replace' as const,
+              before: before as T,
+              after: changed || dormant ? value : (before as T),
+              changed: changed || dormant,
+              coveredRecipients: unit?.coveredRecipients,
+            }
+          : undefined;
+        if (mutation) capture?.(mutation);
+        publishChanged(resultCommit.physicalChanged, { value });
+        if (mutation) observer?.(mutation);
+      } catch (error) {
+        failed = true;
+        first = error;
+      } finally {
+        if (unit && publicationComplete) {
+          try {
+            publicationComplete(unit.completion);
+          } catch (error) {
+            if (!failed) { failed = true; first = error; }
+            else reportContainedObserverError({
+              error,
+              operation: 'notify:subscriber',
+            });
+          }
+        }
       }
+      if (failed) throw first;
     },
     derive: (update) => {
-      if (isDormantMember(leaf)) {
-        const next = update(undefined as T);
-        const result = kernel.commitSlot(slotIndex, next);
-        publishResult(result);
-        mutationSource.observer?.({
-          intent: 'derive',
-          before: undefined as T,
-          after: kernel.readSlot<T>(slotIndex),
-          // Membership changed even when the retained slot value did not.
-          changed: true,
-        });
-        return;
+      const observer = mutationSource.observer,
+        capture = mutationSource.capture;
+      const publicationPrepare = mutationSource.preparePublication;
+      const publicationComplete = mutationSource.completePublication;
+      const dormant = liveness.absence?.isAbsent(leaf) === true;
+      const publicationInput = mutationSource.capturePublicationInput?.();
+      const current = dormant ? kernel.readSlot<T>(slotIndex) : realized.peek();
+      const before = kernel.readRecordSlot<T>(slotIndex);
+      const next = update(dormant ? (undefined as T) : current);
+      let unit: PreparedPublicationUnit | undefined;
+      let terminal: TerminalRecordPlan | undefined;
+      const preparePublication = (
+        changed: boolean,
+        retained: T = before as T,
+        physicalChanged=changed
+      ) => {
+        unit = publicationPrepare?.(
+          {
+            intent: 'derive',
+            before,
+            after: changed ? next : retained,
+            changed,
+            physicalChanged,preparedTerminal:terminal,
+          },
+          publicationInput
+        );
+        return unit?.record;
+      };
+      let failed = false;
+      let first: unknown;
+      try {
+        const resultCommit = kernel.commitRecorded(
+          slotIndex,
+          next,
+          physicalChanged =>
+            combineTerminalRecords(
+              terminal = mutationSource.prepareTerminal?.({
+                intent: 'derive',
+                before,
+                after: next,
+                changed: true,
+              }),
+              preparePublication(true,before as T,physicalChanged)
+            ),
+          publicationPrepare
+            ? (current,physicalChanged) => preparePublication(false, current,physicalChanged)
+            : undefined
+        );
+        const changed = resultCommit.changed;
+        const mutation = {
+          intent: 'derive' as const,
+          before,
+          after: changed || dormant ? next : before,
+          changed: changed || dormant,
+              coveredRecipients: unit?.coveredRecipients,
+        };
+        capture?.(mutation);
+        publishResult(
+          resultCommit.physicalChanged
+            ? { revision: kernel.revision(), changed: true, slot: slotIndex }
+            : { revision: kernel.revision(), changed: false }
+        );
+        observer?.(mutation);
+      } catch (error) {
+        failed = true;
+        first = error;
+      } finally {
+        if (unit && publicationComplete) {
+          try {
+            publicationComplete(unit.completion);
+          } catch (error) {
+            if (!failed) { failed = true; first = error; }
+            else reportContainedObserverError({
+              error,
+              operation: 'notify:subscriber',
+            });
+          }
+        }
       }
-      const observer = mutationSource.observer;
-      if (!observer) {
-        publishResult(kernel.updateSlot(slotIndex, update));
-        return;
-      }
-      const before = realized.peek();
-      const next = update(before);
-      const result = kernel.commitSlot(slotIndex, next);
-      publishResult(result);
-      observer({
-        intent: 'derive',
-        before,
-        after: result.changed ? next : before,
-        changed: result.changed,
-      });
+      if (failed) throw first;
     },
   };
   registerWritableLocationBinding(binding);
   native.set = binding.replace;
   native.update = binding.derive;
-  return leaf;
+  return {leaf,token:realized.token,attach(nextKernel,nextPublication,nextSlot,nextLiveness){kernel=nextKernel;publication=nextPublication;slotIndex=nextSlot;liveness=nextLiveness;}};
 }
 
 export function createNativeTreeScalarLeafRuntime(
@@ -213,20 +396,44 @@ export function createNativeTreeScalarLeafRuntime(
   const kernel = createTreeScalarSlotRuntime(physicalCommitClock);
   const publication = new NativeScalarSlotPublication(observation);
   const leafByPositionId = new Map<PositionId, Location<unknown>>();
+  const liveness: { absence?: MemberAbsence } = {};
 
   return {
+    enableAbsence(absence: MemberAbsence): void {
+      liveness.absence = absence;
+    },
+    disableAbsence(): void {
+      liveness.absence = undefined;
+    },
     createLeaf<T>(
       initialValue: T,
       equal: (current: T, next: T) => boolean,
-      positionId?: PositionId
+      positionId?: PositionId,
+      allocation?: ConstructionAllocation
     ): Location<T> {
+      if(allocation){
+        const detached=createTreeScalarSlotRuntime();
+        const localPublication=new NativeScalarSlotPublication(observation);
+        const localSlot=detached.createSlot(initialValue,equal);
+        const prepared=createNativeScalarLeaf<T>(detached,localPublication,observation,localSlot,{});
+        allocation.add(()=>{
+          const slot=kernel.createSlot(initialValue,equal,positionId);
+          kernel.bindPublicationSource(slot,prepared.leaf);
+          publication.bind(slot,prepared.token);
+          if(positionId!==undefined)leafByPositionId.set(positionId,prepared.leaf as Location<unknown>);
+          prepared.attach(kernel,publication,slot,liveness);
+        },()=>{ /* No cancellation work is registered for this scalar allocation. */ },()=>{if(detached.revision()!==0)throw new Error('Detached member changed during preparation');});
+        return prepared.leaf;
+      }
       const slotIndex = kernel.createSlot(initialValue, equal, positionId);
-      const leaf = createNativeScalarLeaf<T>(
+      const {leaf} = createNativeScalarLeaf<T>(
         kernel,
         publication,
         observation,
-        slotIndex
+        slotIndex,
+        liveness
       );
+      kernel.bindPublicationSource(slotIndex, leaf);
       if (positionId !== undefined) {
         leafByPositionId.set(positionId, leaf as Location<unknown>);
       }

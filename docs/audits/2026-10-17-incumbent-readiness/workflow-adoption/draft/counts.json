@@ -1,0 +1,26 @@
+[
+  {
+    "file": "editor.ts",
+    "physicalLines": 115,
+    "nonblankLines": 112,
+    "sha256": "87b0d0552aca9838712af080fe4832baaabb0b6497cc39340e6f0074bb8bebe7"
+  },
+  {
+    "file": "scenario.ts",
+    "physicalLines": 124,
+    "nonblankLines": 116,
+    "sha256": "83b12e52f73dd20db375ae8d3cb8adf0d4bbe1c1e07e8ee536c9cfa91ce20460"
+  },
+  {
+    "file": "run.mjs",
+    "physicalLines": 25,
+    "nonblankLines": 25,
+    "sha256": "af0344853c6bc909d04e9cfed897180a4cd9ff83021fc6e1da546230c05b55a7"
+  },
+  {
+    "file": "tsconfig.json",
+    "physicalLines": 10,
+    "nonblankLines": 10,
+    "sha256": "8ed351add34500f24ac5783c295925a17ab1ff5c52cc40035b12e3b6dbc7f287"
+  }
+]

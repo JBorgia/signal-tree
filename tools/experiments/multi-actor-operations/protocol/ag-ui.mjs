@@ -1,0 +1,62 @@
+// Narrow AG-UI tool-event consumer. Transport output is a proposal, not consent.
+// Host supplies attribution and the authoritative proposal builder.
+export function dispatchToolStream({ coordinator, makeProposal, actor = { kind: 'unknown' }, maxBytes = 65536, maxCalls = 128 }) {
+  if (!Number.isSafeInteger(maxBytes) || maxBytes < 1 || !Number.isSafeInteger(maxCalls) || maxCalls < 1) throw new Error('Invalid stream limits');
+  let run;
+  let closed = false;
+  let finished = false;
+  const calls = new Map();
+  const encoder = new TextEncoder();
+  const text = value => typeof value === 'string' && value.length > 0;
+  return {
+    consume(event) {
+      if (closed || finished) throw new Error('Stream closed');
+      if (!event || typeof event !== 'object') throw new Error('Invalid event');
+      if (event.type === 'RUN_STARTED') {
+        if (run || !text(event.threadId) || !text(event.runId)) throw new Error('Invalid run start');
+        run = Object.freeze({ threadId: event.threadId, runId: event.runId });
+        return;
+      }
+      if (!run) throw new Error('Run has not started');
+      if (event.type === 'TOOL_CALL_START') {
+        if (event.toolCallName !== 'propose_dispatch' || !text(event.toolCallId) || calls.has(event.toolCallId) || calls.size >= maxCalls) throw new Error('Invalid tool call');
+        calls.set(event.toolCallId, { args: '', bytes: 0, phase: 'buffering' });
+        return;
+      }
+      if (event.type === 'TOOL_CALL_ARGS') {
+        const call = calls.get(event.toolCallId);
+        if (!call || call.phase !== 'buffering' || typeof event.delta !== 'string') throw new Error('Invalid tool arguments');
+        const size = encoder.encode(event.delta).length;
+        if (call.bytes + size > maxBytes) throw new Error('Tool arguments exceed limit');
+        call.args += event.delta; call.bytes += size;
+        return;
+      }
+      if (event.type === 'TOOL_CALL_END') {
+        const call = calls.get(event.toolCallId);
+        if (!call || call.phase !== 'buffering') throw new Error('Invalid tool end');
+        const input = JSON.parse(call.args);
+        if (!input || typeof input !== 'object' || Array.isArray(input) || !input.patch || typeof input.patch !== 'object' || Array.isArray(input.patch) || Object.keys(input).some(k => !['patch', 'reads'].includes(k)) || (input.reads !== undefined && (!Array.isArray(input.reads) || !input.reads.every(text)))) throw new Error('Invalid dispatch arguments');
+        const id = JSON.stringify([run.threadId, run.runId, event.toolCallId]);
+        // Mark completion in progress before calling host code. Reentry may
+        // dispose/end the run, but cannot complete this same call recursively.
+        call.phase = 'preparing';
+        try {
+          const proposal = makeProposal(input.patch, input.reads);
+          if (closed || finished || calls.get(event.toolCallId) !== call) throw new Error('Tool completion interrupted');
+          const result = coordinator.create(id, proposal, actor);
+          call.phase = 'ended'; call.args = ''; call.bytes = 0;
+          return result;
+        } finally {
+          if (call.phase === 'preparing') call.phase = 'buffering';
+        }
+      }
+      if (event.type === 'RUN_FINISHED' || event.type === 'RUN_ERROR') {
+        if (event.type === 'RUN_FINISHED' && (event.threadId !== run.threadId || event.runId !== run.runId || [...calls.values()].some(c => c.phase !== 'ended'))) throw new Error('Incomplete or unrelated run');
+        finished = true; calls.clear();
+        return; // Never approve, confirm, deliver, or infer command success.
+      }
+      throw new Error('Unsupported event; no state or approval authority granted');
+    },
+    dispose() { closed = true; calls.clear(); },
+  };
+}

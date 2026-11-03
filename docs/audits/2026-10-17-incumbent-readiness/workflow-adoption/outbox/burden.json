@@ -1,0 +1,22 @@
+{
+  "application.ts": {
+    "nonblankLines": 97,
+    "sha256": "bc42f3dcfe8e6556d9dea917de569b5a53e416886c87fdb1ab960163247e2a19"
+  },
+  "test.ts": {
+    "nonblankLines": 143,
+    "sha256": "4adb85bd906ad9aeee310c3702b980d8595944c59264522905ac363294ba4725"
+  },
+  "run.mjs": {
+    "nonblankLines": 15,
+    "sha256": "50b3f66d48e72c916eb10e7dd48c69c66a73490d8f5b049767d08cd2a145e021"
+  },
+  "PLAN.md": {
+    "nonblankLines": 30,
+    "sha256": "eac86c003570309e939ada820ed63d0b7ba94aa9afe8999fc55e994da2bfdf9e"
+  },
+  "tsconfig.json": {
+    "nonblankLines": 12,
+    "sha256": "71d10b2c64c27cf967cc4b8d0f7c80222fb4f81d217c450e7ee3fdfd68a380f0"
+  }
+}

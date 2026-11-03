@@ -1,0 +1,366 @@
+[
+  {
+    "command": [
+      "node",
+      "docs/research/prepared-selection-order-0/run.mjs",
+      "base",
+      "callback-controls.mjs",
+      "C",
+      "first"
+    ],
+    "exit": 1,
+    "stdout": "{\"lane\":\"base\",\"entry\":\"callback-controls.mjs\",\"control\":\"C\",\"exit\":1,\"stable\":true,\"out\":\"/private/tmp/st-prepared-selection-replay/runs/base-callback-controls.mjs-C-first\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/prepared-selection-order-0/run.mjs",
+      "base",
+      "callback-controls.mjs",
+      "C-then-X",
+      "first"
+    ],
+    "exit": 1,
+    "stdout": "{\"lane\":\"base\",\"entry\":\"callback-controls.mjs\",\"control\":\"C-then-X\",\"exit\":1,\"stable\":true,\"out\":\"/private/tmp/st-prepared-selection-replay/runs/base-callback-controls.mjs-C-then-X-first\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/prepared-selection-order-0/run.mjs",
+      "base",
+      "callback-controls.mjs",
+      "C-then-A",
+      "first"
+    ],
+    "exit": 1,
+    "stdout": "{\"lane\":\"base\",\"entry\":\"callback-controls.mjs\",\"control\":\"C-then-A\",\"exit\":1,\"stable\":true,\"out\":\"/private/tmp/st-prepared-selection-replay/runs/base-callback-controls.mjs-C-then-A-first\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/prepared-selection-order-0/run.mjs",
+      "base",
+      "callback-controls.mjs",
+      "nestedwrites",
+      "first"
+    ],
+    "exit": 1,
+    "stdout": "{\"lane\":\"base\",\"entry\":\"callback-controls.mjs\",\"control\":\"nestedwrites\",\"exit\":1,\"stable\":true,\"out\":\"/private/tmp/st-prepared-selection-replay/runs/base-callback-controls.mjs-nestedwrites-first\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/prepared-selection-order-0/run.mjs",
+      "base",
+      "callback-controls.mjs",
+      "callbackthrows",
+      "first"
+    ],
+    "exit": 1,
+    "stdout": "{\"lane\":\"base\",\"entry\":\"callback-controls.mjs\",\"control\":\"callbackthrows\",\"exit\":1,\"stable\":true,\"out\":\"/private/tmp/st-prepared-selection-replay/runs/base-callback-controls.mjs-callbackthrows-first\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/prepared-selection-order-0/run.mjs",
+      "base",
+      "callback-controls.mjs",
+      "callbackthrows-undefined",
+      "first"
+    ],
+    "exit": 1,
+    "stdout": "{\"lane\":\"base\",\"entry\":\"callback-controls.mjs\",\"control\":\"callbackthrows-undefined\",\"exit\":1,\"stable\":true,\"out\":\"/private/tmp/st-prepared-selection-replay/runs/base-callback-controls.mjs-callbackthrows-undefined-first\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/prepared-selection-order-0/run.mjs",
+      "base",
+      "callback-controls.mjs",
+      "removedselectedrows",
+      "first"
+    ],
+    "exit": 1,
+    "stdout": "{\"lane\":\"base\",\"entry\":\"callback-controls.mjs\",\"control\":\"removedselectedrows\",\"exit\":1,\"stable\":true,\"out\":\"/private/tmp/st-prepared-selection-replay/runs/base-callback-controls.mjs-removedselectedrows-first\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/prepared-selection-order-0/run.mjs",
+      "DSK1",
+      "callback-controls.mjs",
+      "C",
+      "first"
+    ],
+    "exit": 1,
+    "stdout": "{\"lane\":\"DSK1\",\"entry\":\"callback-controls.mjs\",\"control\":\"C\",\"exit\":1,\"stable\":true,\"out\":\"/private/tmp/st-prepared-selection-replay/runs/DSK1-callback-controls.mjs-C-first\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/prepared-selection-order-0/run.mjs",
+      "DSK1",
+      "callback-controls.mjs",
+      "C-then-X",
+      "first"
+    ],
+    "exit": 1,
+    "stdout": "{\"lane\":\"DSK1\",\"entry\":\"callback-controls.mjs\",\"control\":\"C-then-X\",\"exit\":1,\"stable\":true,\"out\":\"/private/tmp/st-prepared-selection-replay/runs/DSK1-callback-controls.mjs-C-then-X-first\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/prepared-selection-order-0/run.mjs",
+      "DSK1",
+      "callback-controls.mjs",
+      "C-then-A",
+      "first"
+    ],
+    "exit": 0,
+    "stdout": "{\"lane\":\"DSK1\",\"entry\":\"callback-controls.mjs\",\"control\":\"C-then-A\",\"exit\":0,\"stable\":true,\"out\":\"/private/tmp/st-prepared-selection-replay/runs/DSK1-callback-controls.mjs-C-then-A-first\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/prepared-selection-order-0/run.mjs",
+      "DSK1",
+      "callback-controls.mjs",
+      "nestedwrites",
+      "first"
+    ],
+    "exit": 1,
+    "stdout": "{\"lane\":\"DSK1\",\"entry\":\"callback-controls.mjs\",\"control\":\"nestedwrites\",\"exit\":1,\"stable\":true,\"out\":\"/private/tmp/st-prepared-selection-replay/runs/DSK1-callback-controls.mjs-nestedwrites-first\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/prepared-selection-order-0/run.mjs",
+      "DSK1",
+      "callback-controls.mjs",
+      "callbackthrows",
+      "first"
+    ],
+    "exit": 1,
+    "stdout": "{\"lane\":\"DSK1\",\"entry\":\"callback-controls.mjs\",\"control\":\"callbackthrows\",\"exit\":1,\"stable\":true,\"out\":\"/private/tmp/st-prepared-selection-replay/runs/DSK1-callback-controls.mjs-callbackthrows-first\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/prepared-selection-order-0/run.mjs",
+      "DSK1",
+      "callback-controls.mjs",
+      "callbackthrows-undefined",
+      "first"
+    ],
+    "exit": 1,
+    "stdout": "{\"lane\":\"DSK1\",\"entry\":\"callback-controls.mjs\",\"control\":\"callbackthrows-undefined\",\"exit\":1,\"stable\":true,\"out\":\"/private/tmp/st-prepared-selection-replay/runs/DSK1-callback-controls.mjs-callbackthrows-undefined-first\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/prepared-selection-order-0/run.mjs",
+      "DSK1",
+      "callback-controls.mjs",
+      "removedselectedrows",
+      "first"
+    ],
+    "exit": 1,
+    "stdout": "{\"lane\":\"DSK1\",\"entry\":\"callback-controls.mjs\",\"control\":\"removedselectedrows\",\"exit\":1,\"stable\":true,\"out\":\"/private/tmp/st-prepared-selection-replay/runs/DSK1-callback-controls.mjs-removedselectedrows-first\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/prepared-selection-order-0/run.mjs",
+      "OA",
+      "callback-controls.mjs",
+      "C",
+      "first"
+    ],
+    "exit": 0,
+    "stdout": "{\"lane\":\"OA\",\"entry\":\"callback-controls.mjs\",\"control\":\"C\",\"exit\":0,\"stable\":true,\"out\":\"/private/tmp/st-prepared-selection-replay/runs/OA-callback-controls.mjs-C-first\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/prepared-selection-order-0/run.mjs",
+      "OA",
+      "callback-controls.mjs",
+      "C-then-X",
+      "first"
+    ],
+    "exit": 0,
+    "stdout": "{\"lane\":\"OA\",\"entry\":\"callback-controls.mjs\",\"control\":\"C-then-X\",\"exit\":0,\"stable\":true,\"out\":\"/private/tmp/st-prepared-selection-replay/runs/OA-callback-controls.mjs-C-then-X-first\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/prepared-selection-order-0/run.mjs",
+      "OA",
+      "callback-controls.mjs",
+      "C-then-A",
+      "first"
+    ],
+    "exit": 0,
+    "stdout": "{\"lane\":\"OA\",\"entry\":\"callback-controls.mjs\",\"control\":\"C-then-A\",\"exit\":0,\"stable\":true,\"out\":\"/private/tmp/st-prepared-selection-replay/runs/OA-callback-controls.mjs-C-then-A-first\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/prepared-selection-order-0/run.mjs",
+      "OA",
+      "callback-controls.mjs",
+      "nestedwrites",
+      "first"
+    ],
+    "exit": 0,
+    "stdout": "{\"lane\":\"OA\",\"entry\":\"callback-controls.mjs\",\"control\":\"nestedwrites\",\"exit\":0,\"stable\":true,\"out\":\"/private/tmp/st-prepared-selection-replay/runs/OA-callback-controls.mjs-nestedwrites-first\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/prepared-selection-order-0/run.mjs",
+      "OA",
+      "callback-controls.mjs",
+      "callbackthrows",
+      "first"
+    ],
+    "exit": 1,
+    "stdout": "{\"lane\":\"OA\",\"entry\":\"callback-controls.mjs\",\"control\":\"callbackthrows\",\"exit\":1,\"stable\":true,\"out\":\"/private/tmp/st-prepared-selection-replay/runs/OA-callback-controls.mjs-callbackthrows-first\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/prepared-selection-order-0/run.mjs",
+      "OA",
+      "callback-controls.mjs",
+      "callbackthrows-undefined",
+      "first"
+    ],
+    "exit": 1,
+    "stdout": "{\"lane\":\"OA\",\"entry\":\"callback-controls.mjs\",\"control\":\"callbackthrows-undefined\",\"exit\":1,\"stable\":true,\"out\":\"/private/tmp/st-prepared-selection-replay/runs/OA-callback-controls.mjs-callbackthrows-undefined-first\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/prepared-selection-order-0/run.mjs",
+      "OA",
+      "callback-controls.mjs",
+      "removedselectedrows",
+      "first"
+    ],
+    "exit": 0,
+    "stdout": "{\"lane\":\"OA\",\"entry\":\"callback-controls.mjs\",\"control\":\"removedselectedrows\",\"exit\":0,\"stable\":true,\"out\":\"/private/tmp/st-prepared-selection-replay/runs/OA-callback-controls.mjs-removedselectedrows-first\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/prepared-selection-order-0/run.mjs",
+      "OB",
+      "callback-controls.mjs",
+      "C",
+      "first"
+    ],
+    "exit": 0,
+    "stdout": "{\"lane\":\"OB\",\"entry\":\"callback-controls.mjs\",\"control\":\"C\",\"exit\":0,\"stable\":true,\"out\":\"/private/tmp/st-prepared-selection-replay/runs/OB-callback-controls.mjs-C-first\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/prepared-selection-order-0/run.mjs",
+      "OB",
+      "callback-controls.mjs",
+      "C-then-X",
+      "first"
+    ],
+    "exit": 0,
+    "stdout": "{\"lane\":\"OB\",\"entry\":\"callback-controls.mjs\",\"control\":\"C-then-X\",\"exit\":0,\"stable\":true,\"out\":\"/private/tmp/st-prepared-selection-replay/runs/OB-callback-controls.mjs-C-then-X-first\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/prepared-selection-order-0/run.mjs",
+      "OB",
+      "callback-controls.mjs",
+      "C-then-A",
+      "first"
+    ],
+    "exit": 0,
+    "stdout": "{\"lane\":\"OB\",\"entry\":\"callback-controls.mjs\",\"control\":\"C-then-A\",\"exit\":0,\"stable\":true,\"out\":\"/private/tmp/st-prepared-selection-replay/runs/OB-callback-controls.mjs-C-then-A-first\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/prepared-selection-order-0/run.mjs",
+      "OB",
+      "callback-controls.mjs",
+      "nestedwrites",
+      "first"
+    ],
+    "exit": 0,
+    "stdout": "{\"lane\":\"OB\",\"entry\":\"callback-controls.mjs\",\"control\":\"nestedwrites\",\"exit\":0,\"stable\":true,\"out\":\"/private/tmp/st-prepared-selection-replay/runs/OB-callback-controls.mjs-nestedwrites-first\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/prepared-selection-order-0/run.mjs",
+      "OB",
+      "callback-controls.mjs",
+      "callbackthrows",
+      "first"
+    ],
+    "exit": 1,
+    "stdout": "{\"lane\":\"OB\",\"entry\":\"callback-controls.mjs\",\"control\":\"callbackthrows\",\"exit\":1,\"stable\":true,\"out\":\"/private/tmp/st-prepared-selection-replay/runs/OB-callback-controls.mjs-callbackthrows-first\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/prepared-selection-order-0/run.mjs",
+      "OB",
+      "callback-controls.mjs",
+      "callbackthrows-undefined",
+      "first"
+    ],
+    "exit": 1,
+    "stdout": "{\"lane\":\"OB\",\"entry\":\"callback-controls.mjs\",\"control\":\"callbackthrows-undefined\",\"exit\":1,\"stable\":true,\"out\":\"/private/tmp/st-prepared-selection-replay/runs/OB-callback-controls.mjs-callbackthrows-undefined-first\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/prepared-selection-order-0/run.mjs",
+      "OB",
+      "callback-controls.mjs",
+      "removedselectedrows",
+      "first"
+    ],
+    "exit": 0,
+    "stdout": "{\"lane\":\"OB\",\"entry\":\"callback-controls.mjs\",\"control\":\"removedselectedrows\",\"exit\":0,\"stable\":true,\"out\":\"/private/tmp/st-prepared-selection-replay/runs/OB-callback-controls.mjs-removedselectedrows-first\"}\n",
+    "stderr": ""
+  }
+]

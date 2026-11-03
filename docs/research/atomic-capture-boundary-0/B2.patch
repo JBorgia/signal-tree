@@ -1,0 +1,44 @@
+--- a/packages/kernel/src/lib/entity-signal.ts
++++ b/packages/kernel/src/lib/entity-signal.ts
+@@ -688,7 +688,12 @@
+     frame: EntityMutationFrame<K, E>,
+     options?: { advancePhysicalRevision?: boolean }
+   ) {
+-    const result = frame.commit(committedEntityObserver());
++    const revision=physicalCommitClock?.revision();
++    const responsibility = frame.mutations.length>0 && frame.mutations.every(m=>m.kind==='replace-value')
++      ? mutationCaptureRuntime?.prepareEntityResponsibility?.({owner:getPositionIds()?.[0] as number,ownerPath:basePath,meta:ambientMeta(),changes:frame.mutations.map(m=>({subject:m.subjectId,before:valueStore.backingForSubject(m.subjectId),after:(m as PreparedValueReplacement<K,E>).nextValue,structural:false}))})
++      : undefined;
++    if(physicalCommitClock?.revision()!==revision)throw new Error('Entity frame responsibility preparation reentered installation');
++    const result = frame.commit(committedEntityObserver(),responsibility);
+     if (options?.advancePhysicalRevision !== false) {
+       physicalCommitClock?.advance();
+     }
+--- a/packages/kernel/src/lib/physical/entity-mutation-frame.ts
++++ b/packages/kernel/src/lib/physical/entity-mutation-frame.ts
+@@ -1,3 +1,4 @@
++import type { TerminalRecordPlan } from '../internals/intrinsic-mutation';
+ import type { CommittedEntityMutation } from '../internals/mutation-capture-runtime';
+ import { EntityValueStore } from './entity-value-store';
+ import {
+@@ -153,7 +154,8 @@
+    * preparation failure throws before anything applies or is reported.
+    */
+   commit(
+-    observeCommitted?: (changes: readonly CommittedEntityMutation[]) => void
++    observeCommitted?: (changes: readonly CommittedEntityMutation[]) => void,
++    responsibility?: TerminalRecordPlan
+   ): EntityMutationCommitResult {
+     const preparedMutations = this.prepareCommitInstructions();
+     // Before-images of touched lifetimes only. An inactive lifetime's retained
+@@ -250,6 +252,10 @@
+       physicallyChangedSubjectIds.add(mutation.subjectId);
+     }
+
++    if (responsibility) {
++      for(let i=0;i<responsibility.writes.length;i++){const w=responsibility.writes[i];w.map.set(w.key,w.value);}
++      for(let i=0;i<responsibility.adds.length;i++){const a=responsibility.adds[i];a.set.add(a.value);}
++    }
+     if (before && observeCommitted) {
+       observeCommitted(
+         [...before].map(([subject, entry]) => ({

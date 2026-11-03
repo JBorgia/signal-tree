@@ -1,0 +1,78 @@
+--- a/packages/vue/src/lib/vue-observation.ts
++++ b/packages/vue/src/lib/vue-observation.ts
+@@ -33,13 +33,13 @@
+   asReadonly(): VueReadonlyCell<T>;
+ }
+
+-const wrapReadonlyCell = <T>(source: ComputedRef<T>): VueReadonlyCell<T> => {
+-  const cell = (() => source.value) as VueReadonlyCell<T>;
++const wrapReadonlyCell = <T>(source: ComputedRef<T>, read: () => T = () => source.value): VueReadonlyCell<T> => {
++  const cell = (() => read()) as VueReadonlyCell<T>;
+   Object.defineProperties(cell, {
+     __v_isRef: { value: true },
+     __v_isReadonly: { value: true },
+     effect: { value: source.effect },
+-    value: { get: () => source.value },
++    value: { get: read },
+   });
+   return cell;
+ };
+@@ -65,6 +65,7 @@
+
+ export const createVueObservationAdapter = (): ObservationAdapter => {
+   let invalidationGroupDepth = 0;
++  let deliveryDepth = 0;
+   const pendingInvalidations = new Set<() => void>();
+
+   const scheduleInvalidation = (invalidate: () => void): void => {
+@@ -147,8 +148,20 @@
+     }),
+
+     createReadonlyCell: <T>(computeValue: () => T) => {
+-      const source = computed(computeValue);
+-      return wrapReadonlyCell(source);
++      let evaluations = 0;
++      const source = computed(() => {
++        evaluations += 1;
++        return computeValue();
++      });
++      return wrapReadonlyCell(source, () => {
++        const before = evaluations;
++        const value = source.value;
++        if (deliveryDepth === 0 || invalidationGroupDepth > 0 || evaluations !== before) return value;
++        // Native invalidations are delivered serially. A different source can
++        // already be publishing while this owned readonly carrier is cached.
++        // Refresh the owned read only at delivery, never inside a grouped body.
++        return computeValue();
++      });
+     },
+
+     runInvalidationGroup(run): void {
+@@ -165,15 +178,20 @@
+         if (invalidationGroupDepth === 0 && pendingInvalidations.size > 0) {
+           const invalidations = [...pendingInvalidations];
+           pendingInvalidations.clear();
+-          for (const invalidate of invalidations) {
+-            try {
+-              invalidate();
+-            } catch (error) {
+-              if (!hasFailure) {
+-                failure = error;
+-                hasFailure = true;
++          deliveryDepth += 1;
++          try {
++            for (const invalidate of invalidations) {
++              try {
++                invalidate();
++              } catch (error) {
++                if (!hasFailure) {
++                  failure = error;
++                  hasFailure = true;
++                }
+               }
+             }
++          } finally {
++            deliveryDepth -= 1;
+           }
+         }
+       }

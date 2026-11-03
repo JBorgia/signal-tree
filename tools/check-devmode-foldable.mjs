@@ -107,7 +107,7 @@ async function measure(id, code, define) {
  * must fold away. Thrown-error codes (ST1xxx, ST2004-ST2006) are intentionally
  * retained in production and are NOT listed here.
  */
-const WARN_ONLY_CODES = ['ST2001', 'ST2002', 'ST2003', 'ST2007'];
+const WARN_ONLY_CODES = ['ST2001', 'ST2002', 'ST2003', 'ST2007', 'ST2026'];
 
 /** Advisory literals that must NOT survive an ngDevMode=false build. */
 function findDiagnostics(text) {

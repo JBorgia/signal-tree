@@ -1,0 +1,121 @@
+--- a/packages/kernel/src/enhancers/transactions/transactions.ts
++++ b/packages/kernel/src/enhancers/transactions/transactions.ts
+@@ -2629,7 +2629,7 @@
+     // v16 8e).
+     beginStructuralWrite();
+     openPhysicalRows(positionRegistry);
+-    let result: ReturnType<typeof rollbackPendingTurnAt>;
++    let result: ReturnType<typeof rollbackPendingTurnAt> | { ok: true };
+     let failed = true;
+     try {
+       // Path observers see what the tree exposes, never a location's
+@@ -2650,44 +2650,51 @@
+             // that spreads `getActiveWriteContext()` carries the namespace.
+             ownerId: positionRegistry?.id,
+           },
+-          () => rollbackPendingTurnAt({
+-            authority: authorityPosition,
+-            turnId: transactionId,
+-            store,
+-            topology: positionRegistry,
+-            realizationContext,
+-            port: {
+-              // Keep the established normalized admission and discard path.
+-              // Only the physical application route is replaced.
+-              validateEffects: (normalized) => realizationPort.validateEffects?.(normalized),
+-              applyAtomically(normalized): void {
+-                if (
+-                  orderDeltas.length > 0 ||
+-                  (normalized.some(e => e.subjectId === undefined) && normalized.some(e => e.subjectId !== undefined)) ||
+-                  requiresDeclarativeStructuralTarget(
+-                    normalized,
+-                    (owner) => {
+-                      let binding: CollectionTransitionTargetBinding | undefined;
+-                      visitTree(tree.$, (node) => {
+-                        const candidate = (
+-                          node as {
+-                            __prepareTransitionTarget?: CollectionTransitionTargetBinding;
+-                          }
+-                        ).__prepareTransitionTarget;
+-                        if (candidate?.owner === owner) binding = candidate;
+-                        return undefined;
+-                      });
+-                      return binding?.readSource();
+-                    }
+-                  )
+-                ) {
+-                  rollbackPendingTarget(normalized, orderDeltas, completion);
+-                } else {
+-                  realizationPort.applyAtomically(normalized);
++          () => {
++            // Keep the baseline complete-target admission for structural
++            // handoffs/order: per-effect occupancy is not its admissibility test.
++            if (
++              orderDeltas.length > 0 ||
++              requiresDeclarativeStructuralTarget(
++                effects.map(toRollbackEffect),
++                (owner) => {
++                  let binding: CollectionTransitionTargetBinding | undefined;
++                  visitTree(tree.$, (node) => {
++                    const candidate = (
++                      node as {
++                        __prepareTransitionTarget?: CollectionTransitionTargetBinding;
++                      }
++                    ).__prepareTransitionTarget;
++                    if (candidate?.owner === owner) binding = candidate;
++                    return undefined;
++                  });
++                  return binding?.readSource();
+                 }
++              )
++            ) {
++              rollbackPendingTarget(effects.map(toRollbackEffect), orderDeltas, completion);
++              return { ok: true as const };
++            }
++            return rollbackPendingTurnAt({
++              authority: authorityPosition,
++              turnId: transactionId,
++              store,
++              topology: positionRegistry,
++              realizationContext,
++              port: {
++                validateEffects: (normalized) => realizationPort.validateEffects?.(normalized),
++                applyAtomically(normalized): void {
++                  // D2's additional mixed route keeps ordinary normalized
++                  // admission; it changes physical installation only.
++                  if (normalized.some(e => e.subjectId === undefined) && normalized.some(e => e.subjectId !== undefined)) {
++                    rollbackPendingTarget(normalized, orderDeltas, completion);
++                  } else {
++                    realizationPort.applyAtomically(normalized);
++                  }
++                },
+               },
+-            },
+-          })
++            });
++          }
+         )
+       );
+       failed = false;
+--- a/packages/kernel/src/lib/entity-signal.ts
++++ b/packages/kernel/src/lib/entity-signal.ts
+@@ -649,9 +649,16 @@
+             basePath,
+             [publication.subjectId],
+             getPositionIdsForNotify(),
+-            structuralEffect
+-              ? createStructuralEffectMeta(structuralEffect)
+-              : ambientMeta()
++            {
++              ...(structuralEffect
++                ? createStructuralEffectMeta(structuralEffect)
++                : ambientMeta()),
++              // Replay publishes retained storage too. Apply the same exposed
++              // path protocol as the ordinary realization adapter, without
++              // changing the ambient context of subsequent application taps.
++              intent: 'system',
++              participation: 'realized',
++            }
+           );
+           // Replay taps describe the change actually installed. A rekey has
+           // no lifecycle tap, matching changeId; unchanged rows stay silent.

@@ -1,0 +1,27 @@
+{
+  "archive": "evidence.tar.xz",
+  "sha256": "461987ff930dfaf5675a8db63dc02651a27bd32df79636a130288e049da1149c",
+  "files": {
+    "PLAN.md": "ea603c4d0c13fa861082ee830c0113730642baf5503dece78031c86b291d4f58",
+    "RESULT.md": "fc5745d6553377cf020bacd0823284f5f85bc5cea9b17d826fc3d5b417564c2c",
+    "bundle.mjs": "c4e35709b356d3740997e7cc246a6b428d53e7b03107f5adddcd195ed856e3bc",
+    "counts.json": "0e8aa1abac00aa7c25c244de0b45c92e8c2c7c9615187a70be5c416e9f73d063",
+    "counts.log": "0e8aa1abac00aa7c25c244de0b45c92e8c2c7c9615187a70be5c416e9f73d063",
+    "counts.py": "46aee314a9693b62f0bc35b33c4bce5a1186e85cd7c89078dffc53532eed4db4",
+    "editor-first.ts": "e30ac8d98ceedbdba2f7e9846b290ca89668117c6d69f5e53dba40011f3327a7",
+    "editor.ts": "87b0d0552aca9838712af080fe4832baaabb0b6497cc39340e6f0074bb8bebe7",
+    "plan-before-run.sha256": "91b6492689b9dadf3b107736e78a293fb15dc68843d84745769c108ce743345f",
+    "receipt-first.json": "fadda9d996f4fab1c10f3f5cf77ec8a7c98304e0b1b1f9321727e53ee1eb44df",
+    "receipt.json": "b1ad878a64228338eaa3c5027ef6774fea40063611c5f11ef34e1b9242a7ac8e",
+    "results-first.json": "9244421af4ff3db97011c32c8606b1232322a28fc4035fe27132b2ba94f14cdb",
+    "results.json": "08c6e0afe8862c2a931fd9507be078eedbd0ed937884cf4b9ab69bf8c4bde562",
+    "run-final.log": "08c6e0afe8862c2a931fd9507be078eedbd0ed937884cf4b9ab69bf8c4bde562",
+    "run-first.log": "9244421af4ff3db97011c32c8606b1232322a28fc4035fe27132b2ba94f14cdb",
+    "run.mjs": "af0344853c6bc909d04e9cfed897180a4cd9ff83021fc6e1da546230c05b55a7",
+    "scenario-first.ts": "c1f9ac6c5acfcd24ae1d07429e0f387f8ad53167e23b62428242a55775224622",
+    "scenario.ts": "83b12e52f73dd20db375ae8d3cb8adf0d4bbe1c1e07e8ee536c9cfa91ce20460",
+    "tsconfig.json": "8ed351add34500f24ac5783c295925a17ab1ff5c52cc40035b12e3b6dbc7f287",
+    "typecheck-final.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "typecheck-first.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  }
+}

@@ -280,11 +280,16 @@ describe('a throwing observer cannot strand a transaction or silence Link', () =
     const relation = link(tree.$.x, { set: (v) => void sent.push(v) });
     await flush();
     sent.length = 0;
-    const port = getTreeRealizationPort(tree.$ as object) as {
-      validateEffects: (...args: unknown[]) => unknown;
+    const port = getTreeRealizationPort(tree.$ as object);
+    if (!port?.prepareSelectedUnit) throw new Error('Expected selected preparation port');
+    const original = port.prepareSelectedUnit;
+    const refusal = new Error('injected pre-install selected preparation failure: structural-drift');
+    let refusalCalls = 0, returnedPlans = 0;
+    port.prepareSelectedUnit = function (...args) {
+      refusalCalls++;
+      if (refusalCalls === 1) throw refusal; // No original call or installable plan.
+      const plan = original.apply(this, args); returnedPlans++; return plan;
     };
-    const original = port.validateEffects;
-    port.validateEffects = () => ({ kind: 'structural-drift' });
     let thrown: unknown;
     try {
       try {
@@ -295,7 +300,9 @@ describe('a throwing observer cannot strand a transaction or silence Link', () =
       } catch (error) {
         thrown = error;
       }
-      port.validateEffects = original;
+      port.prepareSelectedUnit = original;
+      expect(refusalCalls).toBe(1);
+      expect(returnedPlans).toBe(0); // Preparation threw before any compensation plan could install.
       const recovery = (
         thrown as { recovery?: { transaction: { confirm(): void } } }
       )?.recovery;
@@ -306,7 +313,7 @@ describe('a throwing observer cannot strand a transaction or silence Link', () =
       expect(await settledWithin(relation)).toBe(true);
       expect(sent.at(-1)).toBe(1);
     } finally {
-      port.validateEffects = original;
+      port.prepareSelectedUnit = original;
       relation.dispose();
       tree.destroy();
     }
@@ -762,20 +769,27 @@ describe('failures after the callback returns (16.x)', () => {
       destroy(): void;
     };
     const offInv = tree.$.inv.subscribe(() => undefined);
-    const port = getTreeRealizationPort(tree.$ as object) as {
-      validateEffects: (...args: unknown[]) => unknown;
+    const port = getTreeRealizationPort(tree.$ as object);
+    if (!port?.prepareSelectedUnit) throw new Error('Expected selected preparation port');
+    const original = port.prepareSelectedUnit;
+    const refusal = new Error('injected pre-install selected preparation failure: structural-drift');
+    let refusalCalls = 0, returnedPlans = 0;
+    port.prepareSelectedUnit = function (...args) {
+      refusalCalls++;
+      if (refusalCalls === 1) throw refusal; // No original call or installable plan.
+      const plan = original.apply(this, args); returnedPlans++; return plan;
     };
-    const original = port.validateEffects;
-    port.validateEffects = () => ({ kind: 'structural-drift' });
     let thrown: unknown;
     try {
       tree.transact(() => tree.$.x(1));
     } catch (error) {
       thrown = error;
     } finally {
-      port.validateEffects = original;
+      port.prepareSelectedUnit = original;
     }
     try {
+      expect(refusalCalls).toBe(1);
+      expect(returnedPlans).toBe(0); // Preparation threw before any compensation plan could install.
       const recovery = (
         thrown as {
           recovery?: {
@@ -829,21 +843,28 @@ describe('failures after the callback returns (16.x)', () => {
         throw new Error('capture release failed');
       },
     };
-    const port = getTreeRealizationPort(tree.$ as object) as {
-      validateEffects: (...args: unknown[]) => unknown;
+    const port = getTreeRealizationPort(tree.$ as object);
+    if (!port?.prepareSelectedUnit) throw new Error('Expected selected preparation port');
+    const original = port.prepareSelectedUnit;
+    const refusal = new Error('injected pre-install selected preparation failure: structural-drift');
+    let refusalCalls = 0, returnedPlans = 0;
+    port.prepareSelectedUnit = function (...args) {
+      refusalCalls++;
+      if (refusalCalls === 1) throw refusal; // No original call or installable plan.
+      const plan = original.apply(this, args); returnedPlans++; return plan;
     };
-    const original = port.validateEffects;
-    port.validateEffects = () => ({ kind: 'structural-drift' });
     let thrown: unknown;
     try {
       tree.transact(() => tree.$.x(1));
     } catch (error) {
       thrown = error;
     } finally {
-      port.validateEffects = original;
+      port.prepareSelectedUnit = original;
       host[MUTATION_CAPTURE_RUNTIME] = previous;
     }
     try {
+      expect(refusalCalls).toBe(1);
+      expect(returnedPlans).toBe(0); // Preparation threw before any compensation plan could install.
       const recovery = (
         thrown as {
           recovery?: {
@@ -879,21 +900,28 @@ describe('failures after the callback returns (16.x)', () => {
         throw failure;
       },
     };
-    const port = getTreeRealizationPort(tree.$ as object) as {
-      validateEffects: (...args: unknown[]) => unknown;
+    const port = getTreeRealizationPort(tree.$ as object);
+    if (!port?.prepareSelectedUnit) throw new Error('Expected selected preparation port');
+    const original = port.prepareSelectedUnit;
+    const refusal = new Error('injected pre-install selected preparation failure: structural-drift');
+    let refusalCalls = 0, returnedPlans = 0;
+    port.prepareSelectedUnit = function (...args) {
+      refusalCalls++;
+      if (refusalCalls === 1) throw refusal; // No original call or installable plan.
+      const plan = original.apply(this, args); returnedPlans++; return plan;
     };
-    const original = port.validateEffects;
-    port.validateEffects = () => ({ kind: 'structural-drift' });
     let thrown: unknown;
     try {
       tree.transact(() => tree.$.x(1));
     } catch (error) {
       thrown = error;
     } finally {
-      port.validateEffects = original;
+      port.prepareSelectedUnit = original;
       host[MUTATION_CAPTURE_RUNTIME] = previous;
     }
     try {
+      expect(refusalCalls).toBe(1);
+      expect(returnedPlans).toBe(0);
       expect(report).toHaveBeenCalledWith(
         expect.stringContaining('rollback was then refused'),
         failure
@@ -970,11 +998,16 @@ describe('failures after the callback returns (16.x)', () => {
         throw new Error('capture release failed');
       },
     };
-    const port = getTreeRealizationPort(tree.$ as object) as {
-      validateEffects: (...args: unknown[]) => unknown;
+    const port = getTreeRealizationPort(tree.$ as object);
+    if (!port?.prepareSelectedUnit) throw new Error('Expected selected preparation port');
+    const original = port.prepareSelectedUnit;
+    const refusal = new Error('injected pre-install selected preparation failure: structural-drift');
+    let refusalCalls = 0, returnedPlans = 0;
+    port.prepareSelectedUnit = function (...args) {
+      refusalCalls++;
+      if (refusalCalls === 1) throw refusal; // No original call or installable plan.
+      const plan = original.apply(this, args); returnedPlans++; return plan;
     };
-    const original = port.validateEffects;
-    port.validateEffects = () => ({ kind: 'structural-drift' });
     report.mockImplementation(() => {
       throw new Error('fail-on-console');
     });
@@ -984,13 +1017,15 @@ describe('failures after the callback returns (16.x)', () => {
     } catch (error) {
       thrown = error;
     } finally {
-      port.validateEffects = original;
+      port.prepareSelectedUnit = original;
       host[MUTATION_CAPTURE_RUNTIME] = previous;
     }
     try {
       expect((thrown as Error | undefined)?.message).not.toBe(
         'fail-on-console'
       );
+      expect(refusalCalls).toBe(1);
+      expect(returnedPlans).toBe(0); // Preparation threw before any compensation plan could install.
       const recovery = (
         thrown as { recovery?: { transaction: { confirm(): void } } }
       )?.recovery;
@@ -1166,9 +1201,15 @@ describe('failures after the callback returns (16.x)', () => {
     }
   });
 
-  it('the throwing-callback rollback is unchanged from 9df8fbff', async () => {
-    // An observer writes the same row while the failed callback is rolled
-    // back; 9df8fbff rolled the callback back regardless, and so does this.
+  it('a throwing callback refuses rollback over a later observer write', async () => {
+    // Deliberate correction of the 9df8fbff compatibility characterization,
+    // as v15 corrected it in cf98697a: callback failure cannot authorize
+    // overwriting a later writer (L4). The window-based refusal is still
+    // post-callback only; what changed is order. The observer's write used to
+    // receive an OLDER turn id than the transaction it observed, so the
+    // dependency plan could not see it (transaction-reentrant-order.spec.ts).
+    // v16 keeps pending authority and hands back recovery rather than v15's
+    // record-as-committed containment.
     type Row = { id: string; v: number };
     const tree = signalTree(
       { rows: entityMap<Row, string>({ selectId: (r) => r.id }) },
@@ -1183,16 +1224,41 @@ describe('failures after the callback returns (16.x)', () => {
     });
     const boom = new Error('boom');
     try {
-      expect(() =>
+      let failure: unknown;
+      try {
         tree.transact(() => {
           tree.$.rows.updateOne('A', { v: 1 });
           throw boom;
-        })
-      ).toThrow(boom);
+        });
+      } catch (error) {
+        failure = error;
+      }
+      expect(failure).toMatchObject({
+        code: 'SIGNALTREE_ROLLBACK_FAILED',
+        cause: { kind: 'later-confirmed-dependency' },
+      });
+      const recovery = (
+        failure as {
+          recovery?: {
+            transaction: { confirm(): void };
+            callbackFailed: boolean;
+            callbackError: unknown;
+          };
+        }
+      ).recovery;
+      expect(recovery?.callbackFailed).toBe(true);
+      expect(recovery?.callbackError).toBe(boom);
       await flush();
-      // Compatibility characterization, NOT a safety assertion: this path
-      // still overwrites the observer's later v=5 with the baseline.
-      expect(tree.$.rows.byIdOrFail('A')().v).toBe(0);
+      expect(tree.$.rows.byIdOrFail('A')().v).toBe(5);
+      expect(peekInternalTransactionRuntime(tree)?.getPendingTurnCount()).toBe(
+        1
+      );
+      expect(hasOpenCommitScope(tree as object)).toBe(true);
+      recovery?.transaction.confirm();
+      expect(peekInternalTransactionRuntime(tree)?.getPendingTurnCount()).toBe(
+        0
+      );
+      expect(hasOpenCommitScope(tree as object)).toBe(false);
     } finally {
       off();
       tree.destroy();

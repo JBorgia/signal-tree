@@ -1,0 +1,26 @@
+
+> nx run vue:test --testNamePattern=Vue entity projection publication|Vue owned collection publication|4c coherent value settlement
+
+> pnpm exec tsc --noEmit -p packages/vue/tsconfig.spec.json && npx vitest run --config packages/vue/vitest.config.ts --testNamePattern="Vue entity projection publication|Vue owned collection publication|4c coherent value settlement"
+
+(node:74817) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+packages/vue/src/lib/vue-observation.ts(117,40): error TS2339: Property 'value' does not exist on type '{ read: () => number; advance: () => void; }'.
+Warning: command "pnpm exec tsc --noEmit -p packages/vue/tsconfig.spec.json && npx vitest run --config packages/vue/vitest.config.ts --testNamePattern="Vue entity projection publication|Vue owned collection publication|4c coherent value settlement"" exited with non-zero status code
+
+
+ NX   Running target test for project vue failed
+
+Failed tasks:
+
+- vue:test
+
+Hint: run the command with --verbose for more details.
+
+  Run duration:      6.4s
+  Critical path:     6.3s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Speed up or split the longest tasks on the critical path:
+        vue:test    6.3s

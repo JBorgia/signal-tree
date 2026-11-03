@@ -5,6 +5,47 @@ semantics. The construction model is
 `signalTree(initialState, { derived, enhancers })`; state is read through
 `tree.$`.
 
+## v16 Link declarations and native reader migration
+
+`connection.declare(declaration, work)` declares complete inputs for synchronous
+writes to its supported owned SignalTree source. Use `{ kind: 'independent' }`
+only with no pending-owner inputs; `{ kind: 'dependent', owners: [pending] }`
+for all contributing owners; `{ kind: 'unknown' }` when completeness is unknown.
+Input owners do not acquire ownership of the callback's writes. Native evidence
+still applies; hidden inputs, saved values and application-computed caches are
+the application's completeness responsibility.
+
+No async callback, returned thenable or declaration across await. Callback results
+are discarded. Invalid declarations may throw after writes have occurred; those
+writes can remain. `SignalTreePublicationError.stage` distinguishes
+`before-callback` from `after-callback`; `reason` describes the rejection. Inspect
+current state before recovery. This is not an atomic rollback wrapper.
+
+`receipt.read()` is a current immutable admission snapshot, not a reactive signal
+or delivery acknowledgment. `no-write` creates no new obligation and does not
+approve or clear an existing one. Equal values can have different publication
+support. `eligible`/`started` do not prove remote acceptance; even `settled()` can
+resolve after endpoint failure reported through `onTreeError()`. After successful
+dependency rejection, reevaluate current ordinary publication under current gates;
+do not treat the old declaration as approved or expect the application recipe to
+rerun. A surviving value may still publish.
+
+Link only supported owned leaves, branches/roots, entity fields/rows/collections;
+roots or branches containing EntityMap are excluded (link the collection itself).
+Unowned callables and native computeds are not admitted just because their types
+match. Use one framework facade consistently.
+
+Native custom adapters with createWritableCell + createWritableProjection +
+createReadonlyCell must add callable `createCurrentReadonlyCell(readCurrent)`.
+It must lazily provide the promised native readonly carrier, stable identity,
+tracking/cleanup and fresh values/errors on every direct read, including readers
+retained before callbacks and nested writes. Missing capability rejects factory
+construction before initial-state reads/tree allocation. Keep ordinary cached
+readonly behavior; do not fake native carriers or flush application computeds.
+Token-only/partial adapters keep portable routing. SignalTree-held reader freshness
+does not change application-computed framework timing. These are v16 requirements;
+stable v15 remains unchanged. See the kernel README for a declaration example.
+
 ## What SignalTree is — and is not
 
 ```text
@@ -44,7 +85,9 @@ anything under `@signal-tree/*`. Generate `@signal-tree/*` names for new code:
   PENDING, so `confirm()` and a retried `rollback()` both stay available. Settle
   the NEWEST open transaction first; rolling an older one back while a newer
   overlapping one is open refuses with
-  `cause.kind === 'later-pending-dependency'`.
+  `cause.kind === 'later-confirmed-dependency'`. A newer pending transaction
+  that omitted or re-added a branch enclosing the older one's writes counts as
+  overlapping.
 - `@signal-tree/angular` — the complete Angular application facade. **Angular
   code imports `signalTree` and all other SignalTree APIs from here**. Terminal
   state leaves are native `WritableSignal<T>` values and derived leaves are
@@ -64,6 +107,19 @@ anything under `@signal-tree/*`. Generate `@signal-tree/*` names for new code:
 Use `@signal-tree/kernel` directly only for framework-neutral TypeScript,
 including reusable domain libraries. Framework facades forward the neutral
 kernel surface by canonical identity; they do not duplicate semantic authority.
+
+## Current reads during callbacks (v16)
+
+Root/object-branch snapshots and entity-projection readers consult current
+installed state during callbacks, including readers acquired earlier. A retained
+snapshot reader is not a historical snapshot: store its result to retain a value.
+
+Native terminal leaves, application-created computed values, effects and React
+renders retain framework publication timing. Snapshot freshness does not flush
+those consumers. Read-after-write means after installation, not during
+preparation before the write exists. Nested writes still follow the documented
+whole-value ordering and omission rules; freshness does not change which later
+writes win.
 
 ## Accessor grammar and terminal values
 
@@ -200,3 +256,28 @@ of the same model.
 - `docs/guides/persistence-guide.md` — the `link()`-as-storage recipe
 - `docs/guides/migration-v14-v15.md` — `@signaltree/*` → `@signal-tree/*` migration (rename, consolidation, removed APIs)
 - `docs/migration/post-rc1-workstream.md` — greenfield-first post-RC program
+
+### Read-only runtime observation
+
+Tooling can import `stateLocationReader`, `entityMembershipReader`,
+`linkStateReader`, `transactionLifecycleReader` and `restorationReader` from
+`@signal-tree/kernel/internals`. These observe the constructed tree; they do not
+install enhancers or confer mutation/settlement authority. Use the appropriate
+framework facade for application state, and reserve this entry point for tooling.
+
+- `stateLocationReader` resolves structured property/entity addresses and current
+  entity lifetimes. Do not parse dotted display paths as identity.
+- `entityMembershipReader` exposes current collection membership and changes.
+- `linkStateReader` observes Link state; local completion is not proof of remote
+  durable persistence beyond the endpoint's contract.
+- `transactionLifecycleReader` exposes pending transactions and settlement/refusal
+  observations, including whether pending authority remains.
+- `restorationReader` exposes history entries, recorded transaction lineage and undo/redo/jump outcomes.
+
+Check optional-reader availability before use; readers do not enable missing
+capabilities. Release subscriptions when the owning view/session ends, and destroy
+owned trees at teardown. Readers are not a retained audit log.
+`ConfirmedTurnEffectView.fieldSegments` preserves producer-known entity-field
+address segments; `plainBranchMembership` distinguishes member presence before
+and after an effect. Neither display paths nor an absent value can replace those
+facts. Confirmed-history access remains subject to configured retention.

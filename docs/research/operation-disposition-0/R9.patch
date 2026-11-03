@@ -1,0 +1,11 @@
+--- a/packages/kernel/src/enhancers/transactions/transactions.ts
++++ b/packages/kernel/src/enhancers/transactions/transactions.ts
+@@ -2721,6 +2721,8 @@
+                       point.install();
+                       if (completion) completion.committed = true;
+                       point.publish();
++                    } else if (normalized.some(effect => effect.plainBranchMembership)) {
++                      rollbackPendingTarget(normalized, orderDeltas, completion);
+                     } else {
+                       realizationPort.applyAtomically(normalized);
+                     }

@@ -1,0 +1,21 @@
+{
+  "README.md": "d381d5fc019607847bd2ca3b15c9dd3054f47f76feab1e22c6e5549169f5604c",
+  "artifact-consumer/angular.ts": "7b088575a8fa1aa43c349ba3816af18a561b4d16f280c59b1dd03b7cd5e34c88",
+  "artifact-consumer/kernel.ts": "7f821c5df7103a27fac6eee8046bc681610e12ff4d3459854f3c1792aa473dc9",
+  "artifact-consumer/react.ts": "b15d35f3b35f7f7d38b6fda6a5f8cf4e79ba83b0365fa06925de52eea53d0312",
+  "artifact-consumer/solid.ts": "bbf35ec3d3563126c56d1e3992a12e22466603078647a70883e1e08af8e10487",
+  "artifact-consumer/tsconfig.json": "4031ffa3f5fd8d90058c7b013c9534b82ca473793e0e146f055d2f31279bdb18",
+  "artifact-consumer/vue.ts": "6da5c80fe729078b7383af815dfde9c7e52194f1cc88464f07914acd4bf70a48",
+  "artifact-consumer-setup.py": "7a8491b9a087bba7d1742e3c178676af89e0dd65a7c5a05eaf86038b9b6bf9b5",
+  "destination-receipt.json": "43b1f6bd63b6b9655447d464863ed53f9f1f2f961ed910eef439d8d0cdf06ccf",
+  "raw-evidence-manifest.json": "3830d1f114f3a2a49e49e721b579ae8872090d5515171cb2c056dd6856fb18ed",
+  "raw-evidence.tar.xz": "4716744e49f2d60209ae0897bf76da6e265cc62af1b5c5711849b4a49998580d",
+  "review/REVIEW.md": "7aa9e72aac5abf95c8fb8efb54dbd43f95159c621377e7d08466d1036abe55ff",
+  "review/probe.ts": "1492456b425fdd141c12e3f25442febb7df72b14ef422ce66e4fc8e001c09f2f",
+  "review/tsconfig.json": "4c4a6606dd45005c59ea4c9969c560ed1ff19e3bdfd2c615087a03670af98ef8",
+  "runtime-equivalence.cjs": "f9b4052e5504aa1eb204629290350b2e149a24f8224a4ef22c610bc9c3bb737d",
+  "st-unknown-access-RESULT.md": "dd7369819a1903a7b1544fe92dc2920871978d52fc07eaf74d863ed2f9e4469b",
+  "st-unknown-access-manifest.json": "5d3bc99304ef08b5ecf70103ac4bf13f55ba2767f560e4373bb4fd8ddfd5b221",
+  "st-unknown-access-original-typing.spec.ts": "8a27fc3d0cd9a3e7757008ff0ecec15c67d7437b1766adb0ab3b9a0c8d29b1da",
+  "st-unknown-access-spec-migration-equivalence.json": "967b20207564ab87060eff1324e8474728eb6318e700a3afb11cee885133de9a"
+}

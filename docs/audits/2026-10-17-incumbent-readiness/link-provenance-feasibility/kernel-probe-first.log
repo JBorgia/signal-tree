@@ -1,0 +1,89 @@
+{
+  "sameObservedTrace": true,
+  "direct": {
+    "pending": {
+      "events": [
+        {
+          "path": "x",
+          "value": 7,
+          "prev": 0,
+          "meta": {
+            "transactionId": "pending-owner",
+            "transactionOwner": {},
+            "mutationIntent": "replace",
+            "ownerId": "tree"
+          },
+          "active": null
+        },
+        {
+          "path": "y",
+          "value": 7,
+          "prev": 0,
+          "meta": {
+            "mutationIntent": "replace",
+            "ownerId": "tree"
+          },
+          "active": null
+        }
+      ],
+      "sent": [],
+      "state": {
+        "x": 7,
+        "y": 7
+      },
+      "active": null
+    },
+    "afterConfirm": {
+      "sent": [
+        7
+      ],
+      "state": {
+        "x": 7,
+        "y": 7
+      }
+    }
+  },
+  "copy": {
+    "pending": {
+      "events": [
+        {
+          "path": "x",
+          "value": 7,
+          "prev": 0,
+          "meta": {
+            "transactionId": "pending-owner",
+            "transactionOwner": {},
+            "mutationIntent": "replace",
+            "ownerId": "tree"
+          },
+          "active": null
+        },
+        {
+          "path": "y",
+          "value": 7,
+          "prev": 0,
+          "meta": {
+            "mutationIntent": "replace",
+            "ownerId": "tree"
+          },
+          "active": null
+        }
+      ],
+      "sent": [],
+      "state": {
+        "x": 7,
+        "y": 7
+      },
+      "active": null
+    },
+    "afterConfirm": {
+      "sent": [
+        7
+      ],
+      "state": {
+        "x": 7,
+        "y": 7
+      }
+    }
+  }
+}

@@ -1,0 +1,90 @@
+{
+  "status": "incomplete after 600 seconds; no final counts",
+  "reportedFailureCases": 24,
+  "files": [
+    {
+      "file": "src/lib/production-scalar-substrate.benchmark.spec.ts",
+      "reported": "8 tests | 1 failed | 1 skipped",
+      "names": [
+        "proves compiled scalar reads and writes stay constant in logical work"
+      ]
+    },
+    {
+      "file": "src/lib/absent-path-write.spec.ts",
+      "reported": "77 tests | 3 failed",
+      "names": [
+        "a directly omitted leaf (transactions alone)",
+        "a directly omitted leaf (transactions first)",
+        "a directly omitted leaf (restoration first)"
+      ]
+    },
+    {
+      "file": "src/lib/branch-omission-correctness.spec.ts",
+      "reported": "35 tests | 1 failed",
+      "names": [
+        "rollback retains the original scalar baseline when a later replacement omits it"
+      ]
+    },
+    {
+      "file": "src/enhancers/transactions/transactions.spec.ts",
+      "reported": "14 tests | 1 failed",
+      "names": [
+        "throws rollback error with preserved callback failure when realization-port validation refuses and does not fallback to the scoped resolver"
+      ]
+    },
+    {
+      "file": "src/enhancers/restoration/restoration-missing-anchors.spec.ts",
+      "reported": "26 tests | 1 failed",
+      "names": [
+        "preserves reversed placement and held lifetime"
+      ]
+    },
+    {
+      "file": "src/enhancers/transactions/recovery-handle-0.spec.ts",
+      "reported": "7 tests | 5 failed",
+      "names": [
+        "the thrown error carries a handle to the still-pending transaction",
+        "the recovered handle can settle once the conflict is gone",
+        "callbackFailed is explicit, because callbackError cannot carry it",
+        "a refused rollback on a healthy callback is unchanged",
+        "reports the partial turn it hands back, not just how to settle it"
+      ]
+    },
+    {
+      "file": "src/lib/heterogeneous-atomicity.spec.ts",
+      "reported": "4 tests | 2 failed",
+      "names": [
+        "leaves everything neutral when the transaction throws",
+        "leaves everything neutral when the transaction is rolled back"
+      ]
+    },
+    {
+      "file": "src/lib/link-absent-locations.spec.ts",
+      "reported": "21 tests | 6 failed",
+      "names": [
+        "rollback of transactions that re-add the location, a sibling and the rows",
+        "rollback of transactions that re-add the location, a sibling and the rows",
+        "rollback of transactions that re-add the location, a sibling and the rows",
+        "rollback of transactions that re-add the location, a sibling and the rows",
+        "rollback of transactions that re-add the location, a sibling and the rows",
+        "rollback of transactions that re-add the location, a sibling and the rows"
+      ]
+    },
+    {
+      "file": "src/enhancers/transactions/membership-history-projection.spec.ts",
+      "reported": "10 tests | 3 failed",
+      "names": [
+        "rollback reverses reactivation without materializing an absent member (42)",
+        "rollback reverses reactivation without materializing an absent member (undefined)",
+        "keeps an absent member absent when rollback restores an entity key handoff"
+      ]
+    },
+    {
+      "file": "src/enhancers/restoration/pending-membership-admission.spec.ts",
+      "reported": "7 tests | 1 failed",
+      "names": [
+        "retains external absence authority through pending reacquisition and rollback"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,12 @@
+{
+  "browser/app.ts": "e208e0254919feeebe95384b21aa5302baf1937de495e13dbc03f04129d51c8a",
+  "browser/checks.mjs": "1438d339d257dec60ff725daa2fc3fbb872bf59bfd768e222c1ac02cee65eafe",
+  "browser/run.mjs": "2818d1c4156f164f257828f7c0d78f7e96dbb49069599578be468d6c989a3031",
+  "browser/review-fixture.d.mts": "9774e3d955500dc3d464d2114589785fba67db85879c844652fca969213b87aa",
+  "packs/signal-tree-angular-16.0.0-dev.tgz": "da6bf34cd1769f323ef26c43acd0cf388028e348a34a8fbbc8e976b01a800993",
+  "packs/signal-tree-kernel-16.0.0-dev.tgz": "64cfcda4aa980a4e27322693edf28d22c9aae54905d2e1d1b0c821ad455ac019",
+  "consumer/browser/review-fixture.mjs": "653ae035ff584c4832b7b817431c5dd314920b75890de937e8e54d8ba287326f",
+  "consumer/coordinator.mjs": "096140d4460b8b8e51148444bc4e7c6f5bf3f80f4373f6b0586d46ecd1fa539c",
+  "consumer/dispatch-fixture.mjs": "3ba8cd1b48cdfd8c0dbc4936ac4ed806421be2a123813363d9fae70ea008dcb6",
+  "site/app.js": "0b30206e925cddeda9772030c81f34b002d005d2f16904d76784ea0dcc9c8a70"
+}

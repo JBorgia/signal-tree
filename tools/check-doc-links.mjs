@@ -58,10 +58,19 @@
  *   node tools/check-doc-links.mjs --list        # every link it can see
  *   node tools/check-doc-links.mjs --self-test   # prove it can fail
  */
-import { readFileSync, existsSync, readdirSync, writeFileSync } from 'node:fs';
+import {
+  readFileSync,
+  existsSync,
+  readdirSync,
+  writeFileSync,
+  mkdirSync,
+  mkdtempSync,
+  rmSync,
+} from 'node:fs';
 import { join, dirname, resolve, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import semver from 'semver';
+import { execFileSync } from 'node:child_process';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 
@@ -127,11 +136,37 @@ function packagedReadmeAsset(abs, target) {
 }
 
 function walk(dir, out = []) {
+  if (dir === ROOT && existsSync(join(ROOT, '.git'))) {
+    // Check the checkout's tracked and current untracked surfaces, not ignored
+    // local caches or other agents' disposable copies. A source archive has no
+    // Git index and uses the filesystem traversal below. Git errors must fail,
+    // not silently switch the set of documents being qualified.
+    const paths = execFileSync(
+      'git', ['ls-files', '--cached', '--others', '--exclude-standard', '-z'],
+      { cwd: ROOT, encoding: 'utf8', maxBuffer: 32 * 1024 * 1024 }
+    ).split('\0').filter(Boolean);
+    return [...new Set(paths)]
+      .filter((path) => /\.(md|txt)$/.test(path) && !SKIP_DIR.test('/' + path + '/'))
+      .map((path) => join(ROOT, path))
+      .filter((path) => {
+        if (!existsSync(path)) return false;
+        for (let parent = dirname(path); parent !== ROOT; parent = dirname(parent)) {
+          if (existsSync(join(parent, '.git'))) return false;
+        }
+        return true;
+      });
+  }
   for (const entry of readdirSync(dir, { withFileTypes: true })) {
     const abs = join(dir, entry.name);
     const rel = relative(ROOT, abs);
     if (SKIP_DIR.test('/' + rel + '/')) continue;
-    if (entry.isDirectory()) walk(abs, out);
+    // Embedded repositories/worktrees own their own documentation. Do not scan
+    // another release line under an agent's local worktree directory. Ordinary
+    // untracked documentation remains checked; this is not a gitignore filter.
+    if (entry.isDirectory()) {
+      if (existsSync(join(abs, '.git'))) continue;
+      walk(abs, out);
+    }
     else if (/\.(md|txt)$/.test(entry.name)) out.push(abs);
   }
   return out;
@@ -157,10 +192,10 @@ function expectedDistTag(version) {
 }
 
 /** `@signal-tree/*` install instructions that are unavailable or stale. */
-export function scanInstalls() {
+export function scanInstalls(documents = walk(ROOT)) {
   const packages = publishable();
   const bad = [];
-  for (const abs of walk(ROOT)) {
+  for (const abs of documents) {
     const rel = relative(ROOT, abs);
     if (
       SKIP_FILE.test(rel) ||
@@ -225,9 +260,9 @@ export function scanInstalls() {
   return bad;
 }
 
-export function scan() {
+export function scan(documents = walk(ROOT)) {
   const links = [];
-  for (const abs of walk(ROOT)) {
+  for (const abs of documents) {
     const rel = relative(ROOT, abs);
     if (
       SKIP_FILE.test(rel) ||
@@ -282,24 +317,46 @@ if (argv.includes('--self-test')) {
   );
   let caughtLink;
   let caughtInstall;
+  const scopeProbe = mkdtempSync(join(ROOT, 'docs', '__link_scope_'));
+  let excludedForeignLinks;
+  let excludedForeignInstalls;
   try {
-    caughtLink = scan().some(
+    for (const kind of ['worktree', 'repository']) {
+      const nested = join(scopeProbe, kind);
+      mkdirSync(nested);
+      if (kind === 'worktree') writeFileSync(join(nested, '.git'), 'gitdir: unused\n');
+      else mkdirSync(join(nested, '.git'));
+      writeFileSync(join(nested, 'README.md'), readFileSync(probeFile));
+    }
+    const scopeRelative = relative(ROOT, scopeProbe);
+    const probeDocuments = walk(ROOT);
+    excludedForeignLinks = !scan(probeDocuments).some((link) => link.file.startsWith(scopeRelative));
+    excludedForeignInstalls = !scanInstalls(probeDocuments).some((install) =>
+      install.file.startsWith(scopeRelative)
+    );
+    caughtLink = scan(probeDocuments).some(
       (l) => l.file.includes('__link_gate_probe__') && !l.ok
     );
-    caughtInstall = scanInstalls().some((install) =>
+    caughtInstall = scanInstalls(probeDocuments).some((install) =>
       install.file.includes('__link_gate_probe__')
     );
   } finally {
     const { unlinkSync } = await import('node:fs');
     unlinkSync(probeFile);
+    rmSync(scopeProbe, { recursive: true });
   }
-  const clean = scan().every((l) => l.ok) && scanInstalls().length === 0;
+  const cleanDocuments = walk(ROOT);
+  const clean = scan(cleanDocuments).every((l) => l.ok) && scanInstalls(cleanDocuments).length === 0;
   if (!caughtLink) {
     console.error('❌ self-test: the gate did NOT flag a broken link.');
     process.exit(1);
   }
   if (!caughtInstall) {
     console.error('❌ self-test: the gate did NOT flag a stale dist-tag.');
+    process.exit(1);
+  }
+  if (!excludedForeignLinks || !excludedForeignInstalls) {
+    console.error('❌ self-test: nested repository/worktree documentation was scanned.');
     process.exit(1);
   }
   if (!clean) {
@@ -316,9 +373,10 @@ if (argv.includes('--self-test')) {
   process.exit(0);
 }
 
-const links = scan();
+const documents = walk(ROOT);
+const links = scan(documents);
 const broken = links.filter((l) => !l.ok);
-const badInstalls = scanInstalls();
+const badInstalls = scanInstalls(documents);
 
 if (argv.includes('--list')) {
   for (const l of links) {

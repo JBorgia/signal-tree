@@ -32,6 +32,7 @@ describe('NavigationComponent', () => {
         '/entities',
         '/restoration',
         '/external-truth',
+        '/independent-publication',
       ],
       ['/frameworks', '/docs', '/docs', '/docs', '/docs', '/docs'],
       ['/benchmarks', '/devtools', '/deep-typing', '/architecture-overview'],

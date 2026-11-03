@@ -1,0 +1,290 @@
+{
+  "status": "prepared only; no tests executed by this plan",
+  "identityRequirement": "apply exact final candidate manifest overlay with backup/finallyrestore; running at HEAD is not candidate verification",
+  "env": {
+    "NX_DAEMON": "false",
+    "NX_ISOLATE_PLUGINS": "false"
+  },
+  "execution": "sequential; preserve firstfailure; bounded600s max per invocation; full kernel/framework suites only after all relevant focused gates pass and parent authorization",
+  "coverage": "prior284CPR5cases first18jobs plus turn-member-images/jump-undo-equivalence and full selected compatibility specs. Some known24 assertions intentionally repeat in full compatibility specs. No count claim for unexecuted additions.",
+  "jobs": [
+    {
+      "label": "known24",
+      "command": [
+        "pnpm",
+        "nx",
+        "test",
+        "kernel",
+        "--testFile=src/lib/production-scalar-substrate.benchmark.spec.ts",
+        "--testFile=src/lib/absent-path-write.spec.ts",
+        "--testFile=src/lib/branch-omission-correctness.spec.ts",
+        "--testFile=src/enhancers/transactions/transactions.spec.ts",
+        "--testFile=src/enhancers/restoration/restoration-missing-anchors.spec.ts",
+        "--testFile=src/enhancers/transactions/recovery-handle-0.spec.ts",
+        "--testFile=src/lib/heterogeneous-atomicity.spec.ts",
+        "--testFile=src/lib/link-absent-locations.spec.ts",
+        "--testFile=src/enhancers/transactions/membership-history-projection.spec.ts",
+        "--testFile=src/enhancers/restoration/pending-membership-admission.spec.ts",
+        "--testNamePattern=(?:proves compiled scalar reads and writes stay constant in logical work|a directly omitted leaf \\(transactions alone\\)|a directly omitted leaf \\(transactions first\\)|a directly omitted leaf \\(restoration first\\)|rollback retains the original scalar baseline when a later replacement omits it|throws rollback error with preserved callback failure when realization-port validation refuses and does not fallback to the scoped resolver|preserves reversed placement and held lifetime|the thrown error carries a handle to the still-pending transaction|the recovered handle can settle once the conflict is gone|callbackFailed is explicit, because callbackError cannot carry it|a refused rollback on a healthy callback is unchanged|reports the partial turn it hands back, not just how to settle it|leaves everything neutral when the transaction throws|leaves everything neutral when the transaction is rolled back|rollback of transactions that re-add the location, a sibling and the rows|rollback reverses reactivation without materializing an absent member \\(42\\)|rollback reverses reactivation without materializing an absent member \\(undefined\\)|keeps an absent member absent when rollback restores an entity key handoff|retains external absence authority through pending reacquisition and rollback)$",
+        "--maxWorkers=1"
+      ],
+      "knownCPR5Count": null
+    },
+    {
+      "label": "kernel-membership",
+      "command": [
+        "pnpm",
+        "nx",
+        "test",
+        "kernel",
+        "--testFile=packages/kernel/src/enhancers/restoration/entity-membership-capture.spec.ts",
+        "--maxWorkers=1"
+      ],
+      "knownCPR5Count": null
+    },
+    {
+      "label": "kernel-setAll-staging",
+      "command": [
+        "pnpm",
+        "nx",
+        "test",
+        "kernel",
+        "--testFile=packages/kernel/src/lib/entity-set-all-staging.spec.ts",
+        "--maxWorkers=1"
+      ],
+      "knownCPR5Count": null
+    },
+    {
+      "label": "kernel-addMany-anchors",
+      "command": [
+        "pnpm",
+        "nx",
+        "test",
+        "kernel",
+        "--testFile=packages/kernel/src/lib/entity-add-many-anchors.spec.ts",
+        "--maxWorkers=1"
+      ],
+      "knownCPR5Count": null
+    },
+    {
+      "label": "kernel-setAll-order",
+      "command": [
+        "pnpm",
+        "nx",
+        "test",
+        "kernel",
+        "--testFile=packages/kernel/src/enhancers/restoration/set-all-order-reversal.spec.ts",
+        "--maxWorkers=1"
+      ],
+      "knownCPR5Count": null
+    },
+    {
+      "label": "kernel-addMany-redo",
+      "command": [
+        "pnpm",
+        "nx",
+        "test",
+        "kernel",
+        "--testFile=packages/kernel/src/enhancers/restoration/add-many-redo-order.spec.ts",
+        "--maxWorkers=1"
+      ],
+      "knownCPR5Count": null
+    },
+    {
+      "label": "kernel-addMany-overwrite",
+      "command": [
+        "pnpm",
+        "nx",
+        "test",
+        "kernel",
+        "--testFile=packages/kernel/src/enhancers/restoration/add-many-overwrite-reversal.spec.ts",
+        "--maxWorkers=1"
+      ],
+      "knownCPR5Count": null
+    },
+    {
+      "label": "react-4de",
+      "command": [
+        "pnpm",
+        "nx",
+        "test",
+        "react",
+        "transaction-realization.spec.tsx",
+        "--testNamePattern=4[de] ",
+        "--maxWorkers=1"
+      ],
+      "knownCPR5Count": null
+    },
+    {
+      "label": "vue-4de",
+      "command": [
+        "pnpm",
+        "nx",
+        "test",
+        "vue",
+        "transaction-realization.spec.ts",
+        "--testNamePattern=4[de] ",
+        "--maxWorkers=1"
+      ],
+      "knownCPR5Count": null
+    },
+    {
+      "label": "solid-4de",
+      "command": [
+        "pnpm",
+        "nx",
+        "test",
+        "solid",
+        "transaction-realization.spec.ts",
+        "--testNamePattern=4[de] ",
+        "--maxWorkers=1"
+      ],
+      "knownCPR5Count": null
+    },
+    {
+      "label": "angular-4de",
+      "command": [
+        "pnpm",
+        "nx",
+        "test",
+        "angular",
+        "transaction-realization.spec.ts",
+        "--testNamePattern=4[de] ",
+        "--maxWorkers=1"
+      ],
+      "knownCPR5Count": null
+    },
+    {
+      "label": "vue-selection",
+      "command": [
+        "pnpm",
+        "nx",
+        "test",
+        "vue",
+        "entity-selection-lifetime.spec.ts",
+        "--maxWorkers=1"
+      ],
+      "knownCPR5Count": null
+    },
+    {
+      "label": "vue-projection",
+      "command": [
+        "pnpm",
+        "nx",
+        "test",
+        "vue",
+        "entity-projection-publication.spec.ts",
+        "--maxWorkers=1"
+      ],
+      "knownCPR5Count": null
+    },
+    {
+      "label": "vue-prepared",
+      "command": [
+        "pnpm",
+        "nx",
+        "test",
+        "vue",
+        "prepared-selection-publication.spec.ts",
+        "--maxWorkers=1"
+      ],
+      "knownCPR5Count": null
+    },
+    {
+      "label": "kernel-selection",
+      "command": [
+        "pnpm",
+        "nx",
+        "test",
+        "kernel",
+        "--testFile=packages/kernel/src/lib/entity-selection-lifetime.spec.ts",
+        "--maxWorkers=1"
+      ],
+      "knownCPR5Count": null
+    },
+    {
+      "label": "kernel-structural",
+      "command": [
+        "pnpm",
+        "nx",
+        "test",
+        "kernel",
+        "--testFile=packages/kernel/src/enhancers/restoration/declarative-structural-transition-0.spec.ts",
+        "--maxWorkers=1"
+      ],
+      "knownCPR5Count": null
+    },
+    {
+      "label": "kernel-tap-reads",
+      "command": [
+        "pnpm",
+        "nx",
+        "test",
+        "kernel",
+        "--testFile=packages/kernel/src/lib/entity-tap-reads.spec.ts",
+        "--maxWorkers=1"
+      ],
+      "knownCPR5Count": null
+    },
+    {
+      "label": "kernel-replay-taps",
+      "command": [
+        "pnpm",
+        "nx",
+        "test",
+        "kernel",
+        "--testFile=packages/kernel/src/lib/entity-replay-tap-boundaries.spec.ts",
+        "--maxWorkers=1"
+      ],
+      "knownCPR5Count": null
+    },
+    {
+      "label": "member-composition-regressions",
+      "command": [
+        "pnpm",
+        "nx",
+        "test",
+        "kernel",
+        "--testFile=src/enhancers/restoration/turn-member-images.spec.ts",
+        "--testFile=src/enhancers/restoration/jump-undo-equivalence.spec.ts",
+        "--maxWorkers=1"
+      ]
+    },
+    {
+      "label": "settlement-compatibility-full-selected-files",
+      "command": [
+        "pnpm",
+        "nx",
+        "test",
+        "kernel",
+        "--testFile=src/lib/absent-path-write.spec.ts",
+        "--testFile=src/lib/branch-omission-correctness.spec.ts",
+        "--testFile=src/lib/link-absent-locations.spec.ts",
+        "--testFile=src/lib/heterogeneous-atomicity.spec.ts",
+        "--testFile=src/enhancers/transactions/membership-history-projection.spec.ts",
+        "--testFile=src/enhancers/restoration/pending-membership-admission.spec.ts",
+        "--testFile=src/enhancers/transactions/recovery-handle-0.spec.ts",
+        "--testFile=src/enhancers/transactions/rollback-refusal-scope.spec.ts",
+        "--testFile=src/active-transaction-context.spec.ts",
+        "--testFile=src/enhancers/transactions/queued-inspection-review.spec.ts",
+        "--testFile=src/lib/production-stats-guards.spec.ts",
+        "--maxWorkers=1"
+      ]
+    },
+    {
+      "label": "rollback-planner-regressions",
+      "command": [
+        "pnpm",
+        "nx",
+        "test",
+        "kernel",
+        "--testFile=src/lib/internals/causal-runtime/pending-rollback.spec.ts",
+        "--testFile=src/lib/internals/causal-runtime/structural-pending-rollback-composition.spec.ts",
+        "--testFile=src/lib/internals/causal-runtime/pending-rollback-composition.spec.ts",
+        "--testFile=src/enhancers/transactions/rekeyed-rollback-defect.spec.ts",
+        "--testFile=src/lib/internals/causal-runtime/planner-contiguous-boundaries.spec.ts",
+        "--maxWorkers=1"
+      ]
+    }
+  ]
+}

@@ -14,7 +14,8 @@ export {
   withWriteObservationScope,
   type DeclaredWriteScopes,
 } from './lib/internals/write-observation-scope';
-import type { CarrierKind, ISignalTree, ISignalTreeOf } from './lib/types';
+import type { CarrierKind } from './lib/types';
+import type { ToolingTree } from './lib/internals/tooling-tree';
 import { getActiveWriteContext } from './lib/write-context';
 import { peekInternalTransactionRuntime } from './enhancers/transactions/transactions';
 import { getPositionRegistry } from './lib/internals/position-registry';
@@ -66,9 +67,11 @@ export function activeTransactionContext():
  * ⚠️ Generic kernel truth, deliberately. A consumer translates capabilities
  * into its own capability model; no consumer-shaped predicate belongs here.
  */
-export function treeCapabilities<T, C extends CarrierKind = CarrierKind>(
-  tree: ISignalTreeOf<T, C, unknown>
-) {
+export function treeCapabilities<
+  T,
+  C extends CarrierKind = CarrierKind,
+  TAccum = unknown
+>(tree: ToolingTree<T, C, TAccum>) {
   return getTreeCapabilities(tree);
 }
 export type {
@@ -103,6 +106,11 @@ function projectConfirmedTurns(
       before?: unknown;
       after?: unknown;
       subject?: unknown;
+      subjectFieldSegments?: readonly string[];
+      plainBranchMembership?: {
+        readonly before: boolean;
+        readonly after: boolean;
+      };
     }[];
   }[],
   retention: { truncated: boolean; firstAvailableTurnId?: number }
@@ -119,6 +127,13 @@ function projectConfirmedTurns(
         before: 'before' in effect ? effect.before : undefined,
         after: 'after' in effect ? effect.after : undefined,
         subjectId: 'subject' in effect ? effect.subject : undefined,
+        // The producer-known row-relative address, never a parsed path.
+        ...(effect.subjectFieldSegments
+          ? { fieldSegments: [...effect.subjectFieldSegments] }
+          : {}),
+        ...(effect.plainBranchMembership
+          ? { plainBranchMembership: { ...effect.plainBranchMembership } }
+          : {}),
       });
     }
     turns.push({
@@ -154,7 +169,7 @@ export function treeRuntimeId<
   T,
   C extends CarrierKind = CarrierKind,
   TAccum = unknown
->(tree: ISignalTreeOf<T, C, TAccum>): TreeId | undefined {
+>(tree: ToolingTree<T, C, TAccum>): TreeId | undefined {
   return getPositionRegistry(tree.$)?.id;
 }
 
@@ -178,11 +193,9 @@ export function confirmedTurnReader<
   T,
   C extends CarrierKind = CarrierKind,
   TAccum = unknown
->(tree: ISignalTreeOf<T, C, TAccum>): ConfirmedTurnReader | undefined {
+>(tree: ToolingTree<T, C, TAccum>): ConfirmedTurnReader | undefined {
   // The peek reads only the runtime's symbol on the tree, never its carriers.
-  const runtime = peekInternalTransactionRuntime(
-    tree as unknown as ISignalTree<T>
-  );
+  const runtime = peekInternalTransactionRuntime(tree);
   if (!runtime) {
     return undefined;
   }
@@ -205,3 +218,58 @@ export function confirmedTurnReader<
     },
   };
 }
+
+/*
+ * READ-ONLY RUNTIME OBSERVATION READERS (v15 → v16 integration, slice 6).
+ *
+ * Each reader observes an existing owner; none is an authority. A reader
+ * retains no event history and never installs the capability it reads: a tree
+ * without `transactions()`, `restoration()` or entity collections answers
+ * `undefined`. Admission is `ToolingTree<T, C, TAccum>`: the accumulated
+ * surface and carrier of the constructed tree, never `TreeNode<T>` rebuilt
+ * from unwrapped state.
+ */
+export {
+  stateLocationReader,
+  type StateLocationReader,
+  type StateLocationSegment,
+  type StateLocationTarget,
+} from './lib/internals/state-location-view';
+
+export {
+  linkStateReader,
+  type LinkStateReader,
+  type LinkStateView,
+  type LinkStateEvent,
+  type LinkStateSnapshot,
+} from './lib/internals/link-state-view';
+
+export {
+  transactionLifecycleReader,
+  type PendingTransactionView,
+  type TransactionLifecycleReader,
+  type TransactionLifecycleSnapshot,
+  type TransactionLifecycleObservation,
+  type TransactionRefusalReason,
+} from './lib/internals/transaction-lifecycle-view';
+
+export {
+  restorationReader,
+  type RestorationReader,
+  type RestorationReaderSnapshot,
+  type RestorationReaderEvent,
+  type RestorationEntryView,
+  type RestorationEntryId,
+  type RestorationOperationId,
+} from './lib/internals/restoration-reader';
+
+export {
+  entityMembershipReader,
+  type EntityMembershipReader,
+  type EntityMembershipSnapshot,
+  type EntityMembershipEvent,
+  type EntityMembershipCollection,
+  type EntityMembershipLocation,
+  type EntityMembership,
+  type EntityMembershipChange,
+} from './lib/internals/entity-membership-view';

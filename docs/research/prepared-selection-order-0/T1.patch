@@ -1,0 +1,11 @@
+--- a/packages/kernel/src/lib/entity-signal.ts
++++ b/packages/kernel/src/lib/entity-signal.ts
+@@ -3837,7 +3837,7 @@
+       // unit; a throw still closes it.
+       const membershipUnit = membershipTap;
+       membershipUnit?.(MEMBERSHIP_OPEN_ORDER);
+-      let addedSubjectIds: number[];
++      let addedSubjectIds: readonly number[];
+       let afterSubjects: number[];
+       const stagedRemovalStructuralEffects: PendingStructuralEffect[] = [];
+       try {

@@ -1,0 +1,34 @@
+[
+  {
+    "file": "packages/angular/src/lib/kernel-comparison.benchmark.spec.ts",
+    "emittedEqual": true
+  },
+  {
+    "file": "packages/angular/src/lib/whole-value-new-keys.spec.ts",
+    "emittedEqual": true
+  },
+  {
+    "file": "packages/kernel/src/lib/e-membership-reachability.spec.ts",
+    "emittedEqual": true
+  },
+  {
+    "file": "packages/kernel/src/lib/incremental-materialization.spec.ts",
+    "emittedEqual": true
+  },
+  {
+    "file": "packages/kernel/src/lib/point-owner-resolution-cost.spec.ts",
+    "emittedEqual": true
+  },
+  {
+    "file": "packages/kernel/src/lib/whole-value-new-keys.spec.ts",
+    "emittedEqual": true
+  },
+  {
+    "file": "packages/solid/src/lib/whole-value-new-keys.spec.ts",
+    "emittedEqual": true
+  },
+  {
+    "file": "packages/vue/src/lib/whole-value-new-keys.spec.ts",
+    "emittedEqual": true
+  }
+]

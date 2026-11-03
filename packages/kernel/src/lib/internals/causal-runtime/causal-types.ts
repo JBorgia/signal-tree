@@ -1,3 +1,4 @@
+import type { PlainBranchMemberPresence } from '../plain-branch-membership';
 import type { PositionId, StructuralEffect } from '../../types';
 
 export type { PositionId };
@@ -12,6 +13,12 @@ export type TurnState = 'pending' | 'confirmed';
  */
 export type StructuralEffectKind = 'add' | 'remove' | 'rekey';
 
+/** Own-property presence of an entity field; omitted when both endpoints exist. */
+export type FieldPresence = {
+  readonly before: boolean;
+  readonly after: boolean;
+};
+
 export interface CausalEffect {
   readonly owner: PositionId;
   readonly before: unknown;
@@ -19,6 +26,8 @@ export interface CausalEffect {
   readonly subjectId?: unknown;
   /** Producer-known row-relative property keys; [] names the whole row. */
   readonly subjectFieldSegments?: readonly string[];
+  readonly plainBranchMembership?: PlainBranchMemberPresence;
+  readonly fieldPresence?: FieldPresence;
   /**
    * Captured realization address — REQUIRED, because every live producer sets
    * it on every variant.
@@ -67,6 +76,8 @@ export interface ReversalEffect {
   readonly subjectId?: unknown;
   /** Producer-known row-relative property keys; [] names the whole row. */
   readonly subjectFieldSegments?: readonly string[];
+  readonly plainBranchMembership?: PlainBranchMemberPresence;
+  readonly fieldPresence?: FieldPresence;
   /**
    * Captured realization address.
    *
@@ -79,6 +90,15 @@ export interface ReversalEffect {
   readonly structural?: StructuralEffectKind;
   /** Durable structural recipe carried from canonical history into realization. */
   readonly structuralContext?: StructuralEffect;
+  /**
+   * Ordinal of the turn this effect comes from, when one application crosses
+   * several turns (a jump). A turn records one net effect per location, in
+   * first-occurrence order, so effect order is chronological only BETWEEN
+   * turns: a member's value is superseded by a value target of its own turn,
+   * and supersedes a value target of an earlier turn. Absent: a single turn.
+   * (v16 8g.)
+   */
+  readonly turn?: number;
 }
 
 export interface ConfirmedReversalPlan {

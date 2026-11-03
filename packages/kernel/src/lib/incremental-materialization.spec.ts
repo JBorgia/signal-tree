@@ -4,6 +4,9 @@ import { visitTree } from './internals/visit-tree';
 import { getPositionRegistry } from './internals/position-registry';
 import { signalTree } from './signal-tree';
 
+// grid() constructs every addressed row and column; keep timed operations unchanged.
+type GeneratedRow = Record<string, { (): number; (value: number): void }>;
+
 /**
  * Incremental materialisation.
  *
@@ -43,7 +46,7 @@ describe('incremental materialisation', () => {
   it('shares untouched subtrees and replaces touched ones', () => {
     const tree = signalTree(grid(3, 3), { capabilities: ['causal-runtime'] });
     const before = tree.$();
-    tree.$.r1.c1(42);
+    (tree.$.r1 as GeneratedRow).c1(42);
     const after = tree.$();
 
     expect(after).not.toBe(before);
@@ -55,9 +58,9 @@ describe('incremental materialisation', () => {
   it('still observes every write', () => {
     const tree = signalTree(grid(3, 3), { capabilities: ['causal-runtime'] });
     tree.$();
-    tree.$.r1.c1(42);
+    (tree.$.r1 as GeneratedRow).c1(42);
     expect(tree.$().r1.c1).toBe(42);
-    tree.$.r0.c0(7);
+    (tree.$.r0 as GeneratedRow).c0(7);
     expect(tree.$().r0.c0).toBe(7);
     expect(tree.$().r1.c1).toBe(42);
   });
@@ -135,7 +138,7 @@ describe('incremental materialisation', () => {
     tree.$();
 
     const dirtyAll = () => {
-      for (let r = 0; r < 60; r++) tree.$['r' + r]['c0'](Math.random());
+      for (let r = 0; r < 60; r++) (tree.$['r' + r] as GeneratedRow)['c0'](Math.random());
     };
 
     // BEST OF THREE, not one sample. This assertion FLAKED under load (11.67ms
@@ -187,7 +190,7 @@ describe('incremental materialisation', () => {
   it('rebuilds only the touched row of a wide grid', () => {
     const tree = signalTree(grid(50, 50), { capabilities: ['causal-runtime'] });
     const before = tree.$();
-    tree.$.r25.c25(999);
+    (tree.$.r25 as GeneratedRow).c25(999);
     const after = tree.$();
 
     const shared = Object.keys(after).filter(

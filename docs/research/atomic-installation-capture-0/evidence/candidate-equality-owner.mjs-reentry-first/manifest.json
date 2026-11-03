@@ -1,0 +1,12 @@
+{
+  "node": "v24.15.0",
+  "base": "19a5bd03",
+  "lane": "candidate",
+  "entry": "equality-owner.mjs",
+  "control": "reentry",
+  "exit": 0,
+  "signal": null,
+  "stable": true,
+  "bundle": "c24a5a60e3db67ab371b131b658e306111f1b8a8efc906f33e3425a484602398",
+  "originalManifestSha256": "424a11f9b026f58b65da3d5041ba67e8c87eeb5476e964ed139c628735709aa9"
+}

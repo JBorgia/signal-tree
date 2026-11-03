@@ -1,0 +1,2774 @@
+{
+  "node": "v24.15.0",
+  "esbuild": "0.25.12",
+  "rows": [
+    {
+      "arm": "incumbent",
+      "fixture": "signaltree-bare",
+      "mode": "prod",
+      "bytes": 35392,
+      "gzip": 11919,
+      "ceilingBytes": 12032,
+      "headroomBytes": 113,
+      "sha256": "188112b239b5796aaabbf9b850beab95566134f73fd9acad074bbbd226d1a6e8",
+      "observed": [
+        1,
+        "b"
+      ],
+      "contributions": [
+        {
+          "module": "dist/packages/kernel/dist/lib/signal-tree.js",
+          "bytes": 7455
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/location-runtime.js",
+          "bytes": 3622
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/member-membership.js",
+          "bytes": 3153
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/tree-scalar-slot-runtime.js",
+          "bytes": 3007
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/materialize-markers.js",
+          "bytes": 1947
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/tree-scalar-leaf-runtime.js",
+          "bytes": 1537
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/utilities/deep-equal.js",
+          "bytes": 1517
+        },
+        {
+          "module": "dist/packages/kernel/dist/enhancers/index.js",
+          "bytes": 1398
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/utils.js",
+          "bytes": 1387
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/owned-mutation.js",
+          "bytes": 1260
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/utilities/is-built-in-object.js",
+          "bytes": 1074
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/error-reporter.js",
+          "bytes": 996
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/position-registry.js",
+          "bytes": 940
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/tree-capabilities.js",
+          "bytes": 934
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/intrinsic-mutation.js",
+          "bytes": 849
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/snapshot-authority.js",
+          "bytes": 604
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/merge-derived.js",
+          "bytes": 580
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/mutation-capture-runtime.js",
+          "bytes": 565
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/constants.js",
+          "bytes": 365
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/node-shape.js",
+          "bytes": 282
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/leaf.js",
+          "bytes": 226
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/path-observation-port.js",
+          "bytes": 223
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/owned-metadata.js",
+          "bytes": 221
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/physical-commit-clock.js",
+          "bytes": 213
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/cell-identity.js",
+          "bytes": 191
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/tree-scalar-slot-port.js",
+          "bytes": 170
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/runtime-tree-plan.js",
+          "bytes": 143
+        },
+        {
+          "module": "../../../../../../private/tmp/st-new-key-cost-20261018/results/incumbent/signaltree-bare.js",
+          "bytes": 121
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/observation-substrate.js",
+          "bytes": 104
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/owner-invalidation-port.js",
+          "bytes": 97
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/observation-adapter.js",
+          "bytes": 89
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/root-source.js",
+          "bytes": 48
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/enhancer-types.js",
+          "bytes": 42
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/write-context.js",
+          "bytes": 31
+        }
+      ]
+    },
+    {
+      "arm": "incumbent",
+      "fixture": "signaltree-bare",
+      "mode": "dev",
+      "bytes": 41722,
+      "gzip": 14325,
+      "ceilingBytes": 14438.4,
+      "headroomBytes": 113,
+      "sha256": "981f5762f2344aaf4e099b842f400117e894e4132813ebf6642d2bca17c4d73c",
+      "observed": [
+        1,
+        "b"
+      ],
+      "contributions": [
+        {
+          "module": "dist/packages/kernel/dist/lib/signal-tree.js",
+          "bytes": 11821
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/location-runtime.js",
+          "bytes": 3622
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/member-membership.js",
+          "bytes": 3381
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/tree-scalar-slot-runtime.js",
+          "bytes": 3007
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/materialize-markers.js",
+          "bytes": 2662
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/utils.js",
+          "bytes": 1648
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/tree-scalar-leaf-runtime.js",
+          "bytes": 1537
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/utilities/deep-equal.js",
+          "bytes": 1517
+        },
+        {
+          "module": "dist/packages/kernel/dist/enhancers/index.js",
+          "bytes": 1398
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/owned-mutation.js",
+          "bytes": 1260
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/error-reporter.js",
+          "bytes": 1208
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/utilities/is-built-in-object.js",
+          "bytes": 1074
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/merge-derived.js",
+          "bytes": 998
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/position-registry.js",
+          "bytes": 940
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/tree-capabilities.js",
+          "bytes": 934
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/intrinsic-mutation.js",
+          "bytes": 849
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/snapshot-authority.js",
+          "bytes": 700
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/mutation-capture-runtime.js",
+          "bytes": 565
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/constants.js",
+          "bytes": 399
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/node-shape.js",
+          "bytes": 282
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/leaf.js",
+          "bytes": 226
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/path-observation-port.js",
+          "bytes": 223
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/owned-metadata.js",
+          "bytes": 221
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/physical-commit-clock.js",
+          "bytes": 213
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/cell-identity.js",
+          "bytes": 191
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/tree-scalar-slot-port.js",
+          "bytes": 170
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/runtime-tree-plan.js",
+          "bytes": 143
+        },
+        {
+          "module": "../../../../../../private/tmp/st-new-key-cost-20261018/results/incumbent/signaltree-bare.js",
+          "bytes": 121
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/observation-substrate.js",
+          "bytes": 104
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/owner-invalidation-port.js",
+          "bytes": 97
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/observation-adapter.js",
+          "bytes": 89
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/root-source.js",
+          "bytes": 48
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/enhancer-types.js",
+          "bytes": 42
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/write-context.js",
+          "bytes": 31
+        }
+      ]
+    },
+    {
+      "arm": "incumbent",
+      "fixture": "signaltree-entities",
+      "mode": "prod",
+      "bytes": 86292,
+      "gzip": 26074,
+      "ceilingBytes": 26214.4,
+      "headroomBytes": 140,
+      "sha256": "51218870818f3a1a2578a1898928aa1c04a7d9d927850d726e104fcc5670bfb4",
+      "observed": [
+        {
+          "id": 1,
+          "name": "b"
+        }
+      ],
+      "contributions": [
+        {
+          "module": "dist/packages/kernel/dist/lib/entity-signal.js",
+          "bytes": 35449
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/signal-tree.js",
+          "bytes": 7508
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/physical/structural-store.js",
+          "bytes": 7375
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/location-runtime.js",
+          "bytes": 4242
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/member-membership.js",
+          "bytes": 3173
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/tree-scalar-slot-runtime.js",
+          "bytes": 3007
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/physical/entity-mutation-frame.js",
+          "bytes": 2664
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/materialize-markers.js",
+          "bytes": 2443
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/markers/entity-map.js",
+          "bytes": 1783
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/tree-scalar-leaf-runtime.js",
+          "bytes": 1539
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/utilities/deep-equal.js",
+          "bytes": 1517
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/utils.js",
+          "bytes": 1469
+        },
+        {
+          "module": "dist/packages/kernel/dist/enhancers/index.js",
+          "bytes": 1398
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/owned-mutation.js",
+          "bytes": 1264
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/utilities/deep-clone.js",
+          "bytes": 1182
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/utilities/is-built-in-object.js",
+          "bytes": 1075
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/error-reporter.js",
+          "bytes": 996
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/position-registry.js",
+          "bytes": 978
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/tree-capabilities.js",
+          "bytes": 934
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/intrinsic-mutation.js",
+          "bytes": 849
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/snapshot-authority.js",
+          "bytes": 616
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/merge-derived.js",
+          "bytes": 581
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/mutation-capture-runtime.js",
+          "bytes": 565
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/physical/entity-value-store.js",
+          "bytes": 480
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/constants.js",
+          "bytes": 365
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/node-shape.js",
+          "bytes": 285
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/entity-projection-seed.js",
+          "bytes": 235
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/physical/entity-handle-resolution.js",
+          "bytes": 230
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/leaf.js",
+          "bytes": 226
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/path-observation-port.js",
+          "bytes": 223
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/owned-metadata.js",
+          "bytes": 222
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/physical-commit-clock.js",
+          "bytes": 213
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/cell-identity.js",
+          "bytes": 193
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/tree-scalar-slot-port.js",
+          "bytes": 171
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/runtime-tree-plan.js",
+          "bytes": 143
+        },
+        {
+          "module": "../../../../../../private/tmp/st-new-key-cost-20261018/results/incumbent/signaltree-entities.js",
+          "bytes": 137
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/entity-membership-source.js",
+          "bytes": 126
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/observation-substrate.js",
+          "bytes": 104
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/owner-invalidation-port.js",
+          "bytes": 97
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/observation-adapter.js",
+          "bytes": 90
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/root-source.js",
+          "bytes": 48
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/enhancer-types.js",
+          "bytes": 42
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/write-context.js",
+          "bytes": 31
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/physical-rows.js",
+          "bytes": 23
+        }
+      ]
+    },
+    {
+      "arm": "incumbent",
+      "fixture": "signaltree-entities",
+      "mode": "dev",
+      "bytes": 93943,
+      "gzip": 28902,
+      "ceilingBytes": 29081.6,
+      "headroomBytes": 179,
+      "sha256": "a2aa5aa95d725ae6c2f28f96f55bfde7d7a0d06b608093724f35540999a9090a",
+      "observed": [
+        {
+          "id": 1,
+          "name": "b"
+        }
+      ],
+      "contributions": [
+        {
+          "module": "dist/packages/kernel/dist/lib/entity-signal.js",
+          "bytes": 36011
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/signal-tree.js",
+          "bytes": 11874
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/physical/structural-store.js",
+          "bytes": 7375
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/location-runtime.js",
+          "bytes": 4242
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/materialize-markers.js",
+          "bytes": 3595
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/member-membership.js",
+          "bytes": 3401
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/tree-scalar-slot-runtime.js",
+          "bytes": 3007
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/physical/entity-mutation-frame.js",
+          "bytes": 2664
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/markers/entity-map.js",
+          "bytes": 2105
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/utils.js",
+          "bytes": 1730
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/tree-scalar-leaf-runtime.js",
+          "bytes": 1539
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/utilities/deep-equal.js",
+          "bytes": 1517
+        },
+        {
+          "module": "dist/packages/kernel/dist/enhancers/index.js",
+          "bytes": 1398
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/owned-mutation.js",
+          "bytes": 1264
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/error-reporter.js",
+          "bytes": 1208
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/utilities/deep-clone.js",
+          "bytes": 1182
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/utilities/is-built-in-object.js",
+          "bytes": 1075
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/merge-derived.js",
+          "bytes": 999
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/position-registry.js",
+          "bytes": 978
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/tree-capabilities.js",
+          "bytes": 934
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/intrinsic-mutation.js",
+          "bytes": 849
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/snapshot-authority.js",
+          "bytes": 712
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/mutation-capture-runtime.js",
+          "bytes": 565
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/physical/entity-value-store.js",
+          "bytes": 480
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/constants.js",
+          "bytes": 399
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/node-shape.js",
+          "bytes": 285
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/entity-projection-seed.js",
+          "bytes": 235
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/physical/entity-handle-resolution.js",
+          "bytes": 230
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/leaf.js",
+          "bytes": 226
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/path-observation-port.js",
+          "bytes": 223
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/owned-metadata.js",
+          "bytes": 222
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/physical-commit-clock.js",
+          "bytes": 213
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/cell-identity.js",
+          "bytes": 193
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/tree-scalar-slot-port.js",
+          "bytes": 171
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/runtime-tree-plan.js",
+          "bytes": 143
+        },
+        {
+          "module": "../../../../../../private/tmp/st-new-key-cost-20261018/results/incumbent/signaltree-entities.js",
+          "bytes": 137
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/entity-membership-source.js",
+          "bytes": 126
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/observation-substrate.js",
+          "bytes": 104
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/owner-invalidation-port.js",
+          "bytes": 97
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/observation-adapter.js",
+          "bytes": 90
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/root-source.js",
+          "bytes": 48
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/enhancer-types.js",
+          "bytes": 42
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/write-context.js",
+          "bytes": 31
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/physical-rows.js",
+          "bytes": 23
+        }
+      ]
+    },
+    {
+      "arm": "prepair",
+      "fixture": "signaltree-bare",
+      "mode": "prod",
+      "bytes": 37013,
+      "gzip": 12474,
+      "ceilingBytes": 12032,
+      "headroomBytes": -442,
+      "sha256": "788cda98e037a0c131de3a716fc0b13cffed72e40ed662b985f4185309960cf8",
+      "observed": [
+        1,
+        "b"
+      ],
+      "contributions": [
+        {
+          "module": "dist/packages/kernel/dist/lib/signal-tree.js",
+          "bytes": 8698
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/location-runtime.js",
+          "bytes": 3622
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/member-membership.js",
+          "bytes": 3208
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/tree-scalar-slot-runtime.js",
+          "bytes": 3007
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/materialize-markers.js",
+          "bytes": 2113
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/tree-scalar-leaf-runtime.js",
+          "bytes": 1537
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/utilities/deep-equal.js",
+          "bytes": 1517
+        },
+        {
+          "module": "dist/packages/kernel/dist/enhancers/index.js",
+          "bytes": 1398
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/utils.js",
+          "bytes": 1387
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/owned-mutation.js",
+          "bytes": 1260
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/utilities/is-built-in-object.js",
+          "bytes": 1074
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/error-reporter.js",
+          "bytes": 996
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/position-registry.js",
+          "bytes": 940
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/tree-capabilities.js",
+          "bytes": 934
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/intrinsic-mutation.js",
+          "bytes": 849
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/snapshot-authority.js",
+          "bytes": 604
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/merge-derived.js",
+          "bytes": 580
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/mutation-capture-runtime.js",
+          "bytes": 565
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/constants.js",
+          "bytes": 365
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/leaf.js",
+          "bytes": 297
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/node-shape.js",
+          "bytes": 282
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/path-observation-port.js",
+          "bytes": 223
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/owned-metadata.js",
+          "bytes": 221
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/physical-commit-clock.js",
+          "bytes": 213
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/cell-identity.js",
+          "bytes": 191
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/observation-substrate.js",
+          "bytes": 190
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/tree-scalar-slot-port.js",
+          "bytes": 170
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/runtime-tree-plan.js",
+          "bytes": 143
+        },
+        {
+          "module": "../../../../../../private/tmp/st-new-key-cost-20261018/results/prepair/signaltree-bare.js",
+          "bytes": 121
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/owner-invalidation-port.js",
+          "bytes": 97
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/observation-adapter.js",
+          "bytes": 89
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/root-source.js",
+          "bytes": 48
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/enhancer-types.js",
+          "bytes": 42
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/write-context.js",
+          "bytes": 31
+        }
+      ]
+    },
+    {
+      "arm": "prepair",
+      "fixture": "signaltree-bare",
+      "mode": "dev",
+      "bytes": 43659,
+      "gzip": 14890,
+      "ceilingBytes": 14438.4,
+      "headroomBytes": -452,
+      "sha256": "d00280b2cd0a16fa7c04ba3ca9fefcc2c78cabeabdf5413994aa794bd3d34db0",
+      "observed": [
+        1,
+        "b"
+      ],
+      "contributions": [
+        {
+          "module": "dist/packages/kernel/dist/lib/signal-tree.js",
+          "bytes": 13377
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/location-runtime.js",
+          "bytes": 3624
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/member-membership.js",
+          "bytes": 3436
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/tree-scalar-slot-runtime.js",
+          "bytes": 3007
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/materialize-markers.js",
+          "bytes": 2827
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/utils.js",
+          "bytes": 1649
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/tree-scalar-leaf-runtime.js",
+          "bytes": 1537
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/utilities/deep-equal.js",
+          "bytes": 1517
+        },
+        {
+          "module": "dist/packages/kernel/dist/enhancers/index.js",
+          "bytes": 1398
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/owned-mutation.js",
+          "bytes": 1260
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/error-reporter.js",
+          "bytes": 1208
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/utilities/is-built-in-object.js",
+          "bytes": 1074
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/merge-derived.js",
+          "bytes": 998
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/position-registry.js",
+          "bytes": 940
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/tree-capabilities.js",
+          "bytes": 934
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/intrinsic-mutation.js",
+          "bytes": 849
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/snapshot-authority.js",
+          "bytes": 700
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/mutation-capture-runtime.js",
+          "bytes": 565
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/constants.js",
+          "bytes": 399
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/leaf.js",
+          "bytes": 297
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/node-shape.js",
+          "bytes": 282
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/path-observation-port.js",
+          "bytes": 223
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/owned-metadata.js",
+          "bytes": 221
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/physical-commit-clock.js",
+          "bytes": 213
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/cell-identity.js",
+          "bytes": 192
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/observation-substrate.js",
+          "bytes": 190
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/tree-scalar-slot-port.js",
+          "bytes": 170
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/runtime-tree-plan.js",
+          "bytes": 143
+        },
+        {
+          "module": "../../../../../../private/tmp/st-new-key-cost-20261018/results/prepair/signaltree-bare.js",
+          "bytes": 121
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/owner-invalidation-port.js",
+          "bytes": 97
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/observation-adapter.js",
+          "bytes": 89
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/root-source.js",
+          "bytes": 48
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/enhancer-types.js",
+          "bytes": 42
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/write-context.js",
+          "bytes": 31
+        }
+      ]
+    },
+    {
+      "arm": "prepair",
+      "fixture": "signaltree-entities",
+      "mode": "prod",
+      "bytes": 87926,
+      "gzip": 26647,
+      "ceilingBytes": 26214.4,
+      "headroomBytes": -433,
+      "sha256": "415f8a8c0a893826bd0f4700556eb78e8d42fde2c50e26c893515f890adb7c90",
+      "observed": [
+        {
+          "id": 1,
+          "name": "b"
+        }
+      ],
+      "contributions": [
+        {
+          "module": "dist/packages/kernel/dist/lib/entity-signal.js",
+          "bytes": 35479
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/signal-tree.js",
+          "bytes": 8757
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/physical/structural-store.js",
+          "bytes": 7375
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/location-runtime.js",
+          "bytes": 4217
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/member-membership.js",
+          "bytes": 3229
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/tree-scalar-slot-runtime.js",
+          "bytes": 3007
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/physical/entity-mutation-frame.js",
+          "bytes": 2664
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/materialize-markers.js",
+          "bytes": 2610
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/markers/entity-map.js",
+          "bytes": 1783
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/tree-scalar-leaf-runtime.js",
+          "bytes": 1539
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/utilities/deep-equal.js",
+          "bytes": 1517
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/utils.js",
+          "bytes": 1469
+        },
+        {
+          "module": "dist/packages/kernel/dist/enhancers/index.js",
+          "bytes": 1398
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/owned-mutation.js",
+          "bytes": 1264
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/utilities/deep-clone.js",
+          "bytes": 1182
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/utilities/is-built-in-object.js",
+          "bytes": 1075
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/error-reporter.js",
+          "bytes": 996
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/position-registry.js",
+          "bytes": 978
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/tree-capabilities.js",
+          "bytes": 934
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/intrinsic-mutation.js",
+          "bytes": 849
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/snapshot-authority.js",
+          "bytes": 616
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/merge-derived.js",
+          "bytes": 581
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/mutation-capture-runtime.js",
+          "bytes": 565
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/physical/entity-value-store.js",
+          "bytes": 480
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/constants.js",
+          "bytes": 365
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/leaf.js",
+          "bytes": 297
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/node-shape.js",
+          "bytes": 285
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/entity-projection-seed.js",
+          "bytes": 235
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/physical/entity-handle-resolution.js",
+          "bytes": 230
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/path-observation-port.js",
+          "bytes": 223
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/owned-metadata.js",
+          "bytes": 222
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/physical-commit-clock.js",
+          "bytes": 213
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/cell-identity.js",
+          "bytes": 193
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/observation-substrate.js",
+          "bytes": 190
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/tree-scalar-slot-port.js",
+          "bytes": 171
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/runtime-tree-plan.js",
+          "bytes": 143
+        },
+        {
+          "module": "../../../../../../private/tmp/st-new-key-cost-20261018/results/prepair/signaltree-entities.js",
+          "bytes": 137
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/entity-membership-source.js",
+          "bytes": 126
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/owner-invalidation-port.js",
+          "bytes": 97
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/observation-adapter.js",
+          "bytes": 90
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/root-source.js",
+          "bytes": 48
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/enhancer-types.js",
+          "bytes": 42
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/write-context.js",
+          "bytes": 31
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/physical-rows.js",
+          "bytes": 23
+        }
+      ]
+    },
+    {
+      "arm": "prepair",
+      "fixture": "signaltree-entities",
+      "mode": "dev",
+      "bytes": 95895,
+      "gzip": 29487,
+      "ceilingBytes": 29081.6,
+      "headroomBytes": -406,
+      "sha256": "28acf8216d635a7603e0a1b6f4ddb2e12665c228c46f927f34659bf041e49847",
+      "observed": [
+        {
+          "id": 1,
+          "name": "b"
+        }
+      ],
+      "contributions": [
+        {
+          "module": "dist/packages/kernel/dist/lib/entity-signal.js",
+          "bytes": 36041
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/signal-tree.js",
+          "bytes": 13441
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/physical/structural-store.js",
+          "bytes": 7375
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/location-runtime.js",
+          "bytes": 4217
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/materialize-markers.js",
+          "bytes": 3762
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/member-membership.js",
+          "bytes": 3457
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/tree-scalar-slot-runtime.js",
+          "bytes": 3007
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/physical/entity-mutation-frame.js",
+          "bytes": 2664
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/markers/entity-map.js",
+          "bytes": 2105
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/utils.js",
+          "bytes": 1730
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/tree-scalar-leaf-runtime.js",
+          "bytes": 1539
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/utilities/deep-equal.js",
+          "bytes": 1517
+        },
+        {
+          "module": "dist/packages/kernel/dist/enhancers/index.js",
+          "bytes": 1398
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/owned-mutation.js",
+          "bytes": 1264
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/error-reporter.js",
+          "bytes": 1208
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/utilities/deep-clone.js",
+          "bytes": 1182
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/utilities/is-built-in-object.js",
+          "bytes": 1075
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/merge-derived.js",
+          "bytes": 999
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/position-registry.js",
+          "bytes": 978
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/tree-capabilities.js",
+          "bytes": 934
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/intrinsic-mutation.js",
+          "bytes": 849
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/snapshot-authority.js",
+          "bytes": 712
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/mutation-capture-runtime.js",
+          "bytes": 565
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/physical/entity-value-store.js",
+          "bytes": 480
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/constants.js",
+          "bytes": 399
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/leaf.js",
+          "bytes": 297
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/node-shape.js",
+          "bytes": 285
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/entity-projection-seed.js",
+          "bytes": 235
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/physical/entity-handle-resolution.js",
+          "bytes": 230
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/path-observation-port.js",
+          "bytes": 223
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/owned-metadata.js",
+          "bytes": 222
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/physical-commit-clock.js",
+          "bytes": 213
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/cell-identity.js",
+          "bytes": 193
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/observation-substrate.js",
+          "bytes": 190
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/tree-scalar-slot-port.js",
+          "bytes": 171
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/runtime-tree-plan.js",
+          "bytes": 143
+        },
+        {
+          "module": "../../../../../../private/tmp/st-new-key-cost-20261018/results/prepair/signaltree-entities.js",
+          "bytes": 137
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/entity-membership-source.js",
+          "bytes": 126
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/owner-invalidation-port.js",
+          "bytes": 97
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/observation-adapter.js",
+          "bytes": 90
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/root-source.js",
+          "bytes": 48
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/enhancer-types.js",
+          "bytes": 42
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/write-context.js",
+          "bytes": 31
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/physical-rows.js",
+          "bytes": 23
+        }
+      ]
+    },
+    {
+      "arm": "paired",
+      "fixture": "signaltree-bare",
+      "mode": "prod",
+      "bytes": 37349,
+      "gzip": 12612,
+      "ceilingBytes": 12032,
+      "headroomBytes": -580,
+      "sha256": "2bb25ed2665587558f8684e37466e6ed1322c771d1b3b729c6eb2e43c0e33dea",
+      "observed": [
+        1,
+        "b"
+      ],
+      "contributions": [
+        {
+          "module": "dist/packages/kernel/dist/lib/signal-tree.js",
+          "bytes": 8939
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/location-runtime.js",
+          "bytes": 3617
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/member-membership.js",
+          "bytes": 3212
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/tree-scalar-slot-runtime.js",
+          "bytes": 3007
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/materialize-markers.js",
+          "bytes": 2207
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/tree-scalar-leaf-runtime.js",
+          "bytes": 1537
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/utilities/deep-equal.js",
+          "bytes": 1517
+        },
+        {
+          "module": "dist/packages/kernel/dist/enhancers/index.js",
+          "bytes": 1398
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/utils.js",
+          "bytes": 1388
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/owned-mutation.js",
+          "bytes": 1260
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/utilities/is-built-in-object.js",
+          "bytes": 1074
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/error-reporter.js",
+          "bytes": 996
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/position-registry.js",
+          "bytes": 940
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/tree-capabilities.js",
+          "bytes": 934
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/intrinsic-mutation.js",
+          "bytes": 849
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/snapshot-authority.js",
+          "bytes": 604
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/merge-derived.js",
+          "bytes": 580
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/mutation-capture-runtime.js",
+          "bytes": 565
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/constants.js",
+          "bytes": 365
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/leaf.js",
+          "bytes": 297
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/node-shape.js",
+          "bytes": 282
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/path-observation-port.js",
+          "bytes": 223
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/owned-metadata.js",
+          "bytes": 221
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/physical-commit-clock.js",
+          "bytes": 213
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/cell-identity.js",
+          "bytes": 192
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/observation-substrate.js",
+          "bytes": 190
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/tree-scalar-slot-port.js",
+          "bytes": 170
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/runtime-tree-plan.js",
+          "bytes": 143
+        },
+        {
+          "module": "../../../../../../private/tmp/st-new-key-cost-20261018/results/paired/signaltree-bare.js",
+          "bytes": 121
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/owner-invalidation-port.js",
+          "bytes": 97
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/observation-adapter.js",
+          "bytes": 89
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/root-source.js",
+          "bytes": 48
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/enhancer-types.js",
+          "bytes": 42
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/write-context.js",
+          "bytes": 31
+        }
+      ]
+    },
+    {
+      "arm": "paired",
+      "fixture": "signaltree-bare",
+      "mode": "dev",
+      "bytes": 43997,
+      "gzip": 15061,
+      "ceilingBytes": 14438.4,
+      "headroomBytes": -623,
+      "sha256": "83ce9fcfd76c41bb6ea30aac51feb8915edbcc7ae9b003a70dabfe6ee9faa91d",
+      "observed": [
+        1,
+        "b"
+      ],
+      "contributions": [
+        {
+          "module": "dist/packages/kernel/dist/lib/signal-tree.js",
+          "bytes": 13623
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/location-runtime.js",
+          "bytes": 3617
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/member-membership.js",
+          "bytes": 3440
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/tree-scalar-slot-runtime.js",
+          "bytes": 3007
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/materialize-markers.js",
+          "bytes": 2922
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/utils.js",
+          "bytes": 1649
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/tree-scalar-leaf-runtime.js",
+          "bytes": 1537
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/utilities/deep-equal.js",
+          "bytes": 1517
+        },
+        {
+          "module": "dist/packages/kernel/dist/enhancers/index.js",
+          "bytes": 1398
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/owned-mutation.js",
+          "bytes": 1260
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/error-reporter.js",
+          "bytes": 1208
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/utilities/is-built-in-object.js",
+          "bytes": 1074
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/merge-derived.js",
+          "bytes": 998
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/position-registry.js",
+          "bytes": 940
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/tree-capabilities.js",
+          "bytes": 934
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/intrinsic-mutation.js",
+          "bytes": 849
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/snapshot-authority.js",
+          "bytes": 700
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/mutation-capture-runtime.js",
+          "bytes": 565
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/constants.js",
+          "bytes": 399
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/leaf.js",
+          "bytes": 297
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/node-shape.js",
+          "bytes": 282
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/path-observation-port.js",
+          "bytes": 223
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/owned-metadata.js",
+          "bytes": 221
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/physical-commit-clock.js",
+          "bytes": 213
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/cell-identity.js",
+          "bytes": 192
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/observation-substrate.js",
+          "bytes": 190
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/tree-scalar-slot-port.js",
+          "bytes": 170
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/runtime-tree-plan.js",
+          "bytes": 143
+        },
+        {
+          "module": "../../../../../../private/tmp/st-new-key-cost-20261018/results/paired/signaltree-bare.js",
+          "bytes": 121
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/owner-invalidation-port.js",
+          "bytes": 97
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/observation-adapter.js",
+          "bytes": 89
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/root-source.js",
+          "bytes": 48
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/enhancer-types.js",
+          "bytes": 42
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/write-context.js",
+          "bytes": 31
+        }
+      ]
+    },
+    {
+      "arm": "paired",
+      "fixture": "signaltree-entities",
+      "mode": "prod",
+      "bytes": 88277,
+      "gzip": 26763,
+      "ceilingBytes": 26214.4,
+      "headroomBytes": -549,
+      "sha256": "07f88c9c9bd22a8c889f1eb605a705fae3bb83e41d1e2aa837f1e6f130c9d790",
+      "observed": [
+        {
+          "id": 1,
+          "name": "b"
+        }
+      ],
+      "contributions": [
+        {
+          "module": "dist/packages/kernel/dist/lib/entity-signal.js",
+          "bytes": 35476
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/signal-tree.js",
+          "bytes": 9006
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/physical/structural-store.js",
+          "bytes": 7375
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/location-runtime.js",
+          "bytes": 4228
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/member-membership.js",
+          "bytes": 3229
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/tree-scalar-slot-runtime.js",
+          "bytes": 3007
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/materialize-markers.js",
+          "bytes": 2704
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/physical/entity-mutation-frame.js",
+          "bytes": 2664
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/markers/entity-map.js",
+          "bytes": 1783
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/tree-scalar-leaf-runtime.js",
+          "bytes": 1539
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/utilities/deep-equal.js",
+          "bytes": 1517
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/utils.js",
+          "bytes": 1469
+        },
+        {
+          "module": "dist/packages/kernel/dist/enhancers/index.js",
+          "bytes": 1398
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/owned-mutation.js",
+          "bytes": 1264
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/utilities/deep-clone.js",
+          "bytes": 1182
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/utilities/is-built-in-object.js",
+          "bytes": 1075
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/error-reporter.js",
+          "bytes": 996
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/position-registry.js",
+          "bytes": 978
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/tree-capabilities.js",
+          "bytes": 934
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/intrinsic-mutation.js",
+          "bytes": 849
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/snapshot-authority.js",
+          "bytes": 616
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/merge-derived.js",
+          "bytes": 581
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/mutation-capture-runtime.js",
+          "bytes": 565
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/physical/entity-value-store.js",
+          "bytes": 480
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/constants.js",
+          "bytes": 365
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/leaf.js",
+          "bytes": 297
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/node-shape.js",
+          "bytes": 285
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/entity-projection-seed.js",
+          "bytes": 235
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/physical/entity-handle-resolution.js",
+          "bytes": 230
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/path-observation-port.js",
+          "bytes": 223
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/owned-metadata.js",
+          "bytes": 222
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/physical-commit-clock.js",
+          "bytes": 213
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/cell-identity.js",
+          "bytes": 193
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/observation-substrate.js",
+          "bytes": 190
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/tree-scalar-slot-port.js",
+          "bytes": 171
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/runtime-tree-plan.js",
+          "bytes": 143
+        },
+        {
+          "module": "../../../../../../private/tmp/st-new-key-cost-20261018/results/paired/signaltree-entities.js",
+          "bytes": 137
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/entity-membership-source.js",
+          "bytes": 126
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/owner-invalidation-port.js",
+          "bytes": 97
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/observation-adapter.js",
+          "bytes": 90
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/root-source.js",
+          "bytes": 48
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/enhancer-types.js",
+          "bytes": 42
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/write-context.js",
+          "bytes": 31
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/physical-rows.js",
+          "bytes": 23
+        }
+      ]
+    },
+    {
+      "arm": "paired",
+      "fixture": "signaltree-entities",
+      "mode": "dev",
+      "bytes": 96246,
+      "gzip": 29600,
+      "ceilingBytes": 29081.6,
+      "headroomBytes": -519,
+      "sha256": "f8fedb6304ab73e4376159ee0e2029439c64e94ff549d7d6f8219629a56bcfea",
+      "observed": [
+        {
+          "id": 1,
+          "name": "b"
+        }
+      ],
+      "contributions": [
+        {
+          "module": "dist/packages/kernel/dist/lib/entity-signal.js",
+          "bytes": 36038
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/signal-tree.js",
+          "bytes": 13690
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/physical/structural-store.js",
+          "bytes": 7375
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/location-runtime.js",
+          "bytes": 4228
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/materialize-markers.js",
+          "bytes": 3856
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/member-membership.js",
+          "bytes": 3457
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/tree-scalar-slot-runtime.js",
+          "bytes": 3007
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/physical/entity-mutation-frame.js",
+          "bytes": 2664
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/markers/entity-map.js",
+          "bytes": 2105
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/utils.js",
+          "bytes": 1730
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/tree-scalar-leaf-runtime.js",
+          "bytes": 1539
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/utilities/deep-equal.js",
+          "bytes": 1517
+        },
+        {
+          "module": "dist/packages/kernel/dist/enhancers/index.js",
+          "bytes": 1398
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/owned-mutation.js",
+          "bytes": 1264
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/error-reporter.js",
+          "bytes": 1208
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/utilities/deep-clone.js",
+          "bytes": 1182
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/utilities/is-built-in-object.js",
+          "bytes": 1075
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/merge-derived.js",
+          "bytes": 999
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/position-registry.js",
+          "bytes": 978
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/tree-capabilities.js",
+          "bytes": 934
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/intrinsic-mutation.js",
+          "bytes": 849
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/snapshot-authority.js",
+          "bytes": 712
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/mutation-capture-runtime.js",
+          "bytes": 565
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/physical/entity-value-store.js",
+          "bytes": 480
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/constants.js",
+          "bytes": 399
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/leaf.js",
+          "bytes": 297
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/node-shape.js",
+          "bytes": 285
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/entity-projection-seed.js",
+          "bytes": 235
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/physical/entity-handle-resolution.js",
+          "bytes": 230
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/path-observation-port.js",
+          "bytes": 223
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/owned-metadata.js",
+          "bytes": 222
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/physical-commit-clock.js",
+          "bytes": 213
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/cell-identity.js",
+          "bytes": 193
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/observation-substrate.js",
+          "bytes": 190
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/tree-scalar-slot-port.js",
+          "bytes": 171
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/runtime-tree-plan.js",
+          "bytes": 143
+        },
+        {
+          "module": "../../../../../../private/tmp/st-new-key-cost-20261018/results/paired/signaltree-entities.js",
+          "bytes": 137
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/entity-membership-source.js",
+          "bytes": 126
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/owner-invalidation-port.js",
+          "bytes": 97
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/observation-adapter.js",
+          "bytes": 90
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/root-source.js",
+          "bytes": 48
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/enhancer-types.js",
+          "bytes": 42
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/write-context.js",
+          "bytes": 31
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/physical-rows.js",
+          "bytes": 23
+        }
+      ]
+    },
+    {
+      "arm": "shared",
+      "fixture": "signaltree-bare",
+      "mode": "prod",
+      "bytes": 37284,
+      "gzip": 12592,
+      "ceilingBytes": 12032,
+      "headroomBytes": -560,
+      "sha256": "1f1c6daa2fb1a356f209cc09de7b71210f506f6352bfaf1ac1bbe5fbe5f870ac",
+      "observed": [
+        1,
+        "b"
+      ],
+      "contributions": [
+        {
+          "module": "dist/packages/kernel/dist/lib/signal-tree.js",
+          "bytes": 8939
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/location-runtime.js",
+          "bytes": 3617
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/member-membership.js",
+          "bytes": 3212
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/tree-scalar-slot-runtime.js",
+          "bytes": 2863
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/materialize-markers.js",
+          "bytes": 2124
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/tree-scalar-leaf-runtime.js",
+          "bytes": 1537
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/utilities/deep-equal.js",
+          "bytes": 1517
+        },
+        {
+          "module": "dist/packages/kernel/dist/enhancers/index.js",
+          "bytes": 1398
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/utils.js",
+          "bytes": 1388
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/owned-mutation.js",
+          "bytes": 1260
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/utilities/is-built-in-object.js",
+          "bytes": 1074
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/intrinsic-mutation.js",
+          "bytes": 1011
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/error-reporter.js",
+          "bytes": 996
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/position-registry.js",
+          "bytes": 940
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/tree-capabilities.js",
+          "bytes": 934
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/snapshot-authority.js",
+          "bytes": 604
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/merge-derived.js",
+          "bytes": 580
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/mutation-capture-runtime.js",
+          "bytes": 565
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/constants.js",
+          "bytes": 365
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/leaf.js",
+          "bytes": 297
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/node-shape.js",
+          "bytes": 282
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/path-observation-port.js",
+          "bytes": 223
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/owned-metadata.js",
+          "bytes": 221
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/physical-commit-clock.js",
+          "bytes": 213
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/cell-identity.js",
+          "bytes": 192
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/observation-substrate.js",
+          "bytes": 190
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/tree-scalar-slot-port.js",
+          "bytes": 170
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/runtime-tree-plan.js",
+          "bytes": 143
+        },
+        {
+          "module": "../../../../../../private/tmp/st-new-key-cost-20261018/results/shared/signaltree-bare.js",
+          "bytes": 121
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/owner-invalidation-port.js",
+          "bytes": 97
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/observation-adapter.js",
+          "bytes": 89
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/root-source.js",
+          "bytes": 48
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/enhancer-types.js",
+          "bytes": 42
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/write-context.js",
+          "bytes": 31
+        }
+      ]
+    },
+    {
+      "arm": "shared",
+      "fixture": "signaltree-bare",
+      "mode": "dev",
+      "bytes": 43932,
+      "gzip": 15028,
+      "ceilingBytes": 14438.4,
+      "headroomBytes": -590,
+      "sha256": "a89a45c48f6366a6854c64e43f8527a63a0be754c8df04eb05b21a62f548ca73",
+      "observed": [
+        1,
+        "b"
+      ],
+      "contributions": [
+        {
+          "module": "dist/packages/kernel/dist/lib/signal-tree.js",
+          "bytes": 13623
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/location-runtime.js",
+          "bytes": 3617
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/member-membership.js",
+          "bytes": 3440
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/tree-scalar-slot-runtime.js",
+          "bytes": 2863
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/materialize-markers.js",
+          "bytes": 2839
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/utils.js",
+          "bytes": 1649
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/tree-scalar-leaf-runtime.js",
+          "bytes": 1537
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/utilities/deep-equal.js",
+          "bytes": 1517
+        },
+        {
+          "module": "dist/packages/kernel/dist/enhancers/index.js",
+          "bytes": 1398
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/owned-mutation.js",
+          "bytes": 1260
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/error-reporter.js",
+          "bytes": 1208
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/utilities/is-built-in-object.js",
+          "bytes": 1074
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/intrinsic-mutation.js",
+          "bytes": 1011
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/merge-derived.js",
+          "bytes": 998
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/position-registry.js",
+          "bytes": 940
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/tree-capabilities.js",
+          "bytes": 934
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/snapshot-authority.js",
+          "bytes": 700
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/mutation-capture-runtime.js",
+          "bytes": 565
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/constants.js",
+          "bytes": 399
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/leaf.js",
+          "bytes": 297
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/node-shape.js",
+          "bytes": 282
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/path-observation-port.js",
+          "bytes": 223
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/owned-metadata.js",
+          "bytes": 221
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/physical-commit-clock.js",
+          "bytes": 213
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/cell-identity.js",
+          "bytes": 192
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/observation-substrate.js",
+          "bytes": 190
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/tree-scalar-slot-port.js",
+          "bytes": 170
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/runtime-tree-plan.js",
+          "bytes": 143
+        },
+        {
+          "module": "../../../../../../private/tmp/st-new-key-cost-20261018/results/shared/signaltree-bare.js",
+          "bytes": 121
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/owner-invalidation-port.js",
+          "bytes": 97
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/observation-adapter.js",
+          "bytes": 89
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/root-source.js",
+          "bytes": 48
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/enhancer-types.js",
+          "bytes": 42
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/write-context.js",
+          "bytes": 31
+        }
+      ]
+    },
+    {
+      "arm": "shared",
+      "fixture": "signaltree-entities",
+      "mode": "prod",
+      "bytes": 87924,
+      "gzip": 26640,
+      "ceilingBytes": 26214.4,
+      "headroomBytes": -426,
+      "sha256": "c41c09bf4909d9bbc4914144e9ae4455525fecb8ca363002aac745ec0ae3c303",
+      "observed": [
+        {
+          "id": 1,
+          "name": "b"
+        }
+      ],
+      "contributions": [
+        {
+          "module": "dist/packages/kernel/dist/lib/entity-signal.js",
+          "bytes": 35332
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/signal-tree.js",
+          "bytes": 9006
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/physical/structural-store.js",
+          "bytes": 7375
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/location-runtime.js",
+          "bytes": 4228
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/member-membership.js",
+          "bytes": 3229
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/tree-scalar-slot-runtime.js",
+          "bytes": 2863
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/materialize-markers.js",
+          "bytes": 2621
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/physical/entity-mutation-frame.js",
+          "bytes": 2520
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/markers/entity-map.js",
+          "bytes": 1783
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/tree-scalar-leaf-runtime.js",
+          "bytes": 1539
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/utilities/deep-equal.js",
+          "bytes": 1517
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/utils.js",
+          "bytes": 1469
+        },
+        {
+          "module": "dist/packages/kernel/dist/enhancers/index.js",
+          "bytes": 1398
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/owned-mutation.js",
+          "bytes": 1264
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/utilities/deep-clone.js",
+          "bytes": 1182
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/utilities/is-built-in-object.js",
+          "bytes": 1075
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/intrinsic-mutation.js",
+          "bytes": 1011
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/error-reporter.js",
+          "bytes": 996
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/position-registry.js",
+          "bytes": 978
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/tree-capabilities.js",
+          "bytes": 934
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/snapshot-authority.js",
+          "bytes": 616
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/merge-derived.js",
+          "bytes": 581
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/mutation-capture-runtime.js",
+          "bytes": 565
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/physical/entity-value-store.js",
+          "bytes": 480
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/constants.js",
+          "bytes": 365
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/leaf.js",
+          "bytes": 297
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/node-shape.js",
+          "bytes": 285
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/entity-projection-seed.js",
+          "bytes": 235
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/physical/entity-handle-resolution.js",
+          "bytes": 230
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/path-observation-port.js",
+          "bytes": 223
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/owned-metadata.js",
+          "bytes": 222
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/physical-commit-clock.js",
+          "bytes": 213
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/cell-identity.js",
+          "bytes": 193
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/observation-substrate.js",
+          "bytes": 190
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/tree-scalar-slot-port.js",
+          "bytes": 171
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/runtime-tree-plan.js",
+          "bytes": 143
+        },
+        {
+          "module": "../../../../../../private/tmp/st-new-key-cost-20261018/results/shared/signaltree-entities.js",
+          "bytes": 137
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/entity-membership-source.js",
+          "bytes": 126
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/owner-invalidation-port.js",
+          "bytes": 97
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/observation-adapter.js",
+          "bytes": 90
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/root-source.js",
+          "bytes": 48
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/enhancer-types.js",
+          "bytes": 42
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/write-context.js",
+          "bytes": 31
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/physical-rows.js",
+          "bytes": 23
+        }
+      ]
+    },
+    {
+      "arm": "shared",
+      "fixture": "signaltree-entities",
+      "mode": "dev",
+      "bytes": 95893,
+      "gzip": 29495,
+      "ceilingBytes": 29081.6,
+      "headroomBytes": -414,
+      "sha256": "fedaea030b4d024d0a05a7877cbe6818a2220bf44caec5b6aa3dbc711ac07eb6",
+      "observed": [
+        {
+          "id": 1,
+          "name": "b"
+        }
+      ],
+      "contributions": [
+        {
+          "module": "dist/packages/kernel/dist/lib/entity-signal.js",
+          "bytes": 35894
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/signal-tree.js",
+          "bytes": 13690
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/physical/structural-store.js",
+          "bytes": 7375
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/location-runtime.js",
+          "bytes": 4228
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/materialize-markers.js",
+          "bytes": 3773
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/member-membership.js",
+          "bytes": 3457
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/tree-scalar-slot-runtime.js",
+          "bytes": 2863
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/physical/entity-mutation-frame.js",
+          "bytes": 2520
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/markers/entity-map.js",
+          "bytes": 2105
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/utils.js",
+          "bytes": 1730
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/tree-scalar-leaf-runtime.js",
+          "bytes": 1539
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/utilities/deep-equal.js",
+          "bytes": 1517
+        },
+        {
+          "module": "dist/packages/kernel/dist/enhancers/index.js",
+          "bytes": 1398
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/owned-mutation.js",
+          "bytes": 1264
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/error-reporter.js",
+          "bytes": 1208
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/utilities/deep-clone.js",
+          "bytes": 1182
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/utilities/is-built-in-object.js",
+          "bytes": 1075
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/intrinsic-mutation.js",
+          "bytes": 1011
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/merge-derived.js",
+          "bytes": 999
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/position-registry.js",
+          "bytes": 978
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/tree-capabilities.js",
+          "bytes": 934
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/snapshot-authority.js",
+          "bytes": 712
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/mutation-capture-runtime.js",
+          "bytes": 565
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/physical/entity-value-store.js",
+          "bytes": 480
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/constants.js",
+          "bytes": 399
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/leaf.js",
+          "bytes": 297
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/node-shape.js",
+          "bytes": 285
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/entity-projection-seed.js",
+          "bytes": 235
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/physical/entity-handle-resolution.js",
+          "bytes": 230
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/path-observation-port.js",
+          "bytes": 223
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/owned-metadata.js",
+          "bytes": 222
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/physical-commit-clock.js",
+          "bytes": 213
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/cell-identity.js",
+          "bytes": 193
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/observation-substrate.js",
+          "bytes": 190
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/tree-scalar-slot-port.js",
+          "bytes": 171
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/runtime-tree-plan.js",
+          "bytes": 143
+        },
+        {
+          "module": "../../../../../../private/tmp/st-new-key-cost-20261018/results/shared/signaltree-entities.js",
+          "bytes": 137
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/entity-membership-source.js",
+          "bytes": 126
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/owner-invalidation-port.js",
+          "bytes": 97
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/observation-adapter.js",
+          "bytes": 90
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/root-source.js",
+          "bytes": 48
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/enhancer-types.js",
+          "bytes": 42
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/write-context.js",
+          "bytes": 31
+        },
+        {
+          "module": "dist/packages/kernel/dist/lib/internals/physical-rows.js",
+          "bytes": 23
+        }
+      ]
+    }
+  ]
+}

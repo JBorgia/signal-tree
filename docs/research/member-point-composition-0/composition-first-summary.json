@@ -1,0 +1,594 @@
+{
+  "base": {
+    "pass": 6,
+    "total": 10,
+    "results": [
+      {
+        "mode": "callback",
+        "exit": 0,
+        "stable": true,
+        "command": "ST_PROOF_OUTPUT=/private/tmp/st-member-composition node docs/research/member-point-composition-0/run.mjs base composition-acceptance.mjs callback second",
+        "checks": [
+          {
+            "name": "useful speculative row and pending authority",
+            "pass": true
+          },
+          {
+            "name": "settlement result and exact first failure",
+            "pass": true
+          },
+          {
+            "name": "complete visible disposition and retained lifetime",
+            "pass": true
+          },
+          {
+            "name": "coherent actual settlement delivery",
+            "pass": true
+          },
+          {
+            "name": "terminal retry is inert",
+            "pass": true
+          }
+        ],
+        "output": "/private/tmp/st-member-composition/runs/base-composition-acceptance.mjs-callback-second"
+      },
+      {
+        "mode": "fault-member-error",
+        "exit": 1,
+        "stable": true,
+        "command": "ST_PROOF_OUTPUT=/private/tmp/st-member-composition node docs/research/member-point-composition-0/run.mjs base composition-acceptance.mjs fault-member-error second",
+        "checks": [
+          {
+            "name": "useful speculative row and pending authority",
+            "pass": true
+          },
+          {
+            "name": "settlement result and exact first failure",
+            "pass": true
+          },
+          {
+            "name": "complete visible disposition and retained lifetime",
+            "pass": false
+          },
+          {
+            "name": "coherent actual settlement delivery",
+            "pass": false
+          },
+          {
+            "name": "terminal retry is inert",
+            "pass": false
+          }
+        ],
+        "output": "/private/tmp/st-member-composition/runs/base-composition-acceptance.mjs-fault-member-error-second"
+      },
+      {
+        "mode": "fault-member-undefined",
+        "exit": 1,
+        "stable": true,
+        "command": "ST_PROOF_OUTPUT=/private/tmp/st-member-composition node docs/research/member-point-composition-0/run.mjs base composition-acceptance.mjs fault-member-undefined second",
+        "checks": [
+          {
+            "name": "useful speculative row and pending authority",
+            "pass": true
+          },
+          {
+            "name": "settlement result and exact first failure",
+            "pass": true
+          },
+          {
+            "name": "complete visible disposition and retained lifetime",
+            "pass": false
+          },
+          {
+            "name": "coherent actual settlement delivery",
+            "pass": false
+          },
+          {
+            "name": "terminal retry is inert",
+            "pass": false
+          }
+        ],
+        "output": "/private/tmp/st-member-composition/runs/base-composition-acceptance.mjs-fault-member-undefined-second"
+      },
+      {
+        "mode": "fault-row-error",
+        "exit": 0,
+        "stable": true,
+        "command": "ST_PROOF_OUTPUT=/private/tmp/st-member-composition node docs/research/member-point-composition-0/run.mjs base composition-acceptance.mjs fault-row-error second",
+        "checks": [
+          {
+            "name": "useful speculative row and pending authority",
+            "pass": true
+          },
+          {
+            "name": "settlement result and exact first failure",
+            "pass": true
+          },
+          {
+            "name": "complete visible disposition and retained lifetime",
+            "pass": true
+          },
+          {
+            "name": "coherent actual settlement delivery",
+            "pass": true
+          },
+          {
+            "name": "terminal retry is inert",
+            "pass": true
+          }
+        ],
+        "output": "/private/tmp/st-member-composition/runs/base-composition-acceptance.mjs-fault-row-error-second"
+      },
+      {
+        "mode": "fault-row-undefined",
+        "exit": 0,
+        "stable": true,
+        "command": "ST_PROOF_OUTPUT=/private/tmp/st-member-composition node docs/research/member-point-composition-0/run.mjs base composition-acceptance.mjs fault-row-undefined second",
+        "checks": [
+          {
+            "name": "useful speculative row and pending authority",
+            "pass": true
+          },
+          {
+            "name": "settlement result and exact first failure",
+            "pass": true
+          },
+          {
+            "name": "complete visible disposition and retained lifetime",
+            "pass": true
+          },
+          {
+            "name": "coherent actual settlement delivery",
+            "pass": true
+          },
+          {
+            "name": "terminal retry is inert",
+            "pass": true
+          }
+        ],
+        "output": "/private/tmp/st-member-composition/runs/base-composition-acceptance.mjs-fault-row-undefined-second"
+      },
+      {
+        "mode": "fault-scalar-error",
+        "exit": 1,
+        "stable": true,
+        "command": "ST_PROOF_OUTPUT=/private/tmp/st-member-composition node docs/research/member-point-composition-0/run.mjs base composition-acceptance.mjs fault-scalar-error second",
+        "checks": [
+          {
+            "name": "useful speculative row and pending authority",
+            "pass": true
+          },
+          {
+            "name": "settlement result and exact first failure",
+            "pass": true
+          },
+          {
+            "name": "complete visible disposition and retained lifetime",
+            "pass": false
+          },
+          {
+            "name": "coherent actual settlement delivery",
+            "pass": false
+          },
+          {
+            "name": "terminal retry is inert",
+            "pass": false
+          }
+        ],
+        "output": "/private/tmp/st-member-composition/runs/base-composition-acceptance.mjs-fault-scalar-error-second"
+      },
+      {
+        "mode": "fault-scalar-undefined",
+        "exit": 1,
+        "stable": true,
+        "command": "ST_PROOF_OUTPUT=/private/tmp/st-member-composition node docs/research/member-point-composition-0/run.mjs base composition-acceptance.mjs fault-scalar-undefined second",
+        "checks": [
+          {
+            "name": "useful speculative row and pending authority",
+            "pass": true
+          },
+          {
+            "name": "settlement result and exact first failure",
+            "pass": true
+          },
+          {
+            "name": "complete visible disposition and retained lifetime",
+            "pass": false
+          },
+          {
+            "name": "coherent actual settlement delivery",
+            "pass": false
+          },
+          {
+            "name": "terminal retry is inert",
+            "pass": false
+          }
+        ],
+        "output": "/private/tmp/st-member-composition/runs/base-composition-acceptance.mjs-fault-scalar-undefined-second"
+      },
+      {
+        "mode": "overlap",
+        "exit": 0,
+        "stable": true,
+        "command": "ST_PROOF_OUTPUT=/private/tmp/st-member-composition node docs/research/member-point-composition-0/run.mjs base composition-acceptance.mjs overlap second",
+        "checks": [
+          {
+            "name": "useful speculative row and pending authority",
+            "pass": true
+          },
+          {
+            "name": "settlement result and exact first failure",
+            "pass": true
+          },
+          {
+            "name": "complete visible disposition and retained lifetime",
+            "pass": true
+          },
+          {
+            "name": "coherent actual settlement delivery",
+            "pass": true
+          },
+          {
+            "name": "terminal retry is inert",
+            "pass": true
+          }
+        ],
+        "output": "/private/tmp/st-member-composition/runs/base-composition-acceptance.mjs-overlap-second"
+      },
+      {
+        "mode": "x-first",
+        "exit": 0,
+        "stable": true,
+        "command": "ST_PROOF_OUTPUT=/private/tmp/st-member-composition node docs/research/member-point-composition-0/run.mjs base composition-acceptance.mjs x-first second",
+        "checks": [
+          {
+            "name": "useful speculative row and pending authority",
+            "pass": true
+          },
+          {
+            "name": "settlement result and exact first failure",
+            "pass": true
+          },
+          {
+            "name": "complete visible disposition and retained lifetime",
+            "pass": true
+          },
+          {
+            "name": "coherent actual settlement delivery",
+            "pass": true
+          },
+          {
+            "name": "terminal retry is inert",
+            "pass": true
+          }
+        ],
+        "output": "/private/tmp/st-member-composition/runs/base-composition-acceptance.mjs-x-first-second"
+      },
+      {
+        "mode": "y-first",
+        "exit": 0,
+        "stable": true,
+        "command": "ST_PROOF_OUTPUT=/private/tmp/st-member-composition node docs/research/member-point-composition-0/run.mjs base composition-acceptance.mjs y-first second",
+        "checks": [
+          {
+            "name": "useful speculative row and pending authority",
+            "pass": true
+          },
+          {
+            "name": "settlement result and exact first failure",
+            "pass": true
+          },
+          {
+            "name": "complete visible disposition and retained lifetime",
+            "pass": true
+          },
+          {
+            "name": "coherent actual settlement delivery",
+            "pass": true
+          },
+          {
+            "name": "terminal retry is inert",
+            "pass": true
+          }
+        ],
+        "output": "/private/tmp/st-member-composition/runs/base-composition-acceptance.mjs-y-first-second"
+      }
+    ]
+  },
+  "CPRB": {
+    "pass": 8,
+    "total": 10,
+    "results": [
+      {
+        "mode": "callback",
+        "exit": 0,
+        "stable": true,
+        "command": "ST_PROOF_OUTPUT=/private/tmp/st-member-composition node docs/research/member-point-composition-0/run.mjs CPRB composition-acceptance.mjs callback first",
+        "checks": [
+          {
+            "name": "useful speculative row and pending authority",
+            "pass": true
+          },
+          {
+            "name": "settlement result and exact first failure",
+            "pass": true
+          },
+          {
+            "name": "complete visible disposition and retained lifetime",
+            "pass": true
+          },
+          {
+            "name": "coherent actual settlement delivery",
+            "pass": true
+          },
+          {
+            "name": "terminal retry is inert",
+            "pass": true
+          }
+        ],
+        "output": "/private/tmp/st-member-composition/runs/CPRB-composition-acceptance.mjs-callback-first"
+      },
+      {
+        "mode": "fault-member-error",
+        "exit": 1,
+        "stable": true,
+        "command": "ST_PROOF_OUTPUT=/private/tmp/st-member-composition node docs/research/member-point-composition-0/run.mjs CPRB composition-acceptance.mjs fault-member-error first",
+        "checks": [
+          {
+            "name": "useful speculative row and pending authority",
+            "pass": true
+          },
+          {
+            "name": "settlement result and exact first failure",
+            "pass": true
+          },
+          {
+            "name": "complete visible disposition and retained lifetime",
+            "pass": false
+          },
+          {
+            "name": "coherent actual settlement delivery",
+            "pass": false
+          },
+          {
+            "name": "terminal retry is inert",
+            "pass": false
+          }
+        ],
+        "output": "/private/tmp/st-member-composition/runs/CPRB-composition-acceptance.mjs-fault-member-error-first"
+      },
+      {
+        "mode": "fault-member-undefined",
+        "exit": 1,
+        "stable": true,
+        "command": "ST_PROOF_OUTPUT=/private/tmp/st-member-composition node docs/research/member-point-composition-0/run.mjs CPRB composition-acceptance.mjs fault-member-undefined first",
+        "checks": [
+          {
+            "name": "useful speculative row and pending authority",
+            "pass": true
+          },
+          {
+            "name": "settlement result and exact first failure",
+            "pass": true
+          },
+          {
+            "name": "complete visible disposition and retained lifetime",
+            "pass": false
+          },
+          {
+            "name": "coherent actual settlement delivery",
+            "pass": false
+          },
+          {
+            "name": "terminal retry is inert",
+            "pass": false
+          }
+        ],
+        "output": "/private/tmp/st-member-composition/runs/CPRB-composition-acceptance.mjs-fault-member-undefined-first"
+      },
+      {
+        "mode": "fault-row-error",
+        "exit": 0,
+        "stable": true,
+        "command": "ST_PROOF_OUTPUT=/private/tmp/st-member-composition node docs/research/member-point-composition-0/run.mjs CPRB composition-acceptance.mjs fault-row-error first",
+        "checks": [
+          {
+            "name": "useful speculative row and pending authority",
+            "pass": true
+          },
+          {
+            "name": "settlement result and exact first failure",
+            "pass": true
+          },
+          {
+            "name": "complete visible disposition and retained lifetime",
+            "pass": true
+          },
+          {
+            "name": "coherent actual settlement delivery",
+            "pass": true
+          },
+          {
+            "name": "terminal retry is inert",
+            "pass": true
+          }
+        ],
+        "output": "/private/tmp/st-member-composition/runs/CPRB-composition-acceptance.mjs-fault-row-error-first"
+      },
+      {
+        "mode": "fault-row-undefined",
+        "exit": 0,
+        "stable": true,
+        "command": "ST_PROOF_OUTPUT=/private/tmp/st-member-composition node docs/research/member-point-composition-0/run.mjs CPRB composition-acceptance.mjs fault-row-undefined first",
+        "checks": [
+          {
+            "name": "useful speculative row and pending authority",
+            "pass": true
+          },
+          {
+            "name": "settlement result and exact first failure",
+            "pass": true
+          },
+          {
+            "name": "complete visible disposition and retained lifetime",
+            "pass": true
+          },
+          {
+            "name": "coherent actual settlement delivery",
+            "pass": true
+          },
+          {
+            "name": "terminal retry is inert",
+            "pass": true
+          }
+        ],
+        "output": "/private/tmp/st-member-composition/runs/CPRB-composition-acceptance.mjs-fault-row-undefined-first"
+      },
+      {
+        "mode": "fault-scalar-error",
+        "exit": 0,
+        "stable": true,
+        "command": "ST_PROOF_OUTPUT=/private/tmp/st-member-composition node docs/research/member-point-composition-0/run.mjs CPRB composition-acceptance.mjs fault-scalar-error first",
+        "checks": [
+          {
+            "name": "useful speculative row and pending authority",
+            "pass": true
+          },
+          {
+            "name": "settlement result and exact first failure",
+            "pass": true
+          },
+          {
+            "name": "complete visible disposition and retained lifetime",
+            "pass": true
+          },
+          {
+            "name": "coherent actual settlement delivery",
+            "pass": true
+          },
+          {
+            "name": "terminal retry is inert",
+            "pass": true
+          }
+        ],
+        "output": "/private/tmp/st-member-composition/runs/CPRB-composition-acceptance.mjs-fault-scalar-error-first"
+      },
+      {
+        "mode": "fault-scalar-undefined",
+        "exit": 0,
+        "stable": true,
+        "command": "ST_PROOF_OUTPUT=/private/tmp/st-member-composition node docs/research/member-point-composition-0/run.mjs CPRB composition-acceptance.mjs fault-scalar-undefined first",
+        "checks": [
+          {
+            "name": "useful speculative row and pending authority",
+            "pass": true
+          },
+          {
+            "name": "settlement result and exact first failure",
+            "pass": true
+          },
+          {
+            "name": "complete visible disposition and retained lifetime",
+            "pass": true
+          },
+          {
+            "name": "coherent actual settlement delivery",
+            "pass": true
+          },
+          {
+            "name": "terminal retry is inert",
+            "pass": true
+          }
+        ],
+        "output": "/private/tmp/st-member-composition/runs/CPRB-composition-acceptance.mjs-fault-scalar-undefined-first"
+      },
+      {
+        "mode": "overlap",
+        "exit": 0,
+        "stable": true,
+        "command": "ST_PROOF_OUTPUT=/private/tmp/st-member-composition node docs/research/member-point-composition-0/run.mjs CPRB composition-acceptance.mjs overlap first",
+        "checks": [
+          {
+            "name": "useful speculative row and pending authority",
+            "pass": true
+          },
+          {
+            "name": "settlement result and exact first failure",
+            "pass": true
+          },
+          {
+            "name": "complete visible disposition and retained lifetime",
+            "pass": true
+          },
+          {
+            "name": "coherent actual settlement delivery",
+            "pass": true
+          },
+          {
+            "name": "terminal retry is inert",
+            "pass": true
+          }
+        ],
+        "output": "/private/tmp/st-member-composition/runs/CPRB-composition-acceptance.mjs-overlap-first"
+      },
+      {
+        "mode": "x-first",
+        "exit": 0,
+        "stable": true,
+        "command": "ST_PROOF_OUTPUT=/private/tmp/st-member-composition node docs/research/member-point-composition-0/run.mjs CPRB composition-acceptance.mjs x-first first",
+        "checks": [
+          {
+            "name": "useful speculative row and pending authority",
+            "pass": true
+          },
+          {
+            "name": "settlement result and exact first failure",
+            "pass": true
+          },
+          {
+            "name": "complete visible disposition and retained lifetime",
+            "pass": true
+          },
+          {
+            "name": "coherent actual settlement delivery",
+            "pass": true
+          },
+          {
+            "name": "terminal retry is inert",
+            "pass": true
+          }
+        ],
+        "output": "/private/tmp/st-member-composition/runs/CPRB-composition-acceptance.mjs-x-first-first"
+      },
+      {
+        "mode": "y-first",
+        "exit": 0,
+        "stable": true,
+        "command": "ST_PROOF_OUTPUT=/private/tmp/st-member-composition node docs/research/member-point-composition-0/run.mjs CPRB composition-acceptance.mjs y-first first",
+        "checks": [
+          {
+            "name": "useful speculative row and pending authority",
+            "pass": true
+          },
+          {
+            "name": "settlement result and exact first failure",
+            "pass": true
+          },
+          {
+            "name": "complete visible disposition and retained lifetime",
+            "pass": true
+          },
+          {
+            "name": "coherent actual settlement delivery",
+            "pass": true
+          },
+          {
+            "name": "terminal retry is inert",
+            "pass": true
+          }
+        ],
+        "output": "/private/tmp/st-member-composition/runs/CPRB-composition-acceptance.mjs-y-first-first"
+      }
+    ]
+  }
+}

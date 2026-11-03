@@ -1,0 +1,932 @@
+[
+  {
+    "path": "/private/tmp/st-atomic-proof-20261013/spec.mjs",
+    "resolvedAs": "/private/tmp/st-atomic-proof-20261013/spec.mjs",
+    "sha256": "1689dbc4493988f24d40ad5b01f23fc815d7111b337b5cbc3a9f8aca94bdb273",
+    "loadedSha256": "1689dbc4493988f24d40ad5b01f23fc815d7111b337b5cbc3a9f8aca94bdb273"
+  },
+  {
+    "path": "/private/tmp/st-atomic-proof-20261013/candidate/packages/kernel/src/enhancers/transactions/transactions.ts",
+    "resolvedAs": "/Users/jonathanborgia/.codex/worktrees/atomic-capture-proof/signaltree/packages/kernel/src/enhancers/transactions/transactions.ts",
+    "sha256": "644b74cc7769d74c57a4156fbc543a691968085d0ee75b39f2044d9edd83cffb",
+    "loadedSha256": "b2d1d9572bc1cb57e051c5abdee9fdd64942c33cdc1d258e115597da02cb6fcd"
+  },
+  {
+    "path": "/Users/jonathanborgia/.codex/worktrees/atomic-capture-proof/signaltree/packages/vue/src/lib/vue-observation.ts",
+    "resolvedAs": "/Users/jonathanborgia/.codex/worktrees/atomic-capture-proof/signaltree/packages/vue/src/lib/vue-observation.ts",
+    "sha256": "b9122fe201ec11645a86fe8d8253423c5498a9f53f4c7bc93cbfca02fdeb34cb",
+    "loadedSha256": "b9122fe201ec11645a86fe8d8253423c5498a9f53f4c7bc93cbfca02fdeb34cb"
+  },
+  {
+    "path": "/Users/jonathanborgia/.codex/worktrees/atomic-capture-proof/signaltree/packages/kernel/src/adapter.ts",
+    "resolvedAs": "/Users/jonathanborgia/.codex/worktrees/atomic-capture-proof/signaltree/packages/kernel/src/adapter.ts",
+    "sha256": "e99cc57221d867942fcb276fb48136ebd5b5620663436d7a2ed756c75a7d6fa9",
+    "loadedSha256": "e99cc57221d867942fcb276fb48136ebd5b5620663436d7a2ed756c75a7d6fa9"
+  },
+  {
+    "path": "/Users/jonathanborgia/.codex/worktrees/atomic-capture-proof/signaltree/packages/kernel/src/index.ts",
+    "resolvedAs": "/Users/jonathanborgia/.codex/worktrees/atomic-capture-proof/signaltree/packages/kernel/src/index.ts",
+    "sha256": "180b166b80796e9519188f694e29a4fff2a66a92256e2858557e1d7a7b7d2388",
+    "loadedSha256": "180b166b80796e9519188f694e29a4fff2a66a92256e2858557e1d7a7b7d2388"
+  },
+  {
+    "path": "/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/vue@3.5.42_typescript@6.0.3/node_modules/vue/index.mjs",
+    "resolvedAs": "/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/vue@3.5.42_typescript@6.0.3/node_modules/vue/index.mjs",
+    "sha256": "be2f35590bee45e69850d0d8d48f0b8c8f5c0ef0ecf8a7265ab12fb7add6584d",
+    "loadedSha256": "be2f35590bee45e69850d0d8d48f0b8c8f5c0ef0ecf8a7265ab12fb7add6584d"
+  },
+  {
+    "path": "/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/vue@3.5.42_typescript@6.0.3/node_modules/vue/index.js",
+    "resolvedAs": "/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/vue@3.5.42_typescript@6.0.3/node_modules/vue/index.js",
+    "sha256": "a5287f6056bc5c2c569d318063ee043f55a0d323fa7262f64456d58fd574f928",
+    "loadedSha256": "a5287f6056bc5c2c569d318063ee043f55a0d323fa7262f64456d58fd574f928"
+  },
+  {
+    "path": "/private/tmp/st-atomic-proof-20261013/candidate/packages/kernel/src/lib/internals/native-location-realization.ts",
+    "resolvedAs": "/Users/jonathanborgia/.codex/worktrees/atomic-capture-proof/signaltree/packages/kernel/src/lib/internals/native-location-realization.ts",
+    "sha256": "7a148240fe9a0f307c4a2a61d1a5839ec3fed66fdd27d4a14ff12c0c05d65a7c",
+    "loadedSha256": "7a148240fe9a0f307c4a2a61d1a5839ec3fed66fdd27d4a14ff12c0c05d65a7c"
+  },
+  {
+    "path": "/Users/jonathanborgia/.codex/worktrees/atomic-capture-proof/signaltree/packages/kernel/src/lib/internals/owner-invalidation.ts",
+    "resolvedAs": "/Users/jonathanborgia/.codex/worktrees/atomic-capture-proof/signaltree/packages/kernel/src/lib/internals/owner-invalidation.ts",
+    "sha256": "5c69c9022656eb21baeb4f242d81d399db82a8867a595266e1a3d4ff419eb627",
+    "loadedSha256": "5c69c9022656eb21baeb4f242d81d399db82a8867a595266e1a3d4ff419eb627"
+  },
+  {
+    "path": "/Users/jonathanborgia/.codex/worktrees/atomic-capture-proof/signaltree/packages/kernel/src/lib/signal-tree.ts",
+    "resolvedAs": "/Users/jonathanborgia/.codex/worktrees/atomic-capture-proof/signaltree/packages/kernel/src/lib/signal-tree.ts",
+    "sha256": "b97cec9eae6c8c4443ddd65974c4306dce1395fda24dcb7b24519d8cee578e99",
+    "loadedSha256": "b97cec9eae6c8c4443ddd65974c4306dce1395fda24dcb7b24519d8cee578e99"
+  },
+  {
+    "path": "/Users/jonathanborgia/.codex/worktrees/atomic-capture-proof/signaltree/packages/kernel/src/lib/internals/construction-branch.ts",
+    "resolvedAs": "/Users/jonathanborgia/.codex/worktrees/atomic-capture-proof/signaltree/packages/kernel/src/lib/internals/construction-branch.ts",
+    "sha256": "22a1ad1a73e6f8bdc6cf9ff29ba91fbda767df2c415343eaa7b3e2497ade8282",
+    "loadedSha256": "22a1ad1a73e6f8bdc6cf9ff29ba91fbda767df2c415343eaa7b3e2497ade8282"
+  },
+  {
+    "path": "/Users/jonathanborgia/.codex/worktrees/atomic-capture-proof/signaltree/packages/kernel/src/lib/internals/canonical-snapshot.ts",
+    "resolvedAs": "/Users/jonathanborgia/.codex/worktrees/atomic-capture-proof/signaltree/packages/kernel/src/lib/internals/canonical-snapshot.ts",
+    "sha256": "51b8ca59737c3b3c082a12926925b526fcb2182bb345a15eb189320209741d50",
+    "loadedSha256": "51b8ca59737c3b3c082a12926925b526fcb2182bb345a15eb189320209741d50"
+  },
+  {
+    "path": "/private/tmp/st-atomic-proof-20261013/candidate/packages/kernel/src/lib/internals/native-tree-scalar-leaf-runtime.ts",
+    "resolvedAs": "/Users/jonathanborgia/.codex/worktrees/atomic-capture-proof/signaltree/packages/kernel/src/lib/internals/native-tree-scalar-leaf-runtime.ts",
+    "sha256": "4c2077142cd3f69c475221abe0a0a45f605f14d304d73ef256980a2c661da876",
+    "loadedSha256": "4c2077142cd3f69c475221abe0a0a45f605f14d304d73ef256980a2c661da876"
+  },
+  {
+    "path": "/Users/jonathanborgia/.codex/worktrees/atomic-capture-proof/signaltree/packages/kernel/src/lib/internals/observation-adapter.ts",
+    "resolvedAs": "/Users/jonathanborgia/.codex/worktrees/atomic-capture-proof/signaltree/packages/kernel/src/lib/internals/observation-adapter.ts",
+    "sha256": "cc505e5d8951e6b25a17b6741cdcd9d9070fe76bdcf73e3ceabb2c028efd1016",
+    "loadedSha256": "cc505e5d8951e6b25a17b6741cdcd9d9070fe76bdcf73e3ceabb2c028efd1016"
+  },
+  {
+    "path": "/Users/jonathanborgia/.codex/worktrees/atomic-capture-proof/signaltree/packages/kernel/src/lib/internals/restoration-eligibility.ts",
+    "resolvedAs": "/Users/jonathanborgia/.codex/worktrees/atomic-capture-proof/signaltree/packages/kernel/src/lib/internals/restoration-eligibility.ts",
+    "sha256": "e78e31933f34e842bf355249c404a11d02750700eddeaf09737f7c2bbde880ba",
+    "loadedSha256": "e78e31933f34e842bf355249c404a11d02750700eddeaf09737f7c2bbde880ba"
+  },
+  {
+    "path": "/private/tmp/st-atomic-proof-20261013/candidate/packages/kernel/src/lib/internals/location-runtime.ts",
+    "resolvedAs": "/Users/jonathanborgia/.codex/worktrees/atomic-capture-proof/signaltree/packages/kernel/src/lib/internals/location-runtime.ts",
+    "sha256": "0b97cf252ea781e365cdc9a8d8202c4cc1076805fd4ba3fac3bcaeb98a44b5a6",
+    "loadedSha256": "0b97cf252ea781e365cdc9a8d8202c4cc1076805fd4ba3fac3bcaeb98a44b5a6"
+  },
+  {
+    "path": "/Users/jonathanborgia/.codex/worktrees/atomic-capture-proof/signaltree/packages/kernel/src/lib/internals/node-shape.ts",
+    "resolvedAs": "/Users/jonathanborgia/.codex/worktrees/atomic-capture-proof/signaltree/packages/kernel/src/lib/internals/node-shape.ts",
+    "sha256": "435224e100d4a45f7a52691236b3a9289d05cfb11100eb26fd5fc7275921c5d1",
+    "loadedSha256": "435224e100d4a45f7a52691236b3a9289d05cfb11100eb26fd5fc7275921c5d1"
+  },
+  {
+    "path": "/Users/jonathanborgia/.codex/worktrees/atomic-capture-proof/signaltree/packages/kernel/src/lib/internals/observation-substrate.ts",
+    "resolvedAs": "/Users/jonathanborgia/.codex/worktrees/atomic-capture-proof/signaltree/packages/kernel/src/lib/internals/observation-substrate.ts",
+    "sha256": "74bfc1e148cdf432164e27227e9e8113f540650885c467d58b26cc28f604500d",
+    "loadedSha256": "74bfc1e148cdf432164e27227e9e8113f540650885c467d58b26cc28f604500d"
+  },
+  {
+    "path": "/Users/jonathanborgia/.codex/worktrees/atomic-capture-proof/signaltree/packages/kernel/src/lib/audit/audit.ts",
+    "resolvedAs": "/Users/jonathanborgia/.codex/worktrees/atomic-capture-proof/signaltree/packages/kernel/src/lib/audit/audit.ts",
+    "sha256": "7723acc97ab475103d9c0e3963ca373005732433e28b050021976942011f0385",
+    "loadedSha256": "7723acc97ab475103d9c0e3963ca373005732433e28b050021976942011f0385"
+  },
+  {
+    "path": "/Users/jonathanborgia/.codex/worktrees/atomic-capture-proof/signaltree/packages/kernel/src/enhancers/devtools/devtools.ts",
+    "resolvedAs": "/Users/jonathanborgia/.codex/worktrees/atomic-capture-proof/signaltree/packages/kernel/src/enhancers/devtools/devtools.ts",
+    "sha256": "a70ae3062de88cd4cbd6c817271309f7aaacaa560a9cf14b11389c185392a48e",
+    "loadedSha256": "a70ae3062de88cd4cbd6c817271309f7aaacaa560a9cf14b11389c185392a48e"
+  },
+  {
+    "path": "/Users/jonathanborgia/.codex/worktrees/atomic-capture-proof/signaltree/packages/kernel/src/lib/leaf.ts",
+    "resolvedAs": "/Users/jonathanborgia/.codex/worktrees/atomic-capture-proof/signaltree/packages/kernel/src/lib/leaf.ts",
+    "sha256": "c2a8c94a23b8adab93e21961b3835fc99a4e39af559de1d7d177a699e7e1d30e",
+    "loadedSha256": "c2a8c94a23b8adab93e21961b3835fc99a4e39af559de1d7d177a699e7e1d30e"
+  },
+  {
+    "path": "/Users/jonathanborgia/.codex/worktrees/atomic-capture-proof/signaltree/packages/kernel/src/lib/undoable.ts",
+    "resolvedAs": "/Users/jonathanborgia/.codex/worktrees/atomic-capture-proof/signaltree/packages/kernel/src/lib/undoable.ts",
+    "sha256": "c77dc84b015f025a4b83b79d63bf33e0e706078ff555e0913989de78c34c47db",
+    "loadedSha256": "c77dc84b015f025a4b83b79d63bf33e0e706078ff555e0913989de78c34c47db"
+  },
+  {
+    "path": "/Users/jonathanborgia/.codex/worktrees/atomic-capture-proof/signaltree/packages/kernel/src/lib/readonly.ts",
+    "resolvedAs": "/Users/jonathanborgia/.codex/worktrees/atomic-capture-proof/signaltree/packages/kernel/src/lib/readonly.ts",
+    "sha256": "fa280db2ab5bc3a91e21021944108d829efa35723e20adb22ddf7748c311d8ec",
+    "loadedSha256": "fa280db2ab5bc3a91e21021944108d829efa35723e20adb22ddf7748c311d8ec"
+  },
+  {
+    "path": "/Users/jonathanborgia/.codex/worktrees/atomic-capture-proof/signaltree/packages/kernel/src/lib/external.ts",
+    "resolvedAs": "/Users/jonathanborgia/.codex/worktrees/atomic-capture-proof/signaltree/packages/kernel/src/lib/external.ts",
+    "sha256": "dea4c23ea9ef115ea0200561068d6a1e64da0ba9e0ce53161f66a413cbf9d704",
+    "loadedSha256": "dea4c23ea9ef115ea0200561068d6a1e64da0ba9e0ce53161f66a413cbf9d704"
+  },
+  {
+    "path": "/Users/jonathanborgia/.codex/worktrees/atomic-capture-proof/signaltree/packages/kernel/src/lib/internals/error-reporter.ts",
+    "resolvedAs": "/Users/jonathanborgia/.codex/worktrees/atomic-capture-proof/signaltree/packages/kernel/src/lib/internals/error-reporter.ts",
+    "sha256": "042d4b3def7842348ca633c631fd758fcbfe68d7756b9dbac71f48f521a8d95f",
+    "loadedSha256": "042d4b3def7842348ca633c631fd758fcbfe68d7756b9dbac71f48f521a8d95f"
+  },
+  {
+    "path": "/Users/jonathanborgia/.codex/worktrees/atomic-capture-proof/signaltree/packages/kernel/src/lib/link.ts",
+    "resolvedAs": "/Users/jonathanborgia/.codex/worktrees/atomic-capture-proof/signaltree/packages/kernel/src/lib/link.ts",
+    "sha256": "d16e5f14cd4ad52d2b4b4f22466208004d73e7f464318cc910adfa7889bd6901",
+    "loadedSha256": "d16e5f14cd4ad52d2b4b4f22466208004d73e7f464318cc910adfa7889bd6901"
+  },
+  {
+    "path": "/Users/jonathanborgia/.codex/worktrees/atomic-capture-proof/signaltree/packages/kernel/src/enhancers/batching/batching.ts",
+    "resolvedAs": "/Users/jonathanborgia/.codex/worktrees/atomic-capture-proof/signaltree/packages/kernel/src/enhancers/batching/batching.ts",
+    "sha256": "0e674d16c26114ea2959364c0e277229e708dad8456755c6d765e18d253f42f3",
+    "loadedSha256": "0e674d16c26114ea2959364c0e277229e708dad8456755c6d765e18d253f42f3"
+  },
+  {
+    "path": "/Users/jonathanborgia/.codex/worktrees/atomic-capture-proof/signaltree/packages/kernel/src/lib/types.ts",
+    "resolvedAs": "/Users/jonathanborgia/.codex/worktrees/atomic-capture-proof/signaltree/packages/kernel/src/lib/types.ts",
+    "sha256": "04b2be7fe467b3c800aa32e6a113895b5c7ea6d3d3c279c60f4b5f7cddc78a4e",
+    "loadedSha256": "04b2be7fe467b3c800aa32e6a113895b5c7ea6d3d3c279c60f4b5f7cddc78a4e"
+  },
+  {
+    "path": "/Users/jonathanborgia/.codex/worktrees/atomic-capture-proof/signaltree/packages/kernel/src/enhancers/restoration/restoration.ts",
+    "resolvedAs": "/Users/jonathanborgia/.codex/worktrees/atomic-capture-proof/signaltree/packages/kernel/src/enhancers/restoration/restoration.ts",
+    "sha256": "73e6a6193e4221013a315c203f06319e662a223945ef483d09fd312e016e5f73",
+    "loadedSha256": "73e6a6193e4221013a315c203f06319e662a223945ef483d09fd312e016e5f73"
+  },
+  {
+    "path": "/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/vue@3.5.42_typescript@6.0.3/node_modules/vue/dist/vue.cjs.js",
+    "resolvedAs": "/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/vue@3.5.42_typescript@6.0.3/node_modules/vue/dist/vue.cjs.js",
+    "sha256": "b4398e9b6c9c0eda7f7ba096086694e1c7ab84ff959829e58246b536be3a4295",
+    "loadedSha256": "b4398e9b6c9c0eda7f7ba096086694e1c7ab84ff959829e58246b536be3a4295"
+  },
+  {
+    "path": "/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/vue@3.5.42_typescript@6.0.3/node_modules/vue/dist/vue.cjs.prod.js",
+    "resolvedAs": "/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/vue@3.5.42_typescript@6.0.3/node_modules/vue/dist/vue.cjs.prod.js",
+    "sha256": "c629f47c3e2a1925379b96528f03c091184439e4d70f3d9067509dedb94857da",
+    "loadedSha256": "c629f47c3e2a1925379b96528f03c091184439e4d70f3d9067509dedb94857da"
+  },
+  {
+    "path": "/Users/jonathanborgia/.codex/worktrees/atomic-capture-proof/signaltree/packages/kernel/src/lib/internals/plain-branch-membership.ts",
+    "resolvedAs": "/Users/jonathanborgia/.codex/worktrees/atomic-capture-proof/signaltree/packages/kernel/src/lib/internals/plain-branch-membership.ts",
+    "sha256": "61293bc95bd0237503e900eb4d68f55b8b85f955e82f5de22f5835469ba1ffbf",
+    "loadedSha256": "61293bc95bd0237503e900eb4d68f55b8b85f955e82f5de22f5835469ba1ffbf"
+  },
+  {
+    "path": "/Users/jonathanborgia/.codex/worktrees/atomic-capture-proof/signaltree/packages/kernel/src/lib/internals/physical-rows.ts",
+    "resolvedAs": "/Users/jonathanborgia/.codex/worktrees/atomic-capture-proof/signaltree/packages/kernel/src/lib/internals/physical-rows.ts",
+    "sha256": "b5ba4a48f620b2776edad5bdec2aa21c5c4044e683ebcf6673f29432c77dc48b",
+    "loadedSha256": "b5ba4a48f620b2776edad5bdec2aa21c5c4044e683ebcf6673f29432c77dc48b"
+  },
+  {
+    "path": "/Users/jonathanborgia/.codex/worktrees/atomic-capture-proof/signaltree/packages/kernel/src/lib/internals/exposed-publication.ts",
+    "resolvedAs": "/Users/jonathanborgia/.codex/worktrees/atomic-capture-proof/signaltree/packages/kernel/src/lib/internals/exposed-publication.ts",
+    "sha256": "1edaeed30249341f57170df22c21fb9921a4c0b9ddf53327098d5e50daa1ca5f",
+    "loadedSha256": "1edaeed30249341f57170df22c21fb9921a4c0b9ddf53327098d5e50daa1ca5f"
+  },
+  {
+    "path": "/Users/jonathanborgia/.codex/worktrees/atomic-capture-proof/signaltree/packages/kernel/src/lib/internals/member-membership.ts",
+    "resolvedAs": "/Users/jonathanborgia/.codex/worktrees/atomic-capture-proof/signaltree/packages/kernel/src/lib/internals/member-membership.ts",
+    "sha256": "e748154443c4769a66572cf7eff6f4224ba7e1619f2d542fe301ebaf64283906",
+    "loadedSha256": "e748154443c4769a66572cf7eff6f4224ba7e1619f2d542fe301ebaf64283906"
+  },
+  {
+    "path": "/Users/jonathanborgia/.codex/worktrees/atomic-capture-proof/signaltree/packages/kernel/src/lib/internals/subject-restoration-claims.ts",
+    "resolvedAs": "/Users/jonathanborgia/.codex/worktrees/atomic-capture-proof/signaltree/packages/kernel/src/lib/internals/subject-restoration-claims.ts",
+    "sha256": "78da09b87c6e0a902b6ed7353a04ddd382fc7c5b8e8c4ed66de8634b87298cbf",
+    "loadedSha256": "78da09b87c6e0a902b6ed7353a04ddd382fc7c5b8e8c4ed66de8634b87298cbf"
+  },
+  {
+    "path": "/Users/jonathanborgia/.codex/worktrees/atomic-capture-proof/signaltree/packages/kernel/src/lib/internals/transaction-lifecycle-source.ts",
+    "resolvedAs": "/Users/jonathanborgia/.codex/worktrees/atomic-capture-proof/signaltree/packages/kernel/src/lib/internals/transaction-lifecycle-source.ts",
+    "sha256": "63283ef073b6fa156b90c5e9cf8c78c3fdfc6153bf25e36c4813030d3d6c25c7",
+    "loadedSha256": "63283ef073b6fa156b90c5e9cf8c78c3fdfc6153bf25e36c4813030d3d6c25c7"
+  },
+  {
+    "path": "/Users/jonathanborgia/.codex/worktrees/atomic-capture-proof/signaltree/packages/kernel/src/lib/internals/causal-runtime/post-application-failure.ts",
+    "resolvedAs": "/Users/jonathanborgia/.codex/worktrees/atomic-capture-proof/signaltree/packages/kernel/src/lib/internals/causal-runtime/post-application-failure.ts",
+    "sha256": "3912c42c51186907cfdc9201d26200930c0afb8478c7dd9779bcd825424a214f",
+    "loadedSha256": "3912c42c51186907cfdc9201d26200930c0afb8478c7dd9779bcd825424a214f"
+  },
+  {
+    "path": "/private/tmp/st-atomic-proof-20261013/candidate/packages/kernel/src/lib/internals/causal-runtime/target-transition.ts",
+    "resolvedAs": "/Users/jonathanborgia/.codex/worktrees/atomic-capture-proof/signaltree/packages/kernel/src/lib/internals/causal-runtime/target-transition.ts",
+    "sha256": "51bce15a6d9805f9d783c1d281cc7405385a43e6c26e93e0f6ed8ac3227ad6c2",
+    "loadedSha256": "51bce15a6d9805f9d783c1d281cc7405385a43e6c26e93e0f6ed8ac3227ad6c2"
+  },
+  {
+    "path": "/Users/jonathanborgia/.codex/worktrees/atomic-capture-proof/signaltree/packages/kernel/src/lib/write-participation.ts",
+    "resolvedAs": "/Users/jonathanborgia/.codex/worktrees/atomic-capture-proof/signaltree/packages/kernel/src/lib/write-participation.ts",
+    "sha256": "874604cae15f14835731ed26a7f7b7bc65ec138ae966a2db2c9fb93032b7fb6e",
+    "loadedSha256": "874604cae15f14835731ed26a7f7b7bc65ec138ae966a2db2c9fb93032b7fb6e"
+  },
+  {
+    "path": "/Users/jonathanborgia/.codex/worktrees/atomic-capture-proof/signaltree/packages/kernel/src/lib/internals/causal-runtime/tree-realization-adapter.ts",
+    "resolvedAs": "/Users/jonathanborgia/.codex/worktrees/atomic-capture-proof/signaltree/packages/kernel/src/lib/internals/causal-runtime/tree-realization-adapter.ts",
+    "sha256": "23623d327864c0f315a18a8f1d8e9712cd41ab9761df690c32df7849b816b2a4",
+    "loadedSha256": "23623d327864c0f315a18a8f1d8e9712cd41ab9761df690c32df7849b816b2a4"
+  },
+  {
+    "path": "/Users/jonathanborgia/.codex/worktrees/atomic-capture-proof/signaltree/packages/kernel/src/lib/internals/entity-membership-source.ts",
+    "resolvedAs": "/Users/jonathanborgia/.codex/worktrees/atomic-capture-proof/signaltree/packages/kernel/src/lib/internals/entity-membership-source.ts",
+    "sha256": "099b2d5ad23ae5f7a75f691577bf45221aa18c1276d09ca1dacf2324b3eb6dc1",
+    "loadedSha256": "099b2d5ad23ae5f7a75f691577bf45221aa18c1276d09ca1dacf2324b3eb6dc1"
+  },
+  {
+    "path": "/Users/jonathanborgia/.codex/worktrees/atomic-capture-proof/signaltree/packages/kernel/src/lib/internals/causal-runtime/applied-turn-projection.ts",
+    "resolvedAs": "/Users/jonathanborgia/.codex/worktrees/atomic-capture-proof/signaltree/packages/kernel/src/lib/internals/causal-runtime/applied-turn-projection.ts",
+    "sha256": "d4b0314fdb72f518740ab3db6c90dc011d42abe94a4e3f17d995d3ac538dd5c8",
+    "loadedSha256": "d4b0314fdb72f518740ab3db6c90dc011d42abe94a4e3f17d995d3ac538dd5c8"
+  },
+  {
+    "path": "/Users/jonathanborgia/.codex/worktrees/atomic-capture-proof/signaltree/packages/kernel/src/lib/internals/causal-runtime/pending-rollback.ts",
+    "resolvedAs": "/Users/jonathanborgia/.codex/worktrees/atomic-capture-proof/signaltree/packages/kernel/src/lib/internals/causal-runtime/pending-rollback.ts",
+    "sha256": "ac6ad5b5b7150dc9845c46eb7eca93351cda1545bb6dccf59f11559cd74c1d25",
+    "loadedSha256": "ac6ad5b5b7150dc9845c46eb7eca93351cda1545bb6dccf59f11559cd74c1d25"
+  },
+  {
+    "path": "/Users/jonathanborgia/.codex/worktrees/atomic-capture-proof/signaltree/packages/kernel/src/lib/internals/owner-invalidation-port.ts",
+    "resolvedAs": "/Users/jonathanborgia/.codex/worktrees/atomic-capture-proof/signaltree/packages/kernel/src/lib/internals/owner-invalidation-port.ts",
+    "sha256": "8e1a2ace8ffc3640649449944e99905ee239fec53c9e375bd011556d30c315f7",
+    "loadedSha256": "8e1a2ace8ffc3640649449944e99905ee239fec53c9e375bd011556d30c315f7"
+  },
+  {
+    "path": "/Users/jonathanborgia/.codex/worktrees/atomic-capture-proof/signaltree/packages/kernel/src/lib/internals/commit-consequence.ts",
+    "resolvedAs": "/Users/jonathanborgia/.codex/worktrees/atomic-capture-proof/signaltree/packages/kernel/src/lib/internals/commit-consequence.ts",
+    "sha256": "bfe4abc380b25859d3964dd08e714f199abe6bda881c27fe1165f2ac5f86e523",
+    "loadedSha256": "bfe4abc380b25859d3964dd08e714f199abe6bda881c27fe1165f2ac5f86e523"
+  },
+  {
+    "path": "/Users/jonathanborgia/.codex/worktrees/atomic-capture-proof/signaltree/packages/kernel/src/lib/internals/causal-runtime/realization-context.ts",
+    "resolvedAs": "/Users/jonathanborgia/.codex/worktrees/atomic-capture-proof/signaltree/packages/kernel/src/lib/internals/causal-runtime/realization-context.ts",
+    "sha256": "6ec5b9efd721421f6766d7ceaa81c3e7441cb59c93b36b3ca3a924a9855229da",
+    "loadedSha256": "6ec5b9efd721421f6766d7ceaa81c3e7441cb59c93b36b3ca3a924a9855229da"
+  },
+  {
+    "path": "/Users/jonathanborgia/.codex/worktrees/atomic-capture-proof/signaltree/packages/kernel/src/lib/internals/causal-runtime/transaction-lifecycle.ts",
+    "resolvedAs": "/Users/jonathanborgia/.codex/worktrees/atomic-capture-proof/signaltree/packages/kernel/src/lib/internals/causal-runtime/transaction-lifecycle.ts",
+    "sha256": "2beca18cdf035ee8227c5026f401d61161cf6a1460276ce632966ae0e94cedd2",
+    "loadedSha256": "2beca18cdf035ee8227c5026f401d61161cf6a1460276ce632966ae0e94cedd2"
+  },
+  {
+    "path": "/Users/jonathanborgia/.codex/worktrees/atomic-capture-proof/signaltree/packages/kernel/src/lib/internals/visit-tree.ts",
+    "resolvedAs": "/Users/jonathanborgia/.codex/worktrees/atomic-capture-proof/signaltree/packages/kernel/src/lib/internals/visit-tree.ts",
+    "sha256": "1c542d5082a0b4acb2f627eb70e88fcfabd4f49acb2b120d43d90f25b6199078",
+    "loadedSha256": "1c542d5082a0b4acb2f627eb70e88fcfabd4f49acb2b120d43d90f25b6199078"
+  },
+  {
+    "path": "/Users/jonathanborgia/.codex/worktrees/atomic-capture-proof/signaltree/packages/kernel/src/lib/write-context.ts",
+    "resolvedAs": "/Users/jonathanborgia/.codex/worktrees/atomic-capture-proof/signaltree/packages/kernel/src/lib/write-context.ts",
+    "sha256": "8bb6f9dd964192f2ef92f399f2866e1577c2eb594bdff24fa060a357ab0129ad",
+    "loadedSha256": "8bb6f9dd964192f2ef92f399f2866e1577c2eb594bdff24fa060a357ab0129ad"
+  },
+  {
+    "path": "/Users/jonathanborgia/.codex/worktrees/atomic-capture-proof/signaltree/packages/kernel/src/lib/internals/owned-mutation.ts",
+    "resolvedAs": "/Users/jonathanborgia/.codex/worktrees/atomic-capture-proof/signaltree/packages/kernel/src/lib/internals/owned-mutation.ts",
+    "sha256": "8491afa231ffef3734a5be76bbb541631913dbc77cd81b02578af2b22080ca24",
+    "loadedSha256": "8491afa231ffef3734a5be76bbb541631913dbc77cd81b02578af2b22080ca24"
+  },
+  {
+    "path": "/Users/jonathanborgia/.codex/worktrees/atomic-capture-proof/signaltree/packages/kernel/src/lib/internals/cell-identity.ts",
+    "resolvedAs": "/Users/jonathanborgia/.codex/worktrees/atomic-capture-proof/signaltree/packages/kernel/src/lib/internals/cell-identity.ts",
+    "sha256": "60a94340b3830b8f9a6efe2ec0b2206b141f64aae7ce46593a1517f9f964c492",
+    "loadedSha256": "60a94340b3830b8f9a6efe2ec0b2206b141f64aae7ce46593a1517f9f964c492"
+  },
+  {
+    "path": "/private/tmp/st-atomic-proof-20261013/candidate/packages/kernel/src/lib/internals/intrinsic-mutation.ts",
+    "resolvedAs": "/Users/jonathanborgia/.codex/worktrees/atomic-capture-proof/signaltree/packages/kernel/src/lib/internals/intrinsic-mutation.ts",
+    "sha256": "602bfb23807a5c455336d317b8b2a129adbfe102c1e9334419f9a0b8447d44e0",
+    "loadedSha256": "602bfb23807a5c455336d317b8b2a129adbfe102c1e9334419f9a0b8447d44e0"
+  },
+  {
+    "path": "/Users/jonathanborgia/.codex/worktrees/atomic-capture-proof/signaltree/packages/kernel/src/lib/internals/physical-commit-clock.ts",
+    "resolvedAs": "/Users/jonathanborgia/.codex/worktrees/atomic-capture-proof/signaltree/packages/kernel/src/lib/internals/physical-commit-clock.ts",
+    "sha256": "44466c7b0b6bdde4d7a24b7d324c575a8cf782c5b60c2b85bf08c9c12442119e",
+    "loadedSha256": "44466c7b0b6bdde4d7a24b7d324c575a8cf782c5b60c2b85bf08c9c12442119e"
+  },
+  {
+    "path": "/Users/jonathanborgia/.codex/worktrees/atomic-capture-proof/signaltree/packages/kernel/src/lib/path-notifier.ts",
+    "resolvedAs": "/Users/jonathanborgia/.codex/worktrees/atomic-capture-proof/signaltree/packages/kernel/src/lib/path-notifier.ts",
+    "sha256": "016d3ad005ce360c8e3ae83520a064cff99fd2e4dbbabb077fb2ba075c0e8799",
+    "loadedSha256": "016d3ad005ce360c8e3ae83520a064cff99fd2e4dbbabb077fb2ba075c0e8799"
+  },
+  {
+    "path": "/Users/jonathanborgia/.codex/worktrees/atomic-capture-proof/signaltree/packages/kernel/src/lib/internals/causal-runtime/turn-store.ts",
+    "resolvedAs": "/Users/jonathanborgia/.codex/worktrees/atomic-capture-proof/signaltree/packages/kernel/src/lib/internals/causal-runtime/turn-store.ts",
+    "sha256": "49520bc9420ebd430b982edf9a0a21f4a8ca889539a54b5198d205a9bd8f667f",
+    "loadedSha256": "49520bc9420ebd430b982edf9a0a21f4a8ca889539a54b5198d205a9bd8f667f"
+  },
+  {
+    "path": "/private/tmp/st-atomic-proof-20261013/candidate/packages/kernel/src/lib/internals/tree-scalar-slot-port.ts",
+    "resolvedAs": "/Users/jonathanborgia/.codex/worktrees/atomic-capture-proof/signaltree/packages/kernel/src/lib/internals/tree-scalar-slot-port.ts",
+    "sha256": "4581209ac479bc50b0ee6dc2ee8b8bcf15dae6596636a3fb1694c42f26fbdfa9",
+    "loadedSha256": "4581209ac479bc50b0ee6dc2ee8b8bcf15dae6596636a3fb1694c42f26fbdfa9"
+  },
+  {
+    "path": "/Users/jonathanborgia/.codex/worktrees/atomic-capture-proof/signaltree/packages/kernel/src/lib/internals/position-registry.ts",
+    "resolvedAs": "/Users/jonathanborgia/.codex/worktrees/atomic-capture-proof/signaltree/packages/kernel/src/lib/internals/position-registry.ts",
+    "sha256": "e86ed017e11d69ee5cdf625082309bef976b2528227367f652a762998f0f89b6",
+    "loadedSha256": "e86ed017e11d69ee5cdf625082309bef976b2528227367f652a762998f0f89b6"
+  },
+  {
+    "path": "/Users/jonathanborgia/.codex/worktrees/atomic-capture-proof/signaltree/packages/kernel/src/lib/utils.ts",
+    "resolvedAs": "/Users/jonathanborgia/.codex/worktrees/atomic-capture-proof/signaltree/packages/kernel/src/lib/utils.ts",
+    "sha256": "3a631f9381e564a964474e7e86c0eeac5809c5da8b4658c6f105927828d89e53",
+    "loadedSha256": "3a631f9381e564a964474e7e86c0eeac5809c5da8b4658c6f105927828d89e53"
+  },
+  {
+    "path": "/private/tmp/st-atomic-proof-20261013/candidate/packages/kernel/src/lib/internals/intercept-leaf-signals.ts",
+    "resolvedAs": "/Users/jonathanborgia/.codex/worktrees/atomic-capture-proof/signaltree/packages/kernel/src/lib/internals/intercept-leaf-signals.ts",
+    "sha256": "2ac52a3b9b32bd9ab7ff32bbbe4e356383ba1c2b087c2867b6bda6fe3b792bd8",
+    "loadedSha256": "2ac52a3b9b32bd9ab7ff32bbbe4e356383ba1c2b087c2867b6bda6fe3b792bd8"
+  },
+  {
+    "path": "/Users/jonathanborgia/.codex/worktrees/atomic-capture-proof/signaltree/packages/kernel/src/lib/internals/mutation-capture-runtime.ts",
+    "resolvedAs": "/Users/jonathanborgia/.codex/worktrees/atomic-capture-proof/signaltree/packages/kernel/src/lib/internals/mutation-capture-runtime.ts",
+    "sha256": "f54e6d4a0176f3628a60d3e1cc913ecbe1ded163ba04442295564ea741becfdc",
+    "loadedSha256": "f54e6d4a0176f3628a60d3e1cc913ecbe1ded163ba04442295564ea741becfdc"
+  },
+  {
+    "path": "/Users/jonathanborgia/.codex/worktrees/atomic-capture-proof/signaltree/packages/kernel/src/enhancers/devtools/devtools-impl.ts",
+    "resolvedAs": "/Users/jonathanborgia/.codex/worktrees/atomic-capture-proof/signaltree/packages/kernel/src/enhancers/devtools/devtools-impl.ts",
+    "sha256": "3cc54d7b0e4f552cbbf81dda85358496df11f815d569643ba6b16443570313c9",
+    "loadedSha256": "3cc54d7b0e4f552cbbf81dda85358496df11f815d569643ba6b16443570313c9"
+  },
+  {
+    "path": "/Users/jonathanborgia/.codex/worktrees/atomic-capture-proof/signaltree/packages/kernel/src/lib/internals/owned-metadata.ts",
+    "resolvedAs": "/Users/jonathanborgia/.codex/worktrees/atomic-capture-proof/signaltree/packages/kernel/src/lib/internals/owned-metadata.ts",
+    "sha256": "192ca95912014282eca73f56005df91a565ec048b558dee8c88a02883e86a376",
+    "loadedSha256": "192ca95912014282eca73f56005df91a565ec048b558dee8c88a02883e86a376"
+  },
+  {
+    "path": "/Users/jonathanborgia/.codex/worktrees/atomic-capture-proof/signaltree/packages/kernel/src/lib/internals/utilities/is-built-in-object.ts",
+    "resolvedAs": "/Users/jonathanborgia/.codex/worktrees/atomic-capture-proof/signaltree/packages/kernel/src/lib/internals/utilities/is-built-in-object.ts",
+    "sha256": "6690b24d9e52fe23c1d01d296826b44aa4c79b457ada685307697012d9846111",
+    "loadedSha256": "6690b24d9e52fe23c1d01d296826b44aa4c79b457ada685307697012d9846111"
+  },
+  {
+    "path": "/private/tmp/st-atomic-proof-20261013/candidate/packages/kernel/src/lib/internals/tree-scalar-slot-runtime.ts",
+    "resolvedAs": "/Users/jonathanborgia/.codex/worktrees/atomic-capture-proof/signaltree/packages/kernel/src/lib/internals/tree-scalar-slot-runtime.ts",
+    "sha256": "de97762a39c8ecb7b8854ceedbf6c731612d5c6213ece65bbc3b9394b551b2f9",
+    "loadedSha256": "de97762a39c8ecb7b8854ceedbf6c731612d5c6213ece65bbc3b9394b551b2f9"
+  },
+  {
+    "path": "/Users/jonathanborgia/.codex/worktrees/atomic-capture-proof/signaltree/packages/kernel/src/lib/internals/production-substrate-stats.ts",
+    "resolvedAs": "/Users/jonathanborgia/.codex/worktrees/atomic-capture-proof/signaltree/packages/kernel/src/lib/internals/production-substrate-stats.ts",
+    "sha256": "de67f70c33be1fd2082d961c4d636ec1e4b6409495ff1c6895ab2b56349d857f",
+    "loadedSha256": "de67f70c33be1fd2082d961c4d636ec1e4b6409495ff1c6895ab2b56349d857f"
+  },
+  {
+    "path": "/Users/jonathanborgia/.codex/worktrees/atomic-capture-proof/signaltree/packages/kernel/src/lib/internals/materialize-markers.ts",
+    "resolvedAs": "/Users/jonathanborgia/.codex/worktrees/atomic-capture-proof/signaltree/packages/kernel/src/lib/internals/materialize-markers.ts",
+    "sha256": "f32d89ec9342e9c3541fd3fba1e841bbbf22726ba85233386104882f0158d11e",
+    "loadedSha256": "f32d89ec9342e9c3541fd3fba1e841bbbf22726ba85233386104882f0158d11e"
+  },
+  {
+    "path": "/Users/jonathanborgia/.codex/worktrees/atomic-capture-proof/signaltree/packages/kernel/src/lib/internals/utilities/get-changes.ts",
+    "resolvedAs": "/Users/jonathanborgia/.codex/worktrees/atomic-capture-proof/signaltree/packages/kernel/src/lib/internals/utilities/get-changes.ts",
+    "sha256": "33eb6af992af9f44089bbca066b4200bbb5263ff40eb15c805548dfed882f072",
+    "loadedSha256": "33eb6af992af9f44089bbca066b4200bbb5263ff40eb15c805548dfed882f072"
+  },
+  {
+    "path": "/Users/jonathanborgia/.codex/worktrees/atomic-capture-proof/signaltree/packages/kernel/src/lib/markers/entity-map.ts",
+    "resolvedAs": "/Users/jonathanborgia/.codex/worktrees/atomic-capture-proof/signaltree/packages/kernel/src/lib/markers/entity-map.ts",
+    "sha256": "dcd89d2b8f2afc3931dcce3ddf935578d9c98dc1762f1b4a49041e1b275d182e",
+    "loadedSha256": "dcd89d2b8f2afc3931dcce3ddf935578d9c98dc1762f1b4a49041e1b275d182e"
+  },
+  {
+    "path": "/Users/jonathanborgia/.codex/worktrees/atomic-capture-proof/signaltree/packages/kernel/src/lib/enhancer-types.ts",
+    "resolvedAs": "/Users/jonathanborgia/.codex/worktrees/atomic-capture-proof/signaltree/packages/kernel/src/lib/enhancer-types.ts",
+    "sha256": "7583d38293a9853af8bfb3e534f3bd4bb1361d75eb0cfb1b6a5b8802ad7cf8d0",
+    "loadedSha256": "7583d38293a9853af8bfb3e534f3bd4bb1361d75eb0cfb1b6a5b8802ad7cf8d0"
+  },
+  {
+    "path": "/Users/jonathanborgia/.codex/worktrees/atomic-capture-proof/signaltree/packages/kernel/src/lib/internals/link-state-source.ts",
+    "resolvedAs": "/Users/jonathanborgia/.codex/worktrees/atomic-capture-proof/signaltree/packages/kernel/src/lib/internals/link-state-source.ts",
+    "sha256": "a2655a67f8af24b4811cefedf32d17bdc3eb792bac1b972e65371c5ac2c4df60",
+    "loadedSha256": "a2655a67f8af24b4811cefedf32d17bdc3eb792bac1b972e65371c5ac2c4df60"
+  },
+  {
+    "path": "/Users/jonathanborgia/.codex/worktrees/atomic-capture-proof/signaltree/packages/kernel/src/lib/internals/root-source.ts",
+    "resolvedAs": "/Users/jonathanborgia/.codex/worktrees/atomic-capture-proof/signaltree/packages/kernel/src/lib/internals/root-source.ts",
+    "sha256": "96ce05e9464bb874f09c6e418b0cf68ebe36e8d3995bcab30e2d9fa4fbc279c2",
+    "loadedSha256": "96ce05e9464bb874f09c6e418b0cf68ebe36e8d3995bcab30e2d9fa4fbc279c2"
+  },
+  {
+    "path": "/Users/jonathanborgia/.codex/worktrees/atomic-capture-proof/signaltree/packages/kernel/src/lib/internals/entity-egress-projection.ts",
+    "resolvedAs": "/Users/jonathanborgia/.codex/worktrees/atomic-capture-proof/signaltree/packages/kernel/src/lib/internals/entity-egress-projection.ts",
+    "sha256": "f071541ff79537b0fde69d4d85554b37c1a586942964a26cdcdd816bb111a115",
+    "loadedSha256": "f071541ff79537b0fde69d4d85554b37c1a586942964a26cdcdd816bb111a115"
+  },
+  {
+    "path": "/Users/jonathanborgia/.codex/worktrees/atomic-capture-proof/signaltree/packages/kernel/src/lib/internals/entity-projection-seed.ts",
+    "resolvedAs": "/Users/jonathanborgia/.codex/worktrees/atomic-capture-proof/signaltree/packages/kernel/src/lib/internals/entity-projection-seed.ts",
+    "sha256": "044549e0abf060cfee14c26a13e013d22f2a4fbe6ad4db37206247d88d7eecd6",
+    "loadedSha256": "044549e0abf060cfee14c26a13e013d22f2a4fbe6ad4db37206247d88d7eecd6"
+  },
+  {
+    "path": "/Users/jonathanborgia/.codex/worktrees/atomic-capture-proof/signaltree/packages/kernel/src/lib/internals/source-mutation.ts",
+    "resolvedAs": "/Users/jonathanborgia/.codex/worktrees/atomic-capture-proof/signaltree/packages/kernel/src/lib/internals/source-mutation.ts",
+    "sha256": "cc24db10b21def186cca62d23a27224e09edb7ffe8991bdd8e8ebb094b8b5a87",
+    "loadedSha256": "cc24db10b21def186cca62d23a27224e09edb7ffe8991bdd8e8ebb094b8b5a87"
+  },
+  {
+    "path": "/Users/jonathanborgia/.codex/worktrees/atomic-capture-proof/signaltree/packages/kernel/src/lib/constants.ts",
+    "resolvedAs": "/Users/jonathanborgia/.codex/worktrees/atomic-capture-proof/signaltree/packages/kernel/src/lib/constants.ts",
+    "sha256": "0198acd1d2d8325d846b80cadefdf53db12df2d7843fd6bb41b47fd0fb93da00",
+    "loadedSha256": "0198acd1d2d8325d846b80cadefdf53db12df2d7843fd6bb41b47fd0fb93da00"
+  },
+  {
+    "path": "/Users/jonathanborgia/.codex/worktrees/atomic-capture-proof/signaltree/packages/kernel/src/enhancers/index.ts",
+    "resolvedAs": "/Users/jonathanborgia/.codex/worktrees/atomic-capture-proof/signaltree/packages/kernel/src/enhancers/index.ts",
+    "sha256": "b3f2d8805cd540733e58950d1673e8f6b7ebe850f8589d3067680b2c2b94768f",
+    "loadedSha256": "b3f2d8805cd540733e58950d1673e8f6b7ebe850f8589d3067680b2c2b94768f"
+  },
+  {
+    "path": "/Users/jonathanborgia/.codex/worktrees/atomic-capture-proof/signaltree/packages/kernel/src/lib/internals/path-observation-port.ts",
+    "resolvedAs": "/Users/jonathanborgia/.codex/worktrees/atomic-capture-proof/signaltree/packages/kernel/src/lib/internals/path-observation-port.ts",
+    "sha256": "096b86e4630bfeffaee645ab48870c8cc185911f601f8444113f5e457f2805ce",
+    "loadedSha256": "096b86e4630bfeffaee645ab48870c8cc185911f601f8444113f5e457f2805ce"
+  },
+  {
+    "path": "/Users/jonathanborgia/.codex/worktrees/atomic-capture-proof/signaltree/packages/kernel/src/lib/internals/snapshot-authority.ts",
+    "resolvedAs": "/Users/jonathanborgia/.codex/worktrees/atomic-capture-proof/signaltree/packages/kernel/src/lib/internals/snapshot-authority.ts",
+    "sha256": "d082605b6c48613dc08db6a066d4657c5f43622712bab23bff095fd162b32954",
+    "loadedSha256": "d082605b6c48613dc08db6a066d4657c5f43622712bab23bff095fd162b32954"
+  },
+  {
+    "path": "/private/tmp/st-atomic-proof-20261013/candidate/packages/kernel/src/lib/internals/tree-scalar-leaf-runtime.ts",
+    "resolvedAs": "/Users/jonathanborgia/.codex/worktrees/atomic-capture-proof/signaltree/packages/kernel/src/lib/internals/tree-scalar-leaf-runtime.ts",
+    "sha256": "cc5569bab774c535de00cdbe05b6969990bf7b3333f49c8577af9dfe59b75935",
+    "loadedSha256": "cc5569bab774c535de00cdbe05b6969990bf7b3333f49c8577af9dfe59b75935"
+  },
+  {
+    "path": "/Users/jonathanborgia/.codex/worktrees/atomic-capture-proof/signaltree/packages/kernel/src/lib/internals/merge-derived.ts",
+    "resolvedAs": "/Users/jonathanborgia/.codex/worktrees/atomic-capture-proof/signaltree/packages/kernel/src/lib/internals/merge-derived.ts",
+    "sha256": "a4bd3d4bbc0d4d5739d6c728cac4585d2eed9384274f4c2095b4ff7b14f59968",
+    "loadedSha256": "a4bd3d4bbc0d4d5739d6c728cac4585d2eed9384274f4c2095b4ff7b14f59968"
+  },
+  {
+    "path": "/Users/jonathanborgia/.codex/worktrees/atomic-capture-proof/signaltree/packages/kernel/src/lib/internals/tree-capabilities.ts",
+    "resolvedAs": "/Users/jonathanborgia/.codex/worktrees/atomic-capture-proof/signaltree/packages/kernel/src/lib/internals/tree-capabilities.ts",
+    "sha256": "e11c6e045c7e88e19458ee841936a3e3afe50de74b17cf9279c3e2e5fc37e9d9",
+    "loadedSha256": "e11c6e045c7e88e19458ee841936a3e3afe50de74b17cf9279c3e2e5fc37e9d9"
+  },
+  {
+    "path": "/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vue+shared@3.5.42/node_modules/@vue/shared/index.js",
+    "resolvedAs": "/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vue+shared@3.5.42/node_modules/@vue/shared/index.js",
+    "sha256": "22aeabedc1f2782f67b05c54df4382d4e52a0e0c384ff02349372e2acd9974ed",
+    "loadedSha256": "22aeabedc1f2782f67b05c54df4382d4e52a0e0c384ff02349372e2acd9974ed"
+  },
+  {
+    "path": "/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vue+runtime-dom@3.5.42/node_modules/@vue/runtime-dom/index.js",
+    "resolvedAs": "/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vue+runtime-dom@3.5.42/node_modules/@vue/runtime-dom/index.js",
+    "sha256": "32a727cae7f8ef6ff93696552dd16b5fd355207439f74421dd9f19d7193f866f",
+    "loadedSha256": "32a727cae7f8ef6ff93696552dd16b5fd355207439f74421dd9f19d7193f866f"
+  },
+  {
+    "path": "/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vue+compiler-dom@3.5.42/node_modules/@vue/compiler-dom/index.js",
+    "resolvedAs": "/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vue+compiler-dom@3.5.42/node_modules/@vue/compiler-dom/index.js",
+    "sha256": "21407fc5cebe255208627dd039f2284156be88abbd9123281a79581d349b48c1",
+    "loadedSha256": "21407fc5cebe255208627dd039f2284156be88abbd9123281a79581d349b48c1"
+  },
+  {
+    "path": "/Users/jonathanborgia/.codex/worktrees/atomic-capture-proof/signaltree/packages/kernel/src/lib/internals/utilities/append-all.ts",
+    "resolvedAs": "/Users/jonathanborgia/.codex/worktrees/atomic-capture-proof/signaltree/packages/kernel/src/lib/internals/utilities/append-all.ts",
+    "sha256": "26576cf769d69c5d9090262bd51657cc7710d98e928ceb6e36653b389dae14b5",
+    "loadedSha256": "26576cf769d69c5d9090262bd51657cc7710d98e928ceb6e36653b389dae14b5"
+  },
+  {
+    "path": "/Users/jonathanborgia/.codex/worktrees/atomic-capture-proof/signaltree/packages/kernel/src/lib/entity-signal.ts",
+    "resolvedAs": "/Users/jonathanborgia/.codex/worktrees/atomic-capture-proof/signaltree/packages/kernel/src/lib/entity-signal.ts",
+    "sha256": "9e880fff10634be5504d0e9fefa930f1a0060968343de4e7a89c7e326b262319",
+    "loadedSha256": "9e880fff10634be5504d0e9fefa930f1a0060968343de4e7a89c7e326b262319"
+  },
+  {
+    "path": "/Users/jonathanborgia/.codex/worktrees/atomic-capture-proof/signaltree/packages/kernel/src/lib/internals/write-observation-scope.ts",
+    "resolvedAs": "/Users/jonathanborgia/.codex/worktrees/atomic-capture-proof/signaltree/packages/kernel/src/lib/internals/write-observation-scope.ts",
+    "sha256": "3cd7be31fe6a76ef174912c8281f0b22e4e7236888fb63c54a8f90d68b046406",
+    "loadedSha256": "3cd7be31fe6a76ef174912c8281f0b22e4e7236888fb63c54a8f90d68b046406"
+  },
+  {
+    "path": "/Users/jonathanborgia/.codex/worktrees/atomic-capture-proof/signaltree/packages/kernel/src/lib/internals/runtime-tree-plan.ts",
+    "resolvedAs": "/Users/jonathanborgia/.codex/worktrees/atomic-capture-proof/signaltree/packages/kernel/src/lib/internals/runtime-tree-plan.ts",
+    "sha256": "e407dd6b87df6b8cb9ea674f5c93321c9f38447740cd782a4ca32ebf4e160272",
+    "loadedSha256": "e407dd6b87df6b8cb9ea674f5c93321c9f38447740cd782a4ca32ebf4e160272"
+  },
+  {
+    "path": "/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vue+runtime-dom@3.5.42/node_modules/@vue/runtime-dom/dist/runtime-dom.cjs.js",
+    "resolvedAs": "/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vue+runtime-dom@3.5.42/node_modules/@vue/runtime-dom/dist/runtime-dom.cjs.js",
+    "sha256": "ca490178d20779b86027c282ca2337e8f37f0706466e92ebb583d8a591768396",
+    "loadedSha256": "ca490178d20779b86027c282ca2337e8f37f0706466e92ebb583d8a591768396"
+  },
+  {
+    "path": "/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vue+runtime-dom@3.5.42/node_modules/@vue/runtime-dom/dist/runtime-dom.cjs.prod.js",
+    "resolvedAs": "/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vue+runtime-dom@3.5.42/node_modules/@vue/runtime-dom/dist/runtime-dom.cjs.prod.js",
+    "sha256": "5ae7ce5350837bf677d6787d48d3aa38b5c5da4e94e92b7ba7c4377d0b3777b8",
+    "loadedSha256": "5ae7ce5350837bf677d6787d48d3aa38b5c5da4e94e92b7ba7c4377d0b3777b8"
+  },
+  {
+    "path": "/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vue+shared@3.5.42/node_modules/@vue/shared/dist/shared.cjs.js",
+    "resolvedAs": "/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vue+shared@3.5.42/node_modules/@vue/shared/dist/shared.cjs.js",
+    "sha256": "3bdb3097b9b0e53a0534bd44370e98c4c4e4cb0478e129dd1b001c17b544db33",
+    "loadedSha256": "3bdb3097b9b0e53a0534bd44370e98c4c4e4cb0478e129dd1b001c17b544db33"
+  },
+  {
+    "path": "/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vue+shared@3.5.42/node_modules/@vue/shared/dist/shared.cjs.prod.js",
+    "resolvedAs": "/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vue+shared@3.5.42/node_modules/@vue/shared/dist/shared.cjs.prod.js",
+    "sha256": "65846bef8da92ca3d122ab2b1e9e76cc7a88631291ced54eef10709a90b60cf0",
+    "loadedSha256": "65846bef8da92ca3d122ab2b1e9e76cc7a88631291ced54eef10709a90b60cf0"
+  },
+  {
+    "path": "/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vue+compiler-dom@3.5.42/node_modules/@vue/compiler-dom/dist/compiler-dom.cjs.js",
+    "resolvedAs": "/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vue+compiler-dom@3.5.42/node_modules/@vue/compiler-dom/dist/compiler-dom.cjs.js",
+    "sha256": "9d195a4df05ece3ed1687d2f55e364e6ba00e1aafd2d5571ad82be2dfd39cb84",
+    "loadedSha256": "9d195a4df05ece3ed1687d2f55e364e6ba00e1aafd2d5571ad82be2dfd39cb84"
+  },
+  {
+    "path": "/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vue+compiler-dom@3.5.42/node_modules/@vue/compiler-dom/dist/compiler-dom.cjs.prod.js",
+    "resolvedAs": "/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vue+compiler-dom@3.5.42/node_modules/@vue/compiler-dom/dist/compiler-dom.cjs.prod.js",
+    "sha256": "f84c25c9ddcd8b603a708485bcfd0559af88305a702e128e250a41aabaa2d87c",
+    "loadedSha256": "f84c25c9ddcd8b603a708485bcfd0559af88305a702e128e250a41aabaa2d87c"
+  },
+  {
+    "path": "/Users/jonathanborgia/.codex/worktrees/atomic-capture-proof/signaltree/packages/kernel/src/lib/internals/causal-runtime/scoped-value-addressing.ts",
+    "resolvedAs": "/Users/jonathanborgia/.codex/worktrees/atomic-capture-proof/signaltree/packages/kernel/src/lib/internals/causal-runtime/scoped-value-addressing.ts",
+    "sha256": "1505a2da26081d0f282e034277cc6ada8abca342f19e13a2f369cb3402132456",
+    "loadedSha256": "1505a2da26081d0f282e034277cc6ada8abca342f19e13a2f369cb3402132456"
+  },
+  {
+    "path": "/Users/jonathanborgia/.codex/worktrees/atomic-capture-proof/signaltree/packages/kernel/src/lib/internals/utilities/deep-clone.ts",
+    "resolvedAs": "/Users/jonathanborgia/.codex/worktrees/atomic-capture-proof/signaltree/packages/kernel/src/lib/internals/utilities/deep-clone.ts",
+    "sha256": "4d4052a19f5bc484792d3cfc2d821890ce255d69d0640565ccbeda18b81b2635",
+    "loadedSha256": "4d4052a19f5bc484792d3cfc2d821890ce255d69d0640565ccbeda18b81b2635"
+  },
+  {
+    "path": "/Users/jonathanborgia/.codex/worktrees/atomic-capture-proof/signaltree/packages/kernel/src/lib/internals/utilities/deep-equal.ts",
+    "resolvedAs": "/Users/jonathanborgia/.codex/worktrees/atomic-capture-proof/signaltree/packages/kernel/src/lib/internals/utilities/deep-equal.ts",
+    "sha256": "d3281de95e87aab27bc493810e4b3e1b13c9ce874d9e68c8435140c94f48271c",
+    "loadedSha256": "d3281de95e87aab27bc493810e4b3e1b13c9ce874d9e68c8435140c94f48271c"
+  },
+  {
+    "path": "/Users/jonathanborgia/.codex/worktrees/atomic-capture-proof/signaltree/packages/kernel/src/lib/internals/causal-runtime/transient-rows.ts",
+    "resolvedAs": "/Users/jonathanborgia/.codex/worktrees/atomic-capture-proof/signaltree/packages/kernel/src/lib/internals/causal-runtime/transient-rows.ts",
+    "sha256": "434971128a52abda9365b7581aaf49a00536dcd719640db7815e732ff0cb94be",
+    "loadedSha256": "434971128a52abda9365b7581aaf49a00536dcd719640db7815e732ff0cb94be"
+  },
+  {
+    "path": "/Users/jonathanborgia/.codex/worktrees/atomic-capture-proof/signaltree/packages/kernel/src/lib/internals/restoration-source.ts",
+    "resolvedAs": "/Users/jonathanborgia/.codex/worktrees/atomic-capture-proof/signaltree/packages/kernel/src/lib/internals/restoration-source.ts",
+    "sha256": "9d14e6393b381289a7dab186b1b4ef60da5b8c993135d9f0437145cdc659d600",
+    "loadedSha256": "9d14e6393b381289a7dab186b1b4ef60da5b8c993135d9f0437145cdc659d600"
+  },
+  {
+    "path": "/Users/jonathanborgia/.codex/worktrees/atomic-capture-proof/signaltree/packages/kernel/src/lib/internals/subject-reclamation-sink.ts",
+    "resolvedAs": "/Users/jonathanborgia/.codex/worktrees/atomic-capture-proof/signaltree/packages/kernel/src/lib/internals/subject-reclamation-sink.ts",
+    "sha256": "84f269cd29df0dbcd7c0e3ca198ba0f1386ea18292b304528a6f4dd7fb745345",
+    "loadedSha256": "84f269cd29df0dbcd7c0e3ca198ba0f1386ea18292b304528a6f4dd7fb745345"
+  },
+  {
+    "path": "/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vue+compiler-core@3.5.42/node_modules/@vue/compiler-core/index.js",
+    "resolvedAs": "/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vue+compiler-core@3.5.42/node_modules/@vue/compiler-core/index.js",
+    "sha256": "ccc969ede88026f2168f8a6ca482913664ac12b2e0cfe1e34cd211767e521a60",
+    "loadedSha256": "ccc969ede88026f2168f8a6ca482913664ac12b2e0cfe1e34cd211767e521a60"
+  },
+  {
+    "path": "/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vue+runtime-core@3.5.42/node_modules/@vue/runtime-core/index.js",
+    "resolvedAs": "/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vue+runtime-core@3.5.42/node_modules/@vue/runtime-core/index.js",
+    "sha256": "62c7b9f4f1090dd5217eccacffb381d56a5d27f60c0256e7f04915a77489ef82",
+    "loadedSha256": "62c7b9f4f1090dd5217eccacffb381d56a5d27f60c0256e7f04915a77489ef82"
+  },
+  {
+    "path": "/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vue+compiler-core@3.5.42/node_modules/@vue/compiler-core/dist/compiler-core.cjs.js",
+    "resolvedAs": "/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vue+compiler-core@3.5.42/node_modules/@vue/compiler-core/dist/compiler-core.cjs.js",
+    "sha256": "97cfe91652ffd3ba4518aaf858e318ef4cae39913ceb9f1595caaf655f02e705",
+    "loadedSha256": "97cfe91652ffd3ba4518aaf858e318ef4cae39913ceb9f1595caaf655f02e705"
+  },
+  {
+    "path": "/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vue+compiler-core@3.5.42/node_modules/@vue/compiler-core/dist/compiler-core.cjs.prod.js",
+    "resolvedAs": "/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vue+compiler-core@3.5.42/node_modules/@vue/compiler-core/dist/compiler-core.cjs.prod.js",
+    "sha256": "2bfa1452e21df6ecf3fbd58be3b027d480b1650951a2a782ce0cb87da9904f6d",
+    "loadedSha256": "2bfa1452e21df6ecf3fbd58be3b027d480b1650951a2a782ce0cb87da9904f6d"
+  },
+  {
+    "path": "/Users/jonathanborgia/.codex/worktrees/atomic-capture-proof/signaltree/packages/kernel/src/lib/physical/entity-mutation-frame.ts",
+    "resolvedAs": "/Users/jonathanborgia/.codex/worktrees/atomic-capture-proof/signaltree/packages/kernel/src/lib/physical/entity-mutation-frame.ts",
+    "sha256": "77dbf428bf754ea3475728046a7e6ee3edbc0e2fa678f26c30c6e12710f501c5",
+    "loadedSha256": "77dbf428bf754ea3475728046a7e6ee3edbc0e2fa678f26c30c6e12710f501c5"
+  },
+  {
+    "path": "/Users/jonathanborgia/.codex/worktrees/atomic-capture-proof/signaltree/packages/kernel/src/lib/physical/entity-handle-resolution.ts",
+    "resolvedAs": "/Users/jonathanborgia/.codex/worktrees/atomic-capture-proof/signaltree/packages/kernel/src/lib/physical/entity-handle-resolution.ts",
+    "sha256": "8ac798d660e0050bc864c6c09b199ccd0f3c069ebd7abf07d311d74529931005",
+    "loadedSha256": "8ac798d660e0050bc864c6c09b199ccd0f3c069ebd7abf07d311d74529931005"
+  },
+  {
+    "path": "/Users/jonathanborgia/.codex/worktrees/atomic-capture-proof/signaltree/packages/kernel/src/lib/physical/entity-value-store.ts",
+    "resolvedAs": "/Users/jonathanborgia/.codex/worktrees/atomic-capture-proof/signaltree/packages/kernel/src/lib/physical/entity-value-store.ts",
+    "sha256": "f6400264ea2fc4f54091f13c1c0004cca68b75eb40cd011ee4e4f85efe264e6f",
+    "loadedSha256": "f6400264ea2fc4f54091f13c1c0004cca68b75eb40cd011ee4e4f85efe264e6f"
+  },
+  {
+    "path": "/Users/jonathanborgia/.codex/worktrees/atomic-capture-proof/signaltree/packages/kernel/src/lib/physical/structural-store.ts",
+    "resolvedAs": "/Users/jonathanborgia/.codex/worktrees/atomic-capture-proof/signaltree/packages/kernel/src/lib/physical/structural-store.ts",
+    "sha256": "ebe953a11b3ee7811406bec37465213757267d7c68b8b84763d4496a238e3994",
+    "loadedSha256": "ebe953a11b3ee7811406bec37465213757267d7c68b8b84763d4496a238e3994"
+  },
+  {
+    "path": "/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vue+runtime-core@3.5.42/node_modules/@vue/runtime-core/dist/runtime-core.cjs.js",
+    "resolvedAs": "/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vue+runtime-core@3.5.42/node_modules/@vue/runtime-core/dist/runtime-core.cjs.js",
+    "sha256": "096a0e1aae527b55579f6653c56f90aca30d8686ddc689baab49cab10fdb64c3",
+    "loadedSha256": "096a0e1aae527b55579f6653c56f90aca30d8686ddc689baab49cab10fdb64c3"
+  },
+  {
+    "path": "/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vue+runtime-core@3.5.42/node_modules/@vue/runtime-core/dist/runtime-core.cjs.prod.js",
+    "resolvedAs": "/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vue+runtime-core@3.5.42/node_modules/@vue/runtime-core/dist/runtime-core.cjs.prod.js",
+    "sha256": "46a4320a7d717dc424433bb62218e02d7e9965d4fe8cf8c4bbd8167f960ab436",
+    "loadedSha256": "46a4320a7d717dc424433bb62218e02d7e9965d4fe8cf8c4bbd8167f960ab436"
+  },
+  {
+    "path": "/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vue+reactivity@3.5.42/node_modules/@vue/reactivity/index.js",
+    "resolvedAs": "/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vue+reactivity@3.5.42/node_modules/@vue/reactivity/index.js",
+    "sha256": "ea58baa61892122ece77249d50c4b4bcdda46dd5233d6908d86d6bb4f874a109",
+    "loadedSha256": "ea58baa61892122ece77249d50c4b4bcdda46dd5233d6908d86d6bb4f874a109"
+  },
+  {
+    "path": "/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/source-map-js@1.2.1/node_modules/source-map-js/source-map.js",
+    "resolvedAs": "/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/source-map-js@1.2.1/node_modules/source-map-js/source-map.js",
+    "sha256": "dc098456c2d9ab90a4c0a17cca9be16665b9813df20906553a98b0088a157be7",
+    "loadedSha256": "dc098456c2d9ab90a4c0a17cca9be16665b9813df20906553a98b0088a157be7"
+  },
+  {
+    "path": "/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/entities@7.0.1/node_modules/entities/dist/commonjs/decode.js",
+    "resolvedAs": "/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/entities@7.0.1/node_modules/entities/dist/commonjs/decode.js",
+    "sha256": "e318cd751279428b7d7e6e9e4c0dc7cc8a4c78e8c2bd00d42da9f8e7b3ef5c07",
+    "loadedSha256": "e318cd751279428b7d7e6e9e4c0dc7cc8a4c78e8c2bd00d42da9f8e7b3ef5c07"
+  },
+  {
+    "path": "/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@babel+parser@7.29.8/node_modules/@babel/parser/lib/index.js",
+    "resolvedAs": "/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@babel+parser@7.29.8/node_modules/@babel/parser/lib/index.js",
+    "sha256": "6969920ae0610df927b6b3e675d1309372c268e36d391652af8e3e0183cbe8f8",
+    "loadedSha256": "6969920ae0610df927b6b3e675d1309372c268e36d391652af8e3e0183cbe8f8"
+  },
+  {
+    "path": "/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/estree-walker@2.0.2/node_modules/estree-walker/dist/umd/estree-walker.js",
+    "resolvedAs": "/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/estree-walker@2.0.2/node_modules/estree-walker/dist/umd/estree-walker.js",
+    "sha256": "183597c40a43d2a2ebda3dc85ae2dd70e107b3e5cec305b02a5bffa54e0f4b9b",
+    "loadedSha256": "183597c40a43d2a2ebda3dc85ae2dd70e107b3e5cec305b02a5bffa54e0f4b9b"
+  },
+  {
+    "path": "/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vue+reactivity@3.5.42/node_modules/@vue/reactivity/dist/reactivity.cjs.js",
+    "resolvedAs": "/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vue+reactivity@3.5.42/node_modules/@vue/reactivity/dist/reactivity.cjs.js",
+    "sha256": "d7ce0df6c01a8bcbac5941faef4cdc9e4e9093068cce3893c7d605c31031dc6a",
+    "loadedSha256": "d7ce0df6c01a8bcbac5941faef4cdc9e4e9093068cce3893c7d605c31031dc6a"
+  },
+  {
+    "path": "/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vue+reactivity@3.5.42/node_modules/@vue/reactivity/dist/reactivity.cjs.prod.js",
+    "resolvedAs": "/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vue+reactivity@3.5.42/node_modules/@vue/reactivity/dist/reactivity.cjs.prod.js",
+    "sha256": "5261ed7954bd4ec73f4a40bca682f1ec17db2ce427305fbd55b458341dd73dc9",
+    "loadedSha256": "5261ed7954bd4ec73f4a40bca682f1ec17db2ce427305fbd55b458341dd73dc9"
+  },
+  {
+    "path": "/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/source-map-js@1.2.1/node_modules/source-map-js/lib/source-node.js",
+    "resolvedAs": "/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/source-map-js@1.2.1/node_modules/source-map-js/lib/source-node.js",
+    "sha256": "b45db8183550ca1e6259976f6ceee89f6764360c56cf206701bd2f7471144e31",
+    "loadedSha256": "b45db8183550ca1e6259976f6ceee89f6764360c56cf206701bd2f7471144e31"
+  },
+  {
+    "path": "/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/source-map-js@1.2.1/node_modules/source-map-js/lib/source-map-generator.js",
+    "resolvedAs": "/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/source-map-js@1.2.1/node_modules/source-map-js/lib/source-map-generator.js",
+    "sha256": "645482e8d23fd49cd025a0ad07c2e2beb173995138370d6a73e596e18e889bd8",
+    "loadedSha256": "645482e8d23fd49cd025a0ad07c2e2beb173995138370d6a73e596e18e889bd8"
+  },
+  {
+    "path": "/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/source-map-js@1.2.1/node_modules/source-map-js/lib/source-map-consumer.js",
+    "resolvedAs": "/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/source-map-js@1.2.1/node_modules/source-map-js/lib/source-map-consumer.js",
+    "sha256": "78f7a8f6d20f51a99a9cbd8d552321b1a72de9b9fb9c39dbeb27dc84eb2eade5",
+    "loadedSha256": "78f7a8f6d20f51a99a9cbd8d552321b1a72de9b9fb9c39dbeb27dc84eb2eade5"
+  },
+  {
+    "path": "/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/entities@7.0.1/node_modules/entities/dist/commonjs/generated/decode-data-html.js",
+    "resolvedAs": "/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/entities@7.0.1/node_modules/entities/dist/commonjs/generated/decode-data-html.js",
+    "sha256": "80b85ad02696af10d597c1353db7eb01fbbe4db5b922ac8693c29cbe18d53ac4",
+    "loadedSha256": "80b85ad02696af10d597c1353db7eb01fbbe4db5b922ac8693c29cbe18d53ac4"
+  },
+  {
+    "path": "/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/entities@7.0.1/node_modules/entities/dist/commonjs/internal/bin-trie-flags.js",
+    "resolvedAs": "/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/entities@7.0.1/node_modules/entities/dist/commonjs/internal/bin-trie-flags.js",
+    "sha256": "ddb6a8fcaab3a1fb6d60c576bf10302a554d71869b6466a14fc11a800264559a",
+    "loadedSha256": "ddb6a8fcaab3a1fb6d60c576bf10302a554d71869b6466a14fc11a800264559a"
+  },
+  {
+    "path": "/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/entities@7.0.1/node_modules/entities/dist/commonjs/decode-codepoint.js",
+    "resolvedAs": "/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/entities@7.0.1/node_modules/entities/dist/commonjs/decode-codepoint.js",
+    "sha256": "98d97fd43e4db015e5afa7c69b1055cd1ade8114530ea01734add86184125271",
+    "loadedSha256": "98d97fd43e4db015e5afa7c69b1055cd1ade8114530ea01734add86184125271"
+  },
+  {
+    "path": "/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/entities@7.0.1/node_modules/entities/dist/commonjs/generated/decode-data-xml.js",
+    "resolvedAs": "/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/entities@7.0.1/node_modules/entities/dist/commonjs/generated/decode-data-xml.js",
+    "sha256": "07e89fa83ca837b188e4cc52a8d6d2b6983fc5a63b15abad789da9be2ea777b6",
+    "loadedSha256": "07e89fa83ca837b188e4cc52a8d6d2b6983fc5a63b15abad789da9be2ea777b6"
+  },
+  {
+    "path": "/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/source-map-js@1.2.1/node_modules/source-map-js/lib/util.js",
+    "resolvedAs": "/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/source-map-js@1.2.1/node_modules/source-map-js/lib/util.js",
+    "sha256": "0629f3ae2f3049cda3a2e87ea651dcf0cc71108f4681795ab989a8ac1573fc03",
+    "loadedSha256": "0629f3ae2f3049cda3a2e87ea651dcf0cc71108f4681795ab989a8ac1573fc03"
+  },
+  {
+    "path": "/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/source-map-js@1.2.1/node_modules/source-map-js/lib/quick-sort.js",
+    "resolvedAs": "/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/source-map-js@1.2.1/node_modules/source-map-js/lib/quick-sort.js",
+    "sha256": "72ed4911cdc72232cac53cac995e28e865cd4302186173bba74ff6436c089915",
+    "loadedSha256": "72ed4911cdc72232cac53cac995e28e865cd4302186173bba74ff6436c089915"
+  },
+  {
+    "path": "/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/entities@7.0.1/node_modules/entities/dist/commonjs/internal/decode-shared.js",
+    "resolvedAs": "/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/entities@7.0.1/node_modules/entities/dist/commonjs/internal/decode-shared.js",
+    "sha256": "e68061084a578fa4f95bd96407f2a4e272bb38615ae1b1076d1181981ce95549",
+    "loadedSha256": "e68061084a578fa4f95bd96407f2a4e272bb38615ae1b1076d1181981ce95549"
+  },
+  {
+    "path": "/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/source-map-js@1.2.1/node_modules/source-map-js/lib/array-set.js",
+    "resolvedAs": "/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/source-map-js@1.2.1/node_modules/source-map-js/lib/array-set.js",
+    "sha256": "163bb3055aaea7140167740036a83161fd912c344b14f992754b80f21477d754",
+    "loadedSha256": "163bb3055aaea7140167740036a83161fd912c344b14f992754b80f21477d754"
+  },
+  {
+    "path": "/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/source-map-js@1.2.1/node_modules/source-map-js/lib/binary-search.js",
+    "resolvedAs": "/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/source-map-js@1.2.1/node_modules/source-map-js/lib/binary-search.js",
+    "sha256": "c7f4a47a125af0bd860443dfd71d2f412d1a97dcb53ab7038189d63b91dc32bd",
+    "loadedSha256": "c7f4a47a125af0bd860443dfd71d2f412d1a97dcb53ab7038189d63b91dc32bd"
+  },
+  {
+    "path": "/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/source-map-js@1.2.1/node_modules/source-map-js/lib/base64-vlq.js",
+    "resolvedAs": "/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/source-map-js@1.2.1/node_modules/source-map-js/lib/base64-vlq.js",
+    "sha256": "f3407e528f54ec0787bd0a71eeac0c99fffd98445916fcbe116dc69ca3be928b",
+    "loadedSha256": "f3407e528f54ec0787bd0a71eeac0c99fffd98445916fcbe116dc69ca3be928b"
+  },
+  {
+    "path": "/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/source-map-js@1.2.1/node_modules/source-map-js/lib/mapping-list.js",
+    "resolvedAs": "/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/source-map-js@1.2.1/node_modules/source-map-js/lib/mapping-list.js",
+    "sha256": "35ddb82861f11a70ab84cb47d620fcb28d7f884bb444644e06bde815b836ef9e",
+    "loadedSha256": "35ddb82861f11a70ab84cb47d620fcb28d7f884bb444644e06bde815b836ef9e"
+  },
+  {
+    "path": "/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/source-map-js@1.2.1/node_modules/source-map-js/lib/base64.js",
+    "resolvedAs": "/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/source-map-js@1.2.1/node_modules/source-map-js/lib/base64.js",
+    "sha256": "651bf433cf05e9ec8cee0b94639483236a605d48279e83d3d5c5de81c21d6599",
+    "loadedSha256": "651bf433cf05e9ec8cee0b94639483236a605d48279e83d3d5c5de81c21d6599"
+  },
+  {
+    "path": "/private/tmp/st-atomic-proof-20261013/prepare.mjs",
+    "resolvedAs": "/private/tmp/st-atomic-proof-20261013/prepare.mjs",
+    "sha256": "bef6f894e6e005c52361699bbc0d54587cd46f3970afbfe8b6087d43a9a3db89",
+    "loadedSha256": "bef6f894e6e005c52361699bbc0d54587cd46f3970afbfe8b6087d43a9a3db89"
+  },
+  {
+    "path": "/private/tmp/st-atomic-proof-20261013/settlement.mjs",
+    "resolvedAs": "/private/tmp/st-atomic-proof-20261013/settlement.mjs",
+    "sha256": "1d45a1916c8e941ae0d2fe5114e7568bf312b2375cabf7d53d66d0949545cd06",
+    "loadedSha256": "1d45a1916c8e941ae0d2fe5114e7568bf312b2375cabf7d53d66d0949545cd06"
+  },
+  {
+    "path": "/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/solid-js@1.9.15/node_modules/solid-js/dist/solid.js",
+    "resolvedAs": "/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/solid-js@1.9.15/node_modules/solid-js/dist/solid.js",
+    "sha256": "2d8f12f3e25009c6a522c981f1b46695951b59ec800a2471f516bb79ce1f9934",
+    "loadedSha256": "2d8f12f3e25009c6a522c981f1b46695951b59ec800a2471f516bb79ce1f9934"
+  },
+  {
+    "path": "/Users/jonathanborgia/.codex/worktrees/atomic-capture-proof/signaltree/packages/solid/src/lib/solid-observation.ts",
+    "resolvedAs": "/Users/jonathanborgia/.codex/worktrees/atomic-capture-proof/signaltree/packages/solid/src/lib/solid-observation.ts",
+    "sha256": "637c48e331243a37625ae7f6b99cfd993a6d278bf4236e5cc962eb8603c0211b",
+    "loadedSha256": "637c48e331243a37625ae7f6b99cfd993a6d278bf4236e5cc962eb8603c0211b"
+  },
+  {
+    "path": "/private/tmp/st-atomic-proof-20261013/equality-owner.mjs",
+    "resolvedAs": "/private/tmp/st-atomic-proof-20261013/equality-owner.mjs",
+    "sha256": "51124f8afa821a7bd6c57417ef633723b4e1bfc38be2bed56517734169922319",
+    "loadedSha256": "51124f8afa821a7bd6c57417ef633723b4e1bfc38be2bed56517734169922319"
+  },
+  {
+    "path": "/private/tmp/st-atomic-proof-20261013/reentry.mjs",
+    "resolvedAs": "/private/tmp/st-atomic-proof-20261013/reentry.mjs",
+    "sha256": "a16c0dd81e2a8efdc72d1c219a2d7ecefb29888238e2b53e6cdbcbbef2742055",
+    "loadedSha256": "a16c0dd81e2a8efdc72d1c219a2d7ecefb29888238e2b53e6cdbcbbef2742055"
+  },
+  {
+    "path": "/private/tmp/st-atomic-proof-20261013/kernel.mjs",
+    "resolvedAs": "/private/tmp/st-atomic-proof-20261013/kernel.mjs",
+    "sha256": "1559da27a0b5f8ef314a65666fcd405b3eb8ed4710ccb772a419cc83fa9b90d2",
+    "loadedSha256": "1559da27a0b5f8ef314a65666fcd405b3eb8ed4710ccb772a419cc83fa9b90d2"
+  },
+  {
+    "path": "/private/tmp/st-atomic-review-20261013/mixed.mjs",
+    "resolvedAs": "/private/tmp/st-atomic-review-20261013/mixed.mjs",
+    "sha256": "20d92805036c90fc0dd81c3c9e4742990b5b493f6a24b29f4d7df0eeaff5ed91",
+    "loadedSha256": "20d92805036c90fc0dd81c3c9e4742990b5b493f6a24b29f4d7df0eeaff5ed91"
+  },
+  {
+    "path": "/private/tmp/st-atomic-proof-20261013/prepare-neutral.mjs",
+    "resolvedAs": "/private/tmp/st-atomic-proof-20261013/prepare-neutral.mjs",
+    "sha256": "95737ae8e7272c815eb93295cb3027e7e30fa08405c536315cc91b966145e805",
+    "loadedSha256": "95737ae8e7272c815eb93295cb3027e7e30fa08405c536315cc91b966145e805"
+  },
+  {
+    "path": "/private/tmp/st-atomic-proof-20261013/mixed.mjs",
+    "resolvedAs": "/private/tmp/st-atomic-proof-20261013/mixed.mjs",
+    "sha256": "f7d8bf233aae1cb2138ab12bf3dd85d310995c545a4fd8db6fe70adf5911f984",
+    "loadedSha256": "f7d8bf233aae1cb2138ab12bf3dd85d310995c545a4fd8db6fe70adf5911f984"
+  },
+  {
+    "path": "/Users/jonathanborgia/.codex/worktrees/atomic-capture-proof/signaltree/packages/kernel/src/enhancers/transactions/transactions.ts",
+    "resolvedAs": "/Users/jonathanborgia/.codex/worktrees/atomic-capture-proof/signaltree/packages/kernel/src/enhancers/transactions/transactions.ts",
+    "sha256": "3b6c5128ed0790d0f698de87ee77b6df51eba45ef95e22167a0ca40420b21259",
+    "loadedSha256": "130e1f2d8bee471567cc1974199a192aeaec4f3ce64fc98ecc36774d3ebe7a02"
+  },
+  {
+    "path": "/Users/jonathanborgia/.codex/worktrees/atomic-capture-proof/signaltree/packages/kernel/src/lib/internals/native-tree-scalar-leaf-runtime.ts",
+    "resolvedAs": "/Users/jonathanborgia/.codex/worktrees/atomic-capture-proof/signaltree/packages/kernel/src/lib/internals/native-tree-scalar-leaf-runtime.ts",
+    "sha256": "ee979e4e37bb4094058eae0d008899c24b02cc1cfc6878fdfb83909ef2baf995",
+    "loadedSha256": "ee979e4e37bb4094058eae0d008899c24b02cc1cfc6878fdfb83909ef2baf995"
+  },
+  {
+    "path": "/Users/jonathanborgia/.codex/worktrees/atomic-capture-proof/signaltree/packages/kernel/src/lib/internals/native-location-realization.ts",
+    "resolvedAs": "/Users/jonathanborgia/.codex/worktrees/atomic-capture-proof/signaltree/packages/kernel/src/lib/internals/native-location-realization.ts",
+    "sha256": "7a148240fe9a0f307c4a2a61d1a5839ec3fed66fdd27d4a14ff12c0c05d65a7c",
+    "loadedSha256": "7a148240fe9a0f307c4a2a61d1a5839ec3fed66fdd27d4a14ff12c0c05d65a7c"
+  },
+  {
+    "path": "/Users/jonathanborgia/.codex/worktrees/atomic-capture-proof/signaltree/packages/kernel/src/lib/internals/location-runtime.ts",
+    "resolvedAs": "/Users/jonathanborgia/.codex/worktrees/atomic-capture-proof/signaltree/packages/kernel/src/lib/internals/location-runtime.ts",
+    "sha256": "92c0222cb381abbb26fda754a114c42bd24db90e400de7162a57869b380030c8",
+    "loadedSha256": "92c0222cb381abbb26fda754a114c42bd24db90e400de7162a57869b380030c8"
+  },
+  {
+    "path": "/Users/jonathanborgia/.codex/worktrees/atomic-capture-proof/signaltree/packages/kernel/src/lib/internals/intrinsic-mutation.ts",
+    "resolvedAs": "/Users/jonathanborgia/.codex/worktrees/atomic-capture-proof/signaltree/packages/kernel/src/lib/internals/intrinsic-mutation.ts",
+    "sha256": "ce5d130c453a2469319533f22d9687bc16932bd164be0a6d88dfad077af44d6c",
+    "loadedSha256": "ce5d130c453a2469319533f22d9687bc16932bd164be0a6d88dfad077af44d6c"
+  },
+  {
+    "path": "/Users/jonathanborgia/.codex/worktrees/atomic-capture-proof/signaltree/packages/kernel/src/lib/internals/tree-scalar-slot-runtime.ts",
+    "resolvedAs": "/Users/jonathanborgia/.codex/worktrees/atomic-capture-proof/signaltree/packages/kernel/src/lib/internals/tree-scalar-slot-runtime.ts",
+    "sha256": "27f5e8dcebaf91645744636980244bdc7cdd012bf3b10efde34edce2faa9c31b",
+    "loadedSha256": "27f5e8dcebaf91645744636980244bdc7cdd012bf3b10efde34edce2faa9c31b"
+  },
+  {
+    "path": "/Users/jonathanborgia/.codex/worktrees/atomic-capture-proof/signaltree/packages/kernel/src/lib/internals/tree-scalar-slot-port.ts",
+    "resolvedAs": "/Users/jonathanborgia/.codex/worktrees/atomic-capture-proof/signaltree/packages/kernel/src/lib/internals/tree-scalar-slot-port.ts",
+    "sha256": "ef5fade490148d168f198221b16e020b8132a978fb65ffbfdb604e3c06cc84e3",
+    "loadedSha256": "ef5fade490148d168f198221b16e020b8132a978fb65ffbfdb604e3c06cc84e3"
+  },
+  {
+    "path": "/Users/jonathanborgia/.codex/worktrees/atomic-capture-proof/signaltree/packages/kernel/src/lib/internals/tree-scalar-leaf-runtime.ts",
+    "resolvedAs": "/Users/jonathanborgia/.codex/worktrees/atomic-capture-proof/signaltree/packages/kernel/src/lib/internals/tree-scalar-leaf-runtime.ts",
+    "sha256": "1247b117a88c0cd5e9c1c634b1b94f220a7340b350149b9aaac4584b00110297",
+    "loadedSha256": "1247b117a88c0cd5e9c1c634b1b94f220a7340b350149b9aaac4584b00110297"
+  },
+  {
+    "path": "/Users/jonathanborgia/.codex/worktrees/atomic-capture-proof/signaltree/packages/kernel/src/lib/internals/causal-runtime/target-transition.ts",
+    "resolvedAs": "/Users/jonathanborgia/.codex/worktrees/atomic-capture-proof/signaltree/packages/kernel/src/lib/internals/causal-runtime/target-transition.ts",
+    "sha256": "f4369b437bc4d80d39d53ab5d1b1ec1022b6d4e28d3351a5d0b21dc28154f18d",
+    "loadedSha256": "f4369b437bc4d80d39d53ab5d1b1ec1022b6d4e28d3351a5d0b21dc28154f18d"
+  },
+  {
+    "path": "/Users/jonathanborgia/.codex/worktrees/atomic-capture-proof/signaltree/packages/kernel/src/lib/internals/intercept-leaf-signals.ts",
+    "resolvedAs": "/Users/jonathanborgia/.codex/worktrees/atomic-capture-proof/signaltree/packages/kernel/src/lib/internals/intercept-leaf-signals.ts",
+    "sha256": "2523359e248a8056923ceca285d3339d9914dc898c61980dfac0bb4cb6d82bcf",
+    "loadedSha256": "2523359e248a8056923ceca285d3339d9914dc898c61980dfac0bb4cb6d82bcf"
+  },
+  {
+    "path": "/private/tmp/st-atomic-proof-20261013/freshness.mjs",
+    "resolvedAs": "/private/tmp/st-atomic-proof-20261013/freshness.mjs",
+    "sha256": "bbbbc973b3ad0e58b1cd844861ad5cfa1dc44a4e866fcc0066a69b9b6e33d86f",
+    "loadedSha256": "bbbbc973b3ad0e58b1cd844861ad5cfa1dc44a4e866fcc0066a69b9b6e33d86f"
+  },
+  {
+    "path": "/Users/jonathanborgia/.codex/worktrees/atomic-capture-proof/signaltree/packages/kernel/src/lib/internals/write-observation.ts",
+    "resolvedAs": "/Users/jonathanborgia/.codex/worktrees/atomic-capture-proof/signaltree/packages/kernel/src/lib/internals/write-observation.ts",
+    "sha256": "a35d2471c4b1a912351b55b6205faabd97c8d7056bfc28c4b4da9893654b878e",
+    "loadedSha256": "a35d2471c4b1a912351b55b6205faabd97c8d7056bfc28c4b4da9893654b878e"
+  }
+]

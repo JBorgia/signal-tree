@@ -65,6 +65,7 @@ export const createSolidObservationAdapter = (): ObservationAdapter & {
   return {
     dispose,
     createToken: createObservationToken,
+    createCurrentReadonlyCell: <T>(readCurrent: () => T) => readCurrent,
 
     createWritableCell: <T>(read: () => T) => {
       const [track, bump] = createSignal(0, { equals: false });

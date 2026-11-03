@@ -1,0 +1,509 @@
+[
+  {
+    "command": [
+      "node",
+      "docs/research/membership-point-work-0/run.mjs",
+      "OAPI",
+      "timing.mjs",
+      "suite",
+      "focused-first"
+    ],
+    "exit": 0,
+    "stdout": "{\"lane\":\"OAPI\",\"entry\":\"timing.mjs\",\"control\":\"suite\",\"exit\":0,\"stable\":true,\"out\":\"/private/tmp/st-membership-point-replay/runs/OAPI-timing.mjs-suite-focused-first\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/membership-point-work-0/run.mjs",
+      "OAPI",
+      "owned-read-controls.mjs",
+      "reentry",
+      "focused-first"
+    ],
+    "exit": 0,
+    "stdout": "{\"lane\":\"OAPI\",\"entry\":\"owned-read-controls.mjs\",\"control\":\"reentry\",\"exit\":0,\"stable\":true,\"out\":\"/private/tmp/st-membership-point-replay/runs/OAPI-owned-read-controls.mjs-reentry-focused-first\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/membership-point-work-0/run.mjs",
+      "OAPI",
+      "owned-read-controls-v2.mjs",
+      "reentry",
+      "focused-first"
+    ],
+    "exit": 0,
+    "stdout": "{\"lane\":\"OAPI\",\"entry\":\"owned-read-controls-v2.mjs\",\"control\":\"reentry\",\"exit\":0,\"stable\":true,\"out\":\"/private/tmp/st-membership-point-replay/runs/OAPI-owned-read-controls-v2.mjs-reentry-focused-first\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/membership-point-work-0/run.mjs",
+      "OAPI",
+      "review-readonly-memo.mjs",
+      "suite",
+      "focused-first"
+    ],
+    "exit": 0,
+    "stdout": "{\"lane\":\"OAPI\",\"entry\":\"review-readonly-memo.mjs\",\"control\":\"suite\",\"exit\":0,\"stable\":true,\"out\":\"/private/tmp/st-membership-point-replay/runs/OAPI-review-readonly-memo.mjs-suite-focused-first\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/membership-point-work-0/run.mjs",
+      "OAPI",
+      "review-empty.mjs",
+      "suite",
+      "focused-first"
+    ],
+    "exit": 0,
+    "stdout": "{\"lane\":\"OAPI\",\"entry\":\"review-empty.mjs\",\"control\":\"suite\",\"exit\":0,\"stable\":true,\"out\":\"/private/tmp/st-membership-point-replay/runs/OAPI-review-empty.mjs-suite-focused-first\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/membership-point-work-0/run.mjs",
+      "OAPI",
+      "review-active.mjs",
+      "suite",
+      "focused-first"
+    ],
+    "exit": 0,
+    "stdout": "{\"lane\":\"OAPI\",\"entry\":\"review-active.mjs\",\"control\":\"suite\",\"exit\":0,\"stable\":true,\"out\":\"/private/tmp/st-membership-point-replay/runs/OAPI-review-active.mjs-suite-focused-first\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/membership-point-work-0/run.mjs",
+      "OAPI",
+      "mixed-no-inspect.mjs",
+      "capture-error",
+      "focused-first"
+    ],
+    "exit": 0,
+    "stdout": "{\"lane\":\"OAPI\",\"entry\":\"mixed-no-inspect.mjs\",\"control\":\"capture-error\",\"exit\":0,\"stable\":true,\"out\":\"/private/tmp/st-membership-point-replay/runs/OAPI-mixed-no-inspect.mjs-capture-error-focused-first\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/membership-point-work-0/run.mjs",
+      "OAPI",
+      "mixed-add.mjs",
+      "capture-error",
+      "focused-first"
+    ],
+    "exit": 0,
+    "stdout": "{\"lane\":\"OAPI\",\"entry\":\"mixed-add.mjs\",\"control\":\"capture-error\",\"exit\":0,\"stable\":true,\"out\":\"/private/tmp/st-membership-point-replay/runs/OAPI-mixed-add.mjs-capture-error-focused-first\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/membership-point-work-0/run.mjs",
+      "OAPI",
+      "inspection-v2.mjs",
+      "control",
+      "focused-first"
+    ],
+    "exit": 0,
+    "stdout": "{\"lane\":\"OAPI\",\"entry\":\"inspection-v2.mjs\",\"control\":\"control\",\"exit\":0,\"stable\":true,\"out\":\"/private/tmp/st-membership-point-replay/runs/OAPI-inspection-v2.mjs-control-focused-first\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/membership-point-work-0/run.mjs",
+      "OAPI",
+      "disposition.mjs",
+      "rollback",
+      "focused-first"
+    ],
+    "exit": 0,
+    "stdout": "{\"lane\":\"OAPI\",\"entry\":\"disposition.mjs\",\"control\":\"rollback\",\"exit\":0,\"stable\":true,\"out\":\"/private/tmp/st-membership-point-replay/runs/OAPI-disposition.mjs-rollback-focused-first\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/membership-point-work-0/run.mjs",
+      "OAPI",
+      "disposition.mjs",
+      "confirm",
+      "focused-first"
+    ],
+    "exit": 0,
+    "stdout": "{\"lane\":\"OAPI\",\"entry\":\"disposition.mjs\",\"control\":\"confirm\",\"exit\":0,\"stable\":true,\"out\":\"/private/tmp/st-membership-point-replay/runs/OAPI-disposition.mjs-confirm-focused-first\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/membership-point-work-0/run.mjs",
+      "OAPI",
+      "recovery.mjs",
+      "rollback",
+      "focused-first"
+    ],
+    "exit": 0,
+    "stdout": "{\"lane\":\"OAPI\",\"entry\":\"recovery.mjs\",\"control\":\"rollback\",\"exit\":0,\"stable\":true,\"out\":\"/private/tmp/st-membership-point-replay/runs/OAPI-recovery.mjs-rollback-focused-first\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/membership-point-work-0/run.mjs",
+      "OAPI",
+      "recovery.mjs",
+      "confirm",
+      "focused-first"
+    ],
+    "exit": 0,
+    "stdout": "{\"lane\":\"OAPI\",\"entry\":\"recovery.mjs\",\"control\":\"confirm\",\"exit\":0,\"stable\":true,\"out\":\"/private/tmp/st-membership-point-replay/runs/OAPI-recovery.mjs-confirm-focused-first\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/membership-point-work-0/run.mjs",
+      "OAPI",
+      "controls.mjs",
+      "repeat",
+      "focused-first"
+    ],
+    "exit": 0,
+    "stdout": "{\"lane\":\"OAPI\",\"entry\":\"controls.mjs\",\"control\":\"repeat\",\"exit\":0,\"stable\":true,\"out\":\"/private/tmp/st-membership-point-replay/runs/OAPI-controls.mjs-repeat-focused-first\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/membership-point-work-0/run.mjs",
+      "OAPI",
+      "controls.mjs",
+      "prepare-reentry",
+      "focused-first"
+    ],
+    "exit": 0,
+    "stdout": "{\"lane\":\"OAPI\",\"entry\":\"controls.mjs\",\"control\":\"prepare-reentry\",\"exit\":0,\"stable\":true,\"out\":\"/private/tmp/st-membership-point-replay/runs/OAPI-controls.mjs-prepare-reentry-focused-first\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/membership-point-work-0/run.mjs",
+      "OAPI",
+      "prepare.mjs",
+      "undefined",
+      "focused-first"
+    ],
+    "exit": 0,
+    "stdout": "{\"lane\":\"OAPI\",\"entry\":\"prepare.mjs\",\"control\":\"undefined\",\"exit\":0,\"stable\":true,\"out\":\"/private/tmp/st-membership-point-replay/runs/OAPI-prepare.mjs-undefined-focused-first\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/membership-point-work-0/run.mjs",
+      "OAPI",
+      "prepare.mjs",
+      "reentry",
+      "focused-first"
+    ],
+    "exit": 0,
+    "stdout": "{\"lane\":\"OAPI\",\"entry\":\"prepare.mjs\",\"control\":\"reentry\",\"exit\":0,\"stable\":true,\"out\":\"/private/tmp/st-membership-point-replay/runs/OAPI-prepare.mjs-reentry-focused-first\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/membership-point-work-0/run.mjs",
+      "OAPI",
+      "spec.mjs",
+      "atomic:body",
+      "focused-first"
+    ],
+    "exit": 0,
+    "stdout": "{\"lane\":\"OAPI\",\"entry\":\"spec.mjs\",\"control\":\"atomic:body\",\"exit\":0,\"stable\":true,\"out\":\"/private/tmp/st-membership-point-replay/runs/OAPI-spec.mjs-atomic:body-focused-first\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/membership-point-work-0/run.mjs",
+      "OAPI",
+      "settlement.mjs",
+      "explicit-rollback-fault",
+      "focused-first"
+    ],
+    "exit": 0,
+    "stdout": "{\"lane\":\"OAPI\",\"entry\":\"settlement.mjs\",\"control\":\"explicit-rollback-fault\",\"exit\":0,\"stable\":true,\"out\":\"/private/tmp/st-membership-point-replay/runs/OAPI-settlement.mjs-explicit-rollback-fault-focused-first\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/membership-point-work-0/run.mjs",
+      "OAPI",
+      "review-shared-controls-v2.mjs",
+      "readonly",
+      "focused-first"
+    ],
+    "exit": 0,
+    "stdout": "{\"lane\":\"OAPI\",\"entry\":\"review-shared-controls-v2.mjs\",\"control\":\"readonly\",\"exit\":0,\"stable\":true,\"out\":\"/private/tmp/st-membership-point-replay/runs/OAPI-review-shared-controls-v2.mjs-readonly-focused-first\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/membership-point-work-0/run.mjs",
+      "OAPI",
+      "review-shared-controls-v2.mjs",
+      "primed",
+      "focused-first"
+    ],
+    "exit": 0,
+    "stdout": "{\"lane\":\"OAPI\",\"entry\":\"review-shared-controls-v2.mjs\",\"control\":\"primed\",\"exit\":0,\"stable\":true,\"out\":\"/private/tmp/st-membership-point-replay/runs/OAPI-review-shared-controls-v2.mjs-primed-focused-first\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/membership-point-work-0/run.mjs",
+      "OAPI",
+      "review-shared-controls-v2.mjs",
+      "dynamic",
+      "focused-first"
+    ],
+    "exit": 0,
+    "stdout": "{\"lane\":\"OAPI\",\"entry\":\"review-shared-controls-v2.mjs\",\"control\":\"dynamic\",\"exit\":0,\"stable\":true,\"out\":\"/private/tmp/st-membership-point-replay/runs/OAPI-review-shared-controls-v2.mjs-dynamic-focused-first\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/membership-point-work-0/run.mjs",
+      "OAPI",
+      "review-shared-controls-v2.mjs",
+      "errors",
+      "focused-first"
+    ],
+    "exit": 0,
+    "stdout": "{\"lane\":\"OAPI\",\"entry\":\"review-shared-controls-v2.mjs\",\"control\":\"errors\",\"exit\":0,\"stable\":true,\"out\":\"/private/tmp/st-membership-point-replay/runs/OAPI-review-shared-controls-v2.mjs-errors-focused-first\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/membership-point-work-0/run.mjs",
+      "OAPI",
+      "review-shared-controls-v2.mjs",
+      "writable-token",
+      "focused-first"
+    ],
+    "exit": 0,
+    "stdout": "{\"lane\":\"OAPI\",\"entry\":\"review-shared-controls-v2.mjs\",\"control\":\"writable-token\",\"exit\":0,\"stable\":true,\"out\":\"/private/tmp/st-membership-point-replay/runs/OAPI-review-shared-controls-v2.mjs-writable-token-focused-first\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/membership-point-work-0/run.mjs",
+      "OAPI",
+      "review-shared-controls-v2.mjs",
+      "body-error",
+      "focused-first"
+    ],
+    "exit": 0,
+    "stdout": "{\"lane\":\"OAPI\",\"entry\":\"review-shared-controls-v2.mjs\",\"control\":\"body-error\",\"exit\":0,\"stable\":true,\"out\":\"/private/tmp/st-membership-point-replay/runs/OAPI-review-shared-controls-v2.mjs-body-error-focused-first\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/membership-point-work-0/run.mjs",
+      "OAPI",
+      "review-shared-controls-v2.mjs",
+      "reentry",
+      "focused-first"
+    ],
+    "exit": 0,
+    "stdout": "{\"lane\":\"OAPI\",\"entry\":\"review-shared-controls-v2.mjs\",\"control\":\"reentry\",\"exit\":0,\"stable\":true,\"out\":\"/private/tmp/st-membership-point-replay/runs/OAPI-review-shared-controls-v2.mjs-reentry-focused-first\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/membership-point-work-0/run.mjs",
+      "OAPI",
+      "review-shared-multitree.mjs",
+      "suite",
+      "focused-first"
+    ],
+    "exit": 0,
+    "stdout": "{\"lane\":\"OAPI\",\"entry\":\"review-shared-multitree.mjs\",\"control\":\"suite\",\"exit\":0,\"stable\":true,\"out\":\"/private/tmp/st-membership-point-replay/runs/OAPI-review-shared-multitree.mjs-suite-focused-first\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/membership-point-work-0/run.mjs",
+      "OAPI",
+      "review-selection-reentry-mixed.mjs",
+      "suite",
+      "focused-first"
+    ],
+    "exit": 0,
+    "stdout": "{\"lane\":\"OAPI\",\"entry\":\"review-selection-reentry-mixed.mjs\",\"control\":\"suite\",\"exit\":0,\"stable\":true,\"out\":\"/private/tmp/st-membership-point-replay/runs/OAPI-review-selection-reentry-mixed.mjs-suite-focused-first\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/membership-point-work-0/run.mjs",
+      "OAPI",
+      "review-selection-reentry-aba.mjs",
+      "suite",
+      "focused-first"
+    ],
+    "exit": 0,
+    "stdout": "{\"lane\":\"OAPI\",\"entry\":\"review-selection-reentry-aba.mjs\",\"control\":\"suite\",\"exit\":0,\"stable\":true,\"out\":\"/private/tmp/st-membership-point-replay/runs/OAPI-review-selection-reentry-aba.mjs-suite-focused-first\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/membership-point-work-0/run.mjs",
+      "OAPI",
+      "review-order-cross.mjs",
+      "normal",
+      "focused-first"
+    ],
+    "exit": 0,
+    "stdout": "{\"lane\":\"OAPI\",\"entry\":\"review-order-cross.mjs\",\"control\":\"normal\",\"exit\":0,\"stable\":true,\"out\":\"/private/tmp/st-membership-point-replay/runs/OAPI-review-order-cross.mjs-normal-focused-first\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/membership-point-work-0/run.mjs",
+      "OAPI",
+      "review-order-cross.mjs",
+      "throw",
+      "focused-first"
+    ],
+    "exit": 0,
+    "stdout": "{\"lane\":\"OAPI\",\"entry\":\"review-order-cross.mjs\",\"control\":\"throw\",\"exit\":0,\"stable\":true,\"out\":\"/private/tmp/st-membership-point-replay/runs/OAPI-review-order-cross.mjs-throw-focused-first\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/membership-point-work-0/run.mjs",
+      "OAPI",
+      "callback-controls.mjs",
+      "C",
+      "focused-first"
+    ],
+    "exit": 0,
+    "stdout": "{\"lane\":\"OAPI\",\"entry\":\"callback-controls.mjs\",\"control\":\"C\",\"exit\":0,\"stable\":true,\"out\":\"/private/tmp/st-membership-point-replay/runs/OAPI-callback-controls.mjs-C-focused-first\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/membership-point-work-0/run.mjs",
+      "OAPI",
+      "callback-controls.mjs",
+      "C-then-X",
+      "focused-first"
+    ],
+    "exit": 0,
+    "stdout": "{\"lane\":\"OAPI\",\"entry\":\"callback-controls.mjs\",\"control\":\"C-then-X\",\"exit\":0,\"stable\":true,\"out\":\"/private/tmp/st-membership-point-replay/runs/OAPI-callback-controls.mjs-C-then-X-focused-first\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/membership-point-work-0/run.mjs",
+      "OAPI",
+      "callback-controls.mjs",
+      "C-then-A",
+      "focused-first"
+    ],
+    "exit": 0,
+    "stdout": "{\"lane\":\"OAPI\",\"entry\":\"callback-controls.mjs\",\"control\":\"C-then-A\",\"exit\":0,\"stable\":true,\"out\":\"/private/tmp/st-membership-point-replay/runs/OAPI-callback-controls.mjs-C-then-A-focused-first\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/membership-point-work-0/run.mjs",
+      "OAPI",
+      "callback-controls.mjs",
+      "nested-writes",
+      "focused-first"
+    ],
+    "exit": 1,
+    "stdout": "{\"lane\":\"OAPI\",\"entry\":\"callback-controls.mjs\",\"control\":\"nested-writes\",\"exit\":1,\"stable\":true,\"out\":\"/private/tmp/st-membership-point-replay/runs/OAPI-callback-controls.mjs-nested-writes-focused-first\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/membership-point-work-0/run.mjs",
+      "OAPI",
+      "callback-controls.mjs",
+      "callback-throws",
+      "focused-first"
+    ],
+    "exit": 1,
+    "stdout": "{\"lane\":\"OAPI\",\"entry\":\"callback-controls.mjs\",\"control\":\"callback-throws\",\"exit\":1,\"stable\":true,\"out\":\"/private/tmp/st-membership-point-replay/runs/OAPI-callback-controls.mjs-callback-throws-focused-first\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/membership-point-work-0/run.mjs",
+      "OAPI",
+      "callback-controls.mjs",
+      "callback-throws-undefined",
+      "focused-first"
+    ],
+    "exit": 1,
+    "stdout": "{\"lane\":\"OAPI\",\"entry\":\"callback-controls.mjs\",\"control\":\"callback-throws-undefined\",\"exit\":1,\"stable\":true,\"out\":\"/private/tmp/st-membership-point-replay/runs/OAPI-callback-controls.mjs-callback-throws-undefined-focused-first\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/membership-point-work-0/run.mjs",
+      "OAPI",
+      "callback-controls.mjs",
+      "removed-selected-rows",
+      "focused-first"
+    ],
+    "exit": 1,
+    "stdout": "{\"lane\":\"OAPI\",\"entry\":\"callback-controls.mjs\",\"control\":\"removed-selected-rows\",\"exit\":1,\"stable\":true,\"out\":\"/private/tmp/st-membership-point-replay/runs/OAPI-callback-controls.mjs-removed-selected-rows-focused-first\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/membership-point-work-0/run.mjs",
+      "OAPI",
+      "review-order-late-subject.mjs",
+      "throw",
+      "focused-first"
+    ],
+    "exit": 0,
+    "stdout": "{\"lane\":\"OAPI\",\"entry\":\"review-order-late-subject.mjs\",\"control\":\"throw\",\"exit\":0,\"stable\":true,\"out\":\"/private/tmp/st-membership-point-replay/runs/OAPI-review-order-late-subject.mjs-throw-focused-first\"}\n",
+    "stderr": ""
+  }
+]

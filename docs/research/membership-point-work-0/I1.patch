@@ -1,0 +1,20 @@
+--- a/packages/kernel/src/lib/entity-signal.ts
++++ b/packages/kernel/src/lib/entity-signal.ts
+@@ -693,8 +693,15 @@
+   ) {
+     const revision=physicalCommitClock?.revision();
+     const changes: Array<import('./internals/mutation-capture-runtime').CommittedEntityMutation> = [];
+-    const keys = structuralStore.activeKeysSnapshot();
+-    let tail = keys.length ? structuralStore.subjectIdForKey(keys[keys.length-1]) : undefined;
++    // Only fresh subjects need the pre-install tail. Preserve the sampling
++    // boundary before record cloning, using the existing constant-time index.
++    const hasFreshSubjects = frame.mutations.some(
++      (mutation) => mutation.kind === 'create-fresh-subject'
++    );
++    const tailKey = hasFreshSubjects ? structuralStore.lastActiveKey() : undefined;
++    let tail = tailKey === undefined
++      ? undefined
++      : structuralStore.subjectIdForKey(tailKey);
+     for (const m of frame.mutations) {
+       const key = 'key' in m ? m.key : structuralStore.activeKeyForSubject(m.subjectId);
+       const before = valueStore.backingForSubject(m.subjectId);

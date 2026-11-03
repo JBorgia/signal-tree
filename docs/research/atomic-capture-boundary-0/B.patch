@@ -1,0 +1,71 @@
+--- a/packages/kernel/src/enhancers/transactions/transactions.ts
++++ b/packages/kernel/src/enhancers/transactions/transactions.ts
+@@ -2008,6 +2008,37 @@
+         }
+       }
+     });
++
++
++  const sourceCaptureRuntime = getMutationCaptureRuntime(tree);
++  if (sourceCaptureRuntime) {
++    sourceCaptureRuntime.prepareEntityResponsibility = (capture) => {
++      const id = resolveTransactionId(capture.meta);
++      if (id === undefined || isRestoring || capture.meta?.origin === 'transaction-rollback' || capture.meta?.origin === 'restoration') return;
++      (globalThis as any).__entityPrepareProbe?.(capture);
++      const bucket = getTransactionBucket(id);
++      const scratch = createCaptureBucket();
++      for (const [key,effect] of bucket.effects) scratch.effects.set(key, cloneTurnEffect(effect));
++      for (const [key,value] of bucket.baselineValues) scratch.baselineValues.set(key,value);
++      for (const change of capture.changes) {
++        if(change.structural) throw new Error('Research boundary requires existing-row replacement');
++        // Prepare bounded field instructions before state becomes live; rich capture remains later.
++        const before=change.before as Record<string,unknown>, after=change.after as Record<string,unknown>;
++        for(const key of new Set([...Object.keys(before),...Object.keys(after)])) {
++          const beforeValue=before[key],afterValue=after[key];
++          const beforePresent=Object.prototype.hasOwnProperty.call(before,key),afterPresent=Object.prototype.hasOwnProperty.call(after,key);
++          if(beforeValue===afterValue && beforePresent===afterPresent) continue;
++          enqueueEffect(scratch,scratch.effects,{kind:'set',position:capture.owner,ownerPath:capture.ownerPath,path: `${capture.ownerPath}.${key}`,subject:change.subject,subjectFieldSegments:[key],before:beforeValue,after:afterValue,mutationIntent:capture.meta?.mutationIntent,...(!(beforePresent&&afterPresent)?{fieldPresence:{before:beforePresent,after:afterPresent}}:{})});
++        }
++      }
++      const writes: {map: Map<any,any>;key: unknown;value: unknown}[]=[];
++      for(const [key,value] of scratch.effects) writes.push({map:bucket.effects,key,value});
++      for(const [key,value] of scratch.baselineValues) writes.push({map:bucket.baselineValues,key,value});
++      if(pendingTransactions.size>0) for(const key of windowKeys([capture.owner],capture.changes.map(c=>c.subject))) writes.push({map:bucket.ownWriteSeq,key,value:windowWriteSeq});
++      return {writes,adds:[{set:bucket.positionIds,value:capture.owner},{set:bucket.ownerPaths,value:capture.ownerPath},...capture.changes.map(c=>({set:bucket.subjectIds,value:c.subject}))]};
++    };
++    tree.registerCleanup(()=>{ delete sourceCaptureRuntime.prepareEntityResponsibility; });
++  }
+
+   const resolveOwnerPositionId = (ownerPath?: string): number | undefined => {
+     if (!ownerPath) {
+--- a/packages/kernel/src/lib/entity-signal.ts
++++ b/packages/kernel/src/lib/entity-signal.ts
+@@ -1367,7 +1367,18 @@
+     const before = capture
+       ? valueStore.backingForSubject(subjectId)
+       : undefined;
++    const revision = physicalCommitClock?.revision();
++    const plan = mutationCaptureRuntime?.prepareEntityResponsibility?.({
++      owner: getPositionIds()?.[0] as number, ownerPath: basePath,
++      changes: [{subject: subjectId, before: valueStore.backingForSubject(subjectId), after: nextValue, structural: false}],
++      meta: ambientMeta(),
++    });
++    if (physicalCommitClock?.revision() !== revision) throw new Error('Entity responsibility preparation reentered installation');
+     valueStore.retainSubjectValue(subjectId, nextValue);
++    if (plan) {
++      for (let i=0;i<plan.writes.length;i++) { const w=plan.writes[i]; w.map.set(w.key,w.value); }
++      for (let i=0;i<plan.adds.length;i++) { const a=plan.adds[i]; a.set.add(a.value); }
++    }
+     capture?.([
+       { subject: subjectId, before, after: nextValue, structural: false },
+     ]);
+--- a/packages/kernel/src/lib/internals/mutation-capture-runtime.ts
++++ b/packages/kernel/src/lib/internals/mutation-capture-runtime.ts
+@@ -40,6 +40,7 @@
+ );
+
+ export interface MutationCaptureRuntime {
++  prepareEntityResponsibility?: (capture: CommittedEntityCapture) => {writes: {map: Map<any,any>; key: unknown; value: unknown}[]; adds: {set: Set<any>;value: unknown}[]} | undefined;
+   /** Pay-for-use: producers build committed evidence only when this is true. */
+   hasCommittedEntityObservers?(): boolean;
+   publishCommittedEntity?(capture: CommittedEntityCapture): void;

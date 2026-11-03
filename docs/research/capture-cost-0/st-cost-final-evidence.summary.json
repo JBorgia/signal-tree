@@ -1,0 +1,27 @@
+{
+  "archive": "/private/tmp/st-cost-final-evidence.json.xz",
+  "sha256": "8b8fb42b3c47432bd72f90b24bc6daf93e474fe116edf1519a5b6478bb657929",
+  "bytes": 219820,
+  "uncompressedBytes": 7959680,
+  "entries": 1304,
+  "allHashesVerified": true,
+  "packageArchive": "/private/tmp/st-cost-final-packages.tar.xz",
+  "packageArchiveBytes": 149384,
+  "packageArchiveSha256": "514920267d3616d78285719422e0c5a9f57849890437bfcda712947fb9e7dc4d",
+  "optimizedSnapshot": {
+    "source": "/private/tmp/st-cost-performance/g1-comparison/optimized-idle32-leaf128.heapsnapshot",
+    "archive": "/private/tmp/st-cost-final-optimized.heapsnapshot.xz",
+    "sourceBytes": 24391811,
+    "sourceSha256": "b1533fe483d9d94fba1d7d4f1f96ef4ba7e574ad8f153db313cd324bd5ff9f4c",
+    "archiveSha256": "3bc6ce50e71ff90afd823976396237c5c1e6531e234ad6494927128ee900ff49",
+    "limitation": "Optimized snapshot ngDevMode=false; original snapshot flags differ. Do not claim exact-condition snapshot ratios."
+  },
+  "optimizedBundleBehavior": "4/4 exact production/development bare/entities fixtures pass",
+  "limits": [
+    "Original130,final156,longer26 timing evidence preserved separately; no sample replacement",
+    "Host noise and snapshot flag differences remain in original protocols and receipts",
+    "No generated bundles or duplicated candidate source directories; bundle/source hashes retained",
+    "Baseline/original package metadata preserved with complete dist runtime/declaration graph; package tar intended for replay, not publication",
+    "Archive script used: /private/tmp/st-cost-final-assemble.py"
+  ]
+}

@@ -1,0 +1,444 @@
+[
+  {
+    "project": "angular",
+    "testPath": "packages/angular/src/lib/whole-value-new-keys.spec.ts",
+    "testSha256": "4b253ccd9d584b4bd768b20fc4e7e115051e8f3d11a51e4380141256967e11b4",
+    "case": "publishes newly supplied ordinary keys through the angular facade",
+    "classification": "shared-admission-error-observed; cause/regression-status not adjudicated",
+    "errors": [
+      {
+        "name": "Error",
+        "message": "Scalar selection requires prepared admission",
+        "stack": "Error: Scalar selection requires prepared admission\n    at /private/tmp/st-r3-compatibility-inventory/candidate/packages/kernel/src/enhancers/transactions/transactions.ts:2891:25\n    at prepareScalarSelection (/private/tmp/st-r3-compatibility-inventory/candidate/packages/kernel/src/lib/internals/native-scalar-selection.ts:7:263)\n    at Object.prepare (/private/tmp/st-r3-compatibility-inventory/candidate/packages/kernel/src/lib/experimental-publication/private.ts:180:55)\n    at publicationPreparer (/private/tmp/st-r3-compatibility-inventory/candidate/packages/kernel/src/lib/internals/intrinsic-mutation.ts:329:32)\n    at preparePublication (/private/tmp/st-r3-compatibility-inventory/candidate/packages/kernel/src/lib/internals/native-tree-scalar-leaf-runtime.ts:237:16)\n    at /private/tmp/st-r3-compatibility-inventory/candidate/packages/kernel/src/lib/internals/native-tree-scalar-leaf-runtime.ts:259:15\n    at Object.commitRecorded (/private/tmp/st-r3-compatibility-inventory/candidate/packages/kernel/src/lib/internals/tree-scalar-slot-runtime.ts:337:34)\n    at getter.replace [as set] (/private/tmp/st-r3-compatibility-inventory/candidate/packages/kernel/src/lib/internals/native-tree-scalar-leaf-runtime.ts:248:37)\n    at /private/tmp/st-r3-compatibility-inventory/candidate/packages/angular/src/lib/whole-value-new-keys.spec.ts:35:14\n    at withWriteContext (/private/tmp/st-r3-compatibility-inventory/candidate/packages/kernel/src/lib/write-context.ts:65:12)"
+      }
+    ],
+    "rawLog": "/private/tmp/st-r3-compatibility-inventory/full-runs/angular/first.log",
+    "events": "/private/tmp/st-r3-compatibility-inventory/full-runs/angular/events.jsonl",
+    "manifest": "e0b64de42df330abff455d2ee1b981c99abee187a77269cd064f52f3b08505f3"
+  },
+  {
+    "project": "kernel",
+    "testPath": "packages/kernel/src/enhancers/restoration/restoration.spec.ts",
+    "testSha256": "6e7e13999ac6161cec1065804521b5608ad2eb82d2d615c4943450ab63e75c35",
+    "case": "restoration enhancer > rolls back a thrown transaction callback through the realization port and records no turn",
+    "classification": "unclassified-runtime-or-fixture-failure; preserve for independent causal review",
+    "errors": [
+      {
+        "name": "AssertionError",
+        "message": "expected \"applyAtomically\" to be called 1 times, but got 0 times",
+        "stack": "AssertionError: expected \"applyAtomically\" to be called 1 times, but got 0 times\n    at /private/tmp/st-r3-compatibility-inventory/candidate/packages/kernel/src/enhancers/restoration/restoration.spec.ts:439:22\n    at processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+      }
+    ],
+    "rawLog": "/private/tmp/st-r3-compatibility-inventory/full-runs/kernel/first.log",
+    "events": "/private/tmp/st-r3-compatibility-inventory/full-runs/kernel/events.jsonl",
+    "manifest": "e0b64de42df330abff455d2ee1b981c99abee187a77269cd064f52f3b08505f3"
+  },
+  {
+    "project": "kernel",
+    "testPath": "packages/kernel/src/enhancers/restoration/restoration.spec.ts",
+    "testSha256": "6e7e13999ac6161cec1065804521b5608ad2eb82d2d615c4943450ab63e75c35",
+    "case": "restoration enhancer > rolls back a pending scalar write through the realization port while preserving a later unrelated confirmed write",
+    "classification": "unclassified-runtime-or-fixture-failure; preserve for independent causal review",
+    "errors": [
+      {
+        "name": "AssertionError",
+        "message": "expected \"applyAtomically\" to be called 1 times, but got 0 times",
+        "stack": "AssertionError: expected \"applyAtomically\" to be called 1 times, but got 0 times\n    at /private/tmp/st-r3-compatibility-inventory/candidate/packages/kernel/src/enhancers/restoration/restoration.spec.ts:514:22\n    at processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+      }
+    ],
+    "rawLog": "/private/tmp/st-r3-compatibility-inventory/full-runs/kernel/first.log",
+    "events": "/private/tmp/st-r3-compatibility-inventory/full-runs/kernel/events.jsonl",
+    "manifest": "e0b64de42df330abff455d2ee1b981c99abee187a77269cd064f52f3b08505f3"
+  },
+  {
+    "project": "kernel",
+    "testPath": "packages/kernel/src/lib/internals/causal-runtime/tree-realization-adapter.spec.ts",
+    "testSha256": "4eb7b7bf8e87df32dc9c1af1ad438a83302ac2d71326735bb3b03a1653e1dae1",
+    "case": "tree realization adapter > keeps outer transaction authorship active across an inner realization write",
+    "classification": "unclassified-runtime-or-fixture-failure; preserve for independent causal review",
+    "errors": [
+      {
+        "name": "AssertionError",
+        "message": "expected '' to be 'B' // Object.is equality",
+        "stack": "AssertionError: expected '' to be 'B' // Object.is equality\n    at /private/tmp/st-r3-compatibility-inventory/candidate/packages/kernel/src/lib/internals/causal-runtime/tree-realization-adapter.spec.ts:3924:29\n    at file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)\n    at file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:2955:64"
+      }
+    ],
+    "rawLog": "/private/tmp/st-r3-compatibility-inventory/full-runs/kernel/first.log",
+    "events": "/private/tmp/st-r3-compatibility-inventory/full-runs/kernel/events.jsonl",
+    "manifest": "e0b64de42df330abff455d2ee1b981c99abee187a77269cd064f52f3b08505f3"
+  },
+  {
+    "project": "kernel",
+    "testPath": "packages/kernel/src/lib/transaction-observer-failure.spec.ts",
+    "testSha256": "fb0021d35f1c1f645517c24756722237ae0f2764daad593ddaa451f2bb17d6b8",
+    "case": "a throwing observer cannot strand a transaction or silence Link > a refused compensation on a throwing callback hands back recovery, and settling it releases Link",
+    "classification": "unclassified-runtime-or-fixture-failure; preserve for independent causal review",
+    "errors": [
+      {
+        "name": "AssertionError",
+        "message": "expected undefined to be defined",
+        "stack": "AssertionError: expected undefined to be defined\n    at /private/tmp/st-r3-compatibility-inventory/candidate/packages/kernel/src/lib/transaction-observer-failure.spec.ts:302:24\n    at processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+      }
+    ],
+    "rawLog": "/private/tmp/st-r3-compatibility-inventory/full-runs/kernel/first.log",
+    "events": "/private/tmp/st-r3-compatibility-inventory/full-runs/kernel/events.jsonl",
+    "manifest": "e0b64de42df330abff455d2ee1b981c99abee187a77269cd064f52f3b08505f3"
+  },
+  {
+    "project": "kernel",
+    "testPath": "packages/kernel/src/lib/transaction-observer-failure.spec.ts",
+    "testSha256": "fb0021d35f1c1f645517c24756722237ae0f2764daad593ddaa451f2bb17d6b8",
+    "case": "failures after the callback returns (16.x) > a refused rollback after the group fails to close reports callbackFailed false",
+    "classification": "unclassified-runtime-or-fixture-failure; preserve for independent causal review",
+    "errors": [
+      {
+        "name": "AssertionError",
+        "message": "expected undefined to be defined",
+        "stack": "AssertionError: expected undefined to be defined\n    at /private/tmp/st-r3-compatibility-inventory/candidate/packages/kernel/src/lib/transaction-observer-failure.spec.ts:787:24\n    at file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)\n    at file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:2955:64"
+      }
+    ],
+    "rawLog": "/private/tmp/st-r3-compatibility-inventory/full-runs/kernel/first.log",
+    "events": "/private/tmp/st-r3-compatibility-inventory/full-runs/kernel/events.jsonl",
+    "manifest": "e0b64de42df330abff455d2ee1b981c99abee187a77269cd064f52f3b08505f3"
+  },
+  {
+    "project": "kernel",
+    "testPath": "packages/kernel/src/lib/transaction-observer-failure.spec.ts",
+    "testSha256": "fb0021d35f1c1f645517c24756722237ae0f2764daad593ddaa451f2bb17d6b8",
+    "case": "failures after the callback returns (16.x) > a refused rollback after a capture-release failure hands back recovery that does not blame the callback",
+    "classification": "unclassified-runtime-or-fixture-failure; preserve for independent causal review",
+    "errors": [
+      {
+        "name": "AssertionError",
+        "message": "expected undefined to be defined",
+        "stack": "AssertionError: expected undefined to be defined\n    at /private/tmp/st-r3-compatibility-inventory/candidate/packages/kernel/src/lib/transaction-observer-failure.spec.ts:856:24\n    at processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+      }
+    ],
+    "rawLog": "/private/tmp/st-r3-compatibility-inventory/full-runs/kernel/first.log",
+    "events": "/private/tmp/st-r3-compatibility-inventory/full-runs/kernel/events.jsonl",
+    "manifest": "e0b64de42df330abff455d2ee1b981c99abee187a77269cd064f52f3b08505f3"
+  },
+  {
+    "project": "kernel",
+    "testPath": "packages/kernel/src/lib/transaction-observer-failure.spec.ts",
+    "testSha256": "fb0021d35f1c1f645517c24756722237ae0f2764daad593ddaa451f2bb17d6b8",
+    "case": "failures after the callback returns (16.x) > a refused rollback after a capture-release failure still reports that failure",
+    "classification": "unclassified-runtime-or-fixture-failure; preserve for independent causal review",
+    "errors": [
+      {
+        "name": "AssertionError",
+        "message": "expected \"error\" to be called with arguments: [ StringContaining{\u2026}, \u2026(1) ]\n\nNumber of calls: 0\n",
+        "stack": "AssertionError: expected \"error\" to be called with arguments: [ StringContaining{\u2026}, \u2026(1) ]\n\nNumber of calls: 0\n\n    at Proxy.<anonymous> (file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vitest+expect@4.1.9/node_modules/@vitest/expect/dist/index.js:1487:10)\n    at Proxy.<anonymous> (file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vitest+expect@4.1.9/node_modules/@vitest/expect/dist/index.js:1156:15)\n    at Proxy.methodWrapper (file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/chai@6.2.2/node_modules/chai/index.js:1700:25)\n    at /private/tmp/st-r3-compatibility-inventory/candidate/packages/kernel/src/lib/transaction-observer-failure.spec.ts:897:22\n    at file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20"
+      }
+    ],
+    "rawLog": "/private/tmp/st-r3-compatibility-inventory/full-runs/kernel/first.log",
+    "events": "/private/tmp/st-r3-compatibility-inventory/full-runs/kernel/events.jsonl",
+    "manifest": "e0b64de42df330abff455d2ee1b981c99abee187a77269cd064f52f3b08505f3"
+  },
+  {
+    "project": "kernel",
+    "testPath": "packages/kernel/src/lib/transaction-observer-failure.spec.ts",
+    "testSha256": "fb0021d35f1c1f645517c24756722237ae0f2764daad593ddaa451f2bb17d6b8",
+    "case": "failures after the callback returns (16.x) > a throwing console inside a cleanup report cannot replace the refusal",
+    "classification": "unclassified-runtime-or-fixture-failure; preserve for independent causal review",
+    "errors": [
+      {
+        "name": "AssertionError",
+        "message": "expected undefined to be defined",
+        "stack": "AssertionError: expected undefined to be defined\n    at /private/tmp/st-r3-compatibility-inventory/candidate/packages/kernel/src/lib/transaction-observer-failure.spec.ts:997:24\n    at file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)\n    at file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:2955:64"
+      }
+    ],
+    "rawLog": "/private/tmp/st-r3-compatibility-inventory/full-runs/kernel/first.log",
+    "events": "/private/tmp/st-r3-compatibility-inventory/full-runs/kernel/events.jsonl",
+    "manifest": "e0b64de42df330abff455d2ee1b981c99abee187a77269cd064f52f3b08505f3"
+  },
+  {
+    "project": "kernel",
+    "testPath": "packages/kernel/src/lib/opaque-leaf-restoration-v16-controls.spec.ts",
+    "testSha256": "3caf653470ce0136ecd912c60410eda76476c134dad711e6dab2ae63df0af5af",
+    "case": "automatic compensation and recovery restore the whole terminal > a refused compensation hands back a recovery whose inspection and rollback address the terminal (transactions only)",
+    "classification": "unclassified-runtime-or-fixture-failure; preserve for independent causal review",
+    "errors": [
+      {
+        "name": "AssertionError",
+        "message": "expected undefined to be an instance of SignalTreeRollbackError",
+        "stack": "AssertionError: expected undefined to be an instance of SignalTreeRollbackError\n    at Proxy.<anonymous> (file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vitest+expect@4.1.9/node_modules/@vitest/expect/dist/index.js:1386:15)\n    at Proxy.<anonymous> (file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vitest+expect@4.1.9/node_modules/@vitest/expect/dist/index.js:1156:15)\n    at Proxy.methodWrapper (file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/chai@6.2.2/node_modules/chai/index.js:1700:25)\n    at /private/tmp/st-r3-compatibility-inventory/candidate/packages/kernel/src/lib/opaque-leaf-restoration-v16-controls.spec.ts:137:22\n    at file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20"
+      }
+    ],
+    "rawLog": "/private/tmp/st-r3-compatibility-inventory/full-runs/kernel/first.log",
+    "events": "/private/tmp/st-r3-compatibility-inventory/full-runs/kernel/events.jsonl",
+    "manifest": "e0b64de42df330abff455d2ee1b981c99abee187a77269cd064f52f3b08505f3"
+  },
+  {
+    "project": "kernel",
+    "testPath": "packages/kernel/src/lib/opaque-leaf-restoration-v16-controls.spec.ts",
+    "testSha256": "3caf653470ce0136ecd912c60410eda76476c134dad711e6dab2ae63df0af5af",
+    "case": "automatic compensation and recovery restore the whole terminal > a refused compensation hands back a recovery whose inspection and rollback address the terminal (transactions first)",
+    "classification": "unclassified-runtime-or-fixture-failure; preserve for independent causal review",
+    "errors": [
+      {
+        "name": "AssertionError",
+        "message": "expected undefined to be an instance of SignalTreeRollbackError",
+        "stack": "AssertionError: expected undefined to be an instance of SignalTreeRollbackError\n    at Proxy.<anonymous> (file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vitest+expect@4.1.9/node_modules/@vitest/expect/dist/index.js:1386:15)\n    at Proxy.<anonymous> (file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vitest+expect@4.1.9/node_modules/@vitest/expect/dist/index.js:1156:15)\n    at Proxy.methodWrapper (file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/chai@6.2.2/node_modules/chai/index.js:1700:25)\n    at /private/tmp/st-r3-compatibility-inventory/candidate/packages/kernel/src/lib/opaque-leaf-restoration-v16-controls.spec.ts:137:22\n    at file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20"
+      }
+    ],
+    "rawLog": "/private/tmp/st-r3-compatibility-inventory/full-runs/kernel/first.log",
+    "events": "/private/tmp/st-r3-compatibility-inventory/full-runs/kernel/events.jsonl",
+    "manifest": "e0b64de42df330abff455d2ee1b981c99abee187a77269cd064f52f3b08505f3"
+  },
+  {
+    "project": "kernel",
+    "testPath": "packages/kernel/src/lib/opaque-leaf-restoration-v16-controls.spec.ts",
+    "testSha256": "3caf653470ce0136ecd912c60410eda76476c134dad711e6dab2ae63df0af5af",
+    "case": "automatic compensation and recovery restore the whole terminal > a refused compensation hands back a recovery whose inspection and rollback address the terminal (restoration first)",
+    "classification": "unclassified-runtime-or-fixture-failure; preserve for independent causal review",
+    "errors": [
+      {
+        "name": "AssertionError",
+        "message": "expected undefined to be an instance of SignalTreeRollbackError",
+        "stack": "AssertionError: expected undefined to be an instance of SignalTreeRollbackError\n    at Proxy.<anonymous> (file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vitest+expect@4.1.9/node_modules/@vitest/expect/dist/index.js:1386:15)\n    at Proxy.<anonymous> (file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vitest+expect@4.1.9/node_modules/@vitest/expect/dist/index.js:1156:15)\n    at Proxy.methodWrapper (file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/chai@6.2.2/node_modules/chai/index.js:1700:25)\n    at /private/tmp/st-r3-compatibility-inventory/candidate/packages/kernel/src/lib/opaque-leaf-restoration-v16-controls.spec.ts:137:22\n    at file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20"
+      }
+    ],
+    "rawLog": "/private/tmp/st-r3-compatibility-inventory/full-runs/kernel/first.log",
+    "events": "/private/tmp/st-r3-compatibility-inventory/full-runs/kernel/events.jsonl",
+    "manifest": "e0b64de42df330abff455d2ee1b981c99abee187a77269cd064f52f3b08505f3"
+  },
+  {
+    "project": "kernel",
+    "testPath": "packages/kernel/src/lib/whole-value-new-keys.spec.ts",
+    "testSha256": "5af582a90e3783871085fda5513baea975f31c57db467f92c6edc1c3e898bb11",
+    "case": "owner-authorized whole-value new keys > retains newly installed membership responsibility after a failed rollback",
+    "classification": "shared-admission-error-observed; cause/regression-status not adjudicated",
+    "errors": [
+      {
+        "name": "Error",
+        "message": "Scalar selection requires prepared admission",
+        "stack": "Error: Scalar selection requires prepared admission\n    at /private/tmp/st-r3-compatibility-inventory/candidate/packages/kernel/src/enhancers/transactions/transactions.ts:2891:25\n    at prepareScalarSelection (/private/tmp/st-r3-compatibility-inventory/candidate/packages/kernel/src/lib/internals/native-scalar-selection.ts:7:263)\n    at Object.prepare (/private/tmp/st-r3-compatibility-inventory/candidate/packages/kernel/src/lib/experimental-publication/private.ts:180:55)\n    at publicationPreparer (/private/tmp/st-r3-compatibility-inventory/candidate/packages/kernel/src/lib/internals/intrinsic-mutation.ts:329:32)\n    at preparePublication (/private/tmp/st-r3-compatibility-inventory/candidate/packages/kernel/src/lib/internals/location-runtime.ts:483:18)\n    at /private/tmp/st-r3-compatibility-inventory/candidate/packages/kernel/src/lib/internals/location-runtime.ts:490:13\n    at Object.commitRecorded (/private/tmp/st-r3-compatibility-inventory/candidate/packages/kernel/src/lib/internals/tree-scalar-slot-runtime.ts:337:34)\n    at /private/tmp/st-r3-compatibility-inventory/candidate/packages/kernel/src/lib/internals/tree-scalar-leaf-runtime.ts:164:35\n    at Object.replace (/private/tmp/st-r3-compatibility-inventory/candidate/packages/kernel/src/lib/internals/location-runtime.ts:488:26)\n    at node.n (/private/tmp/st-r3-compatibility-inventory/candidate/packages/kernel/src/lib/internals/location-runtime.ts:461:17)"
+      }
+    ],
+    "rawLog": "/private/tmp/st-r3-compatibility-inventory/full-runs/kernel/first.log",
+    "events": "/private/tmp/st-r3-compatibility-inventory/full-runs/kernel/events.jsonl",
+    "manifest": "e0b64de42df330abff455d2ee1b981c99abee187a77269cd064f52f3b08505f3"
+  },
+  {
+    "project": "kernel",
+    "testPath": "packages/kernel/src/lib/whole-value-new-keys.spec.ts",
+    "testSha256": "5af582a90e3783871085fda5513baea975f31c57db467f92c6edc1c3e898bb11",
+    "case": "owner-authorized whole-value new keys > refuses removal of a created branch with a confirmed descendant dependency",
+    "classification": "shared-admission-error-observed; cause/regression-status not adjudicated",
+    "errors": [
+      {
+        "name": "Error",
+        "message": "Scalar selection requires prepared admission",
+        "stack": "Error: Scalar selection requires prepared admission\n    at /private/tmp/st-r3-compatibility-inventory/candidate/packages/kernel/src/enhancers/transactions/transactions.ts:2891:25\n    at prepareScalarSelection (/private/tmp/st-r3-compatibility-inventory/candidate/packages/kernel/src/lib/internals/native-scalar-selection.ts:7:263)\n    at Object.prepare (/private/tmp/st-r3-compatibility-inventory/candidate/packages/kernel/src/lib/experimental-publication/private.ts:180:55)\n    at publicationPreparer (/private/tmp/st-r3-compatibility-inventory/candidate/packages/kernel/src/lib/internals/intrinsic-mutation.ts:329:32)\n    at preparePublication (/private/tmp/st-r3-compatibility-inventory/candidate/packages/kernel/src/lib/internals/location-runtime.ts:483:18)\n    at /private/tmp/st-r3-compatibility-inventory/candidate/packages/kernel/src/lib/internals/location-runtime.ts:490:13\n    at Object.commitRecorded (/private/tmp/st-r3-compatibility-inventory/candidate/packages/kernel/src/lib/internals/tree-scalar-slot-runtime.ts:337:34)\n    at /private/tmp/st-r3-compatibility-inventory/candidate/packages/kernel/src/lib/internals/tree-scalar-leaf-runtime.ts:164:35\n    at Object.replace (/private/tmp/st-r3-compatibility-inventory/candidate/packages/kernel/src/lib/internals/location-runtime.ts:488:26)\n    at node.n (/private/tmp/st-r3-compatibility-inventory/candidate/packages/kernel/src/lib/internals/location-runtime.ts:461:17)"
+      }
+    ],
+    "rawLog": "/private/tmp/st-r3-compatibility-inventory/full-runs/kernel/first.log",
+    "events": "/private/tmp/st-r3-compatibility-inventory/full-runs/kernel/events.jsonl",
+    "manifest": "e0b64de42df330abff455d2ee1b981c99abee187a77269cd064f52f3b08505f3"
+  },
+  {
+    "project": "kernel",
+    "testPath": "packages/kernel/src/lib/whole-value-new-keys.spec.ts",
+    "testSha256": "5af582a90e3783871085fda5513baea975f31c57db467f92c6edc1c3e898bb11",
+    "case": "owner-authorized whole-value new keys > preserves reentrant installed handles when outer private preparation throws",
+    "classification": "shared-admission-error-observed; cause/regression-status not adjudicated",
+    "errors": [
+      {
+        "name": "Error",
+        "message": "Scalar selection requires prepared admission",
+        "stack": "Error: Scalar selection requires prepared admission\n    at /private/tmp/st-r3-compatibility-inventory/candidate/packages/kernel/src/enhancers/transactions/transactions.ts:2891:25\n    at prepareScalarSelection (/private/tmp/st-r3-compatibility-inventory/candidate/packages/kernel/src/lib/internals/native-scalar-selection.ts:7:263)\n    at Object.prepare (/private/tmp/st-r3-compatibility-inventory/candidate/packages/kernel/src/lib/experimental-publication/private.ts:180:55)\n    at publicationPreparer (/private/tmp/st-r3-compatibility-inventory/candidate/packages/kernel/src/lib/internals/intrinsic-mutation.ts:329:32)\n    at preparePublication (/private/tmp/st-r3-compatibility-inventory/candidate/packages/kernel/src/lib/internals/location-runtime.ts:483:18)\n    at /private/tmp/st-r3-compatibility-inventory/candidate/packages/kernel/src/lib/internals/location-runtime.ts:490:13\n    at Object.commitRecorded (/private/tmp/st-r3-compatibility-inventory/candidate/packages/kernel/src/lib/internals/tree-scalar-slot-runtime.ts:337:34)\n    at /private/tmp/st-r3-compatibility-inventory/candidate/packages/kernel/src/lib/internals/tree-scalar-leaf-runtime.ts:164:35\n    at Object.replace (/private/tmp/st-r3-compatibility-inventory/candidate/packages/kernel/src/lib/internals/location-runtime.ts:488:26)\n    at node.saved0 (/private/tmp/st-r3-compatibility-inventory/candidate/packages/kernel/src/lib/internals/location-runtime.ts:461:17)"
+      }
+    ],
+    "rawLog": "/private/tmp/st-r3-compatibility-inventory/full-runs/kernel/first.log",
+    "events": "/private/tmp/st-r3-compatibility-inventory/full-runs/kernel/events.jsonl",
+    "manifest": "e0b64de42df330abff455d2ee1b981c99abee187a77269cd064f52f3b08505f3"
+  },
+  {
+    "project": "kernel",
+    "testPath": "packages/kernel/src/enhancers/transactions/transaction-lifecycle-view.spec.ts",
+    "testSha256": "9beb551de9a15e2585420c9b62f3aa5d36a62ca2e63071a535e9e36a171905c1",
+    "case": "reports realization refusal with retained authority and permits confirmation",
+    "classification": "unclassified-runtime-or-fixture-failure; preserve for independent causal review",
+    "errors": [
+      {
+        "name": "AssertionError",
+        "message": "expected [Function] to throw an error",
+        "stack": "AssertionError: expected [Function] to throw an error\n    at Proxy.<anonymous> (file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vitest+expect@4.1.9/node_modules/@vitest/expect/dist/index.js:1552:16)\n    at Proxy.<anonymous> (file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vitest+expect@4.1.9/node_modules/@vitest/expect/dist/index.js:1156:15)\n    at Proxy.methodWrapper (file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/chai@6.2.2/node_modules/chai/index.js:1700:25)\n    at /private/tmp/st-r3-compatibility-inventory/candidate/packages/kernel/src/enhancers/transactions/transaction-lifecycle-view.spec.ts:340:38\n    at file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20"
+      }
+    ],
+    "rawLog": "/private/tmp/st-r3-compatibility-inventory/full-runs/kernel/first.log",
+    "events": "/private/tmp/st-r3-compatibility-inventory/full-runs/kernel/events.jsonl",
+    "manifest": "e0b64de42df330abff455d2ee1b981c99abee187a77269cd064f52f3b08505f3"
+  },
+  {
+    "project": "kernel",
+    "testPath": "packages/kernel/src/enhancers/transactions/transaction-safety.spec.ts",
+    "testSha256": "37e5d73415832047863481084d1d0b8be7d8bdf16305973a18172de1b5070771",
+    "case": "callback failure cannot reverse other authority > retains external ABA written inside a failed callback (batching=false)",
+    "classification": "unclassified-runtime-or-fixture-failure; preserve for independent causal review",
+    "errors": [
+      {
+        "name": "AssertionError",
+        "message": "expected +0 to be 1 // Object.is equality",
+        "stack": "AssertionError: expected +0 to be 1 // Object.is equality\n    at /private/tmp/st-r3-compatibility-inventory/candidate/packages/kernel/src/enhancers/transactions/transaction-safety.spec.ts:361:25\n    at file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)\n    at file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:2955:64"
+      }
+    ],
+    "rawLog": "/private/tmp/st-r3-compatibility-inventory/full-runs/kernel/first.log",
+    "events": "/private/tmp/st-r3-compatibility-inventory/full-runs/kernel/events.jsonl",
+    "manifest": "e0b64de42df330abff455d2ee1b981c99abee187a77269cd064f52f3b08505f3"
+  },
+  {
+    "project": "kernel",
+    "testPath": "packages/kernel/src/lib/entity-granular-reactivity.spec.ts",
+    "testSha256": "83365544bcb4a572988125141bab0c28786a54b5a2279522f3eed0d9b7d9e872",
+    "case": "entityMap \u2014 collection queries are lazily derived (13.5.0) > a single-entity update does not rebuild the collection",
+    "classification": "real-counted-work-guard-failure; unchanged 13000 versus <2000",
+    "errors": [
+      {
+        "name": "AssertionError",
+        "message": "expected 13000 to be less than 2000",
+        "stack": "AssertionError: expected 13000 to be less than 2000\n    at /private/tmp/st-r3-compatibility-inventory/candidate/packages/kernel/src/lib/entity-granular-reactivity.spec.ts:215:19\n    at file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)\n    at file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:2955:64"
+      }
+    ],
+    "rawLog": "/private/tmp/st-r3-compatibility-inventory/full-runs/kernel/first.log",
+    "events": "/private/tmp/st-r3-compatibility-inventory/full-runs/kernel/events.jsonl",
+    "manifest": "e0b64de42df330abff455d2ee1b981c99abee187a77269cd064f52f3b08505f3"
+  },
+  {
+    "project": "kernel",
+    "testPath": "packages/kernel/src/lib/equal-owner-public-adversaries.spec.ts",
+    "testSha256": "c7056f6680adb446e384b97eab46217def9893077e9300a3aebc106a96a662a0",
+    "case": "pending native ancestor input is respected by a dependent declaration",
+    "classification": "historical-oracle-conflict-observed",
+    "errors": [
+      {
+        "name": "AssertionError",
+        "message": "expected { state: 'validating' } to deeply equal { state: 'held', \u2026(1) }",
+        "stack": "AssertionError: expected { state: 'validating' } to deeply equal { state: 'held', \u2026(1) }\n    at /private/tmp/st-r3-compatibility-inventory/candidate/packages/kernel/src/lib/equal-owner-public-adversaries.spec.ts:55:32\n    at processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+      }
+    ],
+    "rawLog": "/private/tmp/st-r3-compatibility-inventory/full-runs/kernel/first.log",
+    "events": "/private/tmp/st-r3-compatibility-inventory/full-runs/kernel/events.jsonl",
+    "manifest": "e0b64de42df330abff455d2ee1b981c99abee187a77269cd064f52f3b08505f3"
+  },
+  {
+    "project": "kernel",
+    "testPath": "packages/kernel/src/lib/link-commit-ordering.spec.ts",
+    "testSha256": "49c26727b88e2cd994afec1c7768d664b3db5f438da8c69c4d136baedb34cf9c",
+    "case": "public Link publication survives a refused rollback > holds persistence after refusal and releases it after a successful retry",
+    "classification": "unclassified-runtime-or-fixture-failure; preserve for independent causal review",
+    "errors": [
+      {
+        "name": "AssertionError",
+        "message": "expected [Function] to throw an error",
+        "stack": "AssertionError: expected [Function] to throw an error\n    at Proxy.<anonymous> (file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vitest+expect@4.1.9/node_modules/@vitest/expect/dist/index.js:1552:16)\n    at Proxy.<anonymous> (file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vitest+expect@4.1.9/node_modules/@vitest/expect/dist/index.js:1156:15)\n    at Proxy.methodWrapper (file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/chai@6.2.2/node_modules/chai/index.js:1700:25)\n    at /private/tmp/st-r3-compatibility-inventory/candidate/packages/kernel/src/lib/link-commit-ordering.spec.ts:193:40\n    at processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+      }
+    ],
+    "rawLog": "/private/tmp/st-r3-compatibility-inventory/full-runs/kernel/first.log",
+    "events": "/private/tmp/st-r3-compatibility-inventory/full-runs/kernel/events.jsonl",
+    "manifest": "e0b64de42df330abff455d2ee1b981c99abee187a77269cd064f52f3b08505f3"
+  },
+  {
+    "project": "react",
+    "testPath": "packages/react/src/branch-declaration-qualification.spec.tsx",
+    "testSha256": "cd36a24864157eb9de9c805a45d46dd5b5f1ed985b0a9df58e1b3adece91b461",
+    "case": "React branch equal whole actual-owner / confirm",
+    "classification": "historical-oracle-conflict-observed",
+    "errors": [
+      {
+        "name": "AssertionError",
+        "message": "expected [ 'held', 'conservative' ] to include 'no-write'",
+        "stack": "AssertionError: expected [ 'held', 'conservative' ] to include 'no-write'\n    at Proxy.<anonymous> (file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vitest+expect@4.1.9/node_modules/@vitest/expect/dist/index.js:1319:15)\n    at Proxy.<anonymous> (file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vitest+expect@4.1.9/node_modules/@vitest/expect/dist/index.js:1156:15)\n    at Proxy.methodWrapper (file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/chai@6.2.2/node_modules/chai/index.js:1700:25)\n    at /private/tmp/st-r3-compatibility-inventory/candidate/packages/react/src/branch-declaration-qualification.spec.tsx:31:70\n    at file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+      }
+    ],
+    "rawLog": "/private/tmp/st-r3-compatibility-inventory/full-runs/react/first.log",
+    "events": "/private/tmp/st-r3-compatibility-inventory/full-runs/react/events.jsonl",
+    "manifest": "e0b64de42df330abff455d2ee1b981c99abee187a77269cd064f52f3b08505f3"
+  },
+  {
+    "project": "react",
+    "testPath": "packages/react/src/branch-declaration-qualification.spec.tsx",
+    "testSha256": "cd36a24864157eb9de9c805a45d46dd5b5f1ed985b0a9df58e1b3adece91b461",
+    "case": "React branch equal whole actual-owner / rollback",
+    "classification": "historical-oracle-conflict-observed",
+    "errors": [
+      {
+        "name": "AssertionError",
+        "message": "expected [ 'held', 'conservative' ] to include 'no-write'",
+        "stack": "AssertionError: expected [ 'held', 'conservative' ] to include 'no-write'\n    at Proxy.<anonymous> (file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vitest+expect@4.1.9/node_modules/@vitest/expect/dist/index.js:1319:15)\n    at Proxy.<anonymous> (file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vitest+expect@4.1.9/node_modules/@vitest/expect/dist/index.js:1156:15)\n    at Proxy.methodWrapper (file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/chai@6.2.2/node_modules/chai/index.js:1700:25)\n    at /private/tmp/st-r3-compatibility-inventory/candidate/packages/react/src/branch-declaration-qualification.spec.tsx:31:70\n    at file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+      }
+    ],
+    "rawLog": "/private/tmp/st-r3-compatibility-inventory/full-runs/react/first.log",
+    "events": "/private/tmp/st-r3-compatibility-inventory/full-runs/react/events.jsonl",
+    "manifest": "e0b64de42df330abff455d2ee1b981c99abee187a77269cd064f52f3b08505f3"
+  },
+  {
+    "project": "react",
+    "testPath": "packages/react/src/branch-declaration-qualification.spec.tsx",
+    "testSha256": "cd36a24864157eb9de9c805a45d46dd5b5f1ed985b0a9df58e1b3adece91b461",
+    "case": "React branch disposed held receipt releases waiter without settling owner",
+    "classification": "historical-oracle-conflict-observed",
+    "errors": [
+      {
+        "name": "AssertionError",
+        "message": "expected [ 'held', 'conservative' ] to include 'no-write'",
+        "stack": "AssertionError: expected [ 'held', 'conservative' ] to include 'no-write'\n    at Proxy.<anonymous> (file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vitest+expect@4.1.9/node_modules/@vitest/expect/dist/index.js:1319:15)\n    at Proxy.<anonymous> (file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vitest+expect@4.1.9/node_modules/@vitest/expect/dist/index.js:1156:15)\n    at Proxy.methodWrapper (file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/chai@6.2.2/node_modules/chai/index.js:1700:25)\n    at /private/tmp/st-r3-compatibility-inventory/candidate/packages/react/src/branch-declaration-qualification.spec.tsx:61:103\n    at file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+      }
+    ],
+    "rawLog": "/private/tmp/st-r3-compatibility-inventory/full-runs/react/first.log",
+    "events": "/private/tmp/st-r3-compatibility-inventory/full-runs/react/events.jsonl",
+    "manifest": "e0b64de42df330abff455d2ee1b981c99abee187a77269cd064f52f3b08505f3"
+  },
+  {
+    "project": "react",
+    "testPath": "packages/react/src/whole-value-new-keys.spec.tsx",
+    "testSha256": "ebe6def4d9922612ce386949ca67b3f476b9bae46e3dd4f9660b2d9a4b234667",
+    "case": "publishes newly supplied ordinary keys through the React facade",
+    "classification": "shared-admission-error-observed; cause/regression-status not adjudicated",
+    "errors": [
+      {
+        "name": "Error",
+        "message": "Scalar selection requires prepared admission",
+        "stack": "Error: Scalar selection requires prepared admission\n    at /private/tmp/st-r3-compatibility-inventory/candidate/packages/kernel/src/enhancers/transactions/transactions.ts:2891:25\n    at prepareScalarSelection (/private/tmp/st-r3-compatibility-inventory/candidate/packages/kernel/src/lib/internals/native-scalar-selection.ts:7:263)\n    at Object.prepare (/private/tmp/st-r3-compatibility-inventory/candidate/packages/kernel/src/lib/experimental-publication/private.ts:180:55)\n    at publicationPreparer (/private/tmp/st-r3-compatibility-inventory/candidate/packages/kernel/src/lib/internals/intrinsic-mutation.ts:329:32)\n    at preparePublication (/private/tmp/st-r3-compatibility-inventory/candidate/packages/kernel/src/lib/internals/location-runtime.ts:483:18)\n    at /private/tmp/st-r3-compatibility-inventory/candidate/packages/kernel/src/lib/internals/location-runtime.ts:490:13\n    at Object.commitRecorded (/private/tmp/st-r3-compatibility-inventory/candidate/packages/kernel/src/lib/internals/tree-scalar-slot-runtime.ts:337:34)\n    at /private/tmp/st-r3-compatibility-inventory/candidate/packages/kernel/src/lib/internals/tree-scalar-leaf-runtime.ts:164:35\n    at Object.replace (/private/tmp/st-r3-compatibility-inventory/candidate/packages/kernel/src/lib/internals/location-runtime.ts:488:26)\n    at node.n (/private/tmp/st-r3-compatibility-inventory/candidate/packages/kernel/src/lib/internals/location-runtime.ts:461:17)"
+      }
+    ],
+    "rawLog": "/private/tmp/st-r3-compatibility-inventory/full-runs/react/first.log",
+    "events": "/private/tmp/st-r3-compatibility-inventory/full-runs/react/events.jsonl",
+    "manifest": "e0b64de42df330abff455d2ee1b981c99abee187a77269cd064f52f3b08505f3"
+  },
+  {
+    "project": "solid",
+    "testPath": "packages/solid/src/lib/whole-value-new-keys.spec.ts",
+    "testSha256": "b857f1b9b00b4b91429bb2382df0e5fb5557564e062feb4f837d4736a7786416",
+    "case": "publishes newly supplied ordinary keys through the solid facade",
+    "classification": "shared-admission-error-observed; cause/regression-status not adjudicated",
+    "errors": [
+      {
+        "name": "Error",
+        "message": "Scalar selection requires prepared admission",
+        "stack": "Error: Scalar selection requires prepared admission\n    at /private/tmp/st-r3-compatibility-inventory/candidate/packages/kernel/src/enhancers/transactions/transactions.ts:2891:25\n    at prepareScalarSelection (/private/tmp/st-r3-compatibility-inventory/candidate/packages/kernel/src/lib/internals/native-scalar-selection.ts:7:263)\n    at Object.prepare (/private/tmp/st-r3-compatibility-inventory/candidate/packages/kernel/src/lib/experimental-publication/private.ts:180:55)\n    at publicationPreparer (/private/tmp/st-r3-compatibility-inventory/candidate/packages/kernel/src/lib/internals/intrinsic-mutation.ts:329:32)\n    at preparePublication (/private/tmp/st-r3-compatibility-inventory/candidate/packages/kernel/src/lib/internals/native-tree-scalar-leaf-runtime.ts:237:16)\n    at /private/tmp/st-r3-compatibility-inventory/candidate/packages/kernel/src/lib/internals/native-tree-scalar-leaf-runtime.ts:259:15\n    at Object.commitRecorded (/private/tmp/st-r3-compatibility-inventory/candidate/packages/kernel/src/lib/internals/tree-scalar-slot-runtime.ts:337:34)\n    at cell.replace [as set] (/private/tmp/st-r3-compatibility-inventory/candidate/packages/kernel/src/lib/internals/native-tree-scalar-leaf-runtime.ts:248:37)\n    at /private/tmp/st-r3-compatibility-inventory/candidate/packages/solid/src/lib/whole-value-new-keys.spec.ts:42:14\n    at withWriteContext (/private/tmp/st-r3-compatibility-inventory/candidate/packages/kernel/src/lib/write-context.ts:65:12)"
+      }
+    ],
+    "rawLog": "/private/tmp/st-r3-compatibility-inventory/full-runs/solid/first.log",
+    "events": "/private/tmp/st-r3-compatibility-inventory/full-runs/solid/events.jsonl",
+    "manifest": "e0b64de42df330abff455d2ee1b981c99abee187a77269cd064f52f3b08505f3"
+  },
+  {
+    "project": "vue",
+    "testPath": "packages/vue/src/lib/whole-value-new-keys.spec.ts",
+    "testSha256": "53d4c578d5de844431dbe2cb81d9e89ea2e8338defc544cc4fdaba230055d97d",
+    "case": "publishes newly supplied ordinary keys through the vue facade",
+    "classification": "shared-admission-error-observed; cause/regression-status not adjudicated",
+    "errors": [
+      {
+        "name": "Error",
+        "message": "Scalar selection requires prepared admission",
+        "stack": "Error: Scalar selection requires prepared admission\n    at /private/tmp/st-r3-compatibility-inventory/candidate/packages/kernel/src/enhancers/transactions/transactions.ts:2891:25\n    at prepareScalarSelection (/private/tmp/st-r3-compatibility-inventory/candidate/packages/kernel/src/lib/internals/native-scalar-selection.ts:7:263)\n    at Object.prepare (/private/tmp/st-r3-compatibility-inventory/candidate/packages/kernel/src/lib/experimental-publication/private.ts:180:55)\n    at publicationPreparer (/private/tmp/st-r3-compatibility-inventory/candidate/packages/kernel/src/lib/internals/intrinsic-mutation.ts:329:32)\n    at preparePublication (/private/tmp/st-r3-compatibility-inventory/candidate/packages/kernel/src/lib/internals/native-tree-scalar-leaf-runtime.ts:237:16)\n    at /private/tmp/st-r3-compatibility-inventory/candidate/packages/kernel/src/lib/internals/native-tree-scalar-leaf-runtime.ts:259:15\n    at Object.commitRecorded (/private/tmp/st-r3-compatibility-inventory/candidate/packages/kernel/src/lib/internals/tree-scalar-slot-runtime.ts:337:34)\n    at cell.replace [as set] (/private/tmp/st-r3-compatibility-inventory/candidate/packages/kernel/src/lib/internals/native-tree-scalar-leaf-runtime.ts:248:37)\n    at cell.set (/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/vue-observation.ts:80:31)\n    at /private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/whole-value-new-keys.spec.ts:30:14"
+      }
+    ],
+    "rawLog": "/private/tmp/st-r3-compatibility-inventory/full-runs/vue/first.log",
+    "events": "/private/tmp/st-r3-compatibility-inventory/full-runs/vue/events.jsonl",
+    "manifest": "e0b64de42df330abff455d2ee1b981c99abee187a77269cd064f52f3b08505f3"
+  }
+]

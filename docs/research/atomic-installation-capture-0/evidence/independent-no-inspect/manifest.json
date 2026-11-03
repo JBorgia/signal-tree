@@ -1,0 +1,12 @@
+{
+  "node": "v24.15.0",
+  "base": "19a5bd03",
+  "lane": "candidate",
+  "entry": "mixed.mjs",
+  "control": "capture-error",
+  "exit": 1,
+  "signal": null,
+  "stable": true,
+  "bundle": "fc46b1cba2560460af5acf4d35a2bf8a8a62b863675951d8d06861eb9c3be904",
+  "originalManifestSha256": "2cf4bf61efe5f33bb3b32eb0ec875058bce0d2e44c891a028378a04f1e116a93"
+}

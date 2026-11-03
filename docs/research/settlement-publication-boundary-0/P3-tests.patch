@@ -1,0 +1,346 @@
+diff --git a/packages/kernel/src/lib/projection-freshness.spec.ts b/packages/kernel/src/lib/projection-freshness.spec.ts
+new file mode 100644
+index 00000000..d7a589d9
+--- /dev/null
++++ b/packages/kernel/src/lib/projection-freshness.spec.ts
+@@ -0,0 +1,149 @@
++import { describe, expect, it } from 'vitest';
++
++import { entityMap, signalTree, transactions } from '../index';
++import { NEUTRAL_LOCATION_RUNTIME } from './internals/location-runtime';
++import { createNativeLocationRuntime } from './internals/native-location-realization';
++import type { ObservationAdapter } from './internals/observation-adapter';
++
++describe('projection freshness realization compatibility', () => {
++  it('accepts and calls a legacy one-argument readonly implementation', () => {
++    let computes = 0;
++    let predicates = 0;
++    const legacy = {
++      createToken: () => ({ observe() {}, invalidate() {} }),
++      runInvalidationGroup: (run: () => void) => run(),
++      createReadonlyCell: <T>(compute: () => T) => compute,
++    };
++    // These assignments/calls also exercise the ordinary spec-types gate.
++    const adapter: ObservationAdapter = legacy;
++    const direct = legacy.createReadonlyCell(() => ++computes);
++    expect(direct()).toBe(1);
++    const runtime = createNativeLocationRuntime(adapter);
++    const projected = runtime.createDerived(
++      () => ++computes,
++      () => {
++        predicates++;
++        return false;
++      }
++    );
++    expect(projected()).toBe(2);
++    expect(projected()).toBe(3);
++    expect(predicates).toBe(0);
++  });
++
++  it('allows a framework-free cache to consult freshness only during delivery', () => {
++    let bodyDepth = 0;
++    let deliveryDepth = 0;
++    const notifications: (() => void)[] = [];
++    const adapter: ObservationAdapter = {
++      createToken: () => ({ observe() {}, invalidate() {} }),
++      runInvalidationGroup(run) {
++        bodyDepth++;
++        try {
++          run();
++        } finally {
++          bodyDepth--;
++          if (bodyDepth === 0) {
++            deliveryDepth++;
++            try {
++              for (const notify of notifications.splice(0)) notify();
++            } finally {
++              deliveryDepth--;
++            }
++          }
++        }
++      },
++      createReadonlyCell<T>(compute: () => T, isCurrent?: () => boolean) {
++        let initialized = false;
++        let cached: T;
++        return () => {
++          if (
++            !initialized ||
++            (deliveryDepth > 0 && bodyDepth === 0 && isCurrent && !isCurrent())
++          ) {
++            const next = compute();
++            cached = next;
++            initialized = true;
++          }
++          return cached;
++        };
++      },
++    };
++    let version = 0;
++    let computedVersion = -1;
++    let computations = 0;
++    let predicates = 0;
++    const runtime = createNativeLocationRuntime(adapter);
++    const projection = runtime.createDerived(
++      () => {
++        computations++;
++        computedVersion = version;
++        return { version };
++      },
++      () => {
++        predicates++;
++        return computedVersion === version;
++      }
++    );
++    const initial = projection();
++    let inside: unknown;
++    const delivered: { version: number }[] = [];
++    adapter.runInvalidationGroup(() => {
++      version++;
++      inside = projection();
++      notifications.push(() => delivered.push(projection(), projection()));
++    });
++    expect(inside).toBe(initial);
++    expect(delivered).toEqual([{ version: 1 }, { version: 1 }]);
++    expect(delivered[0]).toBe(delivered[1]);
++    expect(predicates).toBe(2);
++    expect(computations).toBe(2);
++    expect(projection()).toBe(delivered[0]);
++    adapter.runInvalidationGroup(() => {
++      notifications.push(() => delivered.push(projection()));
++    });
++    expect(computations).toBe(2);
++    expect(delivered[2]).toBe(delivered[0]);
++  });
++
++  it('keeps actual neutral mixed settlement collection reads coherent', () => {
++    const tree = signalTree(
++      {
++        scalar: 0,
++        rows: entityMap<{ id: string; value: number }, string>({
++          selectId: (row) => row.id,
++        }),
++      },
++      { enhancers: [transactions()] }
++    );
++    tree.$.rows.addOne({ id: 'A', value: 0 });
++    const read = () => [
++      tree.$.scalar(),
++      tree.$.rows.byId('A')?.()?.value,
++      tree.$.rows.all()[0]?.value,
++    ];
++    const projected = NEUTRAL_LOCATION_RUNTIME.createDerived(read, () => {
++      throw new Error(
++        'The neutral runtime should use its dependency invalidation'
++      );
++    });
++    const observed: ReturnType<typeof read>[] = [projected()];
++    const release = projected.subscribe(() => observed.push(projected()));
++    try {
++      const pending = tree.transact(() => {
++        tree.$.scalar(1);
++        tree.$.rows.updateOne('A', { value: 1 });
++      });
++      expect(projected()).toEqual([1, 1, 1]);
++      expect(observed).toContainEqual([1, 1, 1]);
++      const beforeSettlement = observed.length;
++      pending.rollback();
++      expect(projected()).toEqual([0, 0, 0]);
++      expect(observed.length).toBeGreaterThan(beforeSettlement);
++      expect(observed.slice(beforeSettlement)).toEqual([[0, 0, 0]]);
++    } finally {
++      release();
++      tree.destroy();
++    }
++  });
++});
+diff --git a/packages/vue/src/lib/projection-freshness.spec.ts b/packages/vue/src/lib/projection-freshness.spec.ts
+new file mode 100644
+index 00000000..c8338cab
+--- /dev/null
++++ b/packages/vue/src/lib/projection-freshness.spec.ts
+@@ -0,0 +1,185 @@
++import { describe, expect, it } from 'vitest';
++import { effect, stop } from 'vue';
++
++import { createVueObservationAdapter } from './vue-observation';
++
++describe('Vue projection freshness argument', () => {
++  it('refreshes only stale projections and retains successful repeated-read identity', () => {
++    const adapter = createVueObservationAdapter();
++    const publication = adapter.createToken();
++    let version = 0;
++    let cachedVersion = -1;
++    let computes = 0;
++    let predicates = 0;
++    const cell = adapter.createReadonlyCell!(
++      () => {
++        computes++;
++        cachedVersion = version;
++        return { version };
++      },
++      () => {
++        predicates++;
++        return cachedVersion === version;
++      }
++    );
++    const initial = cell();
++    const seen: { first: { version: number }; second: { version: number } }[] =
++      [];
++    const runner = effect(() => {
++      publication.observe();
++      seen.push({ first: cell(), second: cell() });
++    });
++    try {
++      expect(predicates).toBe(0);
++      adapter.runInvalidationGroup(() => publication.invalidate());
++      expect(predicates).toBeGreaterThan(0);
++      expect(computes).toBe(1);
++      expect(seen.at(-1)!.first).toBe(initial);
++      version++;
++      adapter.runInvalidationGroup(() => publication.invalidate());
++      expect(computes).toBe(2);
++      expect(seen.at(-1)!.first).toEqual({ version: 1 });
++      expect(seen.every(({ first, second }) => first === second)).toBe(true);
++      const refreshed = seen.at(-1)!.first;
++      expect(cell()).toBe(refreshed);
++      adapter.runInvalidationGroup(() => publication.invalidate());
++      expect(cell()).toBe(refreshed);
++      expect(computes).toBe(2);
++    } finally {
++      stop(runner);
++    }
++  });
++
++  it('preserves native memoization when freshness is omitted', () => {
++    const adapter = createVueObservationAdapter();
++    const publication = adapter.createToken();
++    let computes = 0;
++    const cell = adapter.createReadonlyCell!(() => ({ count: ++computes }));
++    const initial = cell();
++    const seen: object[] = [];
++    const runner = effect(() => {
++      publication.observe();
++      seen.push(cell(), cell());
++    });
++    try {
++      adapter.runInvalidationGroup(() => publication.invalidate());
++      expect(seen.length).toBeGreaterThan(2);
++      expect(seen.every((value) => value === initial)).toBe(true);
++      expect(computes).toBe(1);
++    } finally {
++      stop(runner);
++    }
++  });
++
++  it('does not consult freshness inside a nested grouped callback', () => {
++    const adapter = createVueObservationAdapter();
++    const publication = adapter.createToken();
++    let version = 0;
++    let cachedVersion = -1;
++    let predicates = 0;
++    let armed = false;
++    const cell = adapter.createReadonlyCell!(
++      () => {
++        cachedVersion = version;
++        return { version };
++      },
++      () => {
++        predicates++;
++        return cachedVersion === version;
++      }
++    );
++    const initial = cell();
++    let nestedRead: unknown;
++    let before = -1;
++    let after = -1;
++    const runner = effect(() => {
++      publication.observe();
++      if (!armed) return;
++      before = predicates;
++      adapter.runInvalidationGroup(() => {
++        version++;
++        nestedRead = cell();
++      });
++      after = predicates;
++    });
++    try {
++      armed = true;
++      adapter.runInvalidationGroup(() => publication.invalidate());
++      expect(before).toBeGreaterThanOrEqual(0);
++      expect(after).toBe(before);
++      expect(nestedRead).toBe(initial);
++    } finally {
++      stop(runner);
++    }
++  });
++
++  for (const boundary of ['predicate', 'compute'] as const) {
++    it.each(['observer', 'body Error', 'body undefined'] as const)(
++      `preserves first %s failure at ${boundary}, delivers siblings, and recovers delivery depth`,
++      (source) => {
++        const adapter = createVueObservationAdapter();
++        const publication = adapter.createToken();
++        const sibling = adapter.createToken();
++        const observerFailure = new Error(`${boundary} failure`);
++        const bodyFailure =
++          source === 'body undefined' ? undefined : new Error('body failure');
++        let version = 0;
++        let cachedVersion = -1;
++        let armed = false;
++        let predicates = 0;
++        let siblingRuns = 0;
++        const cell = adapter.createReadonlyCell!(
++          () => {
++            if (armed && boundary === 'compute') throw observerFailure;
++            cachedVersion = version;
++            return { version };
++          },
++          () => {
++            predicates++;
++            if (armed && boundary === 'predicate') throw observerFailure;
++            return cachedVersion === version;
++          }
++        );
++        const initial = cell();
++        const runner = effect(() => {
++          publication.observe();
++          cell();
++        });
++        const siblingRunner = effect(() => {
++          sibling.observe();
++          siblingRuns++;
++        });
++        let caught = false;
++        let failure: unknown;
++        try {
++          try {
++            adapter.runInvalidationGroup(() => {
++              armed = true;
++              version++;
++              publication.invalidate();
++              sibling.invalidate();
++              if (source !== 'observer') throw bodyFailure;
++            });
++          } catch (error) {
++            caught = true;
++            failure = error;
++          }
++          expect(caught).toBe(true);
++          expect(failure).toBe(
++            source === 'observer' ? observerFailure : bodyFailure
++          );
++          expect(siblingRuns).toBe(2);
++          const afterFailure = predicates;
++          expect(cell()).toBe(initial);
++          expect(predicates).toBe(afterFailure);
++          armed = false;
++          adapter.runInvalidationGroup(() => publication.invalidate());
++          expect(cell()).toEqual({ version: 1 });
++        } finally {
++          stop(runner);
++          stop(siblingRunner);
++        }
++      }
++    );
++  }
++});

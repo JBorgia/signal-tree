@@ -1,0 +1,23 @@
+
+TRANSACTION-SEMANTICS-2 / candidate A — current implementation
+
+  HELD        S01 one pending writer, rejected
+  HELD        S03 two pending, same location — reject OLDER
+  HELD        S04 THREE pending, same location — reject MIDDLE
+  HELD        S05 reject OLDEST then settle newer — newer must not be lost
+  HELD        S07 reject NEWEST — older pending value survives
+  HELD        S11 reject both — no rejected value may remain
+  HELD        S10 accept NEWER then accept OLDER — settlement must not reorder
+  UNSUPPORTED A1 unrelated snapshot advances canonical, P1 stays pending
+              Current implementation exposes no canonical/pending split
+  UNSUPPORTED A2 correlated ACCEPT settles the contribution
+              Current implementation has no correlated authority settlement input
+  HELD        A5 fresh snapshot, no relation — settlement must NOT be invented
+  UNSUPPORTED A6 stale versioned event must not regress canonical
+              Current implementation has no revision-ordering input
+  VIOLATED    F06 reject succeeds, then reject again
+              a second reject reported a fresh successful settlement
+  HELD        F07 reject succeeds, then accept must not resurrect
+
+  cases: 9 held, 1 violated, 3 unsupported, 0 error, 13 total
+  Held means this implemented case only; unsupported is not a pass or a law verdict.

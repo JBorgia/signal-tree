@@ -49,15 +49,16 @@ describe('W1: diagnostics for writes that go nowhere', () => {
 
   afterEach(() => errSpy.mockRestore());
 
-  it('ST2010: warns when writing a key absent from the initial shape', () => {
+  it('owner-authorized whole values install new keys without ST2010', () => {
     const tree = signalTree({ known: 1 } as Record<string, unknown>);
     void tree.$;
 
     tree.$({ neverDeclared: 'x' } as never);
 
     const msg = errSpy.mock.calls.map((c) => String(c[0])).join('\n');
-    expect(msg).toContain('ST2010');
-    expect(msg).toContain('neverDeclared');
+    expect(msg).not.toContain('ST2010');
+    expect(tree.$()).toEqual({ neverDeclared: 'x' });
+    tree.destroy();
   });
 
   it('stays silent for an ordinary write', () => {
@@ -71,7 +72,7 @@ describe('W1: diagnostics for writes that go nowhere', () => {
     expect(tree.$.known()).toBe(2);
   });
 
-  it('reports every occurrence rather than suppressing later ones', () => {
+  it('repeated whole writes use the newly created location', () => {
     // Deliberately NOT deduped: a global suppression Set silenced the SECOND
     // occurrence of a genuine bug — a different tree or a different namespace
     // reaching the same relative path — for the whole process lifetime.
@@ -83,10 +84,12 @@ describe('W1: diagnostics for writes that go nowhere', () => {
     const hits = errSpy.mock.calls.filter((c) =>
       String(c[0]).includes('repeatedlyMissing')
     );
-    expect(hits.length).toBe(3);
+    expect(hits.length).toBe(0);
+    expect(tree.$()).toEqual({ repeatedlyMissing: 2 });
+    tree.destroy();
   });
 
-  it('does not suppress the same relative path in a DIFFERENT namespace', () => {
+  it('creates distinct locations for the same relative key in different branches', () => {
     const tree = signalTree({
       billing: { present: 1 },
       shipping: { present: 1 },
@@ -99,6 +102,11 @@ describe('W1: diagnostics for writes that go nowhere', () => {
     const hits = errSpy.mock.calls.filter((c) =>
       String(c[0]).includes('absentKey')
     );
-    expect(hits.length).toBe(2);
+    expect(hits.length).toBe(0);
+    expect(tree.$()).toEqual({
+      billing: { absentKey: 1 },
+      shipping: { absentKey: 1 },
+    });
+    tree.destroy();
   });
 });

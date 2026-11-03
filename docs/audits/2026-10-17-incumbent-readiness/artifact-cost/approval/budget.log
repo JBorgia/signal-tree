@@ -1,0 +1,6 @@
+target                   prod (ships)      dev (diagnostics)
+──────────────────────────────────────────────────────────────────
+signaltree-bare        ✅ 12.30/12.41KB   ✅ 14.68/14.79KB
+signaltree-entities    ✅ 26.02/26.16KB   ✅ 28.80/28.98KB
+
+✅ Bundle within budget (prod and dev).

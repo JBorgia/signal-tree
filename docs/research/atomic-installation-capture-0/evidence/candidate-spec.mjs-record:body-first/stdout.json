@@ -1,0 +1,29 @@
+{
+  "lane": "record",
+  "mode": "body",
+  "hits": 1,
+  "pubHits": 0,
+  "afterSet": true,
+  "checks": [
+    {
+      "name": "fault nonvacuous",
+      "pass": true
+    },
+    {
+      "name": "primary identity",
+      "pass": true
+    },
+    {
+      "name": "responsibility state",
+      "pass": true
+    }
+  ],
+  "physical": 0,
+  "direct": 0,
+  "pending": 0,
+  "error": {
+    "threw": true,
+    "primary": true,
+    "recoveryPrimary": false
+  }
+}

@@ -1,0 +1,313 @@
+diff --git a/packages/angular/src/lib/transaction-realization.spec.ts b/packages/angular/src/lib/transaction-realization.spec.ts
+index e86fa0e5..c2e86629 100644
+--- a/packages/angular/src/lib/transaction-realization.spec.ts
++++ b/packages/angular/src/lib/transaction-realization.spec.ts
+@@ -72,7 +72,7 @@ const projectionFrame = (
+     phase,
+     scalar,
+     projections: {
+-      all: $.rows.all().map((row) => encode(row)!),
++      all: $.rows.all().map((row) => `${row.id}:${row.name}`),
+       ids: [...$.rows.ids()],
+       count: $.rows.count(),
+       empty: $.rows.empty(),
+@@ -80,7 +80,7 @@ const projectionFrame = (
+       hasA: $.rows.has('A')(),
+       where: $.rows
+         .where(matchesA)()
+-        .map((row) => encode(row)!),
++        .map((row) => `${row.id}:${row.name}`),
+       find: encode($.rows.find(matchesA)()),
+       slice: [...$.rows.names()],
+       activeId: $.rows.activeId() ?? null,
+diff --git a/packages/kernel/src/transaction-realization-contract.ts b/packages/kernel/src/transaction-realization-contract.ts
+index a28d6b96..979a3f6f 100644
+--- a/packages/kernel/src/transaction-realization-contract.ts
++++ b/packages/kernel/src/transaction-realization-contract.ts
+@@ -2,6 +2,13 @@ import { expect, it } from 'vitest';
+ 
+ import type { PendingTransaction } from './enhancers/transactions/transactions.types';
+ 
++function required<T>(value: T | null | undefined): T {
++  if (value === undefined || value === null) {
++    throw new Error('Missing required test value');
++  }
++  return value;
++}
++
+ /**
+  * PROPOSAL-REALIZATION-CONFORMANCE — PROPOSAL-0 Phase B.
+  *
+@@ -433,13 +440,13 @@ export function transactionRealizationContract<Tree>(
+           const rowA = entries.find((entry) => entry.key === 'A');
+           const matches = entries.filter((entry) => entry.id === 'A');
+           return {
+-            all: entries.map((entry) => encode(entry)!),
++            all: entries.map((entry) => `${entry.id}:${entry.name}`),
+             ids: entries.map((entry) => entry.key),
+             count: entries.length,
+             empty: entries.length === 0,
+             map: entries.map((entry) => `${entry.key}:${entry.name}`),
+             hasA: rowA !== undefined,
+-            where: matches.map((entry) => encode(entry)!),
++            where: matches.map((entry) => `${entry.id}:${entry.name}`),
+             find: encode(matches[0]),
+             slice: entries.map((entry) => entry.name),
+             activeId: selected,
+@@ -500,7 +507,7 @@ export function transactionRealizationContract<Tree>(
+             pending.rollback();
+             scalar = 0;
+             await check([original]);
+-            expect(held!.current()?.name).toBe('Original');
++            expect(required(held).current()?.name).toBe('Original');
+           } else if (scenario === 'new lifetime at reused key') {
+             change('remove', () => hooks.removeRow(tree, 'A'));
+             await check([]);
+@@ -508,7 +515,7 @@ export function transactionRealizationContract<Tree>(
+               hooks.addRow(tree, { id: 'A', name: 'Impostor' })
+             );
+             await check([{ key: 'A', id: 'A', name: 'Impostor' }]);
+-            expect(held!.current()).toBeUndefined();
++            expect(required(held).current()).toBeUndefined();
+           } else if (scenario === 'selection while absent') {
+             change('select B', () => hooks.selectRow(tree, 'B'));
+             await check([], 'B');
+@@ -526,12 +533,12 @@ export function transactionRealizationContract<Tree>(
+           } else if (scenario === 'selected rekey') {
+             change('rekey', () => hooks.rekeyRow(tree, 'A', 'X'));
+             await check([{ ...original, key: 'X' }], 'X');
+-            expect(held!.current()?.name).toBe('Original');
++            expect(required(held).current()?.name).toBe('Original');
+             change('write rekeyed lifetime', () =>
+               hooks.realizeRowName(tree, 'X', 'Updated')
+             );
+             await check([{ ...original, key: 'X', name: 'Updated' }], 'X');
+-            expect(held!.current()?.name).toBe('Updated');
++            expect(required(held).current()?.name).toBe('Updated');
+           } else {
+             change('add unrelated B', () =>
+               hooks.addRow(tree, { id: 'B', name: 'Other' })
+@@ -541,16 +548,16 @@ export function transactionRealizationContract<Tree>(
+               hooks.realizeRowName(tree, 'B', 'Changed')
+             );
+             await check([original, { key: 'B', id: 'B', name: 'Changed' }]);
+-            expect(held!.current()?.name).toBe('Original');
++            expect(required(held).current()?.name).toBe('Original');
+             change('remove unrelated B', () => hooks.removeRow(tree, 'B'));
+             await check([original]);
+-            held!.dispose();
+-            const heldCount = held!.seen.length;
++            required(held).dispose();
++            const heldCount = required(held).seen.length;
+             change('after held disposal', () =>
+               hooks.realizeRowName(tree, 'A', 'After disposal')
+             );
+             await check([{ ...original, name: 'After disposal' }]);
+-            expect(held!.seen.length).toBe(heldCount);
++            expect(required(held).seen.length).toBe(heldCount);
+           }
+         } finally {
+           held?.dispose();
+diff --git a/packages/react/src/transaction-realization.spec.tsx b/packages/react/src/transaction-realization.spec.tsx
+index 5b2651d1..675852fc 100644
+--- a/packages/react/src/transaction-realization.spec.tsx
++++ b/packages/react/src/transaction-realization.spec.tsx
+@@ -102,7 +102,7 @@ const projectionFrame = (
+     phase,
+     scalar,
+     projections: {
+-      all: $.rows.all().map((row) => encode(row)!),
++      all: $.rows.all().map((row) => `${row.id}:${row.name}`),
+       ids: [...$.rows.ids()],
+       count: $.rows.count(),
+       empty: $.rows.empty(),
+@@ -110,7 +110,7 @@ const projectionFrame = (
+       hasA: $.rows.has('A')(),
+       where: $.rows
+         .where(matchesA)()
+-        .map((row) => encode(row)!),
++        .map((row) => `${row.id}:${row.name}`),
+       find: encode($.rows.find(matchesA)()),
+       slice: [...$.rows.names()],
+       activeId: $.rows.activeId() ?? null,
+diff --git a/packages/solid/src/lib/transaction-realization.spec.ts b/packages/solid/src/lib/transaction-realization.spec.ts
+index 2656faa0..a64d1a7c 100644
+--- a/packages/solid/src/lib/transaction-realization.spec.ts
++++ b/packages/solid/src/lib/transaction-realization.spec.ts
+@@ -75,7 +75,7 @@ const projectionFrame = (
+     phase,
+     scalar,
+     projections: {
+-      all: $.rows.all().map((row) => encode(row)!),
++      all: $.rows.all().map((row) => `${row.id}:${row.name}`),
+       ids: [...$.rows.ids()],
+       count: $.rows.count(),
+       empty: $.rows.empty(),
+@@ -83,7 +83,7 @@ const projectionFrame = (
+       hasA: $.rows.has('A')(),
+       where: $.rows
+         .where(matchesA)()
+-        .map((row) => encode(row)!),
++        .map((row) => `${row.id}:${row.name}`),
+       find: encode($.rows.find(matchesA)()),
+       slice: [...$.rows.names()],
+       activeId: $.rows.activeId() ?? null,
+diff --git a/packages/vue/src/lib/entity-projection-publication.spec.ts b/packages/vue/src/lib/entity-projection-publication.spec.ts
+index 2a86876d..75b68132 100644
+--- a/packages/vue/src/lib/entity-projection-publication.spec.ts
++++ b/packages/vue/src/lib/entity-projection-publication.spec.ts
+@@ -8,6 +8,13 @@ import {
+   type PendingTransaction,
+ } from '../index';
+ 
++function required<T>(value: T | null | undefined): T {
++  if (value === undefined || value === null) {
++    throw new Error('Missing required test value');
++  }
++  return value;
++}
++
+ type Row = { id: string; v: number };
+ const build = () =>
+   signalTree(
+@@ -292,12 +299,12 @@ describe('Vue entity projection publication', () => {
+       phase = 'after';
+       expect(entered).toBe(true);
+       expect(inside).toHaveLength(1);
+-      expect(inside[0]!.after).toBe(inside[0]!.before);
+-      expect(inside[0]!.direct).toBe(9);
++      expect(required(inside[0]).after).toBe(required(inside[0]).before);
++      expect(required(inside[0]).direct).toBe(9);
+       expect(nested).toBeDefined();
+-      nested!.confirm();
++      required(nested).confirm();
+       await nextTick();
+-      expect(held.value[0]!.v).toBe(9);
++      expect(required(held.value[0]).v).toBe(9);
+       expect(rows.activeEntity.value?.v).toBe(9);
+     } finally {
+       dispose();
+diff --git a/packages/vue/src/lib/settlement-publication.spec.ts b/packages/vue/src/lib/settlement-publication.spec.ts
+index eb0af931..b710aa2d 100644
+--- a/packages/vue/src/lib/settlement-publication.spec.ts
++++ b/packages/vue/src/lib/settlement-publication.spec.ts
+@@ -23,6 +23,13 @@ import {
+ } from '../index';
+ import { createVueObservationAdapter } from './vue-observation';
+ 
++function required<T>(value: T | null | undefined): T {
++  if (value === undefined || value === null) {
++    throw new Error('Missing required test value');
++  }
++  return value;
++}
++
+ type Row = { id: string; value: number };
+ const build = () => {
+   const tree = signalTree(
+@@ -44,10 +51,14 @@ describe('Vue owned collection publication', () => {
+     const held = tree.$.left.all;
+     const effects: number[] = [];
+     const watched: number[] = [];
+-    const runner = effect(() => effects.push(held.value[0]!.value));
+-    const stopWatch = watch(held, (rows) => watched.push(rows[0]!.value), {
+-      flush: 'sync',
+-    });
++    const runner = effect(() => effects.push(required(held.value[0]).value));
++    const stopWatch = watch(
++      held,
++      (rows) => watched.push(required(rows[0]).value),
++      {
++        flush: 'sync',
++      }
++    );
+     try {
+       expect(held).toBe(tree.$.left.all);
+       expect(isRef(held)).toBe(true);
+@@ -59,7 +70,7 @@ describe('Vue owned collection publication', () => {
+       await nextTick();
+       expect(effects).toContain(1);
+       expect(watched).toContain(1);
+-      expect(held.value[0]!.value).toBe(1);
++      expect(required(held.value[0]).value).toBe(1);
+     } finally {
+       stop(runner);
+       stopWatch();
+@@ -77,8 +88,8 @@ describe('Vue owned collection publication', () => {
+           phase,
+           values: [
+             tree.$.scalar.value,
+-            tree.$.left.all.value[0]!.value,
+-            tree.$.right.all.value[0]!.value,
++            required(tree.$.left.all.value[0]).value,
++            required(tree.$.right.all.value[0]).value,
+           ],
+         });
+       },
+@@ -152,13 +163,13 @@ describe('Vue owned collection publication', () => {
+       phase = 'after-rollback';
+       expect(reentered).toBe(true);
+       expect(reads).toHaveLength(1);
+-      expect(reads[0]!.held).toBe(reads[0]!.before);
+-      expect(reads[0]!.native).toBe(reads[0]!.nativeBefore);
++      expect(required(reads[0]).held).toBe(required(reads[0]).before);
++      expect(required(reads[0]).native).toBe(required(reads[0]).nativeBefore);
+       expect(nested).toBeDefined();
+-      nested!.confirm();
++      required(nested).confirm();
+       await nextTick();
+       expect(tree.$.left.byId('A')?.()?.value).toBe(9);
+-      expect(held.value[0]!.value).toBe(9);
++      expect(required(held.value[0]).value).toBe(9);
+     } finally {
+       dispose();
+       tree.destroy();
+@@ -174,7 +185,7 @@ describe('Vue owned collection publication', () => {
+     let useLeft = true;
+     let leftValue = 1;
+     let rightValue = 2;
+-    const cell = adapter.createReadonlyCell!(() => {
++    const cell = required(adapter.createReadonlyCell).call(adapter, () => {
+       choice.observe();
+       if (useLeft) {
+         left.observe();
+@@ -225,7 +236,7 @@ describe('Vue owned collection publication', () => {
+     const adapter = createVueObservationAdapter();
+     const token = adapter.createToken();
+     let evaluations = 0;
+-    const cell = adapter.createReadonlyCell!(() => {
++    const cell = required(adapter.createReadonlyCell).call(adapter, () => {
+       token.observe();
+       return ++evaluations;
+     }) as unknown as ComputedRef<number>;
+@@ -342,7 +353,9 @@ describe('Vue owned collection publication', () => {
+     const adapter = createVueObservationAdapter();
+     const token = adapter.createToken();
+     let computes = 0;
+-    const owned = adapter.createReadonlyCell!(() => ({ value: ++computes }));
++    const owned = required(adapter.createReadonlyCell).call(adapter, () => ({
++      value: ++computes,
++    }));
+     const initial = owned();
+     const rows: { same: boolean; sameInitial: boolean }[] = [];
+     const dispose = watchEffect(
+diff --git a/packages/vue/src/lib/transaction-realization.spec.ts b/packages/vue/src/lib/transaction-realization.spec.ts
+index 3610603f..0c8afcda 100644
+--- a/packages/vue/src/lib/transaction-realization.spec.ts
++++ b/packages/vue/src/lib/transaction-realization.spec.ts
+@@ -67,13 +67,13 @@ const projectionFrame = (
+     phase,
+     scalar,
+     projections: {
+-      all: $.rows.all.value.map((row) => encode(row)!),
++      all: $.rows.all.value.map((row) => `${row.id}:${row.name}`),
+       ids: [...$.rows.ids.value],
+       count: $.rows.count.value,
+       empty: $.rows.empty.value,
+       map: [...$.rows.asMap.value].map(([key, row]) => `${key}:${row.name}`),
+       hasA: $.rows.has('A').value,
+-      where: $.rows.where(matchesA).value.map((row) => encode(row)!),
++      where: $.rows.where(matchesA).value.map((row) => `${row.id}:${row.name}`),
+       find: encode($.rows.find(matchesA).value),
+       slice: [...$.rows.names.value],
+       activeId: $.rows.activeId.value ?? null,

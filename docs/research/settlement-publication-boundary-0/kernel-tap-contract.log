@@ -1,0 +1,35 @@
+
+> nx run kernel:test --testFile=packages/kernel/src/lib/entity-tap-reads.spec.ts
+
+> node tools/run-core-vitest.mjs --testFile=packages/kernel/src/lib/entity-tap-reads.spec.ts
+
+(node:62577) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:62638) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /Users/jonathanborgia/.codex/worktrees/atomic-capture-proof/signaltree/packages/kernel
+
+(node:62662) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ Test Files  1 passed (1)
+      Tests  13 passed (13)
+   Start at  15:41:08
+   Duration  5.95s (transform 2.53s, setup 0ms, import 3.42s, tests 100ms, environment 1.86s)
+
+
+
+
+ NX   Successfully ran target test for project kernel
+
+
+  Run duration:      8.7s
+  Cache:             0/1 hit (0%)
+  Critical path:     8.6s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Drastically reduce your run duration by sharing a cache across your team and CI → https://nx.dev/ci/features/remote-cache?utm_source=nx-cli&utm_medium=cli&utm_campaign=performance-report&utm_content=remote-cache.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    8.6s

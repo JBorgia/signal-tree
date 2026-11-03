@@ -104,6 +104,7 @@ describe('EntityMutationFrame', () => {
     const frame = new EntityMutationFrame(valueStore, structuralStore);
     frame.stageValueReplacement({
       kind: 'replace-value',
+      authoredFields: null,
       key: 1,
       subjectId: 1,
       nextValue: { id: 1, name: 'Changed' },

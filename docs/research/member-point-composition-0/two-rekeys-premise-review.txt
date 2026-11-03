@@ -1,0 +1,11 @@
+Two-rekeys premise review, 2026-10-13
+Fixture: docs/research/member-point-composition-0/composition-two-rekeys.mjs, reported modes x-first and fault-row-error.
+
+Expected original keys [A,D] is justified. Public kernel README lines156-158 states changeId adopts a new key without lifetime loss. Existing rekeyed-rollback-defect.spec.ts lines94-107 requires rekey-alone rollback returning original key; lines142-160 requires rekey plus value update restoring original key and value. These are two independent lifetimes, with no later outside author, key occupancy conflict or missing anchor. Each public changeId source key exists and destination is vacant.
+
+The runtime explicitly distinguishes payload key fields and actual address: entity-signal.ts4193 notes changeId(1,77) keeps payload {id:1}, so selectId cannot recover current address. Therefore all() [{id:A,v:300},{id:D,v:400}] alongside ids[A,E] is not restored state. Values alone do not satisfy settlement.
+
+Raw ordinary-input x-first runs both base and CPRD: rollback.threw=false, after.ids[A,E], row values300/400, pending0, retry.threw=false retaining wrong key. Fault-row-error likewise wrong keys and exact injected error. This establishes baseline defect survives candidate. It is not evidence the original injected rich-capture exception is reachable by ordinary input; this is a separate ordinary structural settlement counterexample.
+
+Fixture caveat: inherited callback mode builds one-row expected all/snapshot and would require a two-row oracle if run; this does not affect the reported x-first and fault-row-error runs. No existing fixture/assertion changed.
+Raw: /private/tmp/st-base-two-rekeys/runs and /private/tmp/st-CPRD-two-rekeys/runs.

@@ -1,0 +1,13 @@
+{
+  "docs/architecture/multi-actor/PLAN.md": "8d1746835c158580713e4e0696c75296fbc962fd2197edd547834a536d70fa91",
+  "docs/architecture/multi-actor/IMPLEMENTATION.md": "5152f1b591b297bd3e069bad7aea1632ec40c45dbca079d5216eb8e7fdd7dde0",
+  "RELEASE-CURRENT.md": "4c3221a1ef7b974fae2719dddae4ccb3c3c9212e7dd582e87c9bdfc8d5e277c3",
+  "TODO.md": "1ba2da0841a52125a1b1f44f1601aa8774d664b667d699414367db71d8392c09",
+  "AGENTS.md": "e24bfff2e9bff7c569dd827207c57f6ed04d038c8878da4cc6e662dbc79d2155",
+  ".github/skills/adversarial-confirmation/references/protocol.md": "d6331155e2d0e8fa421244f0845c1efcd96d7970afa96a8bacf32805ff029d84",
+  "docs/review-contract.md": "b9b2f633a6d8dda9b1955cd01f92e3b1e8aabe8f3e110e806bbaa57c0a43e4e9",
+  ".codex/config.toml": "7496b50e0c776442a8b1eceb981da4ef4dc173f0d6e40443d3cbc08c640e7fb2",
+  ".codex/agents/release-reviewer.toml": "cc7c61e0956f6e6f60234ecd7a799b9ee4fc0852436dd2747684087501575792",
+  "tools/experiments/multi-actor-operations/VERIFICATION.md": "68542bf4d6ffafc02970db478ef7d6143be3b823a7aab1e2c1ad2bf132d6fe35",
+  "tools/experiments/multi-actor-operations/comparison/README.md": "3aa486212bbb84ecf9de86d6416297b0918c48ad1857ac2b57ecc0cdfb3317eb"
+}

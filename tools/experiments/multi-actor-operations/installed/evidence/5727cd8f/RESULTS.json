@@ -1,0 +1,44 @@
+{
+  "sourceHead": "5727cd8fcf701128358674411400c019b137a5e4",
+  "sourceArchiveSha256": "403d4bd222d08c74e3e4dffad5df8efb32e45ac24a91ad24a5b7635787fdc287",
+  "sourceFilesVerified": 3441,
+  "sourceDifferences": 0,
+  "kernelBuild": "pass with 11 TS4111 warnings",
+  "strictConsumer": {
+    "bundler": "pass",
+    "node16": "pass",
+    "skipLibCheck": false,
+    "strict": true,
+    "fixtureDeclarations": "narrow .d.mts; no ambient module override or any"
+  },
+  "installedRuntime": {
+    "probe": 6,
+    "workflow": 3,
+    "settlement": 2,
+    "typedOperation": 1
+  },
+  "bundledInstalledRuntime": {
+    "probe": 6,
+    "workflow": 3,
+    "settlement": 2
+  },
+  "angular": {
+    "version": "22.0.7",
+    "build": "pass",
+    "strictFullAot": "pass",
+    "classRuntimeCases": 2,
+    "renderedDom": false,
+    "jitFallback": false
+  },
+  "artifacts": {
+    "signal-tree-angular-16.0.0-dev.tgz": "da6bf34cd1769f323ef26c43acd0cf388028e348a34a8fbbc8e976b01a800993",
+    "signal-tree-kernel-16.0.0-dev.tgz": "64cfcda4aa980a4e27322693edf28d22c9aae54905d2e1d1b0c821ad455ac019"
+  },
+  "limits": [
+    "Borrowed root build dependencies, versions recorded; no frozen-lock reinstall",
+    "Prototype backend remains in-memory",
+    "No private source imports, source aliases, annotation overrides or declaration rewrites in installed consumers",
+    "Raw workflow stdout retains inherited public-source-bundle wording; manifests/commands describe actual installed-package execution",
+    "Not full five-package/release/lifecycle/cost qualification"
+  ]
+}

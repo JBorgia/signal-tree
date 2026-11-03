@@ -1,0 +1,12 @@
+{
+  "node": "v24.15.0",
+  "base": "19a5bd03",
+  "lane": "candidate",
+  "entry": "freshness.mjs",
+  "control": "rollback",
+  "exit": 0,
+  "signal": null,
+  "stable": true,
+  "bundle": "eb31e2cec16df577debeb6550bf9e32e2d953e6cbc0881a88242c46010023bea",
+  "originalManifestSha256": "581faf062e92aa1bdb27b21150332b467c4f97daaab87b191b78c3828cd4a6a1"
+}

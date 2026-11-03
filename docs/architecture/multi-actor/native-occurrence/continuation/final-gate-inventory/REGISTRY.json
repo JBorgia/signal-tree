@@ -1,0 +1,1519 @@
+{
+  "source": "/private/tmp/st-native-combined-c5/candidate/tools/verify-gates.mjs",
+  "sha256": "21ac1c5f2e2e1b347af819f685d0b9ce7c58bc330092312c9819a2d6b8980843",
+  "count": 84,
+  "rows": [
+    {
+      "index": 1,
+      "name": "typecheck",
+      "covers": "core sources AND typing specs compile (both projects, not just one)",
+      "cmd": [
+        "npm",
+        "run",
+        "typecheck"
+      ],
+      "env": {},
+      "slow": true,
+      "releaseOnly": false,
+      "needsBuild": false,
+      "provenBy": null,
+      "hasMutation": true,
+      "knownFailing": null,
+      "line": 101
+    },
+    {
+      "index": 2,
+      "name": "test:all",
+      "covers": "behaviour across all published packages AND the demo app",
+      "cmd": [
+        "npx",
+        "nx",
+        "run-many",
+        "-t",
+        "test",
+        "--projects=kernel,angular,react,vue,solid,demo,react-reference",
+        "--parallel=1",
+        "--skip-nx-cache"
+      ],
+      "env": {},
+      "slow": true,
+      "releaseOnly": false,
+      "needsBuild": false,
+      "provenBy": null,
+      "hasMutation": true,
+      "knownFailing": null,
+      "line": 112
+    },
+    {
+      "index": 3,
+      "name": "lint:budget",
+      "covers": "eslint errors across all 10 projects, AND warnings never grow",
+      "cmd": [
+        "node",
+        "tools/check-lint-budget.mjs"
+      ],
+      "env": {},
+      "slow": true,
+      "releaseOnly": false,
+      "needsBuild": false,
+      "provenBy": null,
+      "hasMutation": true,
+      "knownFailing": null,
+      "line": 142
+    },
+    {
+      "index": 4,
+      "name": "built-barrels",
+      "covers": "every source export survives into the built barrel",
+      "cmd": [
+        "node",
+        "tools/verify-built-barrels.mjs"
+      ],
+      "env": {},
+      "slow": false,
+      "releaseOnly": false,
+      "needsBuild": true,
+      "provenBy": null,
+      "hasMutation": true,
+      "knownFailing": null,
+      "line": 197
+    },
+    {
+      "index": 5,
+      "name": "devmode-foldable",
+      "covers": "diagnostics fold away when a consumer defines ngDevMode=false",
+      "cmd": [
+        "node",
+        "tools/check-devmode-foldable.mjs"
+      ],
+      "env": {},
+      "slow": false,
+      "releaseOnly": false,
+      "needsBuild": true,
+      "provenBy": "devmode-foldable:self",
+      "hasMutation": false,
+      "knownFailing": null,
+      "line": 208
+    },
+    {
+      "index": 6,
+      "name": "devmode-foldable:self",
+      "covers": "the foldability checker detects a surviving literal AND a non-shrinking bundle",
+      "cmd": [
+        "node",
+        "tools/check-devmode-foldable.mjs",
+        "--self-test"
+      ],
+      "env": {},
+      "slow": false,
+      "releaseOnly": false,
+      "needsBuild": true,
+      "provenBy": null,
+      "hasMutation": true,
+      "knownFailing": null,
+      "line": 221
+    },
+    {
+      "index": 7,
+      "name": "version-claims",
+      "covers": "every documented Angular-version claim matches peerDependencies",
+      "cmd": [
+        "node",
+        "scripts/verify-version-claims.js"
+      ],
+      "env": {},
+      "slow": false,
+      "releaseOnly": false,
+      "needsBuild": false,
+      "provenBy": null,
+      "hasMutation": true,
+      "knownFailing": null,
+      "line": 246
+    },
+    {
+      "index": 8,
+      "name": "exports-importable",
+      "covers": "every package export can actually be imported",
+      "cmd": [
+        "node",
+        "scripts/verify-exports.js"
+      ],
+      "env": {},
+      "slow": false,
+      "releaseOnly": false,
+      "needsBuild": true,
+      "provenBy": null,
+      "hasMutation": true,
+      "knownFailing": null,
+      "line": 256
+    },
+    {
+      "index": 9,
+      "name": "tree-shaking",
+      "covers": "an unused enhancer does not survive into a consumer bundle",
+      "cmd": [
+        "node",
+        "scripts/test-tree-shaking.js"
+      ],
+      "env": {},
+      "slow": false,
+      "releaseOnly": false,
+      "needsBuild": true,
+      "provenBy": "tree-shaking:self",
+      "hasMutation": false,
+      "knownFailing": null,
+      "line": 269
+    },
+    {
+      "index": 10,
+      "name": "tree-shaking:self",
+      "covers": "the tree-shaking checker detects code pulling in a forbidden module",
+      "cmd": [
+        "node",
+        "scripts/test-tree-shaking.js",
+        "--self-test"
+      ],
+      "env": {},
+      "slow": false,
+      "releaseOnly": false,
+      "needsBuild": true,
+      "provenBy": null,
+      "hasMutation": true,
+      "knownFailing": null,
+      "line": 276
+    },
+    {
+      "index": 11,
+      "name": "sanity",
+      "covers": "workspace smoke/parity checks",
+      "cmd": [
+        "node",
+        "scripts/sanity-checks.js"
+      ],
+      "env": {},
+      "slow": false,
+      "releaseOnly": false,
+      "needsBuild": true,
+      "provenBy": null,
+      "hasMutation": true,
+      "knownFailing": null,
+      "line": 293
+    },
+    {
+      "index": 12,
+      "name": "package-hygiene",
+      "covers": "no junk in any tarball, and every declared entry is present",
+      "cmd": [
+        "node",
+        "scripts/verify-package-hygiene.js"
+      ],
+      "env": {},
+      "slow": false,
+      "releaseOnly": false,
+      "needsBuild": true,
+      "provenBy": "package-hygiene:self",
+      "hasMutation": false,
+      "knownFailing": null,
+      "line": 310
+    },
+    {
+      "index": 13,
+      "name": "package-hygiene:self",
+      "covers": "the hygiene checker flags junk and a missing required entry",
+      "cmd": [
+        "node",
+        "scripts/verify-package-hygiene.js",
+        "--self-test"
+      ],
+      "env": {},
+      "slow": false,
+      "releaseOnly": false,
+      "needsBuild": true,
+      "provenBy": null,
+      "hasMutation": true,
+      "knownFailing": null,
+      "line": 317
+    },
+    {
+      "index": 14,
+      "name": "react-reference-typecheck",
+      "covers": "every committed source file in apps/react-reference compiles against the actual workspace packages — reference code is documentation with executable authority",
+      "cmd": [
+        "pnpm",
+        "exec",
+        "tsc",
+        "--noEmit",
+        "-p",
+        "apps/react-reference/tsconfig.app.json"
+      ],
+      "env": {},
+      "slow": false,
+      "releaseOnly": false,
+      "needsBuild": false,
+      "provenBy": null,
+      "hasMutation": true,
+      "knownFailing": null,
+      "line": 328
+    },
+    {
+      "index": 15,
+      "name": "api-callable-baseline",
+      "covers": "the committed INVOCATION-SURFACE baseline matches the built surface — no public function, method, callable property, callable type or constructable class added, removed, changed KIND or changed SIGNATURE",
+      "cmd": [
+        "node",
+        "tools/api-callable-inventory.mjs",
+        "--check"
+      ],
+      "env": {},
+      "slow": false,
+      "releaseOnly": false,
+      "needsBuild": true,
+      "provenBy": "api-callable-baseline:self",
+      "hasMutation": false,
+      "knownFailing": null,
+      "line": 358
+    },
+    {
+      "index": 16,
+      "name": "api-callable-baseline:self",
+      "covers": "the callable checker detects an added/removed member, a rename as removal+addition, a method<->callable-property kind flip, a new exported function, a changed parameter or return type, an added or removed overload on a callable type, optional->required, and a changed class CONSTRUCTOR — while ignoring a non-exported interface",
+      "cmd": [
+        "node",
+        "tools/api-callable-inventory-selftest.mjs"
+      ],
+      "env": {},
+      "slow": false,
+      "releaseOnly": false,
+      "needsBuild": true,
+      "provenBy": null,
+      "hasMutation": true,
+      "knownFailing": null,
+      "line": 376
+    },
+    {
+      "index": 17,
+      "name": "api-baseline",
+      "covers": "the committed public API baseline matches the built surface — no undeclared export added or removed",
+      "cmd": [
+        "node",
+        "tools/api-inventory.mjs",
+        "--check"
+      ],
+      "env": {},
+      "slow": false,
+      "releaseOnly": false,
+      "needsBuild": true,
+      "provenBy": null,
+      "hasMutation": true,
+      "knownFailing": null,
+      "line": 398
+    },
+    {
+      "index": 18,
+      "name": "source-controls",
+      "covers": "no raw NUL or unexpected C0 control character in any tracked source",
+      "cmd": [
+        "node",
+        "tools/check-source-controls.mjs",
+        "--verify-classification"
+      ],
+      "env": {},
+      "slow": false,
+      "releaseOnly": false,
+      "needsBuild": false,
+      "provenBy": null,
+      "hasMutation": true,
+      "knownFailing": null,
+      "line": 415
+    },
+    {
+      "index": 19,
+      "name": "spec-types:hygiene",
+      "covers": "every spec-type baseline entry addresses a SURVIVING spec — a bound attached to no surviving subject is not protection",
+      "cmd": [
+        "node",
+        "tools/check-spec-types.mjs",
+        "--self-test"
+      ],
+      "env": {},
+      "slow": false,
+      "releaseOnly": false,
+      "needsBuild": false,
+      "provenBy": null,
+      "hasMutation": true,
+      "knownFailing": null,
+      "line": 430
+    },
+    {
+      "index": 20,
+      "name": "kernel-neutrality",
+      "covers": "every declared-neutral kernel root has an Angular-free TRANSITIVE TYPE closure — type-only edges included",
+      "cmd": [
+        "node",
+        "tools/check-kernel-neutrality.mjs"
+      ],
+      "env": {},
+      "slow": false,
+      "releaseOnly": false,
+      "needsBuild": false,
+      "provenBy": null,
+      "hasMutation": true,
+      "knownFailing": null,
+      "line": 446
+    },
+    {
+      "index": 21,
+      "name": "kernel-neutrality:self",
+      "covers": "the closure walker itself — pointed at the known-tainted Angular runtime, it must report taint",
+      "cmd": [
+        "node",
+        "tools/check-kernel-neutrality.mjs",
+        "--self-test"
+      ],
+      "env": {},
+      "slow": false,
+      "releaseOnly": false,
+      "needsBuild": false,
+      "provenBy": null,
+      "hasMutation": true,
+      "knownFailing": null,
+      "line": 466
+    },
+    {
+      "index": 22,
+      "name": "source-controls:self",
+      "covers": "the NUL detector itself — a checker whose only evidence is 'found nothing' is indistinguishable from one that cannot find anything",
+      "cmd": [
+        "node",
+        "tools/check-source-controls.mjs",
+        "--self-test"
+      ],
+      "env": {},
+      "slow": false,
+      "releaseOnly": false,
+      "needsBuild": false,
+      "provenBy": null,
+      "hasMutation": true,
+      "knownFailing": null,
+      "line": 479
+    },
+    {
+      "index": 23,
+      "name": "readme-apis:teaching",
+      "covers": "the retired-API half of the doc gate — proven separately because one mutation cannot exercise two independent checks",
+      "cmd": [
+        "node",
+        "scripts/lint-readme-apis.mjs"
+      ],
+      "env": {},
+      "slow": false,
+      "releaseOnly": false,
+      "needsBuild": true,
+      "provenBy": null,
+      "hasMutation": true,
+      "knownFailing": null,
+      "line": 491
+    },
+    {
+      "index": 24,
+      "name": "readme-apis",
+      "covers": "every @signaltree symbol named in a shipped README or live doc exists, and no live doc EXAMPLE teaches a retired API",
+      "cmd": [
+        "node",
+        "scripts/lint-readme-apis.mjs"
+      ],
+      "env": {},
+      "slow": false,
+      "releaseOnly": false,
+      "needsBuild": true,
+      "provenBy": null,
+      "hasMutation": true,
+      "knownFailing": null,
+      "line": 512
+    },
+    {
+      "index": 25,
+      "name": "dead-exports",
+      "covers": "no NEW export is unreachable from every entry point and every import",
+      "cmd": [
+        "node",
+        "tools/find-dead-exports.mjs",
+        "--max=0"
+      ],
+      "env": {},
+      "slow": false,
+      "releaseOnly": false,
+      "needsBuild": false,
+      "provenBy": null,
+      "hasMutation": true,
+      "knownFailing": null,
+      "line": 528
+    },
+    {
+      "index": 26,
+      "name": "angular-store-runtime",
+      "covers": "defineStore resolves without the JIT compiler with local/root/platform identity and injector-owned teardown",
+      "cmd": [
+        "node",
+        "tools/verify-angular-store-runtime.mjs"
+      ],
+      "env": {},
+      "slow": false,
+      "releaseOnly": false,
+      "needsBuild": false,
+      "provenBy": null,
+      "hasMutation": true,
+      "knownFailing": null,
+      "line": 553
+    },
+    {
+      "index": 27,
+      "name": "angular-aot-consumer",
+      "covers": "installed tarballs bootstrap in production AOT without a runtime compiler, render repeated writes and release component/root stores with their injectors",
+      "cmd": [
+        "node",
+        "tools/verify-angular-aot-consumer.mjs"
+      ],
+      "env": {},
+      "slow": true,
+      "releaseOnly": false,
+      "needsBuild": true,
+      "provenBy": null,
+      "hasMutation": true,
+      "knownFailing": null,
+      "line": 564
+    },
+    {
+      "index": 28,
+      "name": "angular-coupling-budget",
+      "covers": "kernel production modules remain free of Angular runtime coupling",
+      "cmd": [
+        "node",
+        "tools/check-angular-coupling-budget.mjs"
+      ],
+      "env": {},
+      "slow": false,
+      "releaseOnly": false,
+      "needsBuild": false,
+      "provenBy": null,
+      "hasMutation": true,
+      "knownFailing": null,
+      "line": 577
+    },
+    {
+      "index": 29,
+      "name": "c6-neutrality-invariants",
+      "covers": "kernel-owned locations keep stable identity while direct reads participate in Angular dependency tracking and zoneless rendering",
+      "cmd": [
+        "npx",
+        "vitest",
+        "run",
+        "--root",
+        "packages/angular",
+        "src/lib/angular-realization-invariants.spec.ts"
+      ],
+      "env": {},
+      "slow": false,
+      "releaseOnly": false,
+      "needsBuild": false,
+      "provenBy": null,
+      "hasMutation": true,
+      "knownFailing": null,
+      "line": 587
+    },
+    {
+      "index": 30,
+      "name": "numeric-claims",
+      "covers": "every measured figure on a live surface names a tool that produces it — ratcheted, so new ungenerated numbers cannot land",
+      "cmd": [
+        "node",
+        "tools/check-numeric-claims.mjs"
+      ],
+      "env": {},
+      "slow": false,
+      "releaseOnly": false,
+      "needsBuild": false,
+      "provenBy": "numeric-claims:self",
+      "hasMutation": false,
+      "knownFailing": null,
+      "line": 605
+    },
+    {
+      "index": 31,
+      "name": "numeric-claims:self",
+      "covers": "the numeric-claims scanner detects a figure in a section that names no generator, and clears it once one is named",
+      "cmd": [
+        "node",
+        "tools/check-numeric-claims.mjs",
+        "--self-test"
+      ],
+      "env": {},
+      "slow": false,
+      "releaseOnly": false,
+      "needsBuild": false,
+      "provenBy": null,
+      "hasMutation": true,
+      "knownFailing": null,
+      "line": 612
+    },
+    {
+      "index": 32,
+      "name": "release-claims",
+      "covers": "every symbol/code ADDED since the last release tag reaches every surface that claims to describe the library",
+      "cmd": [
+        "node",
+        "tools/check-release-claims.mjs"
+      ],
+      "env": {},
+      "slow": false,
+      "releaseOnly": false,
+      "needsBuild": false,
+      "provenBy": null,
+      "hasMutation": true,
+      "knownFailing": null,
+      "line": 629
+    },
+    {
+      "index": 33,
+      "name": "rc-public-dispositions",
+      "covers": "every RC public symbol has release authority; settled negative dispositions are absent from tarballs",
+      "cmd": [
+        "node",
+        "tools/check-rc-public-dispositions.mjs"
+      ],
+      "env": {},
+      "slow": false,
+      "releaseOnly": false,
+      "needsBuild": false,
+      "provenBy": "rc-public-dispositions:self",
+      "hasMutation": false,
+      "knownFailing": null,
+      "line": 676
+    },
+    {
+      "index": 34,
+      "name": "rc-public-dispositions:self",
+      "covers": "the RC public-disposition checker catches blocked symbols and permits allowed symbols",
+      "cmd": [
+        "node",
+        "tools/check-rc-public-dispositions.mjs",
+        "--self-test"
+      ],
+      "env": {},
+      "slow": false,
+      "releaseOnly": false,
+      "needsBuild": false,
+      "provenBy": null,
+      "hasMutation": true,
+      "knownFailing": null,
+      "line": 683
+    },
+    {
+      "index": 35,
+      "name": "demo-coverage",
+      "covers": "every ROOT-barrel export is demonstrated in the demo app — not node methods or type-only declarations",
+      "cmd": [
+        "node",
+        "tools/check-demo-coverage.mjs"
+      ],
+      "env": {},
+      "slow": false,
+      "releaseOnly": false,
+      "needsBuild": true,
+      "provenBy": null,
+      "hasMutation": true,
+      "knownFailing": null,
+      "line": 694
+    },
+    {
+      "index": 36,
+      "name": "dead-exports:self",
+      "covers": "the reachability scan itself is neither too narrow nor too broad",
+      "cmd": [
+        "node",
+        "tools/find-dead-exports.mjs",
+        "--self-test"
+      ],
+      "env": {},
+      "slow": false,
+      "releaseOnly": false,
+      "needsBuild": false,
+      "provenBy": null,
+      "hasMutation": true,
+      "knownFailing": null,
+      "line": 708
+    },
+    {
+      "index": 37,
+      "name": "bench-harness",
+      "covers": "all 3 benchmark arms construct, run, and satisfy their postconditions",
+      "cmd": [
+        "node",
+        "--expose-gc",
+        "tools/bench-compare.mjs",
+        "--n",
+        "200"
+      ],
+      "env": {},
+      "slow": false,
+      "releaseOnly": true,
+      "needsBuild": true,
+      "provenBy": null,
+      "hasMutation": true,
+      "knownFailing": null,
+      "line": 727
+    },
+    {
+      "index": 38,
+      "name": "restoration-hot-path",
+      "covers": "root, scoped-manager, and direct retained-effect restoration arms run and satisfy exact value, identity, frontier, history, and redo postconditions",
+      "cmd": [
+        "node",
+        "tools/bench-restoration-hot-path.mjs",
+        "--production",
+        "--samples",
+        "3",
+        "--warmups",
+        "1",
+        "--json"
+      ],
+      "env": {},
+      "slow": false,
+      "releaseOnly": true,
+      "needsBuild": true,
+      "provenBy": null,
+      "hasMutation": true,
+      "knownFailing": null,
+      "line": 743
+    },
+    {
+      "index": 39,
+      "name": "history-ownership-bench",
+      "covers": "the 6 Phase 0A ownership arms construct, run, keep owner-path postconditions honest, and preserve the current decision-20 verdict contract",
+      "cmd": [
+        "node",
+        "--expose-gc",
+        "tools/bench-history-ownership.mjs",
+        "--smoke",
+        "--require-verdict",
+        "INCONCLUSIVE"
+      ],
+      "env": {},
+      "slow": false,
+      "releaseOnly": true,
+      "needsBuild": true,
+      "provenBy": null,
+      "hasMutation": true,
+      "knownFailing": null,
+      "line": 768
+    },
+    {
+      "index": 40,
+      "name": "memory-harness",
+      "covers": "every memory scenario runs under forced GC and reports collectability",
+      "cmd": [
+        "node",
+        "--expose-gc",
+        "tools/memory-report.mjs"
+      ],
+      "env": {},
+      "slow": false,
+      "releaseOnly": true,
+      "needsBuild": true,
+      "provenBy": null,
+      "hasMutation": true,
+      "knownFailing": null,
+      "line": 788
+    },
+    {
+      "index": 41,
+      "name": "memory-compare",
+      "covers": "all 3 cross-library memory arms construct and measure a marginal slope",
+      "cmd": [
+        "node",
+        "--expose-gc",
+        "tools/memory-compare.mjs",
+        "--n",
+        "1000"
+      ],
+      "env": {},
+      "slow": false,
+      "releaseOnly": true,
+      "needsBuild": true,
+      "provenBy": null,
+      "hasMutation": true,
+      "knownFailing": null,
+      "line": 803
+    },
+    {
+      "index": 42,
+      "name": "update-matrix",
+      "covers": "every arm of the cross-library update matrix constructs, runs and satisfies its postconditions",
+      "cmd": [
+        "node",
+        "--expose-gc",
+        "tools/bench-update-matrix.mjs",
+        "--axis",
+        "consumers",
+        "--samples",
+        "1"
+      ],
+      "env": {},
+      "slow": true,
+      "releaseOnly": false,
+      "needsBuild": true,
+      "provenBy": null,
+      "hasMutation": true,
+      "knownFailing": null,
+      "line": 821
+    },
+    {
+      "index": 43,
+      "name": "bounded-history-retention",
+      "covers": "a tree with a BOUNDED restoration() does not retain retired subjects without bound",
+      "cmd": [
+        "node",
+        "--expose-gc",
+        "tools/probe-bounded-history-retention.mjs"
+      ],
+      "env": {},
+      "slow": true,
+      "releaseOnly": false,
+      "needsBuild": true,
+      "provenBy": "bounded-history-retention:self",
+      "hasMutation": false,
+      "knownFailing": null,
+      "line": 851
+    },
+    {
+      "index": 44,
+      "name": "bounded-history-retention:self",
+      "covers": "the retention verdict rejects the pre-fix table AND the 8.1x table its first threshold accepted",
+      "cmd": [
+        "node",
+        "tools/probe-bounded-history-retention.mjs",
+        "--self-test"
+      ],
+      "env": {},
+      "slow": false,
+      "releaseOnly": false,
+      "needsBuild": false,
+      "provenBy": null,
+      "hasMutation": true,
+      "knownFailing": null,
+      "line": 869
+    },
+    {
+      "index": 45,
+      "name": "retired-lifetime-gross-retention",
+      "covers": "a non-retaining arm stays under an absolute retained-heap ceiling — the slope between two 4 MB-quantized, overlapping medians could not express it",
+      "cmd": [
+        "node",
+        "--expose-gc",
+        "tools/check-retired-lifetime-gross-retention.mjs"
+      ],
+      "env": {},
+      "slow": true,
+      "releaseOnly": false,
+      "needsBuild": true,
+      "provenBy": "retired-lifetime-gross-retention:self",
+      "hasMutation": false,
+      "knownFailing": null,
+      "line": 888
+    },
+    {
+      "index": 46,
+      "name": "retired-lifetime-gross-retention:self",
+      "covers": "the retention checker rejects the retention REGIME and accepts flat totals, bounded fixed runtime cost, and the worst control sample measured across 24 processes",
+      "cmd": [
+        "node",
+        "tools/check-retired-lifetime-gross-retention.mjs",
+        "--self-test"
+      ],
+      "env": {},
+      "slow": false,
+      "releaseOnly": false,
+      "needsBuild": false,
+      "provenBy": null,
+      "hasMutation": true,
+      "knownFailing": null,
+      "line": 908
+    },
+    {
+      "index": 47,
+      "name": "restoration-turn-capacity",
+      "covers": "maxHistorySize retains completed designated turns exactly: omitted defaults, zero retains none, and positive N retains N",
+      "cmd": [
+        "node",
+        "tools/verify-restoration-capacity.mjs"
+      ],
+      "env": {},
+      "slow": false,
+      "releaseOnly": false,
+      "needsBuild": true,
+      "provenBy": null,
+      "hasMutation": true,
+      "knownFailing": null,
+      "line": 932
+    },
+    {
+      "index": 48,
+      "name": "restoration-required-set",
+      "covers": "the restoration claim-set oracle exercises designated retained work and distinguishes ordinary, bounded, and external classifications",
+      "cmd": [
+        "node",
+        "tools/probe-restoration-required-set.mjs",
+        "--self-test"
+      ],
+      "env": {},
+      "slow": false,
+      "releaseOnly": true,
+      "needsBuild": true,
+      "provenBy": null,
+      "hasMutation": true,
+      "knownFailing": null,
+      "line": 944
+    },
+    {
+      "index": 49,
+      "name": "signal-identity-durability",
+      "covers": "a live consumer keeps receiving updates across garbage collection — the property the test suite structurally cannot check",
+      "cmd": [
+        "node",
+        "--expose-gc",
+        "tools/check-signal-identity-durability.mjs"
+      ],
+      "env": {},
+      "slow": true,
+      "releaseOnly": false,
+      "needsBuild": true,
+      "provenBy": "signal-identity-durability:self",
+      "hasMutation": false,
+      "knownFailing": null,
+      "line": 957
+    },
+    {
+      "index": 50,
+      "name": "signal-identity-durability:self",
+      "covers": "the durability checker detects a non-durable identity map and accepts a durable one",
+      "cmd": [
+        "node",
+        "--expose-gc",
+        "tools/check-signal-identity-durability.mjs",
+        "--self-test"
+      ],
+      "env": {},
+      "slow": false,
+      "releaseOnly": false,
+      "needsBuild": false,
+      "provenBy": null,
+      "hasMutation": true,
+      "knownFailing": null,
+      "line": 980
+    },
+    {
+      "index": 51,
+      "name": "memory-consistency",
+      "covers": "the retained-heap table is internally possible — no scenario measures less than a scenario it strictly contains",
+      "cmd": [
+        "node",
+        "--expose-gc",
+        "tools/check-memory-harness.mjs"
+      ],
+      "env": {},
+      "slow": true,
+      "releaseOnly": true,
+      "needsBuild": true,
+      "provenBy": "memory-consistency:self",
+      "hasMutation": false,
+      "knownFailing": null,
+      "line": 1000
+    },
+    {
+      "index": 52,
+      "name": "memory-consistency:self",
+      "covers": "the containment checker rejects the exact 59.95/18.03 table that shipped, and accepts a consistent one",
+      "cmd": [
+        "node",
+        "--expose-gc",
+        "tools/check-memory-harness.mjs",
+        "--self-test"
+      ],
+      "env": {},
+      "slow": false,
+      "releaseOnly": false,
+      "needsBuild": false,
+      "provenBy": null,
+      "hasMutation": true,
+      "knownFailing": null,
+      "line": 1030
+    },
+    {
+      "index": 53,
+      "name": "historical-ab-isolation:self",
+      "covers": "the historical-A/B isolation checker rejects a comparison whose two arms are the same build (NOT full proof of a historical comparison — see the file header)",
+      "cmd": [
+        "node",
+        "tools/check-historical-ab-isolation.mjs",
+        "--self-test"
+      ],
+      "env": {},
+      "slow": false,
+      "releaseOnly": false,
+      "needsBuild": false,
+      "provenBy": null,
+      "hasMutation": true,
+      "knownFailing": null,
+      "line": 1050
+    },
+    {
+      "index": 54,
+      "name": "state-scale",
+      "covers": "the O(1)-write thesis, measured against @ngrx/signals on state-size and consumer axes",
+      "cmd": [
+        "node",
+        "tools/bench-state-scale.mjs",
+        "--quick"
+      ],
+      "env": {},
+      "slow": false,
+      "releaseOnly": true,
+      "needsBuild": true,
+      "provenBy": null,
+      "hasMutation": true,
+      "knownFailing": null,
+      "line": 1078
+    },
+    {
+      "index": 55,
+      "name": "raw-signals",
+      "covers": "the \"why not raw signals\" arms construct, interleave, and their postconditions fire",
+      "cmd": [
+        "node",
+        "tools/bench-raw-signals.mjs",
+        "--writes",
+        "5000",
+        "--consumers",
+        "10"
+      ],
+      "env": {},
+      "slow": false,
+      "releaseOnly": true,
+      "needsBuild": true,
+      "provenBy": null,
+      "hasMutation": true,
+      "knownFailing": null,
+      "line": 1095
+    },
+    {
+      "index": 56,
+      "name": "size-compare",
+      "covers": "cross-library gzip cost is measurable for both libraries",
+      "cmd": [
+        "node",
+        "tools/size-compare.mjs"
+      ],
+      "env": {},
+      "slow": false,
+      "releaseOnly": true,
+      "needsBuild": true,
+      "provenBy": null,
+      "hasMutation": true,
+      "knownFailing": null,
+      "line": 1119
+    },
+    {
+      "index": 57,
+      "name": "size-report",
+      "covers": "every published package builds and its tree-shaken size is measurable",
+      "cmd": [
+        "node",
+        "tools/size-report.mjs"
+      ],
+      "env": {},
+      "slow": false,
+      "releaseOnly": true,
+      "needsBuild": true,
+      "provenBy": null,
+      "hasMutation": true,
+      "knownFailing": null,
+      "line": 1135
+    },
+    {
+      "index": 58,
+      "name": "spec-types",
+      "covers": "spec files are typechecked (they were covered by NOTHING) — ratcheted per file, so a renamed public config option cannot silently void a test",
+      "cmd": [
+        "node",
+        "tools/check-spec-types.mjs"
+      ],
+      "env": {},
+      "slow": true,
+      "releaseOnly": false,
+      "needsBuild": false,
+      "provenBy": null,
+      "hasMutation": true,
+      "knownFailing": null,
+      "line": 1150
+    },
+    {
+      "index": 59,
+      "name": "retention-gc",
+      "covers": "the GC-requiring retention proofs: diagnostic and Link owners release values at their boundaries, and source locations do not retain abandoned derived recipes",
+      "cmd": [
+        "npx",
+        "vitest",
+        "run",
+        "--root",
+        "packages/kernel",
+        "--config",
+        "vitest.retention.config.ts"
+      ],
+      "env": {
+        "NODE_OPTIONS": "--expose-gc"
+      },
+      "slow": false,
+      "releaseOnly": false,
+      "needsBuild": false,
+      "provenBy": null,
+      "hasMutation": true,
+      "knownFailing": null,
+      "line": 1180
+    },
+    {
+      "index": 60,
+      "name": "documented-imports",
+      "covers": "every import specifier a LIVE document teaches resolves against the published export map — the documented -> publishable edge no other gate checks",
+      "cmd": [
+        "node",
+        "tools/check-documented-imports.mjs"
+      ],
+      "env": {},
+      "slow": false,
+      "releaseOnly": false,
+      "needsBuild": false,
+      "provenBy": null,
+      "hasMutation": true,
+      "knownFailing": null,
+      "line": 1203
+    },
+    {
+      "index": 61,
+      "name": "semantic-discoverability",
+      "covers": "the canonical manifest states the v15 model, facade rule, link/persistence, external-authority, and causal-projection boundaries, and each primary package README reaches its co-packed manifest",
+      "cmd": [
+        "node",
+        "tools/check-semantic-discoverability.mjs"
+      ],
+      "env": {},
+      "slow": false,
+      "releaseOnly": false,
+      "needsBuild": false,
+      "provenBy": null,
+      "hasMutation": true,
+      "knownFailing": null,
+      "line": 1220
+    },
+    {
+      "index": 62,
+      "name": "semantic-discoverability:self",
+      "covers": "the semantic-discoverability checker accepts complete guidance and rejects a missing causal-projection rule",
+      "cmd": [
+        "node",
+        "tools/check-semantic-discoverability.mjs",
+        "--self-test"
+      ],
+      "env": {},
+      "slow": false,
+      "releaseOnly": false,
+      "needsBuild": false,
+      "provenBy": null,
+      "hasMutation": true,
+      "knownFailing": null,
+      "line": 1231
+    },
+    {
+      "index": 63,
+      "name": "documented-symbols",
+      "covers": "a package barrel's own API-SUMMARY list does not advertise a symbol the barrel fails to export — the symbol-level complement to documented-imports' specifier-level check",
+      "cmd": [
+        "node",
+        "tools/check-documented-symbols.mjs"
+      ],
+      "env": {},
+      "slow": false,
+      "releaseOnly": false,
+      "needsBuild": false,
+      "provenBy": "documented-symbols:self",
+      "hasMutation": false,
+      "knownFailing": null,
+      "line": 1243
+    },
+    {
+      "index": 64,
+      "name": "documented-symbols:self",
+      "covers": "the barrel-summary checker rejects an advertised-but-unexported symbol, accepts an exported one, and skips `.method` entries",
+      "cmd": [
+        "node",
+        "tools/check-documented-symbols.mjs",
+        "--self-test"
+      ],
+      "env": {},
+      "slow": false,
+      "releaseOnly": false,
+      "needsBuild": false,
+      "provenBy": null,
+      "hasMutation": true,
+      "knownFailing": null,
+      "line": 1256
+    },
+    {
+      "index": 65,
+      "name": "documented-imports:self",
+      "covers": "the documented-import checker accepts a real entry point and rejects both a bogus subpath and a bogus package",
+      "cmd": [
+        "node",
+        "tools/check-documented-imports.mjs",
+        "--self-test"
+      ],
+      "env": {},
+      "slow": false,
+      "releaseOnly": false,
+      "needsBuild": false,
+      "provenBy": null,
+      "hasMutation": true,
+      "knownFailing": null,
+      "line": 1267
+    },
+    {
+      "index": 66,
+      "name": "documented-examples",
+      "covers": "every example a LIVE document teaches still typechecks against the API it imports — the block-level complement to documented-symbols and documented-imports, which check names and specifiers but never the call",
+      "cmd": [
+        "node",
+        "tools/check-documented-examples.mjs"
+      ],
+      "env": {},
+      "slow": false,
+      "releaseOnly": false,
+      "needsBuild": false,
+      "provenBy": null,
+      "hasMutation": true,
+      "knownFailing": null,
+      "line": 1278
+    },
+    {
+      "index": 67,
+      "name": "documented-examples:self",
+      "covers": "the documented-example checker rejects a deleted method, an unexported symbol and a wrong-carrier spelling, while tolerating the elided context and repeated declarations that made the previous whole-file attempt permanently red",
+      "cmd": [
+        "node",
+        "tools/check-documented-examples.mjs",
+        "--self-test"
+      ],
+      "env": {},
+      "slow": false,
+      "releaseOnly": false,
+      "needsBuild": false,
+      "provenBy": null,
+      "hasMutation": true,
+      "knownFailing": null,
+      "line": 1298
+    },
+    {
+      "index": 68,
+      "name": "error-codes",
+      "covers": "every diagnostic code the packages can emit is in docs/errors/README.md, and the catalogue invents none",
+      "cmd": [
+        "node",
+        "tools/check-error-codes.mjs"
+      ],
+      "env": {},
+      "slow": false,
+      "releaseOnly": false,
+      "needsBuild": false,
+      "provenBy": null,
+      "hasMutation": true,
+      "knownFailing": null,
+      "line": 1310
+    },
+    {
+      "index": 69,
+      "name": "error-codes:self",
+      "covers": "the catalogue checker detects a removed code AND reports the catalogue in sync without the probe",
+      "cmd": [
+        "node",
+        "tools/check-error-codes.mjs",
+        "--self-test"
+      ],
+      "env": {},
+      "slow": false,
+      "releaseOnly": false,
+      "needsBuild": false,
+      "provenBy": null,
+      "hasMutation": true,
+      "knownFailing": null,
+      "line": 1329
+    },
+    {
+      "index": 70,
+      "name": "declaration-docs",
+      "covers": "a package whose source carries JSDoc ships JSDoc in its shipped .d.ts",
+      "cmd": [
+        "node",
+        "tools/check-declaration-docs.mjs"
+      ],
+      "env": {},
+      "slow": false,
+      "releaseOnly": false,
+      "needsBuild": true,
+      "provenBy": null,
+      "hasMutation": true,
+      "knownFailing": null,
+      "line": 1344
+    },
+    {
+      "index": 71,
+      "name": "declaration-docs:self",
+      "covers": "the declaration-docs checker flags a stripped declaration set AND reports clean at the real ratio",
+      "cmd": [
+        "node",
+        "tools/check-declaration-docs.mjs",
+        "--self-test"
+      ],
+      "env": {},
+      "slow": false,
+      "releaseOnly": false,
+      "needsBuild": true,
+      "provenBy": null,
+      "hasMutation": true,
+      "knownFailing": null,
+      "line": 1376
+    },
+    {
+      "index": 72,
+      "name": "doc-links",
+      "covers": "every relative link resolves AND every install instruction selects a publishable current package (archive/CHANGELOG excluded as point-in-time)",
+      "cmd": [
+        "node",
+        "tools/check-doc-links.mjs"
+      ],
+      "env": {},
+      "slow": false,
+      "releaseOnly": false,
+      "needsBuild": false,
+      "provenBy": null,
+      "hasMutation": true,
+      "knownFailing": null,
+      "line": 1393
+    },
+    {
+      "index": 73,
+      "name": "doc-links:self",
+      "covers": "the documentation checker flags a missing target and stale dist-tag, then reports the repo clean without them",
+      "cmd": [
+        "node",
+        "tools/check-doc-links.mjs",
+        "--self-test"
+      ],
+      "env": {},
+      "slow": false,
+      "releaseOnly": false,
+      "needsBuild": false,
+      "provenBy": null,
+      "hasMutation": true,
+      "knownFailing": null,
+      "line": 1408
+    },
+    {
+      "index": 74,
+      "name": "publish-manifests",
+      "covers": "the BUILT manifests are installable off this machine — no workspace/file/link protocols, internal ranges admit the versions shipping beside them",
+      "cmd": [
+        "node",
+        "tools/check-publish-manifests.mjs"
+      ],
+      "env": {},
+      "slow": false,
+      "releaseOnly": false,
+      "needsBuild": true,
+      "provenBy": "publish-manifests:self",
+      "hasMutation": false,
+      "knownFailing": null,
+      "line": 1422
+    },
+    {
+      "index": 75,
+      "name": "publish-manifests:self",
+      "covers": "the manifest checker rejects `workspace:*` and a range that admits nothing, and its comparator handles prereleases",
+      "cmd": [
+        "node",
+        "tools/check-publish-manifests.mjs",
+        "--self-test"
+      ],
+      "env": {},
+      "slow": false,
+      "releaseOnly": false,
+      "needsBuild": false,
+      "provenBy": null,
+      "hasMutation": true,
+      "knownFailing": null,
+      "line": 1437
+    },
+    {
+      "index": 76,
+      "name": "publish-artifacts",
+      "covers": "every declared `files` entry of every package resolves in dist",
+      "cmd": [
+        "node",
+        "scripts/prepare-publish-artifacts.mjs"
+      ],
+      "env": {},
+      "slow": false,
+      "releaseOnly": false,
+      "needsBuild": true,
+      "provenBy": null,
+      "hasMutation": true,
+      "knownFailing": null,
+      "line": 1457
+    },
+    {
+      "index": 77,
+      "name": "framework-facade-closure",
+      "covers": "packed framework facades forward every intended neutral runtime symbol by identity, while consumer declarations compile with skipLibCheck=false under bundler and node16 resolution",
+      "cmd": [
+        "node",
+        "tools/verify-consumer-typecheck.mjs"
+      ],
+      "env": {},
+      "slow": false,
+      "releaseOnly": false,
+      "needsBuild": true,
+      "provenBy": null,
+      "hasMutation": true,
+      "knownFailing": null,
+      "line": 1471
+    },
+    {
+      "index": 78,
+      "name": "react-ssr-facade",
+      "covers": "the packed React facade supplies a canonical server snapshot to useSyncExternalStore",
+      "cmd": [
+        "node",
+        "tools/verify-consumer-typecheck.mjs"
+      ],
+      "env": {},
+      "slow": false,
+      "releaseOnly": false,
+      "needsBuild": true,
+      "provenBy": null,
+      "hasMutation": true,
+      "knownFailing": null,
+      "line": 1482
+    },
+    {
+      "index": 79,
+      "name": "bundle-budget",
+      "covers": "built package sizes stay inside their budgets",
+      "cmd": [
+        "node",
+        "tools/check-bundle-budget.mjs"
+      ],
+      "env": {},
+      "slow": false,
+      "releaseOnly": false,
+      "needsBuild": true,
+      "provenBy": null,
+      "hasMutation": true,
+      "knownFailing": null,
+      "line": 1494
+    },
+    {
+      "index": 80,
+      "name": "publish-architecture",
+      "covers": "every shell and CI registry path delegates to the canonical candidate publisher",
+      "cmd": [
+        "node",
+        "scripts/verify-publish-architecture.mjs"
+      ],
+      "env": {},
+      "slow": false,
+      "releaseOnly": false,
+      "needsBuild": false,
+      "provenBy": null,
+      "hasMutation": true,
+      "knownFailing": null,
+      "line": 1536
+    },
+    {
+      "index": 81,
+      "name": "publish-authorization",
+      "covers": "the canonical publisher retains its managed npm credential fallback",
+      "cmd": [
+        "node",
+        "scripts/verify-publish-architecture.mjs"
+      ],
+      "env": {},
+      "slow": false,
+      "releaseOnly": false,
+      "needsBuild": false,
+      "provenBy": null,
+      "hasMutation": true,
+      "knownFailing": null,
+      "line": 1547
+    },
+    {
+      "index": 82,
+      "name": "release-prerelease-metadata",
+      "covers": "prerelease tags create GitHub releases marked as prereleases",
+      "cmd": [
+        "node",
+        "scripts/verify-publish-architecture.mjs"
+      ],
+      "env": {},
+      "slow": false,
+      "releaseOnly": false,
+      "needsBuild": false,
+      "provenBy": null,
+      "hasMutation": true,
+      "knownFailing": null,
+      "line": 1558
+    },
+    {
+      "index": 83,
+      "name": "release-plan:self",
+      "covers": "the public release boundary rejects private Studio source, unexpected packages and reversed dependencies",
+      "cmd": [
+        "node",
+        "scripts/release-plan.mjs",
+        "--self-test"
+      ],
+      "env": {},
+      "slow": false,
+      "releaseOnly": false,
+      "needsBuild": false,
+      "provenBy": null,
+      "hasMutation": true,
+      "knownFailing": null,
+      "line": 1568
+    },
+    {
+      "index": 84,
+      "name": "release-plan",
+      "covers": "the canonical release set matches publishable manifests and orders kernel before adapters",
+      "cmd": [
+        "node",
+        "scripts/release-plan.mjs",
+        "--json"
+      ],
+      "env": {},
+      "slow": false,
+      "releaseOnly": false,
+      "needsBuild": false,
+      "provenBy": null,
+      "hasMutation": true,
+      "knownFailing": null,
+      "line": 1579
+    }
+  ]
+}

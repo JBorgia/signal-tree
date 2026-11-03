@@ -1,0 +1,446 @@
+
+> nx run vue:test --testNamePattern=Vue entity projection publication
+
+> pnpm exec tsc --noEmit -p packages/vue/tsconfig.spec.json && npx vitest run --config packages/vue/vitest.config.ts --testNamePattern="Vue entity projection publication"
+
+(node:68273) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+npm warn Unknown env config "verify-deps-before-run". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown project config "auto-install-peers". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown project config "shamefully-hoist". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+(node:68290) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:68451) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /Users/jonathanborgia/.codex/worktrees/atomic-capture-proof/signaltree/packages/vue
+
+(node:68819) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:68810) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:68814) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:68818) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:68811) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:68812) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:68817) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:68816) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:68820) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ❯ src/lib/entity-projection-publication.spec.ts (13 tests | 8 failed) 110ms
+     × review-empty: rollback observers see scalar, all, count, and empty restored 42ms
+     × review-active: rollback observers see direct and active row restored 6ms
+     × coheres all owned reads for remove rollback (unprimed) 7ms
+     × coheres all owned reads for add rollback (primed) 4ms
+     × coheres all owned reads for remove rollback (primed) 16ms
+     × coheres all owned reads for field rollback (primed) 4ms
+     × coheres all owned reads for selection rollback (primed) 7ms
+     × publishes marker-computed slices and sorted projection chains coherently 5ms
+(node:68923) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:68926) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:68927) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:68924) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:68925) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:68929) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:68928) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:68930) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 8 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/lib/entity-projection-publication.spec.ts > Vue entity projection publication > review-empty: rollback observers see scalar, all, count, and empty restored
+AssertionError: [{"phase":"setup","scalar":0,"all":[],"count":0,"empty":true},{"phase":"setup","scalar":1,"all":[],"count":0,"empty":true},{"phase":"setup","scalar":1,"all":[1],"count":1,"empty":false},{"phase":"rollback","scalar":0,"all":[1],"count":1,"empty":false},{"phase":"rollback","scalar":0,"all":[],"count":0,"empty":true}]: expected false to be true // Object.is equality
+
+- Expected
++ Received
+
+- true
++ false
+
+ ❯ src/lib/entity-projection-publication.spec.ts:59:9
+     57|         ),
+     58|         JSON.stringify(seen)
+     59|       ).toBe(true);
+       |         ^
+     60|     } finally {
+     61|       dispose();
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/8]⎯
+
+ FAIL  src/lib/entity-projection-publication.spec.ts > Vue entity projection publication > review-active: rollback observers see direct and active row restored
+AssertionError: [{"phase":"setup","scalar":0,"row":0,"all":[0],"active":0},{"phase":"setup","scalar":1,"row":1,"all":[0],"active":0},{"phase":"setup","scalar":1,"row":1,"all":[0],"active":1},{"phase":"setup","scalar":1,"row":1,"all":[1],"active":1},{"phase":"rollback","scalar":0,"row":0,"all":[1],"active":1},{"phase":"rollback","scalar":0,"row":0,"all":[1],"active":0},{"phase":"rollback","scalar":0,"row":0,"all":[0],"active":0}]: expected false to be true // Object.is equality
+
+- Expected
++ Received
+
+- true
++ false
+
+ ❯ src/lib/entity-projection-publication.spec.ts:104:9
+    102|         ),
+    103|         JSON.stringify(seen)
+    104|       ).toBe(true);
+       |         ^
+    105|     } finally {
+    106|       dispose();
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/8]⎯
+
+ FAIL  src/lib/entity-projection-publication.spec.ts > Vue entity projection publication > coheres all owned reads for remove rollback (unprimed)
+AssertionError: expected { scalar: +0, ids: [], …(11) } to deeply equal { scalar: +0, ids: [ 'A' ], …(11) }
+
+- Expected
++ Received
+
+@@ -26,13 +26,11 @@
+    "find": {
+      "id": "A",
+      "v": 0,
+    },
+    "has": true,
+-   "ids": [
+-     "A",
+-   ],
++   "ids": [],
+    "scalar": 0,
+    "where": [
+      {
+        "id": "A",
+        "v": 0,
+
+ ❯ src/lib/entity-projection-publication.spec.ts:182:51
+    180|           expect(expected.activeId).toBe(operation === 'selection' ? '…
+    181|           expect(seen.length).toBeGreaterThan(0);
+    182|           for (const frame of seen) expect(frame).toEqual(expected);
+       |                                                   ^
+    183|         } finally {
+    184|           dispose();
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/8]⎯
+
+ FAIL  src/lib/entity-projection-publication.spec.ts > Vue entity projection publication > coheres all owned reads for add rollback (primed)
+AssertionError: expected { scalar: +0, ids: [ 'A' ], …(11) } to deeply equal { scalar: +0, ids: [], all: [], …(10) }
+
+- Expected
++ Received
+
+  {
+    "activeEntity": undefined,
+    "activeId": "A",
+-   "all": [],
+-   "asMap": [],
++   "all": [
++     {
++       "id": "A",
++       "v": 1,
++     },
++   ],
++   "asMap": [
++     [
++       "A",
++       {
++         "id": "A",
++         "v": 1,
++       },
++     ],
++   ],
+    "byId": undefined,
+-   "count": 0,
+-   "empty": true,
++   "count": 1,
++   "empty": false,
+    "field": undefined,
+-   "find": undefined,
+-   "has": false,
+-   "ids": [],
++   "find": {
++     "id": "A",
++     "v": 1,
++   },
++   "has": true,
++   "ids": [
++     "A",
++   ],
+    "scalar": 0,
+-   "where": [],
++   "where": [
++     {
++       "id": "A",
++       "v": 1,
++     },
++   ],
+  }
+
+ ❯ src/lib/entity-projection-publication.spec.ts:182:51
+    180|           expect(expected.activeId).toBe(operation === 'selection' ? '…
+    181|           expect(seen.length).toBeGreaterThan(0);
+    182|           for (const frame of seen) expect(frame).toEqual(expected);
+       |                                                   ^
+    183|         } finally {
+    184|           dispose();
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/8]⎯
+
+ FAIL  src/lib/entity-projection-publication.spec.ts > Vue entity projection publication > coheres all owned reads for remove rollback (primed)
+AssertionError: expected { scalar: +0, ids: [], all: [], …(10) } to deeply equal { scalar: +0, ids: [ 'A' ], …(11) }
+
+- Expected
++ Received
+
+  {
+    "activeEntity": undefined,
+    "activeId": "A",
+-   "all": [
+-     {
+-       "id": "A",
+-       "v": 0,
+-     },
+-   ],
+-   "asMap": [
+-     [
+-       "A",
+-       {
+-         "id": "A",
+-         "v": 0,
+-       },
+-     ],
+-   ],
++   "all": [],
++   "asMap": [],
+    "byId": 0,
+-   "count": 1,
+-   "empty": false,
++   "count": 0,
++   "empty": true,
+    "field": 0,
+-   "find": {
+-     "id": "A",
+-     "v": 0,
+-   },
+-   "has": true,
+-   "ids": [
+-     "A",
+-   ],
++   "find": undefined,
++   "has": false,
++   "ids": [],
+    "scalar": 0,
+-   "where": [
+-     {
+-       "id": "A",
+-       "v": 0,
+-     },
+-   ],
++   "where": [],
+  }
+
+ ❯ src/lib/entity-projection-publication.spec.ts:182:51
+    180|           expect(expected.activeId).toBe(operation === 'selection' ? '…
+    181|           expect(seen.length).toBeGreaterThan(0);
+    182|           for (const frame of seen) expect(frame).toEqual(expected);
+       |                                                   ^
+    183|         } finally {
+    184|           dispose();
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/8]⎯
+
+ FAIL  src/lib/entity-projection-publication.spec.ts > Vue entity projection publication > coheres all owned reads for field rollback (primed)
+AssertionError: expected { scalar: +0, ids: [ 'A' ], …(11) } to deeply equal { scalar: +0, ids: [ 'A' ], …(11) }
+
+- Expected
++ Received
+
+  {
+    "activeEntity": {
+      "id": "A",
+-     "v": 0,
++     "v": 1,
+    },
+    "activeId": "A",
+    "all": [
+      {
+        "id": "A",
+-       "v": 0,
++       "v": 1,
+      },
+    ],
+    "asMap": [
+      [
+        "A",
+        {
+          "id": "A",
+-         "v": 0,
++         "v": 1,
+        },
+      ],
+    ],
+    "byId": 0,
+    "count": 1,
+    "empty": false,
+    "field": 0,
+    "find": {
+      "id": "A",
+-     "v": 0,
++     "v": 1,
+    },
+    "has": true,
+    "ids": [
+      "A",
+    ],
+    "scalar": 0,
+    "where": [
+      {
+        "id": "A",
+-       "v": 0,
++       "v": 1,
+      },
+    ],
+  }
+
+ ❯ src/lib/entity-projection-publication.spec.ts:182:51
+    180|           expect(expected.activeId).toBe(operation === 'selection' ? '…
+    181|           expect(seen.length).toBeGreaterThan(0);
+    182|           for (const frame of seen) expect(frame).toEqual(expected);
+       |                                                   ^
+    183|         } finally {
+    184|           dispose();
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/8]⎯
+
+ FAIL  src/lib/entity-projection-publication.spec.ts > Vue entity projection publication > coheres all owned reads for selection rollback (primed)
+AssertionError: expected { Object (scalar, ids, ...) } to deeply equal { Object (scalar, ids, ...) }
+
+- Expected
++ Received
+
+@@ -5,11 +5,11 @@
+    },
+    "activeId": "B",
+    "all": [
+      {
+        "id": "A",
+-       "v": 0,
++       "v": 1,
+      },
+      {
+        "id": "B",
+        "v": 8,
+      },
+@@ -17,11 +17,11 @@
+    "asMap": [
+      [
+        "A",
+        {
+          "id": "A",
+-         "v": 0,
++         "v": 1,
+        },
+      ],
+      [
+        "B",
+        {
+@@ -34,20 +34,20 @@
+    "count": 2,
+    "empty": false,
+    "field": 0,
+    "find": {
+      "id": "A",
+-     "v": 0,
++     "v": 1,
+    },
+    "has": true,
+    "ids": [
+      "A",
+      "B",
+    ],
+    "scalar": 0,
+    "where": [
+      {
+        "id": "A",
+-       "v": 0,
++       "v": 1,
+      },
+    ],
+  }
+
+ ❯ src/lib/entity-projection-publication.spec.ts:182:51
+    180|           expect(expected.activeId).toBe(operation === 'selection' ? '…
+    181|           expect(seen.length).toBeGreaterThan(0);
+    182|           for (const frame of seen) expect(frame).toEqual(expected);
+       |                                                   ^
+    183|         } finally {
+    184|           dispose();
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/8]⎯
+
+ FAIL  src/lib/entity-projection-publication.spec.ts > Vue entity projection publication > publishes marker-computed slices and sorted projection chains coherently
+AssertionError: expected { scalar: +0, ids: [ 'B', 'A' ], …(3) } to deeply equal { scalar: +0, ids: [ 'A', 'B' ], …(3) }
+
+- Expected
++ Received
+
+  {
+-   "find": "A",
++   "find": "B",
+    "ids": [
++     "B",
+      "A",
+-     "B",
+    ],
+    "scalar": 0,
+-   "total": 2,
++   "total": 5,
+    "where": [
+-     "A",
+      "B",
++     "A",
+    ],
+  }
+
+ ❯ src/lib/entity-projection-publication.spec.ts:341:23
+    339|       expect(seen.length).toBeGreaterThan(0);
+    340|       for (const frame of seen)
+    341|         expect(frame).toEqual({
+       |                       ^
+    342|           scalar: 0,
+    343|           ids: ['A', 'B'],
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[8/8]⎯
+
+
+ Test Files  1 failed | 16 skipped (17)
+      Tests  8 failed | 5 passed | 124 skipped (137)
+   Start at  16:22:51
+   Duration  2.91s (transform 10.42s, setup 0ms, import 19.07s, tests 110ms, environment 4ms)
+
+Warning: command "pnpm exec tsc --noEmit -p packages/vue/tsconfig.spec.json && npx vitest run --config packages/vue/vitest.config.ts --testNamePattern="Vue entity projection publication"" exited with non-zero status code
+
+
+ NX   Running target test for project vue failed
+
+Failed tasks:
+
+- vue:test
+
+Hint: run the command with --verbose for more details.
+
+  Run duration:      8.4s
+  Critical path:     8.4s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Speed up or split the longest tasks on the critical path:
+        vue:test    8.4s

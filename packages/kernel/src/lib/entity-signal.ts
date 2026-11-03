@@ -1,3 +1,32 @@
+import { defineEntityPreparationReader } from './internals/entity-preparation-reader';
+import { createPredicateChurnWarning } from './internals/predicate-churn-warning';
+import { markSnapshotInstalled } from './internals/snapshot-installation';
+import type { PreparedPlacementEntries } from './physical/entity-placement-stage';
+import { PublicationPreparation } from './internals/publication-preparation';
+import { reportContainedObserverError } from './internals/error-reporter';
+import type { EntityStructureOperation, PreparedEntityStructure } from './internals/prepared-entity-structure';
+import { resolveOrdinaryRestorationPlacement, type OrdinaryRestorationPlacement } from './physical/ordinary-restoration-placement';
+import { ordinaryAdmissionKey } from './physical/ordinary-key-evidence';
+import type {SelectedRowIntent,SelectedRowEdit} from './internals/selected-write-operation';
+import {type ClaimedFieldEndpoint,type NativeFieldEndpoint} from './internals/native-field-selection';
+import type { EntityProjectionSeedEntry } from './internals/entity-projection-seed';
+import { EntityPublicationSource, markEntityPublicationFacts, entityPublicationFactsUnit, defineEntityPublicationBinding, currentEntityPublicationInputs, withEntityPublicationInput, withEntityPublicationUnit, type EntityPublicationEdit, type EntityPublicationStep } from './internals/entity-publication';
+import { createPreparedPlacementVisibility } from './physical/prepared-placement-visibility';
+import { withSelectedEntityDisposition } from './internals/selected-entity-disposition';
+import { realizationPlacement } from './internals/causal-runtime/ordinary-realization';
+import type { EntityPlacementStage } from './physical/entity-placement-stage';
+import {
+  EntityOrdinaryTopology,
+  ordinaryPresenceRecord,
+  type OrdinaryEntityPresence,
+} from './physical/entity-ordinary-topology';
+import {
+  withEntityValueTransition,
+  withEntityOrdinaryChanges,
+  type EntityValueTransition,
+  type EntityRealizationEdit,
+} from './internals/entity-value-transition';
+import { installTerminalRecord } from './internals/intrinsic-mutation';
 import type {
   Location,
   ReadableCell,
@@ -12,6 +41,7 @@ import {
   type LocationRuntime,
 } from './internals/location-runtime';
 import { deepClone } from './internals/utilities/deep-clone';
+import { deepEqual } from './internals/utilities/deep-equal';
 
 import {
   EntityMutationFrame,
@@ -30,6 +60,15 @@ import {
   type SubjectLifetimeRecord,
 } from './physical/structural-store';
 import { defineOwnedOwnerPath } from './internals/owned-mutation';
+import {
+  defineEntityMembershipSource,
+  holdEntityMembershipDelivery,
+  MEMBERSHIP_CLOSE,
+  MEMBERSHIP_FACTS,
+  MEMBERSHIP_OPEN,
+  MEMBERSHIP_OPEN_ORDER,
+  type EntityMembershipTap,
+} from './internals/entity-membership-source';
 import type { PhysicalCommitClock } from './internals/physical-commit-clock';
 // Only `notify` is ever called on this — the neutral port contract, not the
 // delivery engine's full surface.
@@ -47,7 +86,16 @@ import {
 } from './internals/position-registry';
 import { markOwnerInvalidated } from './internals/owner-invalidation-port';
 import {
+  inStructuralWrite,
+  isAbsentMember,
+  MEMBERSHIP_CHANGED,
+  reactivatePathOnWrite,
+  structuralWrites,
+} from './internals/member-membership';
+import { physicalRows, taps } from './internals/physical-rows';
+import {
   MUTATION_CAPTURE_RUNTIME,
+  type CommittedEntityMutation,
   type MutationCaptureRuntime,
 } from './internals/mutation-capture-runtime';
 import type {
@@ -279,6 +327,23 @@ import type {
 } from '../lib/types';
 
 /**
+ * True when the subjects present at both endpoints appear in a different
+ * relative order. Subjects present at only one endpoint are ignored.
+ */
+function survivingOrderChanged(
+  before: readonly number[],
+  after: readonly number[]
+): boolean {
+  const inAfter = new Set(after);
+  const inBefore = new Set(before);
+  const survivingBefore = before.filter((subject) => inAfter.has(subject));
+  const survivingAfter = after.filter((subject) => inBefore.has(subject));
+  return survivingBefore.some(
+    (subject, index) => subject !== survivingAfter[index]
+  );
+}
+
+/**
  * Creates an EntitySignal using composition pattern.
  * All state is stored in closures - no `this` binding issues possible.
  *
@@ -321,9 +386,11 @@ export function createEntitySignal<
      * unseen owner could restore is unrecoverable.
      */
     hasRestorationAuthority?: boolean;
+    onDispose?: (callback: () => void) => () => void;
   }
 ): EntitySignal<E, K> {
   const locations = options?.locationRuntime ?? NEUTRAL_LOCATION_RUNTIME;
+  const physicalRowSubjects = new WeakMap<object,number>();
   // ==================
   // CLOSURE STATE (no `this` needed)
   // ==================
@@ -369,17 +436,39 @@ export function createEntitySignal<
    */
   const pendingSubjectEpochs = new Set<EpochHandle>();
 
+  // Source-owned install epoch makes library readers current before notifications.
+  let installedReadRevision=0;
+  // Construction may advance before the returned proxy identity is available.
+  let snapshotIdentity: object | undefined = undefined;
+  const advanceInstalledRead = (): void => {
+    installedReadRevision++;
+    if (snapshotIdentity) markSnapshotInstalled(snapshotIdentity);
+  };
   const createVersionedProjection = <TValue>(
     compute: () => TValue
   ): ReadableCell<TValue> => {
     let projectedVersion = -1;
+    let projectedInstall = -1;
+    let projectedAbsent = false;
     let initialized = false;
     let value: TValue;
-    return locations.createDerived(() => {
+    return locations.createCurrentReadonly(() => {
       const currentVersion = version();
-      if (!initialized || projectedVersion !== currentVersion) {
+      const currentInstall = installedReadRevision;
+      // Presence can install before the existing membership notification. All
+      // keys belong to this attempt: callback reentry must not label its first
+      // result with a newer install revision or effective presence.
+      const currentAbsent = absent();
+      if (
+        !initialized ||
+        projectedVersion !== currentVersion ||
+        projectedInstall !== currentInstall ||
+        projectedAbsent !== currentAbsent
+      ) {
         value = compute();
+        projectedAbsent = currentAbsent;
         projectedVersion = currentVersion;
+        projectedInstall = currentInstall;
         initialized = true;
       }
       return value;
@@ -388,9 +477,10 @@ export function createEntitySignal<
 
   function getProjectedEntity(id: K): E | undefined {
     const subjectId = structuralStore.subjectIdForKey(id);
-    return subjectId === undefined
-      ? undefined
-      : valueStore.backingForSubject(subjectId);
+    if(subjectId===undefined)return undefined;
+    const row=valueStore.backingForSubject(subjectId);
+    if(row && typeof row==='object')physicalRowSubjects.set(row,subjectId);
+    return row;
   }
 
   function getProjectedEntries(): Array<readonly [K, E]> {
@@ -407,6 +497,36 @@ export function createEntitySignal<
   function getProjectedEntities(): E[] {
     return getProjectedEntries().map(([, entity]) => entity);
   }
+
+  /**
+   * ⚠️ PUBLIC READS ARE ABSENT WHILE THE COLLECTION IS (v16 8e). A collection
+   * omitted itself or under an omitted member is an absent, empty collection
+   * to every public read and to every write that names a row: "DORMANT
+   * STORAGE MUST NOT SUPPLY THE REACTIVATED VALUE"
+   * (`whole-value-membership.spec.ts` 18). Its retained rows stay physical
+   * truth for restoration and transactions, which keep the `getProjected*`
+   * reads. One symbol lookup on a collection that was never under an
+   * omission.
+   */
+  const absent = (): boolean => isAbsentMember(api);
+  // Row reads and row writes use physical truth only while a reversal or a
+  // rollback is being applied to this collection's tree (`physicalRows`).
+  // Projections never do, so nothing they cache can hold retained rows.
+  // A tap reads absent-aware even inside the window, unless it started the
+  // reversal itself: the window records the tap depth it opened at.
+  const rowAbsent = (): boolean => {
+    if (!absent()) return false;
+    if (!physicalRows.length) return true;
+    const registry = getPositionRegistry(api);
+    return !physicalRows.some(
+      ([open, depth]) => open === registry && depth === taps.depth
+    );
+  };
+  const presentEntity = (id: K): E | undefined =>
+    rowAbsent() ? undefined : getProjectedEntity(id);
+  const presentEntries = (): Array<readonly [K, E]> =>
+    absent() ? [] : getProjectedEntries();
+  const presentEntities = (): E[] => (absent() ? [] : getProjectedEntities());
 
   function acquireEntityHandleForTesting(
     id: K
@@ -426,154 +546,202 @@ export function createEntitySignal<
     return new EntityMutationFrame(valueStore, structuralStore);
   }
 
-  function prepareTransitionTarget(target: CollectionTransitionTarget): {
-    install(): void;
-    publish(options?: { advancePhysicalRevision?: boolean }): void;
-  } {
-    if (positionId === undefined || target.owner !== positionId) {
-      throw new Error(
-        'Collection transition target owner does not match the binding'
-      );
-    }
-
-    const currentSubjects = new Map<number, { key: K; value: E }>();
-    const activeIdBefore = activeIdSignal();
-    const activeSubjectBefore =
-      activeIdBefore === undefined
-        ? undefined
-        : structuralStore.subjectIdForKey(activeIdBefore);
-    for (const key of structuralStore.activeKeysSnapshot()) {
-      const subjectId = structuralStore.subjectIdForKey(key);
-      const value =
-        subjectId === undefined
-          ? undefined
-          : valueStore.backingForSubject(subjectId);
-      if (subjectId !== undefined && value !== undefined) {
-        currentSubjects.set(subjectId, { key, value });
-      }
-    }
-
-    const preparedSubjects = target.subjects.map((subject) => {
-      if (
-        subject.value === null ||
-        typeof subject.value !== 'object' ||
-        Array.isArray(subject.value)
-      ) {
-        throw new Error(
-          `Collection target subject ${subject.subject} has no entity value`
-        );
-      }
-      return {
-        subjectId: subject.subject,
-        key: subject.key as K,
-        value: deepClone(subject.value) as E,
-      };
-    });
-    const structuralTarget = structuralStore.prepareTarget(
-      preparedSubjects,
-      target.order,
-      target.orderFrontier
-    );
-    const valueTarget = valueStore.prepareTargetValues(preparedSubjects);
-    const affectedSubjects = new Set([
-      ...currentSubjects.keys(),
-      ...preparedSubjects.map(({ subjectId }) => subjectId),
-    ]);
-    const preparedBySubject = new Map(
-      preparedSubjects.map((subject) => [subject.subjectId, subject])
-    );
-    const activeIdAfter =
-      activeSubjectBefore === undefined
-        ? undefined
-        : preparedBySubject.get(activeSubjectBefore)?.key;
-    const targetNeighborBySubject = new Map(
-      target.order.map((subjectId, index) => [
-        subjectId,
-        {
-          beforeSubject: target.order[index - 1],
-          afterSubject: target.order[index + 1],
-        },
-      ])
-    );
-    const subjectChanges = [...affectedSubjects].map((subjectId) => {
-      const before = currentSubjects.get(subjectId);
-      const after = preparedBySubject.get(subjectId);
-      return {
-        subjectId,
-        beforeKey: before?.key,
-        afterKey: after?.key,
-        beforeValue: before?.value,
-        valueEpoch: subjectEpochs.get(subjectId),
-        stateSignal: subjectStateSignals.get(subjectId)?.deref(),
-        afterValue: after?.value,
-        bindingChanged: !before || !after || before.key !== after.key,
-        targetNeighbors: targetNeighborBySubject.get(subjectId),
-      };
-    });
-
-    return {
-      install(): void {
-        structuralStore.installPreparedTarget(structuralTarget);
-        valueStore.installPreparedTargetValues(valueTarget);
-      },
-      publish(options): void {
-        for (const publication of subjectChanges) {
-          // Only a realized subject has an epoch, so this stays as lazy as the
-          // per-entity signal it replaces.
-          if (publication.valueEpoch)
-            advanceEpochHandle(publication.valueEpoch);
-          if (publication.bindingChanged) {
-            if (publication.stateSignal) {
-              deriveLocation(publication.stateSignal, (value) => value + 1);
-            }
+  function prepareStructuralUnit(operations: readonly EntityStructureOperation[], publicationPhase?: PublicationPreparation): PreparedEntityStructure {
+    const frame = createEntityMutationFrame();
+    frame.useProposedPlacement();
+    const stage = structuralStore.preparePlacement();
+    const keys = new Map<K, number | undefined>();
+    const atKey = (key: K) => {
+      if (keys.has(key)) return keys.get(key);
+      const subject = structuralStore.subjectIdForKey(key);
+      if (subject === undefined) return undefined;
+      const row = stage.read(subject);
+      return row.present && row.key === key ? subject : undefined;
+    };
+    for (const op of operations) {
+      const key = op.key as K, prior = stage.read(op.subject);
+      if (op.kind === 'remove') {
+        if (!prior.present || prior.key !== key) throw new Error('Prepared removal source changed');
+        frame.stageSubjectTombstone({kind:'tombstone-subject',key,subjectId:op.subject,restoreAllowed:resolveSubjectState(op.subject)?.restoreAllowed ?? true});
+        keys.set(key,undefined);stage.remove(op.subject);
+      } else {
+        const occupied = atKey(key);
+        if (occupied !== undefined && occupied !== op.subject) throw new Error('Prepared destination is occupied');
+        if (op.kind === 'rekey') {
+          if (!prior.present || prior.key !== op.from) throw new Error('Prepared rekey source changed');
+          if (op.placement && !deepEqual(valueStore.backingForSubject(op.subject), op.value))
+            frame.stageValueReplacement({kind:'replace-value',key:op.from as K,subjectId:op.subject,nextValue:op.value as E,authoredFields:'realization'});
+          frame.stageKeyTransfer({kind:'transfer-key',subjectId:op.subject,fromKey:op.from as K,toKey:key,placement:op.placement});
+          keys.set(prior.key,undefined);stage.rekey(op.subject,key);
+          if(op.placement)stage.insert(op.subject,key,op.placement.beforeSubject,op.placement.afterSubject);
+        } else {
+          if (prior.present) throw new Error('Prepared addition lifetime is active');
+          const state=resolveSubjectState(op.subject);
+          if(op.kind==='fresh') {
+            if(state)throw new Error('Prepared fresh lifetime already exists');
+            frame.stageFreshSubject({kind:'create-fresh-subject',subjectId:op.subject,key,nextValue:op.value as E});
+          } else {
+            if(state && !state.restoreAllowed)throw new Error('Prepared restoration backing retired');
+            frame.stageSubjectRestore({kind:'restore-subject',subjectId:op.subject,key,realizedValue:op.value as E,restoreAllowed:state?.restoreAllowed??true,beforeSubject:op.beforeSubject,afterSubject:op.afterSubject});
           }
-          const key = publication.afterKey ?? publication.beforeKey;
-          if (key === undefined) {
-            continue;
-          }
-          const structuralEffect: StructuralEffect | undefined =
-            publication.beforeKey === undefined
-              ? {
-                  kind: 'add',
-                  subject: publication.subjectId,
-                  key,
-                  value: publication.afterValue,
-                  ...publication.targetNeighbors,
-                }
-              : publication.afterKey === undefined
-              ? {
-                  kind: 'remove',
-                  subject: publication.subjectId,
-                  key,
-                  value: publication.beforeValue,
-                }
-              : publication.beforeKey !== publication.afterKey
-              ? {
-                  kind: 'rekey',
-                  subject: publication.subjectId,
-                  beforeKey: publication.beforeKey,
-                  afterKey: publication.afterKey,
-                }
-              : undefined;
-          pathNotifier.notify(
-            `${basePath}.${String(key)}`,
-            publication.afterValue,
-            publication.beforeValue,
-            basePath,
-            [publication.subjectId],
-            getPositionIdsForNotify(),
-            structuralEffect
-              ? createStructuralEffectMeta(structuralEffect)
-              : ambientMeta()
-          );
+          stage.insert(op.subject,key,op.beforeSubject,op.afterSubject);
         }
-        if (activeIdBefore !== activeIdAfter) {
-          replaceLocation(activeIdSignal, activeIdAfter);
+        keys.set(key,op.subject);
+      }
+    }
+    const prepared = prepareEntityMutationFrame(frame,{advancePhysicalRevision:false,publication:'physical'});
+    const phase=publicationPhase ?? new PublicationPreparation();
+    phase.add(prepared.finalize,prepared.validate);if(!publicationPhase)phase.seal();
+    let result: ReturnType<typeof prepared.install> | undefined;
+    return {
+      install(){if(!publicationPhase)phase.validate();result=prepared.install();},
+      complete(){prepared.complete();},
+      invalidate(){
+        if(!result)throw new Error('Structural source unit not installed');
+        for(const subject of result.physicallyChangedSubjectIds)publishSubjectPhysicalChange(subject);
+        for(const op of operations){
+          lastSubjectIds=[op.subject];
+          if(op.kind==='remove')tombstoneSubjectSignal(op.subject);
+          else {
+            if(op.kind==='fresh')invalidateNodeCache(op.key as K);
+            if(op.kind==='rekey'){rekeyedSubjects.add(op.subject);if(activeIdValue===op.from)replaceLocation(activeIdSignal,op.key as K);}
+            syncEntitySignal(op.key as K);
+          }
         }
         updateSignals();
-        if (options?.advancePhysicalRevision !== false) {
-          physicalCommitClock?.advance();
+      },
+    };
+  }
+
+  function prepareSelectedRows(operations: readonly SelectedRowIntent[],publicationPhase?:PublicationPreparation) {
+    const rows = new Map<number,{subjectId:number;key:string|number;value:unknown;edits:EntityRealizationEdit[];transition:EntityValueTransition<E>}>();
+    const steps: SelectedRowEdit[] = [];
+    for (const operation of operations) {
+      const previous=rows.get(operation.subject);
+      const before=previous?.transition.physicalAfter ?? operation.physicalBefore;
+      const after=(operation.fields===null ? {...(operation.physicalAfter as object)} : {...(before as object)}) as Record<string,unknown>;
+      const edits:EntityRealizationEdit[]=[];
+      if(operation.fields===null) edits.push({kind:'row',value:after});
+      else for(const field of operation.fields){
+        const present=Object.prototype.hasOwnProperty.call(operation.physicalAfter,field);
+        const value=present?(operation.physicalAfter as Record<string,unknown>)[field]:undefined;
+        if(present)Object.defineProperty(after,field,{value,enumerable:true,configurable:true,writable:true});else delete after[field];
+        edits.push({kind:'field',field,present,value,selection:operation.selections.get(field)});
+      }
+      const transition=valueStore.prepareRealizationTransition(operation.subject,after as E,edits,previous?.transition);
+      // Selected publication uses completed steps and this prepared transition.
+      // No fallback edit list is consumed; retaining every prefix is unnecessary.
+      rows.set(operation.subject,{subjectId:operation.subject,key:operation.key,value:after,edits:[],transition:previous?Object.freeze({...transition,physicalBefore:previous.transition.physicalBefore,ordinaryBefore:previous.transition.ordinaryBefore}):transition});
+      steps.push({...operation,physicalBefore:before,physicalAfter:after,ordinaryBefore:transition.ordinaryBefore,ordinaryAfter:transition.ordinaryAfter});
+    }
+    return preparePointValues([...rows.values()],steps,publicationPhase);
+  }
+  function stageSelected(id:K, before:E, after:E, fields:readonly string[] | null, selection:ClaimedFieldEndpoint):void {
+    const selections=selectedInverseField(selection,selection.subject,after,id)!;
+    selection.preparation!.stage({source:entityPublication,subject:selection.subject,key:id,physicalBefore:before,physicalAfter:after,fields,selections,prepare:prepareSelectedRows});
+  }
+
+  /** Existing-lifetime value plans: all reflection precedes physical installation. */
+  function preparePointValues(
+    values: readonly {
+      subjectId: number;
+      key: string | number;
+      value: unknown;
+      edits: readonly EntityRealizationEdit[];
+      transition?: EntityValueTransition<E>;
+    }[],
+    selectedSteps?: readonly SelectedRowEdit[],
+    publicationPhase?: PublicationPreparation
+  ): { install(): void; invalidate(): void; publish(): void; complete():void } {
+    const prepared = values.map(({ subjectId, key, value, edits, transition }) => {
+      if (structuralStore.activeKeyForSubject(subjectId) !== key) {
+        throw new Error(
+          'Point realization subject is no longer active at its key'
+        );
+      }
+      const before = valueStore.backingForSubject(subjectId);
+      const after = deepClone(value) as E;
+      return {
+        subjectId,
+        edits,
+        key: key as K,
+        before,
+        after,
+        transition: transition ?? valueStore.prepareRealizationTransition(
+          subjectId,
+          after,
+          edits
+        ),
+        changed: !deepEqual(before, after),
+        epoch: subjectEpochs.get(subjectId),
+      };
+    });
+    const ordinarySteps=selectedSteps?.map(step=>({subject:step.subject,before:step.ordinaryBefore,after:step.ordinaryAfter,fields:step.fields,restoredFields:step.selections}));
+    const publication=prepareEntityPublication(
+      prepared.map(row=>({subject:row.subjectId,before:row.before,after:row.after,fields:publicationFields(row.before,row.after)})),
+      ordinarySteps ?? prepared.map(row=>({subject:row.subjectId,before:row.transition.ordinaryBefore,after:row.transition.ordinaryAfter,fields:publicationFields(row.transition.ordinaryBefore,row.transition.ordinaryAfter),restoredFields:new Map(row.edits.flatMap(edit=>edit.kind==='field'&&edit.selection?[[edit.field,edit.selection] as const]:[]))})),undefined,undefined,true,
+      selectedSteps?.map((step,ordinal)=>({ordinal,authoredFootprint:authoredFootprint(step.fields),physical:[{subject:step.subject,before:step.physicalBefore,after:step.physicalAfter,fields:step.fields}],ordinary:[ordinarySteps![ordinal]!]}))
+    );
+    const phase=publicationPhase ?? new PublicationPreparation();
+    phase.add(()=>publication.unit?.finalize?.(),()=>publication.unit?.validate?.());if(!publicationPhase)phase.seal();
+    let completed=false;
+    const complete=()=>{if(completed)return;completed=true;if(publication.unit)entityPublication.complete(publication.unit.completion);};
+    return {
+      complete,
+      install(): void {
+        if(!publicationPhase)phase.validate();
+        for (const row of prepared)
+          valueStore.installValueTransition(row.transition);
+        if(publication.unit) installTerminalRecord(publication.unit.record);
+        advanceInstalledRead();
+      },
+      invalidate(): void {
+        let failed = false;
+        let firstError: unknown;
+        const stage = (fn: () => void) => {
+          try {
+            fn();
+          } catch (error) {
+            if (!failed) {
+              failed = true;
+              firstError = error;
+            }
+          }
+        };
+        for (const row of prepared) {
+          const epoch = row.epoch;
+          if (epoch) stage(() => advanceEpochHandle(epoch));
         }
+        stage(() => updateSignals());
+        if(!publicationPhase)stage(complete);
+        if (failed) throw firstError;
+      },
+      publish(): void {
+        let failed=false;let first:unknown;
+        for (const row of prepared) {try {
+          pathNotifier.notify(
+            `${basePath}.${String(row.key)}`,
+            row.after,
+            row.before,
+            basePath,
+            [row.subjectId],
+            getPositionIdsForNotify(),
+            withEntityValueTransition(
+              {
+                ...(ambientMeta() ?? {}),
+                intent: 'system',
+                participation: 'realized',
+              },
+              {...row.transition,publicationUnit:publication.unit?publication.id:undefined}
+            )
+          );
+          if (!selectedSteps && row.changed) emitTap('onUpdate', row.key, row.after, row.after);
+        } catch(error){if(!failed){failed=true;first=error;}}}
+        for(const step of selectedSteps??[])try{
+          const delta:Record<string,unknown>={};for(const field of step.fields??Object.keys(step.physicalAfter as object))if(Object.prototype.hasOwnProperty.call(step.physicalAfter,field))Object.defineProperty(delta,field,{value:(step.physicalAfter as Record<string,unknown>)[field],enumerable:true});
+          emitTap('onUpdate',step.key as K,delta as Partial<E>,step.physicalAfter as E);
+        }catch(error){if(!failed){failed=true;first=error;}}
+        if(failed)throw first;
       },
     };
   }
@@ -603,41 +771,1000 @@ export function createEntitySignal<
     };
   }
 
-  function commitAndProjectEntityMutationFrame(
-    frame: EntityMutationFrame<K, E>,
-    options?: { advancePhysicalRevision?: boolean }
-  ) {
-    const result = frame.commit();
-    if (options?.advancePhysicalRevision !== false) {
-      physicalCommitClock?.advance();
+  /** Validate semantic endpoints against the effective ordinary view, before
+   * physical address substitution. This stage has no install or callbacks. */
+  function validateOrdinaryStructure(
+    effects: readonly import('./internals/causal-runtime/causal-types').ReversalEffect[]
+  ): boolean {
+    const base = ordinaryTopology.preparePlacement(structuralStore.preparePlacement());
+    type Presence = { present: false } | { present: true; key: K };
+    const subjects = new Map<number, Presence>();
+    const keys = new Map<K, number | undefined>();
+    const read = (subject: number): Presence => subjects.get(subject) ?? base.read(subject);
+    const atKey = (key: K): number | undefined => {
+      if (keys.has(key)) return keys.get(key);
+      const subject = ordinaryTopology.atKey(key) ?? structuralStore.subjectIdForKey(key);
+      if (subject === undefined) return undefined;
+      const state = read(subject);
+      // A physical candidate can occupy an inspection-only address. Recheck
+      // its effective ordinary key; sparse exceptions alone are not a view.
+      return state.present && state.key === key ? subject : undefined;
+    };
+    const write = (subject: number, next: Presence): void => {
+      const prior = read(subject);
+      if (prior.present) keys.set(prior.key, undefined);
+      subjects.set(subject, next);
+      if (next.present) keys.set(next.key, subject);
+    };
+    for (const effect of effects) {
+      if (!effect.structural || typeof effect.subjectId !== 'number') continue;
+      const subject = effect.subjectId, prior = read(subject);
+      if (effect.structural === 'remove') {
+        // Existing removal semantics resolve by lifetime, not recorded key.
+        if (!prior.present) return false;
+        write(subject, { present: false });
+      } else if (effect.structural === 'rekey') {
+        if (!prior.present || prior.key !== effect.before || atKey(effect.after as K) !== undefined) return false;
+        write(subject, { present: true, key: effect.after as K });
+      } else {
+        if (prior.present || atKey(effect.after as K) !== undefined) return false;
+        write(subject, { present: true, key: effect.after as K });
+      }
     }
-    return result;
+    return true;
   }
 
+  function prepareOrdinaryRealization(
+    effects: readonly import('./internals/causal-runtime/causal-types').ReversalEffect[],
+    physicalAfter?: ReadonlyMap<number, unknown>,
+    physicalEffects: readonly import('./internals/causal-runtime/causal-types').ReversalEffect[] = effects,
+    physicalPlacement?: EntityPlacementStage<K>,
+    ordinaryOrder?: readonly number[],
+    publicationPhase?: PublicationPreparation
+  ) {
+    type Presence = OrdinaryEntityPresence<K, E>;
+    const physical = physicalPlacement ?? structuralStore.preparePlacement();
+    if (!physicalPlacement)
+      for (const effect of physicalEffects) {
+        if (typeof effect.subjectId !== 'number') continue;
+        const id = effect.subjectId;
+        const placement = realizationPlacement(effect) ?? effect,
+          context = placement.structuralContext;
+        if (effect.structural === 'remove') physical.remove(id);
+        else if (effect.structural === 'add')
+          physical.insert(
+            id,
+            effect.after as K,
+            context && context.kind !== 'rekey'
+              ? context.beforeSubject
+              : undefined,
+            context && context.kind !== 'rekey'
+              ? context.afterSubject
+              : undefined
+          );
+        else if (effect.structural === 'rekey') {
+          physical.rekey(id, effect.after as K);
+          if (realizationPlacement(effect))
+            physical.insert(
+              id,
+              effect.after as K,
+              context && context.kind !== 'rekey'
+                ? context.beforeSubject
+                : undefined,
+              context && context.kind !== 'rekey'
+                ? context.afterSubject
+                : undefined
+            );
+        }
+      }
+    const placement = ordinaryTopology.preparePlacement(
+      structuralStore.preparePlacement()
+    );
+    const orderBefore = ordinaryOrder ? placement.snapshot() : undefined;
+    const episodes = new Map<number, OrdinaryRestorationPlacement>();
+    const staged = new Map<number, Presence>();
+    const physicalValues = new Map<number, E>();
+    const changes: CommittedEntityMutation[] = [];
+    const read = (subject: number): Presence => {
+      const row = placement.read(subject);
+      if (!row.present) return { present: false };
+      const known = staged.get(subject);
+      return {
+        ...row,
+        value: known?.present
+          ? known.value
+          : (valueStore.ordinaryForSubject(subject) as E),
+      };
+    };
+    for (const effect of effects) {
+      if (typeof effect.subjectId !== 'number') continue;
+      const subject = effect.subjectId;
+      const previous = read(subject);
+      const storedContext = effect.structuralContext;
+      let context =
+        effect.structural === 'add' || effect.structural === 'remove'
+          ? storedContext && storedContext.kind !== 'rekey'
+            ? {
+                ...storedContext,
+                kind: effect.structural,
+                key: (effect.structural === 'add'
+                  ? effect.after
+                  : effect.before) as K,
+              }
+            : undefined
+          : effect.structural === 'rekey'
+          ? {
+              kind: 'rekey' as const,
+              subject,
+              beforeKey: effect.before as K,
+              afterKey: effect.after as K,
+            }
+          : undefined;
+      if (context?.kind === 'remove') {
+        episodes.delete(subject);
+        placement.remove(subject);
+        staged.set(subject, { present: false });
+        changes.push({
+          subject,
+          before: previous.present ? previous.value : context.value,
+          after: undefined,
+          structural: true,
+          path: `${basePath}.${String(context.key)}`,
+          structuralRecord: context,
+        });
+      } else if (context?.kind === 'add') {
+        // Replace the last surviving episode without moving any value operation.
+        episodes.delete(subject);
+        episodes.set(subject, { subject, beforeSubject: context.beforeSubject, afterSubject: context.afterSubject });
+        const value = deepClone(context.value) as E;
+        placement.insert(
+          subject,
+          context.key as K,
+          context.beforeSubject,
+          context.afterSubject
+        );
+        const resolved = placement.read(subject);
+        if (resolved.present)
+          context = {
+            ...context,
+            beforeSubject: resolved.beforeSubject,
+            afterSubject: resolved.afterSubject,
+          };
+        staged.set(subject, {
+          present: true,
+          key: context.key as K,
+          value,
+          beforeSubject: context.beforeSubject,
+          afterSubject: context.afterSubject,
+        });
+        physicalValues.set(
+          subject,
+          (physicalAfter?.get(subject) ??
+            (structuralStore.activeKeyForSubject(subject) === undefined
+              ? value
+              : valueStore.backingForSubject(subject))) as E
+        );
+        changes.push({
+          subject,
+          before: undefined,
+          after: value,
+          structural: true,
+          path: `${basePath}.${String(context.key)}`,
+          structuralRecord: { ...context, value },
+        });
+      } else if (context?.kind === 'rekey') {
+        if (!previous.present)
+          throw new Error('Ordinary rekey realization lacks its lifetime');
+        placement.rekey(subject, context.afterKey as K);
+        staged.set(subject, { ...previous, key: context.afterKey as K });
+        changes.push({
+          subject,
+          before: previous.value,
+          after: previous.value,
+          structural: true,
+          path: `${basePath}.${String(context.beforeKey)}`,
+          structuralRecord: context,
+        });
+      } else if (!effect.structural) {
+        if (!previous.present)
+          throw new Error('Ordinary field realization lacks its lifetime');
+        const segments = effect.subjectFieldSegments;
+        if (segments === undefined || segments.length > 1)
+          throw new Error(
+            'Ordinary realization requires an explicit top-level field address'
+          );
+        let value: E;
+        if (segments.length === 0) value = deepClone(effect.after) as E;
+        else {
+          value = { ...previous.value };
+          if (effect.fieldPresence?.after !== false)
+            Object.defineProperty(value, segments[0], {
+              value: deepClone(effect.after),
+              enumerable: true,
+              configurable: true,
+              writable: true,
+            });
+          else delete value[segments[0]];
+        }
+        staged.set(subject, { ...previous, value });
+        const beforeP =
+          physicalValues.get(subject) ?? valueStore.backingForSubject(subject);
+        let afterP = physicalAfter?.get(subject) as E | undefined;
+        if (afterP === undefined) {
+          if (segments.length === 0) afterP = value;
+          else {
+            afterP = { ...beforeP } as E;
+            if (effect.fieldPresence?.after !== false)
+              Object.defineProperty(afterP, segments[0], {
+                value: deepClone(effect.after),
+                enumerable: true,
+                configurable: true,
+                writable: true,
+              });
+            else delete afterP[segments[0]];
+          }
+        }
+        physicalValues.set(subject, afterP);
+        changes.push({
+          subject,
+          before: previous.value,
+          after: value,
+          structural: false,
+          path: `${basePath}.${String(previous.key)}`,
+        });
+      }
+    }
+    const valueTransitions: EntityValueTransition<E>[] = [];
+    for (const [subject, state] of staged) {
+      if (!state.present) continue;
+      const physical = (physicalAfter?.get(subject) ??
+        physicalValues.get(subject) ??
+        valueStore.backingForSubject(subject)) as E;
+      valueTransitions.push(
+        Object.freeze({
+          subject,
+          physicalBefore: valueStore.backingForSubject(subject),
+          physicalAfter: physical,
+          ordinaryBefore: valueStore.ordinaryForSubject(subject),
+          ordinaryAfter: state.value,
+          retainDivergence: !deepEqual(state.value, physical),
+        })
+      );
+    }
+    const ordinaryPlacements = resolveOrdinaryRestorationPlacement(placement, episodes);
+    if (ordinaryOrder) placement.orderDomain(ordinaryOrder);
+    const installPlacement = ordinaryTopology.prepareInstall(
+      placement,
+      physical
+    );
+    const ordinaryEndpoints =
+      ordinaryOrder && orderBefore
+        ? Object.freeze({
+            before: Object.freeze(
+              orderBefore.filter((subject) => ordinaryOrder.includes(subject))
+            ),
+            after: Object.freeze([...ordinaryOrder]),
+            domain: ordinaryOrder,
+          })
+        : undefined;
+    const publication=prepareEntityPublication(
+      physicalEffects.flatMap(effect=>typeof effect.subjectId==='number'?[{subject:effect.subjectId,before:effect.before,after:effect.after,fields:effect.subjectFieldSegments?.length===0?null:effect.subjectFieldSegments??[],structural:effect.structuralContext}]:[]),
+      changes.map(change=>({...change,fields:change.structural?null:publicationFields(change.before,change.after),structural:change.structuralRecord})),
+      undefined,ordinaryEndpoints?.after,false,undefined,undefined,undefined,ordinaryPlacements
+    );
+    if(publication.unit)markEntityPublicationFacts(changes,publication.id);
+    const finalize=()=>publication.unit?.finalize?.();
+    const phase=publicationPhase ?? new PublicationPreparation();
+    phase.add(finalize,()=>publication.unit?.validate?.());if(!publicationPhase)phase.seal();
+    let completed=false;
+    const complete=()=>{if(completed)return;completed=true;if(publication.unit)entityPublication.complete(publication.unit.completion);};
+    return {
+      complete,
+      changes,
+      ordinaryEndpoints,
+      interval: installPlacement.interval,
+      install: () => {
+        if(!publicationPhase)phase.validate();
+        // Both realization callers install the complete physical unit first.
+        // Preserve its backing; this plan installs only ordinary authority.
+        for (const transition of valueTransitions)
+          valueStore.installOrdinaryValueTransition(transition);
+        for (const [subject, state] of staged)
+          if (!state.present) valueStore.dischargeOrdinaryValue(subject);
+        installPlacement();
+        if(publication.unit)installTerminalRecord(publication.unit.record);
+        advanceInstalledRead();
+        if(!publicationPhase)complete();
+      },
+    };
+  }
+
+  type OrdinaryPointPreparation = {
+    changes: CommittedEntityMutation[];
+    install: ReturnType<typeof ordinaryTopology.prepareInstall>;
+    interval: ReturnType<typeof ordinaryTopology.prepareInstall>['interval'];
+    ordinaryEndpoints: {
+      readonly before: readonly number[];
+      readonly after: readonly number[];
+      readonly domain?: readonly number[];
+    } | undefined;
+  };
+  type OrdinaryRichPreparation = OrdinaryPointPreparation & {
+    byPhysicalSubject: Map<number, readonly CommittedEntityMutation[]>;
+    byStep: Array<readonly CommittedEntityMutation[]>;
+  };
+  function prepareOrdinaryTopology(
+    demand: 'point',
+    changes: readonly CommittedEntityMutation[],
+    physical?: ReturnType<typeof structuralStore.preparePlacement>,
+    authoredOrder?: readonly number[],
+    authoredDomain?: readonly number[],
+    physicalEntries?: PreparedPlacementEntries<K>
+  ): OrdinaryPointPreparation;
+  function prepareOrdinaryTopology(
+    demand: 'rich',
+    changes: readonly CommittedEntityMutation[],
+    physical?: ReturnType<typeof structuralStore.preparePlacement>,
+    authoredOrder?: readonly number[],
+    authoredDomain?: readonly number[],
+    physicalEntries?: PreparedPlacementEntries<K>
+  ): OrdinaryRichPreparation;
+  function prepareOrdinaryTopology(
+    demand: 'point' | 'rich',
+    changes: readonly CommittedEntityMutation[],
+    physical = structuralStore.preparePlacement(),
+    authoredOrder?: readonly number[],
+    authoredDomain?: readonly number[],
+    physicalEntries?: PreparedPlacementEntries<K>
+  ): OrdinaryPointPreparation | OrdinaryRichPreparation {
+    const placement = ordinaryTopology.preparePlacement(
+      structuralStore.preparePlacement()
+    );
+    // Query-only index over the fixed physical preparation; ordinary membership
+    // remains sequential and is updated after every private occupancy edit.
+    let visibility:
+      | ReturnType<typeof createPreparedPlacementVisibility<K>>
+      | undefined;
+    const inspection = ambientMeta()?.participation === 'inspection';
+    const orderBefore =
+      !inspection && authoredOrder ? placement.snapshot() : undefined;
+    type Presence = OrdinaryEntityPresence<K, E>;
+    type Present = Extract<Presence, { present: true }>;
+    // These overlays describe the complete prepared ordinary unit. Explicit
+    // vacancy must shadow both the installed exception and physical fallback.
+    const staged = new Map<number, Presence>();
+    const keys = new Map<K, number | undefined>();
+    const selected: CommittedEntityMutation[] = [];
+    // Only the rich frame consumer needs these per-step/per-subject indexes.
+    // Point writes still prepare the same completed ordinary changes and install.
+    const byStep: Array<readonly CommittedEntityMutation[]> | undefined =
+      demand === 'rich' ? [] : undefined;
+    const byPhysicalSubject = demand === 'rich'
+      ? new Map<number, readonly CommittedEntityMutation[]>()
+      : undefined;
+    const read = (subject: number): Presence => {
+      const row = placement.read(subject);
+      if (!row.present) return { present: false };
+      const known = staged.get(subject);
+      return {
+        ...row,
+        value: known?.present
+          ? known.value
+          : (valueStore.ordinaryForSubject(subject) as E),
+      };
+    };
+    const atKey = (key: K): number | undefined => {
+      if (keys.has(key)) return keys.get(key);
+      const subject =
+        ordinaryTopology.atKey(key) ?? structuralStore.subjectIdForKey(key);
+      if (subject === undefined) return undefined;
+      const state = read(subject);
+      return state.present && state.key === key ? subject : undefined;
+    };
+    const write = (subject: number, next: Presence): void => {
+      const previous = read(subject);
+      if (previous.present) keys.set(previous.key, undefined);
+      if (!next.present) placement.remove(subject);
+      else if (!previous.present)
+        placement.insert(
+          subject,
+          next.key,
+          next.beforeSubject,
+          next.afterSubject
+        );
+      else if (previous.key !== next.key) placement.rekey(subject, next.key);
+      staged.set(subject, next);
+      if (next.present) keys.set(next.key, subject);
+      visibility?.setVisible(subject, next.present);
+    };
+    const record = (
+      kind: 'add' | 'remove',
+      subject: number,
+      state: Present
+    ): CommittedEntityMutation => ({
+      subject,
+      before: kind === 'remove' ? state.value : undefined,
+      after: kind === 'add' ? state.value : undefined,
+      structural: true,
+      path: `${basePath}.${String(state.key)}`,
+      structuralRecord: ordinaryPresenceRecord(kind, subject, state),
+    });
+    for (const change of changes) {
+      const effect = change.structuralRecord;
+      const ordinary = read(change.subject);
+      const group: CommittedEntityMutation[] = [];
+      if (inspection) {
+        // Freeze pre-install ordinary occupancy, including explicit absence.
+        // Physical edits never grant authority over an ordinary destination.
+
+        group.push(change);
+      } else if (change.after === undefined) {
+        if (ordinary.present)
+          group.push(record('remove', change.subject, ordinary));
+        write(change.subject, { present: false });
+      } else {
+        const binds =
+          !ordinary.present ||
+          effect?.kind === 'add' ||
+          effect?.kind === 'rekey';
+        if (binds) {
+          // Source record or prepared placement proves presence independently
+          // of the raw key value; do not replace an explicit nullish key.
+          const key = ordinaryAdmissionKey(
+            effect,
+            physical.read(change.subject)
+          ) as K;
+          const displaced = atKey(key);
+          if (displaced !== undefined && displaced !== change.subject) {
+            const state = read(displaced);
+            if (!state.present)
+              throw new Error(
+                'Ordinary occupancy index disagrees with lifetime'
+              );
+            group.push(record('remove', displaced, state));
+            write(displaced, { present: false });
+          }
+          const resolveAnchor = (
+            subject: number | undefined,
+            direction: 'beforeSubject' | 'afterSubject'
+          ): number | undefined => {
+            visibility ??= createPreparedPlacementVisibility(
+              physical,
+              (id) => placement.read(id).present,
+              physicalEntries
+            );
+            return visibility.resolve(
+              subject,
+              direction === 'beforeSubject' ? 'before' : 'after',
+              change.subject
+            );
+          };
+          const physicalRow = physical.read(change.subject);
+          const before =
+            effect?.kind === 'add'
+              ? effect.beforeSubject
+              : physicalRow.present
+              ? physicalRow.beforeSubject
+              : undefined;
+          const after =
+            effect?.kind === 'add'
+              ? effect.afterSubject
+              : physicalRow.present
+              ? physicalRow.afterSubject
+              : undefined;
+          const next: Present = ordinary.present
+            ? { ...ordinary, key }
+            : {
+                present: true,
+                key,
+                value: deepClone(change.after) as E,
+                beforeSubject: resolveAnchor(before, 'beforeSubject'),
+                afterSubject: resolveAnchor(after, 'afterSubject'),
+              };
+          if (!ordinary.present) {
+            placement.insert(
+              change.subject,
+              next.key,
+              next.beforeSubject,
+              next.afterSubject
+            );
+            const resolved = placement.read(change.subject);
+            if (resolved.present) Object.assign(next, resolved);
+            group.push(record('add', change.subject, next));
+          } else if (ordinary.key !== key)
+            group.push({
+              subject: change.subject,
+              before: ordinary.value,
+              after: ordinary.value,
+              structural: true,
+              path: `${basePath}.${String(ordinary.key)}`,
+              structuralRecord: {
+                kind: 'rekey',
+                subject: change.subject,
+                beforeKey: ordinary.key,
+                afterKey: key,
+              },
+            });
+          write(change.subject, next);
+        } else {
+          group.push({ ...change, before: ordinary.value });
+          write(change.subject, { ...ordinary, value: change.after as E });
+        }
+      }
+      if (byPhysicalSubject) {
+        const previous = byPhysicalSubject.get(change.subject);
+        byPhysicalSubject.set(
+          change.subject,
+          previous === undefined ? group : [...previous, ...group]
+        );
+      }
+      byStep?.push(group);
+      selected.push(...group);
+    }
+    let ordinaryEndpoints:
+      | {
+          readonly before: readonly number[];
+          readonly after: readonly number[];
+          readonly domain?: readonly number[];
+        }
+      | undefined;
+    if (!inspection && authoredOrder) {
+      // Explicit order changes permute their admitted domain; omitted ordinary
+      // lifetimes retain their slots and are not implicitly removed/adopted.
+      const ordered = authoredOrder.filter(
+        (subject) => placement.read(subject).present
+      );
+      const orderAfter = placement.orderDomain(ordered);
+      if (orderBefore)
+        ordinaryEndpoints = Object.freeze({
+          before: orderBefore,
+          after: orderAfter,
+          domain: Object.freeze([
+            ...new Set([
+              ...(authoredDomain ?? authoredOrder),
+              ...authoredOrder,
+            ]),
+          ]),
+        });
+    }
+    const installPlacement = ordinaryTopology.prepareInstall(
+      placement,
+      physical
+    );
+    const completedChanges = new Map<
+      CommittedEntityMutation,
+      CommittedEntityMutation
+    >();
+    const completeChange = (
+      change: CommittedEntityMutation
+    ): CommittedEntityMutation => {
+      const known = completedChanges.get(change);
+      if (known) return known;
+      const record = change.structuralRecord;
+      if (!record || record.kind === 'rekey') return change;
+      const state =
+        record.kind === 'add'
+          ? placement.read(change.subject)
+          : placement.base(change.subject);
+      if (!state.present) return change;
+      const completed = {
+        ...change,
+        structuralRecord: {
+          ...record,
+          beforeSubject: state.beforeSubject,
+          afterSubject: state.afterSubject,
+        },
+      };
+      completedChanges.set(change, completed);
+      return completed;
+    };
+    if (byPhysicalSubject)
+      for (const [subject, group] of byPhysicalSubject)
+        byPhysicalSubject.set(subject, group.map(completeChange));
+    const completed = selected.map(completeChange);
+    if (byPhysicalSubject && byStep) return {
+      changes: completed,
+      byPhysicalSubject,
+      byStep: byStep.map((group) => group.map(completeChange)),
+      install: installPlacement,
+      interval: installPlacement.interval,
+      ordinaryEndpoints,
+    };
+    return {
+      changes: completed,
+      install: installPlacement,
+      interval: installPlacement.interval,
+      ordinaryEndpoints,
+    };
+  }
+
+  function commitAndProjectEntityMutationFrame(
+    frame: EntityMutationFrame<K, E>,
+    options?: { advancePhysicalRevision?: boolean; publication?: 'physical' },
+    deferCompletion=false
+  ) {
+    const prepared = prepareEntityMutationFrame(frame, options);
+    prepared.finalize();
+    prepared.validate();
+    const result = prepared.install();
+    if(!deferCompletion)prepared.complete();
+    return {...result,complete:prepared.complete};
+  }
+
+  function prepareEntityMutationFrame(
+    frame: EntityMutationFrame<K, E>,
+    options?: { advancePhysicalRevision?: boolean; publication?: 'physical' }
+  ) {
+    const revision = physicalCommitClock?.revision();
+    const changes: Array<
+      import('./internals/mutation-capture-runtime').CommittedEntityMutation
+    > = [];
+    const valueTransitions = new Map<
+      PreparedValueReplacement<K, E>,
+      EntityValueTransition<E>
+    >();
+    const valueResults = new Map<number, EntityValueTransition<E>>();
+    for (const mutation of frame.mutations) {
+      if (mutation.kind !== 'replace-value') continue;
+      const previous = valueResults.get(mutation.subjectId);
+      const prepared = valueStore.prepareValueTransition(
+        mutation.subjectId,
+        mutation.nextValue,
+        mutation.authoredFields === 'realization' ? undefined : mutation.authoredFields,
+        previous
+      );
+      valueTransitions.set(mutation, prepared);
+      valueResults.set(
+        mutation.subjectId,
+        previous
+          ? Object.freeze({
+              ...prepared,
+              physicalBefore: previous.physicalBefore,
+              ordinaryBefore: previous.ordinaryBefore,
+            })
+          : prepared
+      );
+    }
+    // Only fresh subjects need the pre-install tail. Preserve the sampling
+    // boundary before record cloning, using the existing constant-time index.
+    const hasFreshSubjects = frame.mutations.some(
+      (mutation) => mutation.kind === 'create-fresh-subject'
+    );
+    const tailKey = hasFreshSubjects
+      ? structuralStore.lastActiveKey()
+      : undefined;
+    let tail =
+      tailKey === undefined
+        ? undefined
+        : structuralStore.subjectIdForKey(tailKey);
+    const changeIndexByMutation = new Map<unknown, number>();
+    const physicalValuesByStep=new Map<number,EntityValueTransition<E>>();
+    const restoredByStep = new Map<number,ReadonlyMap<string,NativeFieldEndpoint>>();
+    const authoredByStep = new Map<number, import('./internals/entity-publication').EntityAuthoredFootprint>();
+    for (const m of frame.mutations) {
+      changeIndexByMutation.set(m, changes.length);
+      const key =
+        'key' in m ? m.key : structuralStore.activeKeyForSubject(m.subjectId);
+      const before = valueStore.backingForSubject(m.subjectId);
+      const path = `${basePath}.${String(key)}`;
+      if (m.kind === 'replace-value') {
+        authoredByStep.set(changes.length, authoredFootprint(m.authoredFields));
+        if(m.restoredFields)restoredByStep.set(changes.length,m.restoredFields);
+        const transition = valueTransitions.get(m)!;
+        physicalValuesByStep.set(changes.length,transition);
+        changes.push({
+          subject: m.subjectId,
+          before: transition.ordinaryBefore,
+          after: transition.ordinaryAfter,
+          structural: false,
+          path,
+        });
+      } else if (m.kind === 'create-fresh-subject') {
+        changes.push({
+          subject: m.subjectId,
+          before: undefined,
+          after: m.nextValue,
+          structural: true,
+          path,
+          structuralRecord: {
+            kind: 'add',
+            subject: m.subjectId,
+            key: m.key,
+            value: deepClone(m.nextValue),
+            beforeSubject: tail,
+          },
+        });
+        tail = m.subjectId;
+      } else if (m.kind === 'tombstone-subject') {
+        const neighbors = getNeighborSubjects(m.key);
+        changes.push({
+          subject: m.subjectId,
+          before,
+          after: undefined,
+          structural: true,
+          path,
+          structuralRecord: {
+            kind: 'remove',
+            subject: m.subjectId,
+            key: m.key,
+            value: deepClone(before),
+            ...neighbors,
+          },
+        });
+      } else if (m.kind === 'transfer-key') {
+        changes.push({
+          subject: m.subjectId,
+          before,
+          after: before,
+          structural: true,
+          path: `${basePath}.${String(m.fromKey)}`,
+          structuralRecord: {
+            kind: 'rekey',
+            subject: m.subjectId,
+            beforeKey: m.fromKey,
+            afterKey: m.toKey,
+          },
+        });
+      }
+    }
+    const physicalPlacement = frame.preparePlacement();
+    // Capture after all placement edits; both consumers use this exact stage.
+    const physicalEntries = physicalPlacement.capturePatch();
+    for (let index = 0; index < changes.length; index++) {
+      const change = changes[index];
+      if (change.structuralRecord?.kind !== 'add') continue;
+      const row = physicalPlacement.read(change.subject);
+      if (row.present)
+        changes[index] = {
+          ...change,
+          structuralRecord: {
+            ...change.structuralRecord,
+            beforeSubject: row.beforeSubject,
+            afterSubject: row.afterSubject,
+          },
+        };
+    }
+    const ordinaryPlan = prepareOrdinaryTopology(
+      'rich',
+      changes,
+      physicalPlacement,
+      frame.ordinaryOrder,
+      frame.orderEndpoints?.before,
+      physicalEntries
+    );
+    const valueResultsByStep = frame.mutations.map((mutation) => {
+      if (mutation.kind !== 'replace-value') return undefined;
+      const transition = valueTransitions.get(mutation)!;
+      return Object.freeze({
+        ...transition,
+        ordinaryChanges:
+          ordinaryPlan.byStep[changeIndexByMutation.get(mutation)!],
+      });
+    });
+    for (const [subject, transition] of valueResults) {
+      valueResults.set(
+        subject,
+        Object.freeze({
+          ...transition,
+          ordinaryChanges: ordinaryPlan.byPhysicalSubject.get(subject),
+        })
+      );
+    }
+    // Constant-size evidence paired with membership responsibility, not a
+    // snapshot of the collection or a new ordering authority.
+    const structuralFrontier =
+      physicalPlacement.patch.size > 0 &&
+      !frame.mutations.some((mutation) => mutation.kind === 'restore-subject')
+        ? {
+            before: structuralStore.activeOrderFrontier(),
+            after: undefined as unknown,
+          }
+        : undefined;
+    const physicalInterval =
+      ordinaryTopology.prepareInterval(physicalPlacement, physicalEntries);
+    const physicalBeforeToken = structuralStore.activeOrderFrontier();
+    const topologyUnit = Object.freeze({
+      id: Object.freeze({}),
+      order: frame.orderEndpoints
+        ? Object.freeze({
+            beforeSubjects: frame.orderEndpoints.before,
+            afterSubjects: frame.orderEndpoints.after,
+            ordinaryEndpoints: ordinaryPlan.ordinaryEndpoints
+              ? Object.freeze({
+                  ...ordinaryPlan.ordinaryEndpoints,
+                  beforeToken: ordinaryPlan.interval.before,
+                  afterToken: ordinaryPlan.interval.after,
+                })
+              : undefined,
+          })
+        : undefined,
+      physical: Object.freeze({
+        ...physicalInterval,
+        before: physicalBeforeToken,
+        after: physicalInterval.pairs.length ? {} : physicalBeforeToken,
+      }),
+      ordinary: ordinaryPlan.interval,
+    });
+    if (structuralFrontier)
+      structuralFrontier.after = topologyUnit.physical.after;
+    // Whole replacement offers equal supplied fields to native endpoint selection.
+    // This publication domain does not change native value effects or physical diffs.
+    const ordinaryPublicationByChange = new Map<
+      import('./internals/mutation-capture-runtime').CommittedEntityMutation,
+      EntityPublicationEdit
+    >();
+    const publicationSteps = changes.map((change, ordinal) => {
+      const footprint = authoredByStep.get(ordinal);
+      return {
+        ordinal,
+        authoredFootprint: footprint,
+        authoredRemoval: options?.publication !== 'physical' && change.structuralRecord?.kind === 'remove'
+          ? {...change, fields:null, structural:change.structuralRecord} : undefined,
+        ordinary: (ordinaryPlan.byStep[ordinal] ?? []).map(effect => {
+          const changedFields = effect.structural ? null : publicationFields(effect.before, effect.after);
+          const fields = !effect.structural && footprint?.kind === 'whole'
+            ? Object.freeze([...new Set([...(changedFields ?? []), ...Object.keys(effect.after ?? {})])])
+            : changedFields;
+          const edit = {...effect, restoredFields:restoredByStep.get(ordinal), fields, structural:effect.structuralRecord};
+          ordinaryPublicationByChange.set(effect, edit);
+          return edit;
+        }),
+      };
+    });
+    const publication=prepareEntityPublication(
+      changes.map((change,ordinal)=>{const physical=physicalValuesByStep.get(ordinal);return {...change,before:physical?physical.physicalBefore:change.before,after:physical?physical.physicalAfter:change.after,fields:change.structural?null:publicationFields(physical?physical.physicalBefore:change.before,physical?physical.physicalAfter:change.after),structural:change.structuralRecord};}),
+      ordinaryPlan.changes.map(change=>ordinaryPublicationByChange.get(change)??({...change,fields:change.structural?null:publicationFields(change.before,change.after),structural:change.structuralRecord})),
+      frame.orderEndpoints?.after,ordinaryPlan.ordinaryEndpoints?.after,false,
+      publicationSteps,
+      entityPublication.requestsSeed()?(()=>{
+        const fresh=new Map(frame.mutations.flatMap(mutation=>mutation.kind==='create-fresh-subject'?[[mutation.subjectId,mutation.nextValue] as const]:[]));
+        return physicalPlacement.snapshot().map(subjectId=>{
+          const placement=physicalPlacement.read(subjectId);if(!placement.present)throw new Error('Prepared acquisition seed is absent');
+          const row=valueResults.get(subjectId)?.physicalAfter??fresh.get(subjectId)??valueStore.backingForSubject(subjectId);
+          return {subjectId,key:placement.key,row};
+        });
+      })():undefined,
+      prepareResponsibilityCapture(ordinaryPlan.changes, topologyUnit, structuralFrontier)
+    );
+    if(publication.unit){
+      markEntityPublicationFacts(ordinaryPlan.changes,publication.id);
+      markEntityPublicationFacts(topologyUnit,publication.id);
+      for(const facts of ordinaryPlan.byPhysicalSubject.values())markEntityPublicationFacts(facts,publication.id);
+      for(const facts of ordinaryPlan.byStep)markEntityPublicationFacts(facts,publication.id);
+    }
+    for(const [subject,transition] of valueResults) valueResults.set(subject,Object.freeze({...transition,publicationUnit:publication.unit?publication.id:undefined}));
+    for(let i=0;i<valueResultsByStep.length;i++){const transition=valueResultsByStep[i];if(transition)valueResultsByStep[i]=Object.freeze({...transition,publicationUnit:publication.unit?publication.id:undefined});}
+    const responsibility = undefined;
+    if (physicalCommitClock?.revision() !== revision)
+      throw new Error(
+        'Entity frame responsibility preparation reentered installation'
+      );
+    const observe = committedEntityObserver(
+      structuralFrontier,
+      ordinaryPlan.changes,
+      topologyUnit
+    );
+
+    let installed = false;
+    let consumed = false;
+    let completed = false;
+    let releaseMembership: (() => void) | undefined;
+    const observations: Array<() => void> = [];
+    const resultOf = (result: ReturnType<typeof frame.commit>) => ({
+      ...result, valueResults, valueResultsByStep,
+      ordinaryChanges: ordinaryPlan.byPhysicalSubject,
+      ordinaryEndpoints: ordinaryPlan.ordinaryEndpoints,
+      topologyUnit, orderEndpoints: frame.orderEndpoints,
+    });
+    return {
+      validate(){publication.unit?.validate?.();if(physicalCommitClock?.revision()!==revision)throw new Error('Entity prepared source revision changed');},
+      finalize(){publication.unit?.finalize?.();if(physicalCommitClock?.revision()!==revision)throw new Error('Entity finalization reentered installation');},
+      install() {
+        if (consumed || physicalCommitClock?.revision() !== revision)
+          throw new Error('Prepared entity source is stale or consumed');
+        consumed = true;
+        const result = frame.commit(
+          observe ? () => observe(ordinaryPlan.changes, delivery => observations.push(delivery)) : undefined,
+          responsibility, structuralFrontier, valueTransitions,
+          () => { ordinaryPlan.install(); if (publication.unit) installTerminalRecord(publication.unit.record); advanceInstalledRead(); installed = true; }
+        );
+        if (options?.advancePhysicalRevision !== false) physicalCommitClock?.advance();
+        // Capture installed facts inside their actual bulk unit. Delivery belongs
+        // to detached completion, so sibling facts precede listener reentry.
+        if (membershipTap) {
+          releaseMembership = holdEntityMembershipDelivery(api);
+          membershipTap(MEMBERSHIP_FACTS, frame.mutations, frame.orderEndpoints);
+        }
+        return resultOf(result);
+      },
+      complete() {
+        if (!installed || completed) return;
+        completed = true;
+        let failed = false; let first: unknown;
+        const attempt = (body: () => void) => { try { body(); } catch (error) { if (!failed) { failed = true; first = error; } } };
+        try {
+          for (const delivery of observations) attempt(delivery);
+          attempt(() => { if (publication.unit) entityPublication.complete(publication.unit.completion); });
+          for (const mutation of frame.mutations) {
+            if (mutation.kind === 'retire-retained-value' && mutation.forgetLifetime) {
+              const subject = mutation.subjectId;
+              entityPublication.requestRetirement(subject, () => resolveSubjectState(subject) === undefined && !ordinaryTopology.retains(subject));
+            }
+          }
+          const removed = [...new Set(frame.mutations.filter(mutation => mutation.kind === 'tombstone-subject').map(mutation => mutation.subjectId))];
+          attempt(() => reclaimRetiredSubjectsWithoutOwner(removed));
+        } finally {
+          observations.length = 0;
+          attempt(() => releaseMembership?.());
+          releaseMembership = undefined;
+        }
+        if (failed) throw first;
+      },
+    };
+  }
+
+  function withSuppliedEntityRow<T>(row:E, body:()=>T):T {
+    return withEntityPublicationInput(entityPublication,physicalRowSubjects.get(row),undefined,body);
+  }
+  function nativePredicate(predicate:(row:E)=>boolean,row:E):boolean {
+    return withSuppliedEntityRow(row,()=>predicate(row));
+  }
   /** Reactive signals for queries — all derived, none eagerly maintained. */
-  const allSignal: ReadableCell<E[]> = createVersionedProjection(() => {
-    const entities = getProjectedEntities();
+  const computeAll = (): E[] => {
+    const entities = presentEntities();
     // `sortComparer` gives `all`/`ids` a stable sorted order (parity with
     // @ngrx/entity); `map` keeps insertion order.
-    if (config.sortComparer) entities.sort(config.sortComparer);
+    if (config.sortComparer) {const compare=config.sortComparer;entities.sort((a,b)=>withSuppliedEntityRow(a,()=>withSuppliedEntityRow(b,()=>compare(a,b))));}
     return entities;
-  });
-  const countSignal: ReadableCell<number> = createVersionedProjection(() => {
-    // O(1) — this used to be `entities.length` on a freshly built array.
-    return structuralStore.activeKeyCount();
-  });
-  const idsSignal: ReadableCell<K[]> = createVersionedProjection(() => {
-    return config.sortComparer
-      ? allSignal().map((e) => selectId(e))
-      : [...structuralStore.activeKeysSnapshot()];
-  });
-  const mapSignal: ReadableCell<ReadonlyMap<K, E>> = createVersionedProjection(
-    () => {
-      // Still a copy: callers may hold the result across mutations and must not
-      // see it change underneath them. But it is paid on read, not on write.
-      return new Map(getProjectedEntries());
+  };
+  const allSignal: ReadableCell<E[]> = createVersionedProjection(computeAll);
+  // O(1) — this used to be `entities.length` on a freshly built array.
+  const computeCount = (): number =>
+    absent() ? 0 : structuralStore.activeKeyCount();
+  const countSignal: ReadableCell<number> =
+    createVersionedProjection(computeCount);
+  /**
+   * ⚠️ INSIDE A TAP, A PROJECTION IS READ FRESH (v16 8f). A tap runs inside
+   * its write, and inside a grouped write (a transaction, a reversal) the
+   * cached projections hear of it only when the group ends: read through them,
+   * a tap saw the collection as it was before the group. While a tap runs, a
+   * projection is handed out as an uncached reader of the same computation.
+   * It still reads `version`, so a derived computed inside a tap (a snapshot,
+   * an adapter's computed) depends on the collection as the cached projection
+   * would. Outside taps this is one comparison per access.
+   */
+  const fresh = <T>(read: () => T): ReadableCell<T> => {
+    const current = (): T => {
+      version();
+      return read();
+    };
+    return locations.createCurrentReadonly(current);
+  };
+  const inTap = <T>(cell: ReadableCell<T>, read: () => T): ReadableCell<T> =>
+    taps.depth ? fresh(read) : cell;
+  // Identity-stable across value-only writes: the key snapshot is shared until
+  // the list or a key changes, so the copy (and every consumer) is reused.
+  let idsSource: readonly K[] | undefined;
+  let idsValue: K[] = [];
+  // `all` is the cached projection or, in a tap, the fresh one (v16 8f).
+  const computeIds = (all: () => E[]): K[] => {
+    if (absent()) return [];
+    if (config.sortComparer) return all().map((e) => selectId(e));
+    const keys = structuralStore.activeKeysSnapshot();
+    if (keys !== idsSource) {
+      idsSource = keys;
+      idsValue = [...keys];
     }
+    return idsValue;
+  };
+  const idsSignal: ReadableCell<K[]> = createVersionedProjection(() =>
+    computeIds(allSignal)
   );
+  // Still a copy: callers may hold the result across mutations and must not
+  // see it change underneath them. But it is paid on read, not on write.
+  const computeMap = (): ReadonlyMap<K, E> => new Map(presentEntries());
+  const mapSignal: ReadableCell<ReadonlyMap<K, E>> =
+    createVersionedProjection(computeMap);
 
   /**
    * Per-entity signals — the body-granular reactivity layer.
@@ -682,7 +1809,25 @@ export function createEntitySignal<
     locations.advanceEpoch?.(handle);
   };
   const structuralStore = new StructuralStore<K>();
+  /**
+   * Membership observation seam (`entityMembershipReader`, internals only):
+   * undefined until a reader first observes this collection. Each structural
+   * operation then reports its facts once (see `entity-membership-source.ts`);
+   * nothing is derived, retained or delivered here.
+   */
+  let membershipTap: EntityMembershipTap | undefined;
+  /** One observed unit for a compound operation (prepend = add + move). */
+  function withMembershipGroup<R>(run: () => R): R {
+    const tap = membershipTap;
+    tap?.(MEMBERSHIP_OPEN);
+    try {
+      return run();
+    } finally {
+      tap?.(MEMBERSHIP_CLOSE);
+    }
+  }
   const valueStore = new EntityValueStore<E>();
+  const ordinaryTopology = new EntityOrdinaryTopology<K>();
   /**
    * `SUBJECT-STATE-SEMANTIC-0`. Held WEAKLY.
    *
@@ -720,6 +1865,8 @@ export function createEntitySignal<
   const positionMetadataEnabled = options?.positionMetadataEnabled ?? true;
   const hasRestorationAuthority = options?.hasRestorationAuthority ?? true;
   const ownerId = options?.ownerId;
+  const entityPublication = new EntityPublicationSource();
+  options?.onDispose?.(() => entityPublication.dispose());
   const physicalCommitClock = options?.physicalCommitClock;
   const mutationCaptureRuntime = options?.mutationCaptureRuntime;
   let positionId = (
@@ -793,13 +1940,14 @@ export function createEntitySignal<
   }
 
   function createStructuralEffectMeta(
-    effect: PendingStructuralEffect
+    effect: PendingStructuralEffect,
+    ordinaryChanges?: readonly CommittedEntityMutation[]
   ): WriteMetadata {
     const meta = ambientMeta();
-    return {
-      ...(meta ?? {}),
-      structuralEffect: effect,
-    };
+    const physical = { ...(meta ?? {}), structuralEffect: effect };
+    return ordinaryChanges === undefined
+      ? physical
+      : withEntityOrdinaryChanges(physical, ordinaryChanges);
   }
 
   /**
@@ -834,58 +1982,20 @@ export function createEntitySignal<
    * control produces one per interaction, which is orders of magnitude slower.
    * Anything above ~6/second is a frame loop; nothing a user does reaches it.
    */
-  const predicateWindows = new Map<string, { count: number; start: number }>();
-  const warnedPredicates = new Set<string>();
-  /** Distinct identities within {@link PREDICATE_CHURN_WINDOW_MS} to accuse. */
-  const PREDICATE_CHURN_THRESHOLD = 12;
-  /** ~6 identities/second is well above user-driven, well below a frame loop. */
-  const PREDICATE_CHURN_WINDOW_MS = 2000;
-
-  function warnOnPredicateChurn(
-    method: 'where' | 'find',
-    predicate: (entity: E) => boolean
-  ): void {
-    const source = String(predicate);
-    // Guard against pathological state growth in a long dev session: the map is
-    // only ever as large as the number of DISTINCT predicate sources.
-    if (predicateWindows.size > 200 || warnedPredicates.has(source)) return;
-
-    const now =
-      typeof performance !== 'undefined' ? performance.now() : Date.now();
-    const window = predicateWindows.get(source);
-    if (!window || now - window.start > PREDICATE_CHURN_WINDOW_MS) {
-      // A fresh window, not an increment. This is what makes a slow drip of
-      // legitimately-rebuilt predicates never accumulate to an accusation.
-      predicateWindows.set(source, { count: 1, start: now });
-      return;
-    }
-    window.count++;
-    if (window.count < PREDICATE_CHURN_THRESHOLD) return;
-
-    warnedPredicates.add(source);
-    const perSecond = Math.round(
-      (window.count / Math.max(now - window.start, 1)) * 1000
-    );
-    console.warn(
-      `SignalTree: \`${method}()\` received ${window.count} DIFFERENT functions ` +
-        `with identical source in ${Math.round(now - window.start)}ms ` +
-        `(~${perSecond}/second) — a rate only change detection produces. ` +
-        `Results are memoised per predicate IDENTITY, so an inline arrow misses ` +
-        `the cache every cycle and re-scans the collection: measured at 75x a ` +
-        `hoisted predicate over 1,000 entities. Hoist it to a stable reference ` +
-        `(a class field or module constant) and call ` +
-        `\`${method}(thePredicate)()\`. Source: ${source.slice(0, 80)} [ST2026]`
-    );
-  }
+  // Initialize only when a development-only call is actually made. This also
+  // supports enabling diagnostics after a collection has been constructed.
+  let warnOnPredicateChurn: ReturnType<typeof createPredicateChurnWarning<E>> | undefined;
 
   /** Subjects that have moved to a new key and must not fall back to the old one. */
   const rekeyedSubjects = new Set<number>();
 
   function planRekey(
     from: K,
-    to: K
+    to: K,
+    vacatingKeys?: ReadonlySet<K>
   ): {
-    commit(options?: { advancePhysicalRevision?: boolean }): void;
+    readonly recipe: EntityStructureOperation;
+    commit(options?: { advancePhysicalRevision?: boolean; publication?: 'physical' }): void;
     publish(metaOverride?: WriteMetadata): void;
   } {
     const entity = getProjectedEntity(from);
@@ -902,6 +2012,7 @@ export function createEntitySignal<
       // write shares the tick. RESTORATION-REKEY-CLAIM-WIDTH-0.
       const noOpSubjectId = allocateSubjectId(from);
       return {
+        recipe:{kind:'rekey',subject:noOpSubjectId,from,key:to,value:entity},
         commit(): void {
           lastSubjectIds = [noOpSubjectId];
         },
@@ -910,80 +2021,30 @@ export function createEntitySignal<
         },
       };
     }
-    if (structuralStore.hasActiveKey(to)) {
+    if (structuralStore.hasActiveKey(to) && !vacatingKeys?.has(to)) {
       throw new Error(`Cannot change id to ${String(to)}: already in use`);
     }
 
-    const subjectId = allocateSubjectId(from);
-    const structuralEffect: PendingStructuralEffect = {
-      kind: 'rekey',
-      subject: subjectId,
-      beforeKey: from,
-      afterKey: to,
-    };
-
-    return {
-      commit(options?: { advancePhysicalRevision?: boolean }): void {
-        const transfer: PreparedKeyTransfer<K> = {
-          kind: 'transfer-key',
-          fromKey: from,
-          toKey: to,
-          subjectId,
-        };
-        const frame = createEntityMutationFrame();
-        frame.stageKeyTransfer(transfer);
-        const result = commitAndProjectEntityMutationFrame(frame, options);
-        for (const changedSubjectId of result.physicallyChangedSubjectIds) {
-          publishSubjectPhysicalChange(changedSubjectId);
-        }
-        rekeyedSubjects.add(subjectId);
-        // Narrow last-write participation to the one rekeyed subject. The
-        // leaf-signal interceptor re-reads `__subjectIds` after `changeId`
-        // returns; without this it reports every subject of the prior
-        // collection write as a participant, and restoration then retains a
-        // claim per live subject. Sibling mutators all narrow this latch.
-        // RESTORATION-REKEY-CLAIM-WIDTH-0.
-        lastSubjectIds = [subjectId];
-
-        if (activeIdSignal() === from) {
-          replaceLocation(activeIdSignal, to);
-        }
-
-        syncEntitySignal(to);
-        updateSignals();
-      },
-      publish(metaOverride?: WriteMetadata): void {
-        const meta = metaOverride ?? ambientMeta();
-        pathNotifier.notify(
-          `${basePath}.${String(to)}`,
-          entity,
-          entity,
-          basePath,
-          [subjectId],
-          getPositionIdsForNotify(),
-          {
-            ...(meta ?? {}),
-            structuralEffect,
-          }
-        );
-      },
-    };
+    return planPreparedRekey(from, to, allocateSubjectId(from), entity);
   }
 
   function planPreparedRekey(
     from: K,
     to: K,
     subjectId: number,
-    entity: E
+    entity: E,
+    placement?: { beforeSubject?: number; afterSubject?: number }
   ): {
-    commit(options?: { advancePhysicalRevision?: boolean }): void;
+    readonly recipe: EntityStructureOperation;
+    commit(options?: { advancePhysicalRevision?: boolean; publication?: 'physical' }): void;
     publish(metaOverride?: WriteMetadata): void;
   } {
-    if (from === to) {
+    if (from === to && !placement) {
       // Same rule as `planRekey`'s no-op branch: the interceptor fires on the
       // call, so the latch must name the addressed subject even when the
       // rekey changes nothing. RESTORATION-REKEY-CLAIM-WIDTH-0.
       return {
+        recipe:{kind:'rekey',subject:subjectId,from,key:to,value:entity,placement},
         commit(): void {
           lastSubjectIds = [subjectId];
         },
@@ -993,6 +2054,7 @@ export function createEntitySignal<
       };
     }
 
+    let ordinaryChanges: readonly CommittedEntityMutation[] | undefined;
     const structuralEffect: PendingStructuralEffect = {
       kind: 'rekey',
       subject: subjectId,
@@ -1001,16 +2063,30 @@ export function createEntitySignal<
     };
 
     return {
-      commit(options?: { advancePhysicalRevision?: boolean }): void {
+      recipe:{kind:'rekey',subject:subjectId,from,key:to,value:entity,placement},
+      commit(options?: { advancePhysicalRevision?: boolean; publication?: 'physical' }): void {
         const transfer: PreparedKeyTransfer<K> = {
           kind: 'transfer-key',
+          placement,
           fromKey: from,
           toKey: to,
           subjectId,
         };
         const frame = createEntityMutationFrame();
+        if (
+          placement &&
+          !deepEqual(valueStore.backingForSubject(subjectId), entity)
+        )
+          frame.stageValueReplacement({
+            kind: 'replace-value',
+            key: from,
+            subjectId,
+            nextValue: entity,
+            authoredFields: 'realization',
+          });
         frame.stageKeyTransfer(transfer);
-        const result = commitAndProjectEntityMutationFrame(frame, options);
+        const result = commitAndProjectEntityMutationFrame(frame, options, true);
+        ordinaryChanges = result.ordinaryChanges.get(subjectId);
         for (const changedSubjectId of result.physicallyChangedSubjectIds) {
           publishSubjectPhysicalChange(changedSubjectId);
         }
@@ -1023,12 +2099,12 @@ export function createEntitySignal<
         // RESTORATION-REKEY-CLAIM-WIDTH-0.
         lastSubjectIds = [subjectId];
 
-        if (activeIdSignal() === from) {
+        if (activeIdValue === from) {
           replaceLocation(activeIdSignal, to);
         }
 
         syncEntitySignal(to);
-        updateSignals();
+        updateSignals(result.complete);
       },
       publish(metaOverride?: WriteMetadata): void {
         const meta = metaOverride ?? ambientMeta();
@@ -1039,30 +2115,67 @@ export function createEntitySignal<
           basePath,
           [subjectId],
           getPositionIdsForNotify(),
-          {
-            ...(meta ?? {}),
-            structuralEffect,
-          }
+          ordinaryChanges === undefined
+            ? { ...meta, structuralEffect }
+            : withEntityOrdinaryChanges(
+                { ...meta, structuralEffect },
+                ordinaryChanges
+              )
         );
       },
     };
   }
 
   /** Active-entity selection. See the `activeId`/`activeEntity` accessors. */
-  const activeIdSignal = locations.createCell<K | undefined>(undefined);
+  // Keep the source-owned selection readable while grouped publication is held.
+  // The realization still controls dependency tracking and observer delivery.
+  let activeIdValue: K | undefined;
+  const activeIdSignal = locations.createWritable<K | undefined>(
+    () => activeIdValue,
+    (next) => {
+      if (Object.is(activeIdValue, next)) return false;
+      activeIdValue = next;
+      return true;
+    }
+  ).location;
+  const readActiveId = (): K | undefined => {
+    activeIdSignal();
+    return activeIdValue;
+  };
   let cachedActiveEntity: ReadableCell<E | undefined> | undefined;
 
-  /**
-   * Re-orders `storage` so the given ids come first, in the order given.
-   *
-   * Only the map's iteration order changes; no per-entity signal is touched, so
-   * prepending does not invalidate any row's consumers. The derived collection
-   * signals pick the new order up from the version bump.
-   */
-  function moveToFront(ids: K[]): void {
-    structuralStore.moveKeysToFront(ids);
-    physicalCommitClock?.advance();
-    updateSignals();
+  function publishOrderChange(
+    beforeSubjects: readonly number[],
+    afterSubjects: readonly number[],
+    beforeFrontier: unknown,
+    afterFrontier: unknown = structuralStore.activeOrderFrontier(),
+    ordinaryEndpoints?: {
+      readonly before: readonly number[];
+      readonly after: readonly number[];
+      readonly domain?: readonly number[];
+    },
+    selectedDisposition = false,
+    topologyUnit?: import('./internals/mutation-capture-runtime').CompletedTopologyUnit
+  ): void {
+    if (positionId === undefined) return;
+    mutationCaptureRuntime?.publishCollectionOrder?.({
+      owner: positionId,
+      ownerPath: basePath,
+      beforeSubjects,
+      afterSubjects,
+      beforeFrontier,
+      afterFrontier,
+      ordinaryEndpoints:
+        ordinaryEndpoints && topologyUnit
+          ? {
+              ...ordinaryEndpoints,
+              beforeToken: topologyUnit.ordinary.before,
+              afterToken: topologyUnit.ordinary.after,
+            }
+          : ordinaryEndpoints,
+      topologyUnit,
+      meta: (()=>{const meta=selectedDisposition?withSelectedEntityDisposition(ambientMeta(),[]):ambientMeta();const unit=topologyUnit&&entityPublicationFactsUnit(topologyUnit);return unit?withEntityPublicationUnit(meta,unit):meta;})(),
+    });
   }
 
   function resolveSubjectId(id: K): number | undefined {
@@ -1118,12 +2231,12 @@ export function createEntitySignal<
    */
   function readSubjectEntity(subjectId: number): E | undefined {
     getSubjectEpoch(subjectId)();
-    return valueStore.backingForSubject(subjectId);
+    return rowAbsent() ? undefined : valueStore.backingForSubject(subjectId);
   }
 
   function readEntityByKey(id: K): E | undefined {
     const subjectId = resolveSubjectId(id);
-    if (subjectId === undefined) return getProjectedEntity(id);
+    if (subjectId === undefined) return presentEntity(id);
     return readSubjectEntity(subjectId);
   }
 
@@ -1162,12 +2275,18 @@ export function createEntitySignal<
 
   function commitFreshSubject(id: K): number {
     const subjectId = structuralStore.allocateFreshSubjectId();
+    // This internal identity fallback can install physical membership. It has
+    // no authored ordinary footprint; preserve ordinary answers before links move.
+    const physical = structuralStore.preparePlacement();
+    const ordinary = ordinaryTopology.preparePlacement(
+      structuralStore.preparePlacement()
+    );
+    physical.insert(subjectId, id);
+    const installOrdinary = ordinaryTopology.prepareInstall(ordinary, physical);
     structuralStore.createSubject(subjectId, id);
+    installOrdinary();
+    physicalCommitClock?.advance();
     return subjectId;
-  }
-
-  function commitFreshSubjects(ids: readonly K[]): number[] {
-    return ids.map((id) => commitFreshSubject(id));
   }
 
   /**
@@ -1209,9 +2328,329 @@ export function createEntitySignal<
    * instruction array, a `Set` and an id array per mutation regardless of size.
    * For a one-field update that machinery is the mutation.
    */
-  function commitExistingSubjectValue(subjectId: number, nextValue: E): void {
-    valueStore.retainSubjectValue(subjectId, nextValue);
+  function updateOnePrivate(id: K, changes: Partial<E>, inverseClaim?: ClaimedFieldEndpoint): void {
+    validateSelectedEntry(inverseClaim, structuralStore.subjectIdForKey(id));
+      const callableIntent = consumeCallableWriteIntent();
+      const entity = presentEntity(id);
+      if (!entity) {
+        throw new Error(`Entity with id ${String(id)} not found`);
+      }
+
+      const prev = entity;
+
+      // Run interceptors
+      let transformedChanges = changes;
+      for (const handler of interceptHandlers) {
+        const ctx: InterceptContext<Partial<E>> = {
+          block: (reason?: string) => {
+            throw new Error(
+              `Cannot update entity: ${reason || 'blocked by interceptor'}`
+            );
+          },
+          transform: (value: Partial<E>) => {
+            transformedChanges = value;
+          },
+          blocked: false,
+          blockReason: undefined,
+        };
+        assertSynchronousInterceptorResult(
+          handler.onUpdate?.(id, changes, ctx),
+          'onUpdate'
+        );
+      }
+
+      const finalUpdated = { ...entity, ...transformedChanges };
+      if(inverseClaim?.preparation){stageSelected(id,prev,finalUpdated,Object.keys(transformedChanges),inverseClaim);return;}
+      // One value replacement, no structural consequence — commit it directly.
+      // See `commitExistingSubjectValue` for why this is the whole case.
+      const subjectIdForWrite = rememberSubjectId(id);
+      const transition = commitExistingSubjectValue(
+        subjectIdForWrite,
+        finalUpdated,
+        Object.keys(transformedChanges),
+        selectedInverseField(inverseClaim,subjectIdForWrite,finalUpdated,id)
+      );
+      syncEntitySignal(id);
+      updateSignals(transition.complete);
+
+      // Notify PathNotifier
+      pathNotifier.notify(
+        `${basePath}.${String(id)}`,
+        finalUpdated,
+        prev,
+        basePath,
+        lastSubjectIds,
+        getPositionIdsForNotify(),
+        withEntityValueTransition(ambientMeta(), transition),
+        undefined,
+        (callableIntent ?? getActiveWriteContext()?.mutationIntent) === 'derive'
+          ? undefined
+          : Object.keys(transformedChanges)
+      );
+
+      // Run tap handlers
+      emitTap('onUpdate', id, transformedChanges, finalUpdated);
+  }
+  function replaceOnePrivate(id: K, entity: E, inverseClaim?: ClaimedFieldEndpoint): void {
+    validateSelectedEntry(inverseClaim, structuralStore.subjectIdForKey(id));
+      const callableIntent = consumeCallableWriteIntent();
+      const prev = presentEntity(id);
+      if (!prev) {
+        throw new Error(`Entity with id ${String(id)} not found`);
+      }
+
+      let next = entity;
+      let interceptorReplaced = false;
+      for (const handler of interceptHandlers) {
+        const ctx: InterceptContext<Partial<E>> = {
+          block: (reason?: string) => {
+            throw new Error(
+              `Cannot replace entity: ${reason || 'blocked by interceptor'}`
+            );
+          },
+          transform: (value: Partial<E>) => {
+            interceptorReplaced = true;
+            next = value as E;
+          },
+          blocked: false,
+          blockReason: undefined,
+        };
+        assertSynchronousInterceptorResult(
+          handler.onUpdate?.(id, entity as Partial<E>, ctx),
+          'onUpdate'
+        );
+      }
+
+      const subjectId = structuralStore.subjectIdForKey(id);
+      if (subjectId === undefined) {
+        throw new Error(`Entity with id ${String(id)} has no subject id`);
+      }
+
+      if(inverseClaim?.preparation){
+        const materialized={...next};
+        // Row-shaped certified removal is not whole authorship. An explicit
+        // public replacement transform retains its whole authored domain.
+        const fields=interceptorReplaced ? null : [inverseClaim.field];
+        stageSelected(id,prev,materialized,fields,inverseClaim);return;
+      }
+      const mutationIntent =
+        callableIntent ?? getActiveWriteContext()?.mutationIntent;
+      const replacement: PreparedValueReplacement<K, E> = {
+        kind: 'replace-value',
+        key: id,
+        subjectId,
+        nextValue: next,
+        authoredFields: mutationIntent === 'derive' ? 'derive' : null,
+        restoredFields:selectedInverseField(inverseClaim,subjectId,next,id),
+      };
+      const frame = createEntityMutationFrame();
+      frame.stageValueReplacement(replacement);
+      const committed = commitAndProjectEntityMutationFrame(frame, undefined, true);
+      const transition = committed.valueResults.get(subjectId);
+      // Derive preparation stages accessors once; every subsequent consumer
+      // observes that same physical value rather than reevaluating the input.
+      next = transition?.physicalAfter ?? next;
+      syncEntitySignal(id);
+      updateSignals(committed.complete);
+      pathNotifier.notify(
+        `${basePath}.${String(id)}`,
+        next,
+        prev,
+        basePath,
+        // REPLACE-ONE-SUBJECT-1. This was `undefined`, and it was the ONLY
+        // entity notification in this file that dropped subject identity —
+        // `updateOne`, `updateMany` and `removeOne` all pass theirs. The id
+        // above is DATA; `subjectId` is IDENTITY, and it was already resolved
+        // from `structuralStore` a few lines up, so nothing new is looked up
+        // here.
+        //
+        // Without it, reversal effects arrive with `subjectId: undefined`,
+        // `hasInlineSubjectAddress` is false, no inline subject address is
+        // derived, and no fallback descriptor can be keyed — so rollback and
+        // undo both REFUSE, at TOP level as well as nested.
+        [subjectId],
+        getPositionIdsForNotify(),
+        withEntityValueTransition(
+          ambientMeta(),
+          committed.valueResults.get(subjectId)
+        ),
+        undefined,
+        (callableIntent ?? getActiveWriteContext()?.mutationIntent) === 'derive'
+          ? undefined
+          : null
+      );
+      emitTap('onUpdate', id, next as Partial<E>, next);
+  }
+  function validateSelectedEntry(selection: ClaimedFieldEndpoint | undefined, subject: number | undefined, field?: string): void {
+    if (selection && (selection.source !== entityPublication || selection.subject !== subject || field !== undefined && selection.field !== field))
+      throw new Error('Selected replacement does not match intended source lifetime/field');
+  }
+  function selectedInverseField(claim:ClaimedFieldEndpoint|undefined,subject:number,value:E,key:K):ReadonlyMap<string,NativeFieldEndpoint>|undefined {
+    if(!claim)return undefined;
+    if(claim.source!==entityPublication||claim.subject!==subject||Object.prototype.hasOwnProperty.call(value,claim.field)!==claim.endpoint.present||claim.endpoint.present&&!deepEqual(value[claim.field],claim.endpoint.value))
+      throw new Error('Inverse endpoint changed during setter preparation');
+    // Equality can evaluate user getters; revalidate the active lifetime afterwards.
+    validateSelectedEntry(claim, structuralStore.subjectIdForKey(key));
+    return new Map([[claim.field,claim.endpoint]]);
+  }
+  function authoredFootprint(scope: readonly string[] | null | 'derive' | 'realization'): import('./internals/entity-publication').EntityAuthoredFootprint {
+    if (scope === null) return Object.freeze({kind:'whole'});
+    if (scope === 'derive') return Object.freeze({kind:'derive'});
+    if (scope === 'realization') return Object.freeze({kind:'realization'});
+    return Object.freeze({kind:'fields',fields:Object.freeze([...scope])});
+  }
+  function publicationFields(before: unknown, after: unknown, explicit?: readonly string[] | null): readonly string[] | null {
+    if(explicit !== undefined) return explicit;
+    const a=before && typeof before==='object'?before as Record<string,unknown>:{};
+    const b=after && typeof after==='object'?after as Record<string,unknown>:{};
+    return Object.freeze([...new Set([...Object.keys(a),...Object.keys(b)])].filter(key=>Object.prototype.hasOwnProperty.call(a,key)!==Object.prototype.hasOwnProperty.call(b,key)||!Object.is(a[key],b[key])));
+  }
+  function prepareResponsibilityCapture(
+    changes: readonly CommittedEntityMutation[],
+    topologyUnit: import('./internals/mutation-capture-runtime').CompletedTopologyUnit,
+    structuralFrontier?: import('./internals/mutation-capture-runtime').StructuralFrontierInterval
+  ): import('./internals/mutation-capture-runtime').CommittedEntityCapture | undefined {
+    // Publication support is always prepared. Its optional responsibility
+    // consumer alone needs this owner-bearing capture; rich observers acquire
+    // their own capture through committedEntityObserver below.
+    if (!mutationCaptureRuntime?.prepareEntityResponsibility) return undefined;
+    const owner = getPositionIds()?.[0];
+    if (owner === undefined) return undefined;
+    return { owner, ownerPath: basePath, meta: ambientMeta(), changes, topologyUnit, structuralFrontier };
+  }
+
+  function prepareEntityPublication(physical: readonly EntityPublicationEdit[], ordinary: readonly EntityPublicationEdit[], physicalOrder?: readonly number[], ordinaryOrder?: readonly number[], point=false, steps?: readonly EntityPublicationStep[],seed?:readonly EntityProjectionSeedEntry<K,E|undefined>[],capture?:import('./internals/mutation-capture-runtime').CommittedEntityCapture,ordinaryPlacements?:readonly OrdinaryRestorationPlacement[]) {
+    const id=Object.freeze({});
+    const unit=(point?entityPublication.preparePoint.bind(entityPublication):entityPublication.prepare.bind(entityPublication))({id,owner:ownerId??-1,ordinaryPlacements,meta:ambientMeta(),prepareResponsibility:capture?fieldSelections=>mutationCaptureRuntime?.prepareEntityResponsibility?.({...capture,fieldSelections}):undefined,seed,physical,steps:ambientMeta()?.participation==='inspection'?undefined:steps?.map(step=>({...step,physical:step.physical??physical.slice(step.ordinal,step.ordinal+1)})),ordinary:ambientMeta()?.participation==='inspection'?[]:ordinary,physicalOrder,ordinaryOrder:ambientMeta()?.participation==='inspection'?undefined:ordinaryOrder,inputs:currentEntityPublicationInputs()});
+    return {id,unit};
+  }
+  function commitExistingSubjectValue(
+    subjectId: number,
+    nextValue: E,
+    fields: readonly string[] | null,
+    restoredFields?:ReadonlyMap<string,NativeFieldEndpoint>
+  ): EntityValueTransition<E> & {complete():void} {
+    const revision = physicalCommitClock?.revision();
+    const transition = valueStore.prepareValueTransition(
+      subjectId,
+      nextValue,
+      fields
+    );
+    const ordinaryPlan = prepareOrdinaryTopology('point', [
+      {
+        subject: subjectId,
+        before: transition.ordinaryBefore,
+        after: transition.ordinaryAfter,
+        structural: false,
+        path: `${basePath}.${String(
+          structuralStore.activeKeyForSubject(subjectId)
+        )}`,
+      },
+    ]);
+    const currentPhysicalToken = structuralStore.activeOrderFrontier();
+    const topologyUnit = Object.freeze({
+      id: Object.freeze({}),
+      physical: Object.freeze({
+        before: currentPhysicalToken,
+        after: currentPhysicalToken,
+        pairs: Object.freeze([]),
+      }),
+      ordinary: ordinaryPlan.interval,
+    });
+    const publication = prepareEntityPublication(
+      [{subject:subjectId,before:transition.physicalBefore,after:transition.physicalAfter,fields:publicationFields(transition.physicalBefore,transition.physicalAfter,fields)}],
+      ordinaryPlan.changes.map(change=>({...change,restoredFields,fields:publicationFields(transition.physicalBefore,transition.physicalAfter,fields),structural:change.structuralRecord})),
+      undefined,undefined,false,[{ordinal:0,authoredFootprint:authoredFootprint(fields),ordinary:ordinaryPlan.changes.map(change=>({...change,restoredFields,fields:publicationFields(transition.physicalBefore,transition.physicalAfter,fields),structural:change.structuralRecord}))}],undefined,prepareResponsibilityCapture(ordinaryPlan.changes, topologyUnit)
+    );
+    const capture = committedEntityObserver(
+      undefined,
+      ordinaryPlan.changes,
+      topologyUnit
+    );
+    const plan = undefined;
+    if (physicalCommitClock?.revision() !== revision)
+      throw new Error(
+        'Entity responsibility preparation reentered installation'
+      );
+    publication.unit?.finalize?.();
+    publication.unit?.validate?.();
+    valueStore.installValueTransition(transition);
+    ordinaryPlan.install();
+    if (plan) installTerminalRecord(plan);
+    if(publication.unit) installTerminalRecord(publication.unit.record);
+    advanceInstalledRead();
+    const observations:Array<()=>void>=[];
+    capture?.(ordinaryPlan.changes,delivery=>observations.push(delivery));
     physicalCommitClock?.advance();
+    let completed=false;
+    const complete=()=>{if(completed)return;completed=true;let failed=false,first:unknown;
+      for(const deliver of [...observations,()=>{if(publication.unit)entityPublication.complete(publication.unit.completion);}])try{deliver();}catch(error){if(!failed){failed=true;first=error;}}
+      observations.length=0;if(failed)throw first;
+    };
+    return Object.freeze({
+      complete,
+      ...transition,
+      publicationUnit: publication.unit?publication.id:undefined,
+      ordinaryChanges: ordinaryPlan.changes,
+    });
+  }
+
+  /**
+   * Source-owned committed evidence for open transaction/restoration capture.
+   *
+   * Runs after the physical write it describes and before this collection
+   * notifies the path notifier for the operation, so an observer re-entering
+   * from notifier delivery of the first row cannot find a later row of the
+   * same operation unclaimed. Frame commits and single-row writes report once,
+   * after every touched row has applied. The batch writers (`upsertMany`,
+   * `clear`, `setAll`) report row by row, interleaved only with staged epoch
+   * and state-token publications, which a transaction callback's invalidation
+   * group defers until the callback returns. Attribution is frozen here,
+   * before any callback can change the ambient write context. Pay-for-use:
+   * undefined unless an observer is active.
+   */
+  function committedEntityObserver(
+    structuralFrontier?: import('./internals/mutation-capture-runtime').StructuralFrontierInterval,
+    preparedChanges?: readonly CommittedEntityMutation[],
+    topologyUnit?: import('./internals/mutation-capture-runtime').CompletedTopologyUnit
+  ): ((changes: readonly CommittedEntityMutation[], deferObservation?: (delivery: () => void) => void) => void) | undefined {
+    if (
+      !mutationCaptureRuntime?.hasCommittedEntityObservers?.() &&
+      !(
+        (structuralFrontier ||
+          (topologyUnit &&
+            (topologyUnit.physical.before !== topologyUnit.physical.after ||
+              topologyUnit.ordinary.before !== topologyUnit.ordinary.after))) &&
+        mutationCaptureRuntime?.hasStructuralBoundaryObservers?.()
+      )
+    )
+      return undefined;
+    const owner = getPositionIds()?.[0];
+    if (owner === undefined) return undefined;
+    const meta = ambientMeta();
+    // Prepare topology facts before physical installation. Payloads are not
+    // retained by order composition; only identities and placement are needed.
+    const structuralRecords = structuralFrontier
+      ? preparedChanges?.flatMap<
+          import('./internals/mutation-capture-runtime').StructuralPlacementEvidence
+        >((change) => {
+          const record = change.structuralRecord;
+          if (!record) return [];
+          if (record.kind === 'rekey') return [record];
+          const { value: _value, ...placement } = record;
+          return [placement];
+        })
+      : undefined;
+    return (changes, deferObservation) =>
+      mutationCaptureRuntime.publishCommittedEntity?.({
+        topologyUnit,
+        owner,
+        ownerPath: basePath,
+        changes,
+        structuralFrontier,
+        structuralRecords,
+        meta,
+      }, deferObservation);
   }
 
   function rememberSubjectIds(ids: K[]): number[] {
@@ -1263,7 +2702,7 @@ export function createEntitySignal<
      */
     vacatingKeys?: ReadonlySet<string | number>
   ): {
-    commit(options?: { advancePhysicalRevision?: boolean }): void;
+    commit(options?: { advancePhysicalRevision?: boolean; publication?: 'physical' }): void;
     publish(metaOverride?: WriteMetadata): void;
   } {
     // The occupancy check answers "is this key free?" — but the honest question
@@ -1296,18 +2735,21 @@ export function createEntitySignal<
     };
 
     return {
-      commit(options?: { advancePhysicalRevision?: boolean }): void {
+      commit(options?: { advancePhysicalRevision?: boolean; publication?: 'physical' }): void {
         const frame = createEntityMutationFrame();
         frame.stageSubjectRestore(restoration);
-        const result = commitAndProjectEntityMutationFrame(frame, options);
+        const result = commitAndProjectEntityMutationFrame(frame, options, true);
         for (const changedSubjectId of result.physicallyChangedSubjectIds) {
           publishSubjectPhysicalChange(changedSubjectId);
         }
         lastSubjectIds = [subjectId];
         syncEntitySignal(key);
-        updateSignals();
+        updateSignals(result.complete);
       },
       publish(metaOverride?: WriteMetadata): void {
+        // A restored lifetime re-enters collection membership. Value-only
+        // delivery cannot reinsert it into an observer's collection topology
+        // (a Link's egress projection drops a value for an absent subject).
         pathNotifier.notify(
           `${basePath}.${String(key)}`,
           entity,
@@ -1315,8 +2757,19 @@ export function createEntitySignal<
           basePath,
           [subjectId],
           getPositionIdsForNotify(),
-          metaOverride
+          {
+            ...(metaOverride ?? ambientMeta() ?? {}),
+            structuralEffect: {
+              kind: 'add',
+              subject: subjectId,
+              key,
+              value: deepClone(entity),
+              beforeSubject,
+              afterSubject,
+            },
+          }
         );
+        emitTap('onAdd', entity, key);
       },
     };
   }
@@ -1326,7 +2779,7 @@ export function createEntitySignal<
     entity: E,
     subjectId: number
   ): {
-    commit(options?: { advancePhysicalRevision?: boolean }): void;
+    commit(options?: { advancePhysicalRevision?: boolean; publication?: 'physical' }): void;
     publish(metaOverride?: WriteMetadata): void;
   } {
     const existingState = resolveSubjectState(subjectId);
@@ -1339,7 +2792,7 @@ export function createEntitySignal<
     }
 
     return {
-      commit(options?: { advancePhysicalRevision?: boolean }): void {
+      commit(options?: { advancePhysicalRevision?: boolean; publication?: 'physical' }): void {
         const frame = createEntityMutationFrame();
         frame.stageFreshSubject({
           kind: 'create-fresh-subject',
@@ -1347,11 +2800,11 @@ export function createEntitySignal<
           subjectId,
           nextValue: entity,
         });
-        commitAndProjectEntityMutationFrame(frame, options);
+        const committed=commitAndProjectEntityMutationFrame(frame, options,true);
         lastSubjectIds = [subjectId];
         invalidateNodeCache(key);
         syncEntitySignal(key);
-        updateSignals();
+        updateSignals(committed.complete);
       },
       publish(metaOverride?: WriteMetadata): void {
         pathNotifier.notify(
@@ -1363,6 +2816,7 @@ export function createEntitySignal<
           getPositionIdsForNotify(),
           metaOverride
         );
+        emitTap('onAdd', entity, key);
       },
     };
   }
@@ -1371,7 +2825,7 @@ export function createEntitySignal<
     key: K,
     subjectId: number
   ): {
-    commit(options?: { advancePhysicalRevision?: boolean }): void;
+    commit(options?: { advancePhysicalRevision?: boolean; publication?: 'physical' }): void;
     publish(metaOverride?: WriteMetadata): void;
   } {
     const entity = getProjectedEntity(key);
@@ -1397,16 +2851,16 @@ export function createEntitySignal<
     };
 
     return {
-      commit(options?: { advancePhysicalRevision?: boolean }): void {
+      commit(options?: { advancePhysicalRevision?: boolean; publication?: 'physical' }): void {
         const frame = createEntityMutationFrame();
         frame.stageSubjectTombstone(tombstone);
-        const result = commitAndProjectEntityMutationFrame(frame, options);
+        const result = commitAndProjectEntityMutationFrame(frame, options, true);
         for (const changedSubjectId of result.physicallyChangedSubjectIds) {
           publishSubjectPhysicalChange(changedSubjectId);
         }
         lastSubjectIds = [subjectId];
         tombstoneSubjectSignal(subjectId);
-        updateSignals();
+        updateSignals(result.complete);
       },
       publish(metaOverride?: WriteMetadata): void {
         pathNotifier.notify(
@@ -1422,9 +2876,7 @@ export function createEntitySignal<
           }
         );
 
-        for (const handler of tapHandlers) {
-          handler.onRemove?.(key, entity);
-        }
+        emitTap('onRemove', key, entity);
       },
     };
   }
@@ -1475,6 +2927,8 @@ export function createEntitySignal<
   }
 
   function interceptAddedEntity(entity: E): E {
+    // Already run for this call (a re-adding write, below).
+    if (interceptsSuppressed) return entity;
     let transformedEntity = entity;
     for (const handler of interceptHandlers) {
       const ctx: InterceptContext<E> = {
@@ -1495,7 +2949,35 @@ export function createEntitySignal<
     return transformedEntity;
   }
 
+  /** `setAll`'s whole-row replacement interceptor (a transform replaces it). */
+  function interceptReplacedEntity(id: K, entity: E): E {
+    // Already run for this call (a re-adding write, below).
+    if (interceptsSuppressed) return entity;
+    let replacement = entity;
+    for (const handler of interceptHandlers) {
+      const ctx: InterceptContext<Partial<E>> = {
+        block: (reason?: string) => {
+          throw new Error(
+            `Cannot replace entity: ${reason || 'blocked by interceptor'}`
+          );
+        },
+        transform: (value: Partial<E>) => {
+          replacement = value as E;
+        },
+        blocked: false,
+        blockReason: undefined,
+      };
+      assertSynchronousInterceptorResult(
+        handler.onUpdate?.(id, entity as Partial<E>, ctx),
+        'onUpdate'
+      );
+    }
+    return replacement;
+  }
+
   function interceptUpdatedEntity(id: K, changes: Partial<E>): Partial<E> {
+    // Already run for this call (a re-adding write, below).
+    if (interceptsSuppressed) return changes;
     let transformedChanges = changes;
     for (const handler of interceptHandlers) {
       const ctx: InterceptContext<Partial<E>> = {
@@ -1519,9 +3001,216 @@ export function createEntitySignal<
     return transformedChanges;
   }
 
+  /** Shared admission/install path; prepend finishes topology before delivery. */
+  function addManyInOrder(
+    entities: E[],
+    opts?: AddManyOptions<E, K>,
+    prepend = false
+  ): K[] {
+    const mode = opts?.mode ?? 'strict';
+
+    // addMany appends: an added row's predecessor is the previous added row,
+    // or for the first one the last row before the call. Only that key is
+    // needed, not a copy of every key.
+    const lastPreviousKey = structuralStore.lastActiveKey();
+
+    // First pass: validate/filter based on mode. The rows apply as if one
+    // at a time, so an earlier copy of an id in this call counts as
+    // existing: strict throws (before anything is intercepted or written),
+    // skip keeps the first copy, overwrite keeps the last in the first
+    // copy's place. Two rows under one key was the result in every mode
+    // before (v15 778f86ef and e02238f4, carried in v16 8f): prependMany
+    // then linked the row to itself and the next read never ended.
+    const toProcess: Array<{
+      entity: E;
+      id: K;
+      existingSubjectId?: number;
+    }> = [];
+    // Every copy that applies, in input order.
+    const copies: Array<[(typeof toProcess)[number], E]> = [];
+    const earlier = new Map<K, (typeof toProcess)[number]>();
+    for (const entity of entities) {
+      const id = deriveId(entity, opts);
+      const existingSubjectId = structuralStore.subjectIdForKey(id);
+      let processed = earlier.get(id);
+      if (existingSubjectId !== undefined || processed) {
+        if (mode === 'strict') {
+          throw new Error(`Entity with id ${String(id)} already exists`);
+        } else if (mode === 'skip') {
+          continue;
+        }
+        // 'overwrite': fall through — the projection helper below replaces the existing entry
+      }
+      if (!processed) {
+        processed = { entity, id, existingSubjectId };
+        earlier.set(id, processed);
+        toProcess.push(processed);
+      }
+      copies.push([processed, entity]);
+    }
+
+    if (toProcess.length === 0) return [];
+
+    // Interceptors run once per applied copy, in input order, as successive
+    // single calls would; the last intercepted value wins. Staged before
+    // mutating runtime state so a block cannot partially allocate fresh
+    // subject lifetimes.
+    for (const [processed, entity] of copies) {
+      processed.entity = interceptAddedEntity(entity);
+    }
+    const stagedAdds = toProcess;
+    const plannedFreshSubjectIds = structuralStore.planFreshSubjectIds(
+      stagedAdds.filter(
+        ({ existingSubjectId }) => existingSubjectId === undefined
+      ).length
+    );
+    let plannedFreshIndex = 0;
+    const preparedAdds = stagedAdds.map(
+      ({ id, entity, existingSubjectId }) => ({
+        id,
+        entity,
+        existingSubjectId,
+        // A replacement retains its lifetime; capture what it replaces
+        // before the physical frame installs the new value.
+        prev:
+          existingSubjectId === undefined
+            ? undefined
+            : valueStore.backingForSubject(existingSubjectId),
+        subjectId:
+          existingSubjectId ?? plannedFreshSubjectIds[plannedFreshIndex++],
+      })
+    );
+
+    const beforeFrontier = structuralStore.activeOrderFrontier();
+    const frame = createEntityMutationFrame();
+    for (const {
+      id,
+      entity: transformedEntity,
+      existingSubjectId,
+      subjectId,
+    } of preparedAdds) {
+      if (existingSubjectId === undefined) {
+        frame.stageFreshSubject({
+          kind: 'create-fresh-subject',
+          key: id,
+          subjectId,
+          nextValue: transformedEntity,
+        });
+        continue;
+      }
+
+      frame.stageValueReplacement({
+        kind: 'replace-value',
+        key: id,
+        subjectId: existingSubjectId,
+        nextValue: transformedEntity,
+        authoredFields: null,
+      });
+    }
+
+    if (prepend) frame.stageFinalFront(preparedAdds.map((row) => row.id));
+    const committed = commitAndProjectEntityMutationFrame(frame, undefined, true);
+    const subjectIdsByKey = new Map<K, number>();
+    for (const { id, subjectId } of preparedAdds) {
+      subjectIdsByKey.set(id, subjectId);
+    }
+
+    // Process all entities without triggering per-entity signal updates
+    const processedIds: K[] = [];
+    const addedEntities: Array<{ id: K; entity: E; subjectId: number }> = [];
+
+    for (const { entity: transformedEntity, id } of preparedAdds) {
+      const subjectId = subjectIdsByKey.get(id);
+      if (subjectId === undefined) {
+        throw new Error(`Entity with id ${String(id)} has no subject id`);
+      }
+      invalidateNodeCache(id);
+      syncEntitySignal(id);
+      processedIds.push(id);
+      addedEntities.push({ id, entity: transformedEntity, subjectId });
+    }
+
+    // Finish the compound topology before path observers or taps can copy
+    // metadata or flush history. No shared collector or later backpatching.
+    updateSignals(committed.complete);
+    if (committed.orderEndpoints) {
+      if (mutationCaptureRuntime?.isCaptureActive()) getPositionIds();
+      publishOrderChange(
+        committed.orderEndpoints.before,
+        committed.orderEndpoints.after,
+        beforeFrontier,
+        undefined,
+        committed.ordinaryEndpoints,
+        false,
+        committed.topologyUnit
+      );
+    }
+
+    const subjectIdsForWrite = processedIds.map((id) => {
+      const subjectId = subjectIdsByKey.get(id);
+      if (subjectId === undefined) {
+        throw new Error(`Entity with id ${String(id)} has no subject id`);
+      }
+      return subjectId;
+    });
+    lastSubjectIds = subjectIdsForWrite;
+
+    // Notify PathNotifier for each processed entity.
+    //
+    // Reproduced on 15.3.1: indexing the pre-add key list at
+    // `i + previous - added` anchored [x, y] after k4 and k5 instead of after
+    // k5 and x, so redo reinserted them out of order. A fresh row's
+    // predecessor is the previous FRESH row of this call, else the last row
+    // before it: an 'overwrite' replacement stays where it was, so it is not
+    // an anchor for the rows appended after it (v16 refinement of 7463f4eb,
+    // which anchored to the previous processed row).
+    let previousAppendedSubject =
+      lastPreviousKey === undefined
+        ? undefined
+        : allocateSubjectId(lastPreviousKey);
+    for (let i = 0; i < addedEntities.length; i++) {
+      const { id, entity } = addedEntities[i];
+      const beforeSubject = previousAppendedSubject;
+      if (preparedAdds[i].existingSubjectId === undefined) {
+        previousAppendedSubject = subjectIdsForWrite[i];
+      }
+      pathNotifier.notify(
+        `${basePath}.${String(id)}`,
+        entity,
+        preparedAdds[i].prev,
+        basePath,
+        [subjectIdsForWrite[i]],
+        getPositionIdsForNotify(),
+        preparedAdds[i].existingSubjectId === undefined
+          ? createStructuralEffectMeta(
+              {
+                kind: 'add',
+                subject: subjectIdsForWrite[i],
+                key: id,
+                value: deepClone(entity),
+                ...(prepend ? getNeighborSubjects(id) : { beforeSubject }),
+              },
+              committed.ordinaryChanges.get(subjectIdsForWrite[i])
+            )
+          : withEntityValueTransition(
+              ambientMeta(),
+              committed.valueResults.get(subjectIdsForWrite[i])
+            )
+      );
+    }
+
+    // Run tap handlers for each processed entity
+    for (const { id, entity } of addedEntities) {
+      emitTap('onAdd', entity, id);
+    }
+
+    return processedIds;
+  }
+
   function addOneWithStructuralEffect(
     entity: E,
-    opts?: AddOptions<E, K>
+    opts?: AddOptions<E, K>,
+    prepend = false
   ): { id: K; structuralEffect: PendingAddStructuralEffect } {
     const id = deriveId(entity, opts);
     const previousLastKey = structuralStore.lastActiveKey();
@@ -1547,7 +3236,8 @@ export function createEntitySignal<
       nextValue: transformedEntity,
     };
     frame.stageFreshSubject(freshSubject);
-    commitAndProjectEntityMutationFrame(frame);
+    if (prepend) frame.stageFinalFront([id]);
+    const committed = commitAndProjectEntityMutationFrame(frame, undefined, true);
     const structuralEffect: PendingAddStructuralEffect = {
       kind: 'add',
       subject: subjectId,
@@ -1558,10 +3248,21 @@ export function createEntitySignal<
           ? undefined
           : allocateSubjectId(previousLastKey),
     };
+    if (prepend) {
+      // Complete placement before notifying or invoking onAdd: nested writes
+      // must observe the finished outer operation and survive its return.
+
+      const neighbors = getNeighborSubjects(id);
+      rewritePendingAddEffect(
+        structuralEffect,
+        neighbors.beforeSubject,
+        neighbors.afterSubject
+      );
+    }
     lastSubjectIds = [subjectId];
     invalidateNodeCache(id);
     syncEntitySignal(id);
-    updateSignals();
+    updateSignals(committed.complete);
 
     pathNotifier.notify(
       `${basePath}.${String(id)}`,
@@ -1570,12 +3271,13 @@ export function createEntitySignal<
       basePath,
       [subjectId],
       getPositionIdsForNotify(),
-      createStructuralEffectMeta(structuralEffect)
+      createStructuralEffectMeta(
+        structuralEffect,
+        committed.ordinaryChanges.get(subjectId)
+      )
     );
 
-    for (const handler of tapHandlers) {
-      handler.onAdd?.(transformedEntity, id);
-    }
+    emitTap('onAdd', transformedEntity, id);
 
     return { id, structuralEffect };
   }
@@ -1700,6 +3402,47 @@ export function createEntitySignal<
 
   /** Handlers for observation */
   const tapHandlers: TapHandlers<E, K>[] = [];
+  /**
+   * Run every tap's `method`. A tap reads collections as any consumer does:
+   * absent-aware, even while a reversal is applied to their tree and its own
+   * row writes read hidden rows physically (`taps`, v16 8f).
+   */
+  const emitTap = <M extends keyof TapHandlers<E, K>>(
+    method: M,
+    ...args: Parameters<NonNullable<TapHandlers<E, K>[M]>>
+  ): void => {
+    // A re-adding write re-adds its path before anyone hears of its rows: a
+    // tap reads the collection present, as on an empty one (v16 8f review).
+    if (pendingReAdd) {
+      pendingReAdd = false;
+      reactivatePathOnWrite(api);
+    }
+    // A tap's own writes are ordinary writes: interceptors run for them, even
+    // inside a re-adding write that already ran its own (v16 8f review).
+    const suppressed = interceptsSuppressed;
+    const nested = reAdding;
+    interceptsSuppressed = 0;
+    reAdding = false;
+    taps.depth++;
+    try {
+      for (const handler of tapHandlers)
+        (handler[method] as ((...input: unknown[]) => void) | undefined)?.(
+          ...args
+        );
+    } finally {
+      taps.depth--;
+      interceptsSuppressed = suppressed;
+      reAdding = nested;
+    }
+  };
+  /** A re-adding write already ran this call's interceptors (v16 8f). */
+  let interceptsSuppressed = 0;
+  /** A re-adding write is running on this collection (v16 8f). */
+  let reAdding = false;
+  /** It has written its rows and not yet re-added its path. */
+  let pendingReAdd = false;
+  /** A re-adding write's removal of retained rows: no tap sees it (v16 8e). */
+  let silentClear = 0;
 
   /** Handlers for blocking/transforming */
   const interceptHandlers: InterceptHandlers<E, K>[] = [];
@@ -1709,16 +3452,22 @@ export function createEntitySignal<
   // ==================
 
   /** Mark the collection dirty. O(1) — see the `version` docs above. */
-  function updateSignals(): void {
+  function updateSignals(complete?:()=>void): void {
     const pending = [...pendingSubjectEpochs];
     pendingSubjectEpochs.clear();
-    locations.runInvalidationGroup(() => {
-      for (const epoch of pending) {
-        advanceEpochHandle(epoch);
-      }
-      deriveLocation(version, (value) => value + 1);
-      markOwnerInvalidated(ownerId);
-    });
+    // An absent collection reads empty before and after: nothing a consumer
+    // reads changed. Its membership hook wakes them when it comes back, so a
+    // reversal writing its hidden rows re-runs nobody while those rows are
+    // read physically (v16 8e).
+    let failed=false,first:unknown;
+    const deliver=(run:()=>void)=>{try{run();}catch(error){if(!failed){failed=true;first=error;}}};
+    deliver(()=>{if(!absent())locations.runInvalidationGroup(() => {
+      for (const epoch of pending) deliver(()=>advanceEpochHandle(epoch));
+      deliver(()=>deriveLocation(version, (value) => value + 1));
+      deliver(()=>markOwnerInvalidated(ownerId));
+    });});
+    try{complete?.();}catch(error){if(!failed){failed=true;first=error;}else reportContainedObserverError({error,operation:'notify:subscriber'});}
+    if(failed)throw first;
   }
 
   function createEntityNode(
@@ -1787,7 +3536,8 @@ export function createEntitySignal<
       return key === undefined ? undefined : readEntityByKey(key);
     };
 
-    const node = ((valueOrUpdater?: E | ((current: E) => E)): E | undefined => {
+    const writeRow = (valueOrUpdater?: E | ((current: E) => E), selection?: ClaimedFieldEndpoint): E | undefined => {
+      validateSelectedEntry(selection, subjectId);
       if (valueOrUpdater === undefined) {
         return entitySig();
       }
@@ -1795,20 +3545,19 @@ export function createEntitySignal<
       if (key === undefined) {
         throw new Error(`Entity with subject ${String(subjectId)} not found`);
       }
-      const current = getProjectedEntity(key);
+      const current = presentEntity(key);
       if (current === undefined) {
         throw new Error(`Entity with id ${String(key)} not found`);
       }
-      const next =
-        typeof valueOrUpdater === 'function'
-          ? (valueOrUpdater as (c: E) => E)(current)
-          : (valueOrUpdater as E);
-      withCallableWriteIntent(
-        typeof valueOrUpdater === 'function' ? 'derive' : 'replace',
-        () => api.replaceOne(key, next)
-      );
+      const write = () => {
+        const next = typeof valueOrUpdater === 'function' ? (valueOrUpdater as (c:E)=>E)(current) : valueOrUpdater;
+        withCallableWriteIntent(typeof valueOrUpdater === 'function'?'derive':'replace',()=>replaceOnePrivate(key,next,selection));
+      };
+      if(typeof valueOrUpdater==='function') withEntityPublicationInput(entityPublication,subjectId,undefined,write);
+      else write();
       return undefined;
-    }) as unknown as EntityNode<E>;
+    };
+    const node = ((valueOrUpdater?: E | ((current: E) => E)) => writeRow(valueOrUpdater)) as unknown as EntityNode<E>;
 
     // A retained row/field belongs to a lifetime, not its mutable storage key.
     // Carry only identities; binding metadata must not retain retired values.
@@ -1818,6 +3567,8 @@ export function createEntitySignal<
       if (!registry || owner === undefined) return;
       definePositionRegistry(location, registry);
       defineEntityLocationBinding(location, { owner, subjectId, fieldKey });
+      defineEntityPublicationBinding(location,{source:entityPublication,subject:subjectId,field:fieldKey,
+        replaceSelected: fieldKey === undefined ? (value, selection) => { writeRow(value as E, selection); } : undefined});
       if (mutationCaptureRuntime) {
         Object.defineProperty(location, MUTATION_CAPTURE_RUNTIME, {
           value: mutationCaptureRuntime,
@@ -1827,25 +3578,28 @@ export function createEntitySignal<
     bindLocation(node);
 
     // Field projections derive their read from the subject-owned entity location.
-    // Writes delegate to api.updateOne so interceptors and tap handlers still run.
+    // Public and selected writes share updateOnePrivate, including interceptors and taps.
     for (const key of Object.keys(entity)) {
       const fieldKey = key as keyof E;
       const computeField = () => {
         const current = entitySig();
-        return current && Object.prototype.hasOwnProperty.call(current, fieldKey)
+        return current &&
+          Object.prototype.hasOwnProperty.call(current, fieldKey)
           ? current[fieldKey]
           : undefined;
       };
       const writeField = (
         value: E[typeof fieldKey] | undefined,
-        intent: 'replace' | 'derive'
+        intent: 'replace' | 'derive',
+        selection?: ClaimedFieldEndpoint
       ) => {
+        validateSelectedEntry(selection, subjectId, String(fieldKey));
         const key = currentKey();
         if (key === undefined) {
           throw new Error(`Entity with subject ${String(subjectId)} not found`);
         }
         withCallableWriteIntent(intent, () =>
-          api.updateOne(key, { [fieldKey]: value } as Partial<E>)
+          updateOnePrivate(key, { [fieldKey]: value } as Partial<E>, selection)
         );
       };
       const fieldSignal = locations.createWritableProjection
@@ -2027,6 +3781,7 @@ export function createEntitySignal<
     }
 
     const result = commitAndProjectEntityMutationFrame(frame);
+    // Shared installed-frame completion requests publication retirement.
     for (const changedSubjectId of result.physicallyChangedSubjectIds) {
       if (forgetLifetime && changedSubjectId === prepared.subjectId) {
         // NO PUBLISH for a forgotten subject, and this is load-bearing rather
@@ -2122,6 +3877,7 @@ export function createEntitySignal<
       if (!state || state.active) {
         continue;
       }
+      if (ordinaryTopology.retains(subjectId)) continue;
       if (!valueStore.hasRetainedValueBacking(subjectId)) {
         continue;
       }
@@ -2193,7 +3949,7 @@ export function createEntitySignal<
     // ==================
 
     byId(id: K): EntityNode<E> | undefined {
-      if (structuralStore.hasActiveKey(id)) {
+      if (!rowAbsent() && structuralStore.hasActiveKey(id)) {
         // Present: subscribe to the PER-ENTITY signal only, so callers re-run
         // when THIS entity changes but not when others do (body-granular).
         // Materialized lazily here — bounded by the number of live entities.
@@ -2220,15 +3976,15 @@ export function createEntitySignal<
     // ==================
 
     get all(): ReadableCell<E[]> {
-      return allSignal;
+      return inTap(allSignal, computeAll);
     },
 
     get count(): ReadableCell<number> {
-      return countSignal;
+      return inTap(countSignal, computeCount);
     },
 
     get ids(): ReadableCell<K[]> {
-      return idsSignal;
+      return inTap(idsSignal, () => computeIds(computeAll));
     },
 
     /**
@@ -2240,12 +3996,12 @@ export function createEntitySignal<
      * `WRONG_ENTITY_METHODS`). `asMap` says what it returns.
      */
     get asMap(): ReadableCell<ReadonlyMap<K, E>> {
-      return mapSignal;
+      return inTap(mapSignal, computeMap);
     },
 
     // ── Active entity ───────────────────────────────────────────────────────
     get activeId(): ReadableCell<K | undefined> {
-      return activeIdSignal.asReadonly();
+      return inTap(activeIdSignal.asReadonly(), readActiveId);
     },
 
     /**
@@ -2258,45 +4014,54 @@ export function createEntitySignal<
      * that row changes — which is what `byId` exists for.
      */
     get activeEntity(): ReadableCell<E | undefined> {
-      return (cachedActiveEntity ??= locations.createDerived(() => {
-        const id = activeIdSignal();
+      const read = () => {
+        const id = taps.depth ? readActiveId() : activeIdSignal();
         if (id === undefined) return undefined;
+        // A selection names a key even while no subject occupies it. Keep the
+        // membership edge only while absent; a present selection stays scoped
+        // to its subject, and dependency cleanup drops the old edge on reentry.
+        if (resolveSubjectId(id) === undefined) idsSignal();
         return readEntityByKey(id);
-      }));
+      };
+      if (taps.depth) return fresh(read);
+      return (cachedActiveEntity ??= locations.createDerived(read));
     },
 
     setActiveId(id: K | undefined): void {
       // Not an error when the id is absent: selection frequently outlives the
       // row (a delete arriving from a socket while a detail pane is open), and
       // `activeEntity` already resolves to undefined in that case.
-      const previous = activeIdSignal();
+      const previous = activeIdValue;
       replaceLocation(activeIdSignal, id);
-      if (!Object.is(previous, activeIdSignal())) markOwnerInvalidated(ownerId);
+      if (!Object.is(previous, activeIdValue)) markOwnerInvalidated(ownerId);
     },
 
     clearActiveId(): void {
-      const previous = activeIdSignal();
+      const previous = activeIdValue;
       replaceLocation(activeIdSignal, undefined);
-      if (!Object.is(previous, activeIdSignal())) markOwnerInvalidated(ownerId);
+      if (!Object.is(previous, activeIdValue)) markOwnerInvalidated(ownerId);
     },
 
     has(id: K): ReadableCell<boolean> {
-      return createVersionedProjection(() => structuralStore.hasActiveKey(id));
+      const read = () => !absent() && structuralStore.hasActiveKey(id);
+      return taps.depth ? fresh(read) : createVersionedProjection(read);
     },
 
     // Bare canonical name (the `.isEmpty` alias was removed in v11).
     get empty(): ReadableCell<boolean> {
+      if (taps.depth) return fresh(() => computeCount() === 0);
       return (cachedEmpty ??= locations.createDerived(
         () => countSignal() === 0
       ));
     },
 
     where(predicate: (entity: E) => boolean): ReadableCell<E[]> {
+      if (taps.depth) return fresh(() => computeAll().filter(row=>nativePredicate(predicate,row)));
       const cached = whereCache.get(predicate);
       if (cached) return cached;
 
       if (typeof ngDevMode === 'undefined' || ngDevMode) {
-        warnOnPredicateChurn('where', predicate);
+        (warnOnPredicateChurn ??= createPredicateChurnWarning<E>())('where', predicate);
       }
       // Filter DURING iteration rather than materialising `all` and discarding
       // most of it. `allSignal()` builds an array of every entity; `.filter()`
@@ -2327,10 +4092,10 @@ export function createEntitySignal<
       // `version()` is read directly for the same invalidation `allSignal()`
       // has; the sorted branch gets it transitively.
       const s = createVersionedProjection(() => {
-        if (config.sortComparer) return allSignal().filter(predicate);
+        if (config.sortComparer) return allSignal().filter(row=>nativePredicate(predicate,row));
         const out: E[] = [];
-        for (const entity of getProjectedEntities()) {
-          if (predicate(entity)) out.push(entity);
+        for (const entity of presentEntities()) {
+          if (nativePredicate(predicate,entity)) out.push(entity);
         }
         return out;
       });
@@ -2339,11 +4104,12 @@ export function createEntitySignal<
     },
 
     find(predicate: (entity: E) => boolean): ReadableCell<E | undefined> {
+      if (taps.depth) return fresh(() => computeAll().find(row=>nativePredicate(predicate,row)));
       const cached = findCache.get(predicate);
       if (cached) return cached;
 
       if (typeof ngDevMode === 'undefined' || ngDevMode) {
-        warnOnPredicateChurn('find', predicate);
+        (warnOnPredicateChurn ??= createPredicateChurnWarning<E>())('find', predicate);
       }
       // Same bypass as `where`, and the win here is algorithmic rather than a
       // constant factor: `allSignal().find()` builds the WHOLE array before
@@ -2360,9 +4126,9 @@ export function createEntitySignal<
       // which is order-dependent, so with a `sortComparer` the sorted array is
       // the only correct thing to scan. See the note on `where` above.
       const s = createVersionedProjection(() => {
-        if (config.sortComparer) return allSignal().find(predicate);
-        for (const entity of getProjectedEntities()) {
-          if (predicate(entity)) return entity;
+        if (config.sortComparer) return allSignal().find(row=>nativePredicate(predicate,row));
+        for (const entity of presentEntities()) {
+          if (nativePredicate(predicate,entity)) return entity;
         }
         return undefined;
       });
@@ -2378,39 +4144,15 @@ export function createEntitySignal<
       return addOneWithStructuralEffect(entity, opts).id;
     },
 
-    /**
-     * Insert at the FRONT, reusing `addOne` and then moving the entry.
-     *
-        if (structuralStore.hasActiveKey(id)) {
-     * so the entry order is rebuilt — O(n) in the number of entities. That is
-     * still markedly cheaper than the `setAll([entity, ...existing])` this
-     * replaces, which rebuilds the storage map AND resets every per-entity
-     * signal: only the newcomer's signal changes here, so held nodes survive and
-     * no unrelated row's consumers are invalidated.
-     *
-     * Reusing `addOne` rather than duplicating it keeps duplicate-detection,
-     * interceptors, notifier and tap handlers on exactly one path.
-     */
+    /** Insert at the front before notification and lifecycle callbacks. */
     prependOne(entity: E, opts?: AddOptions<E, K>): K {
-      const previousFirstKey = structuralStore.firstActiveKey();
-      const { id, structuralEffect } = addOneWithStructuralEffect(entity, opts);
-      moveToFront([id]);
-      rewritePendingAddEffect(
-        structuralEffect,
-        undefined,
-        previousFirstKey === undefined
-          ? undefined
-          : allocateSubjectId(previousFirstKey)
+      return withMembershipGroup(
+        () => addOneWithStructuralEffect(entity, opts, true).id
       );
-      return id;
     },
 
     prependMany(entities: E[], opts?: AddManyOptions<E, K>): K[] {
-      const ids = api.addMany(entities, opts);
-      // Front, in the order given — so `prependMany([a, b])` reads back as
-      // [a, b, ...existing], which is what the call site looks like.
-      moveToFront(ids);
-      return ids;
+      return withMembershipGroup(() => addManyInOrder(entities, opts, true));
     },
 
     /**
@@ -2427,216 +4169,24 @@ export function createEntitySignal<
      * still allowing the freed id to be reused by a different subject.
      */
     changeId(from: K, to: K): void {
+      // An absent collection has no row to rekey (v16 8e).
+      if (rowAbsent())
+        throw new Error(`Entity with id ${String(from)} not found`);
       const planned = planRekey(from, to);
       planned.commit();
       planned.publish();
     },
 
     addMany(entities: E[], opts?: AddManyOptions<E, K>): K[] {
-      const mode = opts?.mode ?? 'strict';
-      const previousKeys = [...structuralStore.activeKeysSnapshot()];
-
-      // First pass: validate/filter based on mode
-      const toProcess: Array<{
-        entity: E;
-        id: K;
-        existingSubjectId?: number;
-      }> = [];
-      for (const entity of entities) {
-        const id = deriveId(entity, opts);
-        const existingSubjectId = structuralStore.subjectIdForKey(id);
-        if (existingSubjectId !== undefined) {
-          if (mode === 'strict') {
-            throw new Error(`Entity with id ${String(id)} already exists`);
-          } else if (mode === 'skip') {
-            continue;
-          }
-          // 'overwrite': fall through — the projection helper below replaces the existing entry
-        }
-        toProcess.push({ entity, id, existingSubjectId });
-      }
-
-      if (toProcess.length === 0) return [];
-
-      // Stage all add work before mutating runtime state so a later failure
-      // cannot partially allocate fresh subject lifetimes.
-      const stagedAdds = toProcess.map(({ entity, id, existingSubjectId }) => ({
-        id,
-        entity: interceptAddedEntity(entity),
-        existingSubjectId,
-      }));
-      const plannedFreshSubjectIds = structuralStore.planFreshSubjectIds(
-        stagedAdds.filter(
-          ({ existingSubjectId }) => existingSubjectId === undefined
-        ).length
-      );
-      let plannedFreshIndex = 0;
-      const preparedAdds = stagedAdds.map(
-        ({ id, entity, existingSubjectId }) => ({
-          id,
-          entity,
-          existingSubjectId,
-          subjectId:
-            existingSubjectId ?? plannedFreshSubjectIds[plannedFreshIndex++],
-        })
-      );
-
-      const frame = createEntityMutationFrame();
-      for (const {
-        id,
-        entity: transformedEntity,
-        existingSubjectId,
-        subjectId,
-      } of preparedAdds) {
-        if (existingSubjectId === undefined) {
-          frame.stageFreshSubject({
-            kind: 'create-fresh-subject',
-            key: id,
-            subjectId,
-            nextValue: transformedEntity,
-          });
-          continue;
-        }
-
-        frame.stageValueReplacement({
-          kind: 'replace-value',
-          key: id,
-          subjectId: existingSubjectId,
-          nextValue: transformedEntity,
-        });
-      }
-
-      commitAndProjectEntityMutationFrame(frame);
-      const subjectIdsByKey = new Map<K, number>();
-      for (const { id, subjectId } of preparedAdds) {
-        subjectIdsByKey.set(id, subjectId);
-      }
-
-      // Process all entities without triggering per-entity signal updates
-      const processedIds: K[] = [];
-      const addedEntities: Array<{ id: K; entity: E; subjectId: number }> = [];
-
-      for (const { entity: transformedEntity, id } of preparedAdds) {
-        const subjectId = subjectIdsByKey.get(id);
-        if (subjectId === undefined) {
-          throw new Error(`Entity with id ${String(id)} has no subject id`);
-        }
-        invalidateNodeCache(id);
-        syncEntitySignal(id);
-        processedIds.push(id);
-        addedEntities.push({ id, entity: transformedEntity, subjectId });
-      }
-
-      // Single signal update after all entities are processed
-      updateSignals();
-
-      const subjectIdsForWrite = processedIds.map((id) => {
-        const subjectId = subjectIdsByKey.get(id);
-        if (subjectId === undefined) {
-          throw new Error(`Entity with id ${String(id)} has no subject id`);
-        }
-        return subjectId;
-      });
-      lastSubjectIds = subjectIdsForWrite;
-
-      // Notify PathNotifier for each processed entity
-      for (let i = 0; i < addedEntities.length; i++) {
-        const { id, entity } = addedEntities[i];
-        const beforeKey = previousKeys.at(
-          i + previousKeys.length - addedEntities.length
-        );
-        pathNotifier.notify(
-          `${basePath}.${String(id)}`,
-          entity,
-          undefined,
-          basePath,
-          [subjectIdsForWrite[i]],
-          getPositionIdsForNotify(),
-          createStructuralEffectMeta({
-            kind: 'add',
-            subject: subjectIdsForWrite[i],
-            key: id,
-            value: deepClone(entity),
-            beforeSubject:
-              beforeKey === undefined
-                ? undefined
-                : allocateSubjectId(beforeKey),
-          })
-        );
-      }
-
-      // Run tap handlers for each processed entity
-      for (const { id, entity } of addedEntities) {
-        for (const handler of tapHandlers) {
-          handler.onAdd?.(entity, id);
-        }
-      }
-
-      return processedIds;
+      return addManyInOrder(entities, opts);
     },
 
     // ==================
     // MUTATIONS: UPDATE
     // ==================
 
-    updateOne(id: K, changes: Partial<E>): void {
-      const callableIntent = consumeCallableWriteIntent();
-      const entity = getProjectedEntity(id);
-      if (!entity) {
-        throw new Error(`Entity with id ${String(id)} not found`);
-      }
+    updateOne(id: K, changes: Partial<E>): void { updateOnePrivate(id, changes); },
 
-      const prev = entity;
-
-      // Run interceptors
-      let transformedChanges = changes;
-      for (const handler of interceptHandlers) {
-        const ctx: InterceptContext<Partial<E>> = {
-          block: (reason?: string) => {
-            throw new Error(
-              `Cannot update entity: ${reason || 'blocked by interceptor'}`
-            );
-          },
-          transform: (value: Partial<E>) => {
-            transformedChanges = value;
-          },
-          blocked: false,
-          blockReason: undefined,
-        };
-        assertSynchronousInterceptorResult(
-          handler.onUpdate?.(id, changes, ctx),
-          'onUpdate'
-        );
-      }
-
-      const finalUpdated = { ...entity, ...transformedChanges };
-      // One value replacement, no structural consequence — commit it directly.
-      // See `commitExistingSubjectValue` for why this is the whole case.
-      const subjectIdForWrite = rememberSubjectId(id);
-      commitExistingSubjectValue(subjectIdForWrite, finalUpdated);
-      syncEntitySignal(id);
-      updateSignals();
-
-      // Notify PathNotifier
-      pathNotifier.notify(
-        `${basePath}.${String(id)}`,
-        finalUpdated,
-        prev,
-        basePath,
-        lastSubjectIds,
-        getPositionIdsForNotify(),
-        ambientMeta(),
-        undefined,
-        (callableIntent ?? getActiveWriteContext()?.mutationIntent) === 'derive'
-          ? undefined
-          : Object.keys(transformedChanges)
-      );
-
-      // Run tap handlers
-      for (const handler of tapHandlers) {
-        handler.onUpdate?.(id, transformedChanges, finalUpdated);
-      }
-    },
 
     /**
      * Replace, not merge — and the write path behind `byId(id)(next)`.
@@ -2651,77 +4201,8 @@ export function createEntitySignal<
      * `entity.id` disagreeing with the storage key, so that form has a silent
      * wrong-slot write built into it. This one cannot drift.
      */
-    replaceOne(id: K, entity: E): void {
-      const callableIntent = consumeCallableWriteIntent();
-      const prev = getProjectedEntity(id);
-      if (!prev) {
-        throw new Error(`Entity with id ${String(id)} not found`);
-      }
+    replaceOne(id: K, entity: E): void { replaceOnePrivate(id, entity); },
 
-      let next = entity;
-      for (const handler of interceptHandlers) {
-        const ctx: InterceptContext<Partial<E>> = {
-          block: (reason?: string) => {
-            throw new Error(
-              `Cannot replace entity: ${reason || 'blocked by interceptor'}`
-            );
-          },
-          transform: (value: Partial<E>) => {
-            next = value as E;
-          },
-          blocked: false,
-          blockReason: undefined,
-        };
-        assertSynchronousInterceptorResult(
-          handler.onUpdate?.(id, entity as Partial<E>, ctx),
-          'onUpdate'
-        );
-      }
-
-      const subjectId = structuralStore.subjectIdForKey(id);
-      if (subjectId === undefined) {
-        throw new Error(`Entity with id ${String(id)} has no subject id`);
-      }
-
-      const replacement: PreparedValueReplacement<K, E> = {
-        kind: 'replace-value',
-        key: id,
-        subjectId,
-        nextValue: next,
-      };
-      const frame = createEntityMutationFrame();
-      frame.stageValueReplacement(replacement);
-      commitAndProjectEntityMutationFrame(frame);
-      syncEntitySignal(id);
-      updateSignals();
-      pathNotifier.notify(
-        `${basePath}.${String(id)}`,
-        next,
-        prev,
-        basePath,
-        // REPLACE-ONE-SUBJECT-1. This was `undefined`, and it was the ONLY
-        // entity notification in this file that dropped subject identity —
-        // `updateOne`, `updateMany` and `removeOne` all pass theirs. The id
-        // above is DATA; `subjectId` is IDENTITY, and it was already resolved
-        // from `structuralStore` a few lines up, so nothing new is looked up
-        // here.
-        //
-        // Without it, reversal effects arrive with `subjectId: undefined`,
-        // `hasInlineSubjectAddress` is false, no inline subject address is
-        // derived, and no fallback descriptor can be keyed — so rollback and
-        // undo both REFUSE, at TOP level as well as nested.
-        [subjectId],
-        getPositionIdsForNotify(),
-        ambientMeta(),
-        undefined,
-        (callableIntent ?? getActiveWriteContext()?.mutationIntent) === 'derive'
-          ? undefined
-          : null
-      );
-      for (const handler of tapHandlers) {
-        handler.onUpdate?.(id, next as Partial<E>, next);
-      }
-    },
 
     updateMany(ids: K[], changes: Partial<E>): void {
       if (ids.length === 0) return;
@@ -2736,7 +4217,7 @@ export function createEntitySignal<
       }> = [];
 
       for (const id of ids) {
-        const entity = getProjectedEntity(id);
+        const entity = presentEntity(id);
         if (!entity) {
           throw new Error(`Entity with id ${String(id)} not found`);
         }
@@ -2764,6 +4245,7 @@ export function createEntitySignal<
         }
 
         const finalUpdated = { ...entity, ...transformedChanges };
+
         const subjectId = structuralStore.subjectIdForKey(id);
         if (subjectId === undefined) {
           throw new Error(`Entity with id ${String(id)} has no subject id`);
@@ -2779,22 +4261,28 @@ export function createEntitySignal<
       }
 
       const frame = createEntityMutationFrame();
-      for (const { id, subjectId, finalUpdated } of updatedEntities) {
+      for (const {
+        id,
+        subjectId,
+        finalUpdated,
+        transformedChanges,
+      } of updatedEntities) {
         frame.stageValueReplacement({
           kind: 'replace-value',
           key: id,
           subjectId,
           nextValue: finalUpdated,
+          authoredFields: Object.keys(transformedChanges),
         });
       }
-      commitAndProjectEntityMutationFrame(frame);
+      const committed = commitAndProjectEntityMutationFrame(frame, undefined, true);
 
       for (const { id } of updatedEntities) {
         syncEntitySignal(id);
       }
 
       // Single signal update after all entities are updated
-      updateSignals();
+      updateSignals(committed.complete);
 
       const subjectIdsForWrite = rememberSubjectIds(ids);
 
@@ -2809,7 +4297,10 @@ export function createEntitySignal<
           basePath,
           [subjectIdsForWrite[i]],
           getPositionIdsForNotify(),
-          ambientMeta(),
+          withEntityValueTransition(
+            ambientMeta(),
+            committed.valueResultsByStep[i]
+          ),
           undefined,
           getActiveWriteContext()?.mutationIntent === 'derive'
             ? undefined
@@ -2819,9 +4310,7 @@ export function createEntitySignal<
 
       // Run tap handlers for each updated entity
       for (const { id, transformedChanges, finalUpdated } of updatedEntities) {
-        for (const handler of tapHandlers) {
-          handler.onUpdate?.(id, transformedChanges, finalUpdated);
-        }
+        emitTap('onUpdate', id, transformedChanges, finalUpdated);
       }
     },
 
@@ -2829,8 +4318,9 @@ export function createEntitySignal<
       predicate: (entity: E) => boolean,
       changes: Partial<E>
     ): number {
+      return withEntityPublicationInput(entityPublication,undefined,undefined,()=>{
       const idsToUpdate: K[] = [];
-      for (const [id, entity] of getProjectedEntries()) {
+      for (const [id, entity] of presentEntries()) {
         if (predicate(entity)) {
           idsToUpdate.push(id);
         }
@@ -2839,6 +4329,7 @@ export function createEntitySignal<
         api.updateMany(idsToUpdate, changes);
       }
       return idsToUpdate.length;
+      });
     },
 
     // ==================
@@ -2846,7 +4337,7 @@ export function createEntitySignal<
     // ==================
 
     removeOne(id: K): void {
-      const entity = getProjectedEntity(id);
+      const entity = presentEntity(id);
       if (!entity) {
         throw new Error(`Entity with id ${String(id)} not found`);
       }
@@ -2891,13 +4382,13 @@ export function createEntitySignal<
       };
       const frame = createEntityMutationFrame();
       frame.stageSubjectTombstone(tombstone);
-      const result = commitAndProjectEntityMutationFrame(frame);
+      const result = commitAndProjectEntityMutationFrame(frame, undefined, true);
       for (const changedSubjectId of result.physicallyChangedSubjectIds) {
         publishSubjectPhysicalChange(changedSubjectId);
       }
       tombstoneSubjectSignal(subjectIdsForWrite[0]);
       reclaimRetiredSubjectsWithoutOwner([subjectIdsForWrite[0]]);
-      updateSignals();
+      updateSignals(result.complete);
 
       // Notify PathNotifier
       pathNotifier.notify(
@@ -2907,13 +4398,14 @@ export function createEntitySignal<
         basePath,
         subjectIdsForWrite,
         getPositionIdsForNotify(),
-        createStructuralEffectMeta(structuralEffect)
+        createStructuralEffectMeta(
+          structuralEffect,
+          result.ordinaryChanges.get(subjectIdsForWrite[0])
+        )
       );
 
       // Run tap handlers
-      for (const handler of tapHandlers) {
-        handler.onRemove?.(id, entity);
-      }
+      emitTap('onRemove', id, entity);
     },
 
     removeMany(ids: K[]): void {
@@ -2928,7 +4420,7 @@ export function createEntitySignal<
         afterSubject?: number;
       }> = [];
       for (const id of ids) {
-        const entity = getProjectedEntity(id);
+        const entity = presentEntity(id);
         if (!entity) {
           throw new Error(`Entity with id ${String(id)} not found`);
         }
@@ -2984,7 +4476,7 @@ export function createEntitySignal<
         });
       }
 
-      const result = commitAndProjectEntityMutationFrame(frame);
+      const result = commitAndProjectEntityMutationFrame(frame, undefined, true);
       for (const changedSubjectId of result.physicallyChangedSubjectIds) {
         publishSubjectPhysicalChange(changedSubjectId);
       }
@@ -2997,7 +4489,7 @@ export function createEntitySignal<
       );
 
       // Single signal update after all entities are removed
-      updateSignals();
+      updateSignals(result.complete);
 
       // Notify PathNotifier for each removed entity
       for (let i = 0; i < preparedRemovals.length; i++) {
@@ -3009,28 +4501,30 @@ export function createEntitySignal<
           basePath,
           [subjectIdsForWrite[i]],
           getPositionIdsForNotify(),
-          createStructuralEffectMeta({
-            kind: 'remove',
-            subject: subjectIdsForWrite[i],
-            key: id,
-            value: deepClone(entity),
-            beforeSubject,
-            afterSubject,
-          })
+          createStructuralEffectMeta(
+            {
+              kind: 'remove',
+              subject: subjectIdsForWrite[i],
+              key: id,
+              value: deepClone(entity),
+              beforeSubject,
+              afterSubject,
+            },
+            result.ordinaryChanges.get(subjectIdsForWrite[i])
+          )
         );
       }
 
       // Run tap handlers for each removed entity
       for (const { id, entity } of preparedRemovals) {
-        for (const handler of tapHandlers) {
-          handler.onRemove?.(id, entity);
-        }
+        emitTap('onRemove', id, entity);
       }
     },
 
     removeWhere(predicate: (entity: E) => boolean): number {
+      return withEntityPublicationInput(entityPublication,undefined,undefined,()=>{
       const idsToRemove: K[] = [];
-      for (const [id, entity] of getProjectedEntries()) {
+      for (const [id, entity] of presentEntries()) {
         if (predicate(entity)) {
           idsToRemove.push(id);
         }
@@ -3039,6 +4533,7 @@ export function createEntitySignal<
         api.removeMany(idsToRemove);
       }
       return idsToRemove.length;
+      });
     },
 
     // ==================
@@ -3057,61 +4552,120 @@ export function createEntitySignal<
 
     upsertMany(entities: E[], opts?: AddOptions<E, K>): K[] {
       if (entities.length === 0) return [];
+      const lastPreviousKey = structuralStore.lastActiveKey();
 
-      // Separate adds from updates
-      const toAdd: Array<{ entity: E; id: K }> = [];
-      const toUpdate: Array<{ entity: E; id: K; prev: E; subjectId: number }> =
-        [];
-
+      // Upserted one at a time, as successive upsertOne calls would be: every
+      // id is resolved first (nothing intercepted or written yet), then the
+      // interceptors run once per COPY, in input order: onAdd for a new id's
+      // first copy, onUpdate for each later copy (the raw copy), merged over
+      // the running value. Each key is announced and tapped once, with its
+      // final value (v15 778f86ef and e02238f4, carried in v16 8f).
+      type Upsert = {
+        id: K;
+        prev?: E;
+        subjectId?: number;
+        /** The running value: the stored row, then each intercepted copy. */
+        entity?: E;
+        changes?: Partial<E>;
+      };
+      const toAdd: Upsert[] = [];
+      const toUpdate: Upsert[] = [];
+      const copies: Array<[Upsert, E]> = [];
+      const earlier = new Map<K, Upsert>();
       for (const entity of entities) {
         const id = deriveId(entity, opts);
-        const existing = getProjectedEntity(id);
-        if (existing !== undefined) {
-          const subjectId = resolveSubjectId(id);
+        let row = earlier.get(id);
+        if (!row) {
+          const prev = getProjectedEntity(id);
+          if (prev === undefined) row = { id };
+          else {
+            const subjectId = resolveSubjectId(id);
+            if (subjectId === undefined) {
+              throw new Error(`Entity with id ${String(id)} has no subject id`);
+            }
+            row = { id, prev, entity: prev, subjectId };
+          }
+          (prev === undefined ? toAdd : toUpdate).push(row);
+          earlier.set(id, row);
+        }
+        copies.push([row, entity]);
+      }
+      for (const [row, entity] of copies) {
+        if (row.entity === undefined) {
+          row.entity = interceptAddedEntity(entity);
+        } else {
+          const changes = interceptUpdatedEntity(row.id, entity);
+          row.changes = { ...row.changes, ...changes };
+          row.entity = { ...row.entity, ...changes };
+        }
+      }
+
+      const stagedAdds = toAdd as Array<{ id: K; entity: E }>;
+      const stagedUpdates = toUpdate.map(
+        ({ id, subjectId, prev, entity, changes }) => ({
+          id,
+          subjectId: subjectId as number,
+          prev: prev as E,
+          transformedChanges: changes as Partial<E>,
+          finalUpdated: entity as E,
+        })
+      );
+
+      // One observed membership unit; a throw still closes it.
+      let ordinaryChanges: ReadonlyMap<
+        number,
+        readonly CommittedEntityMutation[]
+      > = new Map();
+      let valueResults: ReadonlyMap<
+        number,
+        EntityValueTransition<E>
+      > = new Map();
+      let completePublication: (()=>void)|undefined;
+      const membershipUnit = membershipTap;
+      membershipUnit?.(MEMBERSHIP_OPEN_ORDER);
+      const addedEntities: Array<{ id: K; entity: E; subjectId: number }> = [];
+      try {
+        const freshSubjectIds = structuralStore.planFreshSubjectIds(
+          stagedAdds.length
+        );
+        const frame = createEntityMutationFrame();
+        for (let i = 0; i < stagedAdds.length; i++)
+          frame.stageFreshSubject({
+            kind: 'create-fresh-subject',
+            key: stagedAdds[i].id,
+            subjectId: freshSubjectIds[i],
+            nextValue: stagedAdds[i].entity,
+          });
+        for (const row of stagedUpdates)
+          frame.stageValueReplacement({
+            kind: 'replace-value',
+            key: row.id,
+            subjectId: row.subjectId,
+            nextValue: row.finalUpdated,
+            authoredFields: Object.keys(row.transformedChanges),
+          });
+        const committed = commitAndProjectEntityMutationFrame(frame, undefined, true);
+        completePublication = committed.complete;
+        valueResults = committed.valueResults;
+        ordinaryChanges = committed.ordinaryChanges;
+        const addedSubjectIdsByKey = new Map<K, number>();
+        for (let i = 0; i < stagedAdds.length; i++) {
+          addedSubjectIdsByKey.set(stagedAdds[i].id, freshSubjectIds[i]);
+        }
+
+        // Process adds
+        for (const { entity: transformedEntity, id } of stagedAdds) {
+          const subjectId = addedSubjectIdsByKey.get(id);
           if (subjectId === undefined) {
             throw new Error(`Entity with id ${String(id)} has no subject id`);
           }
-          toUpdate.push({ entity, id, prev: existing, subjectId });
-        } else {
-          toAdd.push({ entity, id });
+
+          invalidateNodeCache(id);
+          syncEntitySignal(id);
+          addedEntities.push({ id, entity: transformedEntity, subjectId });
         }
-      }
-
-      const stagedAdds = toAdd.map(({ entity, id }) => ({
-        id,
-        entity: interceptAddedEntity(entity),
-      }));
-
-      const stagedUpdates = toUpdate.map(({ entity, id, prev, subjectId }) => {
-        const transformedChanges = interceptUpdatedEntity(id, entity);
-        return {
-          id,
-          subjectId,
-          prev,
-          transformedChanges,
-          finalUpdated: { ...prev, ...transformedChanges },
-        };
-      });
-
-      const freshSubjectIds = commitFreshSubjects(
-        stagedAdds.map(({ id }) => id)
-      );
-      const addedSubjectIdsByKey = new Map<K, number>();
-      for (let i = 0; i < stagedAdds.length; i++) {
-        addedSubjectIdsByKey.set(stagedAdds[i].id, freshSubjectIds[i]);
-      }
-
-      // Process adds
-      const addedEntities: Array<{ id: K; entity: E; subjectId: number }> = [];
-      for (const { entity: transformedEntity, id } of stagedAdds) {
-        const subjectId = addedSubjectIdsByKey.get(id);
-        if (subjectId === undefined) {
-          throw new Error(`Entity with id ${String(id)} has no subject id`);
-        }
-        valueStore.retainSubjectValue(subjectId, transformedEntity);
-        invalidateNodeCache(id);
-        syncEntitySignal(id);
-        addedEntities.push({ id, entity: transformedEntity, subjectId });
+      } finally {
+        membershipUnit?.(MEMBERSHIP_CLOSE);
       }
 
       const updatedEntities: Array<{
@@ -3128,7 +4682,6 @@ export function createEntitySignal<
         finalUpdated,
         transformedChanges,
       } of stagedUpdates) {
-        valueStore.retainSubjectValue(subjectId, finalUpdated);
         syncEntitySignal(id);
         updatedEntities.push({
           id,
@@ -3140,7 +4693,7 @@ export function createEntitySignal<
       }
 
       // Single signal update after all entities are processed
-      updateSignals();
+      updateSignals(completePublication);
 
       const addedSubjectIdsForWrite = addedEntities.map(
         ({ subjectId }) => subjectId
@@ -3153,17 +4706,34 @@ export function createEntitySignal<
         ...updatedSubjectIdsForWrite,
       ];
 
-      // Notify PathNotifier for added entities
+      // Fresh lifetimes require an add effect, not a whole-row value write.
+      // Each appended row follows the previous fresh row of this call.
+      let beforeSubject =
+        lastPreviousKey === undefined
+          ? undefined
+          : allocateSubjectId(lastPreviousKey);
       for (let i = 0; i < addedEntities.length; i++) {
         const { id, entity } = addedEntities[i];
+        const subject = addedSubjectIdsForWrite[i];
         pathNotifier.notify(
           `${basePath}.${String(id)}`,
           entity,
           undefined,
           basePath,
-          [addedSubjectIdsForWrite[i]],
-          getPositionIdsForNotify()
+          [subject],
+          getPositionIdsForNotify(),
+          createStructuralEffectMeta(
+            {
+              kind: 'add',
+              subject,
+              key: id,
+              value: deepClone(entity),
+              beforeSubject,
+            },
+            ordinaryChanges.get(subject)
+          )
         );
+        beforeSubject = subject;
       }
 
       // Notify PathNotifier for updated entities
@@ -3177,7 +4747,10 @@ export function createEntitySignal<
           basePath,
           [updatedSubjectIdsForWrite[i]],
           getPositionIdsForNotify(),
-          ambientMeta(),
+          withEntityValueTransition(
+            ambientMeta(),
+            valueResults.get(updatedSubjectIdsForWrite[i])
+          ),
           undefined,
           getActiveWriteContext()?.mutationIntent === 'derive'
             ? undefined
@@ -3187,16 +4760,12 @@ export function createEntitySignal<
 
       // Run tap handlers for added entities
       for (const { id, entity } of addedEntities) {
-        for (const handler of tapHandlers) {
-          handler.onAdd?.(entity, id);
-        }
+        emitTap('onAdd', entity, id);
       }
 
       // Run tap handlers for updated entities
       for (const { id, transformedChanges, finalUpdated } of updatedEntities) {
-        for (const handler of tapHandlers) {
-          handler.onUpdate?.(id, transformedChanges, finalUpdated);
-        }
+        emitTap('onUpdate', id, transformedChanges, finalUpdated);
       }
 
       return [...toAdd.map((a) => a.id), ...toUpdate.map((u) => u.id)];
@@ -3230,15 +4799,32 @@ export function createEntitySignal<
         return { id, subjectId, entity, beforeSubject, afterSubject };
       });
 
-      for (const { id, subjectId } of activeSubjects) {
-        const currentState = resolveSubjectState(subjectId);
-        structuralStore.tombstoneSubject(
-          subjectId,
-          id,
-          currentState?.restoreAllowed ?? true
-        );
-        publishSubjectPhysicalChange(subjectId);
+      let ordinaryChanges: ReadonlyMap<
+        number,
+        readonly CommittedEntityMutation[]
+      > = new Map();
+      let completePublication: (()=>void)|undefined;
+      const membershipUnit = membershipTap;
+      membershipUnit?.(MEMBERSHIP_OPEN_ORDER);
+      try {
+        const frame = createEntityMutationFrame();
+        for (const { id, subjectId } of activeSubjects)
+          frame.stageSubjectTombstone({
+            kind: 'tombstone-subject',
+            key: id,
+            subjectId,
+            restoreAllowed:
+              resolveSubjectState(subjectId)?.restoreAllowed ?? true,
+          });
+        const committed=commitAndProjectEntityMutationFrame(frame,undefined,true);
+        ordinaryChanges=committed.ordinaryChanges;
+        completePublication=committed.complete;
+      } finally {
+        // Observed once every row is tombstoned, before reactive publication.
+        membershipUnit?.(MEMBERSHIP_CLOSE);
       }
+      for (const { subjectId } of activeSubjects)
+        publishSubjectPhysicalChange(subjectId);
 
       // Per-subject, exactly as `removeOne` does — never a bulk reset (see the
       // tombstone above). A held reference has to keep reading through the SAME
@@ -3253,7 +4839,7 @@ export function createEntitySignal<
       );
       replaceLocation(activeIdSignal, undefined);
       lastSubjectIds = activeSubjects.map(({ subjectId }) => subjectId);
-      updateSignals();
+      updateSignals(completePublication);
 
       for (const {
         id,
@@ -3270,304 +4856,272 @@ export function createEntitySignal<
           basePath,
           [subjectId],
           getPositionIdsForNotify(),
-          createStructuralEffectMeta({
-            kind: 'remove',
-            subject: subjectId,
-            key: id,
-            value: deepClone(entity),
-            beforeSubject,
-            afterSubject,
-          })
+          createStructuralEffectMeta(
+            {
+              kind: 'remove',
+              subject: subjectId,
+              key: id,
+              value: deepClone(entity),
+              beforeSubject,
+              afterSubject,
+            },
+            ordinaryChanges.get(subjectId)
+          )
         );
       }
 
       for (const { id, entity } of activeSubjects) {
-        if (!entity) continue;
-        for (const handler of tapHandlers) {
-          handler.onRemove?.(id, entity);
-        }
+        if (!entity || silentClear) continue;
+        emitTap('onRemove', id, entity);
       }
     },
 
     setAll(entities: E[], opts?: AddOptions<E, K>): void {
-      const currentEntries = getProjectedEntries();
+      // Pre-state from ONE walk of the structural order: each row's key and
+      // subject come off its node, so nothing below re-resolves a current row
+      // or searches the pre-state for a removed row's position.
+      const currentKeys: K[] = [];
+      const currentSubjects: number[] = [];
+      structuralStore.snapshotActiveOrder(currentKeys, currentSubjects);
       const beforeOrderFrontier = structuralStore.activeOrderFrontier();
-      const beforeSubjects = currentEntries
-        .map(([id]) => resolveSubjectId(id))
-        .filter((subjectId): subjectId is number => subjectId !== undefined);
-      const currentIds = new Set(currentEntries.map(([id]) => id));
-      const stagedIncomingIds: K[] = [];
-      const stagedIncomingById = new Map<K, E>();
 
+      // The incoming order, deduplicated (first position, last value), in
+      // index-aligned arrays. `incomingSubjects` holds an update's existing
+      // subject and receives each add's fresh subject once it exists.
+      const incomingIndex = new Map<K, number>();
+      const incomingIds: K[] = [];
+      const incomingEntities: E[] = [];
+      const incomingSubjects: Array<number | undefined> = [];
       for (const entity of entities) {
         const id = deriveId(entity, opts);
-        const transformedEntity = currentIds.has(id)
-          ? (() => {
-              let replacement = entity;
-              for (const handler of interceptHandlers) {
-                const ctx: InterceptContext<Partial<E>> = {
-                  block: (reason?: string) => {
-                    throw new Error(
-                      `Cannot replace entity: ${
-                        reason || 'blocked by interceptor'
-                      }`
-                    );
-                  },
-                  transform: (value: Partial<E>) => {
-                    replacement = value as E;
-                  },
-                  blocked: false,
-                  blockReason: undefined,
-                };
-                assertSynchronousInterceptorResult(
-                  handler.onUpdate?.(id, entity as Partial<E>, ctx),
-                  'onUpdate'
-                );
-              }
-              return replacement;
-            })()
-          : interceptAddedEntity(entity);
+        const existing = structuralStore.subjectIdForKey(id);
+        const transformedEntity =
+          existing !== undefined
+            ? interceptReplacedEntity(id, entity)
+            : interceptAddedEntity(entity);
 
-        if (!stagedIncomingById.has(id)) {
-          stagedIncomingIds.push(id);
+        const index = incomingIndex.get(id);
+        if (index === undefined) {
+          incomingIndex.set(id, incomingIds.length);
+          incomingIds.push(id);
+          incomingEntities.push(transformedEntity);
+          incomingSubjects.push(existing);
+          continue;
         }
-        stagedIncomingById.set(id, transformedEntity);
+        incomingEntities[index] = transformedEntity;
       }
 
-      const stagedRemovals = currentEntries
-        .filter(([id]) => !stagedIncomingById.has(id))
-        .map(([id, entity]) => {
-          for (const handler of interceptHandlers) {
-            const ctx: InterceptContext<void> = {
-              block: (reason?: string) => {
-                throw new Error(
-                  `Cannot remove entity: ${reason || 'blocked by interceptor'}`
-                );
-              },
-              transform: () => {
-                // void transform - no transformation possible
-              },
-              blocked: false,
-              blockReason: undefined,
-            };
-            assertSynchronousInterceptorResult(
-              handler.onRemove?.(id, entity, ctx),
-              'onRemove'
-            );
-          }
-
-          const subjectId = resolveSubjectId(id);
-          if (subjectId === undefined) {
-            throw new Error(`Entity with id ${String(id)} has no subject id`);
-          }
-          return {
-            id,
-            entity,
-            subjectId,
+      const stagedRemovals: Array<{
+        id: K;
+        entity: E;
+        subjectId: number;
+        /** Position in the pre-state order, for the removal's neighbours. */
+        index: number;
+      }> = [];
+      for (let index = 0; index < currentKeys.length; index += 1) {
+        const id = currentKeys[index];
+        if (incomingIndex.has(id)) continue;
+        const subjectId = currentSubjects[index];
+        const entity = valueStore.backingForSubject(subjectId);
+        if (entity === undefined) continue;
+        for (const handler of interceptHandlers) {
+          const ctx: InterceptContext<void> = {
+            block: (reason?: string) => {
+              throw new Error(
+                `Cannot remove entity: ${reason || 'blocked by interceptor'}`
+              );
+            },
+            transform: () => {
+              // void transform - no transformation possible
+            },
+            blocked: false,
+            blockReason: undefined,
           };
-        });
-
-      const stagedUpdates = stagedIncomingIds
-        .filter((id) => currentIds.has(id))
-        .map((id) => {
-          const prev = getProjectedEntity(id);
-          const entity = stagedIncomingById.get(id);
-          if (prev === undefined || entity === undefined) {
-            throw new Error(`Entity with id ${String(id)} not found`);
-          }
-
-          const subjectId = resolveSubjectId(id);
-          if (subjectId === undefined) {
-            throw new Error(`Entity with id ${String(id)} has no subject id`);
-          }
-
-          return {
-            id,
-            prev,
-            entity,
-            subjectId,
-          };
-        });
-      const survivingOriginalIds = new Set(stagedUpdates.map(({ id }) => id));
-
-      const stagedAdds = stagedIncomingIds
-        .filter((id) => !currentIds.has(id))
-        .map((id) => {
-          const entity = stagedIncomingById.get(id);
-          if (entity === undefined) {
-            throw new Error(`Entity with id ${String(id)} not found`);
-          }
-
-          return { id, entity };
-        });
-
-      const finalIndexById = new Map(
-        stagedIncomingIds.map((id, index) => [id, index] as const)
-      );
-
-      const freshSubjectIds = commitFreshSubjects(
-        stagedAdds.map(({ id }) => id)
-      );
-      const freshSubjectIdsByKey = new Map<K, number>();
-      for (let index = 0; index < stagedAdds.length; index += 1) {
-        freshSubjectIdsByKey.set(stagedAdds[index].id, freshSubjectIds[index]);
-      }
-
-      const stagedRemovalStructuralEffects = stagedRemovals.map(
-        ({ id, entity, subjectId }) => {
-          const currentIndex = currentEntries.findIndex(
-            ([entryId]) => entryId === id
+          assertSynchronousInterceptorResult(
+            handler.onRemove?.(id, entity, ctx),
+            'onRemove'
           );
-          let beforeSubject: number | undefined;
-          let afterSubject: number | undefined;
+        }
+        stagedRemovals.push({ id, entity, subjectId, index });
+      }
 
-          for (let index = currentIndex - 1; index >= 0; index -= 1) {
-            const neighborId = currentEntries[index]?.[0];
-            if (
-              neighborId !== undefined &&
-              survivingOriginalIds.has(neighborId)
-            ) {
-              beforeSubject = resolveSubjectId(neighborId);
-              break;
-            }
-          }
+      // An interceptor or selector may have changed membership, keys or order.
+      // Those completed writes stand, but this operation must not commit its
+      // now-stale topology plan (an applied rekey would otherwise be undone by
+      // the reorder below, or a removal recorded against a moved neighbour).
+      if (
+        structuralStore.activeOrderFrontier() !== beforeOrderFrontier ||
+        currentKeys.some(
+          (key, index) =>
+            structuralStore.subjectIdForKey(key) !== currentSubjects[index]
+        )
+      ) {
+        throw new Error(
+          'Cannot setAll: collection topology changed during staging'
+        );
+      }
 
-          for (
-            let index = currentIndex + 1;
-            index < currentEntries.length;
-            index += 1
-          ) {
-            const neighborId = currentEntries[index]?.[0];
-            if (
-              neighborId !== undefined &&
-              survivingOriginalIds.has(neighborId)
-            ) {
-              afterSubject = resolveSubjectId(neighborId);
-              break;
-            }
-          }
+      const stagedUpdates: Array<{
+        id: K;
+        prev: E;
+        entity: E;
+        subjectId: number;
+      }> = [];
+      const stagedAdds: Array<{ id: K; entity: E; index: number }> = [];
+      for (let index = 0; index < incomingIds.length; index += 1) {
+        const id = incomingIds[index];
+        const entity = incomingEntities[index];
+        const subjectId = incomingSubjects[index];
+        if (subjectId === undefined) {
+          stagedAdds.push({ id, entity, index });
+          continue;
+        }
+        // Read after every callback: a field-only reentrant write is the
+        // value this replacement supersedes.
+        const prev = valueStore.backingForSubject(subjectId);
+        if (prev === undefined) {
+          throw new Error(`Entity with id ${String(id)} not found`);
+        }
+        stagedUpdates.push({ id, prev, entity, subjectId });
+      }
 
-          return {
-            kind: 'remove' as const,
+      // From the first fresh subject to the order capture is one membership
+      // unit; a throw still closes it.
+      let ordinaryChanges: ReadonlyMap<
+        number,
+        readonly CommittedEntityMutation[]
+      > = new Map();
+      let valueResults: ReadonlyMap<
+        number,
+        EntityValueTransition<E>
+      > = new Map();
+      let completePublication: (()=>void)|undefined;
+      const membershipUnit = membershipTap;
+      membershipUnit?.(MEMBERSHIP_OPEN_ORDER);
+      let addedSubjectIds: readonly number[];
+      let afterSubjects: number[];
+      const stagedRemovalStructuralEffects: PendingStructuralEffect[] = [];
+      try {
+        // Index-aligned with `stagedAdds`.
+        addedSubjectIds = structuralStore.planFreshSubjectIds(
+          stagedAdds.length
+        );
+        for (let k = 0; k < stagedAdds.length; k += 1) {
+          incomingSubjects[stagedAdds[k].index] = addedSubjectIds[k];
+        }
+        // Every incoming row now has its subject: this IS the after-order.
+        afterSubjects = incomingSubjects as number[];
+
+        // Immediate pre-state neighbours, removed or surviving, exactly as
+        // clear() and removeMany() record them. Anchoring only to survivors left
+        // adjacent removals with identical anchors, so their reversal order
+        // depended on replay order: [a,b,c] -> [q,a] rolled back to [a,c,b], and
+        // replacing every row undid to [c,b,a].
+        for (const { id, entity, subjectId, index } of stagedRemovals) {
+          stagedRemovalStructuralEffects.push({
+            kind: 'remove',
             subject: subjectId,
             key: id,
             value: deepClone(entity),
-            beforeSubject,
-            afterSubject,
-          };
+            beforeSubject: index > 0 ? currentSubjects[index - 1] : undefined,
+            afterSubject: currentSubjects[index + 1],
+          });
         }
-      );
 
-      for (const { id, subjectId } of stagedRemovals) {
-        tombstoneSubjectSignal(subjectId);
-        const currentState = resolveSubjectState(subjectId);
-        structuralStore.tombstoneSubject(
-          subjectId,
-          id,
-          currentState?.restoreAllowed ?? true
-        );
-        publishSubjectPhysicalChange(subjectId);
+        const frame = createEntityMutationFrame();
+        for (const { id, subjectId } of stagedRemovals)
+          frame.stageSubjectTombstone({
+            kind: 'tombstone-subject',
+            key: id,
+            subjectId,
+            restoreAllowed:
+              resolveSubjectState(subjectId)?.restoreAllowed ?? true,
+          });
+        for (const { id, subjectId, entity } of stagedUpdates)
+          frame.stageValueReplacement({
+            kind: 'replace-value',
+            key: id,
+            subjectId,
+            nextValue: entity,
+            authoredFields: null,
+          });
+        for (let k = 0; k < stagedAdds.length; k++)
+          frame.stageFreshSubject({
+            kind: 'create-fresh-subject',
+            key: stagedAdds[k].id,
+            subjectId: addedSubjectIds[k],
+            nextValue: stagedAdds[k].entity,
+          });
+        frame.stageFinalOrder(incomingIds);
+        if (survivingOrderChanged(currentSubjects, afterSubjects))
+          frame.ordinaryOrder = afterSubjects;
+        const committed = commitAndProjectEntityMutationFrame(frame, undefined, true);
+        completePublication = committed.complete;
+        valueResults = committed.valueResults;
+        ordinaryChanges = committed.ordinaryChanges;
+        for (const { subjectId } of stagedRemovals)
+          tombstoneSubjectSignal(subjectId);
+        for (const { id } of stagedAdds) syncEntitySignal(id);
+
+        for (const { id } of stagedUpdates) {
+          syncEntitySignal(id);
+        }
+
+        lastSubjectIds = [
+          ...stagedRemovals.map(({ subjectId }) => subjectId),
+          ...stagedUpdates.map(({ subjectId }) => subjectId),
+          ...addedSubjectIds,
+        ];
+
+        if (mutationCaptureRuntime?.isCaptureActive()) getPositionIds();
+        // Captured whenever SURVIVING subjects change relative order, not only
+        // for a pure reorder. Neighbour hints on the structural effects cannot
+        // restore survivors that moved: reversing [a,b,c] -> [c,a] yielded
+        // [b,c,a]. The order delta carries both endpoints, including subjects
+        // present at only one of them. Membership-only changes keep relying on
+        // the structural effects.
+        if (
+          positionId !== undefined &&
+          mutationCaptureRuntime?.publishCollectionOrder &&
+          survivingOrderChanged(currentSubjects, afterSubjects)
+        ) {
+          publishOrderChange(
+            currentSubjects,
+            afterSubjects,
+            beforeOrderFrontier,
+            undefined,
+            committed.ordinaryEndpoints,
+            false,
+            committed.topologyUnit
+          );
+        }
+      } finally {
+        // The whole replacement has installed (or stopped): the observed
+        // membership unit closes before the removed rows' reactive publication.
+        membershipUnit?.(MEMBERSHIP_CLOSE);
       }
+      for (const { subjectId } of stagedRemovals)
+        publishSubjectPhysicalChange(subjectId);
       reclaimRetiredSubjectsWithoutOwner(
         stagedRemovals.map(({ subjectId }) => subjectId)
       );
 
-      for (const { subjectId, entity } of stagedUpdates) {
-        valueStore.retainSubjectValue(subjectId, entity);
-      }
-
-      const addedSubjectIds = stagedAdds.map(({ id, entity }) => {
-        const subjectId = freshSubjectIdsByKey.get(id);
-        if (subjectId === undefined) {
-          throw new Error(`Entity with id ${String(id)} has no subject id`);
-        }
-        valueStore.retainSubjectValue(subjectId, entity);
-        syncEntitySignal(id);
-        return subjectId;
-      });
-
-      for (const { id } of stagedUpdates) {
-        syncEntitySignal(id);
-      }
-
-      structuralStore.reorderActiveKeys(stagedIncomingIds);
-
-      lastSubjectIds = [
-        ...stagedRemovals.map(({ subjectId }) => subjectId),
-        ...stagedUpdates.map(({ subjectId }) => subjectId),
-        ...addedSubjectIds,
-      ];
-
-      const afterSubjects = stagedIncomingIds
-        .map((id) => resolveSubjectId(id))
-        .filter((subjectId): subjectId is number => subjectId !== undefined);
-      if (mutationCaptureRuntime?.isCaptureActive()) getPositionIds();
-      if (
-        positionId !== undefined &&
-        beforeSubjects.length === afterSubjects.length &&
-        beforeSubjects.every((subjectId) =>
-          afterSubjects.includes(subjectId)
-        ) &&
-        beforeSubjects.some(
-          (subjectId, index) => subjectId !== afterSubjects[index]
-        )
-      ) {
-        mutationCaptureRuntime?.publishCollectionOrder?.({
-          owner: positionId,
-          ownerPath: basePath,
-          beforeSubjects,
-          afterSubjects,
-          beforeFrontier: beforeOrderFrontier,
-          afterFrontier: structuralStore.activeOrderFrontier(),
-          meta: ambientMeta(),
+      // Every incoming row is active by now, so the nearest neighbour with a
+      // subject is the adjacent one in the after-order.
+      const stagedAddStructuralEffects: PendingStructuralEffect[] = [];
+      for (let k = 0; k < stagedAdds.length; k += 1) {
+        const { id, entity, index } = stagedAdds[k];
+        stagedAddStructuralEffects.push({
+          kind: 'add',
+          subject: addedSubjectIds[k],
+          key: id,
+          value: deepClone(entity),
+          beforeSubject: index > 0 ? afterSubjects[index - 1] : undefined,
+          afterSubject: afterSubjects[index + 1],
         });
       }
 
-      const stagedAddStructuralEffects = stagedAdds.map(
-        ({ id, entity }, index) => {
-          const subjectId = addedSubjectIds[index];
-          const finalIndex = finalIndexById.get(id) ?? -1;
-          let beforeSubject: number | undefined;
-          let afterSubject: number | undefined;
-
-          for (let cursor = finalIndex - 1; cursor >= 0; cursor -= 1) {
-            const neighborId = stagedIncomingIds[cursor];
-            if (neighborId === undefined) {
-              continue;
-            }
-            beforeSubject = resolveSubjectId(neighborId);
-            if (beforeSubject !== undefined) {
-              break;
-            }
-          }
-
-          for (
-            let cursor = finalIndex + 1;
-            cursor < stagedIncomingIds.length;
-            cursor += 1
-          ) {
-            const neighborId = stagedIncomingIds[cursor];
-            if (neighborId === undefined) {
-              continue;
-            }
-            afterSubject = resolveSubjectId(neighborId);
-            if (afterSubject !== undefined) {
-              break;
-            }
-          }
-
-          return {
-            kind: 'add' as const,
-            subject: subjectId,
-            key: id,
-            value: deepClone(entity),
-            beforeSubject,
-            afterSubject,
-          };
-        }
-      );
-
-      updateSignals();
+      updateSignals(completePublication);
 
       for (let index = 0; index < stagedRemovals.length; index += 1) {
         const { id, entity, subjectId } = stagedRemovals[index];
@@ -3579,7 +5133,10 @@ export function createEntitySignal<
           basePath,
           [subjectId],
           getPositionIdsForNotify(),
-          createStructuralEffectMeta(structuralEffect)
+          createStructuralEffectMeta(
+            structuralEffect,
+            ordinaryChanges.get(structuralEffect.subject)
+          )
         );
       }
 
@@ -3591,7 +5148,7 @@ export function createEntitySignal<
           basePath,
           subjectId === undefined ? undefined : [subjectId],
           getPositionIdsForNotify(),
-          ambientMeta(),
+          withEntityValueTransition(ambientMeta(), valueResults.get(subjectId)),
           undefined,
           getActiveWriteContext()?.mutationIntent === 'derive'
             ? undefined
@@ -3608,26 +5165,23 @@ export function createEntitySignal<
           basePath,
           [addedSubjectIds[i]],
           getPositionIdsForNotify(),
-          createStructuralEffectMeta(stagedAddStructuralEffects[i])
+          createStructuralEffectMeta(
+            stagedAddStructuralEffects[i],
+            ordinaryChanges.get(stagedAddStructuralEffects[i].subject)
+          )
         );
       }
 
       for (const { id, entity } of stagedRemovals) {
-        for (const handler of tapHandlers) {
-          handler.onRemove?.(id, entity);
-        }
+        emitTap('onRemove', id, entity);
       }
 
       for (const { id, entity } of stagedAdds) {
-        for (const handler of tapHandlers) {
-          handler.onAdd?.(entity, id);
-        }
+        emitTap('onAdd', entity, id);
       }
 
       for (const { id, entity } of stagedUpdates) {
-        for (const handler of tapHandlers) {
-          handler.onUpdate?.(id, entity as Partial<E>, entity);
-        }
+        emitTap('onUpdate', id, entity as Partial<E>, entity);
       }
     },
 
@@ -3669,6 +5223,186 @@ export function createEntitySignal<
     configurable: true,
   });
   defineOwnedOwnerPath(api, basePath);
+
+  // ⚠️ A ROW-ADDING WRITE TO AN ABSENT COLLECTION RE-ADDS ITS PATH, CARRYING
+  // ONLY THE WRITTEN ROWS (v16 8e). The collection reads empty while it is
+  // absent, so the write applies to an empty collection:
+  // 1. it is validated and intercepted as on an empty collection, before
+  //    anything changes, so a block or bad input changes nothing (v16 8f;
+  //    8e intercepted after the removal below, which then stayed);
+  // 2. the retained rows are removed through the ordinary `clear()`, which
+  //    records them, so a reversal restores them; no tap sees it;
+  // 3. the write runs with the rows already intercepted, interceptors
+  //    suppressed, so each runs exactly once;
+  // 4. every omitted member on its path comes back with only that path
+  //    (`reactivatePathOnWrite`).
+  // Retained rows never resurface, and undo, redo, jumpTo and rollback
+  // reverse all of it. Writes that name an existing row refuse instead, as on
+  // an empty collection. Only a structural write on this collection's own
+  // tree (the whole value hydrating it, a reversal) writes it as it is.
+  const clearRetained = api.clear;
+  /**
+   * The call's rows after its interceptors, as the write would intercept them
+   * on an empty collection: ids resolved first (a strict duplicate throws
+   * before any interceptor runs), then once per applied copy in input order —
+   * `onAdd` for a key's first copy; for upserts, `onUpdate` with each later
+   * raw copy, merged; otherwise the last copy wins in the first copy's place.
+   * Ids stay those the raw rows give (`selectId`), as the write would key them.
+   */
+  const interceptAsEmpty = (
+    name: string,
+    args: unknown[]
+  ): [unknown, AddManyOptions<E, K>] => {
+    const opts = args[1] as AddManyOptions<E, K> | undefined;
+    const many = name.endsWith('Many') || name === 'setAll';
+    const input = (many ? args[0] : [args[0]]) as E[];
+    const upsert = name.startsWith('upsert');
+    const mode =
+      name === 'addMany' || name === 'prependMany'
+        ? opts?.mode ?? 'strict'
+        : 'overwrite';
+    const copies: Array<[K, E]> = [];
+    const firsts = new Set<K>();
+    for (const row of input) {
+      const id = deriveId(row, opts);
+      if (firsts.has(id)) {
+        if (mode === 'strict')
+          throw new Error(`Entity with id ${String(id)} already exists`);
+        if (mode === 'skip') continue;
+      }
+      firsts.add(id);
+      copies.push([id, row]);
+    }
+    const rows = new Map<K, E>();
+    for (const [id, row] of copies) {
+      const running = rows.get(id);
+      rows.set(
+        id,
+        upsert && running !== undefined
+          ? { ...running, ...interceptUpdatedEntity(id, row) }
+          : interceptAddedEntity(row)
+      );
+    }
+    const keys = new Map<E, K>();
+    const out: E[] = [];
+    for (const [id, row] of rows) {
+      // One object for two ids (an interceptor that returns a shared object):
+      // each id writes its own copy, keyed as the interceptors were.
+      const own = keys.has(row) ? ({ ...row } as E) : row;
+      keys.set(own, id);
+      out.push(own);
+    }
+    const resolved = {
+      ...opts,
+      selectId: (row: E) => keys.get(row) ?? deriveId(row, opts),
+    };
+    return [many ? out : out[0], resolved];
+  };
+  for (const name of [
+    'addOne',
+    'prependOne',
+    'addMany',
+    'prependMany',
+    'upsertOne',
+    'upsertMany',
+    'setAll',
+    'clear',
+  ] as const) {
+    const write = api[name] as (...args: unknown[]) => unknown;
+    (api as Record<string, unknown>)[name] = (...args: unknown[]) => {
+      if (reAdding || !absent() || inStructuralWrite(proxy))
+        return write(...args);
+      const prepared = name === 'clear' ? [] : interceptAsEmpty(name, args);
+      const writePrepared = () => {
+        interceptsSuppressed++;
+        try {
+          return write(...prepared);
+        } finally {
+          interceptsSuppressed--;
+        }
+      };
+      // An interceptor that wrote this collection may have re-added it; and
+      // a call that adds nothing (`addMany([])`) changes nothing, as on an
+      // empty collection. Either way the write is an ordinary one now, its
+      // interceptors already run (v16 8f review).
+      if (
+        !absent() ||
+        (name !== 'setAll' &&
+          Array.isArray(prepared[0]) &&
+          !(prepared[0] as unknown[]).length)
+      )
+        return writePrepared();
+      reAdding = pendingReAdd = true;
+      try {
+        // The retained rows were never visible, so their removal is no row
+        // change to observe: taps do not see it (`silentClear`).
+        silentClear++;
+        try {
+          clearRetained();
+        } finally {
+          silentClear--;
+        }
+        const result = writePrepared();
+        // Re-added already if a tap was told of a row (`emitTap`).
+        if (pendingReAdd) {
+          pendingReAdd = false;
+          reactivatePathOnWrite(api);
+        }
+        return result;
+      } finally {
+        reAdding = pendingReAdd = false;
+      }
+    };
+  }
+  // Its presence changed (it, or a member above it, was omitted or re-added):
+  // every query and every held row re-reads (`republishMembers`).
+  const wake = () =>
+    locations.runInvalidationGroup(() => {
+      for (const epoch of subjectEpochs.values()) advanceEpochHandle(epoch);
+      deriveLocation(version, (value) => value + 1);
+      markOwnerInvalidated(ownerId);
+    });
+  // Inside a structural write it wakes them once, after the write has closed
+  // (`structuralWrites.end`, chained in order): a reversal being applied reads
+  // rows physically (`physicalRows`), so a consumer re-run inside it would
+  // cache what storage holds rather than the collection's absence. Installed
+  // by the first such change, so a tree without collections carries none of
+  // this. Every queued wake runs even if an earlier one throws.
+  let wakeQueued = false;
+  Object.defineProperty(api, MEMBERSHIP_CHANGED, {
+    value: () => {
+      if (!structuralWrites.depth) return wake();
+      if (wakeQueued) return;
+      wakeQueued = true;
+      const earlier = structuralWrites.end;
+      structuralWrites.end = (failed) => {
+        structuralWrites.end = undefined;
+        wakeQueued = false;
+        // Every queued wake runs; the first consumer error is kept.
+        let caught: { error: unknown } | undefined;
+        for (const run of [() => earlier?.(failed), wake]) {
+          try {
+            run();
+          } catch (error) {
+            caught ??= { error };
+          }
+        }
+        if (!caught) return;
+        // Closing a reversal that threw: its own error is what surfaces, and
+        // a consumer's is reported asynchronously.
+        if (!failed) throw caught.error;
+        const { error } = caught;
+        queueMicrotask(() => {
+          throw error;
+        });
+      };
+    },
+  });
+  // Membership observation attaches its tap here on first use.
+  defineEntityMembershipSource(api, (tap) => {
+    membershipTap = tap;
+    return structuralStore;
+  });
   // ⚠️ THE PROJECTION SEED — internal, WeakMap-carried, never public.
   //
   // Built from the SAME ordered active-key snapshot `getProjectedEntries()`
@@ -3678,9 +5412,40 @@ export function createEntitySignal<
   // `key` is carried explicitly alongside `subjectId` because it is genuinely
   // separate information: after `changeId(1, 77)` the row payload still reads
   // `{ id: 1 }` while the address is 77, so `selectId(row)` cannot recover it.
+  defineEntityPreparationReader(api as object, (requestedKey) => {
+    const key = requestedKey as K;
+    // Preserve byId's lookup/dependency phase before acquiring a lifetime:
+    // native epoch initialization and reads can reenter the collection.
+    if (rowAbsent() || !structuralStore.hasActiveKey(key)) {
+      idsSignal();
+      throw new Error(`Entity with id ${String(key)} not found`);
+    }
+    const entity = readEntityByKey(key);
+    if (!entity) {
+      throw new Error(`Entity with id ${String(key)} not found`);
+    }
+    const subjectId = resolveSubjectId(key);
+    if (subjectId === undefined) {
+      throw new Error(`Entity with id ${String(key)} has no subject id`);
+    }
+    const handle = structuralStore.acquireSubjectHandleForKey(key);
+    if (handle === undefined || handle.subjectId !== subjectId) {
+      throw new Error(`Entity with id ${String(key)} has no acquired subject handle`);
+    }
+    // Facade binding lazily initializes the shared collection owner before
+    // activation. Retain that obligation without constructing row/field nodes.
+    if (getPositionRegistry(api)) getPositionIds();
+    getSubjectStateSignal(subjectId)();
+    const resolved = structuralStore.resolveSubjectHandle(handle);
+    // Activation initialization may rekey or retire this lifetime. Follow the
+    // acquired lifetime, never a replacement at the originally requested key.
+    return resolved.state === 'active' ? readEntityByKey(resolved.key) : undefined;
+  });
+
   defineEntityProjectionSeed(api as object, () => {
     const seed: Array<{ subjectId: number; key: K; row: E }> = [];
-    for (const key of structuralStore.activeKeysSnapshot()) {
+    // An absent collection seeds an empty projection, as `all()` reads.
+    for (const key of absent() ? [] : structuralStore.activeKeysSnapshot()) {
       const subjectId = structuralStore.subjectIdForKey(key);
       if (subjectId === undefined) continue;
       const row = getProjectedEntity(key);
@@ -3696,6 +5461,21 @@ export function createEntitySignal<
 
   Object.defineProperty(api, '__findKeyBySubjectId', {
     value: findKeyBySubjectId,
+    enumerable: false,
+    configurable: true,
+  });
+  Object.defineProperty(api, '__validateOrdinaryStructure', {
+    value: validateOrdinaryStructure,
+    enumerable: false,
+  });
+  Object.defineProperty(api, '__prepareOrdinaryRealization', {
+    value: prepareOrdinaryRealization,
+    enumerable: false,
+    configurable: true,
+  });
+  Object.defineProperty(api, '__prepareStructuralUnit', { value: prepareStructuralUnit });
+  Object.defineProperty(api, '__preparePointValues', {
+    value: preparePointValues,
     enumerable: false,
     configurable: true,
   });
@@ -3735,7 +5515,56 @@ export function createEntitySignal<
         owner: positionId,
         ownerPath: basePath,
         readSource: readTransitionSource,
-        prepareTarget: prepareTransitionTarget,
+        readOrderFrontier: () => structuralStore.activeOrderFrontier(),
+        installCompensatedOrderFrontier: (frontier: unknown) =>
+          structuralStore.installCompensatedOrderFrontier(frontier),
+        prepareTarget: (target, prepare) =>
+          prepare(
+            {
+              positionId,
+              structuralStore,
+              valueStore,
+              ordinaryTopology,
+              prepareOrdinaryRealization,
+              activeIdSignal,
+              subjectEpochs,
+              subjectStateSignals,
+              get membershipTap() {
+                return membershipTap;
+              },
+              advanceEpochHandle,
+              updateSignals,
+              physicalCommitClock,
+              pathNotifier,
+              basePath,
+              getPositionIdsForNotify,
+              createStructuralEffectMeta,
+              ambientMeta,
+              emitTap,
+              publishOrderChange(
+                before,
+                after,
+                beforeFrontier,
+                afterFrontier,
+                ordinaryEndpoints,
+                selectedDisposition
+              ) {
+                if (
+                  survivingOrderChanged(before, after) ||
+                  ordinaryEndpoints !== undefined
+                )
+                  publishOrderChange(
+                    before,
+                    after,
+                    beforeFrontier,
+                    afterFrontier,
+                    ordinaryEndpoints,
+                    selectedDisposition
+                  );
+              },
+            },
+            target
+          ),
       } satisfies CollectionTransitionTargetBinding,
       enumerable: false,
       configurable: true,
@@ -3801,7 +5630,7 @@ export function createEntitySignal<
 
   // The Proxy only handles bracket notation access (signal[id])
   // All methods are direct properties on api - no binding needed
-  const warnedWrongMethods = new Set<string>();
+  let warnedWrongMethods: Set<string> | undefined;
   const proxy = new Proxy(api as unknown as EntitySignal<E, K>, {
     get: (target: EntitySignal<E, K>, prop: string | symbol) => {
       // Handle string/number bracket access: signal[123] or signal['abc']
@@ -3812,11 +5641,11 @@ export function createEntitySignal<
       // library → actionable hint instead of a later "undefined is not a
       // function". Only fires for names that are NOT real api members.
       if (
+        (typeof ngDevMode === 'undefined' || ngDevMode) &&
         typeof prop === 'string' &&
         !(prop in (target as object)) &&
         WRONG_ENTITY_METHODS[prop] &&
-        (typeof ngDevMode === 'undefined' || ngDevMode) &&
-        !warnedWrongMethods.has(prop)
+        !(warnedWrongMethods ??= new Set<string>()).has(prop)
       ) {
         warnedWrongMethods.add(prop);
         console.warn(
@@ -3828,6 +5657,10 @@ export function createEntitySignal<
       return (target as unknown as Record<string | symbol, unknown>)[prop];
     },
   });
+  // The materializer stamps the returned collection identity, not its raw
+  // proxy target. Source enrollment must retain that same identity.
+  snapshotIdentity = proxy;
+  defineEntityPublicationBinding(proxy as object, { source: entityPublication });
   return proxy;
 }
 

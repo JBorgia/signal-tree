@@ -1,3 +1,7 @@
+import { attachScalarResponsibility } from './scalar-responsibility-attachment';
+import type { MutationCaptureRuntime } from './mutation-capture-runtime';
+import { scalarAdmissionMetadata } from './scalar-admission-metadata';
+import { withScalarPublicationCoverage } from './scalar-publication-coverage';
 import type { WriteMetadata } from '../mutation-types';
 import { isTraversableNode } from './node-shape';
 import { getNodeProcessor, snapshotMarkerNode } from './materialize-markers';
@@ -9,7 +13,7 @@ import {
 } from './owned-metadata';
 import { getActiveWriteContext } from '../write-context';
 import { isWritableLocation } from './location-runtime';
-import { observeIntrinsicMutations } from './intrinsic-mutation';
+import { prepareTerminalMutations, type TerminalRecordPlan, observeIntrinsicMutations } from './intrinsic-mutation';
 
 import { visitTree } from './visit-tree';
 
@@ -55,7 +59,7 @@ export function interceptLeafSignals(
     subjectIds?: number[],
     positionIds?: number[]
   ) => void,
-  options: { maxDepth?: number } = {}
+  options: { scalarResponsibility?: MutationCaptureRuntime; maxDepth?: number; beforePublication?: typeof onWrite; terminalRecord?: (...args: Parameters<typeof onWrite>) => TerminalRecordPlan | undefined } = {}
 ): () => void {
   const restorers: Array<() => void> = [];
   const maxDepth = options.maxDepth ?? 32;
@@ -139,21 +143,54 @@ export function interceptLeafSignals(
   const observeLocation = (
     node: object,
     path: string,
-    ownerPathOverride?: string
+    ownerPathOverride?: string,
+    normal = true
   ): void => {
-    const release = observeIntrinsicMutations(node, (mutation) => {
+    const attached:Array<()=>void>=[];
+    try {
+    const release = normal ? observeIntrinsicMutations(node, (mutation) => {
       if (!mutation.changed) return;
       onWrite(
         path,
         mutation.after,
         mutation.before,
-        withMutationIntent(getActiveWriteContext(), mutation.intent),
+        withScalarPublicationCoverage(withMutationIntent(getActiveWriteContext(), mutation.intent), mutation.coveredRecipients),
         ownerPathOverride ?? getOwnerPath(node, path),
         getSubjectIds(node),
         getPositionIds(node)
       );
-    });
-    if (release) restorers.push(release);
+    }) : undefined;
+    if(release)attached.push(release);
+    const scalarRelease=attachScalarResponsibility(node,options.scalarResponsibility,path,undefined,ownerPathOverride);
+    if(scalarRelease)attached.push(scalarRelease);
+    const terminalRecord = options.terminalRecord;
+    if(terminalRecord){
+      const terminalRelease=prepareTerminalMutations(node,(mutation)=>{
+        if(!mutation.changed)return;
+        return terminalRecord.call(options,path,mutation.after,mutation.before,scalarAdmissionMetadata(getActiveWriteContext(),mutation),ownerPathOverride ?? getOwnerPath(node,path),getSubjectIds(node),getPositionIds(node));
+      });
+      if(terminalRelease)attached.push(terminalRelease);
+    }
+    const beforePublication = options.beforePublication;
+    if (beforePublication) {
+    const captureRelease = observeIntrinsicMutations(node, (mutation) => {
+      if (!mutation.changed) return;
+      beforePublication.call(options,
+        path,
+        mutation.after,
+        mutation.before,
+        withScalarPublicationCoverage(withMutationIntent(getActiveWriteContext(), mutation.intent), mutation.coveredRecipients),
+        ownerPathOverride ?? getOwnerPath(node, path),
+        getSubjectIds(node),
+        getPositionIds(node)
+      );
+    }, true);
+      if (captureRelease) attached.push(captureRelease);
+    }
+
+      restorers.push(...attached);
+    } catch(error){for(const release of attached.reverse())release();throw error;}
+
   };
 
   const wrapOwnedFieldAccessors = (
@@ -246,8 +283,8 @@ export function interceptLeafSignals(
         if (path === '') return true;
 
         if (isWritableLocation(node)) {
-          if (!hasIntrinsicMutationEmitter(node)) {
-            observeLocation(node as object, path);
+          if (!hasIntrinsicMutationEmitter(node) || options.beforePublication) {
+            observeLocation(node as object, path, undefined, !hasIntrinsicMutationEmitter(node));
           }
           return false;
         }
@@ -319,6 +356,7 @@ export function interceptLeafSignals(
             'setAll',
             'addOne',
             'addMany',
+            'prependMany',
             'updateOne',
             'updateMany',
             'upsertOne',
@@ -364,7 +402,12 @@ export function interceptLeafSignals(
       },
       { maxDepth }
     );
-  } catch {
+  } catch(error) {
+    if(options.scalarResponsibility){
+      for(const restore of restorers.reverse())restore();
+      restorers.length=0;
+      throw error;
+    }
     // Ignore traversal errors; partial interception is still useful.
   }
 

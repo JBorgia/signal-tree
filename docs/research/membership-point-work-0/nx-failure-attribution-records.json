@@ -1,0 +1,76 @@
+[
+  {
+    "lane": "baseline",
+    "command": [
+      "pnpm",
+      "nx",
+      "test",
+      "kernel",
+      "--testFile=src/lib/production-scalar-substrate.benchmark.spec.ts",
+      "--testFile=src/lib/absent-path-write.spec.ts",
+      "--testFile=src/lib/branch-omission-correctness.spec.ts",
+      "--testFile=src/enhancers/transactions/transactions.spec.ts",
+      "--testFile=src/enhancers/restoration/restoration-missing-anchors.spec.ts",
+      "--testFile=src/enhancers/transactions/recovery-handle-0.spec.ts",
+      "--testFile=src/lib/heterogeneous-atomicity.spec.ts",
+      "--testFile=src/lib/link-absent-locations.spec.ts",
+      "--testFile=src/enhancers/transactions/membership-history-projection.spec.ts",
+      "--testFile=src/enhancers/restoration/pending-membership-admission.spec.ts",
+      "--testNamePattern=(?:proves compiled scalar reads and writes stay constant in logical work|a directly omitted leaf \\(transactions alone\\)|a directly omitted leaf \\(transactions first\\)|a directly omitted leaf \\(restoration first\\)|rollback retains the original scalar baseline when a later replacement omits it|throws rollback error with preserved callback failure when realization-port validation refuses and does not fallback to the scoped resolver|preserves reversed placement and held lifetime|the thrown error carries a handle to the still-pending transaction|the recovered handle can settle once the conflict is gone|callbackFailed is explicit, because callbackError cannot carry it|a refused rollback on a healthy callback is unchanged|reports the partial turn it hands back, not just how to settle it|leaves everything neutral when the transaction throws|leaves everything neutral when the transaction is rolled back|rollback of transactions that re-add the location, a sibling and the rows|rollback reverses reactivation without materializing an absent member \\(42\\)|rollback reverses reactivation without materializing an absent member \\(undefined\\)|keeps an absent member absent when rollback restores an entity key handoff|retains external absence authority through pending reacquisition and rollback)$",
+      "--maxWorkers=1"
+    ],
+    "exit": 0,
+    "timeout": false,
+    "runtime": {
+      "packages/kernel/src/lib/entity-signal.ts": "9e880fff10634be5504d0e9fefa930f1a0060968343de4e7a89c7e326b262319",
+      "packages/kernel/src/lib/physical/entity-mutation-frame.ts": "77dbf428bf754ea3475728046a7e6ee3edbc0e2fa678f26c30c6e12710f501c5",
+      "packages/kernel/src/lib/internals/native-tree-scalar-leaf-runtime.ts": "ee979e4e37bb4094058eae0d008899c24b02cc1cfc6878fdfb83909ef2baf995",
+      "packages/kernel/src/lib/internals/tree-scalar-slot-runtime.ts": "27f5e8dcebaf91645744636980244bdc7cdd012bf3b10efde34edce2faa9c31b",
+      "packages/kernel/src/lib/internals/location-runtime.ts": "92c0222cb381abbb26fda754a114c42bd24db90e400de7162a57869b380030c8",
+      "packages/kernel/src/lib/internals/tree-scalar-slot-port.ts": "ef5fade490148d168f198221b16e020b8132a978fb65ffbfdb604e3c06cc84e3",
+      "packages/kernel/src/lib/internals/intrinsic-mutation.ts": "ce5d130c453a2469319533f22d9687bc16932bd164be0a6d88dfad077af44d6c",
+      "packages/kernel/src/lib/internals/intercept-leaf-signals.ts": "2523359e248a8056923ceca285d3339d9914dc898c61980dfac0bb4cb6d82bcf",
+      "packages/kernel/src/lib/internals/tree-scalar-leaf-runtime.ts": "1247b117a88c0cd5e9c1c634b1b94f220a7340b350149b9aaac4584b00110297",
+      "packages/kernel/src/lib/internals/mutation-capture-runtime.ts": "f54e6d4a0176f3628a60d3e1cc913ecbe1ded163ba04442295564ea741becfdc",
+      "packages/kernel/src/lib/internals/causal-runtime/target-transition.ts": "f4369b437bc4d80d39d53ab5d1b1ec1022b6d4e28d3351a5d0b21dc28154f18d",
+      "packages/kernel/src/enhancers/transactions/transactions.ts": "3b6c5128ed0790d0f698de87ee77b6df51eba45ef95e22167a0ca40420b21259"
+    }
+  },
+  {
+    "lane": "D2I",
+    "command": [
+      "pnpm",
+      "nx",
+      "test",
+      "kernel",
+      "--testFile=src/lib/production-scalar-substrate.benchmark.spec.ts",
+      "--testFile=src/lib/absent-path-write.spec.ts",
+      "--testFile=src/lib/branch-omission-correctness.spec.ts",
+      "--testFile=src/enhancers/transactions/transactions.spec.ts",
+      "--testFile=src/enhancers/restoration/restoration-missing-anchors.spec.ts",
+      "--testFile=src/enhancers/transactions/recovery-handle-0.spec.ts",
+      "--testFile=src/lib/heterogeneous-atomicity.spec.ts",
+      "--testFile=src/lib/link-absent-locations.spec.ts",
+      "--testFile=src/enhancers/transactions/membership-history-projection.spec.ts",
+      "--testFile=src/enhancers/restoration/pending-membership-admission.spec.ts",
+      "--testNamePattern=(?:proves compiled scalar reads and writes stay constant in logical work|a directly omitted leaf \\(transactions alone\\)|a directly omitted leaf \\(transactions first\\)|a directly omitted leaf \\(restoration first\\)|rollback retains the original scalar baseline when a later replacement omits it|throws rollback error with preserved callback failure when realization-port validation refuses and does not fallback to the scoped resolver|preserves reversed placement and held lifetime|the thrown error carries a handle to the still-pending transaction|the recovered handle can settle once the conflict is gone|callbackFailed is explicit, because callbackError cannot carry it|a refused rollback on a healthy callback is unchanged|reports the partial turn it hands back, not just how to settle it|leaves everything neutral when the transaction throws|leaves everything neutral when the transaction is rolled back|rollback of transactions that re-add the location, a sibling and the rows|rollback reverses reactivation without materializing an absent member \\(42\\)|rollback reverses reactivation without materializing an absent member \\(undefined\\)|keeps an absent member absent when rollback restores an entity key handoff|retains external absence authority through pending reacquisition and rollback)$",
+      "--maxWorkers=1"
+    ],
+    "exit": 1,
+    "timeout": false,
+    "runtime": {
+      "packages/kernel/src/lib/entity-signal.ts": "b44f7f2e90e67c939090558b54a1cf4dc3c326d2455ab842437a43edb13b45cd",
+      "packages/kernel/src/lib/physical/entity-mutation-frame.ts": "138c7930f05e66ba1ec964bede42a396751939ecc05361247b550d59fb8bec4a",
+      "packages/kernel/src/lib/internals/native-tree-scalar-leaf-runtime.ts": "4c2077142cd3f69c475221abe0a0a45f605f14d304d73ef256980a2c661da876",
+      "packages/kernel/src/lib/internals/tree-scalar-slot-runtime.ts": "de97762a39c8ecb7b8854ceedbf6c731612d5c6213ece65bbc3b9394b551b2f9",
+      "packages/kernel/src/lib/internals/location-runtime.ts": "0b97cf252ea781e365cdc9a8d8202c4cc1076805fd4ba3fac3bcaeb98a44b5a6",
+      "packages/kernel/src/lib/internals/tree-scalar-slot-port.ts": "4581209ac479bc50b0ee6dc2ee8b8bcf15dae6596636a3fb1694c42f26fbdfa9",
+      "packages/kernel/src/lib/internals/intrinsic-mutation.ts": "602bfb23807a5c455336d317b8b2a129adbfe102c1e9334419f9a0b8447d44e0",
+      "packages/kernel/src/lib/internals/intercept-leaf-signals.ts": "2ac52a3b9b32bd9ab7ff32bbbe4e356383ba1c2b087c2867b6bda6fe3b792bd8",
+      "packages/kernel/src/lib/internals/tree-scalar-leaf-runtime.ts": "cc5569bab774c535de00cdbe05b6969990bf7b3333f49c8577af9dfe59b75935",
+      "packages/kernel/src/lib/internals/mutation-capture-runtime.ts": "2eb2ea8511cbd26b5f414d1da61ed54f8fc9519fa09c506aa91d7e783f2777bb",
+      "packages/kernel/src/lib/internals/causal-runtime/target-transition.ts": "51bce15a6d9805f9d783c1d281cc7405385a43e6c26e93e0f6ed8ac3227ad6c2",
+      "packages/kernel/src/enhancers/transactions/transactions.ts": "7122ff9f6f8d69d6936ae5a9027cdeedbcf210a9a63a1ad910482218363988b9"
+    }
+  }
+]

@@ -1,0 +1,106 @@
+[
+  {
+    "command": [
+      "node",
+      "docs/research/settlement-publication-boundary-0/run.mjs",
+      "P3",
+      "timing-p3.mjs",
+      "suite",
+      "isolated-correction"
+    ],
+    "exit": 0,
+    "stdout": "{\"lane\":\"P3\",\"entry\":\"timing-p3.mjs\",\"control\":\"suite\",\"exit\":0,\"stable\":true,\"out\":\"/private/tmp/st-publication-replay/runs/P3-timing-p3.mjs-suite-isolated-correction\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/settlement-publication-boundary-0/run.mjs",
+      "P3",
+      "owned-read-controls.mjs",
+      "reentry",
+      "isolated-correction"
+    ],
+    "exit": 0,
+    "stdout": "{\"lane\":\"P3\",\"entry\":\"owned-read-controls.mjs\",\"control\":\"reentry\",\"exit\":0,\"stable\":true,\"out\":\"/private/tmp/st-publication-replay/runs/P3-owned-read-controls.mjs-reentry-isolated-correction\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/settlement-publication-boundary-0/run.mjs",
+      "P3",
+      "owned-read-controls-v2.mjs",
+      "reentry",
+      "isolated-correction"
+    ],
+    "exit": 0,
+    "stdout": "{\"lane\":\"P3\",\"entry\":\"owned-read-controls-v2.mjs\",\"control\":\"reentry\",\"exit\":0,\"stable\":true,\"out\":\"/private/tmp/st-publication-replay/runs/P3-owned-read-controls-v2.mjs-reentry-isolated-correction\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/settlement-publication-boundary-0/run.mjs",
+      "P3",
+      "review-readonly-memo.mjs",
+      "suite",
+      "isolated-correction"
+    ],
+    "exit": 0,
+    "stdout": "{\"lane\":\"P3\",\"entry\":\"review-readonly-memo.mjs\",\"control\":\"suite\",\"exit\":0,\"stable\":true,\"out\":\"/private/tmp/st-publication-replay/runs/P3-review-readonly-memo.mjs-suite-isolated-correction\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/settlement-publication-boundary-0/run.mjs",
+      "P3",
+      "review-empty.mjs",
+      "suite",
+      "isolated-correction"
+    ],
+    "exit": 1,
+    "stdout": "{\"lane\":\"P3\",\"entry\":\"review-empty.mjs\",\"control\":\"suite\",\"exit\":1,\"stable\":true,\"out\":\"/private/tmp/st-publication-replay/runs/P3-review-empty.mjs-suite-isolated-correction\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/settlement-publication-boundary-0/run.mjs",
+      "P3",
+      "review-active.mjs",
+      "suite",
+      "isolated-correction"
+    ],
+    "exit": 1,
+    "stdout": "{\"lane\":\"P3\",\"entry\":\"review-active.mjs\",\"control\":\"suite\",\"exit\":1,\"stable\":true,\"out\":\"/private/tmp/st-publication-replay/runs/P3-review-active.mjs-suite-isolated-correction\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/settlement-publication-boundary-0/run.mjs",
+      "DP3",
+      "review-empty.mjs",
+      "suite",
+      "isolated-correction"
+    ],
+    "exit": 1,
+    "stdout": "{\"lane\":\"DP3\",\"entry\":\"review-empty.mjs\",\"control\":\"suite\",\"exit\":1,\"stable\":true,\"out\":\"/private/tmp/st-publication-replay/runs/DP3-review-empty.mjs-suite-isolated-correction\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/settlement-publication-boundary-0/run.mjs",
+      "DP3",
+      "review-active.mjs",
+      "suite",
+      "isolated-correction"
+    ],
+    "exit": 1,
+    "stdout": "{\"lane\":\"DP3\",\"entry\":\"review-active.mjs\",\"control\":\"suite\",\"exit\":1,\"stable\":true,\"out\":\"/private/tmp/st-publication-replay/runs/DP3-review-active.mjs-suite-isolated-correction\"}\n",
+    "stderr": ""
+  }
+]

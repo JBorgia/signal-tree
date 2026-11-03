@@ -51,6 +51,14 @@
     },
     "lint": {
       "executor": "@nx/eslint:lint"
+    },
+    "diagnostic-replay": {
+      "executor": "nx:run-commands",
+      "cache": false,
+      "options": {
+        "command": "node tools/experiments/native-publication-diagnostics/run.mjs",
+        "forwardAllArgs": false
+      }
     }
   }
 }

@@ -1,0 +1,11 @@
+# New ordinary members: source trace
+
+Frozen combined B baseline 6630a74c965b1f414eae5105c3eb3bb3ea09ba9b89f57f81149eee52086af1fd. No repair yet. Existing `whole-value-new-keys.spec.ts` unchanged: 24 pass, two Link settlement timeouts. Both unchanged source and a console-only diagnostic reproduce the same vector. Exact commands/source manifests/logs in runs/first-failure and runs/diagnostic. Diagnostic runtime restored byte-for-byte; instrumented copy preserved.
+
+Fresh `b` below linked rows and fresh root `fresh` both enter prepareMembership, but recipient slot trie has no node at their new addresses. The loop skips at `if(!indexed)continue`. No recipient unit/fact is installed. The plain-membership notifier only marks dirty when experimental publication is enabled. `admit` receives undefined fact and cannot release the held work; trace shows pending=0, no projection. This establishes why both first updates strand; subsequent n(3) in the first original test is not reached.
+
+Further source findings: installPreparedMember does not pass ordinary before/after values, and aggregate recipient field subscriptions are enrolled once in bindSource by traversing existing children. Therefore simply allocating the trie node cannot qualify new-member publication or subsequent child updates. Genuine new child ancestry is not yet installed when prepareMembership runs, so calling captureNativeOccurrence(child) at that point would fail the current authenticated ancestry check. These are source findings, not additional executed counterexamples.
+
+Required bounded mechanism: capture source-owned new ordinary membership/value facts and arrange recipient enrollment for the new subtree without leaking failed preparations, borrowing declaration permission, or granting eligibility from later physical inspection reads. Existing recipients must observe later scalar updates and membership removal/readd, including direct nested scope; sibling recipients must remain independent. New collection acquisition must receive its explicit disposition, not be silently assumed from scalar success. Complete preparation failure/reentry, terminal completion, disposal, and pending foreign proof controls needed. No blanket late snapshot fallback or test timeout increase.
+
+This is not a production repair or a qualification claim. Main source and A/B remain unchanged.

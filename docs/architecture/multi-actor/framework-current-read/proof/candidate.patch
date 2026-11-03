@@ -1,0 +1,1989 @@
+--- a/packages/angular/src/lib/observation-adapter.ts
++++ b/packages/angular/src/lib/observation-adapter.ts
+@@ -4,12 +4,60 @@
+   signal,
+   untracked,
+   type WritableSignal,
++  type Signal,
+ } from '@angular/core';
+ 
+ import type {
+   ObservationAdapter,
+   ObservationToken,
+ } from '@signal-tree/kernel/adapter';
++
++/** One native producer per reader, with source-current direct reads. */
++function currentReadonly<T>(readCurrent: () => T): Signal<T> {
++  let active: { evaluated: boolean } | undefined;
++  let computing = false;
++  let nativeFault: { error: unknown } | undefined;
++  let ownFailure: { error: unknown } | undefined;
++  const pendingNativeFault = (): { error: unknown } | undefined => nativeFault;
++  const source = computed(() => {
++    if (active) active.evaluated = true;
++    computing = true;
++    nativeFault = undefined;
++    try {
++      const value = readCurrent();
++      ownFailure = undefined;
++      return value;
++    } catch (error) {
++      // Do not reclassify a nested native/cycle error as a source-owned error
++      // merely because it propagated through the supplied recipe.
++      const fault = pendingNativeFault();
++      ownFailure = fault && Object.is(fault.error, error) ? undefined : { error };
++      throw error;
++    } finally { computing = false; }
++  });
++  return new Proxy(source, {
++    apply() {
++      const previous = active;
++      const frame = { evaluated: false };
++      active = frame;
++      try {
++        let value: T;
++        try { value = source(); }
++        catch (error) {
++          if (!frame.evaluated && computing) {
++            nativeFault = { error };
++            throw error;
++          }
++          // Only this computation's remembered own-recipe failure qualifies.
++          // Marker=false alone also describes fresh dependency/cycle failures.
++          if (frame.evaluated || !ownFailure || !Object.is(ownFailure.error, error)) throw error;
++          return readCurrent();
++        }
++        return frame.evaluated ? value : readCurrent();
++      } finally { active = previous; }
++    },
++  });
++}
+ 
+ /** Angular dependency tracking for kernel-owned locations. */
+ export const ANGULAR_OBSERVATION_ADAPTER: ObservationAdapter = {
+@@ -38,6 +86,7 @@
+   },
+ 
+   createReadonlyCell: <T,>(compute: () => T) => computed(compute),
++  createCurrentReadonlyCell: currentReadonly,
+ 
+   createWritableProjection: <T,>(compute: () => T) => {
+     const cell = linkedSignal(compute);
+--- a/packages/kernel/src/adapter.ts
++++ b/packages/kernel/src/adapter.ts
+@@ -91,6 +91,9 @@
+       observation.createWritableProjection &&
+       observation.createReadonlyCell
+   );
++  if (hasNativeCarrier && typeof observation.createCurrentReadonlyCell !== 'function') {
++    throw new Error('Native observation adapters require createCurrentReadonlyCell');
++  }
+   return createKernelSignalTreeFactory(
+     observation,
+     hasNativeCarrier
+@@ -98,7 +101,7 @@
+           createNativeTreeScalarLeafRuntime(physicalCommitClock, observation)
+       : undefined,
+     hasNativeCarrier
+-      ? () => createNativeLocationRuntime(observation)
++      ? (boundObservation) => createNativeLocationRuntime(boundObservation)
+       : undefined
+   );
+ };
+--- a/packages/kernel/src/lib/entity-signal.ts
++++ b/packages/kernel/src/lib/entity-signal.ts
+@@ -629,11 +629,13 @@
+    * an adapter's computed) depends on the collection as the cached projection
+    * would. Outside taps this is one comparison per access.
+    */
+-  const fresh = <T>(read: () => T): ReadableCell<T> =>
+-    (() => {
++  const fresh = <T>(read: () => T): ReadableCell<T> => {
++    const current = (): T => {
+       version();
+       return read();
+-    }) as ReadableCell<T>;
++    };
++    return locations.createCurrentReadonly(current);
++  };
+   const inTap = <T>(cell: ReadableCell<T>, read: () => T): ReadableCell<T> =>
+     taps.depth ? fresh(read) : cell;
+   // Identity-stable across value-only writes: the key snapshot is shared until
+@@ -1008,7 +1010,7 @@
+         // RESTORATION-REKEY-CLAIM-WIDTH-0.
+         lastSubjectIds = [subjectId];
+ 
+-        if (activeIdSignal() === from) {
++        if (activeIdValue === from) {
+           replaceLocation(activeIdSignal, to);
+         }
+ 
+@@ -1034,7 +1036,21 @@
+   }
+ 
+   /** Active-entity selection. See the `activeId`/`activeEntity` accessors. */
+-  const activeIdSignal = locations.createCell<K | undefined>(undefined);
++  // Keep the source-owned selection readable while grouped publication is held.
++  // The realization still controls dependency tracking and observer delivery.
++  let activeIdValue: K | undefined;
++  const activeIdSignal = locations.createWritable<K | undefined>(
++    () => activeIdValue,
++    (next) => {
++      if (Object.is(activeIdValue, next)) return false;
++      activeIdValue = next;
++      return true;
++    }
++  ).location;
++  const readActiveId = (): K | undefined => {
++    activeIdSignal();
++    return activeIdValue;
++  };
+   let cachedActiveEntity: ReadableCell<E | undefined> | undefined;
+ 
+   function publishOrderChange(
+@@ -2604,7 +2620,7 @@
+ 
+     // ── Active entity ───────────────────────────────────────────────────────
+     get activeId(): ReadableCell<K | undefined> {
+-      return activeIdSignal.asReadonly();
++      return inTap(activeIdSignal.asReadonly(), readActiveId);
+     },
+ 
+     /**
+@@ -2618,7 +2634,7 @@
+      */
+     get activeEntity(): ReadableCell<E | undefined> {
+       const read = () => {
+-        const id = activeIdSignal();
++        const id = taps.depth ? readActiveId() : activeIdSignal();
+         if (id === undefined) return undefined;
+         // A selection names a key even while no subject occupies it. Keep the
+         // membership edge only while absent; a present selection stays scoped
+@@ -2634,15 +2650,15 @@
+       // Not an error when the id is absent: selection frequently outlives the
+       // row (a delete arriving from a socket while a detail pane is open), and
+       // `activeEntity` already resolves to undefined in that case.
+-      const previous = activeIdSignal();
++      const previous = activeIdValue;
+       replaceLocation(activeIdSignal, id);
+-      if (!Object.is(previous, activeIdSignal())) markOwnerInvalidated(ownerId);
++      if (!Object.is(previous, activeIdValue)) markOwnerInvalidated(ownerId);
+     },
+ 
+     clearActiveId(): void {
+-      const previous = activeIdSignal();
++      const previous = activeIdValue;
+       replaceLocation(activeIdSignal, undefined);
+-      if (!Object.is(previous, activeIdSignal())) markOwnerInvalidated(ownerId);
++      if (!Object.is(previous, activeIdValue)) markOwnerInvalidated(ownerId);
+     },
+ 
+     has(id: K): ReadableCell<boolean> {
+--- a/packages/kernel/src/lib/internals/location-runtime.ts
++++ b/packages/kernel/src/lib/internals/location-runtime.ts
+@@ -3,6 +3,7 @@
+ import type {
+   Location,
+   ReadonlyLocation,
++  ReadableCell,
+   WritableCell,
+ } from './cell-runtime';
+ import type {
+@@ -292,6 +293,7 @@
+     equal?: (left: T, right: T) => boolean
+   ): Location<T>;
+   createDerived<T>(compute: () => T): ReadonlyLocation<T>;
++  createCurrentReadonly<T>(read: () => T): ReadableCell<T>;
+   createWritable<T>(
+     /**
+      * The location's read. `stored` asks for the stored value whatever the
+@@ -670,6 +672,10 @@
+   return {
+     createCell,
+     createDerived,
++    createCurrentReadonly: <T>(read: () => T): ReadableCell<T> =>
++      realization.createCurrentReadonlyCell
++        ? realization.createCurrentReadonlyCell(read)
++        : read,
+     createWritable,
+     createEpoch,
+     advanceEpoch,
+--- a/packages/kernel/src/lib/internals/native-location-realization.ts
++++ b/packages/kernel/src/lib/internals/native-location-realization.ts
+@@ -2,6 +2,7 @@
+ import type {
+   Location,
+   ReadonlyLocation,
++  ReadableCell,
+   WritableCell,
+ } from './cell-runtime';
+ import {
+@@ -323,6 +324,12 @@
+     createEpoch,
+     advanceEpoch,
+     createDerived,
++    createCurrentReadonly: <T>(read: () => T): ReadableCell<T> => {
++      if (!observation.createCurrentReadonlyCell) {
++        throw new Error('Native observation adapters require createCurrentReadonlyCell');
++      }
++      return observation.createCurrentReadonlyCell(read);
++    },
+     createWritable,
+     createWritableProjection,
+     publish,
+--- a/packages/kernel/src/lib/internals/observation-adapter.ts
++++ b/packages/kernel/src/lib/internals/observation-adapter.ts
+@@ -48,6 +48,14 @@
+   };
+   createReadonlyCell?<T>(compute: () => T): ReadableCell<T>;
+   /**
++   * Realize a lazy, source-current readonly reader with the adapter's native
++   * shape and stable same-source metadata. Each direct read evaluates the
++   * source once, without publishing or advancing application computed caches.
++   * Required for v16 adapters selected by the existing three-factory native
++   * classification; portable adapters may retain a neutral callable.
++   */
++  createCurrentReadonlyCell?<T>(readCurrent: () => T): ReadableCell<T>;
++  /**
+    * `ANGULAR-NATIVE-EPOCH-0`. The framework's cheapest read-dependency
+    * primitive, for a per-subject invalidation anchor that carries no value
+    * anyone reads.
+--- a/packages/kernel/src/lib/signal-tree.ts
++++ b/packages/kernel/src/lib/signal-tree.ts
+@@ -2409,6 +2409,10 @@
+     createWritableProjection:
+       observation.createWritableProjection?.bind(observation),
+     createReadonlyCell: observation.createReadonlyCell?.bind(observation),
++    createCurrentReadonlyCell:
++      observation.createCurrentReadonlyCell?.bind(observation),
++    createEpoch: observation.createEpoch?.bind(observation),
++    advanceEpoch: observation.advanceEpoch?.bind(observation),
+     runInvalidationGroup: observation.runInvalidationGroup.bind(observation),
+   };
+   return ((initialState: object, config?: TreeConfig) =>
+--- a/packages/solid/src/lib/solid-observation.ts
++++ b/packages/solid/src/lib/solid-observation.ts
+@@ -65,6 +65,7 @@
+   return {
+     dispose,
+     createToken: createObservationToken,
++    createCurrentReadonlyCell: <T>(readCurrent: () => T) => readCurrent,
+ 
+     createWritableCell: <T>(read: () => T) => {
+       const [track, bump] = createSignal(0, { equals: false });
+--- a/packages/vue/src/lib/vue-observation.ts
++++ b/packages/vue/src/lib/vue-observation.ts
+@@ -32,19 +32,44 @@
+   asReadonly(): VueReadonlyCell<T>;
+ }
+ 
+-const wrapReadonlyCell = <T>(source: ComputedRef<T>): VueReadonlyCell<T> => {
+-  const cell = (() => source.value) as VueReadonlyCell<T>;
++const wrapReadonlyCell = <T>(
++  source: ComputedRef<T>,
++  read: () => T = () => source.value
++): VueReadonlyCell<T> => {
++  const cell = (() => read()) as VueReadonlyCell<T>;
+   Object.defineProperties(cell, {
+     __v_isRef: { value: true },
+     __v_isReadonly: { value: true },
+     effect: { value: source.effect },
+-    value: { get: () => source.value },
++    value: { get: read },
+   });
+   return cell;
+ };
+ 
+ const createReadonlyCell = <T>(read: () => T): VueReadonlyCell<T> =>
+   wrapReadonlyCell(computed(read));
++
++// The marker avoids double recipe execution on a native cache miss. Each
++// invocation owns its frame so nested reads and exceptions restore the caller.
++const createCurrentReadonlyCell = <T>(readCurrent: () => T): VueReadonlyCell<T> => {
++  let active: { evaluated: boolean } | undefined;
++  const source = computed(() => {
++    if (active) active.evaluated = true;
++    return readCurrent();
++  });
++  const read = (): T => {
++    const previous = active;
++    const frame = { evaluated: false };
++    active = frame;
++    try {
++      // Vue may throw while polling a dependency before this recipe runs.
++      // That is a fresh error, not evidence of a cached own-recipe failure.
++      const value = source.value;
++      return frame.evaluated ? value : readCurrent();
++    } finally { active = previous; }
++  };
++  return wrapReadonlyCell(source, read);
++};
+ 
+ const createWritableCell = <T>(read: () => T): VueWritableCell<T> => {
+   const cell = (() => read()) as VueWritableCell<T>;
+@@ -102,6 +127,7 @@
+   };
+ 
+   return {
++    createCurrentReadonlyCell,
+     createToken: createObservationToken,
+ 
+     createWritableCell: <T>(read: () => T) => {
+--- /dev/null
++++ b/packages/angular/src/lib/current-read-capability.spec.ts
+@@ -0,0 +1,124 @@
++import {computed, signal, isSignal} from '@angular/core';
++import {SIGNAL, createWatch} from '@angular/core/primitives/signals';
++import {expect, it} from 'vitest';
++import {ANGULAR_OBSERVATION_ADAPTER as adapter} from './observation-adapter';
++const state = <T>(value: T) => {const s = signal(value); return {read:s, set:s.set};};
++const memo = computed;
++const nativeRead = <T>(cell: () => T): T => cell();
++const metadata = (cell: () => unknown): unknown => {if (!isSignal(cell)) throw new Error('not Signal'); return cell[SIGNAL];};
++const checkReadonly = (cell: () => unknown) => {expect(isSignal(cell)).toBe(true); expect('set' in cell).toBe(false);};
++const queued = new Set<ReturnType<typeof createWatch>>();
++const flush = () => {for (const w of queued) w.run(); queued.clear();};
++const observe = (read: (cleanup: (fn: () => void) => void) => void) => {
++  const w = createWatch(read, w => queued.add(w), false); w.run(); return () => w.destroy();
++};
++
++const current = <T>(read: () => T) => {
++  const cell = adapter.createCurrentReadonlyCell!(read);
++  return {call: cell, read: () => nativeRead(cell), metadata: () => metadata(cell), cell};
++};
++it('current-read source-linked producer preserves held/ABA, counts, identity, cleanup and errors', () => {
++  const left = state(0), right = state(0), branch = state(true);
++  let raw = 'X', calls = 0, failed = false;
++  let latest: {id: string; call: number} | undefined;
++  const c = current(() => {
++    calls++; if (branch.read()) left.read(); else right.read();
++    if (failed) throw new Error('query failure');
++    return latest = {id: raw, call: calls};
++  });
++  const m = c.metadata(); expect(calls).toBe(0);
++  const first = c.read(); expect(first).toBe(latest); expect(calls).toBe(1);
++  expect(c.call()).toBe(latest); expect(calls).toBe(2);
++  expect(c.metadata()).toBe(m); expect(calls).toBe(2); checkReadonly(c.cell);
++  let appRuns = 0;
++  const app = memo(() => {appRuns++; return c.read();});
++  const warmed = app(); expect(warmed.id).toBe('X');
++  for (const id of ['A', 'X', 'A', 'C']) {
++    raw = id; const before = calls; const value = c.read();
++    expect(value.id).toBe(id); expect(value).toBe(latest); expect(calls-before).toBe(1);
++    expect(app()).toBe(warmed); expect(appRuns).toBe(1);
++  }
++  left.set(1); let before = calls;
++  expect(c.read()).toBe(latest); expect(calls-before).toBe(1); expect(app().id).toBe('C');
++  let deliveries = 0, cleanups = 0;
++  const stop = observe(cleanup => {deliveries++; c.read(); cleanup(() => cleanups++);});
++  expect(deliveries).toBe(1);
++  right.set(1); flush(); expect(deliveries).toBe(1);
++  branch.set(false); flush(); expect(deliveries).toBe(2); expect(cleanups).toBe(1);
++  left.set(2); flush(); expect(deliveries).toBe(2);
++  raw = 'D'; right.set(2); flush(); expect(deliveries).toBe(3);
++  stop(); expect(cleanups).toBe(3); right.set(3); flush(); expect(deliveries).toBe(3);
++  failed = true; expect(() => c.read()).toThrow('query failure'); failed = false;
++  before = calls; expect(c.read().id).toBe('D'); expect(calls-before).toBe(1);
++  expect(c.metadata()).toBe(m);
++});
++it('current-read nested invocation markers recover from direct nested throws', () => {
++  let innerRuns = 0, outerRuns = 0;
++  const inner = current(() => {innerRuns++; return {id: 'inner'};});
++  const outer = current(() => {outerRuns++; return inner.read();});
++  expect(outer.read().id).toBe('inner'); expect(innerRuns).toBe(1); expect(outerRuns).toBe(1);
++  let depth = 0, enter = false, fail = false, calls = 0;
++  const reentrant = current((): string => {
++    calls++; depth++;
++    try {
++      expect(depth).toBeLessThanOrEqual(2);
++      if (enter && depth === 1) return reentrant.read();
++      if (fail) throw new Error('nested failure');
++      return 'ok';
++    } finally {depth--;}
++  });
++  expect(reentrant.read()).toBe('ok'); expect(calls).toBe(1); enter = true;
++  let before = calls; expect(reentrant.read()).toBe('ok'); expect(calls-before).toBe(2);
++  fail = true; expect(() => reentrant.read()).toThrow('nested failure'); fail = false;
++  before = calls; expect(reentrant.read()).toBe('ok'); expect(calls-before).toBe(2);
++  enter = false; before = calls; expect(reentrant.read()).toBe('ok'); expect(calls-before).toBe(1);
++});
++
++it('current-read native-only first dependency recovers with native publication error timing', () => {
++  const outcomes: {escaped: boolean; deliveries: string[]}[] = [];
++  for (const mode of ['native', 'current']) {
++    const epoch = state(0); let failed = false, calls = 0;
++    const freshError = new Error('same fresh recipe error');
++    const recipe = () => {calls++; epoch.read(); if (failed) throw freshError; return calls;};
++    const read = mode === 'native' ? memo(recipe) : current(recipe).read;
++    const deliveries: string[] = [];
++    const stop = observe(() => {
++      try {read(); deliveries.push('value');}
++      catch (error) {expect(error).toBe(freshError); deliveries.push('error');}
++    });
++    try {
++      expect(calls).toBe(1); expect(deliveries).toEqual(['value']);
++      failed = true; let before = calls, escaped = false;
++      try {epoch.set(1); flush();} catch (error) {expect(error).toBe(freshError); escaped = true;}
++      const failedPublicationCalls = calls-before;
++      const errorDeliveries = [...deliveries];
++      if (mode === 'current') {
++        before = calls; expect(() => read()).toThrow(freshError); expect(calls-before).toBe(1);
++        failed = false; before = calls; read(); expect(calls-before).toBe(1);
++      } else failed = false;
++      before = calls; epoch.set(2); flush(); const recoveredPublicationCalls = calls-before;
++      expect(deliveries.at(-1)).toBe('value'); expect(deliveries.length).toBe(errorDeliveries.length+1);
++      outcomes.push({escaped,deliveries});
++      console.log('current-read-publication-counts', {mode, escaped, failedPublicationCalls,recoveredPublicationCalls,deliveries});
++    } finally {stop();}
++  }
++  expect(outcomes[1]).toEqual(outcomes[0]);
++});
++it('current-read preserves dependency failures and native cycle errors', () => {
++  const epoch = signal(0); let fail = false, innerRuns = 0, outerRuns = 0;
++  const error = new Error('dependency sentinel');
++  const inner = computed(() => {innerRuns++; epoch(); if (fail) {fail=false; throw error;} return 'ok';});
++  const c = current(() => {outerRuns++; return inner();});
++  expect(c.read()).toBe('ok'); fail=true; epoch.set(1);
++  expect(() => c.read()).toThrow(error); expect(innerRuns).toBe(2);
++  epoch.set(2); expect(c.read()).toBe('ok');
++  let cycleCalls = 0;
++  const cyclic = current((): string => {cycleCalls++; return cyclic.read();});
++  let firstError: unknown;
++  try {cyclic.read();} catch (e) {firstError=e;}
++  expect(firstError).toBeInstanceOf(Error); expect(cycleCalls).toBe(1);
++  let secondError: unknown;
++  try {cyclic.read();} catch (e) {secondError=e;}
++  expect(secondError).toBe(firstError); expect(cycleCalls).toBe(1);
++  expect(outerRuns).toBeGreaterThan(1);
++});
+--- /dev/null
++++ b/packages/angular/src/lib/current-read-capability.typing.spec.ts
+@@ -0,0 +1,6 @@
++import type {Signal} from '@angular/core';
++import {entityMap, signalTree} from '../index';
++const tree = signalTree({rows:entityMap<{id:string}, string>()});
++const id: Signal<string | undefined> = tree.$.rows.activeId;
++const rows: Signal<readonly {id:string}[]> = tree.$.rows.all;
++void id; void rows; tree.destroy();
+--- /dev/null
++++ b/packages/angular/src/lib/selected-active-id-preparation.spec.ts
+@@ -0,0 +1,95 @@
++import { expect, it } from 'vitest';
++import { effect, Injector, runInInjectionContext } from '@angular/core';
++import { TestBed } from '@angular/core/testing';
++import { entityMap, signalTree, transactions } from '../index';
++
++it('public callback discriminator sees restored library selection before choosing newer C', async () => {
++  const tree = signalTree(
++    { rows: entityMap<{ id: string; n: number }, string>() },
++    { enhancers: [transactions()] }
++  );
++  const rows = tree.$.rows;
++  rows.setAll([
++    { id: 'A', n: 1 },
++    { id: 'C', n: 3 },
++  ]);
++  rows.setActiveId('A');
++  const read = () => ({
++    activeId: rows.activeId(),
++    ids: [...rows.ids()],
++    all: rows.all().map((row) => ({ ...row })),
++    directA: rows.byId('A')?.()?.n ?? null,
++  });
++  expect(read()).toEqual({
++    activeId: 'A',
++    ids: ['A', 'C'],
++    all: [
++      { id: 'A', n: 1 },
++      { id: 'C', n: 3 },
++    ],
++    directA: 1,
++  });
++  const seen: ReturnType<typeof read>[] = [];
++  TestBed.configureTestingModule({});
++  const observer = runInInjectionContext(TestBed.inject(Injector), () =>
++    effect(() => {
++      seen.push(read());
++    })
++  );
++  TestBed.tick();
++  const callbacks: ReturnType<typeof read>[] = [];
++  let armed = false;
++  const untap = rows.tap({
++    onRemove: (id) => {
++      if (armed && id === 'D') {
++        callbacks.push(read());
++        rows.setActiveId('C');
++      }
++    },
++  });
++  try {
++    const pending = tree.transact(() => {
++      rows.changeId('A', 'X');
++      rows.addOne({ id: 'D', n: 4 });
++    });
++    await Promise.resolve();
++    TestBed.tick();
++    expect(read().activeId).toBe('X');
++    expect(read().ids).toEqual(['X', 'C', 'D']);
++    armed = true;
++    pending.rollback();
++    await Promise.resolve();
++    TestBed.tick();
++    const final = read();
++    console.log(
++      'selection-public-angular',
++      JSON.stringify({ callbacks, final, seen })
++    );
++    expect(callbacks).toEqual([
++      {
++        activeId: 'A',
++        ids: ['A', 'C'],
++        all: [
++          { id: 'A', n: 1 },
++          { id: 'C', n: 3 },
++        ],
++        directA: 1,
++      },
++    ]);
++    expect(final).toEqual({
++      activeId: 'C',
++      ids: ['A', 'C'],
++      all: [
++        { id: 'A', n: 1 },
++        { id: 'C', n: 3 },
++      ],
++      directA: 1,
++    });
++    expect(seen.at(-1)).toEqual(final);
++  } finally {
++    untap();
++    observer.destroy();
++    TestBed.resetTestingModule();
++    tree.destroy();
++  }
++});
+--- /dev/null
++++ b/packages/angular/src/lib/selected-callback-facade.spec.ts
+@@ -0,0 +1,280 @@
++import { SIGNAL } from '@angular/core/primitives/signals';
++import { expect, it } from 'vitest';
++import { entityMap, signalTree, transactions } from '../index';
++import { computed, isSignal } from '@angular/core';
++
++// Public facades only. These reads are acquired in the tap, as required by the
++// existing fresh-projection contract. Native computed timing is tested apart.
++it('realizes fresh tap reads and preserves later callback writes', async () => {
++  const tree = signalTree(
++    { rows: entityMap<{ id: string; n: number }, string>() },
++    { enhancers: [transactions()] }
++  );
++  const rows = tree.$.rows;
++  rows.setAll([
++    { id: 'A', n: 1 },
++    { id: 'C', n: 3 },
++  ]);
++  rows.setActiveId('A');
++  const snapshot = () => ({
++    id: rows.activeId(),
++    active: rows.activeEntity()?.n,
++    ids: [...rows.ids()],
++    all: rows.all().map((row) => ({ ...row })),
++    count: rows.count(),
++    empty: rows.empty(),
++    map: [...rows.asMap().keys()],
++    hasA: rows.has('A')(),
++    where: rows
++      .where((row) => row.n > 0)()
++      .map((row) => row.id),
++    found: rows.find((row) => row.id === 'A')()?.n,
++  });
++  let armed = false;
++  let calls = 0;
++  const frames: ReturnType<typeof snapshot>[] = [];
++  const stop = rows.tap({
++    onRemove: (id) => {
++      if (!armed || id !== 'D') return;
++      calls++;
++      frames.push(snapshot());
++      const heldId = rows.activeId;
++      const heldAll = rows.all;
++      const heldActive = rows.activeEntity;
++      expect(isSignal(heldId)).toBe(true);
++      expect(isSignal(heldAll)).toBe(true);
++      expect(heldId()).toBe('A');
++      expect(heldActive()?.n).toBe(1);
++      expect(heldAll().map((row) => row.id)).toEqual(['A', 'C']);
++      rows.setActiveId(heldId() === 'A' ? 'C' : 'wrong-selection');
++      rows.updateOne('C', { n: 9 });
++      // The tap-fresh readers remain fresh even if retained across a nested write.
++      expect(heldId()).toBe('C');
++      expect(heldActive()?.n).toBe(9);
++      expect(heldAll().find((row) => row.id === 'C')?.n).toBe(9);
++      frames.push(snapshot());
++    },
++  });
++  try {
++    expect(snapshot().id).toBe('A');
++    const pending = tree.transact(() => {
++      rows.changeId('A', 'X');
++      rows.addOne({ id: 'D', n: 4 });
++    });
++    await Promise.resolve();
++    expect(snapshot().id).toBe('X');
++    armed = true;
++    pending.rollback();
++    await Promise.resolve();
++    expect(calls).toBe(1);
++    expect(frames).toEqual([
++      {
++        id: 'A',
++        active: 1,
++        ids: ['A', 'C'],
++        all: [
++          { id: 'A', n: 1 },
++          { id: 'C', n: 3 },
++        ],
++        count: 2,
++        empty: false,
++        map: ['A', 'C'],
++        hasA: true,
++        where: ['A', 'C'],
++        found: 1,
++      },
++      {
++        id: 'C',
++        active: 9,
++        ids: ['A', 'C'],
++        all: [
++          { id: 'A', n: 1 },
++          { id: 'C', n: 9 },
++        ],
++        count: 2,
++        empty: false,
++        map: ['A', 'C'],
++        hasA: true,
++        where: ['A', 'C'],
++        found: 1,
++      },
++    ]);
++    expect(snapshot()).toEqual(frames[1]);
++  } finally {
++    stop();
++    tree.destroy();
++  }
++});
++
++it('keeps ordinary selected observation granular and native computations cached during the callback', async () => {
++  const tree = signalTree(
++    { rows: entityMap<{ id: string; n: number }, string>() },
++    { enhancers: [transactions()] }
++  );
++  const rows = tree.$.rows;
++  rows.setAll([
++    { id: 'A', n: 1 },
++    { id: 'C', n: 3 },
++  ]);
++  rows.setActiveId('A');
++  let runs = 0;
++  const view = computed(() => {
++    runs++;
++    return rows.activeEntity()?.n;
++  });
++  let selectionRuns = 0;
++  const selectionView = computed(() => {
++    selectionRuns++;
++    return rows.activeId();
++  });
++  let armed = false;
++  let callbackCount = 0;
++  const stop = rows.tap({
++    onRemove: (id) => {
++      if (!armed || id !== 'D') return;
++      callbackCount++;
++      const before = runs;
++      const beforeSelection = selectionRuns;
++      expect(selectionView()).toBe('X');
++      expect(view()).toBe(1);
++      // Reading the fresh library facade must not invalidate the app's memo.
++      expect(rows.activeId()).toBe('A');
++      expect(rows.activeEntity()?.n).toBe(1);
++      expect(runs).toBe(before);
++      rows.setActiveId('C');
++      expect(selectionView()).toBe('X');
++      expect(view()).toBe(1);
++      expect(selectionRuns).toBe(beforeSelection);
++      expect(runs).toBe(before);
++    },
++  });
++  try {
++    expect(view()).toBe(1);
++    const warm = runs;
++    rows.updateOne('C', { n: 4 });
++    expect(view()).toBe(1);
++    expect(runs).toBe(warm);
++    const pending = tree.transact(() => {
++      rows.changeId('A', 'X');
++      rows.addOne({ id: 'D', n: 4 });
++    });
++    await Promise.resolve();
++    expect(rows.activeId()).toBe('X');
++    expect(view()).toBe(1);
++    expect(selectionView()).toBe('X');
++    armed = true;
++    pending.rollback();
++    await Promise.resolve();
++    expect(callbackCount).toBe(1);
++    expect(selectionView()).toBe('C');
++    expect(view()).toBe(4);
++    expect(runs).toBeGreaterThan(warm);
++  } finally {
++    stop();
++    tree.destroy();
++  }
++});
++
++it.each(['rekey', 'clear'] as const)(
++  'preserves a callback selection followed by %s',
++  async (mode) => {
++    const tree = signalTree(
++      { rows: entityMap<{ id: string; n: number }, string>() },
++      { enhancers: [transactions()] }
++    );
++    const rows = tree.$.rows;
++    rows.setAll([
++      { id: 'A', n: 1 },
++      { id: 'C', n: 3 },
++    ]);
++    rows.setActiveId('A');
++    let armed = false;
++    let calls = 0;
++    const expected = mode === 'rekey' ? 'Y' : undefined;
++    const stop = rows.tap({
++      onRemove: (id) => {
++        if (!armed || id !== 'D') return;
++        calls++;
++        expect(rows.activeId()).toBe('A');
++        rows.setActiveId('C');
++        if (mode === 'rekey') rows.changeId('C', 'Y');
++        else rows.clearActiveId();
++        expect(rows.activeId()).toBe(expected);
++        expect(rows.activeEntity()?.n).toBe(mode === 'rekey' ? 3 : undefined);
++      },
++    });
++    try {
++      const pending = tree.transact(() => {
++        rows.changeId('A', 'X');
++        rows.addOne({ id: 'D', n: 4 });
++      });
++      await Promise.resolve();
++      armed = true;
++      pending.rollback();
++      await Promise.resolve();
++      expect(calls).toBe(1);
++      expect(rows.activeId()).toBe(expected);
++      expect(rows.activeEntity()?.n).toBe(mode === 'rekey' ? 3 : undefined);
++      expect(rows.ids()).toEqual(mode === 'rekey' ? ['A', 'Y'] : ['A', 'C']);
++    } finally {
++      stop();
++      tree.destroy();
++    }
++  }
++);
++
++it('retains coherent native metadata on one callback-acquired reader', () => {
++  const tree = signalTree({
++    rows: entityMap<{ id: string; n: number }, string>(),
++  });
++  let callbacks = 0;
++  const stop = tree.$.rows.tap({
++    onAdd: () => {
++      callbacks++;
++      const held = tree.$.rows.ids;
++      const before = held[SIGNAL];
++      expect(held()).toEqual(['A']);
++      const after = held[SIGNAL];
++      console.log('retained-native-metadata', Object.is(before, after));
++      expect(after).toBe(before);
++    },
++  });
++  try {
++    tree.$.rows.addOne({ id: 'A', n: 1 });
++    expect(callbacks).toBe(1);
++  } finally {
++    stop();
++    tree.destroy();
++  }
++});
++
++it('current-read real tap queries evaluate each recipe once across held ABA writes', async () => {
++  const tree = signalTree({rows:entityMap<{id:string;n:number}, string>()}, {enhancers:[transactions()]});
++  const rows = tree.$.rows; rows.setAll([{id:'A',n:1},{id:'C',n:3}]);
++  let armed = false, callbacks = 0;
++  const stop = rows.tap({onRemove: id => {
++    if (!armed || id !== 'D') return; callbacks++;
++    let predicates = 0;
++    const query = rows.where(row => {predicates++; return row.n > 0;});
++    const nested = rows.find(row => row.id === 'C');
++    for (const n of [3,9,3]) {
++      rows.updateOne('C',{n}); const before = predicates;
++      const value = query();
++      expect(predicates-before).toBe(2);
++      expect(value.map(row => row.id)).toEqual(['A','C']);
++      expect(value.find(row => row.id === 'C')?.n).toBe(n);
++      expect(nested()?.n).toBe(n);
++    }
++    let failures = 0, shouldThrow = true;
++    const error = new Error('query sentinel');
++    const throwing = rows.where(() => {failures++; if (shouldThrow) throw error; return true;});
++    expect(() => throwing()).toThrow(error); expect(failures).toBe(1);
++    shouldThrow = false; const before = failures;
++    expect(throwing().length).toBe(2); expect(failures-before).toBe(2);
++  }});
++  try {
++    const pending = tree.transact(() => rows.addOne({id:'D',n:4}));
++    await Promise.resolve(); armed = true; pending.rollback(); await Promise.resolve();
++    expect(callbacks).toBe(1);
++  } finally {stop();tree.destroy();}
++});
+--- /dev/null
++++ b/packages/kernel/src/lib/current-read-capability.spec.ts
+@@ -0,0 +1,84 @@
++import {describe, expect, it} from 'vitest';
++import {createSignalTreeFactory, type ObservationAdapter} from '../adapter';
++import {entityMap} from './markers/entity-map';
++import {createSignalTreeFactory as internalFactory} from './signal-tree';
++import {createLocationRuntime} from './internals/location-runtime';
++import {createNativeLocationRuntime} from './internals/native-location-realization';
++
++const neutral = (): ObservationAdapter => ({
++  createToken: () => ({observe() {}, invalidate() {}}),
++  runInvalidationGroup: run => run(),
++});
++const writable = <T>(read: () => T) => Object.assign(() => read(), {
++  set: (_value: T) => {}, update: (_change: (value: T) => T) => {}, asReadonly: () => read,
++});
++describe('current-read capability construction boundary', () => {
++  for (let mask = 1; mask <= 7; mask++) {
++    it(`preserves classification for legacy factory mask ${mask}`, () => {
++      let tokens = 0, nativeCalls = 0;
++      const adapter: ObservationAdapter = {
++        ...neutral(), createToken() {tokens++; return {observe(){},invalidate(){}};},
++        ...(mask & 1 ? {createWritableCell: <T>(read: () => T) => {nativeCalls++; return {cell:writable(read), peek:read, token:{observe(){},invalidate(){}}};}} : {}),
++        ...(mask & 2 ? {createWritableProjection: <T>(read: () => T) => {nativeCalls++; return {cell:writable(read), peek:read};}} : {}),
++        ...(mask & 4 ? {createReadonlyCell: <T>(read: () => T) => {nativeCalls++; return read;}} : {}),
++      };
++      if (mask === 7) {
++        let getters = 0;
++        const initial = {get value() {getters++; return 1;}};
++        expect(() => createSignalTreeFactory(adapter)(initial)).toThrow(/require createCurrentReadonlyCell/);
++        expect(getters).toBe(0); expect(tokens).toBe(0); expect(nativeCalls).toBe(0);
++      } else {
++        const tree = createSignalTreeFactory(adapter)({value:1, rows:entityMap<{id:string}, string>()});
++        try {
++          expect(tree.$.value()).toBe(1); tree.$.value(2); expect(tree.$.value()).toBe(2);
++          let callbacks = 0;
++          tree.$.rows.tap({onAdd: () => {callbacks++; expect(tree.$.rows.ids()).toEqual(['A']);}});
++          tree.$.rows.addOne({id:'A'}); expect(callbacks).toBe(1); expect(nativeCalls).toBe(0);
++        } finally {tree.destroy();}
++      }
++      // The internal default factory has always selected portable locations,
++      // independently of unused native factory properties.
++      const portable = internalFactory(adapter)({value:1});
++      expect(portable.$.value()).toBe(1); portable.destroy(); expect(nativeCalls).toBe(0);
++    });
++    it(`accepts migrated mask ${mask} without changing native routing`, () => {
++      let nativeScalar = 0, capabilityCalls = 0;
++      const adapter: ObservationAdapter = {
++        ...neutral(),
++        createCurrentReadonlyCell<T>(read: () => T) {expect(this).toBe(adapter); capabilityCalls++; return read;},
++        ...(mask & 1 ? {createWritableCell: <T>(read: () => T) => {nativeScalar++; return {cell:writable(read), peek:read, token:{observe(){},invalidate(){}}};}} : {}),
++        ...(mask & 2 ? {createWritableProjection: <T>(read: () => T) => ({cell:writable(read), peek:read})} : {}),
++        ...(mask & 4 ? {createReadonlyCell: <T>(read: () => T) => read} : {}),
++      };
++      const factory = createSignalTreeFactory(adapter);
++      expect(capabilityCalls).toBe(0);
++      adapter.createCurrentReadonlyCell = () => {throw new Error('unbound replacement');};
++      const tree = factory({value:1, rows:entityMap<{id:string}, string>()});
++      try {
++        expect(tree.$.value()).toBe(1); expect(nativeScalar > 0).toBe(mask === 7);
++        let callbacks = 0;
++        tree.$.rows.tap({onAdd: () => {callbacks++; expect(tree.$.rows.ids()).toEqual(['A']);}});
++        tree.$.rows.addOne({id:'A'}); expect(callbacks).toBe(1); expect(capabilityCalls).toBeGreaterThan(0);
++      }
++      finally {tree.destroy();}
++    });
++  }
++  it('keeps neutral and capability-only adapters portable; binds the optional method', () => {
++    const tree = createSignalTreeFactory(neutral())({value:1});
++    tree.$.value(2); expect(tree.$.value()).toBe(2); tree.destroy();
++    let value = 1, calls = 0;
++    const adapter = {...neutral(), createCurrentReadonlyCell<T>(read: () => T) {
++      expect(this).toBe(adapter); calls++; return read;
++    }};
++    const tree2 = createSignalTreeFactory(adapter)({value:1});
++    tree2.$.value(2); expect(tree2.$.value()).toBe(2); tree2.destroy();
++    const reader = createLocationRuntime(adapter).createCurrentReadonly(() => value);
++    expect(reader()).toBe(1); value = 2; expect(reader()).toBe(2); expect(calls).toBe(1);
++  });
++  it('propagates capability failure instead of substituting a bare callable', () => {
++    const adapter: ObservationAdapter = {...neutral(), createCurrentReadonlyCell() {throw new Error('failed realization');}};
++    for (const runtime of [createLocationRuntime(adapter), createNativeLocationRuntime(adapter)]) {
++      expect(() => runtime.createCurrentReadonly(() => 1)).toThrow('failed realization');
++    }
++  });
++});
+--- /dev/null
++++ b/packages/kernel/src/lib/selected-callback-facade.spec.ts
+@@ -0,0 +1,152 @@
++import { expect, it } from 'vitest';
++import { entityMap, signalTree, transactions } from '../index';
++
++// Public facades only. These reads are acquired in the tap, as required by the
++// existing fresh-projection contract. Native computed timing is tested apart.
++it('realizes fresh tap reads and preserves later callback writes', async () => {
++  const tree = signalTree(
++    { rows: entityMap<{ id: string; n: number }, string>() },
++    { enhancers: [transactions()] }
++  );
++  const rows = tree.$.rows;
++  rows.setAll([
++    { id: 'A', n: 1 },
++    { id: 'C', n: 3 },
++  ]);
++  rows.setActiveId('A');
++  const snapshot = () => ({
++    id: rows.activeId(),
++    active: rows.activeEntity()?.n,
++    ids: [...rows.ids()],
++    all: rows.all().map((row) => ({ ...row })),
++    count: rows.count(),
++    empty: rows.empty(),
++    map: [...rows.asMap().keys()],
++    hasA: rows.has('A')(),
++    where: rows
++      .where((row) => row.n > 0)()
++      .map((row) => row.id),
++    found: rows.find((row) => row.id === 'A')()?.n,
++  });
++  let armed = false;
++  let calls = 0;
++  const frames: ReturnType<typeof snapshot>[] = [];
++  const stop = rows.tap({
++    onRemove: (id) => {
++      if (!armed || id !== 'D') return;
++      calls++;
++      frames.push(snapshot());
++      const heldId = rows.activeId;
++      const heldAll = rows.all;
++      const heldActive = rows.activeEntity;
++
++      expect(heldId()).toBe('A');
++      expect(heldActive()?.n).toBe(1);
++      expect(heldAll().map((row) => row.id)).toEqual(['A', 'C']);
++      rows.setActiveId(heldId() === 'A' ? 'C' : 'wrong-selection');
++      rows.updateOne('C', { n: 9 });
++      // The tap-fresh readers remain fresh even if retained across a nested write.
++      expect(heldId()).toBe('C');
++      expect(heldActive()?.n).toBe(9);
++      expect(heldAll().find((row) => row.id === 'C')?.n).toBe(9);
++      frames.push(snapshot());
++    },
++  });
++  try {
++    expect(snapshot().id).toBe('A');
++    const pending = tree.transact(() => {
++      rows.changeId('A', 'X');
++      rows.addOne({ id: 'D', n: 4 });
++    });
++    await Promise.resolve();
++    expect(snapshot().id).toBe('X');
++    armed = true;
++    pending.rollback();
++    await Promise.resolve();
++    expect(calls).toBe(1);
++    expect(frames).toEqual([
++      {
++        id: 'A',
++        active: 1,
++        ids: ['A', 'C'],
++        all: [
++          { id: 'A', n: 1 },
++          { id: 'C', n: 3 },
++        ],
++        count: 2,
++        empty: false,
++        map: ['A', 'C'],
++        hasA: true,
++        where: ['A', 'C'],
++        found: 1,
++      },
++      {
++        id: 'C',
++        active: 9,
++        ids: ['A', 'C'],
++        all: [
++          { id: 'A', n: 1 },
++          { id: 'C', n: 9 },
++        ],
++        count: 2,
++        empty: false,
++        map: ['A', 'C'],
++        hasA: true,
++        where: ['A', 'C'],
++        found: 1,
++      },
++    ]);
++    expect(snapshot()).toEqual(frames[1]);
++  } finally {
++    stop();
++    tree.destroy();
++  }
++});
++
++it.each(['rekey', 'clear'] as const)(
++  'preserves a callback selection followed by %s',
++  async (mode) => {
++    const tree = signalTree(
++      { rows: entityMap<{ id: string; n: number }, string>() },
++      { enhancers: [transactions()] }
++    );
++    const rows = tree.$.rows;
++    rows.setAll([
++      { id: 'A', n: 1 },
++      { id: 'C', n: 3 },
++    ]);
++    rows.setActiveId('A');
++    let armed = false;
++    let calls = 0;
++    const expected = mode === 'rekey' ? 'Y' : undefined;
++    const stop = rows.tap({
++      onRemove: (id) => {
++        if (!armed || id !== 'D') return;
++        calls++;
++        expect(rows.activeId()).toBe('A');
++        rows.setActiveId('C');
++        if (mode === 'rekey') rows.changeId('C', 'Y');
++        else rows.clearActiveId();
++        expect(rows.activeId()).toBe(expected);
++        expect(rows.activeEntity()?.n).toBe(mode === 'rekey' ? 3 : undefined);
++      },
++    });
++    try {
++      const pending = tree.transact(() => {
++        rows.changeId('A', 'X');
++        rows.addOne({ id: 'D', n: 4 });
++      });
++      await Promise.resolve();
++      armed = true;
++      pending.rollback();
++      await Promise.resolve();
++      expect(calls).toBe(1);
++      expect(rows.activeId()).toBe(expected);
++      expect(rows.activeEntity()?.n).toBe(mode === 'rekey' ? 3 : undefined);
++      expect(rows.ids()).toEqual(mode === 'rekey' ? ['A', 'Y'] : ['A', 'C']);
++    } finally {
++      stop();
++      tree.destroy();
++    }
++  }
++);
+--- /dev/null
++++ b/packages/react/src/selected-callback-facade.spec.tsx
+@@ -0,0 +1,152 @@
++import { expect, it } from 'vitest';
++import { entityMap, signalTree, transactions } from './index';
++
++// Public facades only. These reads are acquired in the tap, as required by the
++// existing fresh-projection contract. Native computed timing is tested apart.
++it('realizes fresh tap reads and preserves later callback writes', async () => {
++  const tree = signalTree(
++    { rows: entityMap<{ id: string; n: number }, string>() },
++    { enhancers: [transactions()] }
++  );
++  const rows = tree.$.rows;
++  rows.setAll([
++    { id: 'A', n: 1 },
++    { id: 'C', n: 3 },
++  ]);
++  rows.setActiveId('A');
++  const snapshot = () => ({
++    id: rows.activeId(),
++    active: rows.activeEntity()?.n,
++    ids: [...rows.ids()],
++    all: rows.all().map((row) => ({ ...row })),
++    count: rows.count(),
++    empty: rows.empty(),
++    map: [...rows.asMap().keys()],
++    hasA: rows.has('A')(),
++    where: rows
++      .where((row) => row.n > 0)()
++      .map((row) => row.id),
++    found: rows.find((row) => row.id === 'A')()?.n,
++  });
++  let armed = false;
++  let calls = 0;
++  const frames: ReturnType<typeof snapshot>[] = [];
++  const stop = rows.tap({
++    onRemove: (id) => {
++      if (!armed || id !== 'D') return;
++      calls++;
++      frames.push(snapshot());
++      const heldId = rows.activeId;
++      const heldAll = rows.all;
++      const heldActive = rows.activeEntity;
++
++      expect(heldId()).toBe('A');
++      expect(heldActive()?.n).toBe(1);
++      expect(heldAll().map((row) => row.id)).toEqual(['A', 'C']);
++      rows.setActiveId(heldId() === 'A' ? 'C' : 'wrong-selection');
++      rows.updateOne('C', { n: 9 });
++      // The tap-fresh readers remain fresh even if retained across a nested write.
++      expect(heldId()).toBe('C');
++      expect(heldActive()?.n).toBe(9);
++      expect(heldAll().find((row) => row.id === 'C')?.n).toBe(9);
++      frames.push(snapshot());
++    },
++  });
++  try {
++    expect(snapshot().id).toBe('A');
++    const pending = tree.transact(() => {
++      rows.changeId('A', 'X');
++      rows.addOne({ id: 'D', n: 4 });
++    });
++    await Promise.resolve();
++    expect(snapshot().id).toBe('X');
++    armed = true;
++    pending.rollback();
++    await Promise.resolve();
++    expect(calls).toBe(1);
++    expect(frames).toEqual([
++      {
++        id: 'A',
++        active: 1,
++        ids: ['A', 'C'],
++        all: [
++          { id: 'A', n: 1 },
++          { id: 'C', n: 3 },
++        ],
++        count: 2,
++        empty: false,
++        map: ['A', 'C'],
++        hasA: true,
++        where: ['A', 'C'],
++        found: 1,
++      },
++      {
++        id: 'C',
++        active: 9,
++        ids: ['A', 'C'],
++        all: [
++          { id: 'A', n: 1 },
++          { id: 'C', n: 9 },
++        ],
++        count: 2,
++        empty: false,
++        map: ['A', 'C'],
++        hasA: true,
++        where: ['A', 'C'],
++        found: 1,
++      },
++    ]);
++    expect(snapshot()).toEqual(frames[1]);
++  } finally {
++    stop();
++    tree.destroy();
++  }
++});
++
++it.each(['rekey', 'clear'] as const)(
++  'preserves a callback selection followed by %s',
++  async (mode) => {
++    const tree = signalTree(
++      { rows: entityMap<{ id: string; n: number }, string>() },
++      { enhancers: [transactions()] }
++    );
++    const rows = tree.$.rows;
++    rows.setAll([
++      { id: 'A', n: 1 },
++      { id: 'C', n: 3 },
++    ]);
++    rows.setActiveId('A');
++    let armed = false;
++    let calls = 0;
++    const expected = mode === 'rekey' ? 'Y' : undefined;
++    const stop = rows.tap({
++      onRemove: (id) => {
++        if (!armed || id !== 'D') return;
++        calls++;
++        expect(rows.activeId()).toBe('A');
++        rows.setActiveId('C');
++        if (mode === 'rekey') rows.changeId('C', 'Y');
++        else rows.clearActiveId();
++        expect(rows.activeId()).toBe(expected);
++        expect(rows.activeEntity()?.n).toBe(mode === 'rekey' ? 3 : undefined);
++      },
++    });
++    try {
++      const pending = tree.transact(() => {
++        rows.changeId('A', 'X');
++        rows.addOne({ id: 'D', n: 4 });
++      });
++      await Promise.resolve();
++      armed = true;
++      pending.rollback();
++      await Promise.resolve();
++      expect(calls).toBe(1);
++      expect(rows.activeId()).toBe(expected);
++      expect(rows.activeEntity()?.n).toBe(mode === 'rekey' ? 3 : undefined);
++      expect(rows.ids()).toEqual(mode === 'rekey' ? ['A', 'Y'] : ['A', 'C']);
++    } finally {
++      stop();
++      tree.destroy();
++    }
++  }
++);
+--- /dev/null
++++ b/packages/solid/src/lib/selected-callback-facade.spec.ts
+@@ -0,0 +1,232 @@
++import { expect, it } from 'vitest';
++import { entityMap, signalTree, transactions } from '../index';
++import { createMemo, createRoot } from 'solid-js';
++
++// Public facades only. These reads are acquired in the tap, as required by the
++// existing fresh-projection contract. Native computed timing is tested apart.
++it('realizes fresh tap reads and preserves later callback writes', async () => {
++  const tree = signalTree(
++    { rows: entityMap<{ id: string; n: number }, string>() },
++    { enhancers: [transactions()] }
++  );
++  const rows = tree.$.rows;
++  rows.setAll([
++    { id: 'A', n: 1 },
++    { id: 'C', n: 3 },
++  ]);
++  rows.setActiveId('A');
++  const snapshot = () => ({
++    id: rows.activeId(),
++    active: rows.activeEntity()?.n,
++    ids: [...rows.ids()],
++    all: rows.all().map((row) => ({ ...row })),
++    count: rows.count(),
++    empty: rows.empty(),
++    map: [...rows.asMap().keys()],
++    hasA: rows.has('A')(),
++    where: rows
++      .where((row) => row.n > 0)()
++      .map((row) => row.id),
++    found: rows.find((row) => row.id === 'A')()?.n,
++  });
++  let armed = false;
++  let calls = 0;
++  const frames: ReturnType<typeof snapshot>[] = [];
++  const stop = rows.tap({
++    onRemove: (id) => {
++      if (!armed || id !== 'D') return;
++      calls++;
++      frames.push(snapshot());
++      const heldId = rows.activeId;
++      const heldAll = rows.all;
++      const heldActive = rows.activeEntity;
++
++      expect(heldId()).toBe('A');
++      expect(heldActive()?.n).toBe(1);
++      expect(heldAll().map((row) => row.id)).toEqual(['A', 'C']);
++      rows.setActiveId(heldId() === 'A' ? 'C' : 'wrong-selection');
++      rows.updateOne('C', { n: 9 });
++      // The tap-fresh readers remain fresh even if retained across a nested write.
++      expect(heldId()).toBe('C');
++      expect(heldActive()?.n).toBe(9);
++      expect(heldAll().find((row) => row.id === 'C')?.n).toBe(9);
++      frames.push(snapshot());
++    },
++  });
++  try {
++    expect(snapshot().id).toBe('A');
++    const pending = tree.transact(() => {
++      rows.changeId('A', 'X');
++      rows.addOne({ id: 'D', n: 4 });
++    });
++    await Promise.resolve();
++    expect(snapshot().id).toBe('X');
++    armed = true;
++    pending.rollback();
++    await Promise.resolve();
++    expect(calls).toBe(1);
++    expect(frames).toEqual([
++      {
++        id: 'A',
++        active: 1,
++        ids: ['A', 'C'],
++        all: [
++          { id: 'A', n: 1 },
++          { id: 'C', n: 3 },
++        ],
++        count: 2,
++        empty: false,
++        map: ['A', 'C'],
++        hasA: true,
++        where: ['A', 'C'],
++        found: 1,
++      },
++      {
++        id: 'C',
++        active: 9,
++        ids: ['A', 'C'],
++        all: [
++          { id: 'A', n: 1 },
++          { id: 'C', n: 9 },
++        ],
++        count: 2,
++        empty: false,
++        map: ['A', 'C'],
++        hasA: true,
++        where: ['A', 'C'],
++        found: 1,
++      },
++    ]);
++    expect(snapshot()).toEqual(frames[1]);
++  } finally {
++    stop();
++    tree.destroy();
++  }
++});
++
++it('keeps ordinary selected observation granular and native computations cached during the callback', async () => {
++  let dispose = () => {};
++  const tree = signalTree(
++    { rows: entityMap<{ id: string; n: number }, string>() },
++    { enhancers: [transactions()] }
++  );
++  const rows = tree.$.rows;
++  rows.setAll([
++    { id: 'A', n: 1 },
++    { id: 'C', n: 3 },
++  ]);
++  rows.setActiveId('A');
++  let runs = 0;
++  const view = createRoot((release) => {
++    dispose = release;
++    return createMemo(() => {
++      runs++;
++      return rows.activeEntity()?.n;
++    });
++  });
++  let selectionRuns = 0;
++  let disposeSelection = () => {};
++  const selectionView = createRoot((release) => {
++    disposeSelection = release;
++    return createMemo(() => {
++      selectionRuns++;
++      return rows.activeId();
++    });
++  });
++  let armed = false;
++  let callbackCount = 0;
++  const stop = rows.tap({
++    onRemove: (id) => {
++      if (!armed || id !== 'D') return;
++      callbackCount++;
++      const before = runs;
++      const beforeSelection = selectionRuns;
++      expect(selectionView()).toBe('X');
++      expect(view()).toBe(1);
++      // Reading the fresh library facade must not invalidate the app's memo.
++      expect(rows.activeId()).toBe('A');
++      expect(rows.activeEntity()?.n).toBe(1);
++      expect(runs).toBe(before);
++      rows.setActiveId('C');
++      expect(selectionView()).toBe('X');
++      expect(view()).toBe(1);
++      expect(selectionRuns).toBe(beforeSelection);
++      expect(runs).toBe(before);
++    },
++  });
++  try {
++    expect(view()).toBe(1);
++    const warm = runs;
++    rows.updateOne('C', { n: 4 });
++    expect(view()).toBe(1);
++    expect(runs).toBe(warm);
++    const pending = tree.transact(() => {
++      rows.changeId('A', 'X');
++      rows.addOne({ id: 'D', n: 4 });
++    });
++    await Promise.resolve();
++    expect(rows.activeId()).toBe('X');
++    expect(view()).toBe(1);
++    expect(selectionView()).toBe('X');
++    armed = true;
++    pending.rollback();
++    await Promise.resolve();
++    expect(callbackCount).toBe(1);
++    expect(selectionView()).toBe('C');
++    expect(view()).toBe(4);
++    expect(runs).toBeGreaterThan(warm);
++  } finally {
++    stop();
++    tree.destroy();
++    dispose();
++    disposeSelection();
++  }
++});
++
++it.each(['rekey', 'clear'] as const)(
++  'preserves a callback selection followed by %s',
++  async (mode) => {
++    const tree = signalTree(
++      { rows: entityMap<{ id: string; n: number }, string>() },
++      { enhancers: [transactions()] }
++    );
++    const rows = tree.$.rows;
++    rows.setAll([
++      { id: 'A', n: 1 },
++      { id: 'C', n: 3 },
++    ]);
++    rows.setActiveId('A');
++    let armed = false;
++    let calls = 0;
++    const expected = mode === 'rekey' ? 'Y' : undefined;
++    const stop = rows.tap({
++      onRemove: (id) => {
++        if (!armed || id !== 'D') return;
++        calls++;
++        expect(rows.activeId()).toBe('A');
++        rows.setActiveId('C');
++        if (mode === 'rekey') rows.changeId('C', 'Y');
++        else rows.clearActiveId();
++        expect(rows.activeId()).toBe(expected);
++        expect(rows.activeEntity()?.n).toBe(mode === 'rekey' ? 3 : undefined);
++      },
++    });
++    try {
++      const pending = tree.transact(() => {
++        rows.changeId('A', 'X');
++        rows.addOne({ id: 'D', n: 4 });
++      });
++      await Promise.resolve();
++      armed = true;
++      pending.rollback();
++      await Promise.resolve();
++      expect(calls).toBe(1);
++      expect(rows.activeId()).toBe(expected);
++      expect(rows.activeEntity()?.n).toBe(mode === 'rekey' ? 3 : undefined);
++      expect(rows.ids()).toEqual(mode === 'rekey' ? ['A', 'Y'] : ['A', 'C']);
++    } finally {
++      stop();
++      tree.destroy();
++    }
++  }
++);
+--- /dev/null
++++ b/packages/vue/src/lib/current-read-capability.spec.ts
+@@ -0,0 +1,119 @@
++import {computed, shallowRef, isRef, isReadonly, effectScope, watchEffect} from 'vue';
++import {expect, it} from 'vitest';
++import {createVueObservationAdapter} from './vue-observation';
++const adapter = createVueObservationAdapter();
++const state = <T>(value: T) => {const s = shallowRef(value); return {read:() => s.value, set:(v: T) => {s.value = v;}};};
++const memo = <T>(read: () => T) => {const c = computed(read); return () => c.value;};
++// The neutral adapter port intentionally types only callability. The public
++// facade typing test separately checks its full ComputedRef assignment.
++const nativeRead = <T>(cell: () => T): T => Reflect.get(cell, 'value');
++const metadata = (cell: () => unknown): unknown => Reflect.get(cell, 'effect');
++const checkReadonly = (cell: () => unknown) => {
++  expect(isRef(cell)).toBe(true); expect(isReadonly(cell)).toBe(true);
++  expect(Reflect.set(cell, 'value', 'bad')).toBe(false);
++};
++const flush = () => {};
++const observe = (read: (cleanup: (fn: () => void) => void) => void) => {
++  const scope = effectScope(); scope.run(() => watchEffect(read, {flush:'sync'})); return () => scope.stop();
++};
++
++const current = <T>(read: () => T) => {
++  const cell = adapter.createCurrentReadonlyCell!(read);
++  return {call: cell, read: () => nativeRead(cell), metadata: () => metadata(cell), cell};
++};
++it('current-read source-linked producer preserves held/ABA, counts, identity, cleanup and errors', () => {
++  const left = state(0), right = state(0), branch = state(true);
++  let raw = 'X', calls = 0, failed = false;
++  let latest: {id: string; call: number} | undefined;
++  const c = current(() => {
++    calls++; if (branch.read()) left.read(); else right.read();
++    if (failed) throw new Error('query failure');
++    return latest = {id: raw, call: calls};
++  });
++  const m = c.metadata(); expect(calls).toBe(0);
++  const first = c.read(); expect(first).toBe(latest); expect(calls).toBe(1);
++  expect(c.call()).toBe(latest); expect(calls).toBe(2);
++  expect(c.metadata()).toBe(m); expect(calls).toBe(2); checkReadonly(c.cell);
++  let appRuns = 0;
++  const app = memo(() => {appRuns++; return c.read();});
++  const warmed = app(); expect(warmed.id).toBe('X');
++  for (const id of ['A', 'X', 'A', 'C']) {
++    raw = id; const before = calls; const value = c.read();
++    expect(value.id).toBe(id); expect(value).toBe(latest); expect(calls-before).toBe(1);
++    expect(app()).toBe(warmed); expect(appRuns).toBe(1);
++  }
++  left.set(1); let before = calls;
++  expect(c.read()).toBe(latest); expect(calls-before).toBe(1); expect(app().id).toBe('C');
++  let deliveries = 0, cleanups = 0;
++  const stop = observe(cleanup => {deliveries++; c.read(); cleanup(() => cleanups++);});
++  expect(deliveries).toBe(1);
++  right.set(1); flush(); expect(deliveries).toBe(1);
++  branch.set(false); flush(); expect(deliveries).toBe(2); expect(cleanups).toBe(1);
++  left.set(2); flush(); expect(deliveries).toBe(2);
++  raw = 'D'; right.set(2); flush(); expect(deliveries).toBe(3);
++  stop(); expect(cleanups).toBe(3); right.set(3); flush(); expect(deliveries).toBe(3);
++  failed = true; expect(() => c.read()).toThrow('query failure'); failed = false;
++  before = calls; expect(c.read().id).toBe('D'); expect(calls-before).toBe(1);
++  expect(c.metadata()).toBe(m);
++});
++it('current-read nested invocation markers recover from direct nested throws', () => {
++  let innerRuns = 0, outerRuns = 0;
++  const inner = current(() => {innerRuns++; return {id: 'inner'};});
++  const outer = current(() => {outerRuns++; return inner.read();});
++  expect(outer.read().id).toBe('inner'); expect(innerRuns).toBe(1); expect(outerRuns).toBe(1);
++  let depth = 0, enter = false, fail = false, calls = 0;
++  const reentrant = current((): string => {
++    calls++; depth++;
++    try {
++      expect(depth).toBeLessThanOrEqual(2);
++      if (enter && depth === 1) return reentrant.read();
++      if (fail) throw new Error('nested failure');
++      return 'ok';
++    } finally {depth--;}
++  });
++  expect(reentrant.read()).toBe('ok'); expect(calls).toBe(1); enter = true;
++  let before = calls; expect(reentrant.read()).toBe('ok'); expect(calls-before).toBe(2);
++  fail = true; expect(() => reentrant.read()).toThrow('nested failure'); fail = false;
++  before = calls; expect(reentrant.read()).toBe('ok'); expect(calls-before).toBe(2);
++  enter = false; before = calls; expect(reentrant.read()).toBe('ok'); expect(calls-before).toBe(1);
++});
++
++it('current-read native-only first dependency recovers with native publication error timing', () => {
++  const outcomes: {escaped: boolean; deliveries: string[]}[] = [];
++  for (const mode of ['native', 'current']) {
++    const epoch = state(0); let failed = false, calls = 0;
++    const freshError = new Error('same fresh recipe error');
++    const recipe = () => {calls++; epoch.read(); if (failed) throw freshError; return calls;};
++    const read = mode === 'native' ? memo(recipe) : current(recipe).read;
++    const deliveries: string[] = [];
++    const stop = observe(() => {
++      try {read(); deliveries.push('value');}
++      catch (error) {expect(error).toBe(freshError); deliveries.push('error');}
++    });
++    try {
++      expect(calls).toBe(1); expect(deliveries).toEqual(['value']);
++      failed = true; let before = calls, escaped = false;
++      try {epoch.set(1); flush();} catch (error) {expect(error).toBe(freshError); escaped = true;}
++      const failedPublicationCalls = calls-before;
++      const errorDeliveries = [...deliveries];
++      if (mode === 'current') {
++        before = calls; expect(() => read()).toThrow(freshError); expect(calls-before).toBe(1);
++        failed = false; before = calls; read(); expect(calls-before).toBe(1);
++      } else failed = false;
++      before = calls; epoch.set(2); flush(); const recoveredPublicationCalls = calls-before;
++      expect(deliveries.at(-1)).toBe('value'); expect(deliveries.length).toBe(errorDeliveries.length+1);
++      outcomes.push({escaped,deliveries});
++      console.log('current-read-publication-counts', {mode, escaped, failedPublicationCalls,recoveredPublicationCalls,deliveries});
++    } finally {stop();}
++  }
++  expect(outcomes[1]).toEqual(outcomes[0]);
++});
++it('current-read preserves a fresh pre-recipe dependency-poll error', () => {
++  const epoch = shallowRef(0); let raw = 'X', fail = false, innerRuns = 0, sourceRuns = 0;
++  const sentinel = new Error('fresh dependency failure');
++  const inner = computed(() => {innerRuns++; void epoch.value; if (fail) {fail=false; throw sentinel;} return raw;});
++  const c = current(() => {sourceRuns++; return inner.value;});
++  expect(c.read()).toBe('X'); raw='Y'; fail=true; epoch.value++;
++  expect(() => c.read()).toThrow(sentinel); expect(sourceRuns).toBe(1); expect(innerRuns).toBe(2);
++  epoch.value++; expect(c.read()).toBe('Y');
++});
+--- /dev/null
++++ b/packages/vue/src/lib/current-read-capability.typing.spec.ts
+@@ -0,0 +1,6 @@
++import type {ComputedRef} from 'vue';
++import {entityMap, signalTree} from '../index';
++const tree = signalTree({rows:entityMap<{id:string}, string>()});
++const id: ComputedRef<string | undefined> = tree.$.rows.activeId;
++const rows: ComputedRef<readonly {id:string}[]> = tree.$.rows.all;
++void id.effect; void rows.effect; tree.destroy();
+--- /dev/null
++++ b/packages/vue/src/lib/selected-active-id-preparation.spec.ts
+@@ -0,0 +1,90 @@
++import { expect, it } from 'vitest';
++import { nextTick, watchEffect } from 'vue';
++import { entityMap, signalTree, transactions } from '../index';
++
++it('public callback discriminator sees restored library selection before choosing newer C', async () => {
++  const tree = signalTree(
++    { rows: entityMap<{ id: string; n: number }, string>() },
++    { enhancers: [transactions()] }
++  );
++  const rows = tree.$.rows;
++  rows.setAll([
++    { id: 'A', n: 1 },
++    { id: 'C', n: 3 },
++  ]);
++  rows.setActiveId('A');
++  const read = () => ({
++    activeId: rows.activeId.value,
++    ids: [...rows.ids.value],
++    all: rows.all.value.map((row) => ({ ...row })),
++    directA: rows.byId('A')?.()?.n ?? null,
++  });
++  expect(read()).toEqual({
++    activeId: 'A',
++    ids: ['A', 'C'],
++    all: [
++      { id: 'A', n: 1 },
++      { id: 'C', n: 3 },
++    ],
++    directA: 1,
++  });
++  const seen: ReturnType<typeof read>[] = [];
++  const stop = watchEffect(
++    () => {
++      seen.push(read());
++    },
++    { flush: 'sync' }
++  );
++  const callbacks: ReturnType<typeof read>[] = [];
++  let armed = false;
++  const untap = rows.tap({
++    onRemove: (id) => {
++      if (armed && id === 'D') {
++        callbacks.push(read());
++        rows.setActiveId('C');
++      }
++    },
++  });
++  try {
++    const pending = tree.transact(() => {
++      rows.changeId('A', 'X');
++      rows.addOne({ id: 'D', n: 4 });
++    });
++    await nextTick();
++    expect(read().activeId).toBe('X');
++    expect(read().ids).toEqual(['X', 'C', 'D']);
++    armed = true;
++    pending.rollback();
++    await nextTick();
++    const final = read();
++    console.log(
++      'selection-public-vue',
++      JSON.stringify({ callbacks, final, seen })
++    );
++    expect(callbacks).toEqual([
++      {
++        activeId: 'A',
++        ids: ['A', 'C'],
++        all: [
++          { id: 'A', n: 1 },
++          { id: 'C', n: 3 },
++        ],
++        directA: 1,
++      },
++    ]);
++    expect(final).toEqual({
++      activeId: 'C',
++      ids: ['A', 'C'],
++      all: [
++        { id: 'A', n: 1 },
++        { id: 'C', n: 3 },
++      ],
++      directA: 1,
++    });
++    expect(seen.at(-1)).toEqual(final);
++  } finally {
++    untap();
++    stop();
++    tree.destroy();
++  }
++});
+--- /dev/null
++++ b/packages/vue/src/lib/selected-callback-facade.spec.ts
+@@ -0,0 +1,282 @@
++import { expect, it } from 'vitest';
++import { entityMap, signalTree, transactions } from '../index';
++import { computed, isRef, isReadonly } from 'vue';
++
++// Public facades only. These reads are acquired in the tap, as required by the
++// existing fresh-projection contract. Native computed timing is tested apart.
++it('realizes fresh tap reads and preserves later callback writes', async () => {
++  const tree = signalTree(
++    { rows: entityMap<{ id: string; n: number }, string>() },
++    { enhancers: [transactions()] }
++  );
++  const rows = tree.$.rows;
++  rows.setAll([
++    { id: 'A', n: 1 },
++    { id: 'C', n: 3 },
++  ]);
++  rows.setActiveId('A');
++  const snapshot = () => ({
++    id: rows.activeId.value,
++    active: rows.activeEntity.value?.n,
++    ids: [...rows.ids.value],
++    all: rows.all.value.map((row) => ({ ...row })),
++    count: rows.count.value,
++    empty: rows.empty.value,
++    map: [...rows.asMap.value.keys()],
++    hasA: rows.has('A').value,
++    where: rows.where((row) => row.n > 0).value.map((row) => row.id),
++    found: rows.find((row) => row.id === 'A').value?.n,
++  });
++  let armed = false;
++  let calls = 0;
++  const frames: ReturnType<typeof snapshot>[] = [];
++  const stop = rows.tap({
++    onRemove: (id) => {
++      if (!armed || id !== 'D') return;
++      calls++;
++      frames.push(snapshot());
++      const heldId = rows.activeId;
++      const heldAll = rows.all;
++      const heldActive = rows.activeEntity;
++      expect(isRef(heldId)).toBe(true);
++      expect(isReadonly(heldId)).toBe(true);
++      expect(isRef(heldAll)).toBe(true);
++      expect(heldId.value).toBe('A');
++      expect(heldActive.value?.n).toBe(1);
++      expect(heldAll.value.map((row) => row.id)).toEqual(['A', 'C']);
++      rows.setActiveId(heldId.value === 'A' ? 'C' : 'wrong-selection');
++      rows.updateOne('C', { n: 9 });
++      // The tap-fresh readers remain fresh even if retained across a nested write.
++      expect(heldId.value).toBe('C');
++      expect(heldActive.value?.n).toBe(9);
++      expect(heldAll.value.find((row) => row.id === 'C')?.n).toBe(9);
++      frames.push(snapshot());
++    },
++  });
++  try {
++    expect(snapshot().id).toBe('A');
++    const pending = tree.transact(() => {
++      rows.changeId('A', 'X');
++      rows.addOne({ id: 'D', n: 4 });
++    });
++    await Promise.resolve();
++    expect(snapshot().id).toBe('X');
++    armed = true;
++    pending.rollback();
++    await Promise.resolve();
++    expect(calls).toBe(1);
++    expect(frames).toEqual([
++      {
++        id: 'A',
++        active: 1,
++        ids: ['A', 'C'],
++        all: [
++          { id: 'A', n: 1 },
++          { id: 'C', n: 3 },
++        ],
++        count: 2,
++        empty: false,
++        map: ['A', 'C'],
++        hasA: true,
++        where: ['A', 'C'],
++        found: 1,
++      },
++      {
++        id: 'C',
++        active: 9,
++        ids: ['A', 'C'],
++        all: [
++          { id: 'A', n: 1 },
++          { id: 'C', n: 9 },
++        ],
++        count: 2,
++        empty: false,
++        map: ['A', 'C'],
++        hasA: true,
++        where: ['A', 'C'],
++        found: 1,
++      },
++    ]);
++    expect(snapshot()).toEqual(frames[1]);
++  } finally {
++    stop();
++    tree.destroy();
++  }
++});
++
++it('keeps ordinary selected observation granular and native computations cached during the callback', async () => {
++  const tree = signalTree(
++    { rows: entityMap<{ id: string; n: number }, string>() },
++    { enhancers: [transactions()] }
++  );
++  const rows = tree.$.rows;
++  rows.setAll([
++    { id: 'A', n: 1 },
++    { id: 'C', n: 3 },
++  ]);
++  rows.setActiveId('A');
++  let runs = 0;
++  const view = computed(() => {
++    runs++;
++    return rows.activeEntity.value?.n;
++  });
++  let selectionRuns = 0;
++  const selectionView = computed(() => {
++    selectionRuns++;
++    return rows.activeId.value;
++  });
++  let armed = false;
++  let callbackCount = 0;
++  const stop = rows.tap({
++    onRemove: (id) => {
++      if (!armed || id !== 'D') return;
++      callbackCount++;
++      const before = runs;
++      const beforeSelection = selectionRuns;
++      expect(selectionView.value).toBe('X');
++      expect(view.value).toBe(1);
++      // Reading the fresh library facade must not invalidate the app's memo.
++      expect(rows.activeId.value).toBe('A');
++      expect(rows.activeEntity.value?.n).toBe(1);
++      expect(runs).toBe(before);
++      rows.setActiveId('C');
++      expect(selectionView.value).toBe('X');
++      expect(view.value).toBe(1);
++      expect(selectionRuns).toBe(beforeSelection);
++      expect(runs).toBe(before);
++    },
++  });
++  try {
++    expect(view.value).toBe(1);
++    const warm = runs;
++    rows.updateOne('C', { n: 4 });
++    expect(view.value).toBe(1);
++    expect(runs).toBe(warm);
++    const pending = tree.transact(() => {
++      rows.changeId('A', 'X');
++      rows.addOne({ id: 'D', n: 4 });
++    });
++    await Promise.resolve();
++    expect(rows.activeId.value).toBe('X');
++    expect(view.value).toBe(1);
++    expect(selectionView.value).toBe('X');
++    armed = true;
++    pending.rollback();
++    await Promise.resolve();
++    expect(callbackCount).toBe(1);
++    expect(selectionView.value).toBe('C');
++    expect(view.value).toBe(4);
++    expect(runs).toBeGreaterThan(warm);
++  } finally {
++    stop();
++    tree.destroy();
++  }
++});
++
++it.each(['rekey', 'clear'] as const)(
++  'preserves a callback selection followed by %s',
++  async (mode) => {
++    const tree = signalTree(
++      { rows: entityMap<{ id: string; n: number }, string>() },
++      { enhancers: [transactions()] }
++    );
++    const rows = tree.$.rows;
++    rows.setAll([
++      { id: 'A', n: 1 },
++      { id: 'C', n: 3 },
++    ]);
++    rows.setActiveId('A');
++    let armed = false;
++    let calls = 0;
++    const expected = mode === 'rekey' ? 'Y' : undefined;
++    const stop = rows.tap({
++      onRemove: (id) => {
++        if (!armed || id !== 'D') return;
++        calls++;
++        expect(rows.activeId.value).toBe('A');
++        rows.setActiveId('C');
++        if (mode === 'rekey') rows.changeId('C', 'Y');
++        else rows.clearActiveId();
++        expect(rows.activeId.value).toBe(expected);
++        expect(rows.activeEntity.value?.n).toBe(
++          mode === 'rekey' ? 3 : undefined
++        );
++      },
++    });
++    try {
++      const pending = tree.transact(() => {
++        rows.changeId('A', 'X');
++        rows.addOne({ id: 'D', n: 4 });
++      });
++      await Promise.resolve();
++      armed = true;
++      pending.rollback();
++      await Promise.resolve();
++      expect(calls).toBe(1);
++      expect(rows.activeId.value).toBe(expected);
++      expect(rows.activeEntity.value?.n).toBe(mode === 'rekey' ? 3 : undefined);
++      expect(rows.ids.value).toEqual(
++        mode === 'rekey' ? ['A', 'Y'] : ['A', 'C']
++      );
++    } finally {
++      stop();
++      tree.destroy();
++    }
++  }
++);
++
++it('retains coherent native metadata on one callback-acquired reader', () => {
++  const tree = signalTree({
++    rows: entityMap<{ id: string; n: number }, string>(),
++  });
++  let callbacks = 0;
++  const stop = tree.$.rows.tap({
++    onAdd: () => {
++      callbacks++;
++      const held = tree.$.rows.ids;
++      const before = held.effect;
++      expect(held.value).toEqual(['A']);
++      const after = held.effect;
++      console.log('retained-native-metadata', Object.is(before, after));
++      expect(after).toBe(before);
++    },
++  });
++  try {
++    tree.$.rows.addOne({ id: 'A', n: 1 });
++    expect(callbacks).toBe(1);
++  } finally {
++    stop();
++    tree.destroy();
++  }
++});
++
++it('current-read real tap queries evaluate each recipe once across held ABA writes', async () => {
++  const tree = signalTree({rows:entityMap<{id:string;n:number}, string>()}, {enhancers:[transactions()]});
++  const rows = tree.$.rows; rows.setAll([{id:'A',n:1},{id:'C',n:3}]);
++  let armed = false, callbacks = 0;
++  const stop = rows.tap({onRemove: id => {
++    if (!armed || id !== 'D') return; callbacks++;
++    let predicates = 0;
++    const query = rows.where(row => {predicates++; return row.n > 0;});
++    const nested = rows.find(row => row.id === 'C');
++    for (const n of [3,9,3]) {
++      rows.updateOne('C',{n}); const before = predicates;
++      const value = query.value;
++      expect(predicates-before).toBe(2);
++      expect(value.map(row => row.id)).toEqual(['A','C']);
++      expect(value.find(row => row.id === 'C')?.n).toBe(n);
++      expect(nested.value?.n).toBe(n);
++    }
++    let failures = 0, shouldThrow = true;
++    const error = new Error('query sentinel');
++    const throwing = rows.where(() => {failures++; if (shouldThrow) throw error; return true;});
++    expect(() => throwing.value).toThrow(error); expect(failures).toBe(1);
++    shouldThrow = false; const before = failures;
++    expect(throwing.value.length).toBe(2); expect(failures-before).toBe(2);
++  }});
++  try {
++    const pending = tree.transact(() => rows.addOne({id:'D',n:4}));
++    await Promise.resolve(); armed = true; pending.rollback(); await Promise.resolve();
++    expect(callbacks).toBe(1);
++  } finally {stop();tree.destroy();}
++});

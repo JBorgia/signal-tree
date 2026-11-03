@@ -1,0 +1,5 @@
+{
+  "extends": "./tsconfig.c1.json",
+  "compilerOptions": { "noEmit": true },
+  "files": ["consumer-types.mts", "c1.mts", "data.d.mts"]
+}

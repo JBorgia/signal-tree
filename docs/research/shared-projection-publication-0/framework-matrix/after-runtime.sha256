@@ -1,0 +1,4 @@
+9e880fff10634be5504d0e9fefa930f1a0060968343de4e7a89c7e326b262319  packages/kernel/src/lib/entity-signal.ts
+92c0222cb381abbb26fda754a114c42bd24db90e400de7162a57869b380030c8  packages/kernel/src/lib/internals/location-runtime.ts
+7a148240fe9a0f307c4a2a61d1a5839ec3fed66fdd27d4a14ff12c0c05d65a7c  packages/kernel/src/lib/internals/native-location-realization.ts
+c4678206e2bd3be2c5d4353e411c4f4c8615b31023bbea210d530ce2e50a3bc4  packages/vue/src/lib/vue-observation.ts

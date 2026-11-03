@@ -1,0 +1,79 @@
+
+> nx run kernel:test --testFile=packages/kernel/src/enhancers/restoration/entity-field-presence.spec.ts --testFile=packages/kernel/src/enhancers/restoration/entity-field-presence-capture.spec.ts --testFile=packages/kernel/src/enhancers/transactions/history-retention-15.spec.ts --testFile=packages/kernel/src/enhancers/transactions/inspect-path-ambiguity-0.spec.ts --testFile=packages/kernel/src/enhancers/transactions/proposal-facade-0.spec.ts --testFile=packages/kernel/src/enhancers/transactions/recovery-handle-0.spec.ts
+
+> node tools/run-core-vitest.mjs --testFile=packages/kernel/src/enhancers/restoration/entity-field-presence.spec.ts --testFile=packages/kernel/src/enhancers/restoration/entity-field-presence-capture.spec.ts --testFile=packages/kernel/src/enhancers/transactions/history-retention-15.spec.ts --testFile=packages/kernel/src/enhancers/transactions/inspect-path-ambiguity-0.spec.ts --testFile=packages/kernel/src/enhancers/transactions/proposal-facade-0.spec.ts --testFile=packages/kernel/src/enhancers/transactions/recovery-handle-0.spec.ts
+
+(node:47049) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:47051) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/signaltree-v16-integration/packages/kernel
+
+(node:47059) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:47063) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:47060) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:47058) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:47061) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:47062) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ❯ src/enhancers/restoration/entity-field-presence-capture.spec.ts (12 tests | 2 failed) 27ms
+     × drops an absent-to-present-to-absent net effect without losing sibling work 4ms
+     × drops an absent-to-present-to-absent net effect without losing sibling work 1ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/enhancers/restoration/entity-field-presence-capture.spec.ts > field presence capture: transactions first > drops an absent-to-present-to-absent net effect without losing sibling work
+ FAIL  src/enhancers/restoration/entity-field-presence-capture.spec.ts > field presence capture: restoration first > drops an absent-to-present-to-absent net effect without losing sibling work
+AssertionError: expected { id: 'a', n: 2 } to strictly equal { id: 'a', n: 1 }
+
+- Expected
++ Received
+
+  {
+    "id": "a",
+-   "n": 1,
++   "n": 2,
+  }
+
+ ❯ src/enhancers/restoration/entity-field-presence-capture.spec.ts:112:45
+    110|       await flush();
+    111|       tree.undo();
+    112|       expect(tree.$.rows.byIdOrFail('a')()).toStrictEqual({ id: 'a', n…
+       |                                             ^
+    113|       tree.redo();
+    114|       expect(tree.$.rows.byIdOrFail('a')()).toStrictEqual({ id: 'a', n…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+
+ Test Files  1 failed | 5 passed (6)
+      Tests  2 failed | 59 passed (61)
+   Start at  20:39:01
+   Duration  522ms (transform 950ms, setup 0ms, import 1.35s, tests 105ms, environment 1.07s)
+
+Warning: command "node tools/run-core-vitest.mjs --testFile=packages/kernel/src/enhancers/restoration/entity-field-presence.spec.ts --testFile=packages/kernel/src/enhancers/restoration/entity-field-presence-capture.spec.ts --testFile=packages/kernel/src/enhancers/transactions/history-retention-15.spec.ts --testFile=packages/kernel/src/enhancers/transactions/inspect-path-ambiguity-0.spec.ts --testFile=packages/kernel/src/enhancers/transactions/proposal-facade-0.spec.ts --testFile=packages/kernel/src/enhancers/transactions/recovery-handle-0.spec.ts" exited with non-zero status code
+
+
+ NX   Running target test for project kernel failed
+
+Failed tasks:
+
+- kernel:test
+
+Hint: run the command with --verbose for more details.
+
+  Run duration:      872ms
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     864ms (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    864ms

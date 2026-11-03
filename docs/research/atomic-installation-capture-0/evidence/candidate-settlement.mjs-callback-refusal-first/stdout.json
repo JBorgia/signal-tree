@@ -1,0 +1,289 @@
+{
+  "control": "callback-refusal",
+  "seen": [
+    [
+      0,
+      0
+    ],
+    [
+      1,
+      1
+    ],
+    [
+      1,
+      5
+    ],
+    [
+      2,
+      2
+    ]
+  ],
+  "scalarSeen": [
+    0,
+    1,
+    2
+  ],
+  "rowSeen": [
+    0,
+    5,
+    2
+  ],
+  "frames": [
+    {
+      "depth": 1,
+      "returnedNormally": true
+    },
+    {
+      "depth": 2,
+      "returnedNormally": true
+    },
+    {
+      "depth": 2,
+      "returnedNormally": true
+    },
+    {
+      "depth": 2,
+      "returnedNormally": true
+    },
+    {
+      "depth": 3,
+      "returnedNormally": true
+    },
+    {
+      "depth": 1,
+      "returnedNormally": true
+    },
+    {
+      "depth": 2,
+      "returnedNormally": true
+    },
+    {
+      "depth": 2,
+      "returnedNormally": true
+    },
+    {
+      "depth": 1,
+      "returnedNormally": true
+    }
+  ],
+  "faultHits": 0,
+  "reentryHits": 1,
+  "snapshots": [
+    {
+      "label": "transact-return",
+      "seen": [
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          5
+        ]
+      ],
+      "scalarSeen": [
+        0,
+        1
+      ],
+      "rowSeen": [
+        0,
+        5
+      ],
+      "faultHits": 0,
+      "reentryHits": 1,
+      "frames": [
+        {
+          "depth": 1,
+          "returnedNormally": true
+        },
+        {
+          "depth": 2,
+          "returnedNormally": true
+        },
+        {
+          "depth": 2,
+          "returnedNormally": true
+        },
+        {
+          "depth": 2,
+          "returnedNormally": true
+        },
+        {
+          "depth": 3,
+          "returnedNormally": true
+        }
+      ],
+      "source": [
+        1,
+        5
+      ],
+      "pending": 1,
+      "openScope": true
+    },
+    {
+      "label": "explicit-recovery-confirm",
+      "seen": [
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          5
+        ]
+      ],
+      "scalarSeen": [
+        0,
+        1
+      ],
+      "rowSeen": [
+        0,
+        5
+      ],
+      "faultHits": 0,
+      "reentryHits": 1,
+      "frames": [
+        {
+          "depth": 1,
+          "returnedNormally": true
+        },
+        {
+          "depth": 2,
+          "returnedNormally": true
+        },
+        {
+          "depth": 2,
+          "returnedNormally": true
+        },
+        {
+          "depth": 2,
+          "returnedNormally": true
+        },
+        {
+          "depth": 3,
+          "returnedNormally": true
+        }
+      ],
+      "source": [
+        1,
+        5
+      ],
+      "pending": 0,
+      "openScope": false
+    },
+    {
+      "label": "next-successful-transaction",
+      "seen": [
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          5
+        ],
+        [
+          2,
+          2
+        ]
+      ],
+      "scalarSeen": [
+        0,
+        1,
+        2
+      ],
+      "rowSeen": [
+        0,
+        5,
+        2
+      ],
+      "faultHits": 0,
+      "reentryHits": 1,
+      "frames": [
+        {
+          "depth": 1,
+          "returnedNormally": true
+        },
+        {
+          "depth": 2,
+          "returnedNormally": true
+        },
+        {
+          "depth": 2,
+          "returnedNormally": true
+        },
+        {
+          "depth": 2,
+          "returnedNormally": true
+        },
+        {
+          "depth": 3,
+          "returnedNormally": true
+        },
+        {
+          "depth": 1,
+          "returnedNormally": true
+        },
+        {
+          "depth": 2,
+          "returnedNormally": true
+        },
+        {
+          "depth": 2,
+          "returnedNormally": true
+        }
+      ],
+      "source": [
+        2,
+        2
+      ],
+      "pending": 0,
+      "openScope": false
+    }
+  ],
+  "outcome": {
+    "threw": true,
+    "callback": false,
+    "publish": false,
+    "message": "SignalTree could not rollback the pending transaction: turn 3 depends on state this rollback would invalidate, so reversing turn 2 is no longer safe [later-confirmed-dependency]",
+    "code": "SIGNALTREE_ROLLBACK_FAILED",
+    "cause": "later-confirmed-dependency",
+    "recovery": {
+      "callbackFailed": true,
+      "callbackErrorIsMarker": true,
+      "inspection": {
+        "changes": [
+          {
+            "path": "scalar",
+            "address": [
+              "scalar"
+            ],
+            "status": "current"
+          },
+          {
+            "path": "rows.A.v",
+            "address": [
+              "rows",
+              "v"
+            ],
+            "subject": 1,
+            "status": "superseded"
+          }
+        ]
+      }
+    }
+  },
+  "status": "pass"
+}

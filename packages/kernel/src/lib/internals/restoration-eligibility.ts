@@ -60,10 +60,10 @@ export function markMetaDesignated(
   // MUT-2, which asserts that shape exactly.
   const stamped: DesignatedWriteMeta = { restorationDesignated: true };
   if (meta) {
-    for (const [key, value] of Object.entries(meta)) {
-      if (value !== undefined) {
-        (stamped as Record<string, unknown>)[key] = value;
-      }
+    for (const key of Reflect.ownKeys(meta)) {
+      if (!Object.prototype.propertyIsEnumerable.call(meta, key)) continue;
+      const value: unknown = Reflect.get(meta, key);
+      if (value !== undefined) Reflect.set(stamped, key, value);
     }
   }
   return stamped;

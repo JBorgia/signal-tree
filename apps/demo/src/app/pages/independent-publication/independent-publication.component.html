@@ -1,0 +1,145 @@
+<div class="publication-page layout-frame">
+  <header class="page-header">
+    <p class="page-eyebrow">v16 development preview · Unreleased</p>
+    <h1>Publish a note while a route is still under review.</h1>
+    <p class="page-lede">
+      A route proposal can stay pending while an independently authored note
+      reaches its own endpoint. This tutorial uses the v16 development API; it
+      is not stable v15 guidance.
+    </p>
+  </header>
+
+  <section aria-labelledby="try-heading">
+    <h2 id="try-heading">Try one local review</h2>
+    <ol class="instructions">
+      <li>
+        Propose west. The visible route changes, but the proposal stays pending.
+      </li>
+      <li>
+        Publish the literal note. Its endpoint can receive it before route
+        review ends.
+      </li>
+      <li>
+        Reject the route to restore its previous value (north on the first
+        proposal), or confirm it to keep west. The note remains.
+      </li>
+    </ol>
+    <div class="actions">
+      <button
+        type="button"
+        data-action="propose"
+        (click)="proposeWest()"
+        [disabled]="hasPending() || publishing()"
+      >
+        1. Propose west
+      </button>
+      <button
+        type="button"
+        data-action="publish"
+        (click)="publishIndependentNote()"
+        [disabled]="!hasPending() || publishing()"
+      >
+        2. Publish independent note
+      </button>
+      <button
+        type="button"
+        data-action="reject"
+        (click)="reject()"
+        [disabled]="!hasPending() || publishing()"
+      >
+        3. Reject route locally
+      </button>
+      <button
+        type="button"
+        data-action="confirm"
+        (click)="confirm()"
+        [disabled]="!hasPending() || publishing()"
+      >
+        3. Confirm route locally
+      </button>
+    </div>
+    <div class="state-grid" aria-live="polite" aria-atomic="true">
+      <article class="state-card">
+        <h3>Visible tree state</h3>
+        <dl>
+          <dt>Route</dt>
+          <dd data-testid="route">{{ tree.$.route() }}</dd>
+          <dt>Proposal</dt>
+          <dd data-testid="proposal">{{ decision() }}</dd>
+          <dt>Note</dt>
+          <dd>{{ tree.$.note() || 'No note yet' }}</dd>
+        </dl>
+      </article>
+      <article class="state-card">
+        <h3>Admission snapshot</h3>
+        <p>
+          <code data-testid="admission">{{
+            admission()?.state ?? 'No declaration yet'
+          }}</code>
+        </p>
+        <p>
+          Read from <code>receipt.read()</code> after this action. A receipt is
+          not a signal or a delivery acknowledgment.
+        </p>
+      </article>
+      <article class="state-card">
+        <h3>In-memory endpoint</h3>
+        <p data-testid="endpoint">
+          {{ deliveredNotes().at(-1) ?? 'No delivery yet' }}
+        </p>
+        <p>
+          Delivered notes: <strong>{{ deliveredNotes().length }}</strong>
+        </p>
+        <p>
+          This list changes only when the Link endpoint's <code>set</code> runs.
+        </p>
+      </article>
+    </div>
+    @if (publishing()) {
+    <p role="status">Waiting for the note Link to settle…</p>
+    } @if (error(); as message) {
+    <p role="alert">Note publication failed: {{ message }}</p>
+    }
+    <p class="aside">
+      Publish the same literal again while review is pending: the receipt can
+      report <code>no-write</code> without another endpoint delivery.
+    </p>
+  </section>
+
+  <section class="boundary" aria-labelledby="boundary-heading">
+    <h2 id="boundary-heading">Declare what the note actually consumes</h2>
+    <p>
+      <code>independent</code> is correct here because
+      <code>'dispatch-ready'</code> is a literal authored without reading the
+      proposal. A value saved earlier, hidden input, or cached computation can
+      still depend on pending work. Moving that read outside the callback does
+      not make it independent. Declare all contributing owners for dependent
+      work; use <code>unknown</code>
+      when you cannot establish a complete declaration.
+    </p>
+    <p>
+      The Link owns publication from the note leaf. Local confirmation and
+      rejection affect tree state; this in-memory endpoint has no server,
+      durable storage, or remote acknowledgment. Admission and
+      <code>settled()</code> do not prove backend durability or distributed
+      agreement.
+    </p>
+    <p>
+      Leaving this page disposes the Link and destroys the component-owned tree.
+    </p>
+  </section>
+
+  <section aria-labelledby="code-heading">
+    <h2 id="code-heading">Use the Angular facade</h2>
+    <p>
+      This small example uses public types and native Angular leaf writes. In a
+      component, keep the tree for its lifetime and release it in
+      <code>ngOnDestroy</code>.
+    </p>
+    <pre
+      class="code-example"
+      tabindex="0"
+      aria-label="Angular independent publication code example"
+    ><code>{{ example }}</code></pre>
+  </section>
+</div>

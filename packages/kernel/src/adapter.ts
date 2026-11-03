@@ -91,6 +91,9 @@ export const createSignalTreeFactory = (
       observation.createWritableProjection &&
       observation.createReadonlyCell
   );
+  if (hasNativeCarrier && typeof observation.createCurrentReadonlyCell !== 'function') {
+    throw new Error('Native observation adapters require createCurrentReadonlyCell');
+  }
   return createKernelSignalTreeFactory(
     observation,
     hasNativeCarrier
@@ -98,7 +101,7 @@ export const createSignalTreeFactory = (
           createNativeTreeScalarLeafRuntime(physicalCommitClock, observation)
       : undefined,
     hasNativeCarrier
-      ? () => createNativeLocationRuntime(observation)
+      ? (boundObservation) => createNativeLocationRuntime(boundObservation)
       : undefined
   );
 };

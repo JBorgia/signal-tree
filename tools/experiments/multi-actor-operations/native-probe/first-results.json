@@ -1,0 +1,127 @@
+{
+  "sourceHead": "5727cd8fcf701128358674411400c019b137a5e4",
+  "results": [
+    {
+      "name": "operation correlation through public tooling seam",
+      "outcome": "PASS",
+      "evidence": {
+        "transactionId": 1,
+        "scopes": [
+          {
+            "tokens": [
+              "operation-1"
+            ],
+            "includesUnscoped": false,
+            "omitted": false
+          }
+        ],
+        "lifecycle": [
+          "opened",
+          "staged",
+          "confirmed"
+        ]
+      }
+    },
+    {
+      "name": "inspect equality does not bind reviewed input or block confirm",
+      "outcome": "PASS",
+      "evidence": {
+        "reviewed": {
+          "changes": [
+            {
+              "path": "requested",
+              "address": [
+                "requested"
+              ],
+              "status": "current"
+            }
+          ]
+        },
+        "after": {
+          "changes": [
+            {
+              "path": "requested",
+              "address": [
+                "requested"
+              ],
+              "status": "current"
+            }
+          ]
+        },
+        "confirmed": true,
+        "invalidDomainState": true
+      }
+    },
+    {
+      "name": "bounded companion rejects stale review and accepts fresh review",
+      "outcome": "PASS",
+      "evidence": {
+        "old": "stale",
+        "refreshedInvalid": "invalid",
+        "fresh": "confirmed",
+        "unrelatedNotePreserved": "independent"
+      }
+    },
+    {
+      "name": "external dependency ABA is absent from inspection and value snapshot",
+      "outcome": "PASS",
+      "evidence": {
+        "before": {
+          "capacity": 10,
+          "inspection": {
+            "changes": [
+              {
+                "path": "requested",
+                "address": [
+                  "requested"
+                ],
+                "status": "current"
+              }
+            ]
+          }
+        },
+        "after": {
+          "capacity": 10,
+          "inspection": {
+            "changes": [
+              {
+                "path": "requested",
+                "address": [
+                  "requested"
+                ],
+                "status": "current"
+              }
+            ]
+          }
+        },
+        "historySensitiveApprovalNotEstablished": true
+      }
+    },
+    {
+      "name": "Link settled resolves after endpoint failure",
+      "outcome": "PASS",
+      "evidence": {
+        "calls": 1,
+        "settledResolved": true,
+        "events": [
+          "created",
+          "changed",
+          "changed",
+          "changed",
+          "changed",
+          "changed",
+          "send-failed",
+          "disposed"
+        ]
+      }
+    },
+    {
+      "name": "write observation does not provide an input revision for net-zero ABA",
+      "outcome": "PASS",
+      "evidence": {
+        "capacityFrames": 0,
+        "inspectionUnchanged": true
+      }
+    }
+  ]
+}

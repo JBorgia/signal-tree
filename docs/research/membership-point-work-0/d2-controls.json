@@ -1,0 +1,171 @@
+[
+  {
+    "command": [
+      "node",
+      "docs/research/membership-point-work-0/run.mjs",
+      "D2I",
+      "mixed-no-inspect.mjs",
+      "capture-error",
+      "capture-first"
+    ],
+    "exit": 0,
+    "stdout": "{\"lane\":\"D2I\",\"entry\":\"mixed-no-inspect.mjs\",\"control\":\"capture-error\",\"exit\":0,\"stable\":true,\"out\":\"/private/tmp/st-membership-point-replay/runs/D2I-mixed-no-inspect.mjs-capture-error-capture-first\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/membership-point-work-0/run.mjs",
+      "D2I",
+      "mixed-add.mjs",
+      "capture-error",
+      "capture-first"
+    ],
+    "exit": 0,
+    "stdout": "{\"lane\":\"D2I\",\"entry\":\"mixed-add.mjs\",\"control\":\"capture-error\",\"exit\":0,\"stable\":true,\"out\":\"/private/tmp/st-membership-point-replay/runs/D2I-mixed-add.mjs-capture-error-capture-first\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/membership-point-work-0/run.mjs",
+      "D2I",
+      "inspection-v2.mjs",
+      "control",
+      "capture-first"
+    ],
+    "exit": 0,
+    "stdout": "{\"lane\":\"D2I\",\"entry\":\"inspection-v2.mjs\",\"control\":\"control\",\"exit\":0,\"stable\":true,\"out\":\"/private/tmp/st-membership-point-replay/runs/D2I-inspection-v2.mjs-control-capture-first\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/membership-point-work-0/run.mjs",
+      "D2I",
+      "disposition.mjs",
+      "rollback",
+      "capture-first"
+    ],
+    "exit": 0,
+    "stdout": "{\"lane\":\"D2I\",\"entry\":\"disposition.mjs\",\"control\":\"rollback\",\"exit\":0,\"stable\":true,\"out\":\"/private/tmp/st-membership-point-replay/runs/D2I-disposition.mjs-rollback-capture-first\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/membership-point-work-0/run.mjs",
+      "D2I",
+      "disposition.mjs",
+      "confirm",
+      "capture-first"
+    ],
+    "exit": 0,
+    "stdout": "{\"lane\":\"D2I\",\"entry\":\"disposition.mjs\",\"control\":\"confirm\",\"exit\":0,\"stable\":true,\"out\":\"/private/tmp/st-membership-point-replay/runs/D2I-disposition.mjs-confirm-capture-first\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/membership-point-work-0/run.mjs",
+      "D2I",
+      "recovery.mjs",
+      "rollback",
+      "capture-first"
+    ],
+    "exit": 0,
+    "stdout": "{\"lane\":\"D2I\",\"entry\":\"recovery.mjs\",\"control\":\"rollback\",\"exit\":0,\"stable\":true,\"out\":\"/private/tmp/st-membership-point-replay/runs/D2I-recovery.mjs-rollback-capture-first\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/membership-point-work-0/run.mjs",
+      "D2I",
+      "recovery.mjs",
+      "confirm",
+      "capture-first"
+    ],
+    "exit": 0,
+    "stdout": "{\"lane\":\"D2I\",\"entry\":\"recovery.mjs\",\"control\":\"confirm\",\"exit\":0,\"stable\":true,\"out\":\"/private/tmp/st-membership-point-replay/runs/D2I-recovery.mjs-confirm-capture-first\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/membership-point-work-0/run.mjs",
+      "D2I",
+      "controls.mjs",
+      "repeat",
+      "capture-first"
+    ],
+    "exit": 0,
+    "stdout": "{\"lane\":\"D2I\",\"entry\":\"controls.mjs\",\"control\":\"repeat\",\"exit\":0,\"stable\":true,\"out\":\"/private/tmp/st-membership-point-replay/runs/D2I-controls.mjs-repeat-capture-first\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/membership-point-work-0/run.mjs",
+      "D2I",
+      "controls.mjs",
+      "prepare-reentry",
+      "capture-first"
+    ],
+    "exit": 0,
+    "stdout": "{\"lane\":\"D2I\",\"entry\":\"controls.mjs\",\"control\":\"prepare-reentry\",\"exit\":0,\"stable\":true,\"out\":\"/private/tmp/st-membership-point-replay/runs/D2I-controls.mjs-prepare-reentry-capture-first\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/membership-point-work-0/run.mjs",
+      "D2I",
+      "prepare.mjs",
+      "undefined",
+      "capture-first"
+    ],
+    "exit": 0,
+    "stdout": "{\"lane\":\"D2I\",\"entry\":\"prepare.mjs\",\"control\":\"undefined\",\"exit\":0,\"stable\":true,\"out\":\"/private/tmp/st-membership-point-replay/runs/D2I-prepare.mjs-undefined-capture-first\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/membership-point-work-0/run.mjs",
+      "D2I",
+      "prepare.mjs",
+      "reentry",
+      "capture-first"
+    ],
+    "exit": 0,
+    "stdout": "{\"lane\":\"D2I\",\"entry\":\"prepare.mjs\",\"control\":\"reentry\",\"exit\":0,\"stable\":true,\"out\":\"/private/tmp/st-membership-point-replay/runs/D2I-prepare.mjs-reentry-capture-first\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/membership-point-work-0/run.mjs",
+      "D2I",
+      "spec.mjs",
+      "atomic:body",
+      "capture-first"
+    ],
+    "exit": 0,
+    "stdout": "{\"lane\":\"D2I\",\"entry\":\"spec.mjs\",\"control\":\"atomic:body\",\"exit\":0,\"stable\":true,\"out\":\"/private/tmp/st-membership-point-replay/runs/D2I-spec.mjs-atomic:body-capture-first\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/membership-point-work-0/run.mjs",
+      "D2I",
+      "settlement.mjs",
+      "explicit-rollback-fault",
+      "capture-first"
+    ],
+    "exit": 0,
+    "stdout": "{\"lane\":\"D2I\",\"entry\":\"settlement.mjs\",\"control\":\"explicit-rollback-fault\",\"exit\":0,\"stable\":true,\"out\":\"/private/tmp/st-membership-point-replay/runs/D2I-settlement.mjs-explicit-rollback-fault-capture-first\"}\n",
+    "stderr": ""
+  }
+]

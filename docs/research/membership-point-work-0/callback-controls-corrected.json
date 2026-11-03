@@ -1,0 +1,54 @@
+[
+  {
+    "command": [
+      "node",
+      "docs/research/membership-point-work-0/run.mjs",
+      "OAPI",
+      "callback-controls.mjs",
+      "nestedwrites",
+      "correct-mode"
+    ],
+    "exit": 0,
+    "stdout": "{\"lane\":\"OAPI\",\"entry\":\"callback-controls.mjs\",\"control\":\"nestedwrites\",\"exit\":0,\"stable\":true,\"out\":\"/private/tmp/st-membership-point-replay/runs/OAPI-callback-controls.mjs-nestedwrites-correct-mode\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/membership-point-work-0/run.mjs",
+      "OAPI",
+      "callback-controls.mjs",
+      "callbackthrows",
+      "correct-mode"
+    ],
+    "exit": 0,
+    "stdout": "{\"lane\":\"OAPI\",\"entry\":\"callback-controls.mjs\",\"control\":\"callbackthrows\",\"exit\":0,\"stable\":true,\"out\":\"/private/tmp/st-membership-point-replay/runs/OAPI-callback-controls.mjs-callbackthrows-correct-mode\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/membership-point-work-0/run.mjs",
+      "OAPI",
+      "callback-controls.mjs",
+      "callbackthrows-undefined",
+      "correct-mode"
+    ],
+    "exit": 0,
+    "stdout": "{\"lane\":\"OAPI\",\"entry\":\"callback-controls.mjs\",\"control\":\"callbackthrows-undefined\",\"exit\":0,\"stable\":true,\"out\":\"/private/tmp/st-membership-point-replay/runs/OAPI-callback-controls.mjs-callbackthrows-undefined-correct-mode\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/membership-point-work-0/run.mjs",
+      "OAPI",
+      "callback-controls.mjs",
+      "removedselectedrows",
+      "correct-mode"
+    ],
+    "exit": 0,
+    "stdout": "{\"lane\":\"OAPI\",\"entry\":\"callback-controls.mjs\",\"control\":\"removedselectedrows\",\"exit\":0,\"stable\":true,\"out\":\"/private/tmp/st-membership-point-replay/runs/OAPI-callback-controls.mjs-removedselectedrows-correct-mode\"}\n",
+    "stderr": ""
+  }
+]

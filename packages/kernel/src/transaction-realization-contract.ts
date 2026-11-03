@@ -2,6 +2,13 @@ import { expect, it } from 'vitest';
 
 import type { PendingTransaction } from './enhancers/transactions/transactions.types';
 
+function required<T>(value: T | null | undefined): T {
+  if (value === undefined || value === null) {
+    throw new Error('Missing required test value');
+  }
+  return value;
+}
+
 /**
  * PROPOSAL-REALIZATION-CONFORMANCE — PROPOSAL-0 Phase B.
  *
@@ -43,6 +50,34 @@ export type Observation<T> = {
   dispose(): void;
 };
 
+export type ValuePublicationFrame = {
+  readonly phase: string;
+  readonly scalar: number;
+  readonly row: string | undefined;
+  readonly all: string | undefined;
+};
+
+export type EntityProjectionSnapshot = {
+  all: string[];
+  ids: string[];
+  count: number;
+  empty: boolean;
+  map: string[];
+  hasA: boolean;
+  where: string[];
+  find: string | null;
+  slice: string[];
+  activeId: string | null;
+  activeEntity: string | null;
+  row: string | null;
+  field: string | null;
+};
+export type EntityProjectionFrame = {
+  phase: string;
+  scalar: number;
+  projections: EntityProjectionSnapshot | null;
+};
+
 export type MixedFrame = {
   readonly scalar: number;
   readonly ids: readonly string[];
@@ -81,6 +116,20 @@ export type TransactionRealizationHooks<Tree> = {
    * emission must be one coherent pair sampled at the same instant.
    */
   observeMixed(tree: Tree): Observation<MixedFrame>;
+
+  /** Record when the native observer executes, not when its values are delivered. */
+  observeValues(
+    tree: Tree,
+    phase: () => string
+  ): readonly Observation<ValuePublicationFrame>[];
+
+  selectRow(tree: Tree, id: string | undefined): void;
+  rekeyRow(tree: Tree, from: string, to: string): void;
+  observeProjections(
+    tree: Tree,
+    phase: () => string,
+    enabled: () => boolean
+  ): readonly Observation<EntityProjectionFrame>[];
 
   /** Let this framework's scheduler run to quiescence. */
   flush(): Promise<void>;
@@ -199,6 +248,325 @@ export function transactionRealizationContract<Tree>(
     observed.dispose();
     dispose();
   });
+
+  it('4c coherent value settlement — own collection reads agree in native observers', async () => {
+    const { tree, dispose } = hooks.createStore();
+    let phase = 'setup';
+    hooks.addRow(tree, { id: 'A', name: 'Original' });
+    await hooks.flush();
+    const observations = hooks.observeValues(tree, () => phase);
+    try {
+      await hooks.flush();
+      phase = 'authoring';
+      const pending = hooks.transact(tree, () => {
+        hooks.writeScalar(tree, 7);
+        hooks.realizeRowName(tree, 'A', 'Proposed');
+      });
+      phase = 'speculative-delivery';
+      await hooks.flush();
+      for (const observed of observations) {
+        expect(observed.current()).toMatchObject({
+          scalar: 7,
+          row: 'Proposed',
+          all: 'Proposed',
+        });
+      }
+
+      phase = 'inside-rollback';
+      pending.rollback();
+      phase = 'after-rollback';
+      await hooks.flush();
+      for (const observed of observations) {
+        const settlement = observed.seen.filter(
+          (frame) =>
+            frame.phase === 'inside-rollback' ||
+            frame.phase === 'after-rollback'
+        );
+        // A silent observer cannot satisfy coherent publication vacuously.
+        expect(settlement.length).toBeGreaterThan(0);
+        for (const frame of settlement) {
+          expect(frame, JSON.stringify(observed.seen)).toMatchObject({
+            scalar: 0,
+            row: 'Original',
+            all: 'Original',
+          });
+        }
+        expect(observed.current()).toMatchObject({
+          scalar: 0,
+          row: 'Original',
+          all: 'Original',
+        });
+      }
+      // No native computed freshness is required inside the authored group.
+      // L13 applies to publication of the completed settlement's own reads.
+    } finally {
+      for (const observed of observations) observed.dispose();
+      dispose();
+    }
+  });
+
+  for (const operation of ['add', 'remove', 'field'] as const) {
+    for (const primed of [true, false]) {
+      it(`4d owned projection settlement — ${operation}, ${
+        primed ? 'primed' : 'first read during delivery'
+      }`, async () => {
+        const { tree, dispose } = hooks.createStore();
+        let phase = 'setup';
+        if (operation !== 'add')
+          hooks.addRow(tree, { id: 'A', name: 'Original' });
+        hooks.selectRow(tree, 'A');
+        await hooks.flush();
+        const observations = hooks.observeProjections(
+          tree,
+          () => phase,
+          () =>
+            primed ||
+            phase === 'inside-rollback' ||
+            phase === 'after-rollback' ||
+            phase === 'selection'
+        );
+        const snapshot = (
+          present: boolean,
+          selected: boolean
+        ): EntityProjectionSnapshot => ({
+          all: present ? ['A:Original'] : [],
+          ids: present ? ['A'] : [],
+          count: present ? 1 : 0,
+          empty: !present,
+          map: present ? ['A:Original'] : [],
+          hasA: present,
+          where: present ? ['A:Original'] : [],
+          find: present ? 'A:Original' : null,
+          slice: present ? ['Original'] : [],
+          activeId: selected ? 'A' : null,
+          activeEntity: present && selected ? 'A:Original' : null,
+          row: present ? 'Original' : null,
+          field: present ? 'Original' : null,
+        });
+        try {
+          await hooks.flush();
+          for (const observed of observations) {
+            expect(observed.current().scalar).toBe(0);
+            expect(observed.current().projections).toEqual(
+              primed ? snapshot(operation !== 'add', true) : null
+            );
+          }
+          phase = 'authoring';
+          const pending = hooks.transact(tree, () => {
+            hooks.writeScalar(tree, 7);
+            if (operation === 'add')
+              hooks.addRow(tree, { id: 'A', name: 'Proposed' });
+            else if (operation === 'remove') hooks.removeRow(tree, 'A');
+            else hooks.realizeRowName(tree, 'A', 'Proposed');
+          });
+          phase = 'speculative-delivery';
+          await hooks.flush();
+          for (const observed of observations)
+            expect(observed.current().scalar).toBe(7);
+          phase = 'inside-rollback';
+          pending.rollback();
+          phase = 'after-rollback';
+          await hooks.flush();
+          for (const observed of observations) {
+            const delivered = observed.seen.filter(
+              (frame) =>
+                frame.phase === 'inside-rollback' ||
+                frame.phase === 'after-rollback'
+            );
+            expect(delivered.length).toBeGreaterThan(0);
+            for (const frame of delivered) {
+              expect(frame.scalar).toBe(0);
+              expect(frame.projections, JSON.stringify(observed.seen)).toEqual(
+                snapshot(operation !== 'add', true)
+              );
+            }
+          }
+          phase = 'selection';
+          hooks.selectRow(tree, undefined);
+          await hooks.flush();
+          for (const observed of observations) {
+            const delivered = observed.seen.filter(
+              (frame) => frame.phase === 'selection'
+            );
+            expect(delivered.length).toBeGreaterThan(0);
+            for (const frame of delivered)
+              expect(frame.projections).toEqual(
+                snapshot(operation !== 'add', false)
+              );
+          }
+        } finally {
+          for (const observed of observations) observed.dispose();
+          dispose();
+        }
+      });
+    }
+  }
+
+  for (const scenario of [
+    'initial absence',
+    'same lifetime restoration',
+    'new lifetime at reused key',
+    'selection while absent',
+    'selected rekey',
+    'unrelated writes and disposal',
+  ] as const) {
+    for (const primed of [true, false]) {
+      it(`4e selection lifetime projections — ${scenario}, ${
+        primed ? 'primed' : 'first read after change'
+      }`, async () => {
+        const { tree, dispose } = hooks.createStore();
+        const startsPresent =
+          scenario !== 'initial absence' &&
+          scenario !== 'selection while absent';
+        if (startsPresent) hooks.addRow(tree, { id: 'A', name: 'Original' });
+        hooks.selectRow(tree, 'A');
+        await hooks.flush();
+        let phase = 'setup';
+        let scalar = 0;
+        const observations = hooks.observeProjections(
+          tree,
+          () => phase,
+          () => primed || phase !== 'setup'
+        );
+        const held = startsPresent ? hooks.holdEntity(tree, 'A') : undefined;
+        type Entry = { key: string; id: string; name: string };
+        const original: Entry = { key: 'A', id: 'A', name: 'Original' };
+        const expected = (
+          entries: Entry[],
+          selected: string
+        ): EntityProjectionSnapshot => {
+          const encode = (entry: Entry | undefined) =>
+            entry ? `${entry.id}:${entry.name}` : null;
+          const rowA = entries.find((entry) => entry.key === 'A');
+          const matches = entries.filter((entry) => entry.id === 'A');
+          return {
+            all: entries.map((entry) => `${entry.id}:${entry.name}`),
+            ids: entries.map((entry) => entry.key),
+            count: entries.length,
+            empty: entries.length === 0,
+            map: entries.map((entry) => `${entry.key}:${entry.name}`),
+            hasA: rowA !== undefined,
+            where: matches.map((entry) => `${entry.id}:${entry.name}`),
+            find: encode(matches[0]),
+            slice: entries.map((entry) => entry.name),
+            activeId: selected,
+            activeEntity: encode(
+              entries.find((entry) => entry.key === selected)
+            ),
+            row: rowA?.name ?? null,
+            field: rowA?.name ?? null,
+          };
+        };
+        const check = async (entries: Entry[], selected = 'A') => {
+          await hooks.flush();
+          for (const observed of observations) {
+            const delivered = observed.seen.filter(
+              (frame) => frame.phase === phase
+            );
+            expect(delivered.length).toBeGreaterThan(0);
+            for (const frame of delivered) {
+              expect(frame.scalar, JSON.stringify(observed.seen)).toBe(scalar);
+              expect(frame.projections, JSON.stringify(observed.seen)).toEqual(
+                expected(entries, selected)
+              );
+            }
+            expect(observed.current().scalar).toBe(scalar);
+            expect(observed.current().projections).toEqual(
+              expected(entries, selected)
+            );
+          }
+        };
+        const change = (name: string, action: () => void) => {
+          phase = name;
+          const pending = hooks.transact(tree, () => {
+            hooks.writeScalar(tree, ++scalar);
+            action();
+          });
+          pending.confirm();
+        };
+        try {
+          await hooks.flush();
+          for (const observed of observations)
+            expect(observed.current().projections).toEqual(
+              primed ? expected(startsPresent ? [original] : [], 'A') : null
+            );
+          if (held) expect(held.current()?.name).toBe('Original');
+          if (scenario === 'initial absence') {
+            change('insert', () =>
+              hooks.addRow(tree, { id: 'A', name: 'Original' })
+            );
+            await check([original]);
+          } else if (scenario === 'same lifetime restoration') {
+            phase = 'remove';
+            const pending = hooks.transact(tree, () => {
+              hooks.writeScalar(tree, ++scalar);
+              hooks.removeRow(tree, 'A');
+            });
+            await check([]);
+            phase = 'rollback';
+            pending.rollback();
+            scalar = 0;
+            await check([original]);
+            expect(required(held).current()?.name).toBe('Original');
+          } else if (scenario === 'new lifetime at reused key') {
+            change('remove', () => hooks.removeRow(tree, 'A'));
+            await check([]);
+            change('replace lifetime', () =>
+              hooks.addRow(tree, { id: 'A', name: 'Impostor' })
+            );
+            await check([{ key: 'A', id: 'A', name: 'Impostor' }]);
+            expect(required(held).current()).toBeUndefined();
+          } else if (scenario === 'selection while absent') {
+            change('select B', () => hooks.selectRow(tree, 'B'));
+            await check([], 'B');
+            change('insert unselected A', () =>
+              hooks.addRow(tree, { id: 'A', name: 'Original' })
+            );
+            await check([original], 'B');
+            change('insert selected B', () =>
+              hooks.addRow(tree, { id: 'B', name: 'Selected' })
+            );
+            await check(
+              [original, { key: 'B', id: 'B', name: 'Selected' }],
+              'B'
+            );
+          } else if (scenario === 'selected rekey') {
+            change('rekey', () => hooks.rekeyRow(tree, 'A', 'X'));
+            await check([{ ...original, key: 'X' }], 'X');
+            expect(required(held).current()?.name).toBe('Original');
+            change('write rekeyed lifetime', () =>
+              hooks.realizeRowName(tree, 'X', 'Updated')
+            );
+            await check([{ ...original, key: 'X', name: 'Updated' }], 'X');
+            expect(required(held).current()?.name).toBe('Updated');
+          } else {
+            change('add unrelated B', () =>
+              hooks.addRow(tree, { id: 'B', name: 'Other' })
+            );
+            await check([original, { key: 'B', id: 'B', name: 'Other' }]);
+            change('write unrelated B', () =>
+              hooks.realizeRowName(tree, 'B', 'Changed')
+            );
+            await check([original, { key: 'B', id: 'B', name: 'Changed' }]);
+            expect(required(held).current()?.name).toBe('Original');
+            change('remove unrelated B', () => hooks.removeRow(tree, 'B'));
+            await check([original]);
+            required(held).dispose();
+            const heldCount = required(held).seen.length;
+            change('after held disposal', () =>
+              hooks.realizeRowName(tree, 'A', 'After disposal')
+            );
+            await check([{ ...original, name: 'After disposal' }]);
+            expect(required(held).seen.length).toBe(heldCount);
+          }
+        } finally {
+          held?.dispose();
+          for (const observed of observations) observed.dispose();
+          dispose();
+        }
+      });
+    }
+  }
 
   // 5 ──────────────────────────────────────────────────────────────────────
   it('5 lifetime preservation — a held reference never retargets to a reused business key', async () => {

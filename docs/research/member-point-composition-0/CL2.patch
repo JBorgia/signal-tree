@@ -1,0 +1,144 @@
+--- a/packages/kernel/src/lib/entity-signal.ts
++++ b/packages/kernel/src/lib/entity-signal.ts
+@@ -514,7 +514,10 @@
+         const stage = (fn: () => void) => { try { fn(); } catch (error) {
+           if (!failed) { failed = true; firstError = error; }
+         } };
+-        for (const row of prepared) if (row.epoch) stage(() => advanceEpochHandle(row.epoch!));
++        for (const row of prepared) {
++          const epoch = row.epoch;
++          if (epoch) stage(() => advanceEpochHandle(epoch));
++        }
+         stage(() => updateSignals());
+         if (failed) throw firstError;
+       },
+--- a/packages/kernel/src/lib/internals/plain-branch-membership.ts
++++ b/packages/kernel/src/lib/internals/plain-branch-membership.ts
+@@ -998,8 +998,9 @@
+     const node = runtime.resolveScalarLeaf(target.owner);
+     if (!node) throw new Error('Plain branch scalar target is unavailable');
+     const { slot, position } = resolveSlot(node);
++    const previous = values.get(slot);
+     values.set(slot, { node, position,
+-      before: values.has(slot) ? values.get(slot)!.before : unwrapBranchForWriteCapture(node),
++      before: previous ? previous.before : unwrapBranchForWriteCapture(node),
+       after: target.after, turn: target.turn });
+   }
+   const frame = runtime.beginFrame();
+@@ -1040,7 +1041,8 @@
+       }));
+   };
+   const invalidate = (): void => {
+-    if (!result) throw new Error('Plain branch target invalidated before installation');
++    const installed = result;
++    if (!installed) throw new Error('Plain branch target invalidated before installation');
+     if (invalidated) return;
+     invalidated = true;
+     let failed = false;
+@@ -1060,7 +1062,7 @@
+           if (!Object.getOwnPropertyDescriptor(branch, key)?.enumerable) rememberHiddenRows(node);
+         });
+       }
+-      run(() => runtime.publishPrepared({ revision: result!.revision, changedSlots: [...changedSlots] }));
++      run(() => runtime.publishPrepared({ revision: installed.revision, changedSlots: [...changedSlots] }));
+       if (failed) throw firstError;
+     }));
+   };
+--- a/packages/kernel/src/lib/internals/intercept-leaf-signals.ts
++++ b/packages/kernel/src/lib/internals/intercept-leaf-signals.ts
+@@ -154,17 +154,19 @@
+         getPositionIds(node)
+       );
+     }) : undefined;
+-    if(options.terminalRecord){
++    const terminalRecord = options.terminalRecord;
++    if(terminalRecord){
+       const terminalRelease=prepareTerminalMutations(node,(mutation)=>{
+         if(!mutation.changed)return;
+-        return options.terminalRecord!(path,mutation.after,mutation.before,withMutationIntent(getActiveWriteContext(),mutation.intent),ownerPathOverride ?? getOwnerPath(node,path),getSubjectIds(node),getPositionIds(node));
++        return terminalRecord.call(options,path,mutation.after,mutation.before,withMutationIntent(getActiveWriteContext(),mutation.intent),ownerPathOverride ?? getOwnerPath(node,path),getSubjectIds(node),getPositionIds(node));
+       });
+       if(terminalRelease)restorers.push(terminalRelease);
+     }
+-    if (options.beforePublication) {
++    const beforePublication = options.beforePublication;
++    if (beforePublication) {
+     const captureRelease = observeIntrinsicMutations(node, (mutation) => {
+       if (!mutation.changed) return;
+-      options.beforePublication!(
++      beforePublication.call(options,
+         path,
+         mutation.after,
+         mutation.before,
+--- a/packages/kernel/src/lib/internals/causal-runtime/tree-realization-adapter.ts
++++ b/packages/kernel/src/lib/internals/causal-runtime/tree-realization-adapter.ts
+@@ -732,9 +732,13 @@
+     else assignPreparedSubjectValue(row.value, path, effect.after);
+   }
+   const members = memberTargets.size ? preparePlainBranchMembers(tree.$, memberTargets, scalarEffects) : undefined;
+-  const collections = [...rows].map(([collection, subjects]) => collection.__preparePointValues!([...subjects.values()]));
++  const collections = [...rows].map(([collection, subjects]) => {
++    const prepare = collection.__preparePointValues;
++    if (!prepare) throw new Error('Point realization preparation is unavailable');
++    return prepare.call(collection, [...subjects.values()]);
++  });
+   if (!frame.prepareCommit) return undefined;
+-  const installScalars = members ? undefined : frame.prepareCommit({ advanceRevision: false, publish: false });
++  const installScalars = members ? () => undefined : frame.prepareCommit({ advanceRevision: false, publish: false });
+   if (clock.revision() !== baseRevision) throw new Error('Point realization preparation reentered installation');
+   let result: ReturnType<typeof frame.commit> | undefined;
+   let installed = false;
+@@ -742,20 +746,21 @@
+     install(): void {
+       if (installed || clock.revision() !== baseRevision) throw new Error('Point realization base revision is stale');
+       if (members) members.install();
+-      else result = installScalars!();
++      else result = installScalars();
+       for (const collection of collections) collection.install();
+       clock.advance();
+       installed = true;
+     },
+     publish(): void {
+-      if (!installed || (!members && !result)) throw new Error('Point realization published before installation');
++      const installedScalars = result;
++      if (!installed || (!members && !installedScalars)) throw new Error('Point realization published before installation');
+       // Complete all owned invalidation staging before any path or replay callback.
+       let failed = false;
+       let firstError: unknown;
+       const run = (fn: () => void) => { try { fn(); } catch (error) { if (!failed) { failed = true; firstError = error; } } };
+       for (const collection of collections) run(() => collection.invalidate());
+       if (members) run(() => members.invalidate());
+-      else run(() => slots.publishPrepared(result!));
++      else if (installedScalars) run(() => slots.publishPrepared(installedScalars));
+       if (members) run(() => members.publish());
+       for (const collection of collections) run(() => collection.publish());
+       for (const effect of members ? [] : scalarEffects) run(() => {
+--- a/packages/kernel/src/enhancers/transactions/transactions.ts
++++ b/packages/kernel/src/enhancers/transactions/transactions.ts
+@@ -2027,13 +2027,15 @@
+       const scratch = createCaptureBucket();
+       const effects: TurnEffect[]=[];
+       for (const change of capture.changes) {
+-        if(change.structuralRecord) effects.push({...change.structuralRecord,position:capture.owner,ownerPath:capture.ownerPath,path:change.path!} as TurnEffect);
++        const path = change.path;
++        if (path === undefined) throw new Error('Entity responsibility has no mutation path');
++        if(change.structuralRecord) effects.push({...change.structuralRecord,position:capture.owner,ownerPath:capture.ownerPath,path} as TurnEffect);
+         else if (!isPlainRecord(change.before) || !isPlainRecord(change.after)) {
+           // Match rich capture's existing whole-row boundary. Arrays and opaque
+           // values are not record fields; index enumeration loses their shape.
+           if (change.before !== change.after) effects.push({
+             kind: 'set', position: capture.owner, ownerPath: capture.ownerPath,
+-            path: change.path!, subject: change.subject,
++            path, subject: change.subject,
+             before: change.before, after: change.after,
+             mutationIntent: capture.meta?.mutationIntent,
+           });
+@@ -2043,7 +2045,7 @@
+             const beforeValue=before[key],afterValue=after[key];
+             const beforePresent=Object.prototype.hasOwnProperty.call(before,key),afterPresent=Object.prototype.hasOwnProperty.call(after,key);
+             if(beforeValue===afterValue && beforePresent===afterPresent) continue;
+-            effects.push({kind:'set',position:capture.owner,ownerPath:capture.ownerPath,path: `${change.path}.${key}`,subject:change.subject,subjectFieldSegments:[key],before:beforeValue,after:afterValue,mutationIntent:capture.meta?.mutationIntent,...(!(beforePresent&&afterPresent)?{fieldPresence:{before:beforePresent,after:afterPresent}}:{})});
++            effects.push({kind:'set',position:capture.owner,ownerPath:capture.ownerPath,path: `${path}.${key}`,subject:change.subject,subjectFieldSegments:[key],before:beforeValue,after:afterValue,mutationIntent:capture.meta?.mutationIntent,...(!(beforePresent&&afterPresent)?{fieldPresence:{before:beforePresent,after:afterPresent}}:{})});
+           }
+         }
+       }

@@ -1,0 +1,50 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import { startDispatchEndpoint, httpCommandAdapter } from './fixture.mjs';
+import { OperationCoordinator } from '../coordinator.mjs';
+
+test('real HTTP requires host-issued exact review grant independently of transport credential', async t => {
+  const endpoint = await startDispatchEndpoint({ reviewRequired: true });
+  t.after(() => endpoint.close());
+  const command = { commandId: 'http-reviewed', proposal: endpoint.backend.proposal({ route: 'west' }), approved: true };
+  const bare = httpCommandAdapter(endpoint.url);
+  await assert.rejects(bare.apply(command), /400/);
+  assert.equal(endpoint.backend.commits, 0);
+  const grant = endpoint.grantReviewForTest(command);
+  const gated = httpCommandAdapter(endpoint.url, 'fixture-only', () => grant);
+  await assert.rejects(gated.apply({ ...command, proposal: endpoint.backend.proposal({ route: 'south' }) }), /400/);
+  assert.equal(endpoint.backend.commits, 0);
+  assert.equal((await gated.apply(command)).status, 'applied');
+  assert.equal(endpoint.backend.commits, 1);
+  endpoint.revokeReviewForTest(grant);
+  await assert.rejects(gated.apply(command), /400/);
+  assert.equal(endpoint.backend.commits, 1);
+});
+test('lost HTTP acknowledgment retains exact grant and command through correlated retry', async t => {
+  const endpoint = await startDispatchEndpoint({ reviewRequired: true });
+  t.after(() => endpoint.close());
+  let grant;
+  const operations = new OperationCoordinator(httpCommandAdapter(endpoint.url, 'fixture-only', () => grant));
+  operations.create('http-review-retry', endpoint.backend.proposal({ note: 'reviewed' }));
+  const binding = operations.review('http-review-retry');
+  grant = endpoint.grantReviewForTest({ ...binding, commandId: JSON.stringify([binding.operationId, binding.revision]) });
+  operations.approve(binding); endpoint.loseNextAcknowledgment();
+  assert.equal((await operations.deliver(binding.operationId)).status, 'uncertain');
+  assert.equal(endpoint.backend.commits, 1);
+  assert.throws(() => operations.dispose(), /unresolved/);
+  assert.equal((await operations.deliver(binding.operationId)).status, 'succeeded');
+  assert.equal(endpoint.backend.commits, 1);
+  endpoint.revokeReviewForTest(grant); operations.dispose();
+});
+test('approved HTTP command still revalidates backend inputs and cannot issue grants over transport', async t => {
+  const endpoint = await startDispatchEndpoint({ reviewRequired: true });
+  t.after(() => endpoint.close());
+  const command = { commandId: 'http-stale', proposal: endpoint.backend.proposal({ route: 'west' }, ['capacity']) };
+  const grant = endpoint.grantReviewForTest(command);
+  endpoint.backend.apply({ commandId: 'service-input-change', proposal: endpoint.backend.proposal({ capacity: 0 }) });
+  const receipt = await httpCommandAdapter(endpoint.url, 'fixture-only', () => grant).apply(command);
+  assert.equal(receipt.status, 'rejected'); assert.equal(receipt.reason, 'conflict');
+  assert.equal(endpoint.backend.snapshot().values.route, 'north');
+  const response = await fetch(endpoint.url.replace('/commands', '/reviews'), { method: 'POST', headers: { authorization: 'Bearer fixture-only' }, body: JSON.stringify(command) });
+  assert.equal(response.status, 404);
+});

@@ -239,7 +239,10 @@ export class WhatsNew14Component {
       for (let i = 0; i < 100; i++) fields[`k${i}`] = 0;
 
       // Arm 1 — consumers depend on ONE leaf each.
-      const granular = signalTree({ ...fields });
+      // The population loop establishes k0; arbitrary Record keys remain unknown.
+      const granular = signalTree({ ...fields } as Record<string, number> & {
+        k0: number;
+      });
       const granularConsumers = Array.from({ length: consumers }, (_, i) =>
         computed(() =>
           (granular.$ as Record<string, () => number>)[`k${i % 100}`]()

@@ -8,6 +8,8 @@
     "allowJs": false,
     "strict": true
   },
-  "include": ["packages/*/src/**/*.spec.ts", "packages/*/src/**/*.test.ts"],
+  "include": ["packages/*/src/**/*.spec.ts", "packages/*/src/**/*.test.ts",
+    "tools/experiments/native-publication-diagnostics/native-netzero-diagnostic.replay.ts",
+    "tools/experiments/native-publication-diagnostics/native-equal-inverse-diagnostic.replay.ts"],
   "exclude": ["**/node_modules/**"]
 }

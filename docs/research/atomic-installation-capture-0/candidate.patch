@@ -1,0 +1,642 @@
+--- a/packages/kernel/src/enhancers/transactions/transactions.ts
++++ b/packages/kernel/src/enhancers/transactions/transactions.ts
+@@ -2302,8 +2302,10 @@
+
+   const rollbackPendingTarget = (
+     effects: TurnEffect[],
+-    orderDeltas: CollectionOrderDelta[]
++    orderDeltas: CollectionOrderDelta[],
++    completion?: { selected: boolean; committed: boolean }
+   ): void => {
++    if (completion) completion.selected = true;
+     const reversalEffects = placeFieldReversalsWhileRowsExist(
+       effects.map(toRollbackEffect)
+     );
+@@ -2362,14 +2364,12 @@
+                 }
+                 frame.set(slot, value);
+               }
++              const install = frame.prepareCommit
++                ? frame.prepareCommit({advanceRevision:false,publish:false})
++                : () => frame.commit({advanceRevision:false,publish:false});
+               let result: ReturnType<typeof frame.commit> | undefined;
+               return {
+-                install(): void {
+-                  result = frame.commit({
+-                    advanceRevision: false,
+-                    publish: false,
+-                  });
+-                },
++                install(): void { result = install(); },
+                 publish(): void {
+                   if (!result) {
+                     throw new Error(
+@@ -2389,7 +2389,8 @@
+       {
+         prepareTarget: (members) =>
+           preparePlainBranchMembers(tree.$ as object, members),
+-      }
++      },
++      { onCommitted() { if (completion) completion.committed = true; } }
+     );
+     const apply = () => prepared.install();
+     const locations = getLocationRuntime(tree.$);
+@@ -2424,7 +2425,8 @@
+      * write recorded under transaction 1 while its own compensation announced
+      * 2, and the join silently missed.
+      */
+-    owningTransactionId: number = transactionId
++    owningTransactionId: number = transactionId,
++    completion?: { selected: boolean; committed: boolean }
+   ): void => {
+     if (effects.length === 0 && orderDeltas.length === 0) {
+       return;
+@@ -2534,6 +2536,7 @@
+           () => {
+             if (
+               orderDeltas.length > 0 ||
++              (effects.some(e => e.kind === 'set' && e.subject === undefined) && effects.some(e => e.subject !== undefined)) ||
+               requiresDeclarativeStructuralTarget(
+                 effects.map(toRollbackEffect),
+                 (owner) => {
+@@ -2551,7 +2554,7 @@
+                 }
+               )
+             ) {
+-              rollbackPendingTarget(effects, orderDeltas);
++              rollbackPendingTarget(effects, orderDeltas, completion);
+               return { ok: true as const };
+             }
+             return rollbackPendingTurnAt({
+@@ -2609,7 +2612,8 @@
+     baselineValues: ReadonlyMap<number, unknown>,
+     orderDeltas: CollectionOrderDelta[] = [],
+     callbackError?: unknown,
+-    owningTransactionId: number = transactionId
++    owningTransactionId: number = transactionId,
++    completion?: { selected: boolean; committed: boolean }
+   ): void => {
+     applyRollbackCompensation(
+       transactionId,
+@@ -2617,7 +2621,8 @@
+       baselineValues,
+       orderDeltas,
+       callbackError,
+-      owningTransactionId
++      owningTransactionId,
++      completion
+     );
+     markOwnerInvalidatedFrom(tree.$ as object);
+   };
+@@ -2862,6 +2867,39 @@
+           ) {
+             return;
+           }
++          notifier.notify(
++            path,
++            next,
++            prev,
++            ownerPath,
++            subjectIds,
++            positionIds,
++            effectiveMeta,
++            treeOwnerId
++          );
++        },
++        { terminalRecord: (path,next,prev,meta,ownerPath,subjectIds,positionIds) => {
++          if(isRestoring || meta?.origin==='restoration' || isInspectionWrite(meta) || getWriteParticipation(meta)==='realized')return;
++          if(meta?.transactionOwner!==transactionOwnerToken)return;
++          const id=resolveTransactionId(meta), position=positionIds?.[0];
++          if(id===undefined || position===undefined || subjectIds?.length || Object.is(prev,next))return;
++          const slots=getTreeScalarSlotRuntime(tree) ?? getTreeScalarSlotRuntime(tree.$);
++          if(slots?.resolveScalarSlot(position)===undefined)return;
++          (globalThis as any).__prepareProbe?.(path,next,prev);
++          const bucket=getTransactionBucket(id);
++          const effect: TurnEffect={kind:'set',path,ownerPath:ownerPath ?? path,position,before:prev,after:next,mutationIntent:meta?.mutationIntent};
++          const key=effectKey(effect), old=bucket.effects.get(key);
++          if(old && old.kind!=='set')throw new Error('Terminal record conflicts with structural evidence');
++          const combined=old ? {...old,after:next,mutationIntent:combineScalarMutationIntent(old.mutationIntent,effect.mutationIntent)} : effect;
++          const writes: {map: Map<any,any>;key:unknown;value:unknown}[]=[{map:bucket.effects,key,value:combined}];
++          if(!bucket.baselineValues.has(position))writes.push({map:bucket.baselineValues,key:position,value:prev});
++          if(pendingTransactions.size>0)for(const key of windowKeys([position],undefined))writes.push({map:bucket.ownWriteSeq,key,value:windowWriteSeq});
++          return {writes,adds:[{set:bucket.positionIds,value:position},{set:bucket.ownerPaths,value:ownerPath ?? path}]};
++        }, beforePublication: (path, next, prev, meta, ownerPath, subjectIds, positionIds) => {
++          (globalThis as any).__captureProbe?.(path,next,prev);
++          const effectiveMeta = meta ?? getActiveWriteContext();
++          if (isRestoring || effectiveMeta?.origin === 'restoration' || isInspectionWrite(effectiveMeta) || getWriteParticipation(effectiveMeta) === 'realized') return;
++          if (typeof effectiveMeta?.transactionId === 'number' && effectiveMeta.transactionOwner !== transactionOwnerToken) return;
+           const transactionId = resolveTransactionId(effectiveMeta);
+           if (transactionId !== undefined) {
+             captureIntoBucket(
+@@ -2887,17 +2925,7 @@
+               positionIds
+             );
+           }
+-          notifier.notify(
+-            path,
+-            next,
+-            prev,
+-            ownerPath,
+-            subjectIds,
+-            positionIds,
+-            effectiveMeta,
+-            treeOwnerId
+-          );
+-        }
++        } }
+       );
+
+       if (typeof notifier.onFlush === 'function') {
+@@ -3449,6 +3477,7 @@
+               ? []
+               : pendingOrderDeltas.get(pendingTurnId) ?? [];
+           let installed = false;
++          const completion = {selected:false,committed:false};
+           let observerFailed = false;
+           let observerError: unknown;
+           const clock =
+@@ -3464,7 +3493,8 @@
+                 pendingTurn?.__baselineValues ?? new Map(),
+                 orderDeltas,
+                 primaryFailed ? primaryError : undefined,
+-                transactionId
++                transactionId,
++                completion
+               );
+               installed = true;
+             };
+@@ -3475,8 +3505,9 @@
+             } catch (error) {
+               // Physical commit precedes observer delivery. A delivery failure
+               // must not leave a successfully compensated turn retryable.
+-              installed ||=
+-                revision !== undefined && clock?.revision() !== revision;
++              installed ||= completion.selected
++                ? completion.committed
++                : revision !== undefined && clock?.revision() !== revision;
+               if (!installed) {
+                 const refusal =
+                   error instanceof SignalTreeRollbackError
+--- a/packages/kernel/src/lib/internals/causal-runtime/target-transition.ts
++++ b/packages/kernel/src/lib/internals/causal-runtime/target-transition.ts
+@@ -67,7 +67,8 @@
+   target: DeclarativeTransitionTarget,
+   bindings: ReadonlyMap<PositionId, CollectionTransitionTargetBinding>,
+   scalarBinding?: ScalarTransitionTargetBinding,
+-  memberBinding?: PlainBranchMemberTransitionTargetBinding
++  memberBinding?: PlainBranchMemberTransitionTargetBinding,
++  completion?: { onCommitted(): void }
+ ): { install(): void } {
+   const prepared: PreparedCollectionTransitionTarget[] = [];
+   // ⚠️ MEMBERS FIRST, as the per-effect path installs them
+@@ -114,9 +115,14 @@
+       for (const collection of prepared) {
+         collection.install();
+       }
++      completion?.onCommitted();
++      let failed = false;
++      let first: unknown;
+       for (const collection of prepared) {
+-        collection.publish();
++        try { collection.publish(); }
++        catch (error) { if (!failed) { failed = true; first = error; } }
+       }
++      if (failed) throw first;
+     },
+   };
+ }
+--- a/packages/kernel/src/lib/internals/intercept-leaf-signals.ts
++++ b/packages/kernel/src/lib/internals/intercept-leaf-signals.ts
+@@ -9,7 +9,7 @@
+ } from './owned-metadata';
+ import { getActiveWriteContext } from '../write-context';
+ import { isWritableLocation } from './location-runtime';
+-import { observeIntrinsicMutations } from './intrinsic-mutation';
++import { prepareTerminalMutations, type TerminalRecordPlan, observeIntrinsicMutations } from './intrinsic-mutation';
+
+ import { visitTree } from './visit-tree';
+
+@@ -55,7 +55,7 @@
+     subjectIds?: number[],
+     positionIds?: number[]
+   ) => void,
+-  options: { maxDepth?: number } = {}
++  options: { maxDepth?: number; beforePublication?: typeof onWrite; terminalRecord?: (...args: Parameters<typeof onWrite>) => TerminalRecordPlan | undefined } = {}
+ ): () => void {
+   const restorers: Array<() => void> = [];
+   const maxDepth = options.maxDepth ?? 32;
+@@ -139,9 +139,10 @@
+   const observeLocation = (
+     node: object,
+     path: string,
+-    ownerPathOverride?: string
++    ownerPathOverride?: string,
++    normal = true
+   ): void => {
+-    const release = observeIntrinsicMutations(node, (mutation) => {
++    const release = normal ? observeIntrinsicMutations(node, (mutation) => {
+       if (!mutation.changed) return;
+       onWrite(
+         path,
+@@ -152,7 +153,29 @@
+         getSubjectIds(node),
+         getPositionIds(node)
+       );
+-    });
++    }) : undefined;
++    if(options.terminalRecord){
++      const terminalRelease=prepareTerminalMutations(node,(mutation)=>{
++        if(!mutation.changed)return;
++        return options.terminalRecord!(path,mutation.after,mutation.before,withMutationIntent(getActiveWriteContext(),mutation.intent),ownerPathOverride ?? getOwnerPath(node,path),getSubjectIds(node),getPositionIds(node));
++      });
++      if(terminalRelease)restorers.push(terminalRelease);
++    }
++    if (options.beforePublication) {
++    const captureRelease = observeIntrinsicMutations(node, (mutation) => {
++      if (!mutation.changed) return;
++      options.beforePublication!(
++        path,
++        mutation.after,
++        mutation.before,
++        withMutationIntent(getActiveWriteContext(), mutation.intent),
++        ownerPathOverride ?? getOwnerPath(node, path),
++        getSubjectIds(node),
++        getPositionIds(node)
++      );
++    }, true);
++      if (captureRelease) restorers.push(captureRelease);
++    }
+     if (release) restorers.push(release);
+   };
+
+@@ -246,8 +269,8 @@
+         if (path === '') return true;
+
+         if (isWritableLocation(node)) {
+-          if (!hasIntrinsicMutationEmitter(node)) {
+-            observeLocation(node as object, path);
++          if (!hasIntrinsicMutationEmitter(node) || options.beforePublication) {
++            observeLocation(node as object, path, undefined, !hasIntrinsicMutationEmitter(node));
+           }
+           return false;
+         }
+--- a/packages/kernel/src/lib/internals/intrinsic-mutation.ts
++++ b/packages/kernel/src/lib/internals/intrinsic-mutation.ts
+@@ -1,3 +1,8 @@
++export interface TerminalRecordPlan {
++  readonly writes: readonly { readonly map: Map<unknown,unknown>; readonly key: unknown; readonly value: unknown }[];
++  readonly adds: readonly { readonly set: Set<unknown>; readonly value: unknown }[];
++}
++type TerminalPreparer = (mutation: IntrinsicMutation<unknown>) => TerminalRecordPlan | undefined;
+ export interface IntrinsicMutation<T> {
+   readonly intent: 'replace' | 'derive';
+   readonly before: T;
+@@ -35,9 +40,15 @@
+ export interface IntrinsicMutationSource<T> {
+   /** `undefined` exactly when nothing observes THIS source. */
+   observer: IntrinsicMutationObserver<T> | undefined;
++  readonly capture?: IntrinsicMutationObserver<T>;
++  readonly terminal?: IntrinsicMutationObserver<T>;
++  readonly prepareTerminal?: (mutation: IntrinsicMutation<T>) => TerminalRecordPlan | undefined;
+ }
+
+ interface SourceRecord {
++  captureRecord?: SourceRecord;
++  terminalRecord?: SourceRecord;
++  terminalPreparer?: TerminalPreparer;
+   /**
+    * Created on first `observeIntrinsicMutations`, not at registration.
+    *
+@@ -124,16 +135,21 @@
+   node: object
+ ): IntrinsicMutationSource<T> {
+   const record: SourceRecord = { observers: undefined, observer: undefined };
++  Object.defineProperty(record, 'prepareTerminal', {get: () => record.terminalPreparer});
++  Object.defineProperty(record, 'terminal', {get: () => record.terminalRecord?.observer});
++  Object.defineProperty(record, 'capture', {get: () => record.captureRecord?.observer});
+   SOURCES.set(node, record);
+   return record as IntrinsicMutationSource<T>;
+ }
+
+ export function observeIntrinsicMutations<T>(
+   node: object,
+-  observer: IntrinsicMutationObserver<T>
++  observer: IntrinsicMutationObserver<T>,
++  capture: boolean | 'terminal' = false
+ ): (() => void) | undefined {
+-  const record = SOURCES.get(node);
+-  if (!record) return undefined;
++  const source = SOURCES.get(node);
++  if (!source) return undefined;
++  const record = capture === 'terminal' ? (source.terminalRecord ??= {observers:undefined,observer:undefined}) : capture ? (source.captureRecord ??= {observers:undefined,observer:undefined}) : source;
+   const installed = observer as IntrinsicMutationObserver<unknown>;
+   (record.observers ??= new Set()).add(installed);
+   compose(record);
+@@ -158,3 +174,11 @@
+     | IntrinsicMutationObserver<T>
+     | undefined;
+ }
++
++// Internal single-owner preparation hook, never a post-install observer.
++export function prepareTerminalMutations(node: object, prepare: TerminalPreparer): (()=>void) | undefined {
++  const source=SOURCES.get(node); if(!source)return;
++  if(source.terminalPreparer)throw new Error('Terminal preparation already owned');
++  source.terminalPreparer=prepare;
++  return ()=>{if(source.terminalPreparer===prepare)source.terminalPreparer=undefined;};
++}
+--- a/packages/kernel/src/lib/internals/location-runtime.ts
++++ b/packages/kernel/src/lib/internals/location-runtime.ts
+@@ -17,7 +17,7 @@
+   PRODUCTION_SUBSTRATE_STATS_ENABLED,
+   recordProductionSubstrateStat,
+ } from './production-substrate-stats';
+-import { registerIntrinsicMutationSource } from './intrinsic-mutation';
++import { type TerminalRecordPlan, registerIntrinsicMutationSource } from './intrinsic-mutation';
+
+ interface DependencyConsumer {
+   readonly dependencies: Map<DependencyNode, DependencyEdge>;
+@@ -299,7 +299,7 @@
+      * value, so a reversal restores storage as it was (v16 8e).
+      */
+     read: (stored?: boolean) => T,
+-    write: (value: T, intent: 'replace' | 'derive') => boolean
++    write: (value: T, intent: 'replace' | 'derive', prepare?: () => TerminalRecordPlan | undefined) => boolean
+   ): WritableLocationBinding<T>;
+   createWritableProjection?<T>(
+     compute: () => T,
+@@ -408,7 +408,7 @@
+
+   const createWritable = <T>(
+     read: (stored?: boolean) => T,
+-    write: (value: T, intent: 'replace' | 'derive') => boolean
++    write: (value: T, intent: 'replace' | 'derive', prepare?: () => TerminalRecordPlan | undefined) => boolean
+   ): WritableLocationBinding<T> => {
+     let observationToken: ObservationToken | undefined;
+     const listeners = new Set<() => void>();
+@@ -447,7 +447,7 @@
+       replace: (next) => {
+         const observer = mutationSource2.observer;
+         const before = observer ? read(true) : undefined;
+-        const changed = write(next, 'replace');
++        const changed = write(next, 'replace',()=>mutationSource2.prepareTerminal?.({intent:'replace',before:before as T,after:next,changed:true}));
+         if (observer) {
+           observer({
+             intent: 'replace',
+@@ -464,7 +464,7 @@
+         const current = read();
+         const before = mutationSource2.observer ? read(true) : current;
+         const next = update(current);
+-        const changed = write(next, 'derive');
++        const changed = write(next, 'derive',()=>mutationSource2.prepareTerminal?.({intent:'derive',before,after:next,changed:true}));
+         const observer = mutationSource2.observer;
+         if (observer) {
+           observer({
+--- a/packages/kernel/src/lib/internals/native-tree-scalar-leaf-runtime.ts
++++ b/packages/kernel/src/lib/internals/native-tree-scalar-leaf-runtime.ts
+@@ -41,11 +41,17 @@
+     if (PRODUCTION_SUBSTRATE_STATS_ENABLED) {
+       recordProductionSubstrateStat('publications', result.changedSlots.length);
+     }
+-    this.observation.runInvalidationGroup(() => {
+-      for (const slotIndex of result.changedSlots) {
+-        this.token(slotIndex).invalidate();
+-      }
+-    });
++    let failed = false;
++    let first: unknown;
++    try {
++      this.observation.runInvalidationGroup(() => {
++        for (const slotIndex of result.changedSlots) {
++          try { this.token(slotIndex).invalidate(); }
++          catch (error) { if (!failed) { failed = true; first = error; } }
++        }
++      });
++    } catch (error) { if (!failed) { failed = true; first = error; } }
++    if (failed) throw first;
+   }
+
+   publishSlot(result: {
+@@ -80,6 +86,15 @@
+
+   discard(): void {
+     this.frame.discard();
++  }
++
++  prepareCommit(options?: { advanceRevision?: boolean; publish?: boolean }): () => ScalarSlotCommitResult {
++    const install = this.frame.prepareCommit({advanceRevision:options?.advanceRevision});
++    return () => {
++      const result = install();
++      if (options?.publish !== false) this.publication.publish(result);
++      return result;
++    };
+   }
+
+   commit(options?: {
+@@ -159,59 +174,27 @@
+     location: leaf,
+     notify: () => publication.publishSlot({ changed: true, slot: slotIndex }),
+     replace: (value) => {
+-      const observer = mutationSource.observer;
+-      const dormant = observer
+-        ? liveness.absence?.isAbsent(leaf) === true
+-        : false;
+-      // History records what storage held, even while the leaf is absent.
+-      const before = observer
+-        ? dormant
+-          ? kernel.readSlot<T>(slotIndex)
+-          : realized.peek()
+-        : undefined;
+-      // The authoritative commit primitive: no result object on the hot path.
+-      const changed = kernel.commitSlotValue(slotIndex, value);
+-      publishChanged(changed, { value });
+-      if (observer) {
+-        observer({
+-          intent: 'replace',
+-          before: before as T,
+-          after: changed || dormant ? value : (before as T),
+-          changed: changed || dormant,
+-        });
+-      }
++      const observer = mutationSource.observer, capture = mutationSource.capture;
++      const observing = observer || capture;
++      const dormant = observing ? liveness.absence?.isAbsent(leaf) === true : false;
++      const before = observing ? (dormant ? kernel.readSlot<T>(slotIndex) : realized.peek()) : undefined;
++      const changed = kernel.commitRecorded(slotIndex, value, () => mutationSource.prepareTerminal?.({intent:'replace',before:before as T,after:value,changed:true}));
++      const mutation = observing ? {intent:'replace' as const,before:before as T,after:changed || dormant ? value : before as T,changed:changed || dormant} : undefined;
++      if (mutation) capture?.(mutation);
++      publishChanged(changed, {value});
++      if (mutation) observer?.(mutation);
+     },
+     derive: (update) => {
+-      if (liveness.absence?.isAbsent(leaf)) {
+-        const stored = kernel.readSlot<T>(slotIndex);
+-        const next = update(undefined as T);
+-        const result = kernel.commitSlot(slotIndex, next);
+-        publishResult(result);
+-        mutationSource.observer?.({
+-          intent: 'derive',
+-          // What storage held: the updater saw the leaf's value, undefined.
+-          before: stored,
+-          after: kernel.readSlot<T>(slotIndex),
+-          // Membership changed even when the retained slot value did not.
+-          changed: true,
+-        });
+-        return;
+-      }
+-      const observer = mutationSource.observer;
+-      if (!observer) {
+-        publishResult(kernel.updateSlot(slotIndex, update));
+-        return;
+-      }
+-      const before = realized.peek();
+-      const next = update(before);
+-      const result = kernel.commitSlot(slotIndex, next);
++      const observer = mutationSource.observer, capture = mutationSource.capture;
++      const dormant = liveness.absence?.isAbsent(leaf) === true;
++      const before = dormant ? kernel.readSlot<T>(slotIndex) : realized.peek();
++      const next = update(dormant ? undefined as T : before);
++      const changed = kernel.commitRecorded(slotIndex,next,()=>mutationSource.prepareTerminal?.({intent:'derive',before,after:next,changed:true}));
++      const result = changed ? {revision:kernel.revision(),changed:true as const,slot:slotIndex} : {revision:kernel.revision(),changed:false as const};
++      const mutation = {intent:'derive' as const,before,after:result.changed || dormant ? next : before,changed:result.changed || dormant};
++      capture?.(mutation);
+       publishResult(result);
+-      observer({
+-        intent: 'derive',
+-        before,
+-        after: result.changed ? next : before,
+-        changed: result.changed,
+-      });
++      observer?.(mutation);
+     },
+   };
+   registerWritableLocationBinding(binding);
+--- a/packages/kernel/src/lib/internals/tree-scalar-leaf-runtime.ts
++++ b/packages/kernel/src/lib/internals/tree-scalar-leaf-runtime.ts
+@@ -127,8 +127,9 @@
+
+     return kernel.readSlot<T>(slotIndex);
+   };
+-  const binding = locations.createWritable(read, (value) => {
+-    const result = kernel.commitSlot(slotIndex, value);
++  const binding = locations.createWritable(read, (value, _intent, prepare) => {
++    const changedValue = kernel.commitRecorded(slotIndex, value, prepare);
++    const result = {changed:changedValue};
+     const reAdded = liveness.absence?.reAdd(holder.leaf) === true;
+     const changed = publication.prepareSlot(slotIndex, result.changed, reAdded);
+     return changed;
+--- a/packages/kernel/src/lib/internals/tree-scalar-slot-port.ts
++++ b/packages/kernel/src/lib/internals/tree-scalar-slot-port.ts
+@@ -25,6 +25,7 @@
+   set(slotIndex: SlotIndex, value: unknown): void;
+   update(slotIndex: SlotIndex, updater: (value: unknown) => unknown): void;
+   discard(): void;
++  prepareCommit?(options?: { advanceRevision?: boolean; publish?: boolean }): () => ScalarSlotCommitResult;
+   commit(options?: {
+     advanceRevision?: boolean;
+     publish?: boolean;
+--- a/packages/kernel/src/lib/internals/tree-scalar-slot-runtime.ts
++++ b/packages/kernel/src/lib/internals/tree-scalar-slot-runtime.ts
+@@ -1,3 +1,4 @@
++import type { TerminalRecordPlan } from './intrinsic-mutation';
+ import type { PositionId } from '../mutation-types';
+ import type { PhysicalCommitClock } from './physical-commit-clock';
+
+@@ -29,10 +30,12 @@
+   set(slotIndex: SlotIndex, value: unknown): void;
+   update(slotIndex: SlotIndex, updater: (value: unknown) => unknown): void;
+   discard(): void;
++  prepareCommit(options?: { advanceRevision?: boolean }): () => ScalarSlotCommitResult;
+   commit(options?: { advanceRevision?: boolean }): ScalarSlotCommitResult;
+ }
+
+ export interface TreeScalarSlotRuntime {
++  commitRecorded<T>(slotIndex: SlotIndex, value: T, prepare?: () => TerminalRecordPlan | undefined): boolean;
+   createSlot<T>(
+     initialValue: T,
+     equal: (current: T, next: T) => boolean,
+@@ -74,7 +77,8 @@
+       staged: ReadonlyMap<SlotIndex, unknown>,
+       options?: { advanceRevision?: boolean }
+     ) => ScalarSlotCommitResult,
+-    private readonly assertSlotIndex: (slotIndex: SlotIndex) => void
++    private readonly assertSlotIndex: (slotIndex: SlotIndex) => void,
++    private readonly prepareValues: (staged: ReadonlyMap<SlotIndex, unknown>, options?: { advanceRevision?: boolean }) => () => ScalarSlotCommitResult
+   ) {}
+
+   set(slotIndex: SlotIndex, value: unknown): void {
+@@ -96,6 +100,13 @@
+     this.assertOpen();
+     this.closed = true;
+     this.staged.clear();
++  }
++
++  prepareCommit(options?: { advanceRevision?: boolean }): () => ScalarSlotCommitResult {
++    this.assertOpen();
++    this.closed = true;
++    if (this.getCommittedRevision() !== this.baseRevision) throw new Error('Stale scalar preparation');
++    return this.prepareValues(this.staged, options);
+   }
+
+   commit(options?: { advanceRevision?: boolean }): ScalarSlotCommitResult {
+@@ -152,6 +163,26 @@
+     ) {
+       throw new Error(`Scalar slot index ${slotIndex} is out of bounds.`);
+     }
++  };
++
++  // Research-only preparation: run equality before any target installs.
++  const prepareSlots = (staged: ReadonlyMap<SlotIndex, unknown>, options?: { advanceRevision?: boolean }): (() => ScalarSlotCommitResult) => {
++    const base = getCommittedRevision();
++    const changed: Array<{ slotIndex: SlotIndex; nextValue: unknown }> = [];
++    for (const [slotIndex, nextValue] of staged) {
++      assertSlotIndex(slotIndex);
++      if (!equalities[slotIndex](values[slotIndex], nextValue)) changed.push({slotIndex, nextValue});
++    }
++    if (getCommittedRevision() !== base) throw new Error('Reentrant scalar preparation');
++    let used = false;
++    return () => {
++      if (used) throw new Error('Prepared scalar commit already used');
++      if (getCommittedRevision() !== base) throw new Error('Stale prepared scalar commit');
++      used = true;
++      for (const {slotIndex,nextValue} of changed) values[slotIndex] = nextValue;
++      const revision = changed.length && options?.advanceRevision !== false ? advanceRevision() : getCommittedRevision();
++      return {revision,changedSlots:changed.map(x=>x.slotIndex)};
++    };
+   };
+
+   const commitSlots = (
+@@ -269,6 +300,24 @@
+       }
+       return values[slotIndex] as T;
+     },
++    commitRecorded<T>(slotIndex: SlotIndex, value: T, prepare?: () => TerminalRecordPlan | undefined): boolean {
++      assertSlotIndex(slotIndex);
++      const base=getCommittedRevision();
++      const equal=equalities[slotIndex](values[slotIndex],value);
++      if(getCommittedRevision()!==base)throw new Error('Scalar equality reentered physical installation');
++      if(equal)return false;
++      const plan=prepare?.();
++      if(getCommittedRevision()!==base)throw new Error('Terminal preparation reentered physical installation');
++      // Prepared internal data only below. No returned closure, value reflection,
++      // equality, observer, or record sink between value and evidence installation.
++      values[slotIndex]=value;
++      if(plan){
++        for(let i=0;i<plan.writes.length;i++){const w=plan.writes[i];w.map.set(w.key,w.value);}
++        for(let i=0;i<plan.adds.length;i++){const a=plan.adds[i];a.set.add(a.value);}
++      }
++      advanceRevision();
++      return true;
++    },
+     commitSlot<T>(slotIndex: SlotIndex, value: T): SingleSlotCommitResult {
+       return commitSlot(slotIndex, value);
+     },
+@@ -288,7 +337,8 @@
+         getCommittedRevision,
+         (slotIndex) => values[slotIndex],
+         commitSlots,
+-        assertSlotIndex
++        assertSlotIndex,
++        prepareSlots
+       );
+     },
+     resolveScalarSlot(positionId: PositionId): SlotIndex | undefined {

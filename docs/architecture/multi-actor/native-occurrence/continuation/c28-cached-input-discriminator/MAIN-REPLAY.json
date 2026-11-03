@@ -1,0 +1,20 @@
+{
+  "c27": {
+    "observationsMatch": true,
+    "result": {
+      "exit": 0,
+      "timeout": false,
+      "changedManifestFiles": [],
+      "fixtureUnchanged": true
+    }
+  },
+  "c28": {
+    "observationsMatch": true,
+    "result": {
+      "exit": 1,
+      "timeout": false,
+      "changedManifestFiles": [],
+      "fixtureUnchanged": true
+    }
+  }
+}

@@ -1,0 +1,128 @@
+
+> nx run vue:test --testNamePattern=Vue owned collection publication|4c coherent value settlement
+
+> pnpm exec tsc --noEmit -p packages/vue/tsconfig.spec.json && npx vitest run --config packages/vue/vitest.config.ts --testNamePattern="Vue owned collection publication|4c coherent value settlement"
+
+(node:82983) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+npm warn Unknown env config "verify-deps-before-run". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown project config "auto-install-peers". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown project config "shamefully-hoist". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+(node:83269) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:83739) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /Users/jonathanborgia/.codex/worktrees/atomic-capture-proof/signaltree/packages/vue
+
+(node:83967) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:83968) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:83965) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:83957) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:83963) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:83960) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:83956) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:83958) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:83964) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ❯ src/lib/settlement-publication.spec.ts (10 tests | 1 failed) 83ms
+     × publishes rollback with both owned collections coherent 40ms
+(node:84027) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:84030) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:84029) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:84031) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:84028) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:84032) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:84033) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ❯ src/lib/transaction-realization.spec.ts (8 tests | 1 failed | 7 skipped) 21ms
+     × 4c coherent value settlement — own collection reads agree in native observers 20ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/lib/settlement-publication.spec.ts > Vue owned collection publication > publishes rollback with both owned collections coherent
+AssertionError: expected [ +0, 1, 1 ] to deeply equal [ +0, +0, +0 ]
+
+- Expected
++ Received
+
+  [
+    0,
+-   0,
+-   0,
++   1,
++   1,
+  ]
+
+ ❯ src/lib/settlement-publication.spec.ts:103:60
+    101|       );
+    102|       expect(settlement.length).toBeGreaterThan(0);
+    103|       for (const entry of settlement) expect(entry.values).toEqual([0,…
+       |                                                            ^
+    104|     } finally {
+    105|       dispose();
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  src/lib/transaction-realization.spec.ts > @signal-tree/vue — pending realization conformance > 4c coherent value settlement — own collection reads agree in native observers
+AssertionError: [{"phase":"setup","scalar":0,"row":"Original","all":"Original"},{"phase":"authoring","scalar":7,"row":"Proposed","all":"Original"},{"phase":"authoring","scalar":7,"row":"Proposed","all":"Original"},{"phase":"authoring","scalar":7,"row":"Proposed","all":"Proposed"},{"phase":"inside-rollback","scalar":0,"row":"Original","all":"Proposed"},{"phase":"inside-rollback","scalar":0,"row":"Original","all":"Proposed"},{"phase":"inside-rollback","scalar":0,"row":"Original","all":"Original"}]: expected { phase: 'inside-rollback', …(3) } to match object { scalar: +0, row: 'Original', …(1) }
+(1 matching property omitted from actual)
+
+- Expected
++ Received
+
+  {
+-   "all": "Original",
++   "all": "Proposed",
+    "row": "Original",
+    "scalar": 0,
+  }
+
+ ❯ ../kernel/src/transaction-realization-contract.ts:252:56
+    250|         expect(settlement.length).toBeGreaterThan(0);
+    251|         for (const frame of settlement) {
+    252|           expect(frame, JSON.stringify(observed.seen)).toMatchObject({
+       |                                                        ^
+    253|             scalar: 0,
+    254|             row: 'Original',
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+ Test Files  2 failed | 14 skipped (16)
+      Tests  2 failed | 9 passed | 113 skipped (124)
+   Start at  15:48:18
+   Duration  2.10s (transform 7.33s, setup 0ms, import 13.20s, tests 104ms, environment 1ms)
+
+Warning: command "pnpm exec tsc --noEmit -p packages/vue/tsconfig.spec.json && npx vitest run --config packages/vue/vitest.config.ts --testNamePattern="Vue owned collection publication|4c coherent value settlement"" exited with non-zero status code
+
+
+ NX   Running target test for project vue failed
+
+Failed tasks:
+
+- vue:test
+
+Hint: run the command with --verbose for more details.
+
+  Run duration:      8.7s
+  Critical path:     8.7s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Speed up or split the longest tasks on the critical path:
+        vue:test    8.7s

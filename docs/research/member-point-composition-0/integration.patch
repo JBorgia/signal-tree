@@ -1,0 +1,4559 @@
+diff --git a/packages/angular/src/lib/transaction-realization.spec.ts b/packages/angular/src/lib/transaction-realization.spec.ts
+index 96a0de8f..c2e86629 100644
+--- a/packages/angular/src/lib/transaction-realization.spec.ts
++++ b/packages/angular/src/lib/transaction-realization.spec.ts
+@@ -8,8 +8,10 @@ import { TestBed } from '@angular/core/testing';
+ import {
+   transactionRealizationContract,
+   type ConformanceRow,
++  type EntityProjectionFrame,
+   type MixedFrame,
+   type Observation,
++  type ValuePublicationFrame,
+ } from '../../../kernel/src/transaction-realization-contract';
+ import { entityMap, signalTree, transactions } from '../index';
+ 
+@@ -28,7 +30,9 @@ const build = () =>
+   signalTree(
+     {
+       scalar: 0,
+-      rows: entityMap<ConformanceRow, string>({ selectId: (r) => r.id }),
++      rows: entityMap<ConformanceRow, string>({
++        selectId: (r) => r.id,
++      }).computed('names', (rows) => rows.map((row) => row.name)),
+     },
+     { enhancers: [transactions()] }
+   );
+@@ -54,6 +58,40 @@ const observe = <T>(read: () => T): Observation<T> => {
+   return { seen, current: () => latest, dispose: () => stop() };
+ };
+ 
++const projectionFrame = (
++  $: Tree['$'],
++  phase: string,
++  enabled: boolean
++): EntityProjectionFrame => {
++  const scalar = $.scalar();
++  if (!enabled) return { phase, scalar, projections: null };
++  const node = $.rows.byId('A');
++  const encode = (row: ConformanceRow | undefined) =>
++    row ? `${row.id}:${row.name}` : null;
++  return {
++    phase,
++    scalar,
++    projections: {
++      all: $.rows.all().map((row) => `${row.id}:${row.name}`),
++      ids: [...$.rows.ids()],
++      count: $.rows.count(),
++      empty: $.rows.empty(),
++      map: [...$.rows.asMap()].map(([key, row]) => `${key}:${row.name}`),
++      hasA: $.rows.has('A')(),
++      where: $.rows
++        .where(matchesA)()
++        .map((row) => `${row.id}:${row.name}`),
++      find: encode($.rows.find(matchesA)()),
++      slice: [...$.rows.names()],
++      activeId: $.rows.activeId() ?? null,
++      activeEntity: encode($.rows.activeEntity()),
++      row: node?.()?.name ?? null,
++      field: node?.name() ?? null,
++    },
++  };
++};
++const matchesA = (row: ConformanceRow) => row.id === 'A';
++
+ describe('@signal-tree/angular — pending realization conformance', () => {
+   beforeEach(() => {
+     TestBed.configureTestingModule({});
+@@ -88,6 +126,21 @@ describe('@signal-tree/angular — pending realization conformance', () => {
+         ids: [...tree.$.rows.ids()],
+       })),
+ 
++    observeValues: (tree, phase) => [
++      observe<ValuePublicationFrame>(() => ({
++        phase: phase(),
++        scalar: tree.$.scalar(),
++        row: tree.$.rows.byId('A')?.()?.name,
++        all: tree.$.rows.all().find((row) => row.id === 'A')?.name,
++      })),
++    ],
++
++    selectRow: (tree, id) => tree.$.rows.setActiveId(id),
++    rekeyRow: (tree, from, to) => tree.$.rows.changeId(from, to),
++    observeProjections: (tree, phase, enabled) => [
++      observe(() => projectionFrame(tree.$, phase(), enabled())),
++    ],
++
+     flush: async () => {
+       TestBed.tick();
+       await microtasks();
+diff --git a/packages/kernel/src/enhancers/transactions/transactions.ts b/packages/kernel/src/enhancers/transactions/transactions.ts
+index fcd858c6..bddff192 100644
+--- a/packages/kernel/src/enhancers/transactions/transactions.ts
++++ b/packages/kernel/src/enhancers/transactions/transactions.ts
+@@ -1,3 +1,4 @@
++import type { TerminalRecordPlan } from '../../lib/internals/intrinsic-mutation';
+ import { publishingExposedOnly } from '../../lib/internals/exposed-publication';
+ import {
+   collectionBindingAt,
+@@ -90,6 +91,7 @@ import {
+   getTreeRealizationDescriptors,
+   getTreeRealizationPort,
+   rememberTreeRealizationDescriptor,
++  preparePointRealization,
+ } from '../../lib/internals/causal-runtime/tree-realization-adapter';
+ import { TurnStore } from '../../lib/internals/causal-runtime/turn-store';
+ import { interceptLeafSignals } from '../../lib/internals/intercept-leaf-signals';
+@@ -101,7 +103,7 @@ import { getOwnedPositionIds } from '../../lib/internals/owned-mutation';
+ import { getPositionRegistry } from '../../lib/internals/position-registry';
+ import { reportContainedObserverError } from '../../lib/internals/error-reporter';
+ import { getPathNotifier } from '../../lib/path-notifier';
+-import { isTraversableNode } from '../../lib/utils';
++import { deepEqual, isTraversableNode } from '../../lib/utils';
+ import {
+   getActiveWriteContext,
+   withWriteContext,
+@@ -1432,6 +1434,7 @@ export function getOrCreateInternalTransactionRuntime<T>(
+   /** A refusal it threw; the reader classifies it from the error's cause. */
+   const publishRefusal = (transactionId: number, error: unknown): void =>
+     publishLifecycle({ kind: 'refused', transactionId, error });
++  const realizationTree = tree as unknown as ISignalTree<object>;
+   const treeWrapper = tree as unknown as object;
+   const stateRoot = tree.$ as unknown as object;
+   const realizationDescriptors =
+@@ -1444,7 +1447,7 @@ export function getOrCreateInternalTransactionRuntime<T>(
+     getTreeRealizationPort(stateRoot) ??
+     getTreeRealizationPort(treeWrapper) ??
+     createTreeRealizationAdapter({
+-      tree: tree as unknown as ISignalTree<object>,
++      tree: realizationTree,
+       descriptors: realizationDescriptors,
+     });
+   defineTreeRealizationPort(treeWrapper, realizationPort);
+@@ -1638,7 +1641,7 @@ export function getOrCreateInternalTransactionRuntime<T>(
+     // v16 8g): rollback of `x(5); omit g; re-add g` came back with x 5.
+     const effects = settleTurnMemberEffects(
+       tree.$ as object,
+-      Array.from(bucket.effects.values()).map(cloneTurnEffect)
++      Array.from(bucket.effects.values()).filter(Boolean).map(cloneTurnEffect)
+     );
+     bucket.effects.clear();
+     const collectionOrders = Array.from(bucket.collectionOrders.values()).map(
+@@ -2009,6 +2012,103 @@ export function getOrCreateInternalTransactionRuntime<T>(
+       }
+     });
+ 
++
++  // Research operation journal: prepared facts survive independently of diagnostics.
++  type OperationRecord = { sequence: number; owner: number; effects: readonly TurnEffect[]; previous?: OperationRecord; owners: Set<number> };
++  const installedOperations = new Map<number, OperationRecord>();
++  const expectedDispositions = new Map<number, readonly TurnEffect[]>();
++  tree.registerCleanup(()=>{ installedOperations.clear(); expectedDispositions.clear(); });
++  const sourceCaptureRuntime = getMutationCaptureRuntime(tree);
++  if (sourceCaptureRuntime) {
++    sourceCaptureRuntime.prepareEntityResponsibility = (capture) => {
++      const id = resolveTransactionId(capture.meta);
++      if (id === undefined || isRestoring || capture.meta?.origin === 'transaction-rollback' || capture.meta?.origin === 'restoration') return;
++      const bucket = getTransactionBucket(id);
++      const scratch = createCaptureBucket();
++      const effects: TurnEffect[]=[];
++      for (const change of capture.changes) {
++        const path = change.path;
++        if (path === undefined) throw new Error('Entity responsibility has no mutation path');
++        if(change.structuralRecord) effects.push({...change.structuralRecord,position:capture.owner,ownerPath:capture.ownerPath,path} as TurnEffect);
++        else if (!isPlainRecord(change.before) || !isPlainRecord(change.after)) {
++          // Match rich capture's existing whole-row boundary. Arrays and opaque
++          // values are not record fields; index enumeration loses their shape.
++          if (change.before !== change.after) effects.push({
++            kind: 'set', position: capture.owner, ownerPath: capture.ownerPath,
++            path, subject: change.subject,
++            before: change.before, after: change.after,
++            mutationIntent: capture.meta?.mutationIntent,
++          });
++        } else {
++          const before=change.before, after=change.after;
++          for(const key of new Set([...Object.keys(before),...Object.keys(after)])) {
++            const beforeValue=before[key],afterValue=after[key];
++            const beforePresent=Object.prototype.hasOwnProperty.call(before,key),afterPresent=Object.prototype.hasOwnProperty.call(after,key);
++            if(beforeValue===afterValue && beforePresent===afterPresent) continue;
++            effects.push({kind:'set',position:capture.owner,ownerPath:capture.ownerPath,path: `${path}.${key}`,subject:change.subject,subjectFieldSegments:[key],before:beforeValue,after:afterValue,mutationIntent:capture.meta?.mutationIntent,...(!(beforePresent&&afterPresent)?{fieldPresence:{before:beforePresent,after:afterPresent}}:{})});
++          }
++        }
++      }
++      const touchedKeys = new Set(effects.map(effectKey));
++      for (const key of touchedKeys) {
++        const prior = bucket.effects.get(key);
++        if (prior) scratch.effects.set(key, cloneTurnEffect(prior));
++      }
++      for (const effect of effects) {
++        if (bucket.baselineValues.has(effect.position)) scratch.baselineValues.set(effect.position, bucket.baselineValues.get(effect.position));
++      }
++      for(const effect of effects)enqueueEffect(scratch,scratch.effects,cloneTurnEffect(effect));
++      const previous=installedOperations.get(id);
++      const operation:OperationRecord={sequence:(previous?.sequence ?? -1)+1,owner:capture.owner,effects,previous,owners:previous?.owners ?? new Set<number>()};
++      const writes: Array<TerminalRecordPlan['writes'][number]> = [
++        { map: installedOperations, key: id, value: operation },
++      ];
++      // Replace the prepared map, including composed-away structural entries.
++      for(const key of touchedKeys) if(!scratch.effects.has(key)) writes.push({map:bucket.effects,key,value:undefined});
++      for(const [key,value] of scratch.effects) writes.push({map:bucket.effects,key,value});
++      for(const [key,value] of scratch.baselineValues) writes.push({map:bucket.baselineValues,key,value});
++      if(pendingTransactions.size>0) for(const key of windowKeys([capture.owner],capture.changes.map(c=>c.subject))) writes.push({map:bucket.ownWriteSeq,key,value:windowWriteSeq});
++      return {writes,adds:[{set:operation.owners,value:capture.owner},{set:bucket.positionIds,value:capture.owner},{set:bucket.ownerPaths,value:capture.ownerPath},...capture.changes.map(c=>({set:bucket.subjectIds,value:c.subject}))]};
++    };
++    tree.registerCleanup(()=>{ delete sourceCaptureRuntime.prepareEntityResponsibility; });
++  }
++  const foldOperationDisposition = (id: number): readonly TurnEffect[] => {
++    const newest = installedOperations.get(id);
++    if (!newest) return [];
++    const records: OperationRecord[] = new Array(newest.sequence + 1);
++    let record: OperationRecord | undefined = newest;
++    for (let i = records.length - 1; i >= 0; i--) {
++      if (!record || record.sequence !== i) throw new Error('Operation journal sequence gap');
++      records[i] = record;
++      record = record.previous;
++    }
++    if (record) throw new Error('Operation journal sequence gap');
++    const expected = createCaptureBucket();
++    for (const operation of records) for (const effect of operation.effects) enqueueEffect(expected, expected.effects, cloneTurnEffect(effect));
++    return settleTurnMemberEffects(tree.$ as object, [...expected.effects.values()].map(cloneTurnEffect));
++  };
++  const validateOperationDisposition = (id:number, turnId:number|undefined):void => {
++    const folded = expectedDispositions.get(id);
++    if (!folded?.length) return;
++    const retained=authority.getPendingTurn(turnId)?.__effects ?? [];
++    const indexed = new Map(retained.map(effect => [effectKey(effect), effect]));
++    for(const effect of folded) {
++      const actual=indexed.get(effectKey(effect));
++      const same = actual && actual.kind === effect.kind && [...new Set([...Object.keys(effect), ...Object.keys(actual)])].every(key => {
++        const expectedValue = (effect as unknown as Record<string, unknown>)[key];
++        const actualValue = (actual as unknown as Record<string, unknown>)[key];
++        const memberImage = (key === 'before' || key === 'after') && effect.kind === 'set' && effect.plainBranchMembership !== undefined;
++        return memberImage || key === 'subjectFieldSegments' || key === 'fieldPresence' || key === 'plainBranchMembership'
++          ? deepEqual(actualValue, expectedValue)
++          : Object.is(actualValue, expectedValue);
++      });
++      if(!same) {
++        const refusal=createRollbackError({kind:'effect-validation-failed',pendingTurnId:turnId ?? id,compensation:[],errorMessage:'Installed operation lacks a matching settlement disposition'});
++        publishRefusal(id,refusal);throw refusal;
++      }
++    }
++  };
++
+   const resolveOwnerPositionId = (ownerPath?: string): number | undefined => {
+     if (!ownerPath) {
+       return undefined;
+@@ -2037,6 +2137,17 @@ export function getOrCreateInternalTransactionRuntime<T>(
+     positionIds?: number[]
+   ): void => {
+     const membership = plainBranchMembershipEffects(meta);
++    const membershipTransaction = resolveTransactionId(meta);
++    if (membership?.length && membershipTransaction !== undefined) {
++      const previous = installedOperations.get(membershipTransaction);
++      installedOperations.set(membershipTransaction, {
++        sequence: (previous?.sequence ?? -1) + 1,
++        owner: membership[0].position,
++        effects: membership.map(cloneTurnEffect),
++        previous,
++        owners: previous?.owners ?? new Set<number>(),
++      });
++    }
+     if (membership) {
+       for (const effect of membership) {
+         bucket.positionIds.add(effect.position);
+@@ -2077,6 +2188,8 @@ export function getOrCreateInternalTransactionRuntime<T>(
+       meta,
+       registry: getPositionRegistry(tree.$),
+     });
++    const recorded=resolveTransactionId(meta);
++    if(recorded!==undefined && subjectIds?.length && installedOperations.get(recorded)?.owners.has(resolvedPositionIds[0]))return;
+     captureEffects(
+       bucket,
+       bucket.effects,
+@@ -2158,13 +2271,32 @@ export function getOrCreateInternalTransactionRuntime<T>(
+       authority.discardPending(reservedId);
+       return undefined;
+     }
++    const dispositions = foldOperationDisposition(transactionId);
++    expectedDispositions.set(transactionId, dispositions);
+     const {
+       subjectIds,
+-      positionIds,
++      positionIds: capturedPositionIds,
+       effects,
+       baselineValues,
+       collectionOrders,
+     } = drainCaptureBucket(bucket);
++    // Prepared scalar writes record admission before installation. Their raw
++    // footprint is not a net turn: x(2); x(1) over baseline 1 must leave an
++    // older pending turn untouched. Only prune positions whose scalar writes
++    // are independently journaled and have no remaining disposition. Legacy
++    // footprint-only owners and entity lifetime claims keep their admission.
++    const preparedOwners = installedOperations.get(transactionId)?.owners;
++    const slots = getTreeScalarSlotRuntime(tree) ?? getTreeScalarSlotRuntime(tree.$);
++    const netPositions = new Set([
++      ...effects.map(effect => effect.position),
++      ...dispositions.map(effect => effect.position),
++      ...collectionOrders.map(order => order.owner),
++    ]);
++    const positionIds = capturedPositionIds.filter(position =>
++      !preparedOwners?.has(position) ||
++      slots?.resolveScalarSlot(position) === undefined ||
++      netPositions.has(position)
++    );
+     const pending = authority.createPending(
+       reservedId,
+       subjectIds.length > 0 ? subjectIds : undefined,
+@@ -2301,12 +2433,16 @@ export function getOrCreateInternalTransactionRuntime<T>(
+   };
+ 
+   const rollbackPendingTarget = (
+-    effects: TurnEffect[],
+-    orderDeltas: CollectionOrderDelta[]
++    effects: readonly ReversalEffect[],
++    orderDeltas: CollectionOrderDelta[],
++    completion?: { selected: boolean; committed: boolean }
+   ): void => {
++    if (completion) completion.selected = true;
+     const reversalEffects = placeFieldReversalsWhileRowsExist(
+-      effects.map(toRollbackEffect)
++      effects
+     );
++    const notifier = getPathNotifier();
++    const treeOwnerId = getPositionRegistry(tree.$)?.id;
+     const bindings = new Map<number, CollectionTransitionTargetBinding>();
+     visitTree(tree.$, (node) => {
+       const binding = (
+@@ -2362,21 +2498,35 @@ export function getOrCreateInternalTransactionRuntime<T>(
+                 }
+                 frame.set(slot, value);
+               }
++              const install = frame.prepareCommit
++                ? frame.prepareCommit({advanceRevision:false,publish:false})
++                : () => frame.commit({advanceRevision:false,publish:false});
+               let result: ReturnType<typeof frame.commit> | undefined;
+               return {
+-                install(): void {
+-                  result = frame.commit({
+-                    advanceRevision: false,
+-                    publish: false,
+-                  });
+-                },
++                install(): void { result = install(); },
+                 publish(): void {
+                   if (!result) {
+                     throw new Error(
+                       'Transaction scalar published before installation'
+                     );
+                   }
+-                  scalarSlotRuntime.publishPrepared(result);
++                  let failed = false;
++                  let first: unknown;
++                  try { scalarSlotRuntime.publishPrepared(result); }
++                  catch (error) { failed = true; first = error; }
++                  // The prepared route publishes the same realized path facts as
++                  // the existing realization port, after the complete unit installs.
++                  for (const effect of reversalEffects) {
++                    if (effect.subjectId !== undefined || effect.plainBranchMembership || !scalars.has(effect.owner)) continue;
++                    const descriptor = realizationDescriptors.get(effect.owner);
++                    const path = effect.path ?? descriptor?.ownerPath;
++                    if (!path) continue;
++                    try {
++                      notifier.notify(path, effect.after, effect.before, effect.ownerPath ?? descriptor?.ownerPath ?? path,
++                        undefined, [effect.owner], {...getActiveWriteContext(), intent: 'system', participation: 'realized'}, treeOwnerId);
++                    } catch (error) { if (!failed) { failed = true; first = error; } }
++                  }
++                  if (failed) throw first;
+                 },
+               };
+             },
+@@ -2389,7 +2539,8 @@ export function getOrCreateInternalTransactionRuntime<T>(
+       {
+         prepareTarget: (members) =>
+           preparePlainBranchMembers(tree.$ as object, members),
+-      }
++      },
++      { onCommitted() { if (completion) completion.committed = true; } }
+     );
+     const apply = () => prepared.install();
+     const locations = getLocationRuntime(tree.$);
+@@ -2424,7 +2575,8 @@ export function getOrCreateInternalTransactionRuntime<T>(
+      * write recorded under transaction 1 while its own compensation announced
+      * 2, and the join silently missed.
+      */
+-    owningTransactionId: number = transactionId
++    owningTransactionId: number = transactionId,
++    completion?: { selected: boolean; committed: boolean }
+   ): void => {
+     if (effects.length === 0 && orderDeltas.length === 0) {
+       return;
+@@ -2532,6 +2684,8 @@ export function getOrCreateInternalTransactionRuntime<T>(
+             ownerId: positionRegistry?.id,
+           },
+           () => {
++            // Keep the baseline complete-target admission for structural
++            // handoffs/order: per-effect occupancy is not its admissibility test.
+             if (
+               orderDeltas.length > 0 ||
+               requiresDeclarativeStructuralTarget(
+@@ -2551,7 +2705,7 @@ export function getOrCreateInternalTransactionRuntime<T>(
+                 }
+               )
+             ) {
+-              rollbackPendingTarget(effects, orderDeltas);
++              rollbackPendingTarget(effects.map(toRollbackEffect), orderDeltas, completion);
+               return { ok: true as const };
+             }
+             return rollbackPendingTurnAt({
+@@ -2559,8 +2713,29 @@ export function getOrCreateInternalTransactionRuntime<T>(
+               turnId: transactionId,
+               store,
+               topology: positionRegistry,
+-              port: realizationPort,
+               realizationContext,
++              port: {
++                validateEffects: (normalized) => realizationPort.validateEffects?.(normalized),
++                applyAtomically(normalized): void {
++                  // D2's additional mixed route keeps ordinary normalized
++                  // admission; it changes physical installation only.
++                  if (normalized.some(e => e.subjectId === undefined) && normalized.some(e => e.subjectId !== undefined)) {
++                    const point = preparePointRealization(realizationTree, normalized);
++                    if (point) {
++                      if (completion) completion.selected = true;
++                      point.install();
++                      if (completion) completion.committed = true;
++                      point.publish();
++                    } else if (normalized.some(effect => effect.plainBranchMembership)) {
++                      rollbackPendingTarget(normalized, orderDeltas, completion);
++                    } else {
++                      realizationPort.applyAtomically(normalized);
++                    }
++                  } else {
++                    realizationPort.applyAtomically(normalized);
++                  }
++                },
++              },
+             });
+           }
+         )
+@@ -2609,7 +2784,8 @@ export function getOrCreateInternalTransactionRuntime<T>(
+     baselineValues: ReadonlyMap<number, unknown>,
+     orderDeltas: CollectionOrderDelta[] = [],
+     callbackError?: unknown,
+-    owningTransactionId: number = transactionId
++    owningTransactionId: number = transactionId,
++    completion?: { selected: boolean; committed: boolean }
+   ): void => {
+     applyRollbackCompensation(
+       transactionId,
+@@ -2617,7 +2793,8 @@ export function getOrCreateInternalTransactionRuntime<T>(
+       baselineValues,
+       orderDeltas,
+       callbackError,
+-      owningTransactionId
++      owningTransactionId,
++      completion
+     );
+     markOwnerInvalidatedFrom(tree.$ as object);
+   };
+@@ -2862,6 +3039,42 @@ export function getOrCreateInternalTransactionRuntime<T>(
+           ) {
+             return;
+           }
++          notifier.notify(
++            path,
++            next,
++            prev,
++            ownerPath,
++            subjectIds,
++            positionIds,
++            effectiveMeta,
++            treeOwnerId
++          );
++        },
++        { terminalRecord: (path,next,prev,meta,ownerPath,subjectIds,positionIds) => {
++          if(isRestoring || meta?.origin==='restoration' || isInspectionWrite(meta) || getWriteParticipation(meta)==='realized')return;
++          if(meta?.transactionOwner!==transactionOwnerToken)return;
++          const id=resolveTransactionId(meta), position=positionIds?.[0];
++          if(id===undefined || position===undefined || subjectIds?.length || Object.is(prev,next))return;
++          const slots=getTreeScalarSlotRuntime(tree) ?? getTreeScalarSlotRuntime(tree.$);
++          if(slots?.resolveScalarSlot(position)===undefined)return;
++          const bucket=getTransactionBucket(id);
++          const effect: TurnEffect={kind:'set',path,ownerPath:ownerPath ?? path,position,before:prev,after:next,mutationIntent:meta?.mutationIntent};
++          const key=effectKey(effect), old=bucket.effects.get(key);
++          if(old && old.kind!=='set')throw new Error('Terminal record conflicts with structural evidence');
++          const combined=old ? {...old,after:next,mutationIntent:combineScalarMutationIntent(old.mutationIntent,effect.mutationIntent)} : effect;
++          const previous=installedOperations.get(id);
++          const operation:OperationRecord={sequence:(previous?.sequence ?? -1)+1,owner:position,effects:[cloneTurnEffect(effect)],previous,owners:previous?.owners ?? new Set<number>()};
++          const writes: Array<TerminalRecordPlan['writes'][number]> = [
++            { map: bucket.effects, key, value: combined },
++            { map: installedOperations, key: id, value: operation },
++          ];
++          if(!bucket.baselineValues.has(position))writes.push({map:bucket.baselineValues,key:position,value:prev});
++          if(pendingTransactions.size>0)for(const key of windowKeys([position],undefined))writes.push({map:bucket.ownWriteSeq,key,value:windowWriteSeq});
++          return {writes,adds:[{set:operation.owners,value:position},{set:bucket.positionIds,value:position},{set:bucket.ownerPaths,value:ownerPath ?? path}]};
++        }, beforePublication: (path, next, prev, meta, ownerPath, subjectIds, positionIds) => {
++          const effectiveMeta = meta ?? getActiveWriteContext();
++          if (isRestoring || effectiveMeta?.origin === 'restoration' || isInspectionWrite(effectiveMeta) || getWriteParticipation(effectiveMeta) === 'realized') return;
++          if (typeof effectiveMeta?.transactionId === 'number' && effectiveMeta.transactionOwner !== transactionOwnerToken) return;
+           const transactionId = resolveTransactionId(effectiveMeta);
+           if (transactionId !== undefined) {
+             captureIntoBucket(
+@@ -2887,17 +3100,7 @@ export function getOrCreateInternalTransactionRuntime<T>(
+               positionIds
+             );
+           }
+-          notifier.notify(
+-            path,
+-            next,
+-            prev,
+-            ownerPath,
+-            subjectIds,
+-            positionIds,
+-            effectiveMeta,
+-            treeOwnerId
+-          );
+-        }
++        } }
+       );
+ 
+       if (typeof notifier.onFlush === 'function') {
+@@ -3313,6 +3516,8 @@ export function getOrCreateInternalTransactionRuntime<T>(
+           reservedTurnId
+         );
+       } catch (error) {
++        installedOperations.delete(transactionId);
++        expectedDispositions.delete(transactionId);
+         pendingTransactions.delete(transactionId);
+         callbackExternalEffects.delete(transactionId);
+         releaseWindowIfClosed();
+@@ -3344,6 +3549,7 @@ export function getOrCreateInternalTransactionRuntime<T>(
+       const handle = {
+         [PENDING_TURN_ID]: pendingTurnId,
+         confirm(): void {
++          validateOperationDisposition(transactionId,pendingTurnId);
+           const pendingTurn = authority.getPendingTurn(pendingTurnId);
+           if (destroyed) throw new Error('Cannot settle a destroyed tree');
+           if (settling)
+@@ -3355,6 +3561,8 @@ export function getOrCreateInternalTransactionRuntime<T>(
+             throw new Error('Cannot confirm a rolled back transaction');
+           }
+           lifecycle = 'confirmed';
++            installedOperations.delete(transactionId);
++            expectedDispositions.delete(transactionId);
+           // Lifecycle observation: recorded at the transition, before the engine
+           // announcement lets restoration confirm its entry, so every reader it
+           // notifies already sees this transaction settled. Public delivery
+@@ -3423,6 +3631,7 @@ export function getOrCreateInternalTransactionRuntime<T>(
+           }
+         },
+         rollback(): void {
++          validateOperationDisposition(transactionId,pendingTurnId);
+           const pendingTurn = authority.getPendingTurn(pendingTurnId);
+           if (destroyed) throw new Error('Cannot settle a destroyed tree');
+           if (settling)
+@@ -3449,6 +3658,7 @@ export function getOrCreateInternalTransactionRuntime<T>(
+               ? []
+               : pendingOrderDeltas.get(pendingTurnId) ?? [];
+           let installed = false;
++          const completion = {selected:false,committed:false};
+           let observerFailed = false;
+           let observerError: unknown;
+           const clock =
+@@ -3464,7 +3674,8 @@ export function getOrCreateInternalTransactionRuntime<T>(
+                 pendingTurn?.__baselineValues ?? new Map(),
+                 orderDeltas,
+                 primaryFailed ? primaryError : undefined,
+-                transactionId
++                transactionId,
++                completion
+               );
+               installed = true;
+             };
+@@ -3475,8 +3686,9 @@ export function getOrCreateInternalTransactionRuntime<T>(
+             } catch (error) {
+               // Physical commit precedes observer delivery. A delivery failure
+               // must not leave a successfully compensated turn retryable.
+-              installed ||=
+-                revision !== undefined && clock?.revision() !== revision;
++              installed ||= completion.selected
++                ? completion.committed
++                : revision !== undefined && clock?.revision() !== revision;
+               if (!installed) {
+                 const refusal =
+                   error instanceof SignalTreeRollbackError
+@@ -3500,6 +3712,8 @@ export function getOrCreateInternalTransactionRuntime<T>(
+               observerError = error;
+             }
+             lifecycle = 'rejected';
++            installedOperations.delete(transactionId);
++            expectedDispositions.delete(transactionId);
+             // Recorded at the transition (compensation installed), before the
+             // engine announcement; delivered after consequences are discarded.
+             retireLifecycleView(transactionId);
+diff --git a/packages/kernel/src/lib/entity-selection-lifetime.spec.ts b/packages/kernel/src/lib/entity-selection-lifetime.spec.ts
+new file mode 100644
+index 00000000..cc21c0af
+--- /dev/null
++++ b/packages/kernel/src/lib/entity-selection-lifetime.spec.ts
+@@ -0,0 +1,135 @@
++import { afterEach, describe, expect, it } from 'vitest';
++
++import { entityMap, signalTree, transactions } from '../index';
++import { NEUTRAL_LOCATION_RUNTIME } from './internals/location-runtime';
++
++const createTree = () =>
++  signalTree(
++    {
++      rows: entityMap<{ id: string; name: string }, string>({
++        selectId: (row) => row.id,
++      }),
++    },
++    { enhancers: [transactions()] }
++  );
++type Tree = ReturnType<typeof createTree>;
++const disposers: (() => void)[] = [];
++const setup = () => {
++  const tree = createTree();
++  disposers.push(() => tree.destroy());
++  tree.$.rows.addOne({ id: 'A', name: 'Original' });
++  tree.$.rows.addOne({ id: 'B', name: 'Other' });
++  tree.$.rows.setActiveId('A');
++  return tree;
++};
++const observeSelection = (tree: Tree) => {
++  const memo = NEUTRAL_LOCATION_RUNTIME.createDerived(() => ({
++    id: tree.$.rows.activeId(),
++    name: tree.$.rows.activeEntity()?.name,
++  }));
++  const seen = [memo()];
++  disposers.push(memo.subscribe(() => seen.push(memo())));
++  return { memo, seen };
++};
++afterEach(() => {
++  for (const dispose of disposers.splice(0).reverse()) dispose();
++});
++
++describe('entity active selection and lifetime dependencies', () => {
++  it('retains selection on removal, while clear explicitly clears selection', () => {
++    for (const operation of ['remove', 'clear'] as const) {
++      const tree = setup();
++      const held = tree.$.rows.byIdOrFail('A');
++      const { memo, seen } = observeSelection(tree);
++      expect(memo()).toEqual({ id: 'A', name: 'Original' });
++      if (operation === 'remove') tree.$.rows.removeOne('A');
++      else tree.$.rows.clear();
++      expect(held()).toBeUndefined();
++      expect(tree.$.rows.activeId()).toBe(
++        operation === 'remove' ? 'A' : undefined
++      );
++      expect(memo()).toEqual({
++        id: operation === 'remove' ? 'A' : undefined,
++        name: undefined,
++      });
++      expect(seen.length).toBeGreaterThan(1);
++      expect(seen.at(-1)).toEqual(memo());
++    }
++  });
++
++  it('publishes restoration of the selected lifetime after its absence was observed', () => {
++    const tree = setup();
++    const held = tree.$.rows.byIdOrFail('A');
++    const { memo, seen } = observeSelection(tree);
++    const pending = tree.transact(() => tree.$.rows.removeOne('A'));
++    expect(held()).toBeUndefined();
++    expect(memo()).toEqual({ id: 'A', name: undefined });
++    const before = seen.length;
++    pending.rollback();
++    expect(tree.$.rows.activeId()).toBe('A');
++    expect(held()?.name).toBe('Original');
++    expect(tree.$.rows.byId('A')).toBe(held);
++    expect(memo()).toEqual({ id: 'A', name: 'Original' });
++    expect(seen.length).toBeGreaterThan(before);
++    expect(seen.at(-1)).toEqual({ id: 'A', name: 'Original' });
++  });
++
++  it('keeps the held lifetime and selection through rekeying', () => {
++    const tree = setup();
++    const held = tree.$.rows.byIdOrFail('A');
++    const { memo, seen } = observeSelection(tree);
++    tree.$.rows.changeId('A', 'renamed');
++    expect(tree.$.rows.activeId()).toBe('renamed');
++    expect(tree.$.rows.byId('A')).toBeUndefined();
++    expect(tree.$.rows.byId('renamed')).toBe(held);
++    expect(held()?.name).toBe('Original');
++    expect(memo()).toEqual({ id: 'renamed', name: 'Original' });
++    expect(seen.at(-1)).toEqual(memo());
++    expect(seen.length).toBeGreaterThan(1);
++  });
++
++  it('resolves a selected key appearing later without retargeting a retired held node', () => {
++    const tree = setup();
++    const held = tree.$.rows.byIdOrFail('A');
++    const { memo, seen } = observeSelection(tree);
++    tree.$.rows.removeOne('A');
++    expect(memo()).toEqual({ id: 'A', name: undefined });
++    const before = seen.length;
++    tree.$.rows.addOne({ id: 'A', name: 'Replacement' });
++    expect(tree.$.rows.activeId()).toBe('A');
++    expect(held()).toBeUndefined();
++    expect(tree.$.rows.byId('A')).not.toBe(held);
++    expect(tree.$.rows.byId('A')?.()?.name).toBe('Replacement');
++    expect(memo()).toEqual({ id: 'A', name: 'Replacement' });
++    expect(seen.length).toBeGreaterThan(before);
++    expect(seen.at(-1)).toEqual(memo());
++  });
++
++  it('preserves newer outside selection while restoring an absent row', () => {
++    const tree = setup();
++    const held = tree.$.rows.byIdOrFail('A');
++    const { memo, seen } = observeSelection(tree);
++    const pending = tree.transact(() => tree.$.rows.removeOne('A'));
++    expect(memo()).toEqual({ id: 'A', name: undefined });
++    tree.$.rows.setActiveId('B');
++    expect(memo()).toEqual({ id: 'B', name: 'Other' });
++    pending.rollback();
++    expect(tree.$.rows.activeId()).toBe('B');
++    expect(held()?.name).toBe('Original');
++    expect(memo()).toEqual({ id: 'B', name: 'Other' });
++    expect(seen.at(-1)).toEqual({ id: 'B', name: 'Other' });
++    expect(seen).toContainEqual({ id: 'A', name: undefined });
++  });
++
++  it('tracks initial missing selection when that key first appears', () => {
++    const tree = setup();
++    tree.$.rows.setActiveId('missing');
++    const { memo, seen } = observeSelection(tree);
++    expect(memo()).toEqual({ id: 'missing', name: undefined });
++    tree.$.rows.addOne({ id: 'missing', name: 'Arrived' });
++    expect(tree.$.rows.activeId()).toBe('missing');
++    expect(memo()).toEqual({ id: 'missing', name: 'Arrived' });
++    expect(seen.length).toBeGreaterThan(1);
++    expect(seen.at(-1)).toEqual(memo());
++  });
++});
+diff --git a/packages/kernel/src/lib/entity-signal.ts b/packages/kernel/src/lib/entity-signal.ts
+index 30dc51f0..a0e67b87 100644
+--- a/packages/kernel/src/lib/entity-signal.ts
++++ b/packages/kernel/src/lib/entity-signal.ts
+@@ -491,6 +491,47 @@ export function createEntitySignal<
+     return new EntityMutationFrame(valueStore, structuralStore);
+   }
+ 
++  /** Existing-lifetime value plans: all reflection precedes physical installation. */
++  function preparePointValues(
++    values: readonly { subjectId: number; key: string | number; value: unknown }[]
++  ): { install(): void; invalidate(): void; publish(): void } {
++    const prepared = values.map(({ subjectId, key, value }) => {
++      if (structuralStore.activeKeyForSubject(subjectId) !== key) {
++        throw new Error('Point realization subject is no longer active at its key');
++      }
++      const before = valueStore.backingForSubject(subjectId);
++      const after = deepClone(value) as E;
++      return { subjectId, key: key as K, before, after,
++        changed: !deepEqual(before, after), epoch: subjectEpochs.get(subjectId) };
++    });
++    return {
++      install(): void {
++        for (const row of prepared) valueStore.retainSubjectValue(row.subjectId, row.after);
++      },
++      invalidate(): void {
++        let failed = false;
++        let firstError: unknown;
++        const stage = (fn: () => void) => { try { fn(); } catch (error) {
++          if (!failed) { failed = true; firstError = error; }
++        } };
++        for (const row of prepared) {
++          const epoch = row.epoch;
++          if (epoch) stage(() => advanceEpochHandle(epoch));
++        }
++        stage(() => updateSignals());
++        if (failed) throw firstError;
++      },
++      publish(): void {
++        for (const row of prepared) {
++          pathNotifier.notify(`${basePath}.${String(row.key)}`, row.after, row.before,
++            basePath, [row.subjectId], getPositionIdsForNotify(),
++            { ...(ambientMeta() ?? {}), intent: 'system', participation: 'realized' });
++          if (row.changed) emitTap('onUpdate', row.key, row.after, row.after);
++        }
++      },
++    };
++  }
++
+   function prepareTransitionTarget(target: CollectionTransitionTarget): {
+     install(): void;
+     publish(options?: { advancePhysicalRevision?: boolean }): void;
+@@ -547,10 +588,13 @@ export function createEntitySignal<
+     const preparedBySubject = new Map(
+       preparedSubjects.map((subject) => [subject.subjectId, subject])
+     );
++    // Selection is a current key choice, not rollback-owned row state. Follow
++    // an existing selected subject through a rekey, but preserve the selected
++    // key when that subject is absent or removed by this target.
+     const activeIdAfter =
+-      activeSubjectBefore === undefined
++      (activeSubjectBefore === undefined
+         ? undefined
+-        : preparedBySubject.get(activeSubjectBefore)?.key;
++        : preparedBySubject.get(activeSubjectBefore)?.key) ?? activeIdBefore;
+     const targetNeighborBySubject = new Map(
+       target.order.map((subjectId, index) => [
+         subjectId,
+@@ -585,6 +629,11 @@ export function createEntitySignal<
+         try {
+           structuralStore.installPreparedTarget(structuralTarget);
+           valueStore.installPreparedTargetValues(valueTarget);
++          // Selection belongs to the installed unit. Replay taps may author
++          // newer selections; publication must never overwrite those writes.
++          if (activeIdBefore !== activeIdAfter) {
++            replaceLocation(activeIdSignal, activeIdAfter);
++          }
+         } finally {
+           tap?.(MEMBERSHIP_CLOSE);
+         }
+@@ -600,6 +649,12 @@ export function createEntitySignal<
+               deriveLocation(publication.stateSignal, (value) => value + 1);
+             }
+           }
++        }
++        updateSignals();
++        if (options?.advancePhysicalRevision !== false) {
++          physicalCommitClock?.advance();
++        }
++        for (const publication of subjectChanges) {
+           const key = publication.afterKey ?? publication.beforeKey;
+           if (key === undefined) {
+             continue;
+@@ -635,9 +690,16 @@ export function createEntitySignal<
+             basePath,
+             [publication.subjectId],
+             getPositionIdsForNotify(),
+-            structuralEffect
+-              ? createStructuralEffectMeta(structuralEffect)
+-              : ambientMeta()
++            {
++              ...(structuralEffect
++                ? createStructuralEffectMeta(structuralEffect)
++                : ambientMeta()),
++              // Replay publishes retained storage too. Apply the same exposed
++              // path protocol as the ordinary realization adapter, without
++              // changing the ambient context of subsequent application taps.
++              intent: 'system',
++              participation: 'realized',
++            }
+           );
+           // Replay taps describe the change actually installed. A rekey has
+           // no lifecycle tap, matching changeId; unchanged rows stay silent.
+@@ -648,13 +710,6 @@ export function createEntitySignal<
+           else if (!kind && !deepEqual(beforeValue, afterValue))
+             emitTap('onUpdate', key, afterValue as E, afterValue as E);
+         }
+-        if (activeIdBefore !== activeIdAfter) {
+-          replaceLocation(activeIdSignal, activeIdAfter);
+-        }
+-        updateSignals();
+-        if (options?.advancePhysicalRevision !== false) {
+-          physicalCommitClock?.advance();
+-        }
+       },
+     };
+   }
+@@ -688,7 +743,35 @@ export function createEntitySignal<
+     frame: EntityMutationFrame<K, E>,
+     options?: { advancePhysicalRevision?: boolean }
+   ) {
+-    const result = frame.commit(committedEntityObserver());
++    const revision=physicalCommitClock?.revision();
++    const changes: Array<import('./internals/mutation-capture-runtime').CommittedEntityMutation> = [];
++    // Only fresh subjects need the pre-install tail. Preserve the sampling
++    // boundary before record cloning, using the existing constant-time index.
++    const hasFreshSubjects = frame.mutations.some(
++      (mutation) => mutation.kind === 'create-fresh-subject'
++    );
++    const tailKey = hasFreshSubjects ? structuralStore.lastActiveKey() : undefined;
++    let tail = tailKey === undefined
++      ? undefined
++      : structuralStore.subjectIdForKey(tailKey);
++    for (const m of frame.mutations) {
++      const key = 'key' in m ? m.key : structuralStore.activeKeyForSubject(m.subjectId);
++      const before = valueStore.backingForSubject(m.subjectId);
++      const path = `${basePath}.${String(key)}`;
++      if (m.kind === 'replace-value') changes.push({subject:m.subjectId,before,after:m.nextValue,structural:false,path});
++      else if (m.kind === 'create-fresh-subject') {
++        changes.push({subject:m.subjectId,before:undefined,after:m.nextValue,structural:true,path,structuralRecord:{kind:'add',subject:m.subjectId,key:m.key,value:deepClone(m.nextValue),beforeSubject:tail}});
++        tail=m.subjectId;
++      } else if (m.kind === 'tombstone-subject') {
++        const neighbors=getNeighborSubjects(m.key);
++        changes.push({subject:m.subjectId,before,after:undefined,structural:true,path,structuralRecord:{kind:'remove',subject:m.subjectId,key:m.key,value:deepClone(before),...neighbors}});
++      } else if(m.kind === 'transfer-key') {
++        changes.push({subject:m.subjectId,before,after:before,structural:true,path:`${basePath}.${String(m.fromKey)}`,structuralRecord:{kind:'rekey',subject:m.subjectId,beforeKey:m.fromKey,afterKey:m.toKey}});
++      }
++    }
++    const responsibility = changes.length ? mutationCaptureRuntime?.prepareEntityResponsibility?.({owner:getPositionIds()?.[0] as number,ownerPath:basePath,meta:ambientMeta(),changes}) : undefined;
++    if(physicalCommitClock?.revision()!==revision)throw new Error('Entity frame responsibility preparation reentered installation');
++    const result = frame.commit(committedEntityObserver(),responsibility);
+     if (options?.advancePhysicalRevision !== false) {
+       physicalCommitClock?.advance();
+     }
+@@ -1319,10 +1402,6 @@ export function createEntitySignal<
+     return subjectId;
+   }
+ 
+-  function commitFreshSubjects(ids: readonly K[]): number[] {
+-    return ids.map((id) => commitFreshSubject(id));
+-  }
+-
+   /**
+    * `UPDATEONE-FAST-0`. The single-subject form of `rememberSubjectIds`, which
+    * allocates twice for one id — once for the caller's `[id]` literal and once
+@@ -1367,7 +1446,18 @@ export function createEntitySignal<
+     const before = capture
+       ? valueStore.backingForSubject(subjectId)
+       : undefined;
++    const revision = physicalCommitClock?.revision();
++    const plan = mutationCaptureRuntime?.prepareEntityResponsibility?.({
++      owner: getPositionIds()?.[0] as number, ownerPath: basePath,
++      changes: [{subject: subjectId, before: valueStore.backingForSubject(subjectId), after: nextValue, structural: false, path: `${basePath}.${String(structuralStore.activeKeyForSubject(subjectId))}`} ],
++      meta: ambientMeta(),
++    });
++    if (physicalCommitClock?.revision() !== revision) throw new Error('Entity responsibility preparation reentered installation');
+     valueStore.retainSubjectValue(subjectId, nextValue);
++    if (plan) {
++      for (let i=0;i<plan.writes.length;i++) { const w=plan.writes[i]; w.map.set(w.key,w.value); }
++      for (let i=0;i<plan.adds.length;i++) { const a=plan.adds[i]; a.set.add(a.value); }
++    }
+     capture?.([
+       { subject: subjectId, before, after: nextValue, structural: false },
+     ]);
+@@ -1405,16 +1495,6 @@ export function createEntitySignal<
+       });
+   }
+ 
+-  function captureCommittedEntity(
+-    subject: number,
+-    before: unknown,
+-    after: unknown,
+-    structural: boolean
+-  ): void {
+-    const capture = committedEntityObserver();
+-    if (capture) capture([{ subject, before, after, structural }]);
+-  }
+-
+   function rememberSubjectIds(ids: K[]): number[] {
+     const resolved = ids.map((id) => allocateSubjectId(id));
+     lastSubjectIds = resolved;
+@@ -2751,6 +2831,10 @@ export function createEntitySignal<
+       const read = () => {
+         const id = activeIdSignal();
+         if (id === undefined) return undefined;
++        // A selection names a key even while no subject occupies it. Keep the
++        // membership edge only while absent; a present selection stays scoped
++        // to its subject, and dependency cleanup drops the old edge on reentry.
++        if (resolveSubjectId(id) === undefined) idsSignal();
+         return readEntityByKey(id);
+       };
+       if (taps.depth) return fresh(read);
+@@ -3474,9 +3558,11 @@ export function createEntitySignal<
+       membershipUnit?.(MEMBERSHIP_OPEN_ORDER);
+       const addedEntities: Array<{ id: K; entity: E; subjectId: number }> = [];
+       try {
+-        const freshSubjectIds = commitFreshSubjects(
+-          stagedAdds.map(({ id }) => id)
+-        );
++        const freshSubjectIds = structuralStore.planFreshSubjectIds(stagedAdds.length);
++        const frame=createEntityMutationFrame();
++        for(let i=0;i<stagedAdds.length;i++) frame.stageFreshSubject({kind:'create-fresh-subject',key:stagedAdds[i].id,subjectId:freshSubjectIds[i],nextValue:stagedAdds[i].entity});
++        for(const row of stagedUpdates) frame.stageValueReplacement({kind:'replace-value',key:row.id,subjectId:row.subjectId,nextValue:row.finalUpdated});
++        commitAndProjectEntityMutationFrame(frame);
+         const addedSubjectIdsByKey = new Map<K, number>();
+         for (let i = 0; i < stagedAdds.length; i++) {
+           addedSubjectIdsByKey.set(stagedAdds[i].id, freshSubjectIds[i]);
+@@ -3488,8 +3574,7 @@ export function createEntitySignal<
+           if (subjectId === undefined) {
+             throw new Error(`Entity with id ${String(id)} has no subject id`);
+           }
+-          valueStore.retainSubjectValue(subjectId, transformedEntity);
+-          captureCommittedEntity(subjectId, undefined, transformedEntity, true);
++
+           invalidateNodeCache(id);
+           syncEntitySignal(id);
+           addedEntities.push({ id, entity: transformedEntity, subjectId });
+@@ -3512,8 +3597,7 @@ export function createEntitySignal<
+         finalUpdated,
+         transformedChanges,
+       } of stagedUpdates) {
+-        valueStore.retainSubjectValue(subjectId, finalUpdated);
+-        captureCommittedEntity(subjectId, prev, finalUpdated, false);
++
+         syncEntitySignal(id);
+         updatedEntities.push({
+           id,
+@@ -3628,15 +3712,9 @@ export function createEntitySignal<
+       const membershipUnit = membershipTap;
+       membershipUnit?.(MEMBERSHIP_OPEN_ORDER);
+       try {
+-        for (const { id, subjectId, entity } of activeSubjects) {
+-          const currentState = resolveSubjectState(subjectId);
+-          structuralStore.tombstoneSubject(
+-            subjectId,
+-            id,
+-            currentState?.restoreAllowed ?? true
+-          );
+-          captureCommittedEntity(subjectId, entity, undefined, true);
+-        }
++        const frame=createEntityMutationFrame();
++        for (const {id,subjectId} of activeSubjects) frame.stageSubjectTombstone({kind:'tombstone-subject',key:id,subjectId,restoreAllowed:resolveSubjectState(subjectId)?.restoreAllowed ?? true});
++        commitAndProjectEntityMutationFrame(frame);
+       } finally {
+         // Observed once every row is tombstoned, before reactive publication.
+         membershipUnit?.(MEMBERSHIP_CLOSE);
+@@ -3804,12 +3882,12 @@ export function createEntitySignal<
+       // unit; a throw still closes it.
+       const membershipUnit = membershipTap;
+       membershipUnit?.(MEMBERSHIP_OPEN_ORDER);
+-      let addedSubjectIds: number[];
++      let addedSubjectIds: readonly number[];
+       let afterSubjects: number[];
+       const stagedRemovalStructuralEffects: PendingStructuralEffect[] = [];
+       try {
+         // Index-aligned with `stagedAdds`.
+-        addedSubjectIds = commitFreshSubjects(stagedAdds.map(({ id }) => id));
++        addedSubjectIds = structuralStore.planFreshSubjectIds(stagedAdds.length);
+         for (let k = 0; k < stagedAdds.length; k += 1) {
+           incomingSubjects[stagedAdds[k].index] = addedSubjectIds[k];
+         }
+@@ -3832,28 +3910,13 @@ export function createEntitySignal<
+           });
+         }
+ 
+-        for (const { id, subjectId, entity } of stagedRemovals) {
+-          tombstoneSubjectSignal(subjectId);
+-          const currentState = resolveSubjectState(subjectId);
+-          structuralStore.tombstoneSubject(
+-            subjectId,
+-            id,
+-            currentState?.restoreAllowed ?? true
+-          );
+-          captureCommittedEntity(subjectId, entity, undefined, true);
+-        }
+-
+-        for (const { subjectId, entity, prev } of stagedUpdates) {
+-          valueStore.retainSubjectValue(subjectId, entity);
+-          captureCommittedEntity(subjectId, prev, entity, false);
+-        }
+-
+-        for (let k = 0; k < stagedAdds.length; k += 1) {
+-          const { id, entity } = stagedAdds[k];
+-          valueStore.retainSubjectValue(addedSubjectIds[k], entity);
+-          captureCommittedEntity(addedSubjectIds[k], undefined, entity, true);
+-          syncEntitySignal(id);
+-        }
++        const frame=createEntityMutationFrame();
++        for (const {id,subjectId} of stagedRemovals) frame.stageSubjectTombstone({kind:'tombstone-subject',key:id,subjectId,restoreAllowed:resolveSubjectState(subjectId)?.restoreAllowed ?? true});
++        for (const {id,subjectId,entity} of stagedUpdates) frame.stageValueReplacement({kind:'replace-value',key:id,subjectId,nextValue:entity});
++        for(let k=0;k<stagedAdds.length;k++) frame.stageFreshSubject({kind:'create-fresh-subject',key:stagedAdds[k].id,subjectId:addedSubjectIds[k],nextValue:stagedAdds[k].entity});
++        commitAndProjectEntityMutationFrame(frame);
++        for(const {subjectId} of stagedRemovals) tombstoneSubjectSignal(subjectId);
++        for(const {id} of stagedAdds) syncEntitySignal(id);
+ 
+         for (const { id } of stagedUpdates) {
+           syncEntitySignal(id);
+@@ -4214,6 +4277,9 @@ export function createEntitySignal<
+     enumerable: false,
+     configurable: true,
+   });
++  Object.defineProperty(api, '__preparePointValues', {
++    value: preparePointValues, enumerable: false, configurable: true,
++  });
+   Object.defineProperty(api, '__planFreshAdd', {
+     value: planFreshAdd,
+     enumerable: false,
+diff --git a/packages/kernel/src/lib/internals/causal-runtime/pending-rollback.spec.ts b/packages/kernel/src/lib/internals/causal-runtime/pending-rollback.spec.ts
+index 86a2ff24..df957f75 100644
+--- a/packages/kernel/src/lib/internals/causal-runtime/pending-rollback.spec.ts
++++ b/packages/kernel/src/lib/internals/causal-runtime/pending-rollback.spec.ts
+@@ -24,6 +24,57 @@ const SUBJECT_DRIVER = 'driver-1';
+ const SUBJECT_DRIVER_TWO = 'driver-2';
+ 
+ describe('rollbackPendingTurnAt', () => {
++  it('restores both rekeyed lifetimes under one collection owner', () => {
++    const tree = signalTree({ rows: entityMap<{ id: string; value: number }>() }, {
++      enhancers: [transactions()],
++    });
++    try {
++      const rows = tree.$.rows;
++      rows.setAll([{ id: 'A', value: 10 }, { id: 'D', value: 20 }]);
++      const first = rows.byIdOrFail('A');
++      const second = rows.byIdOrFail('D');
++      const pending = tree.transact(() => {
++        rows.changeId('A', 'B');
++        rows.changeId('D', 'E');
++      });
++      expect(rows.ids()).toEqual(['B', 'E']);
++      pending.rollback();
++      expect(rows.ids()).toEqual(['A', 'D']);
++      expect(rows.byIdOrFail('A')).toBe(first);
++      expect(rows.byIdOrFail('D')).toBe(second);
++      expect(rows.byId('B')).toBeUndefined();
++      expect(rows.byId('E')).toBeUndefined();
++      expect(rows.all()).toEqual([{ id: 'A', value: 10 }, { id: 'D', value: 20 }]);
++      pending.rollback();
++      expect(rows.ids()).toEqual(['A', 'D']);
++    } finally {
++      tree.destroy();
++    }
++  });
++
++  it('keeps numeric and string subject identities distinct when rolling back rekeys', () => {
++    const { store, appliedTurns, topology } = createPendingRollbackContext();
++    const pending = store.admitPending({
++      id: 1,
++      effects: [
++        { path: 'profile', ownerPath: 'profile', owner: P_DRIVER_KEY, before: 'A', after: 'B', subjectId: 1, structural: 'rekey' },
++        { path: 'profile', ownerPath: 'profile', owner: P_DRIVER_KEY, before: 'D', after: 'E', subjectId: '1', structural: 'rekey' },
++      ],
++    });
++    const applyAtomically = vi.fn<(effects: readonly ReversalEffect[]) => void>();
++    expect(rollbackPendingTurnAt({
++      authority: P_ROOT, turnId: pending.id, store, topology,
++      port: { applyAtomically },
++      realizationContext: createRealizationContextSource({ store, appliedTurns }),
++    })).toEqual({ ok: true, turnId: pending.id });
++    expect(applyAtomically.mock.calls[0][0].map(effect => ({
++      subjectId: effect.subjectId, before: effect.before, after: effect.after,
++    }))).toEqual([
++      { subjectId: 1, before: 'B', after: 'A' },
++      { subjectId: '1', before: 'E', after: 'D' },
++    ]);
++  });
++
+   it('keeps distinct structural subjects in different owners independent', () => {
+     const { store, appliedTurns, topology } = createPendingRollbackContext();
+     const pending = store.admitPending({
+diff --git a/packages/kernel/src/lib/internals/causal-runtime/pending-rollback.ts b/packages/kernel/src/lib/internals/causal-runtime/pending-rollback.ts
+index fedde53d..678bfa53 100644
+--- a/packages/kernel/src/lib/internals/causal-runtime/pending-rollback.ts
++++ b/packages/kernel/src/lib/internals/causal-runtime/pending-rollback.ts
+@@ -261,6 +261,11 @@ function rollbackAddressKey(effect: CausalTurn['effects'][number]): string {
+   if (effect.plainBranchMembership !== undefined) {
+     return `${String(effect.owner)}\u0000membership`;
+   }
++  // Distinct lifetimes may rekey under the same collection owner in one turn.
++  // Owner-only deduplication drops every rekey after the first.
++  if (effect.structural === 'rekey' && effect.subjectId !== undefined) {
++    return JSON.stringify([effect.owner, effect.subjectId, 'rekey']);
++  }
+   if (effect.subjectFieldSegments !== undefined) {
+     return JSON.stringify([
+       effect.owner,
+diff --git a/packages/kernel/src/lib/internals/causal-runtime/target-transition.ts b/packages/kernel/src/lib/internals/causal-runtime/target-transition.ts
+index 00aca019..430ee15b 100644
+--- a/packages/kernel/src/lib/internals/causal-runtime/target-transition.ts
++++ b/packages/kernel/src/lib/internals/causal-runtime/target-transition.ts
+@@ -67,7 +67,8 @@ export function prepareDeclarativeTransitionInstallation(
+   target: DeclarativeTransitionTarget,
+   bindings: ReadonlyMap<PositionId, CollectionTransitionTargetBinding>,
+   scalarBinding?: ScalarTransitionTargetBinding,
+-  memberBinding?: PlainBranchMemberTransitionTargetBinding
++  memberBinding?: PlainBranchMemberTransitionTargetBinding,
++  completion?: { onCommitted(): void }
+ ): { install(): void } {
+   const prepared: PreparedCollectionTransitionTarget[] = [];
+   // ⚠️ MEMBERS FIRST, as the per-effect path installs them
+@@ -114,9 +115,14 @@ export function prepareDeclarativeTransitionInstallation(
+       for (const collection of prepared) {
+         collection.install();
+       }
++      completion?.onCommitted();
++      let failed = false;
++      let first: unknown;
+       for (const collection of prepared) {
+-        collection.publish();
++        try { collection.publish(); }
++        catch (error) { if (!failed) { failed = true; first = error; } }
+       }
++      if (failed) throw first;
+     },
+   };
+ }
+diff --git a/packages/kernel/src/lib/internals/causal-runtime/tree-realization-adapter.ts b/packages/kernel/src/lib/internals/causal-runtime/tree-realization-adapter.ts
+index 3ed22a77..a2fa202e 100644
+--- a/packages/kernel/src/lib/internals/causal-runtime/tree-realization-adapter.ts
++++ b/packages/kernel/src/lib/internals/causal-runtime/tree-realization-adapter.ts
+@@ -39,6 +39,9 @@ const TREE_REALIZATION_DESCRIPTORS = Symbol.for(
+ const TREE_REALIZATION_PORT = Symbol.for('SignalTree:TreeRealizationPort');
+ 
+ type CollectionNode = {
++  __preparePointValues?(values: readonly { subjectId: number; key: string | number; value: unknown }[]): {
++    install(): void; invalidate(): void; publish(): void;
++  };
+   byIdOrFail(id: string | number): unknown;
+   changeId(from: string | number, to: string | number): void;
+   removeOne(id: string | number): void;
+@@ -642,6 +645,137 @@ export function getTreeRealizationPort(
+   ];
+ }
+ 
++/**
++ * Point-only realization for scalar slots and existing entity lifetimes.
++ * The caller retains admission and the encompassing invalidation group.
++ * Undefined means the effects require the existing structural/member planner.
++ */
++export function preparePointRealization(
++  tree: ISignalTree<object>,
++  effects: readonly ReversalEffect[]
++): { install(): void; publish(): void } | undefined {
++  if (!effects.length ||
++      !effects.some(effect => typeof effect.subjectId === 'number')) return undefined;
++  const descriptors = getTreeRealizationDescriptors(tree.$);
++  const slots = getTreeScalarSlotRuntime(tree) ?? getTreeScalarSlotRuntime(tree.$);
++  const clock = getPhysicalCommitClock(tree.$) ?? getPhysicalCommitClock(tree);
++  if (!descriptors || !slots || !clock) return undefined;
++  const baseRevision = clock.revision();
++  const owners = indexStructuralOwnerPaths(tree.$);
++  const memberTargets = new Map<number, { present: boolean; value: unknown; turn?: number }>();
++  for (const effect of effects) if (effect.plainBranchMembership) {
++    memberTargets.delete(effect.owner);
++    memberTargets.set(effect.owner, { present: effect.plainBranchMembership.after, value: effect.after,
++      ...(effect.turn === undefined ? {} : { turn: effect.turn }) });
++  }
++  if (effects.some(effect => effect.structural)) {
++    const scalarEffects = effects.filter(effect => !effect.plainBranchMembership && !effect.structural && typeof effect.subjectId !== 'number');
++    const members = memberTargets.size ? preparePlainBranchMembers(tree.$, memberTargets, scalarEffects) : undefined;
++    const entityEffects = effects.filter(effect => !effect.plainBranchMembership && (!members || effect.structural || typeof effect.subjectId === 'number'));
++    const heterogeneous = planHeterogeneousFrame(tree, descriptors, owners, slots, clock, entityEffects);
++    if (!heterogeneous) return undefined;
++    if (clock.revision() !== baseRevision) throw new Error('Point realization preparation reentered installation');
++    let installed = false;
++    return {
++      install(): void {
++        if (installed || clock.revision() !== baseRevision) throw new Error('Point realization base revision is stale');
++        members?.install();
++        // Existing structural commits resolve anchors in their established order.
++        // The surrounding invalidation group defers native delivery until all install.
++        heterogeneous.install();
++        installed = true;
++      },
++      publish(): void {
++        if (!installed) throw new Error('Point realization published before installation');
++        let failed = false;
++        let firstError: unknown;
++        const run = (fn: () => void): void => { try { fn(); } catch (error) {
++          if (!failed) { failed = true; firstError = error; }
++        } };
++        run(() => heterogeneous.invalidate());
++        if (members) run(() => members.invalidate());
++        if (members) run(() => members.publish());
++        run(() => heterogeneous.publish());
++        if (failed) throw firstError;
++      },
++    };
++  }
++  const rows = new Map<CollectionNode, Map<number, { subjectId: number; key: string | number; value: unknown }>>();
++  const scalarEffects: ReversalEffect[] = [];
++  const frame = slots.beginFrame();
++  for (const effect of effects) {
++    if (effect.plainBranchMembership) continue;
++    if (typeof effect.subjectId !== 'number') {
++      if (effect.subjectFieldSegments !== undefined || hasInlineScopedAddress(effect) || hasInlineSubjectAddress(effect)) return undefined;
++      const slot = slots.resolveScalarSlot(effect.owner);
++      if (slot === undefined) return undefined;
++      frame.set(slot, effect.after);
++      scalarEffects.push(effect);
++      continue;
++    }
++    const descriptor = descriptors.get(effect.owner);
++    const collection = resolveCollectionNode(tree, descriptor, owners, effect);
++    if (!collection?.__preparePointValues) return undefined;
++    const key = collection.__findKeyBySubjectId?.(effect.subjectId);
++    if (key === undefined) return undefined;
++    let bySubject = rows.get(collection);
++    if (!bySubject) rows.set(collection, (bySubject = new Map()));
++    let row = bySubject.get(effect.subjectId);
++    if (!row) {
++      row = { subjectId: effect.subjectId, key, value: deepClone(snapshotCollectionEntityValue(collection, key)) };
++      bySubject.set(effect.subjectId, row);
++    }
++    const path = resolveSubjectFieldPath(descriptor, effect, getPositionRegistry(tree.$));
++    if (path === undefined) return undefined;
++    if (path.length === 0) row.value = effect.after;
++    else if (effect.fieldPresence?.after === false) row.value = withoutFieldAtSegments(row.value, path);
++    else assignPreparedSubjectValue(row.value, path, effect.after);
++  }
++  const members = memberTargets.size ? preparePlainBranchMembers(tree.$, memberTargets, scalarEffects) : undefined;
++  const collections = [...rows].map(([collection, subjects]) => {
++    const prepare = collection.__preparePointValues;
++    if (!prepare) throw new Error('Point realization preparation is unavailable');
++    return prepare.call(collection, [...subjects.values()]);
++  });
++  if (!frame.prepareCommit) return undefined;
++  const installScalars = members ? () => undefined : frame.prepareCommit({ advanceRevision: false, publish: false });
++  if (clock.revision() !== baseRevision) throw new Error('Point realization preparation reentered installation');
++  let result: ReturnType<typeof frame.commit> | undefined;
++  let installed = false;
++  return {
++    install(): void {
++      if (installed || clock.revision() !== baseRevision) throw new Error('Point realization base revision is stale');
++      if (members) members.install();
++      else result = installScalars();
++      for (const collection of collections) collection.install();
++      clock.advance();
++      installed = true;
++    },
++    publish(): void {
++      const installedScalars = result;
++      if (!installed || (!members && !installedScalars)) throw new Error('Point realization published before installation');
++      // Complete all owned invalidation staging before any path or replay callback.
++      let failed = false;
++      let firstError: unknown;
++      const run = (fn: () => void) => { try { fn(); } catch (error) { if (!failed) { failed = true; firstError = error; } } };
++      for (const collection of collections) run(() => collection.invalidate());
++      if (members) run(() => members.invalidate());
++      else if (installedScalars) run(() => slots.publishPrepared(installedScalars));
++      if (members) run(() => members.publish());
++      for (const collection of collections) run(() => collection.publish());
++      for (const effect of members ? [] : scalarEffects) run(() => {
++        const descriptor = descriptors.get(effect.owner);
++        const path = resolveNotifyPath(tree, descriptor, owners, effect);
++        if (path) getPathNotifier().notify(path, effect.after, effect.before,
++          descriptor?.ownerPath ?? path, undefined, [effect.owner],
++          { ...(getActiveWriteContext() ?? {}), intent: 'system', participation: 'realized' });
++      });
++      run(() => markOwnerInvalidatedFrom(tree as object));
++      if (failed) throw firstError;
++    },
++  };
++}
++
+ function planHeterogeneousFrame(
+   tree: ISignalTree<object>,
+   descriptors: ReadonlyMap<PositionId, TreeRealizationDescriptor>,
+@@ -649,7 +783,7 @@ function planHeterogeneousFrame(
+   scalarSlotRuntime: ReturnType<typeof getTreeScalarSlotRuntime>,
+   physicalCommitClock: ReturnType<typeof getPhysicalCommitClock>,
+   effects: readonly ReversalEffect[]
+-): { commit(): void } | undefined {
++): { commit(): void; install(): void; invalidate(): void; publish(): void } | undefined {
+   if (
+     effects.length === 0 ||
+     !effects.some(
+@@ -1019,8 +1153,8 @@ function planHeterogeneousFrame(
+     });
+   }
+ 
+-  return {
+-    commit(): void {
++  let scalarCommitResult: ReturnType<NonNullable<typeof scalarFrame>['commit']> | undefined;
++  const install = (): void => {
+       if (
+         scalarFrame &&
+         physicalCommitClock &&
+@@ -1029,8 +1163,7 @@ function planHeterogeneousFrame(
+         throw new Error('Heterogeneous realization base revision is stale.');
+       }
+ 
+-      const commitAndPublish = () => {
+-        const scalarCommitResult = scalarFrame?.commit({
++        scalarCommitResult = scalarFrame?.commit({
+           advanceRevision: false,
+           publish: false,
+         });
+@@ -1052,40 +1185,49 @@ function planHeterogeneousFrame(
+         }
+ 
+         physicalCommitClock?.advance();
++  };
++  const invalidate = (): void => {
+         if (scalarCommitResult && scalarSlotRuntime) {
+           scalarSlotRuntime.publishPrepared(scalarCommitResult);
+         }
++  };
++  const publish = (): void => {
++    let failed = false;
++    let firstError: unknown;
++    const run = (fn: () => void): void => { try { fn(); } catch (error) {
++      if (!failed) { failed = true; firstError = error; }
++    } };
+ 
+         for (const { plan } of plannedRemoves) {
+-          plan.publish({
++          run(() => plan.publish({
+             ...(getActiveWriteContext() ?? {}),
+             intent: 'system',
+             participation: 'realized',
+-          });
++          }));
+         }
+ 
+         for (const { plan } of plannedRestores) {
+-          plan.publish({
++          run(() => plan.publish({
+             ...(getActiveWriteContext() ?? {}),
+             intent: 'system',
+             participation: 'realized',
+-          });
++          }));
+         }
+ 
+         for (const { plan } of plannedFreshAdds) {
+-          plan.publish({
++          run(() => plan.publish({
+             ...(getActiveWriteContext() ?? {}),
+             intent: 'system',
+             participation: 'realized',
+-          });
++          }));
+         }
+ 
+         for (const { plan } of plannedRekeys) {
+-          plan.publish({
++          run(() => plan.publish({
+             ...(getActiveWriteContext() ?? {}),
+             intent: 'system',
+             participation: 'realized',
+-          });
++          }));
+         }
+ 
+         for (const effect of [
+@@ -1103,7 +1245,7 @@ function planHeterogeneousFrame(
+             continue;
+           }
+ 
+-          getPathNotifier().notify(
++          run(() => getPathNotifier().notify(
+             notifyPath,
+             effect.after,
+             effect.before,
+@@ -1117,20 +1259,19 @@ function planHeterogeneousFrame(
+               intent: 'system',
+               participation: 'realized',
+             }
+-          );
++          ));
+         }
+ 
+-        markOwnerInvalidatedFrom(tree as object);
+-      };
+-
++        run(() => markOwnerInvalidatedFrom(tree as object));
++        if (failed) throw firstError;  };
++  return {
++    install, invalidate, publish,
++    commit(): void {
++      const commitAndPublish = () => { install(); invalidate(); publish(); };
+       const locations = getLocationRuntime(tree.$);
+-      if (locations) {
+-        locations.runInvalidationGroup(commitAndPublish);
+-      } else if (scalarSlotRuntime) {
+-        scalarSlotRuntime.runInvalidationGroup(commitAndPublish);
+-      } else {
+-        commitAndPublish();
+-      }
++      if (locations) locations.runInvalidationGroup(commitAndPublish);
++      else if (scalarSlotRuntime) scalarSlotRuntime.runInvalidationGroup(commitAndPublish);
++      else commitAndPublish();
+     },
+   };
+ }
+diff --git a/packages/kernel/src/lib/internals/intercept-leaf-signals.ts b/packages/kernel/src/lib/internals/intercept-leaf-signals.ts
+index 3378186e..aa1d3dac 100644
+--- a/packages/kernel/src/lib/internals/intercept-leaf-signals.ts
++++ b/packages/kernel/src/lib/internals/intercept-leaf-signals.ts
+@@ -9,7 +9,7 @@ import {
+ } from './owned-metadata';
+ import { getActiveWriteContext } from '../write-context';
+ import { isWritableLocation } from './location-runtime';
+-import { observeIntrinsicMutations } from './intrinsic-mutation';
++import { prepareTerminalMutations, type TerminalRecordPlan, observeIntrinsicMutations } from './intrinsic-mutation';
+ 
+ import { visitTree } from './visit-tree';
+ 
+@@ -55,7 +55,7 @@ export function interceptLeafSignals(
+     subjectIds?: number[],
+     positionIds?: number[]
+   ) => void,
+-  options: { maxDepth?: number } = {}
++  options: { maxDepth?: number; beforePublication?: typeof onWrite; terminalRecord?: (...args: Parameters<typeof onWrite>) => TerminalRecordPlan | undefined } = {}
+ ): () => void {
+   const restorers: Array<() => void> = [];
+   const maxDepth = options.maxDepth ?? 32;
+@@ -139,9 +139,10 @@ export function interceptLeafSignals(
+   const observeLocation = (
+     node: object,
+     path: string,
+-    ownerPathOverride?: string
++    ownerPathOverride?: string,
++    normal = true
+   ): void => {
+-    const release = observeIntrinsicMutations(node, (mutation) => {
++    const release = normal ? observeIntrinsicMutations(node, (mutation) => {
+       if (!mutation.changed) return;
+       onWrite(
+         path,
+@@ -152,7 +153,31 @@ export function interceptLeafSignals(
+         getSubjectIds(node),
+         getPositionIds(node)
+       );
+-    });
++    }) : undefined;
++    const terminalRecord = options.terminalRecord;
++    if(terminalRecord){
++      const terminalRelease=prepareTerminalMutations(node,(mutation)=>{
++        if(!mutation.changed)return;
++        return terminalRecord.call(options,path,mutation.after,mutation.before,withMutationIntent(getActiveWriteContext(),mutation.intent),ownerPathOverride ?? getOwnerPath(node,path),getSubjectIds(node),getPositionIds(node));
++      });
++      if(terminalRelease)restorers.push(terminalRelease);
++    }
++    const beforePublication = options.beforePublication;
++    if (beforePublication) {
++    const captureRelease = observeIntrinsicMutations(node, (mutation) => {
++      if (!mutation.changed) return;
++      beforePublication.call(options,
++        path,
++        mutation.after,
++        mutation.before,
++        withMutationIntent(getActiveWriteContext(), mutation.intent),
++        ownerPathOverride ?? getOwnerPath(node, path),
++        getSubjectIds(node),
++        getPositionIds(node)
++      );
++    }, true);
++      if (captureRelease) restorers.push(captureRelease);
++    }
+     if (release) restorers.push(release);
+   };
+ 
+@@ -246,8 +271,8 @@ export function interceptLeafSignals(
+         if (path === '') return true;
+ 
+         if (isWritableLocation(node)) {
+-          if (!hasIntrinsicMutationEmitter(node)) {
+-            observeLocation(node as object, path);
++          if (!hasIntrinsicMutationEmitter(node) || options.beforePublication) {
++            observeLocation(node as object, path, undefined, !hasIntrinsicMutationEmitter(node));
+           }
+           return false;
+         }
+diff --git a/packages/kernel/src/lib/internals/intrinsic-mutation.ts b/packages/kernel/src/lib/internals/intrinsic-mutation.ts
+index 4c9f8345..0b6b7aa2 100644
+--- a/packages/kernel/src/lib/internals/intrinsic-mutation.ts
++++ b/packages/kernel/src/lib/internals/intrinsic-mutation.ts
+@@ -1,3 +1,8 @@
++export interface TerminalRecordPlan {
++  readonly writes: readonly { readonly map: Map<unknown,unknown>; readonly key: unknown; readonly value: unknown }[];
++  readonly adds: readonly { readonly set: Set<unknown>; readonly value: unknown }[];
++}
++type TerminalPreparer = (mutation: IntrinsicMutation<unknown>) => TerminalRecordPlan | undefined;
+ export interface IntrinsicMutation<T> {
+   readonly intent: 'replace' | 'derive';
+   readonly before: T;
+@@ -35,9 +40,15 @@ type IntrinsicMutationObserver<T> = (mutation: IntrinsicMutation<T>) => void;
+ export interface IntrinsicMutationSource<T> {
+   /** `undefined` exactly when nothing observes THIS source. */
+   observer: IntrinsicMutationObserver<T> | undefined;
++  readonly capture?: IntrinsicMutationObserver<T>;
++  readonly terminal?: IntrinsicMutationObserver<T>;
++  readonly prepareTerminal?: (mutation: IntrinsicMutation<T>) => TerminalRecordPlan | undefined;
+ }
+ 
+ interface SourceRecord {
++  captureRecord?: SourceRecord;
++  terminalRecord?: SourceRecord;
++  terminalPreparer?: TerminalPreparer;
+   /**
+    * Created on first `observeIntrinsicMutations`, not at registration.
+    *
+@@ -124,16 +135,21 @@ export function registerIntrinsicMutationSource<T = unknown>(
+   node: object
+ ): IntrinsicMutationSource<T> {
+   const record: SourceRecord = { observers: undefined, observer: undefined };
++  Object.defineProperty(record, 'prepareTerminal', {get: () => record.terminalPreparer});
++  Object.defineProperty(record, 'terminal', {get: () => record.terminalRecord?.observer});
++  Object.defineProperty(record, 'capture', {get: () => record.captureRecord?.observer});
+   SOURCES.set(node, record);
+   return record as IntrinsicMutationSource<T>;
+ }
+ 
+ export function observeIntrinsicMutations<T>(
+   node: object,
+-  observer: IntrinsicMutationObserver<T>
++  observer: IntrinsicMutationObserver<T>,
++  capture: boolean | 'terminal' = false
+ ): (() => void) | undefined {
+-  const record = SOURCES.get(node);
+-  if (!record) return undefined;
++  const source = SOURCES.get(node);
++  if (!source) return undefined;
++  const record = capture === 'terminal' ? (source.terminalRecord ??= {observers:undefined,observer:undefined}) : capture ? (source.captureRecord ??= {observers:undefined,observer:undefined}) : source;
+   const installed = observer as IntrinsicMutationObserver<unknown>;
+   (record.observers ??= new Set()).add(installed);
+   compose(record);
+@@ -158,3 +174,11 @@ export function getIntrinsicMutationObserver<T>(
+     | IntrinsicMutationObserver<T>
+     | undefined;
+ }
++
++// Internal single-owner preparation hook, never a post-install observer.
++export function prepareTerminalMutations(node: object, prepare: TerminalPreparer): (()=>void) | undefined {
++  const source=SOURCES.get(node); if(!source)return;
++  if(source.terminalPreparer)throw new Error('Terminal preparation already owned');
++  source.terminalPreparer=prepare;
++  return ()=>{if(source.terminalPreparer===prepare)source.terminalPreparer=undefined;};
++}
+diff --git a/packages/kernel/src/lib/internals/location-runtime.ts b/packages/kernel/src/lib/internals/location-runtime.ts
+index 30f4b6ce..238063b9 100644
+--- a/packages/kernel/src/lib/internals/location-runtime.ts
++++ b/packages/kernel/src/lib/internals/location-runtime.ts
+@@ -17,7 +17,7 @@ import {
+   PRODUCTION_SUBSTRATE_STATS_ENABLED,
+   recordProductionSubstrateStat,
+ } from './production-substrate-stats';
+-import { registerIntrinsicMutationSource } from './intrinsic-mutation';
++import { type TerminalRecordPlan, registerIntrinsicMutationSource } from './intrinsic-mutation';
+ 
+ interface DependencyConsumer {
+   readonly dependencies: Map<DependencyNode, DependencyEdge>;
+@@ -299,7 +299,7 @@ export interface LocationRuntime {
+      * value, so a reversal restores storage as it was (v16 8e).
+      */
+     read: (stored?: boolean) => T,
+-    write: (value: T, intent: 'replace' | 'derive') => boolean
++    write: (value: T, intent: 'replace' | 'derive', prepare?: () => TerminalRecordPlan | undefined) => boolean
+   ): WritableLocationBinding<T>;
+   createWritableProjection?<T>(
+     compute: () => T,
+@@ -408,7 +408,7 @@ export function createLocationRuntime(
+ 
+   const createWritable = <T>(
+     read: (stored?: boolean) => T,
+-    write: (value: T, intent: 'replace' | 'derive') => boolean
++    write: (value: T, intent: 'replace' | 'derive', prepare?: () => TerminalRecordPlan | undefined) => boolean
+   ): WritableLocationBinding<T> => {
+     let observationToken: ObservationToken | undefined;
+     const listeners = new Set<() => void>();
+@@ -447,7 +447,7 @@ export function createLocationRuntime(
+       replace: (next) => {
+         const observer = mutationSource2.observer;
+         const before = observer ? read(true) : undefined;
+-        const changed = write(next, 'replace');
++        const changed = write(next, 'replace',()=>mutationSource2.prepareTerminal?.({intent:'replace',before:before as T,after:next,changed:true}));
+         if (observer) {
+           observer({
+             intent: 'replace',
+@@ -464,7 +464,7 @@ export function createLocationRuntime(
+         const current = read();
+         const before = mutationSource2.observer ? read(true) : current;
+         const next = update(current);
+-        const changed = write(next, 'derive');
++        const changed = write(next, 'derive',()=>mutationSource2.prepareTerminal?.({intent:'derive',before,after:next,changed:true}));
+         const observer = mutationSource2.observer;
+         if (observer) {
+           observer({
+diff --git a/packages/kernel/src/lib/internals/mutation-capture-runtime.ts b/packages/kernel/src/lib/internals/mutation-capture-runtime.ts
+index 7190e3f5..109fd506 100644
+--- a/packages/kernel/src/lib/internals/mutation-capture-runtime.ts
++++ b/packages/kernel/src/lib/internals/mutation-capture-runtime.ts
+@@ -1,5 +1,7 @@
++import type { TerminalRecordPlan } from './intrinsic-mutation';
+ import { isTraversableNode } from '../utils';
+ import { reportContainedObserverError } from './error-reporter';
++import type { StructuralEffect } from '../mutation-types';
+ import type { WriteMetadata } from '../mutation-types';
+ 
+ export type CollectionOrderCapture = {
+@@ -26,6 +28,8 @@ export type CommittedEntityMutation = {
+   readonly after: unknown;
+   /** Membership/key changes claim the lifetime, rather than just value fields. */
+   readonly structural: boolean;
++  readonly path?: string;
++  readonly structuralRecord?: StructuralEffect;
+ };
+ 
+ export type CommittedEntityCapture = {
+@@ -40,6 +44,9 @@ export const MUTATION_CAPTURE_RUNTIME = Symbol.for(
+ );
+ 
+ export interface MutationCaptureRuntime {
++  prepareEntityResponsibility?: (
++    capture: CommittedEntityCapture
++  ) => TerminalRecordPlan | undefined;
+   /** Pay-for-use: producers build committed evidence only when this is true. */
+   hasCommittedEntityObservers?(): boolean;
+   publishCommittedEntity?(capture: CommittedEntityCapture): void;
+diff --git a/packages/kernel/src/lib/internals/native-tree-scalar-leaf-runtime.ts b/packages/kernel/src/lib/internals/native-tree-scalar-leaf-runtime.ts
+index edd5343f..0abb06e3 100644
+--- a/packages/kernel/src/lib/internals/native-tree-scalar-leaf-runtime.ts
++++ b/packages/kernel/src/lib/internals/native-tree-scalar-leaf-runtime.ts
+@@ -41,11 +41,17 @@ class NativeScalarSlotPublication {
+     if (PRODUCTION_SUBSTRATE_STATS_ENABLED) {
+       recordProductionSubstrateStat('publications', result.changedSlots.length);
+     }
+-    this.observation.runInvalidationGroup(() => {
+-      for (const slotIndex of result.changedSlots) {
+-        this.token(slotIndex).invalidate();
+-      }
+-    });
++    let failed = false;
++    let first: unknown;
++    try {
++      this.observation.runInvalidationGroup(() => {
++        for (const slotIndex of result.changedSlots) {
++          try { this.token(slotIndex).invalidate(); }
++          catch (error) { if (!failed) { failed = true; first = error; } }
++        }
++      });
++    } catch (error) { if (!failed) { failed = true; first = error; } }
++    if (failed) throw first;
+   }
+ 
+   publishSlot(result: {
+@@ -82,6 +88,15 @@ class NativeScalarSlotMutationFrame implements ScalarSlotMutationFrame {
+     this.frame.discard();
+   }
+ 
++  prepareCommit(options?: { advanceRevision?: boolean; publish?: boolean }): () => ScalarSlotCommitResult {
++    const install = this.frame.prepareCommit({advanceRevision:options?.advanceRevision});
++    return () => {
++      const result = install();
++      if (options?.publish !== false) this.publication.publish(result);
++      return result;
++    };
++  }
++
+   commit(options?: {
+     advanceRevision?: boolean;
+     publish?: boolean;
+@@ -159,59 +174,27 @@ function createNativeScalarLeaf<T>(
+     location: leaf,
+     notify: () => publication.publishSlot({ changed: true, slot: slotIndex }),
+     replace: (value) => {
+-      const observer = mutationSource.observer;
+-      const dormant = observer
+-        ? liveness.absence?.isAbsent(leaf) === true
+-        : false;
+-      // History records what storage held, even while the leaf is absent.
+-      const before = observer
+-        ? dormant
+-          ? kernel.readSlot<T>(slotIndex)
+-          : realized.peek()
+-        : undefined;
+-      // The authoritative commit primitive: no result object on the hot path.
+-      const changed = kernel.commitSlotValue(slotIndex, value);
+-      publishChanged(changed, { value });
+-      if (observer) {
+-        observer({
+-          intent: 'replace',
+-          before: before as T,
+-          after: changed || dormant ? value : (before as T),
+-          changed: changed || dormant,
+-        });
+-      }
++      const observer = mutationSource.observer, capture = mutationSource.capture;
++      const observing = observer || capture;
++      const dormant = observing ? liveness.absence?.isAbsent(leaf) === true : false;
++      const before = observing ? (dormant ? kernel.readSlot<T>(slotIndex) : realized.peek()) : undefined;
++      const changed = kernel.commitRecorded(slotIndex, value, () => mutationSource.prepareTerminal?.({intent:'replace',before:before as T,after:value,changed:true}));
++      const mutation = observing ? {intent:'replace' as const,before:before as T,after:changed || dormant ? value : before as T,changed:changed || dormant} : undefined;
++      if (mutation) capture?.(mutation);
++      publishChanged(changed, {value});
++      if (mutation) observer?.(mutation);
+     },
+     derive: (update) => {
+-      if (liveness.absence?.isAbsent(leaf)) {
+-        const stored = kernel.readSlot<T>(slotIndex);
+-        const next = update(undefined as T);
+-        const result = kernel.commitSlot(slotIndex, next);
+-        publishResult(result);
+-        mutationSource.observer?.({
+-          intent: 'derive',
+-          // What storage held: the updater saw the leaf's value, undefined.
+-          before: stored,
+-          after: kernel.readSlot<T>(slotIndex),
+-          // Membership changed even when the retained slot value did not.
+-          changed: true,
+-        });
+-        return;
+-      }
+-      const observer = mutationSource.observer;
+-      if (!observer) {
+-        publishResult(kernel.updateSlot(slotIndex, update));
+-        return;
+-      }
+-      const before = realized.peek();
+-      const next = update(before);
+-      const result = kernel.commitSlot(slotIndex, next);
++      const observer = mutationSource.observer, capture = mutationSource.capture;
++      const dormant = liveness.absence?.isAbsent(leaf) === true;
++      const before = dormant ? kernel.readSlot<T>(slotIndex) : realized.peek();
++      const next = update(dormant ? undefined as T : before);
++      const changed = kernel.commitRecorded(slotIndex,next,()=>mutationSource.prepareTerminal?.({intent:'derive',before,after:next,changed:true}));
++      const result = changed ? {revision:kernel.revision(),changed:true as const,slot:slotIndex} : {revision:kernel.revision(),changed:false as const};
++      const mutation = {intent:'derive' as const,before,after:result.changed || dormant ? next : before,changed:result.changed || dormant};
++      capture?.(mutation);
+       publishResult(result);
+-      observer({
+-        intent: 'derive',
+-        before,
+-        after: result.changed ? next : before,
+-        changed: result.changed,
+-      });
++      observer?.(mutation);
+     },
+   };
+   registerWritableLocationBinding(binding);
+diff --git a/packages/kernel/src/lib/internals/plain-branch-membership.ts b/packages/kernel/src/lib/internals/plain-branch-membership.ts
+index a9f3ac41..ba6cae21 100644
+--- a/packages/kernel/src/lib/internals/plain-branch-membership.ts
++++ b/packages/kernel/src/lib/internals/plain-branch-membership.ts
+@@ -862,10 +862,12 @@ export function preparePlainBranchMembers(
+       readonly value: unknown;
+       readonly turn?: number;
+     }
+-  >
++  >,
++  scalarTargets?: readonly { owner: number; after: unknown; turn?: number }[]
+ ): {
+   install(): void;
+   publish(): void;
++  invalidate(): void;
+   readonly staged: ReadonlyMap<number, number>;
+ } {
+   const registry = getPositionRegistry(root);
+@@ -989,16 +991,85 @@ export function preparePlainBranchMembers(
+   const staged = new Map<number, number>();
+   for (const { position, turn } of values.values())
+     if (turn !== undefined) staged.set(position, turn);
++  // Member values and scalar endpoints share one final frame. Preparing two
++  // frames independently can elide a scalar whose pre-member value is equal.
++  for (const target of scalarTargets ?? []) {
++    if (target.turn !== undefined && (staged.get(target.owner) ?? target.turn) > target.turn) continue;
++    const node = runtime.resolveScalarLeaf(target.owner);
++    if (!node) throw new Error('Plain branch scalar target is unavailable');
++    const { slot, position } = resolveSlot(node);
++    const previous = values.get(slot);
++    values.set(slot, { node, position,
++      before: previous ? previous.before : unwrapBranchForWriteCapture(node),
++      after: target.after, turn: target.turn });
++  }
+   const frame = runtime.beginFrame();
+   for (const [slot, value] of values) frame.set(slot, value.after);
++  const installFrame = scalarTargets === undefined
++    ? () => frame.commit({ advanceRevision: false, publish: false })
++    : frame.prepareCommit?.({ advanceRevision: false, publish: false });
++  if (!installFrame) throw new Error('Plain branch scalar frame cannot be prepared');
+   let result: ScalarSlotCommitResult | undefined;
++  let invalidated = false;
+   let published = false;
+   const changedSlots = new Set<number>();
+   const changedBranches = new Set<object>();
+   const changedBranchMembers: MemberAddress[] = [];
+   let changes: PlainBranchMembershipChange[] = [];
++  const captureChanges = (): void => {
++      const byBranch = new Map<object, PlainBranchMemberChange[]>();
++      for (const { address, present, before } of members.values()) {
++        if (before.present === present) continue;
++        let entries = byBranch.get(address.branch);
++        if (!entries) byBranch.set(address.branch, (entries = []));
++        entries.push({
++          key: address.key,
++          positionIds: getOwnedPositionIds(address.node),
++          before,
++          after: present
++            ? {
++                present: true,
++                value: unwrapBranchForWriteCapture(address.node),
++              }
++            : { present: false },
++        });
++      }
++      changes = [...byBranch].map(([branch, members]) => ({
++        kind: 'plain-branch-membership',
++        branch,
++        members,
++      }));
++  };
++  const invalidate = (): void => {
++    const installed = result;
++    if (!installed) throw new Error('Plain branch target invalidated before installation');
++    if (invalidated) return;
++    invalidated = true;
++    let failed = false;
++    let firstError: unknown;
++    const run = (fn: () => void): void => {
++      // Default callers retain their established stop-on-error behavior.
++      if (scalarTargets === undefined) { fn(); return; }
++      try { fn(); } catch (error) {
++        if (!failed) { failed = true; firstError = error; }
++      }
++    };
++    withWriteContext({ ...getActiveWriteContext(), intent: 'system', participation: 'realized' }, () => runtime.runInvalidationGroup(() => {
++      for (const branch of changedBranches) run(() => publishMembershipChange(branch));
++      for (const { branch, key, node } of changedBranchMembers) {
++        run(() => republishMembers(branch, [key]));
++        run(() => {
++          if (!Object.getOwnPropertyDescriptor(branch, key)?.enumerable) rememberHiddenRows(node);
++        });
++      }
++      run(() => runtime.publishPrepared({ revision: installed.revision, changedSlots: [...changedSlots] }));
++      if (failed) throw firstError;
++    }));
++  };
++
+   return {
+     staged,
++    invalidate,
+     install(): void {
+       if (result) return;
+       // Revalidate every retained handle before the first physical write.
+@@ -1014,7 +1085,7 @@ export function preparePlainBranchMembers(
+           );
+         }
+       }
+-      result = frame.commit({ advanceRevision: false, publish: false });
++      result = installFrame();
+       for (const slot of result.changedSlots) changedSlots.add(slot);
+       for (const { address, present } of members.values()) {
+         if (
+@@ -1030,28 +1101,7 @@ export function preparePlainBranchMembers(
+           else changedBranchMembers.push(address);
+         }
+       }
+-      const byBranch = new Map<object, PlainBranchMemberChange[]>();
+-      for (const { address, present, before } of members.values()) {
+-        if (before.present === present) continue;
+-        let entries = byBranch.get(address.branch);
+-        if (!entries) byBranch.set(address.branch, (entries = []));
+-        entries.push({
+-          key: address.key,
+-          positionIds: getOwnedPositionIds(address.node),
+-          before,
+-          after: present
+-            ? {
+-                present: true,
+-                value: unwrapBranchForWriteCapture(address.node),
+-              }
+-            : { present: false },
+-        });
+-      }
+-      changes = [...byBranch].map(([branch, members]) => ({
+-        kind: 'plain-branch-membership',
+-        branch,
+-        members,
+-      }));
++      if (scalarTargets === undefined) captureChanges();
+     },
+     publish(): void {
+       const installed = result;
+@@ -1065,20 +1115,8 @@ export function preparePlainBranchMembers(
+         participation: 'realized',
+       };
+       withWriteContext(meta, () => {
+-        runtime.runInvalidationGroup(() => {
+-          for (const branch of changedBranches) publishMembershipChange(branch);
+-          // What a branch member's presence changes below it (v16 8d).
+-          for (const { branch, key, node } of changedBranchMembers) {
+-            republishMembers(branch, [key]);
+-            // Every participant is installed: these are the rows it keeps.
+-            if (!Object.getOwnPropertyDescriptor(branch, key)?.enumerable)
+-              rememberHiddenRows(node);
+-          }
+-          runtime.publishPrepared({
+-            revision: installed.revision,
+-            changedSlots: [...changedSlots],
+-          });
+-        });
++        invalidate();
++        if (scalarTargets !== undefined) captureChanges();
+         for (const [slot, value] of values) {
+           if (!installed.changedSlots.includes(slot)) continue;
+           const path = getOwnedOwnerPath(value.node);
+diff --git a/packages/kernel/src/lib/internals/tree-scalar-leaf-runtime.ts b/packages/kernel/src/lib/internals/tree-scalar-leaf-runtime.ts
+index 672f67cb..f8ab862d 100644
+--- a/packages/kernel/src/lib/internals/tree-scalar-leaf-runtime.ts
++++ b/packages/kernel/src/lib/internals/tree-scalar-leaf-runtime.ts
+@@ -91,6 +91,15 @@ class ScalarSlotMutationFrameOrchestrator implements ScalarSlotMutationFrame {
+     this.frame.discard();
+   }
+ 
++  prepareCommit(options?: { advanceRevision?: boolean; publish?: boolean }): () => ScalarSlotCommitResult {
++    const install = this.frame.prepareCommit({ advanceRevision: options?.advanceRevision });
++    return () => {
++      const result = install();
++      if (options?.publish !== false) this.publication.publish(result);
++      return result;
++    };
++  }
++
+   commit(options?: {
+     advanceRevision?: boolean;
+     publish?: boolean;
+@@ -127,8 +136,9 @@ function createScalarLeaf<T>(
+ 
+     return kernel.readSlot<T>(slotIndex);
+   };
+-  const binding = locations.createWritable(read, (value) => {
+-    const result = kernel.commitSlot(slotIndex, value);
++  const binding = locations.createWritable(read, (value, _intent, prepare) => {
++    const changedValue = kernel.commitRecorded(slotIndex, value, prepare);
++    const result = {changed:changedValue};
+     const reAdded = liveness.absence?.reAdd(holder.leaf) === true;
+     const changed = publication.prepareSlot(slotIndex, result.changed, reAdded);
+     return changed;
+diff --git a/packages/kernel/src/lib/internals/tree-scalar-slot-port.ts b/packages/kernel/src/lib/internals/tree-scalar-slot-port.ts
+index af05633f..9c290040 100644
+--- a/packages/kernel/src/lib/internals/tree-scalar-slot-port.ts
++++ b/packages/kernel/src/lib/internals/tree-scalar-slot-port.ts
+@@ -25,6 +25,7 @@ export interface ScalarSlotMutationFrame {
+   set(slotIndex: SlotIndex, value: unknown): void;
+   update(slotIndex: SlotIndex, updater: (value: unknown) => unknown): void;
+   discard(): void;
++  prepareCommit?(options?: { advanceRevision?: boolean; publish?: boolean }): () => ScalarSlotCommitResult;
+   commit(options?: {
+     advanceRevision?: boolean;
+     publish?: boolean;
+diff --git a/packages/kernel/src/lib/internals/tree-scalar-slot-runtime.ts b/packages/kernel/src/lib/internals/tree-scalar-slot-runtime.ts
+index e4e2f9ed..9c2055b4 100644
+--- a/packages/kernel/src/lib/internals/tree-scalar-slot-runtime.ts
++++ b/packages/kernel/src/lib/internals/tree-scalar-slot-runtime.ts
+@@ -1,3 +1,4 @@
++import type { TerminalRecordPlan } from './intrinsic-mutation';
+ import type { PositionId } from '../mutation-types';
+ import type { PhysicalCommitClock } from './physical-commit-clock';
+ 
+@@ -29,10 +30,12 @@ export interface ScalarSlotMutationFrame {
+   set(slotIndex: SlotIndex, value: unknown): void;
+   update(slotIndex: SlotIndex, updater: (value: unknown) => unknown): void;
+   discard(): void;
++  prepareCommit(options?: { advanceRevision?: boolean }): () => ScalarSlotCommitResult;
+   commit(options?: { advanceRevision?: boolean }): ScalarSlotCommitResult;
+ }
+ 
+ export interface TreeScalarSlotRuntime {
++  commitRecorded<T>(slotIndex: SlotIndex, value: T, prepare?: () => TerminalRecordPlan | undefined): boolean;
+   createSlot<T>(
+     initialValue: T,
+     equal: (current: T, next: T) => boolean,
+@@ -74,7 +77,8 @@ class ScalarSlotMutationFrameImpl implements ScalarSlotMutationFrame {
+       staged: ReadonlyMap<SlotIndex, unknown>,
+       options?: { advanceRevision?: boolean }
+     ) => ScalarSlotCommitResult,
+-    private readonly assertSlotIndex: (slotIndex: SlotIndex) => void
++    private readonly assertSlotIndex: (slotIndex: SlotIndex) => void,
++    private readonly prepareValues: (staged: ReadonlyMap<SlotIndex, unknown>, options?: { advanceRevision?: boolean }) => () => ScalarSlotCommitResult
+   ) {}
+ 
+   set(slotIndex: SlotIndex, value: unknown): void {
+@@ -98,6 +102,13 @@ class ScalarSlotMutationFrameImpl implements ScalarSlotMutationFrame {
+     this.staged.clear();
+   }
+ 
++  prepareCommit(options?: { advanceRevision?: boolean }): () => ScalarSlotCommitResult {
++    this.assertOpen();
++    this.closed = true;
++    if (this.getCommittedRevision() !== this.baseRevision) throw new Error('Stale scalar preparation');
++    return this.prepareValues(this.staged, options);
++  }
++
+   commit(options?: { advanceRevision?: boolean }): ScalarSlotCommitResult {
+     this.assertOpen();
+     this.closed = true;
+@@ -154,6 +165,37 @@ export function createTreeScalarSlotRuntime(
+     }
+   };
+ 
++  // Research-only preparation: run equality before any target installs.
++  const prepareSlots = (staged: ReadonlyMap<SlotIndex, unknown>, options?: { advanceRevision?: boolean }): (() => ScalarSlotCommitResult) => {
++    const base = getCommittedRevision();
++    const changed: Array<{ slotIndex: SlotIndex; nextValue: unknown }> = [];
++    for (const [slotIndex, nextValue] of staged) {
++      assertSlotIndex(slotIndex);
++      if (PRODUCTION_SUBSTRATE_STATS_ENABLED) {
++        recordProductionSubstrateStat('equalityChecks');
++      }
++      if (!equalities[slotIndex](values[slotIndex], nextValue)) changed.push({slotIndex, nextValue});
++    }
++    if (getCommittedRevision() !== base) throw new Error('Reentrant scalar preparation');
++    let used = false;
++    return () => {
++      if (used) throw new Error('Prepared scalar commit already used');
++      if (getCommittedRevision() !== base) throw new Error('Stale prepared scalar commit');
++      used = true;
++      for (const {slotIndex,nextValue} of changed) {
++        values[slotIndex] = nextValue;
++        if (PRODUCTION_SUBSTRATE_STATS_ENABLED) {
++          recordProductionSubstrateStat('slotWrites');
++        }
++      }
++      const revision = changed.length && options?.advanceRevision !== false ? advanceRevision() : getCommittedRevision();
++      if (changed.length && options?.advanceRevision !== false && PRODUCTION_SUBSTRATE_STATS_ENABLED) {
++        recordProductionSubstrateStat('revisionIncrements');
++      }
++      return {revision,changedSlots:changed.map(x=>x.slotIndex)};
++    };
++  };
++
+   const commitSlots = (
+     staged: ReadonlyMap<SlotIndex, unknown>,
+     options?: { advanceRevision?: boolean }
+@@ -269,6 +311,33 @@ export function createTreeScalarSlotRuntime(
+       }
+       return values[slotIndex] as T;
+     },
++    commitRecorded<T>(slotIndex: SlotIndex, value: T, prepare?: () => TerminalRecordPlan | undefined): boolean {
++      assertSlotIndex(slotIndex);
++      const base=getCommittedRevision();
++      if (PRODUCTION_SUBSTRATE_STATS_ENABLED) {
++        recordProductionSubstrateStat('equalityChecks');
++      }
++      const equal=equalities[slotIndex](values[slotIndex],value);
++      if(getCommittedRevision()!==base)throw new Error('Scalar equality reentered physical installation');
++      if(equal)return false;
++      const plan=prepare?.();
++      if(getCommittedRevision()!==base)throw new Error('Terminal preparation reentered physical installation');
++      // Prepared internal data only below. No returned closure, value reflection,
++      // equality, observer, or record sink between value and evidence installation.
++      values[slotIndex]=value;
++      if (PRODUCTION_SUBSTRATE_STATS_ENABLED) {
++        recordProductionSubstrateStat('slotWrites');
++      }
++      if(plan){
++        for(let i=0;i<plan.writes.length;i++){const w=plan.writes[i];w.map.set(w.key,w.value);}
++        for(let i=0;i<plan.adds.length;i++){const a=plan.adds[i];a.set.add(a.value);}
++      }
++      advanceRevision();
++      if (PRODUCTION_SUBSTRATE_STATS_ENABLED) {
++        recordProductionSubstrateStat('revisionIncrements');
++      }
++      return true;
++    },
+     commitSlot<T>(slotIndex: SlotIndex, value: T): SingleSlotCommitResult {
+       return commitSlot(slotIndex, value);
+     },
+@@ -288,7 +357,8 @@ export function createTreeScalarSlotRuntime(
+         getCommittedRevision,
+         (slotIndex) => values[slotIndex],
+         commitSlots,
+-        assertSlotIndex
++        assertSlotIndex,
++        prepareSlots
+       );
+     },
+     resolveScalarSlot(positionId: PositionId): SlotIndex | undefined {
+diff --git a/packages/kernel/src/lib/physical/entity-mutation-frame.ts b/packages/kernel/src/lib/physical/entity-mutation-frame.ts
+index 65997235..f1645961 100644
+--- a/packages/kernel/src/lib/physical/entity-mutation-frame.ts
++++ b/packages/kernel/src/lib/physical/entity-mutation-frame.ts
+@@ -1,3 +1,4 @@
++import type { TerminalRecordPlan } from '../internals/intrinsic-mutation';
+ import type { CommittedEntityMutation } from '../internals/mutation-capture-runtime';
+ import { EntityValueStore } from './entity-value-store';
+ import {
+@@ -153,7 +154,8 @@ export class EntityMutationFrame<
+    * preparation failure throws before anything applies or is reported.
+    */
+   commit(
+-    observeCommitted?: (changes: readonly CommittedEntityMutation[]) => void
++    observeCommitted?: (changes: readonly CommittedEntityMutation[]) => void,
++    responsibility?: TerminalRecordPlan
+   ): EntityMutationCommitResult {
+     const preparedMutations = this.prepareCommitInstructions();
+     // Before-images of touched lifetimes only. An inactive lifetime's retained
+@@ -250,6 +252,10 @@ export class EntityMutationFrame<
+       physicallyChangedSubjectIds.add(mutation.subjectId);
+     }
+ 
++    if (responsibility) {
++      for(let i=0;i<responsibility.writes.length;i++){const w=responsibility.writes[i];w.map.set(w.key,w.value);}
++      for(let i=0;i<responsibility.adds.length;i++){const a=responsibility.adds[i];a.set.add(a.value);}
++    }
+     if (before && observeCommitted) {
+       observeCommitted(
+         [...before].map(([subject, entry]) => ({
+diff --git a/packages/kernel/src/transaction-realization-contract.ts b/packages/kernel/src/transaction-realization-contract.ts
+index 566b604d..979a3f6f 100644
+--- a/packages/kernel/src/transaction-realization-contract.ts
++++ b/packages/kernel/src/transaction-realization-contract.ts
+@@ -2,6 +2,13 @@ import { expect, it } from 'vitest';
+ 
+ import type { PendingTransaction } from './enhancers/transactions/transactions.types';
+ 
++function required<T>(value: T | null | undefined): T {
++  if (value === undefined || value === null) {
++    throw new Error('Missing required test value');
++  }
++  return value;
++}
++
+ /**
+  * PROPOSAL-REALIZATION-CONFORMANCE — PROPOSAL-0 Phase B.
+  *
+@@ -43,6 +50,34 @@ export type Observation<T> = {
+   dispose(): void;
+ };
+ 
++export type ValuePublicationFrame = {
++  readonly phase: string;
++  readonly scalar: number;
++  readonly row: string | undefined;
++  readonly all: string | undefined;
++};
++
++export type EntityProjectionSnapshot = {
++  all: string[];
++  ids: string[];
++  count: number;
++  empty: boolean;
++  map: string[];
++  hasA: boolean;
++  where: string[];
++  find: string | null;
++  slice: string[];
++  activeId: string | null;
++  activeEntity: string | null;
++  row: string | null;
++  field: string | null;
++};
++export type EntityProjectionFrame = {
++  phase: string;
++  scalar: number;
++  projections: EntityProjectionSnapshot | null;
++};
++
+ export type MixedFrame = {
+   readonly scalar: number;
+   readonly ids: readonly string[];
+@@ -82,6 +117,20 @@ export type TransactionRealizationHooks<Tree> = {
+    */
+   observeMixed(tree: Tree): Observation<MixedFrame>;
+ 
++  /** Record when the native observer executes, not when its values are delivered. */
++  observeValues(
++    tree: Tree,
++    phase: () => string
++  ): readonly Observation<ValuePublicationFrame>[];
++
++  selectRow(tree: Tree, id: string | undefined): void;
++  rekeyRow(tree: Tree, from: string, to: string): void;
++  observeProjections(
++    tree: Tree,
++    phase: () => string,
++    enabled: () => boolean
++  ): readonly Observation<EntityProjectionFrame>[];
++
+   /** Let this framework's scheduler run to quiescence. */
+   flush(): Promise<void>;
+ };
+@@ -200,6 +249,325 @@ export function transactionRealizationContract<Tree>(
+     dispose();
+   });
+ 
++  it('4c coherent value settlement — own collection reads agree in native observers', async () => {
++    const { tree, dispose } = hooks.createStore();
++    let phase = 'setup';
++    hooks.addRow(tree, { id: 'A', name: 'Original' });
++    await hooks.flush();
++    const observations = hooks.observeValues(tree, () => phase);
++    try {
++      await hooks.flush();
++      phase = 'authoring';
++      const pending = hooks.transact(tree, () => {
++        hooks.writeScalar(tree, 7);
++        hooks.realizeRowName(tree, 'A', 'Proposed');
++      });
++      phase = 'speculative-delivery';
++      await hooks.flush();
++      for (const observed of observations) {
++        expect(observed.current()).toMatchObject({
++          scalar: 7,
++          row: 'Proposed',
++          all: 'Proposed',
++        });
++      }
++
++      phase = 'inside-rollback';
++      pending.rollback();
++      phase = 'after-rollback';
++      await hooks.flush();
++      for (const observed of observations) {
++        const settlement = observed.seen.filter(
++          (frame) =>
++            frame.phase === 'inside-rollback' ||
++            frame.phase === 'after-rollback'
++        );
++        // A silent observer cannot satisfy coherent publication vacuously.
++        expect(settlement.length).toBeGreaterThan(0);
++        for (const frame of settlement) {
++          expect(frame, JSON.stringify(observed.seen)).toMatchObject({
++            scalar: 0,
++            row: 'Original',
++            all: 'Original',
++          });
++        }
++        expect(observed.current()).toMatchObject({
++          scalar: 0,
++          row: 'Original',
++          all: 'Original',
++        });
++      }
++      // No native computed freshness is required inside the authored group.
++      // L13 applies to publication of the completed settlement's own reads.
++    } finally {
++      for (const observed of observations) observed.dispose();
++      dispose();
++    }
++  });
++
++  for (const operation of ['add', 'remove', 'field'] as const) {
++    for (const primed of [true, false]) {
++      it(`4d owned projection settlement — ${operation}, ${
++        primed ? 'primed' : 'first read during delivery'
++      }`, async () => {
++        const { tree, dispose } = hooks.createStore();
++        let phase = 'setup';
++        if (operation !== 'add')
++          hooks.addRow(tree, { id: 'A', name: 'Original' });
++        hooks.selectRow(tree, 'A');
++        await hooks.flush();
++        const observations = hooks.observeProjections(
++          tree,
++          () => phase,
++          () =>
++            primed ||
++            phase === 'inside-rollback' ||
++            phase === 'after-rollback' ||
++            phase === 'selection'
++        );
++        const snapshot = (
++          present: boolean,
++          selected: boolean
++        ): EntityProjectionSnapshot => ({
++          all: present ? ['A:Original'] : [],
++          ids: present ? ['A'] : [],
++          count: present ? 1 : 0,
++          empty: !present,
++          map: present ? ['A:Original'] : [],
++          hasA: present,
++          where: present ? ['A:Original'] : [],
++          find: present ? 'A:Original' : null,
++          slice: present ? ['Original'] : [],
++          activeId: selected ? 'A' : null,
++          activeEntity: present && selected ? 'A:Original' : null,
++          row: present ? 'Original' : null,
++          field: present ? 'Original' : null,
++        });
++        try {
++          await hooks.flush();
++          for (const observed of observations) {
++            expect(observed.current().scalar).toBe(0);
++            expect(observed.current().projections).toEqual(
++              primed ? snapshot(operation !== 'add', true) : null
++            );
++          }
++          phase = 'authoring';
++          const pending = hooks.transact(tree, () => {
++            hooks.writeScalar(tree, 7);
++            if (operation === 'add')
++              hooks.addRow(tree, { id: 'A', name: 'Proposed' });
++            else if (operation === 'remove') hooks.removeRow(tree, 'A');
++            else hooks.realizeRowName(tree, 'A', 'Proposed');
++          });
++          phase = 'speculative-delivery';
++          await hooks.flush();
++          for (const observed of observations)
++            expect(observed.current().scalar).toBe(7);
++          phase = 'inside-rollback';
++          pending.rollback();
++          phase = 'after-rollback';
++          await hooks.flush();
++          for (const observed of observations) {
++            const delivered = observed.seen.filter(
++              (frame) =>
++                frame.phase === 'inside-rollback' ||
++                frame.phase === 'after-rollback'
++            );
++            expect(delivered.length).toBeGreaterThan(0);
++            for (const frame of delivered) {
++              expect(frame.scalar).toBe(0);
++              expect(frame.projections, JSON.stringify(observed.seen)).toEqual(
++                snapshot(operation !== 'add', true)
++              );
++            }
++          }
++          phase = 'selection';
++          hooks.selectRow(tree, undefined);
++          await hooks.flush();
++          for (const observed of observations) {
++            const delivered = observed.seen.filter(
++              (frame) => frame.phase === 'selection'
++            );
++            expect(delivered.length).toBeGreaterThan(0);
++            for (const frame of delivered)
++              expect(frame.projections).toEqual(
++                snapshot(operation !== 'add', false)
++              );
++          }
++        } finally {
++          for (const observed of observations) observed.dispose();
++          dispose();
++        }
++      });
++    }
++  }
++
++  for (const scenario of [
++    'initial absence',
++    'same lifetime restoration',
++    'new lifetime at reused key',
++    'selection while absent',
++    'selected rekey',
++    'unrelated writes and disposal',
++  ] as const) {
++    for (const primed of [true, false]) {
++      it(`4e selection lifetime projections — ${scenario}, ${
++        primed ? 'primed' : 'first read after change'
++      }`, async () => {
++        const { tree, dispose } = hooks.createStore();
++        const startsPresent =
++          scenario !== 'initial absence' &&
++          scenario !== 'selection while absent';
++        if (startsPresent) hooks.addRow(tree, { id: 'A', name: 'Original' });
++        hooks.selectRow(tree, 'A');
++        await hooks.flush();
++        let phase = 'setup';
++        let scalar = 0;
++        const observations = hooks.observeProjections(
++          tree,
++          () => phase,
++          () => primed || phase !== 'setup'
++        );
++        const held = startsPresent ? hooks.holdEntity(tree, 'A') : undefined;
++        type Entry = { key: string; id: string; name: string };
++        const original: Entry = { key: 'A', id: 'A', name: 'Original' };
++        const expected = (
++          entries: Entry[],
++          selected: string
++        ): EntityProjectionSnapshot => {
++          const encode = (entry: Entry | undefined) =>
++            entry ? `${entry.id}:${entry.name}` : null;
++          const rowA = entries.find((entry) => entry.key === 'A');
++          const matches = entries.filter((entry) => entry.id === 'A');
++          return {
++            all: entries.map((entry) => `${entry.id}:${entry.name}`),
++            ids: entries.map((entry) => entry.key),
++            count: entries.length,
++            empty: entries.length === 0,
++            map: entries.map((entry) => `${entry.key}:${entry.name}`),
++            hasA: rowA !== undefined,
++            where: matches.map((entry) => `${entry.id}:${entry.name}`),
++            find: encode(matches[0]),
++            slice: entries.map((entry) => entry.name),
++            activeId: selected,
++            activeEntity: encode(
++              entries.find((entry) => entry.key === selected)
++            ),
++            row: rowA?.name ?? null,
++            field: rowA?.name ?? null,
++          };
++        };
++        const check = async (entries: Entry[], selected = 'A') => {
++          await hooks.flush();
++          for (const observed of observations) {
++            const delivered = observed.seen.filter(
++              (frame) => frame.phase === phase
++            );
++            expect(delivered.length).toBeGreaterThan(0);
++            for (const frame of delivered) {
++              expect(frame.scalar, JSON.stringify(observed.seen)).toBe(scalar);
++              expect(frame.projections, JSON.stringify(observed.seen)).toEqual(
++                expected(entries, selected)
++              );
++            }
++            expect(observed.current().scalar).toBe(scalar);
++            expect(observed.current().projections).toEqual(
++              expected(entries, selected)
++            );
++          }
++        };
++        const change = (name: string, action: () => void) => {
++          phase = name;
++          const pending = hooks.transact(tree, () => {
++            hooks.writeScalar(tree, ++scalar);
++            action();
++          });
++          pending.confirm();
++        };
++        try {
++          await hooks.flush();
++          for (const observed of observations)
++            expect(observed.current().projections).toEqual(
++              primed ? expected(startsPresent ? [original] : [], 'A') : null
++            );
++          if (held) expect(held.current()?.name).toBe('Original');
++          if (scenario === 'initial absence') {
++            change('insert', () =>
++              hooks.addRow(tree, { id: 'A', name: 'Original' })
++            );
++            await check([original]);
++          } else if (scenario === 'same lifetime restoration') {
++            phase = 'remove';
++            const pending = hooks.transact(tree, () => {
++              hooks.writeScalar(tree, ++scalar);
++              hooks.removeRow(tree, 'A');
++            });
++            await check([]);
++            phase = 'rollback';
++            pending.rollback();
++            scalar = 0;
++            await check([original]);
++            expect(required(held).current()?.name).toBe('Original');
++          } else if (scenario === 'new lifetime at reused key') {
++            change('remove', () => hooks.removeRow(tree, 'A'));
++            await check([]);
++            change('replace lifetime', () =>
++              hooks.addRow(tree, { id: 'A', name: 'Impostor' })
++            );
++            await check([{ key: 'A', id: 'A', name: 'Impostor' }]);
++            expect(required(held).current()).toBeUndefined();
++          } else if (scenario === 'selection while absent') {
++            change('select B', () => hooks.selectRow(tree, 'B'));
++            await check([], 'B');
++            change('insert unselected A', () =>
++              hooks.addRow(tree, { id: 'A', name: 'Original' })
++            );
++            await check([original], 'B');
++            change('insert selected B', () =>
++              hooks.addRow(tree, { id: 'B', name: 'Selected' })
++            );
++            await check(
++              [original, { key: 'B', id: 'B', name: 'Selected' }],
++              'B'
++            );
++          } else if (scenario === 'selected rekey') {
++            change('rekey', () => hooks.rekeyRow(tree, 'A', 'X'));
++            await check([{ ...original, key: 'X' }], 'X');
++            expect(required(held).current()?.name).toBe('Original');
++            change('write rekeyed lifetime', () =>
++              hooks.realizeRowName(tree, 'X', 'Updated')
++            );
++            await check([{ ...original, key: 'X', name: 'Updated' }], 'X');
++            expect(required(held).current()?.name).toBe('Updated');
++          } else {
++            change('add unrelated B', () =>
++              hooks.addRow(tree, { id: 'B', name: 'Other' })
++            );
++            await check([original, { key: 'B', id: 'B', name: 'Other' }]);
++            change('write unrelated B', () =>
++              hooks.realizeRowName(tree, 'B', 'Changed')
++            );
++            await check([original, { key: 'B', id: 'B', name: 'Changed' }]);
++            expect(required(held).current()?.name).toBe('Original');
++            change('remove unrelated B', () => hooks.removeRow(tree, 'B'));
++            await check([original]);
++            required(held).dispose();
++            const heldCount = required(held).seen.length;
++            change('after held disposal', () =>
++              hooks.realizeRowName(tree, 'A', 'After disposal')
++            );
++            await check([{ ...original, name: 'After disposal' }]);
++            expect(required(held).seen.length).toBe(heldCount);
++          }
++        } finally {
++          held?.dispose();
++          for (const observed of observations) observed.dispose();
++          dispose();
++        }
++      });
++    }
++  }
++
+   // 5 ──────────────────────────────────────────────────────────────────────
+   it('5 lifetime preservation — a held reference never retargets to a reused business key', async () => {
+     const { tree, dispose } = hooks.createStore();
+diff --git a/packages/react/src/transaction-realization.spec.tsx b/packages/react/src/transaction-realization.spec.tsx
+index 959e8391..675852fc 100644
+--- a/packages/react/src/transaction-realization.spec.tsx
++++ b/packages/react/src/transaction-realization.spec.tsx
+@@ -9,8 +9,10 @@ import { entityMap, signalTree, transactions } from '@signal-tree/kernel';
+ import {
+   transactionRealizationContract,
+   type ConformanceRow,
++  type EntityProjectionFrame,
+   type MixedFrame,
+   type Observation,
++  type ValuePublicationFrame,
+ } from '../../kernel/src/transaction-realization-contract';
+ import { useSignalTree } from './use-signal-tree';
+ 
+@@ -31,7 +33,9 @@ const build = () =>
+   signalTree(
+     {
+       scalar: 0,
+-      rows: entityMap<ConformanceRow, string>({ selectId: (r) => r.id }),
++      rows: entityMap<ConformanceRow, string>({
++        selectId: (r) => r.id,
++      }).computed('names', (rows) => rows.map((row) => row.name)),
+     },
+     { enhancers: [transactions()] }
+   );
+@@ -84,6 +88,40 @@ const decodeFrame = (encoded: string): MixedFrame => {
+   };
+ };
+ 
++const projectionFrame = (
++  $: Tree['$'],
++  phase: string,
++  enabled: boolean
++): EntityProjectionFrame => {
++  const scalar = $.scalar();
++  if (!enabled) return { phase, scalar, projections: null };
++  const node = $.rows.byId('A');
++  const encode = (row: ConformanceRow | undefined) =>
++    row ? `${row.id}:${row.name}` : null;
++  return {
++    phase,
++    scalar,
++    projections: {
++      all: $.rows.all().map((row) => `${row.id}:${row.name}`),
++      ids: [...$.rows.ids()],
++      count: $.rows.count(),
++      empty: $.rows.empty(),
++      map: [...$.rows.asMap()].map(([key, row]) => `${key}:${row.name}`),
++      hasA: $.rows.has('A')(),
++      where: $.rows
++        .where(matchesA)()
++        .map((row) => `${row.id}:${row.name}`),
++      find: encode($.rows.find(matchesA)()),
++      slice: [...$.rows.names()],
++      activeId: $.rows.activeId() ?? null,
++      activeEntity: encode($.rows.activeEntity()),
++      row: node?.()?.name ?? null,
++      field: node?.name() ?? null,
++    },
++  };
++};
++const matchesA = (row: ConformanceRow) => row.id === 'A';
++
+ describe('@signal-tree/react — pending realization conformance', () => {
+   transactionRealizationContract<Tree>({
+     framework: 'react',
+@@ -137,6 +175,52 @@ describe('@signal-tree/react — pending realization conformance', () => {
+       };
+     },
+ 
++    observeValues: (tree, phase) => {
++      const seen: ValuePublicationFrame[] = [];
++      let latest!: ValuePublicationFrame;
++      // Stable primitive snapshot; record phase at actual render execution.
++      const select = ($: Tree['$']) =>
++        JSON.stringify([
++          $.scalar(),
++          $.rows.byId('A')?.()?.name,
++          $.rows.all().find((row) => row.id === 'A')?.name,
++        ]);
++      function Probe() {
++        const encoded = useSignalTree(tree, select as never) as string;
++        const [scalar, row, all] = JSON.parse(encoded) as [
++          number,
++          string,
++          string
++        ];
++        latest = { phase: phase(), scalar, row, all };
++        seen.push(latest);
++        return null;
++      }
++      const view = render(<Probe />);
++      return [{ seen, current: () => latest, dispose: () => view.unmount() }];
++    },
++
++    selectRow: (tree, id) => tree.$.rows.setActiveId(id),
++    rekeyRow: (tree, from, to) => tree.$.rows.changeId(from, to),
++    observeProjections: (tree, phase, enabled) => {
++      const seen: EntityProjectionFrame[] = [];
++      let latest!: EntityProjectionFrame;
++      // Phase belongs to execution; exclude it from stable external snapshots.
++      const select = ($: Tree['$']) =>
++        JSON.stringify(projectionFrame($, '', enabled()));
++      function ProjectionProbe() {
++        const encoded = useSignalTree(tree, select as never) as string;
++        latest = {
++          ...(JSON.parse(encoded) as EntityProjectionFrame),
++          phase: phase(),
++        };
++        seen.push(latest);
++        return null;
++      }
++      const view = render(<ProjectionProbe />);
++      return [{ seen, current: () => latest, dispose: () => view.unmount() }];
++    },
++
+     async flush() {
+       await act(async () => {
+         await settleKernel();
+diff --git a/packages/solid/src/lib/native-publication-error-boundary.spec.ts b/packages/solid/src/lib/native-publication-error-boundary.spec.ts
+index 7a6f41dd..24adf23b 100644
+--- a/packages/solid/src/lib/native-publication-error-boundary.spec.ts
++++ b/packages/solid/src/lib/native-publication-error-boundary.spec.ts
+@@ -3,11 +3,18 @@ import { describe, expect, it } from 'vitest';
+ 
+ import {
+   createSignalTreeFactory,
++  replaceLocation,
+   type EpochHandle,
+   type ObservationAdapter,
+ } from '@signal-tree/kernel/adapter';
+ 
+-import { entityMap } from '../index';
++import { entityMap, transactions } from '../index';
++// Test-only non-observing authority check; keep this private seam out of the SDK.
++// eslint-disable-next-line @nx/enforce-module-boundaries
++import { peekInternalTransactionRuntime } from '../../../kernel/src/enhancers/transactions/transactions';
++// Test-only non-observing authority check; keep this private seam out of the SDK.
++// eslint-disable-next-line @nx/enforce-module-boundaries
++import { hasOpenCommitScope } from '../../../kernel/src/lib/internals/commit-consequence';
+ import { createSolidObservationAdapter } from './solid-observation';
+ 
+ function required<T>(value: T | undefined): T {
+@@ -236,3 +243,123 @@ describe('Solid public EntityMap publication error timing', () => {
+     }
+   });
+ });
++
++
++describe('Solid mixed settlement member publication failures', () => {
++  it.each(['error', 'undefined'] as const)(
++    'finishes sibling publication before reporting the first %s member-token failure',
++    (failure) => {
++      const base = createSolidObservationAdapter();
++      const marker = failure === 'error' ? new Error('member token publication') : undefined;
++      let selectingMember = false;
++      let armed = false;
++      let hits = 0;
++      let nextToken = 0;
++      const memberTokens = new Set<number>();
++      const adapter: ObservationAdapter = {
++        ...base,
++        createWritableCell<T>(read: () => T) {
++          const realized = required(base.createWritableCell)(read);
++          const token = ++nextToken;
++          return {
++            ...realized,
++            cell: new Proxy(realized.cell, {
++              apply(target, receiver, args) {
++                if (selectingMember) memberTokens.add(token);
++                return Reflect.apply(target, receiver, args);
++              },
++            }),
++            token: {
++              observe() {
++                if (selectingMember) memberTokens.add(token);
++                realized.token.observe();
++              },
++              invalidate() {
++                realized.token.invalidate();
++                if (armed && hits === 0 && memberTokens.has(token)) {
++                  hits++;
++                  throw marker;
++                }
++              },
++            },
++          };
++        },
++      };
++      const group: {
++        keep: number;
++        optional: { x: number; y: number | undefined };
++      } = { keep: 0, optional: { x: 200, y: undefined } };
++      const tree = createSignalTreeFactory(adapter)({
++        count: 100,
++        group,
++        rows: entityMap<{ id: string; value: number }>(),
++      }, { enhancers: [transactions()] });
++      let dispose: (() => void) | undefined;
++      try {
++        const rows = tree.$.rows;
++        const optional = required(tree.$.group.optional);
++        rows.addOne({ id: 'A', value: 300 });
++        rows.setActiveId('A');
++        const held = rows.byIdOrFail('A');
++        selectingMember = true;
++        optional.x();
++        selectingMember = false;
++        expect(memberTokens.size).toBeGreaterThan(0);
++        // Preserve the JavaScript whole-value omission counterexample. The
++        // strict TypeScript branch writer intentionally requires every field.
++        Reflect.apply(tree.$.group, undefined, [{ keep: 0 }]);
++        const read = () => ({
++          snapshot: tree.$(), count: tree.$.count(),
++          optional: optional(),
++          ids: [...rows.ids()], all: rows.all().map(row => ({ ...row })),
++          direct: rows.byIdOrFail('A')().value, held: held().value,
++          activeId: rows.activeId(), active: rows.activeEntity()?.value,
++        });
++        const baseline = structuredClone(read());
++        const seen: Array<ReturnType<typeof read>> = [];
++        dispose = createRoot(off => {
++          createComputed(() => seen.push(structuredClone(read())));
++          return off;
++        });
++        expect(seen).toEqual([baseline]);
++        // SDK locations use the same writable binding as Solid facade .set.
++        const pending = tree.transact(() => {
++          replaceLocation(tree.$.count, 101);
++          replaceLocation(optional.x, 201);
++          rows.updateOne('A', { value: 301 });
++        });
++        expect(tree.$.count()).toBe(101);
++        expect(optional.x()).toBe(201);
++        expect(held().value).toBe(301);
++        expect(required(peekInternalTransactionRuntime(tree)).getPendingTurnCount()).toBe(1);
++        expect(hasOpenCommitScope(tree)).toBe(true);
++        expect(seen.at(-1)?.count).toBe(101);
++        const start = seen.length;
++        armed = true;
++        const outcome = attempt(() => pending.rollback());
++        armed = false;
++        // Freeze actual deliveries before a direct read can refresh any cache.
++        const deliveries = seen.slice(start);
++        expect(hits).toBe(1);
++        expect(outcome.threw).toBe(true);
++        expect(outcome.error).toBe(marker);
++        expect(deliveries.length).toBeGreaterThan(0);
++        for (const delivered of deliveries) expect(delivered).toEqual(baseline);
++        expect(read()).toEqual(baseline);
++        expect(rows.byIdOrFail('A')).toBe(held);
++        expect(required(peekInternalTransactionRuntime(tree)).getPendingTurnCount()).toBe(0);
++        expect(hasOpenCommitScope(tree)).toBe(false);
++        const after = seen.length;
++        expect(attempt(() => pending.rollback()).threw).toBe(false);
++        expect(read()).toEqual(baseline);
++        expect(seen).toHaveLength(after);
++      } finally {
++        armed = false;
++        selectingMember = false;
++        dispose?.();
++        tree.destroy();
++        base.dispose();
++      }
++    }
++  );
++});
+diff --git a/packages/solid/src/lib/transaction-realization.spec.ts b/packages/solid/src/lib/transaction-realization.spec.ts
+index d482416e..a64d1a7c 100644
+--- a/packages/solid/src/lib/transaction-realization.spec.ts
++++ b/packages/solid/src/lib/transaction-realization.spec.ts
+@@ -8,8 +8,10 @@ import { describe } from 'vitest';
+ import {
+   transactionRealizationContract,
+   type ConformanceRow,
++  type EntityProjectionFrame,
+   type MixedFrame,
+   type Observation,
++  type ValuePublicationFrame,
+ } from '../../../kernel/src/transaction-realization-contract';
+ import { entityMap, signalTree, transactions } from '../index';
+ 
+@@ -31,7 +33,9 @@ const build = () =>
+   signalTree(
+     {
+       scalar: 0,
+-      rows: entityMap<ConformanceRow, string>({ selectId: (r) => r.id }),
++      rows: entityMap<ConformanceRow, string>({
++        selectId: (r) => r.id,
++      }).computed('names', (rows) => rows.map((row) => row.name)),
+     },
+     { enhancers: [transactions()] }
+   );
+@@ -57,6 +61,40 @@ const observe = <T>(read: () => T): Observation<T> => {
+   };
+ };
+ 
++const projectionFrame = (
++  $: Tree['$'],
++  phase: string,
++  enabled: boolean
++): EntityProjectionFrame => {
++  const scalar = $.scalar();
++  if (!enabled) return { phase, scalar, projections: null };
++  const node = $.rows.byId('A');
++  const encode = (row: ConformanceRow | undefined) =>
++    row ? `${row.id}:${row.name}` : null;
++  return {
++    phase,
++    scalar,
++    projections: {
++      all: $.rows.all().map((row) => `${row.id}:${row.name}`),
++      ids: [...$.rows.ids()],
++      count: $.rows.count(),
++      empty: $.rows.empty(),
++      map: [...$.rows.asMap()].map(([key, row]) => `${key}:${row.name}`),
++      hasA: $.rows.has('A')(),
++      where: $.rows
++        .where(matchesA)()
++        .map((row) => `${row.id}:${row.name}`),
++      find: encode($.rows.find(matchesA)()),
++      slice: [...$.rows.names()],
++      activeId: $.rows.activeId() ?? null,
++      activeEntity: encode($.rows.activeEntity()),
++      row: node?.()?.name ?? null,
++      field: node?.name() ?? null,
++    },
++  };
++};
++const matchesA = (row: ConformanceRow) => row.id === 'A';
++
+ describe('@signal-tree/solid — pending realization conformance', () => {
+   transactionRealizationContract<Tree>({
+     framework: 'solid',
+@@ -99,6 +137,21 @@ describe('@signal-tree/solid — pending realization conformance', () => {
+         ids: [...tree.$.rows.ids()],
+       })),
+ 
++    observeValues: (tree, phase) => [
++      observe<ValuePublicationFrame>(() => ({
++        phase: phase(),
++        scalar: tree.$.scalar(),
++        row: tree.$.rows.byId('A')?.()?.name,
++        all: tree.$.rows.all().find((row) => row.id === 'A')?.name,
++      })),
++    ],
++
++    selectRow: (tree, id) => tree.$.rows.setActiveId(id),
++    rekeyRow: (tree, from, to) => tree.$.rows.changeId(from, to),
++    observeProjections: (tree, phase, enabled) => [
++      observe(() => projectionFrame(tree.$, phase(), enabled())),
++    ],
++
+     flush: nextTick,
+   });
+ });
+diff --git a/packages/vue/src/lib/entity-projection-publication.spec.ts b/packages/vue/src/lib/entity-projection-publication.spec.ts
+new file mode 100644
+index 00000000..75b68132
+--- /dev/null
++++ b/packages/vue/src/lib/entity-projection-publication.spec.ts
+@@ -0,0 +1,378 @@
++import { describe, expect, it } from 'vitest';
++import { nextTick, watchEffect } from 'vue';
++
++import {
++  entityMap,
++  signalTree,
++  transactions,
++  type PendingTransaction,
++} from '../index';
++
++function required<T>(value: T | null | undefined): T {
++  if (value === undefined || value === null) {
++    throw new Error('Missing required test value');
++  }
++  return value;
++}
++
++type Row = { id: string; v: number };
++const build = () =>
++  signalTree(
++    { scalar: 0, rows: entityMap<Row, string>({ selectId: (row) => row.id }) },
++    { enhancers: [transactions()] }
++  );
++
++describe('Vue entity projection publication', () => {
++  it('review-empty: rollback observers see scalar, all, count, and empty restored', () => {
++    const tree = build();
++    let phase = 'setup';
++    const seen: {
++      phase: string;
++      scalar: number;
++      all: number[];
++      count: number;
++      empty: boolean;
++    }[] = [];
++    const dispose = watchEffect(
++      () => {
++        seen.push({
++          phase,
++          scalar: tree.$.scalar.value,
++          all: tree.$.rows.all.value.map((row) => row.v),
++          count: tree.$.rows.count.value,
++          empty: tree.$.rows.empty.value,
++        });
++      },
++      { flush: 'sync' }
++    );
++    try {
++      const pending = tree.transact(() => {
++        tree.$.scalar.value = 1;
++        tree.$.rows.addOne({ id: 'A', v: 1 });
++      });
++      phase = 'rollback';
++      pending.rollback();
++      const settlement = seen.filter((entry) => entry.phase === 'rollback');
++      expect(settlement.length).toBeGreaterThan(0);
++      expect(
++        settlement.every(
++          (entry) =>
++            entry.scalar === 0 &&
++            entry.all.length === 0 &&
++            entry.count === 0 &&
++            entry.empty === true
++        ),
++        JSON.stringify(seen)
++      ).toBe(true);
++    } finally {
++      dispose();
++      tree.destroy();
++    }
++  });
++
++  it('review-active: rollback observers see direct and active row restored', () => {
++    const tree = build();
++    tree.$.rows.addOne({ id: 'A', v: 0 });
++    tree.$.rows.setActiveId('A');
++    let phase = 'setup';
++    const seen: {
++      phase: string;
++      scalar: number;
++      row: number | undefined;
++      all: number[];
++      active: number | undefined;
++    }[] = [];
++    const dispose = watchEffect(
++      () => {
++        seen.push({
++          phase,
++          scalar: tree.$.scalar.value,
++          row: tree.$.rows.byId('A')?.()?.v,
++          all: tree.$.rows.all.value.map((row) => row.v),
++          active: tree.$.rows.activeEntity.value?.v,
++        });
++      },
++      { flush: 'sync' }
++    );
++    try {
++      const pending = tree.transact(() => {
++        tree.$.scalar.value = 1;
++        tree.$.rows.updateOne('A', { v: 1 });
++      });
++      phase = 'rollback';
++      pending.rollback();
++      const settlement = seen.filter((entry) => entry.phase === 'rollback');
++      expect(settlement.length).toBeGreaterThan(0);
++      expect(
++        settlement.every(
++          (entry) => entry.scalar === 0 && entry.row === 0 && entry.active === 0
++        ),
++        JSON.stringify(seen)
++      ).toBe(true);
++    } finally {
++      dispose();
++      tree.destroy();
++    }
++  });
++
++  for (const prime of [false, true]) {
++    it.each(['add', 'remove', 'field', 'selection'] as const)(
++      `coheres all owned reads for %s rollback (${
++        prime ? 'primed' : 'unprimed'
++      })`,
++      async (operation) => {
++        const tree = build();
++        const rows = tree.$.rows;
++        if (operation !== 'add') rows.addOne({ id: 'A', v: 0 });
++        if (operation === 'selection') rows.addOne({ id: 'B', v: 8 });
++        rows.setActiveId('A');
++        const has = rows.has('A');
++        const where = rows.where((row) => row.id === 'A');
++        const find = rows.find((row) => row.id === 'A');
++        const read = () => ({
++          scalar: tree.$.scalar.value,
++          ids: [...rows.ids.value],
++          all: rows.all.value.map((row) => ({ ...row })),
++          count: rows.count.value,
++          asMap: [...rows.asMap.value.entries()].map(([key, row]) => [
++            key,
++            { ...row },
++          ]),
++          empty: rows.empty.value,
++          activeId: rows.activeId.value,
++          activeEntity: rows.activeEntity.value
++            ? { ...rows.activeEntity.value }
++            : undefined,
++          has: has.value,
++          where: where.value.map((row) => ({ ...row })),
++          find: find.value ? { ...find.value } : undefined,
++          byId: rows.byId('A')?.()?.v,
++          field: rows.byId('A') ? rows.byIdOrFail('A').v.value : undefined,
++        });
++        if (prime) read();
++        let phase = 'setup';
++        const seen: ReturnType<typeof read>[] = [];
++        const dispose = watchEffect(
++          () => {
++            void tree.$.scalar.value;
++            if (prime || phase === 'rollback') {
++              const value = read();
++              if (phase === 'rollback') seen.push(value);
++            }
++          },
++          { flush: 'sync' }
++        );
++        try {
++          const pending = tree.transact(() => {
++            tree.$.scalar.value = 1;
++            if (operation === 'add') rows.addOne({ id: 'A', v: 1 });
++            else if (operation === 'remove') rows.removeOne('A');
++            else rows.updateOne('A', { v: 1 });
++          });
++          await nextTick();
++          expect(tree.$.scalar.value).toBe(1);
++          expect(rows.byId('A')?.()?.v).toBe(
++            operation === 'remove' ? undefined : 1
++          );
++          // Selection is outside truth here. setActiveId has no transaction
++          // capture notification; do not invent selection rollback semantics.
++          if (operation === 'selection') rows.setActiveId('B');
++          phase = 'rollback';
++          pending.rollback();
++          phase = 'after';
++          await nextTick();
++          // Derive the oracle from the authored setup, never from a possibly
++          // stale final projection: matching stale observations are not proof.
++          const restoredA = operation === 'add' ? undefined : { id: 'A', v: 0 };
++          const restoredRows = restoredA ? [restoredA] : [];
++          if (operation === 'selection') restoredRows.push({ id: 'B', v: 8 });
++          const activeId = operation === 'selection' ? 'B' : 'A';
++          const expected = {
++            scalar: 0,
++            ids: restoredRows.map((row) => row.id),
++            all: restoredRows,
++            count: restoredRows.length,
++            asMap: restoredRows.map((row) => [row.id, row]),
++            empty: restoredRows.length === 0,
++            activeId,
++            activeEntity: restoredRows.find((row) => row.id === activeId),
++            has: restoredA !== undefined,
++            where: restoredA ? [restoredA] : [],
++            find: restoredA,
++            byId: restoredA?.v,
++            field: restoredA?.v,
++          };
++          expect(read()).toEqual(expected);
++          expect(seen.length).toBeGreaterThan(0);
++          for (const frame of seen) expect(frame).toEqual(expected);
++        } finally {
++          dispose();
++          tree.destroy();
++        }
++      }
++    );
++  }
++
++  it('preserves projection identities during unchanged-value settlement', async () => {
++    const tree = build();
++    const rows = tree.$.rows;
++    rows.addOne({ id: 'A', v: 0 });
++    rows.setActiveId('A');
++    const where = rows.where((row) => row.id === 'A');
++    const find = rows.find((row) => row.id === 'A');
++    const read = () => [
++      rows.ids.value,
++      rows.all.value,
++      rows.asMap.value,
++      rows.activeEntity.value,
++      where.value,
++      find.value,
++    ];
++    const initial = read();
++    let settling = false;
++    const seen: ReturnType<typeof read>[] = [];
++    const dispose = watchEffect(
++      () => {
++        void tree.$.scalar.value;
++        const frame = read();
++        if (settling) seen.push(frame);
++      },
++      { flush: 'sync' }
++    );
++    try {
++      const pending = tree.transact(() => {
++        tree.$.scalar.value = 1;
++      });
++      await nextTick();
++      settling = true;
++      pending.rollback();
++      expect(seen.length).toBeGreaterThan(0);
++      for (const frame of seen)
++        for (let index = 0; index < initial.length; index++)
++          expect(frame[index]).toBe(initial[index]);
++    } finally {
++      dispose();
++      tree.destroy();
++    }
++  });
++
++  it('retains cached projections inside reentrant authored writes and publishes their result', async () => {
++    const tree = build();
++    const rows = tree.$.rows;
++    rows.addOne({ id: 'A', v: 0 });
++    rows.setActiveId('A');
++    const held = rows.all;
++    let phase = 'setup';
++    let entered = false;
++    let nested: PendingTransaction | undefined;
++    const inside: {
++      before: readonly Row[];
++      after: readonly Row[];
++      direct: number | undefined;
++    }[] = [];
++    const dispose = watchEffect(
++      () => {
++        const scalar = tree.$.scalar.value;
++        void held.value;
++        if (phase !== 'rollback' || scalar !== 0 || entered) return;
++        entered = true;
++        const before = held.value;
++        nested = tree.transact(() => {
++          rows.updateOne('A', { v: 9 });
++          inside.push({
++            before,
++            after: held.value,
++            direct: rows.byId('A')?.()?.v,
++          });
++        });
++      },
++      { flush: 'sync' }
++    );
++    try {
++      const pending = tree.transact(() => {
++        tree.$.scalar.value = 1;
++        rows.updateOne('A', { v: 1 });
++      });
++      await nextTick();
++      phase = 'rollback';
++      pending.rollback();
++      phase = 'after';
++      expect(entered).toBe(true);
++      expect(inside).toHaveLength(1);
++      expect(required(inside[0]).after).toBe(required(inside[0]).before);
++      expect(required(inside[0]).direct).toBe(9);
++      expect(nested).toBeDefined();
++      required(nested).confirm();
++      await nextTick();
++      expect(required(held.value[0]).v).toBe(9);
++      expect(rows.activeEntity.value?.v).toBe(9);
++    } finally {
++      dispose();
++      tree.destroy();
++    }
++  });
++
++  it('publishes marker-computed slices and sorted projection chains coherently', async () => {
++    const tree = signalTree(
++      {
++        scalar: 0,
++        rows: entityMap<Row, string>({
++          selectId: (row) => row.id,
++          sortComparer: (a, b) => a.v - b.v,
++        }).computed('total', (all) => all.reduce((sum, row) => sum + row.v, 0)),
++      },
++      { enhancers: [transactions()] }
++    );
++    tree.$.rows.addMany([
++      { id: 'A', v: 0 },
++      { id: 'B', v: 2 },
++    ]);
++    const where = tree.$.rows.where(() => true);
++    const find = tree.$.rows.find(() => true);
++    let phase = 'setup';
++    const seen: {
++      scalar: number;
++      ids: string[];
++      where: string[];
++      find: string | undefined;
++      total: number;
++    }[] = [];
++    const dispose = watchEffect(
++      () => {
++        const frame = {
++          scalar: tree.$.scalar.value,
++          ids: [...tree.$.rows.ids.value],
++          where: where.value.map((row) => row.id),
++          find: find.value?.id,
++          total: tree.$.rows.total.value,
++        };
++        if (phase === 'rollback') seen.push(frame);
++      },
++      { flush: 'sync' }
++    );
++    try {
++      const pending = tree.transact(() => {
++        tree.$.scalar.value = 1;
++        tree.$.rows.updateOne('A', { v: 3 });
++      });
++      await nextTick();
++      expect(tree.$.rows.ids.value).toEqual(['B', 'A']);
++      expect(tree.$.rows.total.value).toBe(5);
++      phase = 'rollback';
++      pending.rollback();
++      phase = 'after';
++      expect(seen.length).toBeGreaterThan(0);
++      for (const frame of seen)
++        expect(frame).toEqual({
++          scalar: 0,
++          ids: ['A', 'B'],
++          where: ['A', 'B'],
++          find: 'A',
++          total: 2,
++        });
++    } finally {
++      dispose();
++      tree.destroy();
++    }
++  });
++});
+diff --git a/packages/vue/src/lib/entity-selection-lifetime.spec.ts b/packages/vue/src/lib/entity-selection-lifetime.spec.ts
+new file mode 100644
+index 00000000..1e3b411c
+--- /dev/null
++++ b/packages/vue/src/lib/entity-selection-lifetime.spec.ts
+@@ -0,0 +1,327 @@
++import { describe, expect, it } from 'vitest';
++import { nextTick, watch, watchEffect } from 'vue';
++
++import { entityMap, signalTree, transactions } from '../index';
++
++type Row = { id: string; v: number };
++const build = () =>
++  signalTree(
++    { rows: entityMap<Row, string>({ selectId: (row) => row.id }) },
++    { enhancers: [transactions()] }
++  );
++type Tree = ReturnType<typeof build>;
++const observe = (tree: Tree) => {
++  let stage = 'setup';
++  const frames: {
++    stage: string;
++    activeId: string | undefined;
++    direct: number | undefined;
++    active: number | undefined;
++  }[] = [];
++  const sample = () => {
++    const activeId = tree.$.rows.activeId.value;
++    return {
++      stage,
++      activeId,
++      direct:
++        activeId === undefined ? undefined : tree.$.rows.byId(activeId)?.()?.v,
++      active: tree.$.rows.activeEntity.value?.v,
++    };
++  };
++  const dispose = watchEffect(
++    () => {
++      frames.push(sample());
++    },
++    { flush: 'sync' }
++  );
++  return {
++    frames,
++    dispose,
++    stage(value: string) {
++      stage = value;
++    },
++    check(activeId: string | undefined, value: number | undefined) {
++      expect(sample(), JSON.stringify(frames)).toEqual({
++        stage,
++        activeId,
++        direct: value,
++        active: value,
++      });
++    },
++  };
++};
++
++describe('Vue entity selection lifetime', () => {
++  it('resolves initially absent selection when its row is inserted', async () => {
++    const tree = build();
++    tree.$.rows.setActiveId('A');
++    const observation = observe(tree);
++    try {
++      observation.check('A', undefined);
++      observation.stage('insert');
++      tree.$.rows.addOne({ id: 'A', v: 1 });
++      await nextTick();
++      observation.check('A', 1);
++      expect(
++        observation.frames.some(
++          (frame) => frame.stage === 'insert' && frame.active === 1
++        )
++      ).toBe(true);
++    } finally {
++      observation.dispose();
++      tree.destroy();
++    }
++  });
++
++  it('resolves restored membership to the same held lifetime after rollback', async () => {
++    const tree = build();
++    tree.$.rows.addOne({ id: 'A', v: 1 });
++    tree.$.rows.setActiveId('A');
++    const held = tree.$.rows.byIdOrFail('A');
++    const observation = observe(tree);
++    try {
++      observation.check('A', 1);
++      observation.stage('remove');
++      const pending = tree.transact(() => tree.$.rows.removeOne('A'));
++      await nextTick();
++      observation.check('A', undefined);
++      observation.stage('rollback');
++      pending.rollback();
++      await nextTick();
++      observation.check('A', 1);
++      expect(tree.$.rows.byIdOrFail('A')).toBe(held);
++      expect(held()?.v).toBe(1);
++    } finally {
++      observation.dispose();
++      tree.destroy();
++    }
++  });
++
++  it('retargets key-based selection but never a held row to a new lifetime at the same key', async () => {
++    const tree = build();
++    tree.$.rows.addOne({ id: 'A', v: 1 });
++    tree.$.rows.setActiveId('A');
++    const held = tree.$.rows.byIdOrFail('A');
++    const observation = observe(tree);
++    try {
++      observation.check('A', 1);
++      observation.stage('remove');
++      tree.$.rows.removeOne('A');
++      await nextTick();
++      observation.check('A', undefined);
++      observation.stage('new-lifetime');
++      tree.$.rows.addOne({ id: 'A', v: 9 });
++      await nextTick();
++      observation.check('A', 9);
++      expect(tree.$.rows.byIdOrFail('A')).not.toBe(held);
++      expect(held()?.v).not.toBe(9);
++    } finally {
++      observation.dispose();
++      tree.destroy();
++    }
++  });
++
++  it('tracks selection changes while absent and ignores arrivals at the old selected key', async () => {
++    const tree = build();
++    tree.$.rows.setActiveId('A');
++    const observation = observe(tree);
++    try {
++      observation.check('A', undefined);
++      observation.stage('select-B');
++      tree.$.rows.setActiveId('B');
++      await nextTick();
++      observation.check('B', undefined);
++      observation.stage('insert-A');
++      tree.$.rows.addOne({ id: 'A', v: 1 });
++      await nextTick();
++      observation.check('B', undefined);
++      observation.stage('insert-B');
++      tree.$.rows.addOne({ id: 'B', v: 2 });
++      await nextTick();
++      observation.check('B', 2);
++      observation.stage('clear');
++      tree.$.rows.clearActiveId();
++      await nextTick();
++      observation.check(undefined, undefined);
++    } finally {
++      observation.dispose();
++      tree.destroy();
++    }
++  });
++
++  it('moves selected key on rekey while retaining the selected lifetime', async () => {
++    const tree = build();
++    tree.$.rows.addOne({ id: 'A', v: 1 });
++    tree.$.rows.setActiveId('A');
++    const held = tree.$.rows.byIdOrFail('A');
++    const observation = observe(tree);
++    try {
++      observation.check('A', 1);
++      observation.stage('rekey');
++      tree.$.rows.changeId('A', 'B');
++      await nextTick();
++      observation.check('B', 1);
++      expect(tree.$.rows.byId('A')).toBeUndefined();
++      expect(tree.$.rows.byIdOrFail('B')).toBe(held);
++      observation.stage('update-rekeyed');
++      tree.$.rows.updateOne('B', { v: 2 });
++      await nextTick();
++      observation.check('B', 2);
++      expect(held()?.v).toBe(2);
++    } finally {
++      observation.dispose();
++      tree.destroy();
++    }
++  });
++
++  it('retains memo identity across unrelated writes and cleans up switched and stopped observation', async () => {
++    const tree = build();
++    tree.$.rows.addMany([
++      { id: 'A', v: 1 },
++      { id: 'B', v: 2 },
++    ]);
++    tree.$.rows.setActiveId('A');
++    const observation = observe(tree);
++    const active = tree.$.rows.activeEntity;
++    const initial = active.value;
++    const changes: (number | undefined)[] = [];
++    const dispose = watch(active, (row) => changes.push(row?.v), {
++      flush: 'sync',
++    });
++    try {
++      observation.stage('unrelated-field');
++      tree.$.rows.updateOne('B', { v: 3 });
++      observation.stage('unrelated-membership');
++      tree.$.rows.addOne({ id: 'C', v: 4 });
++      tree.$.rows.removeOne('C');
++      await nextTick();
++      observation.check('A', 1);
++      expect(active.value).toBe(initial);
++      expect(changes).toEqual([]);
++      observation.stage('switch-B');
++      tree.$.rows.setActiveId('B');
++      await nextTick();
++      observation.check('B', 3);
++      expect(changes).toEqual([3]);
++      observation.stage('former-selected-field');
++      tree.$.rows.updateOne('A', { v: 5 });
++      await nextTick();
++      observation.check('B', 3);
++      expect(changes).toEqual([3]);
++      observation.stage('selected-field');
++      tree.$.rows.updateOne('B', { v: 6 });
++      await nextTick();
++      observation.check('B', 6);
++      expect(changes).toEqual([3, 6]);
++      dispose();
++      tree.$.rows.updateOne('B', { v: 7 });
++      await nextTick();
++      expect(changes).toEqual([3, 6]);
++    } finally {
++      dispose();
++      observation.dispose();
++      tree.destroy();
++    }
++  });
++
++  it.each([true, false])(
++    'preserves independent replay-tap selection across rekey rollback (mixed scalar: %s)',
++    (mixed) => {
++      const tree = signalTree(
++        {
++          scalar: 0,
++          rows: entityMap<Row, string>({ selectId: (row) => row.id }),
++        },
++        { enhancers: [transactions()] }
++      );
++      tree.$.rows.setAll([
++        { id: 'A', v: 0 },
++        { id: 'C', v: 0 },
++      ]);
++      tree.$.rows.setActiveId('A');
++      const heldA = tree.$.rows.byIdOrFail('A');
++      const heldC = tree.$.rows.byIdOrFail('C');
++      const seen: { id: string; selection: string | undefined }[] = [];
++      let armed = false;
++      const untap = tree.$.rows.tap({
++        onRemove: (id) => {
++          seen.push({ id, selection: tree.$.rows.activeId.value });
++          if (armed && id === 'D') tree.$.rows.setActiveId('C');
++        },
++      });
++      try {
++        const pending = tree.transact(() => {
++          if (mixed) tree.$.scalar.value = 1;
++          tree.$.rows.changeId('A', 'X');
++          tree.$.rows.addOne({ id: 'D', v: 0 });
++        });
++        expect(tree.$.rows.activeId.value).toBe('X');
++        expect(tree.$.rows.byIdOrFail('X')).toBe(heldA);
++        armed = true;
++        pending.rollback();
++        // Unchanged reviewer oracle: the replay callback must execute and its
++        // independent key selection must survive the enclosing settlement.
++        expect(seen.some((entry) => entry.id === 'D')).toBe(true);
++        expect(tree.$.rows.activeId.value, JSON.stringify(seen)).toBe('C');
++        expect(tree.$.scalar.value).toBe(0);
++        expect(tree.$.rows.ids.value).toEqual(['A', 'C']);
++        expect(tree.$.rows.byIdOrFail('A')).toBe(heldA);
++        expect(tree.$.rows.byIdOrFail('C')).toBe(heldC);
++        expect(heldA).not.toBe(heldC);
++        expect(tree.$.rows.activeEntity.value).toBe(heldC());
++      } finally {
++        untap();
++        tree.destroy();
++      }
++    }
++  );
++
++  it('preserves ABA replay-tap selection of the now absent rekey destination', () => {
++    const tree = signalTree(
++      {
++        scalar: 0,
++        rows: entityMap<Row, string>({ selectId: (row) => row.id }),
++      },
++      { enhancers: [transactions()] }
++    );
++    tree.$.rows.setAll([
++      { id: 'A', v: 0 },
++      { id: 'C', v: 0 },
++    ]);
++    tree.$.rows.setActiveId('A');
++    const heldA = tree.$.rows.byIdOrFail('A');
++    const seen: { id: string; selection: string | undefined }[] = [];
++    let armed = false;
++    const untap = tree.$.rows.tap({
++      onRemove: (id) => {
++        seen.push({ id, selection: tree.$.rows.activeId.value });
++        if (armed && id === 'D') {
++          tree.$.rows.setActiveId('C');
++          tree.$.rows.setActiveId('X');
++        }
++      },
++    });
++    try {
++      const pending = tree.transact(() => {
++        tree.$.scalar.value = 1;
++        tree.$.rows.changeId('A', 'X');
++        tree.$.rows.addOne({ id: 'D', v: 0 });
++      });
++      expect(tree.$.rows.activeId.value).toBe('X');
++      expect(tree.$.rows.byIdOrFail('X')).toBe(heldA);
++      armed = true;
++      pending.rollback();
++      expect(seen.some((entry) => entry.id === 'D')).toBe(true);
++      expect(tree.$.rows.activeId.value, JSON.stringify(seen)).toBe('X');
++      expect(tree.$.rows.activeEntity.value).toBeUndefined();
++      expect(tree.$.rows.byId('X')).toBeUndefined();
++      expect(tree.$.rows.byIdOrFail('A')).toBe(heldA);
++      expect(heldA()?.v).toBe(0);
++      expect(tree.$.rows.ids.value).toEqual(['A', 'C']);
++      expect(tree.$.scalar.value).toBe(0);
++    } finally {
++      untap();
++      tree.destroy();
++    }
++  });
++});
+diff --git a/packages/vue/src/lib/prepared-selection-publication.spec.ts b/packages/vue/src/lib/prepared-selection-publication.spec.ts
+new file mode 100644
+index 00000000..a79b6fe4
+--- /dev/null
++++ b/packages/vue/src/lib/prepared-selection-publication.spec.ts
+@@ -0,0 +1,250 @@
++import { describe, expect, it } from 'vitest';
++import { nextTick, watchEffect } from 'vue';
++
++import { transactionLifecycleReader } from '@signal-tree/kernel/internals';
++// eslint-disable-next-line @nx/enforce-module-boundaries
++import { hasOpenCommitScope } from '../../../kernel/src/lib/internals/commit-consequence';
++import { entityMap, signalTree, transactions } from '../index';
++
++type Row = { id: string; v: number };
++const marker = () => entityMap<Row, string>({ selectId: (row) => row.id });
++const build = () =>
++  signalTree({ scalar: 0, rows: marker() }, { enhancers: [transactions()] });
++type Rows = ReturnType<typeof build>['$']['rows'];
++const readRows = (rows: Rows) => {
++  const activeId = rows.activeId.value;
++  return {
++    ids: [...rows.ids.value],
++    all: rows.all.value.map((row) => ({ ...row })),
++    count: rows.count.value,
++    empty: rows.empty.value,
++    map: [...rows.asMap.value].map(([key, row]) => [key, { ...row }]),
++    activeId: activeId ?? null,
++    active: rows.activeEntity.value?.v ?? null,
++    directActive:
++      activeId === undefined ? null : rows.byId(activeId)?.()?.v ?? null,
++    directA: rows.byId('A')?.()?.v ?? null,
++    directC: rows.byId('C')?.()?.v ?? null,
++  };
++};
++const expectedRows = (values: Row[], selected: string) => ({
++  ids: values.map((row) => row.id),
++  all: values,
++  count: values.length,
++  empty: values.length === 0,
++  map: values.map((row) => [row.id, row]),
++  activeId: selected,
++  active: values.find((row) => row.id === selected)?.v ?? null,
++  directActive: values.find((row) => row.id === selected)?.v ?? null,
++  directA: values.find((row) => row.id === 'A')?.v ?? null,
++  directC: values.find((row) => row.id === 'C')?.v ?? null,
++});
++const attempt = (run: () => void) => {
++  try {
++    run();
++    return { threw: false, error: undefined as unknown };
++  } catch (error) {
++    return { threw: true, error };
++  }
++};
++
++describe('prepared selection publication', () => {
++  it.each([
++    'C',
++    'C-then-X',
++    'C-then-A',
++    'nestedwrites',
++    'callbackthrows',
++    'callbackthrows-undefined',
++    'removedselectedrows',
++  ] as const)(
++    'preserves callback contribution, complete disposition, and coherent delivery: %s',
++    async (mode) => {
++      const tree = build();
++      const rows = tree.$.rows;
++      rows.setAll([
++        { id: 'A', v: 0 },
++        { id: 'C', v: 0 },
++      ]);
++      rows.setActiveId('A');
++      const heldA = rows.byIdOrFail('A');
++      const lifecycle = transactionLifecycleReader(tree);
++      if (!lifecycle) throw new Error('Expected transaction lifecycle reader');
++      const failure =
++        mode === 'callbackthrows-undefined'
++          ? undefined
++          : new Error('replay callback first failure');
++      let phase = 'setup';
++      let armed = false;
++      let callbacks = 0;
++      const read = () => ({ scalar: tree.$.scalar.value, ...readRows(rows) });
++      const seen: { phase: string; value: ReturnType<typeof read> }[] = [];
++      const dispose = watchEffect(
++        () => {
++          seen.push({ phase, value: read() });
++        },
++        { flush: 'sync' }
++      );
++      const untap = rows.tap({
++        onRemove: (id) => {
++          if (!armed || id !== 'D') return;
++          callbacks++;
++          rows.setActiveId('C');
++          if (mode === 'C-then-X') rows.setActiveId('X');
++          if (mode === 'C-then-A') rows.setActiveId('A');
++          if (mode === 'nestedwrites') {
++            tree.$.scalar.value = 9;
++            rows.updateOne('C', { v: 9 });
++          }
++          if (mode === 'removedselectedrows') rows.removeOne('C');
++          if (mode.startsWith('callbackthrows')) throw failure;
++        },
++      });
++      try {
++        const pending = tree.transact(() => {
++          tree.$.scalar.value = 1;
++          rows.changeId('A', 'X');
++          rows.addOne({ id: 'D', v: 0 });
++        });
++        await nextTick();
++        expect(tree.$.scalar.value).toBe(1);
++        expect(rows.ids.value).toEqual(['X', 'C', 'D']);
++        expect(rows.activeId.value).toBe('X');
++        expect(lifecycle.snapshot().pending).toHaveLength(1);
++        armed = true;
++        phase = 'rollback';
++        const first = attempt(() => pending.rollback());
++        phase = 'after-rollback';
++        await nextTick();
++        const after = read();
++        const countBeforeRetry = callbacks;
++        phase = 'retry';
++        const retry = attempt(() => pending.rollback());
++        await nextTick();
++        const values: Row[] = [{ id: 'A', v: 0 }];
++        if (mode !== 'removedselectedrows')
++          values.push({ id: 'C', v: mode === 'nestedwrites' ? 9 : 0 });
++        const selected =
++          mode === 'C-then-X' ? 'X' : mode === 'C-then-A' ? 'A' : 'C';
++        const expected = {
++          scalar: mode === 'nestedwrites' ? 9 : 0,
++          ...expectedRows(values, selected),
++        };
++        expect(callbacks).toBe(1);
++        expect(first.threw).toBe(mode.startsWith('callbackthrows'));
++        if (mode.startsWith('callbackthrows'))
++          expect(first.error).toBe(failure);
++        expect(after).toEqual(expected);
++        expect(lifecycle.snapshot().pending).toHaveLength(0);
++        expect(hasOpenCommitScope(tree)).toBe(false);
++        expect(retry.threw).toBe(false);
++        expect(read()).toEqual(after);
++        expect(callbacks).toBe(countBeforeRetry);
++        expect(rows.byIdOrFail('A')).toBe(heldA);
++        expect(heldA().v).toBe(0);
++        const delivered = seen.filter(
++          (frame) =>
++            frame.phase === 'rollback' || frame.phase === 'after-rollback'
++        );
++        expect(delivered.length).toBeGreaterThan(0);
++        for (const frame of delivered)
++          expect(frame.value, JSON.stringify(seen)).toEqual(expected);
++      } finally {
++        dispose();
++        untap();
++        tree.destroy();
++      }
++    }
++  );
++
++  it('stages both collection publications before a cross-collection callback throws', async () => {
++    const tree = signalTree(
++      { scalar: 0, left: marker(), right: marker() },
++      { enhancers: [transactions()] }
++    );
++    for (const rows of [tree.$.left, tree.$.right]) {
++      rows.setAll([
++        { id: 'A', v: 0 },
++        { id: 'C', v: 0 },
++      ]);
++      rows.setActiveId('A');
++    }
++    const heldLeft = tree.$.left.byIdOrFail('A');
++    const heldRight = tree.$.right.byIdOrFail('A');
++    const lifecycle = transactionLifecycleReader(tree);
++    if (!lifecycle) throw new Error('Expected transaction lifecycle reader');
++    const failure = new Error('cross-collection replay failure');
++    let armed = false;
++    let callbacks = 0;
++    let phase = 'setup';
++    const read = () => ({
++      scalar: tree.$.scalar.value,
++      left: readRows(tree.$.left),
++      right: readRows(tree.$.right),
++    });
++    const seen: { phase: string; value: ReturnType<typeof read> }[] = [];
++    const dispose = watchEffect(
++      () => {
++        seen.push({ phase, value: read() });
++      },
++      { flush: 'sync' }
++    );
++    const untap = tree.$.left.tap({
++      onRemove: (id) => {
++        if (!armed || id !== 'D') return;
++        callbacks++;
++        tree.$.right.setActiveId('C');
++        throw failure;
++      },
++    });
++    try {
++      const pending = tree.transact(() => {
++        tree.$.scalar.value = 1;
++        tree.$.left.changeId('A', 'X');
++        tree.$.right.changeId('A', 'X');
++        tree.$.left.addOne({ id: 'D', v: 0 });
++      });
++      await nextTick();
++      expect(tree.$.left.ids.value).toEqual(['X', 'C', 'D']);
++      expect(tree.$.right.ids.value).toEqual(['X', 'C']);
++      expect(lifecycle.snapshot().pending).toHaveLength(1);
++      armed = true;
++      phase = 'rollback';
++      const first = attempt(() => pending.rollback());
++      phase = 'after-rollback';
++      await nextTick();
++      const values = [
++        { id: 'A', v: 0 },
++        { id: 'C', v: 0 },
++      ];
++      const expected = {
++        scalar: 0,
++        left: expectedRows(values, 'A'),
++        right: expectedRows(values, 'C'),
++      };
++      expect(callbacks).toBe(1);
++      expect(first.threw).toBe(true);
++      expect(first.error).toBe(failure);
++      expect(read()).toEqual(expected);
++      expect(lifecycle.snapshot().pending).toHaveLength(0);
++      expect(hasOpenCommitScope(tree)).toBe(false);
++      phase = 'retry';
++      expect(attempt(() => pending.rollback()).threw).toBe(false);
++      expect(read()).toEqual(expected);
++      expect(callbacks).toBe(1);
++      expect(tree.$.left.byIdOrFail('A')).toBe(heldLeft);
++      expect(tree.$.right.byIdOrFail('A')).toBe(heldRight);
++      const delivered = seen.filter(
++        (frame) =>
++          frame.phase === 'rollback' || frame.phase === 'after-rollback'
++      );
++      expect(delivered.length).toBeGreaterThan(0);
++      for (const frame of delivered)
++        expect(frame.value, JSON.stringify(seen)).toEqual(expected);
++    } finally {
++      dispose();
++      untap();
++      tree.destroy();
++    }
++  });
++});
+diff --git a/packages/vue/src/lib/settlement-publication.spec.ts b/packages/vue/src/lib/settlement-publication.spec.ts
+new file mode 100644
+index 00000000..b710aa2d
+--- /dev/null
++++ b/packages/vue/src/lib/settlement-publication.spec.ts
+@@ -0,0 +1,379 @@
++import { describe, expect, it } from 'vitest';
++import {
++  computed,
++  effect,
++  isReadonly,
++  isRef,
++  nextTick,
++  stop,
++  shallowRef,
++  triggerRef,
++  toValue,
++  unref,
++  watch,
++  watchEffect,
++  type ComputedRef,
++} from 'vue';
++
++import {
++  entityMap,
++  signalTree,
++  transactions,
++  type PendingTransaction,
++} from '../index';
++import { createVueObservationAdapter } from './vue-observation';
++
++function required<T>(value: T | null | undefined): T {
++  if (value === undefined || value === null) {
++    throw new Error('Missing required test value');
++  }
++  return value;
++}
++
++type Row = { id: string; value: number };
++const build = () => {
++  const tree = signalTree(
++    {
++      scalar: 0,
++      left: entityMap<Row, string>({ selectId: (row) => row.id }),
++      right: entityMap<Row, string>({ selectId: (row) => row.id }),
++    },
++    { enhancers: [transactions()] }
++  );
++  tree.$.left.addOne({ id: 'A', value: 0 });
++  tree.$.right.addOne({ id: 'A', value: 0 });
++  return tree;
++};
++
++describe('Vue owned collection publication', () => {
++  it('retains native readonly ref identity and watch/effect interoperability', async () => {
++    const tree = build();
++    const held = tree.$.left.all;
++    const effects: number[] = [];
++    const watched: number[] = [];
++    const runner = effect(() => effects.push(required(held.value[0]).value));
++    const stopWatch = watch(
++      held,
++      (rows) => watched.push(required(rows[0]).value),
++      {
++        flush: 'sync',
++      }
++    );
++    try {
++      expect(held).toBe(tree.$.left.all);
++      expect(isRef(held)).toBe(true);
++      expect(isReadonly(held)).toBe(true);
++      expect(held.effect).toBeDefined();
++      expect(unref(held)).toBe(held.value);
++      expect(toValue(held)).toBe(held.value);
++      tree.$.left.updateOne('A', { value: 1 });
++      await nextTick();
++      expect(effects).toContain(1);
++      expect(watched).toContain(1);
++      expect(required(held.value[0]).value).toBe(1);
++    } finally {
++      stop(runner);
++      stopWatch();
++      tree.destroy();
++    }
++  });
++
++  it('publishes rollback with both owned collections coherent', async () => {
++    const tree = build();
++    let phase = 'setup';
++    const seen: { phase: string; values: number[] }[] = [];
++    const dispose = watchEffect(
++      () => {
++        seen.push({
++          phase,
++          values: [
++            tree.$.scalar.value,
++            required(tree.$.left.all.value[0]).value,
++            required(tree.$.right.all.value[0]).value,
++          ],
++        });
++      },
++      { flush: 'sync' }
++    );
++    try {
++      const pending = tree.transact(() => {
++        tree.$.scalar.value = 1;
++        tree.$.left.updateOne('A', { value: 1 });
++        tree.$.right.updateOne('A', { value: 1 });
++      });
++      await nextTick();
++      expect(seen.at(-1)?.values).toEqual([1, 1, 1]);
++      phase = 'rollback';
++      pending.rollback();
++      phase = 'delivered';
++      await nextTick();
++      const settlement = seen.filter(
++        (entry) => entry.phase === 'rollback' || entry.phase === 'delivered'
++      );
++      expect(settlement.length).toBeGreaterThan(0);
++      for (const entry of settlement) expect(entry.values).toEqual([0, 0, 0]);
++    } finally {
++      dispose();
++      tree.destroy();
++    }
++  });
++
++  it('preserves held and native caches inside a reentrant authored group', async () => {
++    const tree = build();
++    const held = tree.$.left.all;
++    const native = computed(() => held.value.map((row) => row.value));
++    void native.value;
++    let phase = 'setup';
++    let reentered = false;
++    let nested: PendingTransaction | undefined;
++    const reads: {
++      held: readonly Row[];
++      before: readonly Row[];
++      native: number[];
++      nativeBefore: number[];
++    }[] = [];
++    const dispose = watchEffect(
++      () => {
++        const scalar = tree.$.scalar.value;
++        void held.value;
++        if (phase !== 'rollback' || scalar !== 0 || reentered) return;
++        reentered = true;
++        const before = held.value;
++        const nativeBefore = native.value;
++        nested = tree.transact(() => {
++          tree.$.left.updateOne('A', { value: 9 });
++          reads.push({
++            held: held.value,
++            before,
++            native: native.value,
++            nativeBefore,
++          });
++        });
++      },
++      { flush: 'sync' }
++    );
++    try {
++      const pending = tree.transact(() => {
++        tree.$.scalar.value = 1;
++        tree.$.left.updateOne('A', { value: 1 });
++      });
++      await nextTick();
++      phase = 'rollback';
++      pending.rollback();
++      phase = 'after-rollback';
++      expect(reentered).toBe(true);
++      expect(reads).toHaveLength(1);
++      expect(required(reads[0]).held).toBe(required(reads[0]).before);
++      expect(required(reads[0]).native).toBe(required(reads[0]).nativeBefore);
++      expect(nested).toBeDefined();
++      required(nested).confirm();
++      await nextTick();
++      expect(tree.$.left.byId('A')?.()?.value).toBe(9);
++      expect(required(held.value[0]).value).toBe(9);
++    } finally {
++      dispose();
++      tree.destroy();
++    }
++  });
++
++  it('tracks switched dependencies and stops observers without unrelated delivery', () => {
++    const adapter = createVueObservationAdapter();
++    const choice = adapter.createToken();
++    const left = adapter.createToken();
++    const right = adapter.createToken();
++    const unrelated = adapter.createToken();
++    let useLeft = true;
++    let leftValue = 1;
++    let rightValue = 2;
++    const cell = required(adapter.createReadonlyCell).call(adapter, () => {
++      choice.observe();
++      if (useLeft) {
++        left.observe();
++        return leftValue;
++      }
++      right.observe();
++      return rightValue;
++    }) as unknown as ComputedRef<number>;
++    const seen: number[] = [];
++    const dispose = watchEffect(
++      () => {
++        seen.push(cell.value);
++      },
++      { flush: 'sync' }
++    );
++    try {
++      expect(seen.at(-1)).toBe(1);
++      adapter.runInvalidationGroup(() => {
++        useLeft = false;
++        choice.invalidate();
++      });
++      expect(seen.at(-1)).toBe(2);
++      const switched = [...seen];
++      adapter.runInvalidationGroup(() => {
++        leftValue = 3;
++        left.invalidate();
++        unrelated.invalidate();
++      });
++      expect(seen).toEqual(switched);
++      adapter.runInvalidationGroup(() => {
++        rightValue = 4;
++        right.invalidate();
++      });
++      expect(seen.at(-1)).toBe(4);
++      dispose();
++      const stopped = [...seen];
++      adapter.runInvalidationGroup(() => {
++        rightValue = 5;
++        right.invalidate();
++      });
++      expect(seen).toEqual(stopped);
++    } finally {
++      dispose();
++    }
++  });
++
++  it('does not evaluate an already refreshed native getter twice for the same read', () => {
++    const adapter = createVueObservationAdapter();
++    const token = adapter.createToken();
++    let evaluations = 0;
++    const cell = required(adapter.createReadonlyCell).call(adapter, () => {
++      token.observe();
++      return ++evaluations;
++    }) as unknown as ComputedRef<number>;
++    const seen: number[] = [];
++    const dispose = watchEffect(
++      () => {
++        seen.push(cell.value);
++      },
++      { flush: 'sync' }
++    );
++    try {
++      expect(evaluations).toBe(1);
++      adapter.runInvalidationGroup(() => token.invalidate());
++      expect(seen).toEqual([1, 2]);
++      expect(evaluations).toBe(2);
++    } finally {
++      dispose();
++    }
++  });
++
++  it.each([
++    ['body Error', true, new Error('body first')],
++    ['body undefined', true, undefined],
++    ['observer Error', false, new Error('observer first')],
++  ] as const)(
++    'preserves the first %s while delivering sibling invalidations',
++    (_, bodyFails, first) => {
++      const adapter = createVueObservationAdapter();
++      const failing = adapter.createToken();
++      const sibling = adapter.createToken();
++      let armed = false;
++      let siblingDelivered = false;
++      const failingEffect = effect(() => {
++        failing.observe();
++        if (armed) throw bodyFails ? new Error('later observer') : first;
++      });
++      const siblingEffect = effect(() => {
++        sibling.observe();
++        if (armed) siblingDelivered = true;
++      });
++      let caught = false;
++      let failure: unknown;
++      try {
++        try {
++          adapter.runInvalidationGroup(() => {
++            armed = true;
++            failing.invalidate();
++            sibling.invalidate();
++            if (bodyFails) throw first;
++          });
++        } catch (error) {
++          caught = true;
++          failure = error;
++        }
++        expect(caught).toBe(true);
++        expect(failure).toBe(first);
++        expect(siblingDelivered).toBe(true);
++      } finally {
++        stop(failingEffect);
++        stop(siblingEffect);
++      }
++    }
++  );
++
++  it('retains native Vue handling of observer throw undefined', () => {
++    // Vue's triggerRef swallows an effect's thrown undefined before the adapter
++    // receives it. The first failed propagation assertion and the standalone
++    // native control are preserved in the publication-boundary evidence packet.
++    // This is native behavior, not a SignalTree error-propagation guarantee.
++    const revision = shallowRef(0);
++    let nativeArmed = false;
++    let nativeRuns = 0;
++    const nativeEffect = effect(() => {
++      void revision.value;
++      nativeRuns++;
++      if (nativeArmed) throw undefined;
++    });
++    const adapter = createVueObservationAdapter();
++    const token = adapter.createToken();
++    const sibling = adapter.createToken();
++    let armed = false;
++    let runs = 0;
++    let siblingDelivered = false;
++    const failingEffect = effect(() => {
++      token.observe();
++      runs++;
++      if (armed) throw undefined;
++    });
++    const siblingEffect = effect(() => {
++      sibling.observe();
++      if (armed) siblingDelivered = true;
++    });
++    try {
++      nativeArmed = true;
++      expect(() => triggerRef(revision)).not.toThrow();
++      expect(nativeRuns).toBe(2);
++      expect(() =>
++        adapter.runInvalidationGroup(() => {
++          armed = true;
++          token.invalidate();
++          sibling.invalidate();
++        })
++      ).not.toThrow();
++      expect(runs).toBe(2);
++      expect(siblingDelivered).toBe(true);
++    } finally {
++      stop(nativeEffect);
++      stop(failingEffect);
++      stop(siblingEffect);
++    }
++  });
++
++  it('memoizes allocating readonly getters across unrelated publication', () => {
++    const adapter = createVueObservationAdapter();
++    const token = adapter.createToken();
++    let computes = 0;
++    const owned = required(adapter.createReadonlyCell).call(adapter, () => ({
++      value: ++computes,
++    }));
++    const initial = owned();
++    const rows: { same: boolean; sameInitial: boolean }[] = [];
++    const dispose = watchEffect(
++      () => {
++        token.observe();
++        const x = owned();
++        const y = owned();
++        rows.push({ same: x === y, sameInitial: x === initial });
++      },
++      { flush: 'sync' }
++    );
++    try {
++      adapter.runInvalidationGroup(() => token.invalidate());
++      expect(rows.length).toBeGreaterThan(1);
++      expect(rows.every((row) => row.same)).toBe(true);
++      expect(computes).toBe(1);
++    } finally {
++      dispose();
++    }
++  });
++});
+diff --git a/packages/vue/src/lib/transaction-realization.spec.ts b/packages/vue/src/lib/transaction-realization.spec.ts
+index 80a714b7..0c8afcda 100644
+--- a/packages/vue/src/lib/transaction-realization.spec.ts
++++ b/packages/vue/src/lib/transaction-realization.spec.ts
+@@ -8,8 +8,10 @@ import { describe } from 'vitest';
+ import {
+   transactionRealizationContract,
+   type ConformanceRow,
++  type EntityProjectionFrame,
+   type MixedFrame,
+   type Observation,
++  type ValuePublicationFrame,
+ } from '../../../kernel/src/transaction-realization-contract';
+ import { entityMap, signalTree, transactions } from '../index';
+ 
+@@ -27,22 +29,62 @@ const build = () =>
+   signalTree(
+     {
+       scalar: 0,
+-      rows: entityMap<ConformanceRow, string>({ selectId: (r) => r.id }),
++      rows: entityMap<ConformanceRow, string>({
++        selectId: (r) => r.id,
++      }).computed('names', (rows) => rows.map((row) => row.name)),
+     },
+     { enhancers: [transactions()] }
+   );
+ 
+-const observe = <T>(read: () => T): Observation<T> => {
++const observe = <T>(
++  read: () => T,
++  flush: 'pre' | 'sync' = 'pre'
++): Observation<T> => {
+   const seen: T[] = [];
+   let latest!: T;
+-  const stop = watchEffect(() => {
+-    const value = read();
+-    latest = value;
+-    seen.push(value);
+-  });
++  const stop = watchEffect(
++    () => {
++      const value = read();
++      latest = value;
++      seen.push(value);
++    },
++    { flush }
++  );
+   return { seen, current: () => latest, dispose: stop };
+ };
+ 
++const projectionFrame = (
++  $: Tree['$'],
++  phase: string,
++  enabled: boolean
++): EntityProjectionFrame => {
++  const scalar = $.scalar.value;
++  if (!enabled) return { phase, scalar, projections: null };
++  const node = $.rows.byId('A');
++  const encode = (row: ConformanceRow | undefined) =>
++    row ? `${row.id}:${row.name}` : null;
++  return {
++    phase,
++    scalar,
++    projections: {
++      all: $.rows.all.value.map((row) => `${row.id}:${row.name}`),
++      ids: [...$.rows.ids.value],
++      count: $.rows.count.value,
++      empty: $.rows.empty.value,
++      map: [...$.rows.asMap.value].map(([key, row]) => `${key}:${row.name}`),
++      hasA: $.rows.has('A').value,
++      where: $.rows.where(matchesA).value.map((row) => `${row.id}:${row.name}`),
++      find: encode($.rows.find(matchesA).value),
++      slice: [...$.rows.names.value],
++      activeId: $.rows.activeId.value ?? null,
++      activeEntity: encode($.rows.activeEntity.value),
++      row: node?.()?.name ?? null,
++      field: node?.name.value ?? null,
++    },
++  };
++};
++const matchesA = (row: ConformanceRow) => row.id === 'A';
++
+ describe('@signal-tree/vue — pending realization conformance', () => {
+   transactionRealizationContract<Tree>({
+     framework: 'vue',
+@@ -75,6 +117,31 @@ describe('@signal-tree/vue — pending realization conformance', () => {
+         ids: [...tree.$.rows.ids.value],
+       })),
+ 
++    observeValues: (tree, phase) => [
++      observe<ValuePublicationFrame>(() => ({
++        phase: phase(),
++        scalar: tree.$.scalar.value,
++        row: tree.$.rows.byId('A')?.()?.name,
++        all: tree.$.rows.all.value.find((row) => row.id === 'A')?.name,
++      })),
++      observe<ValuePublicationFrame>(
++        () => ({
++          phase: phase(),
++          scalar: tree.$.scalar.value,
++          row: tree.$.rows.byId('A')?.()?.name,
++          all: tree.$.rows.all.value.find((row) => row.id === 'A')?.name,
++        }),
++        'sync'
++      ),
++    ],
++
++    selectRow: (tree, id) => tree.$.rows.setActiveId(id),
++    rekeyRow: (tree, from, to) => tree.$.rows.changeId(from, to),
++    observeProjections: (tree, phase, enabled) => [
++      observe(() => projectionFrame(tree.$, phase(), enabled())),
++      observe(() => projectionFrame(tree.$, phase(), enabled()), 'sync'),
++    ],
++
+     flush: async () => {
+       await nextTick();
+       await Promise.resolve();
+diff --git a/packages/vue/src/lib/vue-observation.ts b/packages/vue/src/lib/vue-observation.ts
+index 9eacded6..abe038f4 100644
+--- a/packages/vue/src/lib/vue-observation.ts
++++ b/packages/vue/src/lib/vue-observation.ts
+@@ -3,7 +3,6 @@ import {
+   shallowRef,
+   triggerRef,
+   type ComputedRef,
+-  type ShallowRef,
+ } from 'vue';
+ 
+ import type {
+@@ -65,22 +64,40 @@ const createWritableCell = <T>(read: () => T): VueWritableCell<T> => {
+ 
+ export const createVueObservationAdapter = (): ObservationAdapter => {
+   let invalidationGroupDepth = 0;
+-  const pendingInvalidations = new Set<() => void>();
++  // One native publication dirties every participating dependency chain before
++  // Vue starts synchronous effects. Per-token computed equality keeps unchanged
++  // branches from recomputing their user-visible projections.
++  const publication = shallowRef(0);
++  let pendingInvalidation = false;
+ 
+-  const scheduleInvalidation = (invalidate: () => void): void => {
++  const scheduleInvalidation = (): void => {
+     if (invalidationGroupDepth > 0) {
+-      pendingInvalidations.add(invalidate);
++      pendingInvalidation = true;
+       return;
+     }
+-    invalidate();
++    triggerRef(publication);
++  };
++
++  const createRevision = () => {
++    let generation = 0;
++    const revision = computed(() => {
++      void publication.value;
++      return generation;
++    });
++    return {
++      read: () => revision.value,
++      advance: () => {
++        generation += 1;
++        scheduleInvalidation();
++      },
++    };
+   };
+ 
+   const createObservationToken = (): ObservationToken => {
+-    const revision = shallowRef(0);
+-    const invalidate = () => triggerRef(revision);
++    const revision = createRevision();
+     return {
+-      observe: () => void revision.value,
+-      invalidate: () => scheduleInvalidation(invalidate),
++      observe: () => void revision.read(),
++      invalidate: revision.advance,
+     };
+   };
+ 
+@@ -89,56 +106,35 @@ export const createVueObservationAdapter = (): ObservationAdapter => {
+ 
+     createWritableCell: <T>(read: () => T) => {
+       let published = read();
+-      const revision = shallowRef(0);
+-      const invalidate = () => triggerRef(revision);
++      const revision = createRevision();
+       return {
+         cell: createWritableCell(() => {
+-          void revision.value;
++          void revision.read();
+           return published;
+         }),
+         peek: read,
+         token: {
+-          observe: () => void revision.value,
++          observe: () => void revision.read(),
+           invalidate: () => {
+             published = read();
+-            scheduleInvalidation(invalidate);
++            revision.advance();
+           },
+         },
+       };
+     },
+ 
+-    /**
+-     * `VUE-NATIVE-EPOCH-0`. Vue's own realization of a per-subject
+-     * invalidation anchor.
+-     *
+-     * An epoch carries no value anyone reads — it exists to be depended on and
+-     * advanced — so this is a `shallowRef` and a reader, with no writable-cell
+-     * record and no observation-token wrapper around it.
+-     *
+-     * Supplied as a PAIR with `advanceEpoch`, which is the load-bearing part.
+-     * The kernel never writes this handle: Vue creates it and Vue advances it.
+-     * An earlier design had the kernel write the adapter's cell directly, and
+-     * because Vue ships `cell.set` as an inert placeholder for the kernel to
+-     * replace, Vue's entity invalidation was silently dead. The pair makes that
+-     * class of defect unexpressible.
+-     *
+-     * Advancement goes through `scheduleInvalidation`, so a Vue invalidation
+-     * group batches epoch advances exactly like every other publication.
+-     */
++    /** Subject identity remains kernel-owned; Vue owns its dependency nonce. */
+     createEpoch: () => {
+-      const revision = shallowRef(0);
+-      const epoch = (() => revision.value) as EpochHandle & {
+-        [EPOCH_REF]?: typeof revision;
++      const revision = createRevision();
++      const epoch = revision.read as EpochHandle & {
++        [EPOCH_REF]?: () => void;
+       };
+-      epoch[EPOCH_REF] = revision;
++      epoch[EPOCH_REF] = revision.advance;
+       return epoch;
+     },
+ 
+     advanceEpoch: (epoch) => {
+-      const revision = (epoch as EpochHandle & {
+-        [EPOCH_REF]?: ShallowRef<number>;
+-      })[EPOCH_REF];
+-      if (revision) scheduleInvalidation(() => triggerRef(revision));
++      (epoch as EpochHandle & { [EPOCH_REF]?: () => void })[EPOCH_REF]?.();
+     },
+ 
+     createWritableProjection: <T>(computeValue: () => T) => ({
+@@ -162,17 +158,14 @@ export const createVueObservationAdapter = (): ObservationAdapter => {
+         hasFailure = true;
+       } finally {
+         invalidationGroupDepth -= 1;
+-        if (invalidationGroupDepth === 0 && pendingInvalidations.size > 0) {
+-          const invalidations = [...pendingInvalidations];
+-          pendingInvalidations.clear();
+-          for (const invalidate of invalidations) {
+-            try {
+-              invalidate();
+-            } catch (error) {
+-              if (!hasFailure) {
+-                failure = error;
+-                hasFailure = true;
+-              }
++        if (invalidationGroupDepth === 0 && pendingInvalidation) {
++          pendingInvalidation = false;
++          try {
++            triggerRef(publication);
++          } catch (error) {
++            if (!hasFailure) {
++              failure = error;
++              hasFailure = true;
+             }
+           }
+         }

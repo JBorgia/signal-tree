@@ -4,12 +4,60 @@ import {
   signal,
   untracked,
   type WritableSignal,
+  type Signal,
 } from '@angular/core';
 
 import type {
   ObservationAdapter,
   ObservationToken,
 } from '@signal-tree/kernel/adapter';
+
+/** One native producer per reader, with source-current direct reads. */
+function currentReadonly<T>(readCurrent: () => T): Signal<T> {
+  let active: { evaluated: boolean } | undefined;
+  let computing = false;
+  let nativeFault: { error: unknown } | undefined;
+  let ownFailure: { error: unknown } | undefined;
+  const pendingNativeFault = (): { error: unknown } | undefined => nativeFault;
+  const source = computed(() => {
+    if (active) active.evaluated = true;
+    computing = true;
+    nativeFault = undefined;
+    try {
+      const value = readCurrent();
+      ownFailure = undefined;
+      return value;
+    } catch (error) {
+      // Do not reclassify a nested native/cycle error as a source-owned error
+      // merely because it propagated through the supplied recipe.
+      const fault = pendingNativeFault();
+      ownFailure = fault && Object.is(fault.error, error) ? undefined : { error };
+      throw error;
+    } finally { computing = false; }
+  });
+  return new Proxy(source, {
+    apply() {
+      const previous = active;
+      const frame = { evaluated: false };
+      active = frame;
+      try {
+        let value: T;
+        try { value = source(); }
+        catch (error) {
+          if (!frame.evaluated && computing) {
+            nativeFault = { error };
+            throw error;
+          }
+          // Only this computation's remembered own-recipe failure qualifies.
+          // Marker=false alone also describes fresh dependency/cycle failures.
+          if (frame.evaluated || !ownFailure || !Object.is(ownFailure.error, error)) throw error;
+          return readCurrent();
+        }
+        return frame.evaluated ? value : readCurrent();
+      } finally { active = previous; }
+    },
+  });
+}
 
 /** Angular dependency tracking for kernel-owned locations. */
 export const ANGULAR_OBSERVATION_ADAPTER: ObservationAdapter = {
@@ -38,6 +86,7 @@ export const ANGULAR_OBSERVATION_ADAPTER: ObservationAdapter = {
   },
 
   createReadonlyCell: <T,>(compute: () => T) => computed(compute),
+  createCurrentReadonlyCell: currentReadonly,
 
   createWritableProjection: <T,>(compute: () => T) => {
     const cell = linkedSignal(compute);

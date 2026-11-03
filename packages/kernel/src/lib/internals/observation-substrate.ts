@@ -7,7 +7,7 @@ import {
 } from './owned-mutation';
 import { getOwnedOwnerPath, getOwnedPositionIds } from './owned-metadata';
 import { getPositionRegistry, getNodeAddress } from './position-registry';
-import { isTraversableNode } from './node-shape';
+import { isTraversableNode, nodeStoreOf } from './node-shape';
 import {
   dormantKeys,
   hasDormantMembers,
@@ -64,6 +64,21 @@ type LeafObservation = {
 
 const OBSERVATION = new WeakMap<object, LeafObservation>();
 
+// Only active scopes are indexed. Canonical stores unify a branch's accessor
+// and backing store without installing any work on dormant leaf writes.
+type ObservationScope = { visit: (node: unknown) => void };
+const BRANCH_SCOPES = new WeakMap<object, Set<ObservationScope>>();
+
+/** @internal Enroll a materialized member before its parent exposes it. */
+export function inheritObservationForAddedMember(
+  parent: object,
+  child: unknown
+): void {
+  const scopes = BRANCH_SCOPES.get(nodeStoreOf(parent) ?? parent);
+  if (!scopes) return;
+  for (const scope of scopes) scope.visit(child);
+}
+
 /**
  * @internal Install the stable interception point on an ordinary leaf.
  *
@@ -104,7 +119,8 @@ function claimLeaf(node: object): (() => void) | undefined {
           { path: ownerPath, positionIds, ownerId: registry.id },
           mutation.before,
           mutation.after,
-          mutation.intent
+          mutation.intent,
+          mutation.coveredRecipients
         );
       }) ?? (() => undefined);
   }
@@ -133,10 +149,13 @@ function claimLeaf(node: object): (() => void) | undefined {
  */
 export function acquireObservation(source: unknown): () => void {
   const releases: Array<() => void> = [];
-  const seen = new Set<unknown>();
+  const seen = new Set<object>();
+  const branches: object[] = [];
+  const scope: ObservationScope = { visit: (node) => visit(node) };
 
-  const visit = (node: unknown): void => {
-    if (!isTraversableNode(node)) return;
+  const visit = (candidate: unknown): void => {
+    if (!isTraversableNode(candidate)) return;
+    const node = nodeStoreOf(candidate) ?? candidate;
     if (seen.has(node)) return;
     seen.add(node);
 
@@ -145,6 +164,13 @@ export function acquireObservation(source: unknown): () => void {
       releases.push(claim);
       return;
     }
+    let scopes = BRANCH_SCOPES.get(node);
+    if (!scopes) {
+      scopes = new Set();
+      BRANCH_SCOPES.set(node, scopes);
+    }
+    scopes.add(scope);
+    branches.push(node);
     for (const key of Object.keys(node as Record<string, unknown>)) {
       visit((node as Record<string, unknown>)[key]);
     }
@@ -162,7 +188,15 @@ export function acquireObservation(source: unknown): () => void {
   return () => {
     if (released) return;
     released = true;
+    for (const branch of branches) {
+      const scopes = BRANCH_SCOPES.get(branch);
+      scopes?.delete(scope);
+      if (scopes?.size === 0) BRANCH_SCOPES.delete(branch);
+    }
     for (const release of releases) release();
+    branches.length = 0;
+    releases.length = 0;
+    seen.clear();
   };
 }
 

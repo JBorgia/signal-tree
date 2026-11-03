@@ -1,0 +1,1261 @@
+{
+  "archive": "/private/tmp/st-cost-final-packages.tar.xz",
+  "sha256": "514920267d3616d78285719422e0c5a9f57849890437bfcda712947fb9e7dc4d",
+  "lanes": {
+    "baseline": {
+      "package.json": {
+        "sha256": "a738dcb86c2f21f3c1f99d6906b64452db8c7e695f9b9680888ad512aef8e206",
+        "bytes": 1317
+      },
+      "dist/_adapter-073J_Un_.d.ts": {
+        "sha256": "17edda9cba1baa4010268ed9244b9d8d2af3a4aba0ce7a2fd41c1748ea650d26",
+        "bytes": 66467
+      },
+      "dist/_position-registry-D8dCXLAS.d.ts": {
+        "sha256": "5fa73d43d0525919b2731e54adbe1a2cb1adaafc6fe014c536b4dc75a69bfab6",
+        "bytes": 1205
+      },
+      "dist/adapter.d.ts": {
+        "sha256": "6005d7d2c1cb26f51f1d99430c7d85125a63bc7f9208a1c8c080257a08e176ce",
+        "bytes": 697
+      },
+      "dist/adapter.js": {
+        "sha256": "d080563a22f5bda9437a7c14d4b4bcfb881778733c056d74fa5e483d1d60ceef",
+        "bytes": 1684
+      },
+      "dist/enhancers/batching/batching.js": {
+        "sha256": "f266af789c5f4212b90bacb20657c4fc6a10da3200d7be6246b701946106ffce",
+        "bytes": 6083
+      },
+      "dist/enhancers/devtools/devtools-impl.js": {
+        "sha256": "6db65cd985bc1116b11d9ebb3f99ac6117b743ad10f20f33da705e001ce4e64c",
+        "bytes": 30363
+      },
+      "dist/enhancers/devtools/devtools.js": {
+        "sha256": "b3c05a3a89706751807e85bf96c184c0f26a82a399d980966301162572fbe678",
+        "bytes": 538
+      },
+      "dist/enhancers/index.js": {
+        "sha256": "2101af7fc02fd5d38b59084e760d5b51bff5128eb854e14081f4912873da1425",
+        "bytes": 2177
+      },
+      "dist/enhancers/restoration/restoration.js": {
+        "sha256": "85289f0c88726265fd8a98a5ec547dce489801dab2cb19a8bf021e58d7feb565",
+        "bytes": 85509
+      },
+      "dist/enhancers/transactions/transactions.js": {
+        "sha256": "32eb940d76f926b5994ff452e5df0d0355b9080c9b58f7803e393dc77ea64214",
+        "bytes": 61129
+      },
+      "dist/index.d.ts": {
+        "sha256": "9cace937c510377c8591c9c8e81a9c2e2074c6571446bab73b0829ff163ba3b3",
+        "bytes": 33268
+      },
+      "dist/index.js": {
+        "sha256": "a91d2789824d429e69cd18ce29679dbd736fdeecb8dcbd5eac8d2dab018db799",
+        "bytes": 712
+      },
+      "dist/internals.d.ts": {
+        "sha256": "f8bac88cf050d3f561babdccfa14fc2f86bfd077e6dc7835d19fb200ac5e1fa8",
+        "bytes": 31782
+      },
+      "dist/internals.js": {
+        "sha256": "f0bd6c8036404f0e202eed089fa0d70224e430eb032b6dcc44560709b8d95415",
+        "bytes": 2563
+      },
+      "dist/lib/constants.js": {
+        "sha256": "969946e374794fe221294b48e22afcf073dfdfd26639a928aa48c59a950f4974",
+        "bytes": 581
+      },
+      "dist/lib/enhancer-types.js": {
+        "sha256": "38a55eaafc23f76cda0cc9eb313aa3fda1ebfa01237f815f54e2cb1fafaf5bbe",
+        "bytes": 78
+      },
+      "dist/lib/entity-signal.js": {
+        "sha256": "ee951a9b3541064b7e2c068e3e2640754d5c83451da568e60a665ce80c8512c3",
+        "bytes": 66000
+      },
+      "dist/lib/external.js": {
+        "sha256": "a43be60d2a89d982209a55ce20246ecd7b65e869c908178683a0b12a95351081",
+        "bytes": 819
+      },
+      "dist/lib/internals/canonical-snapshot.js": {
+        "sha256": "4ccacb2bc2e4c73b5daad34987c21628d8a8fe267c70f0faf16863234ce4b119",
+        "bytes": 220
+      },
+      "dist/lib/internals/causal-runtime/applied-turn-projection.js": {
+        "sha256": "c52212b5f2cabac82911f05e341eeb02e405b67e0d680aa4442df2bb9a97abd9",
+        "bytes": 5631
+      },
+      "dist/lib/internals/causal-runtime/pending-rollback.js": {
+        "sha256": "7da008de66dad447d64e1ebfed1998934fee600053d7daa85591cbe7d421dc6b",
+        "bytes": 8878
+      },
+      "dist/lib/internals/causal-runtime/post-application-failure.js": {
+        "sha256": "4933da16cebd20e55159f3176e5e6b7bb13d93582744a9df0762b586d637d875",
+        "bytes": 718
+      },
+      "dist/lib/internals/causal-runtime/realization-context.js": {
+        "sha256": "6dbd74416fe572ebc63bc74bf81eddf86d570b9f53309dfdc77c6fc8f2a90208",
+        "bytes": 2386
+      },
+      "dist/lib/internals/causal-runtime/scoped-value-addressing.js": {
+        "sha256": "0c8a4d03b88f7dc0cc845c22b731fc8f8de86c10e247334ea0b9dac00c5f91f8",
+        "bytes": 222
+      },
+      "dist/lib/internals/causal-runtime/target-transition.js": {
+        "sha256": "b740ddc1d40bfb96bb1c9fc82fa7f05dac7a16496242f3a98f2f1d09824d7c78",
+        "bytes": 21187
+      },
+      "dist/lib/internals/causal-runtime/transaction-lifecycle.js": {
+        "sha256": "e6830837e4288560926c39edc188c66f994348eb8bda2e4482ee8b8c394f1cd1",
+        "bytes": 1922
+      },
+      "dist/lib/internals/causal-runtime/transient-rows.js": {
+        "sha256": "d705adc9d4269f8ca577e796071f30c13ff2a5241af43bb9c2d4781a888fae87",
+        "bytes": 1448
+      },
+      "dist/lib/internals/causal-runtime/tree-realization-adapter.js": {
+        "sha256": "16a995e906f66a4f512abed97c4a04f8e18d5775d182efa8fda5fc4d79123f54",
+        "bytes": 41743
+      },
+      "dist/lib/internals/causal-runtime/turn-store.js": {
+        "sha256": "9c0692505988d4276c5bfe0355a055b90a276ff4dc08f2fb0bad5cf74f2955df",
+        "bytes": 7142
+      },
+      "dist/lib/internals/cell-identity.js": {
+        "sha256": "2b1845cdfc9a5428490df81fedb26fa3acff824379c833384959942b9843b83b",
+        "bytes": 301
+      },
+      "dist/lib/internals/commit-consequence.js": {
+        "sha256": "0cef50047fc80e20c5d93b98222d14a365d433ce0dfd1cf35642c22b321b3bad",
+        "bytes": 3490
+      },
+      "dist/lib/internals/confirmed-turn-view.js": {
+        "sha256": "f67861a6ea9a88888d8dbaf88a71561705063f24f73bfa0126667eaa2fc36067",
+        "bytes": 386
+      },
+      "dist/lib/internals/construction-branch.js": {
+        "sha256": "fb6491c0318fae2b08f9274e3a648c1675ca71ccfdb2fdb2770402f0a89cd4c3",
+        "bytes": 406
+      },
+      "dist/lib/internals/entity-egress-projection.js": {
+        "sha256": "fca3c59f219b16daa96b71b6eda7b02beddc59af98013b12216797df43b1655d",
+        "bytes": 2946
+      },
+      "dist/lib/internals/entity-membership-inventory.js": {
+        "sha256": "b84981dcee85cc32c1db6a3d682d7617a04e0a59331b1fe511c8d7c91df59d10",
+        "bytes": 5171
+      },
+      "dist/lib/internals/entity-membership-source.js": {
+        "sha256": "f484bc5ab09ccbc02c984e12992195099dd5b9ab8ec48c9deae445c626190546",
+        "bytes": 825
+      },
+      "dist/lib/internals/entity-membership-view.js": {
+        "sha256": "efa8c0cc14ff6826d6702e2bbbfdfd2bd9c6e974d89c974772c9311d53f178d8",
+        "bytes": 4566
+      },
+      "dist/lib/internals/entity-projection-seed.js": {
+        "sha256": "6f91549be085973cac62227e01d2d9a1aed16552da11e45b3be7cc7d11f46234",
+        "bytes": 805
+      },
+      "dist/lib/internals/error-reporter.js": {
+        "sha256": "4e3df8672ad2fc6c94b0aec0bc95edca2fcfe5bb192afc36f5e18d8e9a866cff",
+        "bytes": 2229
+      },
+      "dist/lib/internals/exposed-publication.js": {
+        "sha256": "ec41990873df8ce007d38c385a22c13c02adf57a79fde81ed0252d5b75929a75",
+        "bytes": 452
+      },
+      "dist/lib/internals/intercept-leaf-signals.js": {
+        "sha256": "d2fa345fd54f96f477251e68803bd2ff1b2d30b648fa73337a72290658493396",
+        "bytes": 5100
+      },
+      "dist/lib/internals/intrinsic-mutation.js": {
+        "sha256": "b6e5e0c64722e05e05f1b37e9a7260b9a63c564fe27c7638fa0a864ba5452342",
+        "bytes": 1052
+      },
+      "dist/lib/internals/link-state-source.js": {
+        "sha256": "e1703ca459b2b5d8a68e4e5d43edd0c7b2c52120b011920b686195a4efcd9a7e",
+        "bytes": 559
+      },
+      "dist/lib/internals/link-state-view.js": {
+        "sha256": "09decebd532286f9dd857cdda811e63538696ba5f04447b8106daa472a21a3b2",
+        "bytes": 2458
+      },
+      "dist/lib/internals/location-runtime.js": {
+        "sha256": "4861241019e86f1f7356f77f8396ec5a43f753b4b8498e0be979e300e58bee77",
+        "bytes": 10068
+      },
+      "dist/lib/internals/materialize-markers.js": {
+        "sha256": "ffb1e2047bc9edad4b6bf5c98894d54885bb86ed349e7dabbf8f42ae228f3149",
+        "bytes": 7041
+      },
+      "dist/lib/internals/member-membership.js": {
+        "sha256": "0744eb0c398b7c4105d4cc68ead7572df33c1b9d0ebdbab2c3ac76591e14bf8e",
+        "bytes": 7552
+      },
+      "dist/lib/internals/merge-derived.js": {
+        "sha256": "125abd6c055f48c05797b8a9323e62f838e210bcd2aa1e744b7b1e60c7869643",
+        "bytes": 1607
+      },
+      "dist/lib/internals/mutation-capture-runtime.js": {
+        "sha256": "83ae2f74f9725eccf140d34e8976fe259f226eafed6a2b77f3bcd6002ac2f767",
+        "bytes": 1366
+      },
+      "dist/lib/internals/native-location-realization.js": {
+        "sha256": "7c80bc2ce8f23bfaa94d079b2573a26f00bf745a18399778cc0a29b85f9dd198",
+        "bytes": 4616
+      },
+      "dist/lib/internals/native-tree-scalar-leaf-runtime.js": {
+        "sha256": "283385c560e4be2ef8b3b51ee0f49723ecc62adc8d0c5e7d232d2b3a6b9d53e4",
+        "bytes": 4485
+      },
+      "dist/lib/internals/node-shape.js": {
+        "sha256": "a59d861653779f6e7e6580b709badce8e7803be5f5cfb607828cb179a53d39a8",
+        "bytes": 620
+      },
+      "dist/lib/internals/observation-adapter.js": {
+        "sha256": "1907fca8d5bd4ba4c847ccc375de01b0921752185d8f491efffa8e12befcee7e",
+        "bytes": 211
+      },
+      "dist/lib/internals/observation-substrate.js": {
+        "sha256": "4f662ddceb99c87d5098444396ace798fa93470f3ed2902fa5037af41a7db0db",
+        "bytes": 2148
+      },
+      "dist/lib/internals/owned-metadata.js": {
+        "sha256": "66dd3a5beb7db830728ec11a01064a6cf8db5c818ddbd8e0c63ac67411dab301",
+        "bytes": 979
+      },
+      "dist/lib/internals/owned-mutation.js": {
+        "sha256": "cc2b6b3bf0dd5c8f901411a98d621e5f31388babd70aec987b37ac7e85f90c5f",
+        "bytes": 2969
+      },
+      "dist/lib/internals/owner-invalidation-port.js": {
+        "sha256": "ca1a7cb729f0f6a270e5de59a590aab755645c6a218abba9163be09a37132957",
+        "bytes": 428
+      },
+      "dist/lib/internals/owner-invalidation.js": {
+        "sha256": "867aebe08f2dc3bcf70ae4ab1cd332d8ece089e9e6e2ed22d460ebda6b111e37",
+        "bytes": 2428
+      },
+      "dist/lib/internals/path-observation-port.js": {
+        "sha256": "d243c91aa1c394a94d1f0ec1e692ba5b641ed0b54acb4a06411a85621d988ec9",
+        "bytes": 935
+      },
+      "dist/lib/internals/physical-commit-clock.js": {
+        "sha256": "e549fe6fc4b6f0bae4d956d4656cda037150f3571bbb991fa66e0d539bcb4755",
+        "bytes": 727
+      },
+      "dist/lib/internals/physical-rows.js": {
+        "sha256": "af313f1b250cb2d02dd094e231e52969bceadfa95e0c437a5a0ef000740ed86d",
+        "bytes": 164
+      },
+      "dist/lib/internals/plain-branch-membership.js": {
+        "sha256": "14d90ce5c3e06d2bb92c8c4e55c49bf8dadc64ef89f86496459793aaf8ded767",
+        "bytes": 18645
+      },
+      "dist/lib/internals/position-registry.js": {
+        "sha256": "ddda8357d4d92036fa005569f401d333d454317319b7ac29319166df90f36ea7",
+        "bytes": 1867
+      },
+      "dist/lib/internals/production-substrate-stats.prod.js": {
+        "sha256": "750a59ce80f35e04900b1dfc90b18d4caf3dc5b84d4ab93301c338971bc7648c",
+        "bytes": 98
+      },
+      "dist/lib/internals/restoration-eligibility.js": {
+        "sha256": "a16e07468f9bb68d5ac56c5cd42476bbc10b310b02c0aa0b07e02f6b1fc6b739",
+        "bytes": 1220
+      },
+      "dist/lib/internals/restoration-reader.js": {
+        "sha256": "6a970c19cb257042282e5d1ce46d47e7053b3bb93fcb3868a5eea500abeb4204",
+        "bytes": 2597
+      },
+      "dist/lib/internals/restoration-source.js": {
+        "sha256": "5263d1feb5fc9456bd5522104a471dc7ba2fb1007cd19fa33ca183a4576f5df6",
+        "bytes": 468
+      },
+      "dist/lib/internals/root-source.js": {
+        "sha256": "fd3f6454a5b4d80c2912604e68e95e7cff15d7ccd598130c1b6a191f1f533106",
+        "bytes": 495
+      },
+      "dist/lib/internals/runtime-tree-plan.js": {
+        "sha256": "05d31fdf6efa5ef49f08ff271c87b74f541cf62098a028015045dc9a4cab703e",
+        "bytes": 310
+      },
+      "dist/lib/internals/snapshot-authority.js": {
+        "sha256": "dfc7b526b46da263fad45147f6ec94f078b68ab0c5df5d02506f6ac0fc257ce5",
+        "bytes": 2097
+      },
+      "dist/lib/internals/source-mutation.js": {
+        "sha256": "2a4aa7cf346b1dfed863f8659d8b4569f85eb6a7cf3e091e72573eb2d146c855",
+        "bytes": 1773
+      },
+      "dist/lib/internals/state-location-view.js": {
+        "sha256": "1d5639f0ac110ceb7bb6d3e9f12171f79fa1203e9bab2bfe68f04fc3db47b7b7",
+        "bytes": 2562
+      },
+      "dist/lib/internals/subject-reclamation-sink.js": {
+        "sha256": "2699a32e3cdcf80f201f503a1f6dbba6b56bcd12d04326ad958c23845ea43960",
+        "bytes": 1348
+      },
+      "dist/lib/internals/subject-restoration-claims.js": {
+        "sha256": "821f04b20d744b9469134fb0ee079cdfda567c25cd6113eecc8d2f4f026c6a3b",
+        "bytes": 2317
+      },
+      "dist/lib/internals/tooling-tree.js": {
+        "sha256": "7c5d2da645e0586f5aee8b9681dda818e32944375a4acd7fa05616718d2e5d33",
+        "bytes": 101
+      },
+      "dist/lib/internals/transaction-lifecycle-source.js": {
+        "sha256": "c1267d31cdbc6053f8dc8b07a7b3c3cbb5b9ba91dfd1c773b8b825f73b4bc58e",
+        "bytes": 264
+      },
+      "dist/lib/internals/transaction-lifecycle-view.js": {
+        "sha256": "3d7e04e96dce625ab6148bfd827501e00df72333b35d5aff94f3afd4a10b959a",
+        "bytes": 2927
+      },
+      "dist/lib/internals/tree-capabilities.js": {
+        "sha256": "05c762d6f35f3bc7918cd708a5f1c4ce4570a48c2c877b479c67606b22eb2dbf",
+        "bytes": 2167
+      },
+      "dist/lib/internals/tree-scalar-leaf-runtime.js": {
+        "sha256": "fdc7859deef21d91ba2462127fecb01d09c9a44cde8d8b93f076f97817ea76df",
+        "bytes": 2751
+      },
+      "dist/lib/internals/tree-scalar-slot-port.js": {
+        "sha256": "1c16b191969ecb579f55c789f1480065853609251822bf44f982737c739bfd52",
+        "bytes": 529
+      },
+      "dist/lib/internals/tree-scalar-slot-runtime.js": {
+        "sha256": "bdd41f990b71d3318a8330728d4553a5e990b400113ec975735fcfe18304907c",
+        "bytes": 3725
+      },
+      "dist/lib/internals/utilities/append-all.js": {
+        "sha256": "dc3bb31df5084ca8675c9fd73ffd807622fd09a0a16c322acb3a651f68cc6257",
+        "bytes": 105
+      },
+      "dist/lib/internals/utilities/deep-clone.js": {
+        "sha256": "db45f96fa0d840c58321c217c953f8a08a4157df055fd28a9c8e75a79a081e5f",
+        "bytes": 1907
+      },
+      "dist/lib/internals/utilities/deep-equal.js": {
+        "sha256": "bf31d23598305cbf68909395a8eef505d73807e1af01078d0bb7aca888c2cc67",
+        "bytes": 1973
+      },
+      "dist/lib/internals/utilities/is-built-in-object.js": {
+        "sha256": "48b9269302bcc03d18147c399f105c968f7cb6285a182c4d43ccd62850cf8dee",
+        "bytes": 1433
+      },
+      "dist/lib/internals/visit-tree.js": {
+        "sha256": "4a0f98ac82f24a0f2ac20ef3942b0cbc7ba1404fd2f70012bbeb66556e8e5c0c",
+        "bytes": 645
+      },
+      "dist/lib/internals/write-observation-scope.js": {
+        "sha256": "4dc4f650e78d56ae6172f5a769c62b0083a070c6b8df1d808fc9019d3d9a0d99",
+        "bytes": 1516
+      },
+      "dist/lib/internals/write-observation.js": {
+        "sha256": "e4224471cfbac2b091d97ac8a2812830e879cd294d222f11923f543c0de0c6cc",
+        "bytes": 528
+      },
+      "dist/lib/leaf.js": {
+        "sha256": "d8b4384510c497d4073d43c4b8941f4e6ee8845e25f99984e949f8ecb225ec76",
+        "bytes": 521
+      },
+      "dist/lib/link.js": {
+        "sha256": "b4d6739061bef2a6ea27419d3230307d2b0673892ade7f4d45e4eb7108459426",
+        "bytes": 11983
+      },
+      "dist/lib/markers/entity-map.js": {
+        "sha256": "b0358de151d96795acc8e7d3f036acb95a99e485f2442003e00ed6c459ea73fa",
+        "bytes": 3462
+      },
+      "dist/lib/path-notifier.js": {
+        "sha256": "18db31a3a542a709056004b2602b1ae71a80e9b0ecc687fae29443620755d98c",
+        "bytes": 12067
+      },
+      "dist/lib/physical/entity-handle-resolution.js": {
+        "sha256": "ce90278c24c0708532055390e4d4fc4609017471df2aefdabbdcaa85cefb2c37",
+        "bytes": 479
+      },
+      "dist/lib/physical/entity-mutation-frame.js": {
+        "sha256": "c225bb4dc2fd7d3e788b781e79590795256051a6340dbdfff8d8f1c14feec593",
+        "bytes": 3544
+      },
+      "dist/lib/physical/entity-value-store.js": {
+        "sha256": "901db67d813347c2009d7e894e910acb7d260446abadcdff42bfddb8533fee61",
+        "bytes": 793
+      },
+      "dist/lib/physical/structural-store.js": {
+        "sha256": "b15bedb9f985a105bce96257c50f0a9cfd8c03724f2ccf9fe4827d04a9ae308c",
+        "bytes": 13635
+      },
+      "dist/lib/readonly.js": {
+        "sha256": "99a42cd7d0ea2b78d8b348e68149d6a8e04227298e8372e8406342aafe01b364",
+        "bytes": 69
+      },
+      "dist/lib/signal-tree.js": {
+        "sha256": "b2bb4ceb627c552a54f5a94ae43e0b00a3e889ae92a976985f63c7644d25b4bb",
+        "bytes": 27026
+      },
+      "dist/lib/types.js": {
+        "sha256": "b6d98bc9167425df63e74e67d140a89c6c5e985e241b77e54f19904fb4aeb4b8",
+        "bytes": 345
+      },
+      "dist/lib/undoable.js": {
+        "sha256": "1b6bd2bd39c95e3d595ed1e7a87117a731bf64736fa849d33d8c1167be32320a",
+        "bytes": 171
+      },
+      "dist/lib/utils.js": {
+        "sha256": "d5c2979ec2848ee0695a570ed182fcf037a65ce29ffacae6ad520d5c39dd62a7",
+        "bytes": 5555
+      },
+      "dist/lib/write-context.js": {
+        "sha256": "0e5accd045f855e65ea5dcfc72b34085cab7fa4623ed8a64f4fd4ecef650f975",
+        "bytes": 251
+      },
+      "dist/lib/write-participation.js": {
+        "sha256": "01f57ab1e693a6f2c75ce1e106466c3e1553519387db5d6ec41920d1669dc6d9",
+        "bytes": 270
+      }
+    },
+    "original": {
+      "package.json": {
+        "sha256": "a738dcb86c2f21f3c1f99d6906b64452db8c7e695f9b9680888ad512aef8e206",
+        "bytes": 1317
+      },
+      "dist/_adapter-073J_Un_.d.ts": {
+        "sha256": "17edda9cba1baa4010268ed9244b9d8d2af3a4aba0ce7a2fd41c1748ea650d26",
+        "bytes": 66467
+      },
+      "dist/_position-registry-D8dCXLAS.d.ts": {
+        "sha256": "5fa73d43d0525919b2731e54adbe1a2cb1adaafc6fe014c536b4dc75a69bfab6",
+        "bytes": 1205
+      },
+      "dist/adapter.d.ts": {
+        "sha256": "6005d7d2c1cb26f51f1d99430c7d85125a63bc7f9208a1c8c080257a08e176ce",
+        "bytes": 697
+      },
+      "dist/adapter.js": {
+        "sha256": "d080563a22f5bda9437a7c14d4b4bcfb881778733c056d74fa5e483d1d60ceef",
+        "bytes": 1684
+      },
+      "dist/enhancers/batching/batching.js": {
+        "sha256": "f266af789c5f4212b90bacb20657c4fc6a10da3200d7be6246b701946106ffce",
+        "bytes": 6083
+      },
+      "dist/enhancers/devtools/devtools-impl.js": {
+        "sha256": "6db65cd985bc1116b11d9ebb3f99ac6117b743ad10f20f33da705e001ce4e64c",
+        "bytes": 30363
+      },
+      "dist/enhancers/devtools/devtools.js": {
+        "sha256": "b3c05a3a89706751807e85bf96c184c0f26a82a399d980966301162572fbe678",
+        "bytes": 538
+      },
+      "dist/enhancers/index.js": {
+        "sha256": "2101af7fc02fd5d38b59084e760d5b51bff5128eb854e14081f4912873da1425",
+        "bytes": 2177
+      },
+      "dist/enhancers/restoration/restoration.js": {
+        "sha256": "85289f0c88726265fd8a98a5ec547dce489801dab2cb19a8bf021e58d7feb565",
+        "bytes": 85509
+      },
+      "dist/enhancers/transactions/transactions.js": {
+        "sha256": "2511dbf0a6e288bd77b809f9596d2fe45832dc8f4481d10c1652c3a34d90543a",
+        "bytes": 71359
+      },
+      "dist/index.d.ts": {
+        "sha256": "9cace937c510377c8591c9c8e81a9c2e2074c6571446bab73b0829ff163ba3b3",
+        "bytes": 33268
+      },
+      "dist/index.js": {
+        "sha256": "a91d2789824d429e69cd18ce29679dbd736fdeecb8dcbd5eac8d2dab018db799",
+        "bytes": 712
+      },
+      "dist/internals.d.ts": {
+        "sha256": "f8bac88cf050d3f561babdccfa14fc2f86bfd077e6dc7835d19fb200ac5e1fa8",
+        "bytes": 31782
+      },
+      "dist/internals.js": {
+        "sha256": "f0bd6c8036404f0e202eed089fa0d70224e430eb032b6dcc44560709b8d95415",
+        "bytes": 2563
+      },
+      "dist/lib/constants.js": {
+        "sha256": "969946e374794fe221294b48e22afcf073dfdfd26639a928aa48c59a950f4974",
+        "bytes": 581
+      },
+      "dist/lib/enhancer-types.js": {
+        "sha256": "38a55eaafc23f76cda0cc9eb313aa3fda1ebfa01237f815f54e2cb1fafaf5bbe",
+        "bytes": 78
+      },
+      "dist/lib/entity-signal.js": {
+        "sha256": "551d0dd75f4ca3b1263645b6b20162f740e4bae0a81146ac3af9cc13da03246d",
+        "bytes": 69718
+      },
+      "dist/lib/external.js": {
+        "sha256": "a43be60d2a89d982209a55ce20246ecd7b65e869c908178683a0b12a95351081",
+        "bytes": 819
+      },
+      "dist/lib/internals/canonical-snapshot.js": {
+        "sha256": "4ccacb2bc2e4c73b5daad34987c21628d8a8fe267c70f0faf16863234ce4b119",
+        "bytes": 220
+      },
+      "dist/lib/internals/causal-runtime/applied-turn-projection.js": {
+        "sha256": "c52212b5f2cabac82911f05e341eeb02e405b67e0d680aa4442df2bb9a97abd9",
+        "bytes": 5631
+      },
+      "dist/lib/internals/causal-runtime/pending-rollback.js": {
+        "sha256": "11c612b6b2111b8d520ccc057d6c8a203a38fa20493cd01d25d3a201f1cd5e53",
+        "bytes": 9000
+      },
+      "dist/lib/internals/causal-runtime/post-application-failure.js": {
+        "sha256": "4933da16cebd20e55159f3176e5e6b7bb13d93582744a9df0762b586d637d875",
+        "bytes": 718
+      },
+      "dist/lib/internals/causal-runtime/realization-context.js": {
+        "sha256": "6dbd74416fe572ebc63bc74bf81eddf86d570b9f53309dfdc77c6fc8f2a90208",
+        "bytes": 2386
+      },
+      "dist/lib/internals/causal-runtime/scoped-value-addressing.js": {
+        "sha256": "0c8a4d03b88f7dc0cc845c22b731fc8f8de86c10e247334ea0b9dac00c5f91f8",
+        "bytes": 222
+      },
+      "dist/lib/internals/causal-runtime/target-transition.js": {
+        "sha256": "44a7b0a64615faaa76ecb5ddcd04af56831d03a4f0423256a65db8ca3dfcb7b8",
+        "bytes": 21327
+      },
+      "dist/lib/internals/causal-runtime/transaction-lifecycle.js": {
+        "sha256": "e6830837e4288560926c39edc188c66f994348eb8bda2e4482ee8b8c394f1cd1",
+        "bytes": 1922
+      },
+      "dist/lib/internals/causal-runtime/transient-rows.js": {
+        "sha256": "d705adc9d4269f8ca577e796071f30c13ff2a5241af43bb9c2d4781a888fae87",
+        "bytes": 1448
+      },
+      "dist/lib/internals/causal-runtime/tree-realization-adapter.js": {
+        "sha256": "e8f4e727107bceea291aa0b34932b97c2797071e592c14f549ab95bbc2b0352c",
+        "bytes": 47230
+      },
+      "dist/lib/internals/causal-runtime/turn-store.js": {
+        "sha256": "9c0692505988d4276c5bfe0355a055b90a276ff4dc08f2fb0bad5cf74f2955df",
+        "bytes": 7142
+      },
+      "dist/lib/internals/cell-identity.js": {
+        "sha256": "2b1845cdfc9a5428490df81fedb26fa3acff824379c833384959942b9843b83b",
+        "bytes": 301
+      },
+      "dist/lib/internals/commit-consequence.js": {
+        "sha256": "0cef50047fc80e20c5d93b98222d14a365d433ce0dfd1cf35642c22b321b3bad",
+        "bytes": 3490
+      },
+      "dist/lib/internals/confirmed-turn-view.js": {
+        "sha256": "f67861a6ea9a88888d8dbaf88a71561705063f24f73bfa0126667eaa2fc36067",
+        "bytes": 386
+      },
+      "dist/lib/internals/construction-branch.js": {
+        "sha256": "fb6491c0318fae2b08f9274e3a648c1675ca71ccfdb2fdb2770402f0a89cd4c3",
+        "bytes": 406
+      },
+      "dist/lib/internals/entity-egress-projection.js": {
+        "sha256": "fca3c59f219b16daa96b71b6eda7b02beddc59af98013b12216797df43b1655d",
+        "bytes": 2946
+      },
+      "dist/lib/internals/entity-membership-inventory.js": {
+        "sha256": "b84981dcee85cc32c1db6a3d682d7617a04e0a59331b1fe511c8d7c91df59d10",
+        "bytes": 5171
+      },
+      "dist/lib/internals/entity-membership-source.js": {
+        "sha256": "f484bc5ab09ccbc02c984e12992195099dd5b9ab8ec48c9deae445c626190546",
+        "bytes": 825
+      },
+      "dist/lib/internals/entity-membership-view.js": {
+        "sha256": "efa8c0cc14ff6826d6702e2bbbfdfd2bd9c6e974d89c974772c9311d53f178d8",
+        "bytes": 4566
+      },
+      "dist/lib/internals/entity-projection-seed.js": {
+        "sha256": "6f91549be085973cac62227e01d2d9a1aed16552da11e45b3be7cc7d11f46234",
+        "bytes": 805
+      },
+      "dist/lib/internals/error-reporter.js": {
+        "sha256": "4e3df8672ad2fc6c94b0aec0bc95edca2fcfe5bb192afc36f5e18d8e9a866cff",
+        "bytes": 2229
+      },
+      "dist/lib/internals/exposed-publication.js": {
+        "sha256": "ec41990873df8ce007d38c385a22c13c02adf57a79fde81ed0252d5b75929a75",
+        "bytes": 452
+      },
+      "dist/lib/internals/intercept-leaf-signals.js": {
+        "sha256": "ee54dbdb19ef9b5a28ab9a071f1c93168aabd4a6ceaa7d98c367bdd56fbaa61c",
+        "bytes": 6036
+      },
+      "dist/lib/internals/intrinsic-mutation.js": {
+        "sha256": "a9d4d9b2c9511410bf3026e0da9f02a0460af501230b77fe7f252f81c60a17e3",
+        "bytes": 1793
+      },
+      "dist/lib/internals/link-state-source.js": {
+        "sha256": "e1703ca459b2b5d8a68e4e5d43edd0c7b2c52120b011920b686195a4efcd9a7e",
+        "bytes": 559
+      },
+      "dist/lib/internals/link-state-view.js": {
+        "sha256": "09decebd532286f9dd857cdda811e63538696ba5f04447b8106daa472a21a3b2",
+        "bytes": 2458
+      },
+      "dist/lib/internals/location-runtime.js": {
+        "sha256": "752d4fa7eb01e114f1c590a3d22e8b7ebe5fe5257c13444a8ead8bb20859d20c",
+        "bytes": 10245
+      },
+      "dist/lib/internals/materialize-markers.js": {
+        "sha256": "ffb1e2047bc9edad4b6bf5c98894d54885bb86ed349e7dabbf8f42ae228f3149",
+        "bytes": 7041
+      },
+      "dist/lib/internals/member-membership.js": {
+        "sha256": "0744eb0c398b7c4105d4cc68ead7572df33c1b9d0ebdbab2c3ac76591e14bf8e",
+        "bytes": 7552
+      },
+      "dist/lib/internals/merge-derived.js": {
+        "sha256": "125abd6c055f48c05797b8a9323e62f838e210bcd2aa1e744b7b1e60c7869643",
+        "bytes": 1607
+      },
+      "dist/lib/internals/mutation-capture-runtime.js": {
+        "sha256": "83ae2f74f9725eccf140d34e8976fe259f226eafed6a2b77f3bcd6002ac2f767",
+        "bytes": 1366
+      },
+      "dist/lib/internals/native-location-realization.js": {
+        "sha256": "7c80bc2ce8f23bfaa94d079b2573a26f00bf745a18399778cc0a29b85f9dd198",
+        "bytes": 4616
+      },
+      "dist/lib/internals/native-tree-scalar-leaf-runtime.js": {
+        "sha256": "de02b393206fca51acaa4bd8e9021aa4c07f8729276e82ca02b75b7bc6e030c6",
+        "bytes": 5139
+      },
+      "dist/lib/internals/node-shape.js": {
+        "sha256": "a59d861653779f6e7e6580b709badce8e7803be5f5cfb607828cb179a53d39a8",
+        "bytes": 620
+      },
+      "dist/lib/internals/observation-adapter.js": {
+        "sha256": "1907fca8d5bd4ba4c847ccc375de01b0921752185d8f491efffa8e12befcee7e",
+        "bytes": 211
+      },
+      "dist/lib/internals/observation-substrate.js": {
+        "sha256": "4f662ddceb99c87d5098444396ace798fa93470f3ed2902fa5037af41a7db0db",
+        "bytes": 2148
+      },
+      "dist/lib/internals/owned-metadata.js": {
+        "sha256": "66dd3a5beb7db830728ec11a01064a6cf8db5c818ddbd8e0c63ac67411dab301",
+        "bytes": 979
+      },
+      "dist/lib/internals/owned-mutation.js": {
+        "sha256": "cc2b6b3bf0dd5c8f901411a98d621e5f31388babd70aec987b37ac7e85f90c5f",
+        "bytes": 2969
+      },
+      "dist/lib/internals/owner-invalidation-port.js": {
+        "sha256": "ca1a7cb729f0f6a270e5de59a590aab755645c6a218abba9163be09a37132957",
+        "bytes": 428
+      },
+      "dist/lib/internals/owner-invalidation.js": {
+        "sha256": "867aebe08f2dc3bcf70ae4ab1cd332d8ece089e9e6e2ed22d460ebda6b111e37",
+        "bytes": 2428
+      },
+      "dist/lib/internals/path-observation-port.js": {
+        "sha256": "d243c91aa1c394a94d1f0ec1e692ba5b641ed0b54acb4a06411a85621d988ec9",
+        "bytes": 935
+      },
+      "dist/lib/internals/physical-commit-clock.js": {
+        "sha256": "e549fe6fc4b6f0bae4d956d4656cda037150f3571bbb991fa66e0d539bcb4755",
+        "bytes": 727
+      },
+      "dist/lib/internals/physical-rows.js": {
+        "sha256": "af313f1b250cb2d02dd094e231e52969bceadfa95e0c437a5a0ef000740ed86d",
+        "bytes": 164
+      },
+      "dist/lib/internals/plain-branch-membership.js": {
+        "sha256": "1fe5c5027cfadea0cb1fe9eea68819529368b6a1b8e5bbf033f9082daf5673ad",
+        "bytes": 19952
+      },
+      "dist/lib/internals/position-registry.js": {
+        "sha256": "ddda8357d4d92036fa005569f401d333d454317319b7ac29319166df90f36ea7",
+        "bytes": 1867
+      },
+      "dist/lib/internals/production-substrate-stats.prod.js": {
+        "sha256": "750a59ce80f35e04900b1dfc90b18d4caf3dc5b84d4ab93301c338971bc7648c",
+        "bytes": 98
+      },
+      "dist/lib/internals/restoration-eligibility.js": {
+        "sha256": "a16e07468f9bb68d5ac56c5cd42476bbc10b310b02c0aa0b07e02f6b1fc6b739",
+        "bytes": 1220
+      },
+      "dist/lib/internals/restoration-reader.js": {
+        "sha256": "6a970c19cb257042282e5d1ce46d47e7053b3bb93fcb3868a5eea500abeb4204",
+        "bytes": 2597
+      },
+      "dist/lib/internals/restoration-source.js": {
+        "sha256": "5263d1feb5fc9456bd5522104a471dc7ba2fb1007cd19fa33ca183a4576f5df6",
+        "bytes": 468
+      },
+      "dist/lib/internals/root-source.js": {
+        "sha256": "fd3f6454a5b4d80c2912604e68e95e7cff15d7ccd598130c1b6a191f1f533106",
+        "bytes": 495
+      },
+      "dist/lib/internals/runtime-tree-plan.js": {
+        "sha256": "05d31fdf6efa5ef49f08ff271c87b74f541cf62098a028015045dc9a4cab703e",
+        "bytes": 310
+      },
+      "dist/lib/internals/snapshot-authority.js": {
+        "sha256": "dfc7b526b46da263fad45147f6ec94f078b68ab0c5df5d02506f6ac0fc257ce5",
+        "bytes": 2097
+      },
+      "dist/lib/internals/source-mutation.js": {
+        "sha256": "2a4aa7cf346b1dfed863f8659d8b4569f85eb6a7cf3e091e72573eb2d146c855",
+        "bytes": 1773
+      },
+      "dist/lib/internals/state-location-view.js": {
+        "sha256": "1d5639f0ac110ceb7bb6d3e9f12171f79fa1203e9bab2bfe68f04fc3db47b7b7",
+        "bytes": 2562
+      },
+      "dist/lib/internals/subject-reclamation-sink.js": {
+        "sha256": "2699a32e3cdcf80f201f503a1f6dbba6b56bcd12d04326ad958c23845ea43960",
+        "bytes": 1348
+      },
+      "dist/lib/internals/subject-restoration-claims.js": {
+        "sha256": "821f04b20d744b9469134fb0ee079cdfda567c25cd6113eecc8d2f4f026c6a3b",
+        "bytes": 2317
+      },
+      "dist/lib/internals/tooling-tree.js": {
+        "sha256": "7c5d2da645e0586f5aee8b9681dda818e32944375a4acd7fa05616718d2e5d33",
+        "bytes": 101
+      },
+      "dist/lib/internals/transaction-lifecycle-source.js": {
+        "sha256": "c1267d31cdbc6053f8dc8b07a7b3c3cbb5b9ba91dfd1c773b8b825f73b4bc58e",
+        "bytes": 264
+      },
+      "dist/lib/internals/transaction-lifecycle-view.js": {
+        "sha256": "3d7e04e96dce625ab6148bfd827501e00df72333b35d5aff94f3afd4a10b959a",
+        "bytes": 2927
+      },
+      "dist/lib/internals/tree-capabilities.js": {
+        "sha256": "05c762d6f35f3bc7918cd708a5f1c4ce4570a48c2c877b479c67606b22eb2dbf",
+        "bytes": 2167
+      },
+      "dist/lib/internals/tree-scalar-leaf-runtime.js": {
+        "sha256": "60a7ed7cc6af8133d434984e9b91917fc514a7317c4897adfbbb5f336793a176",
+        "bytes": 3039
+      },
+      "dist/lib/internals/tree-scalar-slot-port.js": {
+        "sha256": "1c16b191969ecb579f55c789f1480065853609251822bf44f982737c739bfd52",
+        "bytes": 529
+      },
+      "dist/lib/internals/tree-scalar-slot-runtime.js": {
+        "sha256": "4d49927ecd83e2e04d3e23c08dce007b4bceddb2855ef72be69d198f776c8883",
+        "bytes": 5480
+      },
+      "dist/lib/internals/utilities/append-all.js": {
+        "sha256": "dc3bb31df5084ca8675c9fd73ffd807622fd09a0a16c322acb3a651f68cc6257",
+        "bytes": 105
+      },
+      "dist/lib/internals/utilities/deep-clone.js": {
+        "sha256": "db45f96fa0d840c58321c217c953f8a08a4157df055fd28a9c8e75a79a081e5f",
+        "bytes": 1907
+      },
+      "dist/lib/internals/utilities/deep-equal.js": {
+        "sha256": "bf31d23598305cbf68909395a8eef505d73807e1af01078d0bb7aca888c2cc67",
+        "bytes": 1973
+      },
+      "dist/lib/internals/utilities/is-built-in-object.js": {
+        "sha256": "48b9269302bcc03d18147c399f105c968f7cb6285a182c4d43ccd62850cf8dee",
+        "bytes": 1433
+      },
+      "dist/lib/internals/visit-tree.js": {
+        "sha256": "4a0f98ac82f24a0f2ac20ef3942b0cbc7ba1404fd2f70012bbeb66556e8e5c0c",
+        "bytes": 645
+      },
+      "dist/lib/internals/write-observation-scope.js": {
+        "sha256": "4dc4f650e78d56ae6172f5a769c62b0083a070c6b8df1d808fc9019d3d9a0d99",
+        "bytes": 1516
+      },
+      "dist/lib/internals/write-observation.js": {
+        "sha256": "e4224471cfbac2b091d97ac8a2812830e879cd294d222f11923f543c0de0c6cc",
+        "bytes": 528
+      },
+      "dist/lib/leaf.js": {
+        "sha256": "d8b4384510c497d4073d43c4b8941f4e6ee8845e25f99984e949f8ecb225ec76",
+        "bytes": 521
+      },
+      "dist/lib/link.js": {
+        "sha256": "b4d6739061bef2a6ea27419d3230307d2b0673892ade7f4d45e4eb7108459426",
+        "bytes": 11983
+      },
+      "dist/lib/markers/entity-map.js": {
+        "sha256": "b0358de151d96795acc8e7d3f036acb95a99e485f2442003e00ed6c459ea73fa",
+        "bytes": 3462
+      },
+      "dist/lib/path-notifier.js": {
+        "sha256": "18db31a3a542a709056004b2602b1ae71a80e9b0ecc687fae29443620755d98c",
+        "bytes": 12067
+      },
+      "dist/lib/physical/entity-handle-resolution.js": {
+        "sha256": "ce90278c24c0708532055390e4d4fc4609017471df2aefdabbdcaa85cefb2c37",
+        "bytes": 479
+      },
+      "dist/lib/physical/entity-mutation-frame.js": {
+        "sha256": "2480cc8b0470b34e93cb9a8f01dd816e7f1c74c1e2ef8a9429ad29409444e7c5",
+        "bytes": 3781
+      },
+      "dist/lib/physical/entity-value-store.js": {
+        "sha256": "901db67d813347c2009d7e894e910acb7d260446abadcdff42bfddb8533fee61",
+        "bytes": 793
+      },
+      "dist/lib/physical/structural-store.js": {
+        "sha256": "b15bedb9f985a105bce96257c50f0a9cfd8c03724f2ccf9fe4827d04a9ae308c",
+        "bytes": 13635
+      },
+      "dist/lib/readonly.js": {
+        "sha256": "99a42cd7d0ea2b78d8b348e68149d6a8e04227298e8372e8406342aafe01b364",
+        "bytes": 69
+      },
+      "dist/lib/signal-tree.js": {
+        "sha256": "b2bb4ceb627c552a54f5a94ae43e0b00a3e889ae92a976985f63c7644d25b4bb",
+        "bytes": 27026
+      },
+      "dist/lib/types.js": {
+        "sha256": "b6d98bc9167425df63e74e67d140a89c6c5e985e241b77e54f19904fb4aeb4b8",
+        "bytes": 345
+      },
+      "dist/lib/undoable.js": {
+        "sha256": "1b6bd2bd39c95e3d595ed1e7a87117a731bf64736fa849d33d8c1167be32320a",
+        "bytes": 171
+      },
+      "dist/lib/utils.js": {
+        "sha256": "d5c2979ec2848ee0695a570ed182fcf037a65ce29ffacae6ad520d5c39dd62a7",
+        "bytes": 5555
+      },
+      "dist/lib/write-context.js": {
+        "sha256": "0e5accd045f855e65ea5dcfc72b34085cab7fa4623ed8a64f4fd4ecef650f975",
+        "bytes": 251
+      },
+      "dist/lib/write-participation.js": {
+        "sha256": "01f57ab1e693a6f2c75ce1e106466c3e1553519387db5d6ec41920d1669dc6d9",
+        "bytes": 270
+      }
+    },
+    "optimized": {
+      "package.json": {
+        "sha256": "a738dcb86c2f21f3c1f99d6906b64452db8c7e695f9b9680888ad512aef8e206",
+        "bytes": 1317
+      },
+      "dist/_adapter-073J_Un_.d.ts": {
+        "sha256": "17edda9cba1baa4010268ed9244b9d8d2af3a4aba0ce7a2fd41c1748ea650d26",
+        "bytes": 66467
+      },
+      "dist/_position-registry-D8dCXLAS.d.ts": {
+        "sha256": "5fa73d43d0525919b2731e54adbe1a2cb1adaafc6fe014c536b4dc75a69bfab6",
+        "bytes": 1205
+      },
+      "dist/adapter.d.ts": {
+        "sha256": "6005d7d2c1cb26f51f1d99430c7d85125a63bc7f9208a1c8c080257a08e176ce",
+        "bytes": 697
+      },
+      "dist/adapter.js": {
+        "sha256": "d080563a22f5bda9437a7c14d4b4bcfb881778733c056d74fa5e483d1d60ceef",
+        "bytes": 1684
+      },
+      "dist/enhancers/batching/batching.js": {
+        "sha256": "f266af789c5f4212b90bacb20657c4fc6a10da3200d7be6246b701946106ffce",
+        "bytes": 6083
+      },
+      "dist/enhancers/devtools/devtools-impl.js": {
+        "sha256": "6db65cd985bc1116b11d9ebb3f99ac6117b743ad10f20f33da705e001ce4e64c",
+        "bytes": 30363
+      },
+      "dist/enhancers/devtools/devtools.js": {
+        "sha256": "b3c05a3a89706751807e85bf96c184c0f26a82a399d980966301162572fbe678",
+        "bytes": 538
+      },
+      "dist/enhancers/index.js": {
+        "sha256": "2101af7fc02fd5d38b59084e760d5b51bff5128eb854e14081f4912873da1425",
+        "bytes": 2177
+      },
+      "dist/enhancers/restoration/restoration.js": {
+        "sha256": "85289f0c88726265fd8a98a5ec547dce489801dab2cb19a8bf021e58d7feb565",
+        "bytes": 85509
+      },
+      "dist/enhancers/transactions/transactions.js": {
+        "sha256": "2511dbf0a6e288bd77b809f9596d2fe45832dc8f4481d10c1652c3a34d90543a",
+        "bytes": 71359
+      },
+      "dist/index.d.ts": {
+        "sha256": "9cace937c510377c8591c9c8e81a9c2e2074c6571446bab73b0829ff163ba3b3",
+        "bytes": 33268
+      },
+      "dist/index.js": {
+        "sha256": "a91d2789824d429e69cd18ce29679dbd736fdeecb8dcbd5eac8d2dab018db799",
+        "bytes": 712
+      },
+      "dist/internals.d.ts": {
+        "sha256": "f8bac88cf050d3f561babdccfa14fc2f86bfd077e6dc7835d19fb200ac5e1fa8",
+        "bytes": 31782
+      },
+      "dist/internals.js": {
+        "sha256": "f0bd6c8036404f0e202eed089fa0d70224e430eb032b6dcc44560709b8d95415",
+        "bytes": 2563
+      },
+      "dist/lib/constants.js": {
+        "sha256": "969946e374794fe221294b48e22afcf073dfdfd26639a928aa48c59a950f4974",
+        "bytes": 581
+      },
+      "dist/lib/enhancer-types.js": {
+        "sha256": "38a55eaafc23f76cda0cc9eb313aa3fda1ebfa01237f815f54e2cb1fafaf5bbe",
+        "bytes": 78
+      },
+      "dist/lib/entity-signal.js": {
+        "sha256": "551d0dd75f4ca3b1263645b6b20162f740e4bae0a81146ac3af9cc13da03246d",
+        "bytes": 69718
+      },
+      "dist/lib/external.js": {
+        "sha256": "a43be60d2a89d982209a55ce20246ecd7b65e869c908178683a0b12a95351081",
+        "bytes": 819
+      },
+      "dist/lib/internals/canonical-snapshot.js": {
+        "sha256": "4ccacb2bc2e4c73b5daad34987c21628d8a8fe267c70f0faf16863234ce4b119",
+        "bytes": 220
+      },
+      "dist/lib/internals/causal-runtime/applied-turn-projection.js": {
+        "sha256": "c52212b5f2cabac82911f05e341eeb02e405b67e0d680aa4442df2bb9a97abd9",
+        "bytes": 5631
+      },
+      "dist/lib/internals/causal-runtime/pending-rollback.js": {
+        "sha256": "11c612b6b2111b8d520ccc057d6c8a203a38fa20493cd01d25d3a201f1cd5e53",
+        "bytes": 9000
+      },
+      "dist/lib/internals/causal-runtime/post-application-failure.js": {
+        "sha256": "4933da16cebd20e55159f3176e5e6b7bb13d93582744a9df0762b586d637d875",
+        "bytes": 718
+      },
+      "dist/lib/internals/causal-runtime/realization-context.js": {
+        "sha256": "6dbd74416fe572ebc63bc74bf81eddf86d570b9f53309dfdc77c6fc8f2a90208",
+        "bytes": 2386
+      },
+      "dist/lib/internals/causal-runtime/scoped-value-addressing.js": {
+        "sha256": "0c8a4d03b88f7dc0cc845c22b731fc8f8de86c10e247334ea0b9dac00c5f91f8",
+        "bytes": 222
+      },
+      "dist/lib/internals/causal-runtime/target-transition.js": {
+        "sha256": "44a7b0a64615faaa76ecb5ddcd04af56831d03a4f0423256a65db8ca3dfcb7b8",
+        "bytes": 21327
+      },
+      "dist/lib/internals/causal-runtime/transaction-lifecycle.js": {
+        "sha256": "e6830837e4288560926c39edc188c66f994348eb8bda2e4482ee8b8c394f1cd1",
+        "bytes": 1922
+      },
+      "dist/lib/internals/causal-runtime/transient-rows.js": {
+        "sha256": "d705adc9d4269f8ca577e796071f30c13ff2a5241af43bb9c2d4781a888fae87",
+        "bytes": 1448
+      },
+      "dist/lib/internals/causal-runtime/tree-realization-adapter.js": {
+        "sha256": "e8f4e727107bceea291aa0b34932b97c2797071e592c14f549ab95bbc2b0352c",
+        "bytes": 47230
+      },
+      "dist/lib/internals/causal-runtime/turn-store.js": {
+        "sha256": "9c0692505988d4276c5bfe0355a055b90a276ff4dc08f2fb0bad5cf74f2955df",
+        "bytes": 7142
+      },
+      "dist/lib/internals/cell-identity.js": {
+        "sha256": "2b1845cdfc9a5428490df81fedb26fa3acff824379c833384959942b9843b83b",
+        "bytes": 301
+      },
+      "dist/lib/internals/commit-consequence.js": {
+        "sha256": "0cef50047fc80e20c5d93b98222d14a365d433ce0dfd1cf35642c22b321b3bad",
+        "bytes": 3490
+      },
+      "dist/lib/internals/confirmed-turn-view.js": {
+        "sha256": "f67861a6ea9a88888d8dbaf88a71561705063f24f73bfa0126667eaa2fc36067",
+        "bytes": 386
+      },
+      "dist/lib/internals/construction-branch.js": {
+        "sha256": "fb6491c0318fae2b08f9274e3a648c1675ca71ccfdb2fdb2770402f0a89cd4c3",
+        "bytes": 406
+      },
+      "dist/lib/internals/entity-egress-projection.js": {
+        "sha256": "fca3c59f219b16daa96b71b6eda7b02beddc59af98013b12216797df43b1655d",
+        "bytes": 2946
+      },
+      "dist/lib/internals/entity-membership-inventory.js": {
+        "sha256": "b84981dcee85cc32c1db6a3d682d7617a04e0a59331b1fe511c8d7c91df59d10",
+        "bytes": 5171
+      },
+      "dist/lib/internals/entity-membership-source.js": {
+        "sha256": "f484bc5ab09ccbc02c984e12992195099dd5b9ab8ec48c9deae445c626190546",
+        "bytes": 825
+      },
+      "dist/lib/internals/entity-membership-view.js": {
+        "sha256": "efa8c0cc14ff6826d6702e2bbbfdfd2bd9c6e974d89c974772c9311d53f178d8",
+        "bytes": 4566
+      },
+      "dist/lib/internals/entity-projection-seed.js": {
+        "sha256": "6f91549be085973cac62227e01d2d9a1aed16552da11e45b3be7cc7d11f46234",
+        "bytes": 805
+      },
+      "dist/lib/internals/error-reporter.js": {
+        "sha256": "4e3df8672ad2fc6c94b0aec0bc95edca2fcfe5bb192afc36f5e18d8e9a866cff",
+        "bytes": 2229
+      },
+      "dist/lib/internals/exposed-publication.js": {
+        "sha256": "ec41990873df8ce007d38c385a22c13c02adf57a79fde81ed0252d5b75929a75",
+        "bytes": 452
+      },
+      "dist/lib/internals/intercept-leaf-signals.js": {
+        "sha256": "ee54dbdb19ef9b5a28ab9a071f1c93168aabd4a6ceaa7d98c367bdd56fbaa61c",
+        "bytes": 6036
+      },
+      "dist/lib/internals/intrinsic-mutation.js": {
+        "sha256": "56024b99f93f93dba85f8d22a7d8bc6ccdcc73b9845f3ce0d09aec6ef8435e97",
+        "bytes": 1783
+      },
+      "dist/lib/internals/link-state-source.js": {
+        "sha256": "e1703ca459b2b5d8a68e4e5d43edd0c7b2c52120b011920b686195a4efcd9a7e",
+        "bytes": 559
+      },
+      "dist/lib/internals/link-state-view.js": {
+        "sha256": "09decebd532286f9dd857cdda811e63538696ba5f04447b8106daa472a21a3b2",
+        "bytes": 2458
+      },
+      "dist/lib/internals/location-runtime.js": {
+        "sha256": "752d4fa7eb01e114f1c590a3d22e8b7ebe5fe5257c13444a8ead8bb20859d20c",
+        "bytes": 10245
+      },
+      "dist/lib/internals/materialize-markers.js": {
+        "sha256": "ffb1e2047bc9edad4b6bf5c98894d54885bb86ed349e7dabbf8f42ae228f3149",
+        "bytes": 7041
+      },
+      "dist/lib/internals/member-membership.js": {
+        "sha256": "0744eb0c398b7c4105d4cc68ead7572df33c1b9d0ebdbab2c3ac76591e14bf8e",
+        "bytes": 7552
+      },
+      "dist/lib/internals/merge-derived.js": {
+        "sha256": "125abd6c055f48c05797b8a9323e62f838e210bcd2aa1e744b7b1e60c7869643",
+        "bytes": 1607
+      },
+      "dist/lib/internals/mutation-capture-runtime.js": {
+        "sha256": "83ae2f74f9725eccf140d34e8976fe259f226eafed6a2b77f3bcd6002ac2f767",
+        "bytes": 1366
+      },
+      "dist/lib/internals/native-location-realization.js": {
+        "sha256": "7c80bc2ce8f23bfaa94d079b2573a26f00bf745a18399778cc0a29b85f9dd198",
+        "bytes": 4616
+      },
+      "dist/lib/internals/native-tree-scalar-leaf-runtime.js": {
+        "sha256": "de02b393206fca51acaa4bd8e9021aa4c07f8729276e82ca02b75b7bc6e030c6",
+        "bytes": 5139
+      },
+      "dist/lib/internals/node-shape.js": {
+        "sha256": "a59d861653779f6e7e6580b709badce8e7803be5f5cfb607828cb179a53d39a8",
+        "bytes": 620
+      },
+      "dist/lib/internals/observation-adapter.js": {
+        "sha256": "1907fca8d5bd4ba4c847ccc375de01b0921752185d8f491efffa8e12befcee7e",
+        "bytes": 211
+      },
+      "dist/lib/internals/observation-substrate.js": {
+        "sha256": "4f662ddceb99c87d5098444396ace798fa93470f3ed2902fa5037af41a7db0db",
+        "bytes": 2148
+      },
+      "dist/lib/internals/owned-metadata.js": {
+        "sha256": "66dd3a5beb7db830728ec11a01064a6cf8db5c818ddbd8e0c63ac67411dab301",
+        "bytes": 979
+      },
+      "dist/lib/internals/owned-mutation.js": {
+        "sha256": "cc2b6b3bf0dd5c8f901411a98d621e5f31388babd70aec987b37ac7e85f90c5f",
+        "bytes": 2969
+      },
+      "dist/lib/internals/owner-invalidation-port.js": {
+        "sha256": "ca1a7cb729f0f6a270e5de59a590aab755645c6a218abba9163be09a37132957",
+        "bytes": 428
+      },
+      "dist/lib/internals/owner-invalidation.js": {
+        "sha256": "867aebe08f2dc3bcf70ae4ab1cd332d8ece089e9e6e2ed22d460ebda6b111e37",
+        "bytes": 2428
+      },
+      "dist/lib/internals/path-observation-port.js": {
+        "sha256": "d243c91aa1c394a94d1f0ec1e692ba5b641ed0b54acb4a06411a85621d988ec9",
+        "bytes": 935
+      },
+      "dist/lib/internals/physical-commit-clock.js": {
+        "sha256": "e549fe6fc4b6f0bae4d956d4656cda037150f3571bbb991fa66e0d539bcb4755",
+        "bytes": 727
+      },
+      "dist/lib/internals/physical-rows.js": {
+        "sha256": "af313f1b250cb2d02dd094e231e52969bceadfa95e0c437a5a0ef000740ed86d",
+        "bytes": 164
+      },
+      "dist/lib/internals/plain-branch-membership.js": {
+        "sha256": "1fe5c5027cfadea0cb1fe9eea68819529368b6a1b8e5bbf033f9082daf5673ad",
+        "bytes": 19952
+      },
+      "dist/lib/internals/position-registry.js": {
+        "sha256": "ddda8357d4d92036fa005569f401d333d454317319b7ac29319166df90f36ea7",
+        "bytes": 1867
+      },
+      "dist/lib/internals/production-substrate-stats.prod.js": {
+        "sha256": "750a59ce80f35e04900b1dfc90b18d4caf3dc5b84d4ab93301c338971bc7648c",
+        "bytes": 98
+      },
+      "dist/lib/internals/restoration-eligibility.js": {
+        "sha256": "a16e07468f9bb68d5ac56c5cd42476bbc10b310b02c0aa0b07e02f6b1fc6b739",
+        "bytes": 1220
+      },
+      "dist/lib/internals/restoration-reader.js": {
+        "sha256": "6a970c19cb257042282e5d1ce46d47e7053b3bb93fcb3868a5eea500abeb4204",
+        "bytes": 2597
+      },
+      "dist/lib/internals/restoration-source.js": {
+        "sha256": "5263d1feb5fc9456bd5522104a471dc7ba2fb1007cd19fa33ca183a4576f5df6",
+        "bytes": 468
+      },
+      "dist/lib/internals/root-source.js": {
+        "sha256": "fd3f6454a5b4d80c2912604e68e95e7cff15d7ccd598130c1b6a191f1f533106",
+        "bytes": 495
+      },
+      "dist/lib/internals/runtime-tree-plan.js": {
+        "sha256": "05d31fdf6efa5ef49f08ff271c87b74f541cf62098a028015045dc9a4cab703e",
+        "bytes": 310
+      },
+      "dist/lib/internals/snapshot-authority.js": {
+        "sha256": "dfc7b526b46da263fad45147f6ec94f078b68ab0c5df5d02506f6ac0fc257ce5",
+        "bytes": 2097
+      },
+      "dist/lib/internals/source-mutation.js": {
+        "sha256": "2a4aa7cf346b1dfed863f8659d8b4569f85eb6a7cf3e091e72573eb2d146c855",
+        "bytes": 1773
+      },
+      "dist/lib/internals/state-location-view.js": {
+        "sha256": "1d5639f0ac110ceb7bb6d3e9f12171f79fa1203e9bab2bfe68f04fc3db47b7b7",
+        "bytes": 2562
+      },
+      "dist/lib/internals/subject-reclamation-sink.js": {
+        "sha256": "2699a32e3cdcf80f201f503a1f6dbba6b56bcd12d04326ad958c23845ea43960",
+        "bytes": 1348
+      },
+      "dist/lib/internals/subject-restoration-claims.js": {
+        "sha256": "821f04b20d744b9469134fb0ee079cdfda567c25cd6113eecc8d2f4f026c6a3b",
+        "bytes": 2317
+      },
+      "dist/lib/internals/tooling-tree.js": {
+        "sha256": "7c5d2da645e0586f5aee8b9681dda818e32944375a4acd7fa05616718d2e5d33",
+        "bytes": 101
+      },
+      "dist/lib/internals/transaction-lifecycle-source.js": {
+        "sha256": "c1267d31cdbc6053f8dc8b07a7b3c3cbb5b9ba91dfd1c773b8b825f73b4bc58e",
+        "bytes": 264
+      },
+      "dist/lib/internals/transaction-lifecycle-view.js": {
+        "sha256": "3d7e04e96dce625ab6148bfd827501e00df72333b35d5aff94f3afd4a10b959a",
+        "bytes": 2927
+      },
+      "dist/lib/internals/tree-capabilities.js": {
+        "sha256": "05c762d6f35f3bc7918cd708a5f1c4ce4570a48c2c877b479c67606b22eb2dbf",
+        "bytes": 2167
+      },
+      "dist/lib/internals/tree-scalar-leaf-runtime.js": {
+        "sha256": "60a7ed7cc6af8133d434984e9b91917fc514a7317c4897adfbbb5f336793a176",
+        "bytes": 3039
+      },
+      "dist/lib/internals/tree-scalar-slot-port.js": {
+        "sha256": "1c16b191969ecb579f55c789f1480065853609251822bf44f982737c739bfd52",
+        "bytes": 529
+      },
+      "dist/lib/internals/tree-scalar-slot-runtime.js": {
+        "sha256": "4d49927ecd83e2e04d3e23c08dce007b4bceddb2855ef72be69d198f776c8883",
+        "bytes": 5480
+      },
+      "dist/lib/internals/utilities/append-all.js": {
+        "sha256": "dc3bb31df5084ca8675c9fd73ffd807622fd09a0a16c322acb3a651f68cc6257",
+        "bytes": 105
+      },
+      "dist/lib/internals/utilities/deep-clone.js": {
+        "sha256": "db45f96fa0d840c58321c217c953f8a08a4157df055fd28a9c8e75a79a081e5f",
+        "bytes": 1907
+      },
+      "dist/lib/internals/utilities/deep-equal.js": {
+        "sha256": "bf31d23598305cbf68909395a8eef505d73807e1af01078d0bb7aca888c2cc67",
+        "bytes": 1973
+      },
+      "dist/lib/internals/utilities/is-built-in-object.js": {
+        "sha256": "48b9269302bcc03d18147c399f105c968f7cb6285a182c4d43ccd62850cf8dee",
+        "bytes": 1433
+      },
+      "dist/lib/internals/visit-tree.js": {
+        "sha256": "4a0f98ac82f24a0f2ac20ef3942b0cbc7ba1404fd2f70012bbeb66556e8e5c0c",
+        "bytes": 645
+      },
+      "dist/lib/internals/write-observation-scope.js": {
+        "sha256": "4dc4f650e78d56ae6172f5a769c62b0083a070c6b8df1d808fc9019d3d9a0d99",
+        "bytes": 1516
+      },
+      "dist/lib/internals/write-observation.js": {
+        "sha256": "e4224471cfbac2b091d97ac8a2812830e879cd294d222f11923f543c0de0c6cc",
+        "bytes": 528
+      },
+      "dist/lib/leaf.js": {
+        "sha256": "d8b4384510c497d4073d43c4b8941f4e6ee8845e25f99984e949f8ecb225ec76",
+        "bytes": 521
+      },
+      "dist/lib/link.js": {
+        "sha256": "b4d6739061bef2a6ea27419d3230307d2b0673892ade7f4d45e4eb7108459426",
+        "bytes": 11983
+      },
+      "dist/lib/markers/entity-map.js": {
+        "sha256": "b0358de151d96795acc8e7d3f036acb95a99e485f2442003e00ed6c459ea73fa",
+        "bytes": 3462
+      },
+      "dist/lib/path-notifier.js": {
+        "sha256": "18db31a3a542a709056004b2602b1ae71a80e9b0ecc687fae29443620755d98c",
+        "bytes": 12067
+      },
+      "dist/lib/physical/entity-handle-resolution.js": {
+        "sha256": "ce90278c24c0708532055390e4d4fc4609017471df2aefdabbdcaa85cefb2c37",
+        "bytes": 479
+      },
+      "dist/lib/physical/entity-mutation-frame.js": {
+        "sha256": "2480cc8b0470b34e93cb9a8f01dd816e7f1c74c1e2ef8a9429ad29409444e7c5",
+        "bytes": 3781
+      },
+      "dist/lib/physical/entity-value-store.js": {
+        "sha256": "901db67d813347c2009d7e894e910acb7d260446abadcdff42bfddb8533fee61",
+        "bytes": 793
+      },
+      "dist/lib/physical/structural-store.js": {
+        "sha256": "b15bedb9f985a105bce96257c50f0a9cfd8c03724f2ccf9fe4827d04a9ae308c",
+        "bytes": 13635
+      },
+      "dist/lib/readonly.js": {
+        "sha256": "99a42cd7d0ea2b78d8b348e68149d6a8e04227298e8372e8406342aafe01b364",
+        "bytes": 69
+      },
+      "dist/lib/signal-tree.js": {
+        "sha256": "b2bb4ceb627c552a54f5a94ae43e0b00a3e889ae92a976985f63c7644d25b4bb",
+        "bytes": 27026
+      },
+      "dist/lib/types.js": {
+        "sha256": "b6d98bc9167425df63e74e67d140a89c6c5e985e241b77e54f19904fb4aeb4b8",
+        "bytes": 345
+      },
+      "dist/lib/undoable.js": {
+        "sha256": "1b6bd2bd39c95e3d595ed1e7a87117a731bf64736fa849d33d8c1167be32320a",
+        "bytes": 171
+      },
+      "dist/lib/utils.js": {
+        "sha256": "d5c2979ec2848ee0695a570ed182fcf037a65ce29ffacae6ad520d5c39dd62a7",
+        "bytes": 5555
+      },
+      "dist/lib/write-context.js": {
+        "sha256": "0e5accd045f855e65ea5dcfc72b34085cab7fa4623ed8a64f4fd4ecef650f975",
+        "bytes": 251
+      },
+      "dist/lib/write-participation.js": {
+        "sha256": "01f57ab1e693a6f2c75ce1e106466c3e1553519387db5d6ec41920d1669dc6d9",
+        "bytes": 270
+      }
+    }
+  },
+  "scope": "Complete executable kernel package: original package.json plus entire dist runtime/declaration graph. Measurement entry/bundle/meta junk excluded; README/license omitted for research replay only, not publication."
+}

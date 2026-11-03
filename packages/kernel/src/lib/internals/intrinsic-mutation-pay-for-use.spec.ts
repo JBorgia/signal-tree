@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest';
 import {
   getIntrinsicMutationObserver,
   observeIntrinsicMutations,
+  prepareTerminalMutations,
   registerIntrinsicMutationSource,
   unobservableMutationSource,
 } from './intrinsic-mutation';
@@ -164,5 +165,66 @@ describe('the shared unobservable source cannot carry an observer', () => {
     observeIntrinsicMutations<string>(leaf, (m) => seen.push(m.after));
     leaf('B');
     expect(seen).toEqual(['B']);
+  });
+});
+
+
+describe('responsibility sources remain independent', () => {
+  it('observes late capture and terminal attachment and release per source', () => {
+    const a = {};
+    const b = {};
+    const first = registerIntrinsicMutationSource<string>(a);
+    const second = registerIntrinsicMutationSource<string>(b);
+    expect(first.capture).toBeUndefined();
+    expect(first.terminal).toBeUndefined();
+    expect(second.capture).toBeUndefined();
+    for (const key of ['capture', 'terminal', 'prepareTerminal']) {
+      const descriptor = Object.getOwnPropertyDescriptor(first, key);
+      expect(descriptor).toEqual({
+        get: expect.any(Function), set: undefined,
+        enumerable: false, configurable: false,
+      });
+      expect(descriptor?.get).toBe(Object.getOwnPropertyDescriptor(second, key)?.get);
+    }
+    const seen: string[] = [];
+    const releaseCapture = observeIntrinsicMutations<string>(a,
+      (value) => seen.push(`capture:${value.after}`), true);
+    const releaseTerminal = observeIntrinsicMutations<string>(b,
+      (value) => seen.push(`terminal:${value.after}`), 'terminal');
+    const mutation = { before: 'old', after: 'new', intent: 'replace' as const, changed: true };
+    first.capture?.(mutation);
+    second.terminal?.(mutation);
+    expect(seen).toEqual(['capture:new', 'terminal:new']);
+    expect(first.terminal).toBeUndefined();
+    expect(second.capture).toBeUndefined();
+    releaseCapture?.();
+    expect(first.capture).toBeUndefined();
+    second.terminal?.(mutation);
+    expect(seen).toEqual(['capture:new', 'terminal:new', 'terminal:new']);
+    releaseTerminal?.();
+    expect(second.terminal).toBeUndefined();
+  });
+
+  it('keeps preparation ownership and cleanup local to its source', () => {
+    const a = {};
+    const b = {};
+    const first = registerIntrinsicMutationSource(a);
+    const second = registerIntrinsicMutationSource(b);
+    const plan = { writes: [], adds: [] };
+    const prepare = () => plan;
+    const release = prepareTerminalMutations(a, prepare);
+    expect(first.prepareTerminal).toBe(prepare);
+    expect(first.prepareTerminal?.({
+      before: 0, after: 1, intent: 'replace', changed: true,
+    })).toBe(plan);
+    expect(second.prepareTerminal).toBeUndefined();
+    expect(() => prepareTerminalMutations(a, () => undefined)).toThrow('Terminal preparation already owned');
+    const releaseSecond = prepareTerminalMutations(b, prepare);
+    release?.();
+    release?.();
+    expect(first.prepareTerminal).toBeUndefined();
+    expect(second.prepareTerminal).toBe(prepare);
+    releaseSecond?.();
+    expect(second.prepareTerminal).toBeUndefined();
   });
 });

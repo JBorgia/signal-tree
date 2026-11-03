@@ -16,12 +16,12 @@ import { transactions } from './transactions';
  * `turn.id > pendingId`; ids are monotonic, so a confirmed turn can only ever
  * matter to a pending turn OLDER than itself.
  *
- * 15.x spells the entry point `transaction()`, not `transact()`.
+ * The original 15.x controls are adapted here to v16 `transact()`.
  */
 
 type Store = {
   $: { x: (v?: number) => number; y: (v?: number) => number };
-  transaction: (fn: () => void) => { confirm(): void; rollback(): void };
+  transact: (fn: () => void) => { confirm(): void; rollback(): void };
   __transactions: {
     getConfirmedTurnCount(): number;
     getPendingTurnCount(): number;

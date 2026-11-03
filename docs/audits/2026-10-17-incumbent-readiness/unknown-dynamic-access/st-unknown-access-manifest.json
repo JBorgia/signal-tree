@@ -1,0 +1,19 @@
+{
+  "packages/kernel/src/lib/point-owner-resolution-cost.spec.ts": "3c1059ddada235472687d937c54903b7eac1b28e61755a7c99f3dd89cb00add3",
+  "packages/kernel/src/lib/incremental-materialization.spec.ts": "67fb871421f46ca547a3e678d942e98aa2475484c02c3611d688631e0ca098eb",
+  "packages/kernel/src/lib/whole-value-new-keys.spec.ts": "86cb44e83eb1641b2cb3eb5dd7c12bc524089ccaaf41ada5367fd7cec2bce606",
+  "packages/kernel/src/lib/e-membership-reachability.spec.ts": "cd6316d1e0d86ebf6e9be08333bcce5176dfb00391f3024c7bc5dd6188090411",
+  "packages/kernel/src/lib/types.ts": "f4b10a8d051bc8f2a766c426c61897d5bf4f5c50349a8989deea6fd282b36b33",
+  "packages/kernel/src/lib/type-surface-protection.typing.spec.ts": "3e49ce60e27c2e4504e3f0250f6994828e07a6c116b16a9027c8f4e8caba0b04",
+  "packages/kernel/src/lib/open-record-access.typing.spec.ts": "e846e1a7a2c9bed71a0f40a0b20e2407e630752bc171f85eeb94799373127336",
+  "packages/react/src/lib/open-record-access.typing.spec.ts": "af6b440f4540534f2f72a103d5c5eb90760f5670b95681e5e68b2e33b17beeaf",
+  "packages/solid/src/lib/whole-value-new-keys.spec.ts": "b857f1b9b00b4b91429bb2382df0e5fb5557564e062feb4f837d4736a7786416",
+  "packages/solid/src/lib/open-record-access.typing.spec.ts": "e57311c9e08252c077823beed52ca378cd9bf9b17168e3b4545fa3919afc625d",
+  "packages/angular/src/lib/whole-value-new-keys.spec.ts": "4b253ccd9d584b4bd768b20fc4e7e115051e8f3d11a51e4380141256967e11b4",
+  "packages/angular/src/lib/kernel-comparison.benchmark.spec.ts": "b9e515701d552789b3075611214959c7d2fcb3750453202ec3e39c9d26efd451",
+  "packages/angular/src/lib/open-record-access.typing.spec.ts": "e57311c9e08252c077823beed52ca378cd9bf9b17168e3b4545fa3919afc625d",
+  "packages/vue/src/lib/whole-value-new-keys.spec.ts": "53d4c578d5de844431dbe2cb81d9e89ea2e8338defc544cc4fdaba230055d97d",
+  "packages/vue/src/lib/open-record-access.typing.spec.ts": "f00ed83d5ec501ce8c61164a4e17d84b31535ee88b832468501fbf87cae02ab5",
+  "apps/demo/src/app/pages/whats-new-14/whats-new-14.component.ts": "81d0abc40fe577891697b1d8d22272bd9e0cb6d5f0e67193401e3a68351adff6",
+  "patchSHA256": "9937060aa8f0ec608df0b273208908dacd1e20c076fc0b518275c7045dc24566"
+}

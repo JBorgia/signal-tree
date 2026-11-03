@@ -18,6 +18,10 @@ export interface ProductionSubstrateStats {
   publicUndoPositionEntriesExamined: number;
   turnIndexLookups: number;
   publicUndoTurnEffectsExamined: number;
+  /** Absence walks over a node's member links (cache misses, v16 8g). */
+  absenceWalks: number;
+  /** Member keys a branch write examined for membership (v16 8g). */
+  membershipKeysVisited: number;
 }
 
 type CounterName = keyof ProductionSubstrateStats;
@@ -58,6 +62,8 @@ export function resetProductionSubstrateStatsForTesting(
   stats.publicUndoPositionEntriesExamined = 0;
   stats.turnIndexLookups = 0;
   stats.publicUndoTurnEffectsExamined = 0;
+  stats.absenceWalks = 0;
+  stats.membershipKeysVisited = 0;
   return stats;
 }
 
@@ -93,5 +99,7 @@ function createProductionSubstrateStats(): ProductionSubstrateStats {
     publicUndoPositionEntriesExamined: 0,
     turnIndexLookups: 0,
     publicUndoTurnEffectsExamined: 0,
+    absenceWalks: 0,
+    membershipKeysVisited: 0,
   };
 }

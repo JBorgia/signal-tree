@@ -1,0 +1,454 @@
+# Current work — multi-actor product implementation
+
+Updated November 3, 2026. This checkout is `fix/d1-d2-forward-port`, starting
+`628d302d`, version **16.0.0-dev**. It is not a release candidate.
+
+## Latest C28 composition qualification
+
+[Current evidence](docs/architecture/multi-actor/native-occurrence/continuation/C28-STATUS.md):
+R3 and the reviewed dynamic-admission, initializer-cleanup, exact-attempt
+realization and disposition-index corrections are composed in an isolated
+candidate. Source qualification records 7,849 ordinary passes, one unchanged
+point-work failure, five satisfied expected failures and fifteen skips across
+768 selected files. The two large files are explicitly separate; the combined
+source has not passed them. No whole-suite or release acceptance is claimed.
+
+The demonstrated entity packaging defect is corrected in frozen isolated successor
+`89058c7a` (3,119 files). Independent source review and Main's actual-bundle replay
+support bounded acceptance: 316 focused source passes, five builds, types and
+graph-backed lint pass; the same 20 public cases pass installed and bundled routes.
+Original failing artifacts and assertions remain preserved. This is not activation
+or full release qualification.
+
+A separate diagnostic reduction at manifest `b4d66da3` preserves the installed and
+bundled 20-case controls and all 25 public declaration files. Fresh matched outputs
+save 77/97 bytes for bare production/development and 811/127 bytes for entities.
+All four package budgets still fail (bare 17.84/20.16 KiB; entities 42.92/46.51 KiB).
+The unchanged demo repeat reaches compilation but fails its 570 kB initial ceiling
+at 682.62 kB. An earlier native-addon crash is preserved separately.
+
+Large replacement/undo memory pressure and the unchanged absolute point-work bound
+remain open. Small allocation diagnostics identify row-projection preparation as a
+concrete investigation target, not a proven OOM cause or performance improvement.
+The corrected automatic entity artifact gate is bounded-accepted in composed
+manifest `8f902607` (3,124 files): full-registry setup negatives are errors, not
+mutation proofs; intended blindness requires a current-run witness after clean
+recovery. All 192 canonical package files match the diagnostic build exactly.
+See the [composition disposition](docs/architecture/multi-actor/native-occurrence/continuation/c28-r3-entity-artifact-gate-f1/MAIN-DISPOSITION.md).
+
+The private preparation-reader experiment `812a3ad5` survives bounded independent
+[review](docs/architecture/multi-actor/native-occurrence/continuation/c28-r3-preparation-reader-review/REVIEW.md).
+It avoids cold row/field facade construction while preserving the tested native
+read, lifetime, inspection, clone and recovery behavior. Eleven new focused cases,
+93 existing kernel cases and 15 selected framework cases pass; source types and
+the spec-type ratchet pass. Main verified all 3,127 source hashes. Small matched
+memory measurements are next; no memory, CPU, OOM or size improvement is claimed.
+Test-only [composition](docs/architecture/multi-actor/native-occurrence/continuation/c28-r3-reader-test-composition/REPORT.md)
+`0af649ba` passes the same 11 cases with no special environment variables; runtime
+is unchanged. The first PATH setup failure remains preserved.
+
+The [matched memory campaign](docs/architecture/multi-actor/native-occurrence/continuation/c28-r3-reader-memory/R1/REPORT.md)
+stopped on its fifth invocation: baseline 2,048 reached the 180-second startup
+no-progress limit before any test event or memory sample. Four valid invocations
+provide mixed boundary-heap results at 128/512 rows; the larger pair and repeats
+did not run. Independent review confirms no general memory or OOM conclusion.
+The earlier administrative cancellation and controller defects are preserved.
+
+Predecessors, first failures and approved semantics remain preserved. Production,
+budgets and B's closure are unchanged. No activation, merge or release authorized.
+
+## Historical C27 composition checkpoint
+
+[C27 status and evidence](docs/architecture/multi-actor/native-occurrence/continuation/C27-STATUS.md)
+records the preceding continuation assessment. Public-surface composition and focused
+regressions pass; confirmed-owner retention remains unqualified. A public A/B
+probe demonstrates different no-write/started receipt outcomes despite matching
+current values and delivery. The owner has approved current-obligation no-write semantics for a bounded C28
+implementation and qualification; runtime acceptance remains open.
+Earlier candidate entries below remain historical, not new integration authority.
+
+## Scope
+
+Owner authorized the [multi-actor product implementation plan](docs/architecture/multi-actor/PLAN.md)
+as first-order direction. Implement accountable application operations over truthful
+native state and settlement, optional integration, and existing backend/protocol
+infrastructure. The initial work here is an isolated executable operation prototype
+and public-consumer seam investigation, not a production kernel replacement.
+
+The active v16 readiness source/evidence lives in the separate
+`codex/v16-incumbent-readiness` worktree, inspected at `5727cd8f`, with retained
+runtime `87f6831f`. Its rejected candidates and recurrence gates remain in force.
+Do not transplant this older checkout's runtime into that work or claim its
+historical verification qualifies this product implementation.
+
+The untracked `frontier` is unrelated. Stable v15, the five-package release plan,
+private Studio boundary, B closure, existing semantics and ceilings are unchanged.
+No push, merge, tag or publication is authorized by this plan.
+
+## Product checkpoint
+
+[Implementation evidence](docs/architecture/multi-actor/IMPLEMENTATION.md): isolated
+operation coordinator, installed kernel/Angular consumers, protocol adapter, HTTP
+fixture and Angular DOM reference are implemented with bounded passing controls.
+Independent review corrections and first failures are preserved. Native recurrence
+repair, full framework coverage, final comparative/cost work and exact release
+qualification remain open. This is not release acceptance.
+
+Owner approved a bounded [source-current readonly SDK proof](docs/architecture/multi-actor/framework-current-read/DECISION.md)
+with explicit native custom-adapter migration. Existing native carrier types and
+application-computed timing remain required; this does not activate a candidate.
+
+## Continue safely
+
+Use [AGENTS.md](AGENTS.md) for task routing and [support policy](docs/support-policy.md)
+for compatibility. Before resuming code or release work on this branch, establish
+its intended scope from the current user task and verify implementation differences
+against the intended baseline. A historically completed gate is not evidence for
+this checkout's current artifacts.
+
+Use [validation](.github/VALIDATION_GUIDE.md) and [release tooling](RELEASE_PROCESS.md)
+when release verification is actually requested. Exact-source/artifact checks and
+explicit push/tag/publication authorization remain mandatory.
+
+## Preserved records
+
+[RELEASE-1.0.md](RELEASE-1.0.md), [TODO.md](TODO.md), and the
+[architecture context](docs/architecture/SIGNALTREE-15-CONTEXT.md) retain historical
+findings, decisions and unresolved reservations. Their old current-phase/next-step
+headings are not an automatic work queue. Frozen product constraints remain
+indexed in [contributor contracts](docs/contributor-contracts.md).
+
+## Historical October 1 guidance checkpoint validation
+
+The short entry points, scoped contracts and historical banners are applied.
+Import, semantic-discoverability and numeric-claim checks passed. Documentation
+examples: 29 checked across 25 live documents. The production demo build first
+aborted in native LMDB inside the sandbox; the same uncached build outside the
+sandbox passed. Both results are preserved in the local October 1 audit logs.
+No kernel/framework behavior, package version or public export changed. The demo
+version generator corrected stale 16.0.0 labels to existing 16.0.0-dev; those two
+generated files are included in this checkpoint. The unrelated `frontier` file
+remains untouched. This is not release qualification.
+
+## Latest native qualification
+
+[Preserved differential and reviewed disposition](docs/architecture/multi-actor/native-occurrence/FINAL-DISPOSITION.md): four hidden-collection rollback regressions rejected that source. The owner subsequently directed continued correction. [Current continuation](docs/architecture/multi-actor/native-occurrence/continuation/README.md) records the retained-source repair, entity enrollment repairs and approved SDK combination, with their exact-source controls. Structural admission, publication retirement and collection egress remain under qualification. Production is unchanged; no complete integration or release acceptance is established.
+
+The October 29 continuation has independently reviewed ordinary placement,
+recipient-specific evidence classification and lazy responsibility capture.
+Their composed checkpoint passes its focused controls and source/spec types.
+Scalar/mixed operation phases, dynamic ordinary-member enrollment, terminal
+metadata retirement and preparation costs remain under correction. Preserve
+the failed scalar/rich/packet experiments separately; none is accepted merely
+because its original regression passes. Full qualification follows a combined
+reviewed source, not a sum of focused counts.
+
+The earlier fully framework-checked composed runtime C12 (manifest
+`d96cb84faeec4f098b4bba00deb9b82b108a33469b965978e4d248fa354b1df2`)
+adds the reviewed effective-presence correction and packet-pair indexing,
+plus separately reviewed test and current-reader guidance corrections.
+321 focused kernel cases pass. Source/spec types and all four full framework
+suites pass: Angular 294 (three existing skips), React 94, Vue 215 and Solid 126.
+This supersedes C10's framework failures; C10's interrupted kernel run remains
+preserved as incomplete, not converted into a passing run.
+
+Integration remains blocked. The unchanged native certificate/enrollment selection
+has 12 passes and nine failures. Independent trace establishes a real scalar
+publication safety failure: a queued uncovered notification replaces known
+native/shared-validation obligations with generic fallback evidence and permits
+an early send. Six recipient-enrollment progress failures and the retained
+collection whole-authorship progress gap also remain. The remaining readiness
+case uses an obsolete private completion fixture; its correction requires a
+positive counterpart, not deletion. Reader freshness does not fix these Link
+proof failures. No full kernel completion or new artifact qualification is claimed.
+
+C13 is a test/tooling-only composition over C12: typed diagnostic replay,
+explicit nine-mode forwarding retention gate, and reviewed occupancy/readiness
+fixtures. The gate registry adds one entry (84 to 85). Independent retention
+qualification passes nine forwarding modes, ten existing tests and both actual
+mutant checks; exact source is restored. Diagnostic replay completeness is not
+semantic acceptance. Runtime is byte-identical to C12.
+
+C14's scalar notification-support correction has bounded independent acceptance
+and a composition replay. C15 adds the separate recipient-progress correction;
+original safety/progress cases pass together, but an unchanged sibling-equality
+protocol test now omits delivery. C15 is not accepted. Its exact first failure
+and independent attribution are preserved in the continuation. Equal-whole
+unowned-field publication semantics are owner-approved; scoped native admission
+implementation remains required. Independent
+safety, verification and lint work continues.
+
+Application-native computed/effect and React render timing remains unchanged.
+Historical expectations, first failures and candidate identities are preserved
+in the continuation record. Production remains unchanged.
+
+The point-work gate still fails: the reviewed preparation reduction lowers its
+count from 15,600 to 14,200 in its isolated comparison; the fresh C12
+combined replay measures 13,800 against the unchanged 2,000 ceiling. Lazy activation
+is only conditionally feasible and has no accepted implementation. No broad
+acceptance, activation, release or ceiling change follows. See the
+[continuation evidence](docs/architecture/multi-actor/native-occurrence/continuation/README.md).
+
+## November 2 active corrections
+
+C19 (`b8eace4025ff735988dee88db512a2e9ceb5ac9e1302683d68d6900acea17576`)
+combines independently reviewed pending-value-work handoff and approved explicit
+whole-field authorship with nonsemantic lint maintenance. 109 focused cases pass;
+source/spec types and affected lint pass (zero errors,27 warnings). The full
+kernel run stopped at the exact130,000-row membership-observed batch case after
+exceeding its60-second timeout in synchronous work. Per-test progress and a
+native sample are preserved; small-population scaling attribution is underway.
+This is not complete qualification or release acceptance.
+
+Original failures remain preserved. Independent reviews distinguish the
+post-install getter failure from refusal before application, the unsupported
+private injected callback from real public reentry, obsolete passive-recipient
+holding from actual native uncertainty, and new undeclared rollback publication
+from a prior declaration's permission. Concrete counterparts retain real owner,
+safety, disposal and useful-progress assertions. No runtime exception or metadata
+stamping was added to force those cases green.
+
+C19 enforces no new send after disposal in the two previously incomplete test
+variants. Mixed rollback may still conservatively hold while a foreign owner is
+pending; its selected inverse fields are known, so this is an attribution
+qualification limit, not proven hidden input. Fresh explicit intended-value
+authorship progresses independently, and ordinary fallback must deliver without
+a fresh write once eligible. A declaration around settlement currently remains
+conservative. The stronger automatic-progress failure is preserved as capability
+evidence, not claimed fixed.
+
+See the [continuation](docs/architecture/multi-actor/native-occurrence/continuation/README.md)
+and [bounded authorship guidance](docs/architecture/multi-actor/native-occurrence/continuation/AUTHORSHIP-GUIDANCE.md)
+for source identities, commands, first failures and limits. Point-work costs,
+public-surface disposition and artifact/release qualification remain open.
+Production, stable v15, B closure and approved budgets are unchanged.
+
+## Current combined source: C22
+
+[C22 qualification](docs/architecture/multi-actor/native-occurrence/continuation/combined-c22/RESULTS.md)
+adds one reviewed singleton capture reduction over C21. Its 130 focused kernel
+checks and all four full framework suites pass (729 ordinary passes, three
+existing skips). This supersedes C12 as the latest framework-checked source;
+it does not supersede unresolved kernel qualification.
+
+The full kernel run stalled in an unchanged 130k case that passes alone. The
+remaining 343-file partition completed with 17 failures, now under separate
+fixture, recipient-contract and cost adjudication. The absolute point-work
+regression is real under the unchanged counter: incumbent 800 versus candidate
+13,000 visits. No cost ceiling or public-activation approval is inferred.
+
+The source subset is preserved in a self-contained
+[reconstruction packet](docs/architecture/multi-actor/native-occurrence/continuation/c21-portable-source/README.md);
+C22's one-file patch and full identity are retained alongside it. Production
+remains 87f6831f; no root runtime replacement, activation or release is accepted.
+
+
+## November 2 composed qualification follow-up: C23
+
+C23 preserves C22 runtime and composes reviewed test/routing corrections. Its
+59 focused tests and unchanged spec-type ratchet pass; independent GC routing
+verification passes all12 arms. The original large restoration cases remain
+unqualified: the first corrected isolated run hit its external watchdog without
+a case result. The separate stage investigation is diagnostic, not acceptance.
+
+The exact C22 runtime completed a fresh five-package sequential streamed Nx build.
+The earlier interrupted buffered build remains preserved and is not recast as a
+success. Installed-consumer qualification initially encountered sandbox cache and
+DNS restrictions; its separate network-enabled task-local-cache attempt passes
+framework runtime identities and both bundler/node16 resolution checks with
+unchanged source and artifacts. Node16 denotes module resolution, not the runtime.
+
+Fresh candidate bundle measurements fail all four unchanged ceilings: bare
+17.53/19.88 KiB and entities43.33/46.26 KiB (production/development). A fresh
+retained-production comparison and retained-module attribution are under review;
+ceiling values are not baseline measurements. No budget increase is authorized.
+
+The owner approved the typed declaration surface for existing admitted owned
+sources; implementation and qualification are in progress. The authority record
+is in the continuation declaration-scope review. No source-admission expansion
+or activation follows from that approval. Production
+remains87f6831f, B stays closed, and no integration or release is accepted.
+
+Fresh retained-production artifact comparison records bare production gzip
+12,660→17,951 bytes and entities26,898→44,366 bytes. Experimental publication
+modules and Link contribute zero emitted bytes in these no-Link fixtures; shared
+source-owned support remains. These measured costs are neither explained away by
+the baseline's small entity overage nor qualified by module elimination. See the
+[artifact attribution](docs/architecture/multi-actor/native-occurrence/continuation/c22-bundle-attribution/REVIEW.md).
+
+The isolated large restoration stage diagnostic reaches undo before the180-second
+last-progress watchdog. It has no assertion result and is not a qualified pass.
+Concurrent host pressure is recorded separately and does not establish cause.
+
+The approved public API now has a separately reviewed type/export checkpoint.
+Source and five-facade source types pass; the 17 focused public tests cover their
+stated independent-write cases only. Final spec-type qualification remains open
+after an external watchdog, and no packed proof of the new exports is claimed.
+
+New source-specific qualification preserves an independently reproduced equal-whole ownership
+violation: branch publication sends a pending owner's value after independent
+equal replacement. Three original tests share that failing prefix; independent
+React replay reproduces all three failures with no watchdog. Direct-row rollback delivers the correct value; its
+sole failure was an overly strong started-versus-superseded receipt assertion.
+Neither public type approval nor the earlier whole-unowned approval waives actual
+pending ownership. No composition of this checkpoint into production is accepted.
+
+
+## November 2 — bounded ownership repair resumed
+
+The approved public API checkpoint now passes its unchanged final spec-type
+ratchet on exact manifest081e2114; prior watchdog results remain preserved.
+Fresh installed proof of the new symbols is separate work, not covered by the
+earlier C22 consumer pass.
+
+Neutral-kernel discriminators reproduce pending-owner leakage through both leaf
+and whole-branch equal writes. Ten initial cases yield4 passes/6 failures;
+possible-only unowned progress remains useful. A separate equal no-op inside a
+transaction changing only a sibling is falsely held. A newer net-zero transaction
+followed by an equal write also loses an older pending owner's publication hold.
+These are separate executed records, not a claimed full-suite count.
+
+Independent premise review authorizes a bounded source-owned selection prototype,
+not an unconditional previous-owner guard. Transaction folding can retire a
+position while its old publication proof still names the transaction. The
+prototype must reconcile selection through existing admission/folding, preserve
+complete inherited obligations and validation, and prove restoration/reentry
+before composition. No second compensation authority or public SDK is approved.
+Production remains unchanged; public API artifact work and native repair stay
+separate. See continuation c24-equal-owner-premise and c23-equal-owner-design.
+
+### Public artifact proof completed separately
+
+The exact public-surface manifest081e2114 now passes fresh five-package builds,
+strict installed consumer checks under bundler and Node16 resolution, and bounded
+packed runtime checks across all five facades. Installed bytes match all183 packed
+files. Node16 here is module resolution, not the execution runtime. These probes
+validate public admission types, shared error identity, no-write receipts and
+disposed errors; they do not qualify pending-owner safety or every receipt state.
+See [the packed proof](docs/architecture/multi-actor/native-occurrence/continuation/c23-public-packed-proof/REVIEW.md).
+C24 runtime work is separate and was not composed into those artifacts.
+
+## November 2 — C24 bounded result and successor boundary
+
+C24 source-selection prototype is frozen at manifest cb54add5. Main verified all
+3,072 recorded files and independently replayed the original13 ownership cases
+plus the net-zero ownership companion:14 pass. Complete inherited obligations,
+actual owner preservation and useful possible-only progress survive those cases.
+
+Integration is rejected for live-source responsibility growth:64 equal calls
+retain129 requirement nodes;256 retain513, with fixed one/two owners. Independent
+execution reproduces the one-owner counts and readiness/proof traversal growth.
+Confirmation leaves the chain retained. Counts are structural, not heap bytes or
+timing. The independent diagnostic runner unexpectedly repeated its four cases;
+its stopped wrapper is not an exit-zero qualification. First completed results,
+raw repeats and verified process cleanup remain preserved.
+
+The approved invocation-specific receipt contract permits no-write when selected
+owned support is unchanged. Original React assertions remain preserved; reviewed
+counterparts pass32/32 across all four frameworks with useful delivery/settlement
+and native observation. Six of seven new kernel counterpart assertions pass; the
+remaining aggregate receipt expectations were adjudicated against existing
+coverage rules. A separate diagnostic reaches correct confirmation delivery and
+settlement. Its suppressed console output does not establish final receipt basis.
+
+See the [frozen review](docs/architecture/multi-actor/native-occurrence/continuation/c24-equal-owner-premise/implementation-review/REVIEW-FROZEN.md),
+[prototype record](docs/architecture/multi-actor/native-occurrence/continuation/c24-equal-owner-prototype/REPORT.md)
+and [counterpart replay](docs/architecture/multi-actor/native-occurrence/continuation/c24-receipt-replay/REPORT.md).
+The [successor premise review](docs/architecture/multi-actor/native-occurrence/continuation/c24-bounded-representation-review/REVIEW.md)
+permits a narrow separate experiment retaining exact selected responsibility while
+keeping invocation validation transient. Derived-input admission, nonmatching
+recipient readiness, physical snapshot isolation and all-root retention remain
+explicit gates. This is not permission to strip obligations or widen the API.
+No production integration, full qualification, new cost acceptance or release.
+
+
+## November 2 — C25 frozen result and representation review
+
+C25 manifest `9f3622a1231437c7f9cb732a1d2b3d0aa501ba45feee0c7a051f1e282b458f02`
+contains 3,083 independently verified source entries. The final focused ledger has
+97 unique passing cases; Main independently replayed 22 of these. Types and the
+unchanged spec-type gate pass. Counts from overlapping runs are not additive.
+
+The candidate preserves selected owned literal support while keeping invocation
+validation separate. Physical-only view replacement and confirmed-owner refresh
+have paired snapshot/actual-input controls. First failures remain preserved.
+Repeated literal calls remain bounded in the enumerated-root diagnostic; this is
+not a general heap or GC claim. Derived updater calls with two fixed owners retain
+1/3/5/9 selected requirement nodes at 0/1/2/4 completed calls. Useful settlement
+passes, but this growth rejects general integration. No larger derived stress run,
+full qualification, build, performance comparison or activation was warranted.
+
+See the [frozen result](docs/architecture/multi-actor/native-occurrence/continuation/c25-equal-owner/REPORT.md)
+and [independent interpretation](docs/architecture/multi-actor/native-occurrence/continuation/c25-derived-interpretation/REVIEW.md).
+
+A finalized-role data representation remains a read-only hypothesis. The
+[write/alias audit](docs/architecture/multi-actor/native-occurrence/continuation/finalized-role-write-audit/REVIEW.md)
+finds no supported post-ready mutation of effective roles/flags, but entity
+retirement observes constituent provenance and owner-source availability too.
+The [premise review](docs/architecture/multi-actor/native-occurrence/continuation/finalized-role-premise-review/REVIEW.md)
+requires installation-gated enrollment and cleanup for every durable unresolved
+composite. Preserving only a root provenance flag is insufficient. Separately,
+fixed-owner ancestry bounds do not prove that distinct terminal-owner references
+are reclaimed. These are explicit design gates, not permission to delete evidence.
+
+C25 remains frozen; no C26 runtime implementation is approved by these reviews.
+Production remains 87f6831f, public artifact evidence stays separate, all four
+bundle failures remain, and B remains closed. No push, merge or release.
+
+
+The [retirement discriminator](docs/architecture/multi-actor/native-occurrence/continuation/finalized-role-retirement-discriminator/REVIEW.md)
+executes the extracted predicate and disproves naive root-flag-only flattening.
+A separate summary preserving a static blocker plus ordered live qualifying-window
+cells matches 45 isolated comparisons, independently replayed with Node24.15.0.
+These are predicate-model results, not native lifecycle or heap qualification.
+See [equivalence and limits](docs/architecture/multi-actor/native-occurrence/continuation/finalized-role-retirement-equivalence/REVIEW.md).
+The [hook inventory](docs/architecture/multi-actor/native-occurrence/continuation/finalized-role-design/DESIGN.md)
+locates scalar installed completion but leaves source/alias-safe registration
+lifetime and entity support handling unclosed. A read-only trace is checking
+whether synchronous validation/activation completion supplies the required finite
+lifetime. No runtime normalization or new retention policy is selected.
+
+
+The subsequent [scalar completion audit](docs/architecture/multi-actor/native-occurrence/continuation/finalized-role-horizon-audit/REVIEW.md)
+supports installed scalar completion/validation as a finite registration lifetime
+under normal synchronous unwind. Source replacement or Link disposal need not
+cancel normalization while surviving aliases remain. This is source evidence,
+not executed lifecycle qualification; untraced and entity paths remain excluded.
+Main selected a bounded C26 scalar-only disposable prototype on this reviewed
+premise. It must preserve exact proof roles, retirement summary, readiness, aliases,
+first-error behavior and release-before-callback. No terminal-owner filtering,
+entity support normalization, public API, activation, budget or release change is
+authorized by that experiment. C25 and its first failures remain immutable.
+
+
+## November 2 — C26 bounded scalar repair survives
+
+Frozen source manifest `8055911bdd78c9df536bc8a7e1ea8bf3e74427c64675fbc8d0a566c0d91aa38f`
+remains unchanged across all 3,083 verified entries. The three-file delta preserves
+publication role sets and an exact separate retirement summary while removing
+completed scalar getter/component ancestry. Only installed scalar completion
+registers readiness cleanup; entity composite enrollment remains unchanged.
+
+Independent [source review](docs/architecture/multi-actor/native-occurrence/continuation/c26-independent-review/REVIEW.md)
+supports bounded scalar acceptance. The [prototype](docs/architecture/multi-actor/native-occurrence/continuation/c26-scalar-finalized-role/REPORT.md)
+passes 8 targeted cases and 27 unchanged controls. Main independently replayed
+22 overlapping controls. Five [independent public lifecycle cases](docs/architecture/multi-actor/native-occurrence/continuation/c26-lifecycle-controls/REPORT.md)
+pass on both C25 and C26, with the unchanged spec-type gate passing for their
+new test overlay. Source types and the candidate spec-type gate pass. Focused
+Angular/React/Vue/Solid results are 8/8/8/10; these are not full framework suites.
+
+The [extended fixed-two-owner diagnostic](docs/architecture/multi-actor/native-occurrence/continuation/c26-finite-followup/REPORT.md)
+observes selected ancestry at one node
+through 0/1/2/4/64/256 calls. Enumerated requirement counts are 8/11/14/14/14/14;
+summary weak edges are included. Useful assertions preserve the dependency hold
+after destination confirmation and exact terminal delivery after both declared
+owners confirm. The workload diff extends only checkpoints and title. These are
+structural counts, not heap bytes, GC proof or CPU measurements. Diagnostic and
+model cases overlap earlier runs and are not added to runtime pass totals.
+
+This closes the demonstrated fixed-owner scalar ancestry defect within the tested
+scope. It does not establish bounded distinct terminal-owner history, entity
+normalization, universal completion, full native integration or release readiness.
+Existing point-work regression, incomplete full-kernel qualification, four bundle
+failures and separate API composition remain open. No ceilings, production runtime,
+activation, push, merge, tag or publication changed; B remains closed.
