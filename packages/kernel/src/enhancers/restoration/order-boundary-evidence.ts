@@ -103,6 +103,11 @@ function extend(
   // Indexed list keeps N consecutive additions/removals linear, rather than
   // repeatedly copying or searching an expanding array at each admission.
   const nodes = new Map<number, { before?: number; after?: number }>();
+  const nodeAt = (subject: number) => {
+    const node = nodes.get(subject);
+    if (!node) throw new Error('Captured order boundary is discontinuous');
+    return node;
+  };
   let head: number | undefined = subjects[0];
   subjects.forEach((subject, index) =>
     nodes.set(subject, {
@@ -130,8 +135,8 @@ function extend(
       const node = nodes.get(record.subject);
       if (!node) throw new Error('Captured order boundary has no subject');
       if (node.before === undefined) head = node.after;
-      else nodes.get(node.before)!.after = node.after;
-      if (node.after !== undefined) nodes.get(node.after)!.before = node.before;
+      else nodeAt(node.before).after = node.after;
+      if (node.after !== undefined) nodeAt(node.after).before = node.before;
       nodes.delete(record.subject);
     }
     const waiting = new Map<number, number[]>();
@@ -168,7 +173,7 @@ function extend(
         successor !== undefined && nodes.has(successor)
           ? successor
           : predecessor !== undefined && nodes.has(predecessor)
-          ? nodes.get(predecessor)!.after
+          ? nodeAt(predecessor).after
           : undefined;
       if (
         nodes.size &&
@@ -181,11 +186,11 @@ function extend(
           ? predecessor !== undefined && nodes.has(predecessor)
             ? predecessor
             : undefined
-          : nodes.get(after)!.before;
+          : nodeAt(after).before;
       nodes.set(record.subject, { before, after });
       if (before === undefined) head = record.subject;
-      else nodes.get(before)!.after = record.subject;
-      if (after !== undefined) nodes.get(after)!.before = record.subject;
+      else nodeAt(before).after = record.subject;
+      if (after !== undefined) nodeAt(after).before = record.subject;
       pending.delete(record.subject);
       for (const dependent of waiting.get(record.subject) ?? [])
         ready.push(dependent);
@@ -198,7 +203,7 @@ function extend(
   for (
     let subject = head;
     subject !== undefined;
-    subject = nodes.get(subject)!.after
+    subject = nodeAt(subject).after
   )
     result.push(subject);
   return result;
@@ -278,7 +283,9 @@ function applyPairs(
       throw new Error('Ordinary boundary topology is discontinuous');
     seen.add(id);
     result.push(id);
-    id = nodes.get(id)!.afterSubject;
+    const next=nodes.get(id);
+    if(!next)throw new Error('Ordinary boundary topology is discontinuous');
+    id = next.afterSubject;
   }
   if (result.length !== nodes.size)
     throw new Error('Ordinary boundary topology is incomplete');

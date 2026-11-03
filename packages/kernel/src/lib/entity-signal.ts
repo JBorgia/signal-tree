@@ -637,8 +637,9 @@ export function createEntitySignal<
     return preparePointValues([...rows.values()],steps,publicationPhase);
   }
   function stageSelected(id:K, before:E, after:E, fields:readonly string[] | null, selection:ClaimedFieldEndpoint):void {
-    const selections=selectedInverseField(selection,selection.subject,after,id)!;
-    selection.preparation!.stage({source:entityPublication,subject:selection.subject,key:id,physicalBefore:before,physicalAfter:after,fields,selections,prepare:prepareSelectedRows});
+    const selections=selectedInverseField(selection,selection.subject,after,id);
+    if(!selections||!selection.preparation)throw new Error('Selected row preparation unavailable');
+    selection.preparation.stage({source:entityPublication,subject:selection.subject,key:id,physicalBefore:before,physicalAfter:after,fields,selections,prepare:prepareSelectedRows});
   }
 
   /** Existing-lifetime value plans: all reflection precedes physical installation. */
@@ -680,7 +681,7 @@ export function createEntitySignal<
     const publication=prepareEntityPublication(
       prepared.map(row=>({subject:row.subjectId,before:row.before,after:row.after,fields:publicationFields(row.before,row.after)})),
       ordinarySteps ?? prepared.map(row=>({subject:row.subjectId,before:row.transition.ordinaryBefore,after:row.transition.ordinaryAfter,fields:publicationFields(row.transition.ordinaryBefore,row.transition.ordinaryAfter),restoredFields:new Map(row.edits.flatMap(edit=>edit.kind==='field'&&edit.selection?[[edit.field,edit.selection] as const]:[]))})),undefined,undefined,true,
-      selectedSteps?.map((step,ordinal)=>({ordinal,authoredFootprint:authoredFootprint(step.fields),physical:[{subject:step.subject,before:step.physicalBefore,after:step.physicalAfter,fields:step.fields}],ordinary:[ordinarySteps![ordinal]!]}))
+      ordinarySteps?.map((ordinary,ordinal)=>{const step=selectedSteps?.[ordinal];if(!step)throw new Error('Missing selected publication step');return {ordinal,authoredFootprint:authoredFootprint(step.fields),physical:[{subject:step.subject,before:step.physicalBefore,after:step.physicalAfter,fields:step.fields}],ordinary:[ordinary]};})
     );
     const phase=publicationPhase ?? new PublicationPreparation();
     phase.add(()=>publication.unit?.finalize?.(),()=>publication.unit?.validate?.());if(!publicationPhase)phase.seal();
@@ -1450,7 +1451,8 @@ export function createEntitySignal<
       if (m.kind === 'replace-value') {
         authoredByStep.set(changes.length, authoredFootprint(m.authoredFields));
         if(m.restoredFields)restoredByStep.set(changes.length,m.restoredFields);
-        const transition = valueTransitions.get(m)!;
+        const transition = valueTransitions.get(m);
+        if(!transition)throw new Error('Missing prepared value transition');
         physicalValuesByStep.set(changes.length,transition);
         changes.push({
           subject: m.subjectId,
@@ -1534,11 +1536,13 @@ export function createEntitySignal<
     );
     const valueResultsByStep = frame.mutations.map((mutation) => {
       if (mutation.kind !== 'replace-value') return undefined;
-      const transition = valueTransitions.get(mutation)!;
+      const transition = valueTransitions.get(mutation);
+      const changeIndex=changeIndexByMutation.get(mutation);
+      if(!transition||changeIndex===undefined)throw new Error('Missing prepared value step');
       return Object.freeze({
         ...transition,
         ordinaryChanges:
-          ordinaryPlan.byStep[changeIndexByMutation.get(mutation)!],
+          ordinaryPlan.byStep[changeIndex],
       });
     });
     for (const [subject, transition] of valueResults) {

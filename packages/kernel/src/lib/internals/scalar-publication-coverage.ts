@@ -87,7 +87,8 @@ export function scalarNotificationContributions(
   return (function* () {
     const pending = [root];
     while (pending.length) {
-      const next = pending.pop()!;
+      const next = pending.pop();
+    if (!next) continue;
       if ('entry' in next) yield next.entry;
       else pending.push(next.right, next.left);
     }

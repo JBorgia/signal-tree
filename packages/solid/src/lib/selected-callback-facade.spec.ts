@@ -105,7 +105,7 @@ it('realizes fresh tap reads and preserves later callback writes', async () => {
 });
 
 it('keeps ordinary selected observation granular and native computations cached during the callback', async () => {
-  let dispose = () => {};
+  let dispose = () => { /* Intentionally inert fixture hook; the surrounding protocol is asserted. */ };
   const tree = signalTree(
     { rows: entityMap<{ id: string; n: number }, string>() },
     { enhancers: [transactions()] }
@@ -125,7 +125,7 @@ it('keeps ordinary selected observation granular and native computations cached 
     });
   });
   let selectionRuns = 0;
-  let disposeSelection = () => {};
+  let disposeSelection = () => { /* Intentionally inert fixture hook; the surrounding protocol is asserted. */ };
   const selectionView = createRoot((release) => {
     disposeSelection = release;
     return createMemo(() => {

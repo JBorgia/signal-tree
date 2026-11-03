@@ -57,7 +57,7 @@ it('connection cleanup returns registry counts after repeated validation and pen
   for (let cycle = 0; cycle < 12; cycle++) {
     const owner = signalTree({ z: 0 }, { enhancers: [transactions()] });
     const t = signalTree({ y: 0 });
-    const c = link(t.$.y, { set: () => {} }) as Experimental;
+    const c = link(t.$.y, { set: () => { /* Destination values are intentionally discarded in this protocol fixture. */ } }) as Experimental;
     const p = owner.transact(() => owner.$.z(7));
     try {
       retained.push(c.declare({ kind: 'dependent', owners: [p] }, () => t.$.y(7)));

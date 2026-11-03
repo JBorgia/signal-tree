@@ -6,19 +6,19 @@ import {createLocationRuntime} from './internals/location-runtime';
 import {createNativeLocationRuntime} from './internals/native-location-realization';
 
 const neutral = (): ObservationAdapter => ({
-  createToken: () => ({observe() {}, invalidate() {}}),
+  createToken: () => ({observe() { /* This adapter fixture does not schedule reactive work. */ }, invalidate() { /* This adapter fixture does not schedule reactive work. */ }}),
   runInvalidationGroup: run => run(),
 });
 const writable = <T>(read: () => T) => Object.assign(() => read(), {
-  set: (_value: T) => {}, update: (_change: (value: T) => T) => {}, asReadonly: () => read,
+  set: (_value: T) => { /* Destination values are intentionally discarded in this protocol fixture. */ }, update: (_change: (value: T) => T) => { /* Intentionally inert fixture hook; the surrounding protocol is asserted. */ }, asReadonly: () => read,
 });
 describe('current-read capability construction boundary', () => {
   for (let mask = 1; mask <= 7; mask++) {
     it(`preserves classification for legacy factory mask ${mask}`, () => {
       let tokens = 0, nativeCalls = 0;
       const adapter: ObservationAdapter = {
-        ...neutral(), createToken() {tokens++; return {observe(){},invalidate(){}};},
-        ...(mask & 1 ? {createWritableCell: <T>(read: () => T) => {nativeCalls++; return {cell:writable(read), peek:read, token:{observe(){},invalidate(){}}};}} : {}),
+        ...neutral(), createToken() {tokens++; return {observe(){ /* This adapter fixture does not schedule reactive work. */ },invalidate(){ /* This adapter fixture does not schedule reactive work. */ }};},
+        ...(mask & 1 ? {createWritableCell: <T>(read: () => T) => {nativeCalls++; return {cell:writable(read), peek:read, token:{observe(){ /* This adapter fixture does not schedule reactive work. */ },invalidate(){ /* This adapter fixture does not schedule reactive work. */ }}};}} : {}),
         ...(mask & 2 ? {createWritableProjection: <T>(read: () => T) => {nativeCalls++; return {cell:writable(read), peek:read};}} : {}),
         ...(mask & 4 ? {createReadonlyCell: <T>(read: () => T) => {nativeCalls++; return read;}} : {}),
       };
@@ -46,7 +46,7 @@ describe('current-read capability construction boundary', () => {
       const adapter: ObservationAdapter = {
         ...neutral(),
         createCurrentReadonlyCell<T>(read: () => T) {expect(this).toBe(adapter); capabilityCalls++; return read;},
-        ...(mask & 1 ? {createWritableCell: <T>(read: () => T) => {nativeScalar++; return {cell:writable(read), peek:read, token:{observe(){},invalidate(){}}};}} : {}),
+        ...(mask & 1 ? {createWritableCell: <T>(read: () => T) => {nativeScalar++; return {cell:writable(read), peek:read, token:{observe(){ /* This adapter fixture does not schedule reactive work. */ },invalidate(){ /* This adapter fixture does not schedule reactive work. */ }}};}} : {}),
         ...(mask & 2 ? {createWritableProjection: <T>(read: () => T) => ({cell:writable(read), peek:read})} : {}),
         ...(mask & 4 ? {createReadonlyCell: <T>(read: () => T) => read} : {}),
       };

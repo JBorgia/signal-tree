@@ -142,7 +142,7 @@ it('membership preparation reentry is included before the authored unit installs
         if (!q) q = reentrant.transact(() => reentrant.$.z(9));
       }
       return undefined;
-    }, () => {});
+    }, () => { /* Intentionally inert fixture hook; the surrounding protocol is asserted. */ });
     target.$.a({ y: 0 });
     expect(callbacks).toBe(1); expect(q).toBeDefined();
     expect(target.$.a()).toEqual({ y: 0 });

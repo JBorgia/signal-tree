@@ -18,7 +18,7 @@ for(const mutable of ['fields','structural','both'] as const)it(`refuses frozen 
 for(const fields of [null,Object.freeze(['x'])] as const)it(`safe frozen metadata accepts mutable payload and proof references, fields=${String(fields)}`,()=>{
  const s=new EntityPublicationSource();const payload={x:7,tags:['a']};const proof=initialRequirement();const endpoint={present:true,value:7,requirement:proof};const restored=new Map([['x',endpoint]]);
  const a:Edit=Object.freeze({subject:1,before:undefined,after:payload,fields,structural:Object.freeze({kind:'add' as const,subject:1,value:payload}),restoredFields:restored});let seen:Edit|undefined;
- const off=s.subscribe({prepare(p){seen=p.ordinary[0];return undefined;},complete(){}});
+ const off=s.subscribe({prepare(p){seen=p.ordinary[0];return undefined;},complete(){ /* This participant has no completion side effect. */ }});
  try{install(s,packet([a]));expect(seen).toBe(a);expect(before(s)).toBe(endpoint);expect(Object.isFrozen(payload)).toBe(false);expect(Object.isFrozen(payload.tags)).toBe(false);expect(Object.isFrozen(proof)).toBe(false);expect(Object.isFrozen(endpoint)).toBe(false);expect(a.restoredFields).toBe(restored);payload.tags.push('b');expect(payload.tags.length).toBe(2);}finally{off();s.dispose();}
 });
 it('supported precedence companion: safe frozen removal/add retains restored over selected over proposed endpoint',()=>{

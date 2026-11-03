@@ -47,7 +47,7 @@ it('rollback, abandonment, unavailable pending and unstamped confirmed cells nev
  }finally{s.dispose();}
 });
 it('operand completion requires activation and aggregate completion, not owner settlement',()=>{
- const s=source(),channel={},revision={};l.registerConnection(channel,{supported:true,report:()=>{},wake:()=>{}});
+ const s=source(),channel={},revision={};l.registerConnection(channel,{supported:true,report:()=>{ /* Intentionally inert fixture hook; the surrounding protocol is asserted. */ },wake:()=>{ /* Intentionally inert fixture hook; the surrounding protocol is asserted. */ }});
  try{
   const pending=s.open(1),prepared=l.prepareNativeRequirement([pending],false,[]),raw=prepared.requirement;
   const plan=l.prepareRevision(channel,revision,[pending],{},[],raw,true,raw);

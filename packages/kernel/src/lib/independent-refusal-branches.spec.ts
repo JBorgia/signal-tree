@@ -15,6 +15,6 @@ it('uncaught refused deferred fragment leaves borrowed aliases and source facts 
 });
 it('caught rejection followed by a valid same-source fragment prepares only the valid packet',()=>{
  const s=new EntityPublicationSource();const {packet}=bad();const valid:Edit={subject:2,before:undefined,after:{x:9},fields:['x']};let calls=0;let accepted:Packet|undefined;
- const off=s.subscribe({prepare(p){calls++;accepted=p;return undefined;},complete(){}});
+ const off=s.subscribe({prepare(p){calls++;accepted=p;return undefined;},complete(){ /* This participant has no completion side effect. */ }});
  try{withEntityPointPublicationPreparation(()=>{expect(()=>s.preparePoint(packet)).toThrow(message);s.preparePoint({owner:1,id:{},meta:undefined,ordinary:[valid],physical:[valid]});});expect(calls).toBe(1);expect(accepted!.ordinary).toEqual([valid]);expect(accepted!.owner).toBe(1);expect(s.inspect().rows).toBe(0);}finally{off();s.dispose();}
 });

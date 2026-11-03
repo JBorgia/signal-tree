@@ -51,7 +51,7 @@ it(`retained-source: hidden ${shape} replay respects dependency boundary and ret
 });
 
 it('retained-source: hidden two-row refusal preserves both rows, then retry compensates while still absent',async()=>{
- const tree=make();const rows=tree.$.box!.rows!;let off=()=>{};
+ const tree=make();const rows=tree.$.box!.rows!;let off=()=>{ /* Intentionally inert fixture hook; the surrounding protocol is asserted. */ };
  try{
   rows.setAll([{id:'a',n:0,tag:'A'},{id:'b',n:3,tag:'B'}]);await flush();
   const pending=tree.transact(()=>{rows.updateOne('a',{n:7});rows.updateOne('b',{n:9});});await flush();

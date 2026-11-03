@@ -15,7 +15,7 @@ it('repeated cancellation of an old exact-cell observer cannot detach a newer ob
  const o=owner(),q=o.transact(()=>o.$.x(7));let calls=0;
  // Find exact cell without assuming the public handle exposes its native id.
  const actual=life.pendingOwners().find(c=>c.owner===getPositionRegistry(o.$)!.id)!;
- const old=life.onOwnerCellTransition(actual,()=>{});old();const next=life.onOwnerCellTransition(actual,()=>{calls++;});
+ const old=life.onOwnerCellTransition(actual,()=>{ /* Intentionally inert fixture hook; the surrounding protocol is asserted. */ });old();const next=life.onOwnerCellTransition(actual,()=>{calls++;});
  try{old();q.confirm();expect(calls).toBe(0);await flush();expect(calls).toBe(1);}finally{next();o.destroy();}
 });
 for(const first of ['confirm','rollback'] as const)it(`late enrollment retains two captured owners and excludes later window: ${first}`,async()=>{
@@ -41,10 +41,10 @@ it('destroy cancels already queued retirement notification without rewriting iss
 });
 it('stale cancellation cannot strand a real source retirement registered later for the same cell',async()=>{
  const {tree,s}=await setup(),o=owner(),q=o.transact(()=>o.$.x(7));const cell=life.pendingOwners().find(c=>c.owner===getPositionRegistry(o.$)!.id)!;
- const cancelOld=life.onOwnerCellTransition(cell,()=>{});cancelOld();
+ const cancelOld=life.onOwnerCellTransition(cell,()=>{ /* Intentionally inert fixture hook; the surrounding protocol is asserted. */ });cancelOld();
  try{tree.$.rows.removeOne('a');await flush();expect(s.inspect().retirementRequests).toBe(1);expect(s.inspect().negativePresence).toBe(1);cancelOld();q.confirm();await flush();expect(cell.outcome).toBe('confirmed');expect(s.inspect().negativePresence).toBe(0);expect(s.inspect().retirementRequests).toBe(0);}finally{tree.destroy();o.destroy();}
 });
 for(const role of ['input','validation'] as const)it(`confirmed actual ${role} is not released through the own-window class`,async()=>{
  const {tree,s,id}=await setup(),o=owner(),q=o.transact(()=>o.$.x(7));let c:(ReturnType<typeof link>&{declare(input:{kind:'dependent';owners:readonly object[]},body:()=>unknown):Receipt})|undefined;
- try{if(role==='input')o.updateAndReport(value=>{expect(value.x).toBe(7);tree.$.rows.removeOne('a');return {};});else{c=link(tree.$.rows,{set:()=>{}}) as typeof c;c!.declare({kind:'dependent',owners:[q]},()=>tree.$.rows.removeOne('a'));}await flush();const fact=s.evidence()!.member(id,'ordinary') as life.NativeRequirement,proof=life.nativeProof(fact);expect(fact.retirementOwnWindowOnly).toBe(false);expect(proof[role]?.some(cell=>cell.outcome==='pending')).toBe(true);q.confirm();await flush();expect(proof[role]?.some(cell=>cell.outcome==='confirmed')).toBe(true);expect(s.evidence()!.member(id,'ordinary')).toBe(fact);expect(s.inspect().negativePresence).toBe(1);expect(s.inspect().retireCalls).toBe(0);}finally{c?.dispose();tree.destroy();o.destroy();}
+ try{if(role==='input')o.updateAndReport(value=>{expect(value.x).toBe(7);tree.$.rows.removeOne('a');return {};});else{c=link(tree.$.rows,{set:()=>{ /* Destination values are intentionally discarded in this protocol fixture. */ }}) as typeof c;c!.declare({kind:'dependent',owners:[q]},()=>tree.$.rows.removeOne('a'));}await flush();const fact=s.evidence()!.member(id,'ordinary') as life.NativeRequirement,proof=life.nativeProof(fact);expect(fact.retirementOwnWindowOnly).toBe(false);expect(proof[role]?.some(cell=>cell.outcome==='pending')).toBe(true);q.confirm();await flush();expect(proof[role]?.some(cell=>cell.outcome==='confirmed')).toBe(true);expect(s.evidence()!.member(id,'ordinary')).toBe(fact);expect(s.inspect().negativePresence).toBe(1);expect(s.inspect().retireCalls).toBe(0);}finally{c?.dispose();tree.destroy();o.destroy();}
 });

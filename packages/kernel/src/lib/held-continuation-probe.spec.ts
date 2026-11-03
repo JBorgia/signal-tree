@@ -5,6 +5,7 @@ import {getEntityPublicationBinding} from './internals/entity-publication';
 import {interceptLocationWrites} from './internals/location-runtime';
 import {getPathNotifier} from './path-notifier';
 // Same collector used by repository retention tooling; this is not a byte measurement.
+// eslint-disable-next-line @nx/enforce-module-boundaries -- White-box regression exercises private kernel/realization coordination.
 import {collect} from '../../../../tools/lib/heap-quiescence.mjs';
 type Holder={proceed?:(()=>void);receiver?:object;positive?:object};
 const capture=(box:Holder)=>(_operation:unknown,proceed:()=>void)=>{box.proceed=proceed;proceed();};

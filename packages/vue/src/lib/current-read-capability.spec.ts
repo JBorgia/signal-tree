@@ -12,13 +12,14 @@ const checkReadonly = (cell: () => unknown) => {
   expect(isRef(cell)).toBe(true); expect(isReadonly(cell)).toBe(true);
   expect(Reflect.set(cell, 'value', 'bad')).toBe(false);
 };
-const flush = () => {};
+const flush = () => { /* Intentionally inert fixture hook; the surrounding protocol is asserted. */ };
 const observe = (read: (cleanup: (fn: () => void) => void) => void) => {
   const scope = effectScope(); scope.run(() => watchEffect(read, {flush:'sync'})); return () => scope.stop();
 };
 
 const current = <T>(read: () => T) => {
-  const cell = adapter.createCurrentReadonlyCell!(read);
+  if (!adapter.createCurrentReadonlyCell) throw new Error('Missing fixture current-read factory');
+  const cell = adapter.createCurrentReadonlyCell(read);
   return {call: cell, read: () => nativeRead(cell), metadata: () => metadata(cell), cell};
 };
 it('current-read source-linked producer preserves held/ABA, counts, identity, cleanup and errors', () => {

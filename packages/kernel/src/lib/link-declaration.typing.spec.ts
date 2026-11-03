@@ -1,5 +1,7 @@
 /** Public source typing controls; compiled, not executed. Installed-package qualification is separate. */
+// eslint-disable-next-line @nx/enforce-module-boundaries -- This typing control deliberately checks the public package barrel.
 import { signalTree, entityMap, leaf, type PendingTransaction } from '@signal-tree/kernel';
+// eslint-disable-next-line @nx/enforce-module-boundaries -- This typing control deliberately checks the public package barrel.
 import { link, SignalTreePublicationError, type PublicationReceipt, type PublicationState } from '@signal-tree/kernel';
 declare const owner: PendingTransaction;
 function examples() {
@@ -13,8 +15,8 @@ function examples() {
   // @ts-expect-error a union that can return a Promise is also rejected
   c.declare({kind:'unknown'},():number|Promise<number>=>Math.random()?1:Promise.resolve(1));
   // @ts-expect-error missing owners
-  c.declare({kind:'dependent'},()=>{});
-  const receipt:PublicationReceipt=c.declare({kind:'independent'},()=>{});
+  c.declare({kind:'dependent'},()=>{ /* Intentionally inert fixture hook; the surrounding protocol is asserted. */ });
+  const receipt:PublicationReceipt=c.declare({kind:'independent'},()=>{ /* Intentionally inert fixture hook; the surrounding protocol is asserted. */ });
   // @ts-expect-error receipt method is read-only
   receipt.read=()=>({state:'no-write'});
   // @ts-expect-error detached status snapshot is read-only
@@ -26,18 +28,18 @@ function examples() {
   const plain=signalTree({x:0,pair:{x:0}});
   link(plain.$,{set:value=>{const n:number=value.pair.x;void n;}});
   // @ts-expect-error marker-bearing root admission remains excluded
-  link(t.$,{set:()=>{}});
+  link(t.$,{set:()=>{ /* Destination values are intentionally discarded in this protocol fixture. */ }});
   // Existing structural ownership limit: type admission is not proof of a live tree registry.
-  link(()=>1,{set:()=>{}}); // runtime link must reject; no new acceptance is proposed
-  const erased:()=>void=async()=>{};
+  link(()=>1,{set:()=>{ /* Destination values are intentionally discarded in this protocol fixture. */ }}); // runtime link must reject; no new acceptance is proposed
+  const erased:()=>void=async()=>{ /* Intentionally inert fixture hook; the surrounding protocol is asserted. */ };
   c.declare({kind:'unknown'},erased); // TS void erasure: runtime thenable guard remains mandatory
-  c.declare<unknown>({kind:'unknown'},async()=>{}); // explicit erasure cannot be statically policed
-  const partialThenable=()=>({then:()=>{}});
+  c.declare<unknown>({kind:'unknown'},async()=>{ /* Intentionally inert fixture hook; the surrounding protocol is asserted. */ }); // explicit erasure cannot be statically policed
+  const partialThenable=()=>({then:()=>{ /* Intentionally inert fixture hook; the surrounding protocol is asserted. */ }});
   c.declare({kind:'unknown'},partialThenable); // not PromiseLike<T>, but runtime rejects callable then
   // @ts-expect-error branch containing EntityMap remains rejected
-  link(signalTree({box:{rows:entityMap<{id:string},string>()}}).$.box,{set:()=>{}});
+  link(signalTree({box:{rows:entityMap<{id:string},string>()}}).$.box,{set:()=>{ /* Destination values are intentionally discarded in this protocol fixture. */ }});
   // @ts-expect-error source rejection also applies to subscribe-only endpoints
-  link(t.$,{subscribe:()=>()=>{}});
+  link(t.$,{subscribe:()=>()=>{ /* Intentionally inert fixture hook; the surrounding protocol is asserted. */ }});
   const error = new SignalTreePublicationError('after-callback','async-callback',{cause:owner});
   const code:'SIGNALTREE_PUBLICATION_DECLARATION_INVALID'=error.code;void code;
   // @ts-expect-error unknown declaration error reason is not public contract

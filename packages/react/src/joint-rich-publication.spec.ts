@@ -1,5 +1,6 @@
 import { expect, it } from 'vitest';
 import { entityMap, restoration, signalTree, undoable } from './index';
+// eslint-disable-next-line @nx/enforce-module-boundaries -- White-box regression exercises private kernel/realization coordination.
 import { getMutationCaptureRuntime } from '../../kernel/src/lib/internals/mutation-capture-runtime';
 
 const drain = async () => { for (let i = 0; i < 32; i++) await Promise.resolve(); };

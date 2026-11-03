@@ -269,7 +269,7 @@ describe('deepEqual — built-in identity (13.5.0)', () => {
     // Deliberately preserved: a matching tag falls through to key comparison,
     // which is the previous behaviour callers may rely on.
     class Pt {
-      constructor(public x: number) {}
+      constructor(public x: number) { /* Intentionally inert fixture hook; the surrounding protocol is asserted. */ }
     }
     expect(deepEqual(new Pt(1), new Pt(1))).toBe(true);
     expect(deepEqual(new Pt(1), new Pt(2))).toBe(false);

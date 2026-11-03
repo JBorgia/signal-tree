@@ -1,4 +1,3 @@
-import { TestBed } from '@angular/core/testing';
 import { signalTree } from '@signal-tree/kernel';
 
 /**
@@ -50,15 +49,22 @@ interface ChangeDetectionState {
   filter: string;
 }
 
-// Utility function for generating crypto IDs
-function generateCryptoId(): string {
-  return crypto.randomUUID();
+let seed = 1;
+function random(): number {
+  seed = (Math.imul(seed, 1664525) + 1013904223) >>> 0;
+  return seed / 0x100000000;
 }
+function generateCryptoId(): string { return `fixture-${seed++}`; }
 
 describe('Advanced SignalTree Performance Benchmarks', () => {
-  beforeAll(() => {
-    TestBed.configureTestingModule({});
-  });
+  beforeEach(() => { seed = 1; });
+  const owned: Array<{ destroy(): void }> = [];
+  function createTree<T extends object>(state: T) {
+    const tree = signalTree(state);
+    owned.push(tree);
+    return tree;
+  }
+  afterEach(() => { for (const tree of owned.splice(0)) tree.destroy(); });
 
   // Utility function to measure execution time
   function measureTime(fn: () => void, iterations = 1): number {
@@ -70,40 +76,34 @@ describe('Advanced SignalTree Performance Benchmarks', () => {
     return (end - start) / iterations;
   }
 
-  // Memory usage measurement (basic approximation)
-  function measureMemory(): number {
-    if (
-      typeof (
-        performance as unknown as {
-          measureUserAgentSpecificMemory?: () => number;
-        }
-      ).measureUserAgentSpecificMemory === 'function'
-    ) {
-      return (
-        performance as unknown as {
-          measureUserAgentSpecificMemory: () => number;
-        }
-      ).measureUserAgentSpecificMemory();
+  function measureInitialization<T extends { destroy(): void }>(
+    create: () => T, check: (tree: T) => void, iterations = 10
+  ): number {
+    let elapsed = 0;
+    for (let i = 0; i < iterations; i++) {
+      const start = performance.now();
+      const sample = create();
+      elapsed += performance.now() - start;
+      try { check(sample); } finally { sample.destroy(); }
     }
-    // Fallback estimation
-    return Math.floor(Math.random() * 1000) + 5000;
+    return elapsed / iterations;
   }
 
   it('should benchmark scalability with deep nesting', () => {
     // Test extremely deep nesting (10+ levels)
     const createDeepData = (depth: number): DeepDataNode => {
-      if (depth === 0) return { value: Math.random(), id: generateCryptoId() };
+      if (depth === 0) return { value: 0.5, id: `depth-${depth}` };
       return { [`level_${depth}`]: createDeepData(depth - 1) };
     };
 
     const depths = [5, 10, 15, 20];
     depths.forEach((depth) => {
       const deepData = createDeepData(depth);
-      const tree = signalTree(deepData);
+      const tree = createTree(deepData);
 
-      const initTime = measureTime(() => {
-        signalTree(deepData);
-      }, 10);
+      const initTime = measureInitialization(
+        () => signalTree(deepData), sample => expect(sample.$()).toEqual(deepData)
+      );
 
       expect(initTime).toBeLessThan(20);
       expect(tree).toBeDefined();
@@ -117,14 +117,14 @@ describe('Advanced SignalTree Performance Benchmarks', () => {
     widths.forEach((width) => {
       const wideState: WideStateNode = {};
       for (let i = 0; i < width; i++) {
-        wideState[`prop_${i}`] = Math.random();
+        wideState[`prop_${i}`] = i;
       }
 
-      const tree = signalTree(wideState);
+      const tree = createTree(wideState);
 
-      const initTime = measureTime(() => {
-        signalTree(wideState);
-      }, 10);
+      const initTime = measureInitialization(
+        () => signalTree(wideState), sample => expect(sample.$()).toEqual(wideState)
+      );
 
       expect(initTime).toBeLessThan(50);
       expect(tree).toBeDefined();
@@ -135,7 +135,7 @@ describe('Advanced SignalTree Performance Benchmarks', () => {
     // Test complex computations with cascading updates
     const computedData: ComputedTestState = {
       numbers: Array.from({ length: 1000 }, () =>
-        Math.floor(Math.random() * 1000)
+        Math.floor(random() * 1000)
       ),
       sum: 0,
       average: 0,
@@ -144,12 +144,12 @@ describe('Advanced SignalTree Performance Benchmarks', () => {
       filtered: [] as number[],
     };
 
-    const tree = signalTree(computedData);
+    const tree = createTree(computedData);
 
     // Test cascading updates performance
     const cascadingUpdateTime = measureTime(() => {
       const newNumbers = Array.from({ length: 1000 }, () =>
-        Math.floor(Math.random() * 1000)
+        Math.floor(random() * 1000)
       );
       tree.$(() => ({
         numbers: newNumbers,
@@ -164,7 +164,7 @@ describe('Advanced SignalTree Performance Benchmarks', () => {
     // Test partial state updates
     const partialUpdateTime = measureTime(() => {
       // Use the updater form and preserve other properties.
-      tree.$((current) => ({ ...current, sum: Math.random() * 10000 }));
+      tree.$((current) => ({ ...current, sum: random() * 10000 }));
     }, 1000);
 
     expect(cascadingUpdateTime).toBeLessThan(10);
@@ -174,7 +174,7 @@ describe('Advanced SignalTree Performance Benchmarks', () => {
   it('should benchmark array handling and nested structures', () => {
     const nestedArrayData: NestedArrayState = {
       matrix: Array.from({ length: 100 }, () =>
-        Array.from({ length: 100 }, () => Math.random())
+        Array.from({ length: 100 }, () => random())
       ),
       stats: {
         operations: 0,
@@ -182,7 +182,7 @@ describe('Advanced SignalTree Performance Benchmarks', () => {
       },
     };
 
-    const tree = signalTree(nestedArrayData);
+    const tree = createTree(nestedArrayData);
 
     // Test array updates
     const arrayUpdateTime = measureTime(() => {
@@ -204,7 +204,7 @@ describe('Advanced SignalTree Performance Benchmarks', () => {
     const createTreeNode = (id: string, depth: number): TreeNode => ({
       id,
       name: `Node ${id}`,
-      value: Math.random() * 1000,
+      value: random() * 1000,
       children:
         depth > 0
           ? Array.from({ length: 3 }, (_, i) =>
@@ -218,7 +218,7 @@ describe('Advanced SignalTree Performance Benchmarks', () => {
       searchResults: [],
     };
 
-    const tree = signalTree(searchData);
+    const tree = createTree(searchData);
 
     // Test search performance
     const searchTime = measureTime(() => {
@@ -243,7 +243,7 @@ describe('Advanced SignalTree Performance Benchmarks', () => {
     expect(searchTime).toBeLessThan(5);
   });
 
-  it('should benchmark memory pressure scenarios', () => {
+  it('should update ten populated trees within the workload budget', () => {
     // Create multiple large trees
     const trees = Array.from({ length: 10 }, () => {
       const data = {
@@ -251,36 +251,33 @@ describe('Advanced SignalTree Performance Benchmarks', () => {
         data: Array.from({ length: 1000 }, (_, i) => ({
           id: `item-${i}`,
           name: `Item ${i}`,
-          value: Math.random(),
+          value: random(),
           metadata: {
             created: Date.now(),
             tags: [`tag-${i % 10}`, `category-${Math.floor(i / 100)}`],
           },
         })),
       };
-      return signalTree(data);
+      return createTree(data);
     });
 
-    const memoryAfterCreation = measureMemory();
 
     // Perform updates on all trees
     const updateTime = measureTime(() => {
       trees.forEach((tree) => {
         tree.$((state) => ({
           ...state,
-          data: state.data.map((item) => ({ ...item, value: Math.random() })),
+          data: state.data.map((item) => ({ ...item, value: random() })),
         }));
       });
     }, 1);
 
-    const memoryAfterUpdates = measureMemory();
 
     expect(updateTime).toBeLessThan(100);
-    expect(memoryAfterCreation).toBeGreaterThan(0);
-    expect(memoryAfterUpdates).toBeGreaterThan(0);
+    for (const tree of trees) expect(tree.$.data()).toHaveLength(1000);
   });
 
-  it('should benchmark rapid change detection scenarios', () => {
+  it('should benchmark repeated whole-root replacement with 100 counters', () => {
     const changeDetectionData: ChangeDetectionState = {
       counters: Object.fromEntries(
         Array.from({ length: 100 }, (_, i) => [`counter_${i}`, 0])
@@ -288,20 +285,20 @@ describe('Advanced SignalTree Performance Benchmarks', () => {
       filter: '',
     };
 
-    const tree = signalTree(changeDetectionData);
+    const tree = createTree(changeDetectionData);
 
-    // Test rapid counter updates
+    // Kernel replacement work, including traversal of unchanged counters; no Angular rendering.
     const rapidUpdates = measureTime(() => {
       for (let i = 0; i < 100; i++) {
         // Use the updater form to avoid losing other required fields.
-        tree.$((current) => ({ ...current, filter: 'Item 1' }));
+        tree.$((current) => ({ ...current, filter: `Item ${i}` }));
       }
     }, 100);
 
+    expect(tree.$.filter()).toBe('Item 99');
+    expect(Object.keys(tree.$.counters())).toHaveLength(100);
     expect(rapidUpdates).toBeLessThan(50);
   });
 
-  afterAll(() => {
-    // Cleanup after all tests
-  });
+
 });

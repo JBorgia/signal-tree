@@ -227,7 +227,7 @@ export function createTreeScalarSlotRuntime(
         const mutation = {admissionParticipation,intent:'replace' as const, before, after:equal ? before : nextValue, changed:!equal, physicalChanged:physical.has(slotIndex), publicationPredecessors, deferPublicationFinalization:true};
         const terminal = !equal ? prepareScalarSourceTerminal(source,mutation) : undefined;
         const publication = prepareScalarSourcePublication(source,{...mutation,preparedTerminal:terminal});
-        const unit = publication ? {...publication,record:combineTerminalRecords(terminal,publication.record)!} : terminal ? {record:terminal,completion:{}} : undefined;
+        const unit = publication ? {...publication,record:combineTerminalRecords(terminal,publication.record)} : terminal ? {record:terminal,completion:{}} : undefined;
         if (unit) { units.push(unit); coverage.set(slotIndex, unit.coveredRecipients ?? []); }
       }
     }

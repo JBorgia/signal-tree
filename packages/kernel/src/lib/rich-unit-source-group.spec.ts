@@ -6,7 +6,7 @@ import {getOwnedPositionIds} from './internals/owned-mutation';
 import {getEntityPublicationBinding} from './internals/entity-publication';
 import {getMutationCaptureRuntime} from './internals/mutation-capture-runtime';
 it('same-source restores retain proposed anchors, all rows and ordinary membership before observation',()=>{
- const t=signalTree({rows:entityMap<{id:number;n:number},number>()},{enhancers:[transactions()]});let off=()=>{};let release=()=>{};
+ const t=signalTree({rows:entityMap<{id:number;n:number},number>()},{enhancers:[transactions()]});let off=()=>{ /* Intentionally inert fixture hook; the surrounding protocol is asserted. */ };let release=()=>{ /* Intentionally inert fixture hook; the surrounding protocol is asserted. */ };
  try{
  t.$.rows.addOne({id:1,n:11});t.$.rows.addOne({id:2,n:12});
  const a=getEntityPublicationBinding(t.$.rows.byIdOrFail(1))!.subject!,b=getEntityPublicationBinding(t.$.rows.byIdOrFail(2))!.subject!;

@@ -12,8 +12,8 @@ for(const membership of [false,true])it(`scalar and collection seal after all si
  const t=signalTree({profile:{a:0} as {a?:number},rows:entityMap<{id:number;n:number},number>()},{enhancers:[transactions()]});
  const foreign=signalTree({x:0},{enhancers:[transactions()]});let pending:ReturnType<typeof foreign.transact>|undefined;let a:life.NativeRequirement|undefined,row:life.NativeRequirement|undefined;
  t.$.rows.addOne({id:1,n:0});const register=getPathNotifier().subscribe('**',(_n,_p,_path,_owner,_origin,_subjects,_positions,meta)=>{plainBranchMembershipEffects(meta);});t.$.profile({});getPathNotifier().flushSync();t.$.profile({a:0});getPathNotifier().flushSync();register();const scalar=t.$.profile.a!;
- const offA=preparePublicationMutations(scalar,(_m,_i,n)=>{a=(n as {requirement:life.NativeRequirement}).requirement;return undefined;},()=>{})!;
- const offRow=getEntityPublicationBinding(t.$.rows)!.source.subscribe({prepare(_p,n){row=(n as {requirement:life.NativeRequirement}).requirement;pending=foreign.transact(()=>foreign.$.x(7));return undefined;},complete(){}});
+ const offA=preparePublicationMutations(scalar,(_m,_i,n)=>{a=(n as {requirement:life.NativeRequirement}).requirement;return undefined;},()=>{ /* Intentionally inert fixture hook; the surrounding protocol is asserted. */ })!;
+ const offRow=getEntityPublicationBinding(t.$.rows)!.source.subscribe({prepare(_p,n){row=(n as {requirement:life.NativeRequirement}).requirement;pending=foreign.transact(()=>foreign.$.x(7));return undefined;},complete(){ /* This participant has no completion side effect. */ }});
  try{
   const plan=preparePointRealization(t,[{owner:getOwnedPositionIds(scalar)![0],before:0,after:1,...(membership?{plainBranchMembership:{before:true,after:true}}:{})},{owner:getOwnedPositionIds(t.$.rows)![0],subjectId:getEntityPublicationBinding(t.$.rows.byIdOrFail(1))!.subject!,subjectFieldSegments:['n'],before:0,after:1}]);
   expect(plan).toBeDefined();expect(a).toBeDefined();expect(row).toBeDefined();expect(pending).toBeDefined();

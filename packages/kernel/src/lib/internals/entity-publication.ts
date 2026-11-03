@@ -1,3 +1,4 @@
+import { isTraversableNode } from './node-shape';
 import type { EntityProjectionSeedEntry } from './entity-projection-seed';
 import type { WriteMetadata } from '../mutation-types';
 import { combineTerminalRecords, installTerminalRecord, type PreparedPublicationUnit } from './intrinsic-mutation';
@@ -214,9 +215,9 @@ export class EntityPublicationSource {
     packet=this.admission.prepare(packet);
     let group=pointPreparation.get(this);
     if(!group){
-      const source=this;
-      const state:PointPreparation={packets:[],source,unit:undefined,installed:false,finalized:false,completed:false};
-      const completion={};pointCompletions.set(completion,()=>{if(!state.completed){state.completed=true;if(state.unit)source.complete(state.unit.completion);}});
+      const complete=(value:object)=>this.complete(value);
+      const state:PointPreparation={packets:[],source:this,unit:undefined,installed:false,finalized:false,completed:false};
+      const completion={};pointCompletions.set(completion,()=>{if(!state.completed){state.completed=true;if(state.unit)complete(state.unit.completion);}});
       const gate={set(_key:unknown,_value:unknown){if(!state.installed){state.installed=true;if(state.unit)installTerminalRecord(state.unit.record);}}};
       group={state,publication:{record:{writes:[{map:gate,key:undefined,value:undefined}],adds:[]},completion,validate:()=>state.unit?.validate?.(),finalize:()=>{if(!state.finalized){state.finalized=true;state.unit?.finalize?.();}}}};
       pointPreparation.set(this,group);
@@ -245,7 +246,7 @@ export class EntityPublicationSource {
     };
     return {
       validate,
-      record: combineTerminalRecords(fallbackRecord,...parts.map(part => part.unit.record),{writes:[{map:{set:(_key:unknown,value:unknown)=>{this.revisionToken=value as object;}},key:undefined,value:{}}],adds:[]})!,
+      record: combineTerminalRecords(fallbackRecord,...parts.map(part => part.unit.record),{writes:[{map:{set:(_key:unknown,value:unknown)=>{this.revisionToken=value as object;}},key:undefined,value:{}}],adds:[]}),
       completion: { parts },
       finalize: () => {
         validate();
@@ -288,7 +289,7 @@ export function defineEntityPublicationBinding(node: object, binding: EntityPubl
   if (binding.subject === undefined && binding.field === undefined) anchors.set(binding.source, node);
 }
 export function getEntityPublicationBinding(node: unknown): EntityPublicationBinding | undefined {
-  return node !== null && (typeof node === 'object' || typeof node === 'function')
+  return isTraversableNode(node)
     ? (node as Record<symbol, EntityPublicationBinding | undefined>)[ENTITY_PUBLICATION]
     : undefined;
 }
@@ -328,7 +329,7 @@ export function withEntityPointPublicationPreparation<T>(body:()=>T):T {
   pointPreparation=groups;let result:T;
   try{result=body();}finally{pointPreparation=previous;}
   for(const {state}of groups.values()){
-    const first=state.packets[0]!;
+    const first=state.packets[0];if(!first)throw new Error('Point preparation has no packets');
     state.unit=state.source.prepare({...first,physical:state.packets.flatMap(packet=>packet.physical),ordinary:state.packets.flatMap(packet=>packet.ordinary),steps:state.packets.flatMap(packet=>packet.steps??packet.ordinary.map((edit,ordinal)=>({ordinal,ordinary:[edit]})))});
     state.packets=[];
   }

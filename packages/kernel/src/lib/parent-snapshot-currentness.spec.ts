@@ -19,7 +19,7 @@ function setup(keyed:boolean){
 function child(rows:Rows,key:string):Child{const x=rows[key];if(typeof x!=='function'||!('n'in x)||typeof x.n!=='function')throw Error('missing actual installed child');return x as Child;}
 function record(name:string,value:unknown){const out=process.env.ST_PREPARED_REVIEW_OUTPUT;if(out)writeFileSync(join(out,name+'.json'),JSON.stringify(value,null,2));}
 for(const keyed of [false,true])it(`fresh read-derived completion retains a and nested b: ${keyed?'keyed':'ordinary'}`,()=>{
- const {t,rows}=setup(keyed);const l=link(rows,{set:()=>{}});const sentinel=Error('completion sentinel');let calls=0;let seen:unknown;let physical:unknown;let held:Child|undefined;let supplied:unknown;
+ const {t,rows}=setup(keyed);const l=link(rows,{set:()=>{ /* Destination values are intentionally discarded in this protocol fixture. */ }});const sentinel=Error('completion sentinel');let calls=0;let seen:unknown;let physical:unknown;let held:Child|undefined;let supplied:unknown;
  rows();
  const off=registerMembershipPublication(e=>e.branch===rows&&e.key==='a'&&e.ordinary?.before.present===false?{record:{writes:[],adds:[]},completion:{}}:undefined,()=>{calls++;seen=rows();held=child(rows,'a');physical=held.n();const next={...rows(),b:{n:2}};supplied=next;rows(next);throw sentinel;});
  try{

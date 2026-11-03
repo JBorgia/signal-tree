@@ -6,7 +6,7 @@ import { leaf, signalTree, type LeafDefinition } from '../index';
 describe('terminal carrier identity', () => {
   it('keeps built-ins, typed functions and constructors in terminal refs', () => {
     class Example {
-      constructor(readonly label: string) {}
+      constructor(readonly label: string) { /* Intentionally inert fixture hook; the surrounding protocol is asserted. */ }
     }
     const values = {
       weakMap: new WeakMap<object, string>(),

@@ -11,7 +11,7 @@ for (const route of ['leaf', 'whole'] as const) {
     const foreign = signalTree({ z: 0 }, { enhancers: [transactions()] });
     const sent: { x: number; y: number }[] = [];
     const c = link(tree.$.pair, { set: value => { sent.push({ ...value }); } }) as Declared;
-    let off = () => {};
+    let off = () => { /* Intentionally inert fixture hook; the surrounding protocol is asserted. */ };
     try {
       const q = foreign.transact(() => foreign.$.z(1));
       // No q read, declaration, updater input, or shared validation horizon.

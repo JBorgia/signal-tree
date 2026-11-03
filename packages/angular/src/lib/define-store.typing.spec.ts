@@ -117,3 +117,7 @@ export type _FactoryIdentityChecks = [
   Expect<Equal<InstanceType<typeof ObjectStore>, { count: number }>>,
   Expect<Equal<InstanceType<typeof CallableStore>, () => number>>
 ];
+
+void DefaultStore;
+void ReadonlyCounterStore;
+void ReadonlyDerivedStore;

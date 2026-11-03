@@ -140,7 +140,7 @@ const GATES = [
   },
   {
     name: 'lint:budget',
-    covers: 'eslint errors across all 10 projects, AND warnings never grow',
+    covers: 'eslint errors across all configured packages, applications and tooling, AND warnings never grow',
     // Replaces a bare `npm run lint:all`, which this harness caught passing
     // while an unused `any`-typed function sat in core: lint reported it as a
     // warning and exited 0, because nothing passes --max-warnings. Warnings

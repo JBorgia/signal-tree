@@ -72,19 +72,26 @@ const sameOwners=(a:readonly Cell[]|undefined,b:readonly Cell[]|undefined):boole
 const sameProof=(a:Proof|undefined,b:Proof|undefined):boolean=>!!a&&!!b&&a.unknown===b.unknown&&a.invalid===b.invalid&&!!a.unavailableInput===!!b.unavailableInput&&!!a.historicalWindow===!!b.historicalWindow&&(a.terminalRejectedRoles??0)===(b.terminalRejectedRoles??0)&&(['owners','destination','input','validation','possible'] as const).every(role=>sameOwners(a[role],b[role]));
 type Trie={children:Map<string,Trie>;channels:Set<object>};
 const tries=new WeakMap<object,Trie>();
-function slotFor(branch:object,key:string,child:object):Slot{return Object.freeze({branch,key,child,address:getNodeAddress(branch)?[...getNodeAddress(branch)!,key]:undefined});}
+function slotFor(branch:object,key:string,child:object):Slot{const address=getNodeAddress(branch);return Object.freeze({branch,key,child,address:address?[...address,key]:undefined});}
 function removeIndex(registry:object,address:readonly string[],channel:object):void{const root=tries.get(registry);if(!root)return;const path:{parent:Trie;key:string;node:Trie}[]=[];let node=root;for(const key of address){const child=node.children.get(key);if(!child)return;path.push({parent:node,key,node:child});node=child;}node.channels.delete(channel);for(let i=path.length-1;i>=0;i--){const part=path[i];if(part.node.channels.size||part.node.children.size)break;part.parent.children.delete(part.key);}if(!root.channels.size&&!root.children.size)tries.delete(registry);}
-function trieFor(registry:object,address:readonly string[],create:boolean):Trie|undefined{let node=tries.get(registry);if(!node&&create)tries.set(registry,node={children:new Map(),channels:new Set()});for(const key of address){let next=node?.children.get(key);if(!next&&create&&node)node.children.set(key,next={children:new Map(),channels:new Set()});node=next;}return node;}
+function trieFor(registry:object,address:readonly string[],create:true):Trie;
+function trieFor(registry:object,address:readonly string[],create?:boolean):Trie|undefined;
+function trieFor(registry:object,address:readonly string[],create=false):Trie|undefined{let node=tries.get(registry);if(!node&&create)tries.set(registry,node={children:new Map(),channels:new Set()});for(const key of address){let next=node?.children.get(key);if(!next&&create&&node)node.children.set(key,next={children:new Map(),channels:new Set()});node=next;}if(create&&!node)throw new Error('Constructed publication index missing');return node;}
 function collect(node:Trie|undefined,result:object[]):void{if(!node)return;result.push(...node.channels);for(const child of node.children.values())collect(child,result);}
 function reaches(child:object,suffix:readonly string[],source:object):boolean{let node:unknown=child;for(const key of suffix){if(!isTraversableNode(node))return false;const descriptor=Object.getOwnPropertyDescriptor(node,key);if(!descriptor||!('value'in descriptor))return false;node=descriptor.value;}return node===source;}
 const combineProofs=lifecycle.combineProofs;
-function fieldAt(root:FieldTrie,path:readonly string[],create=false):FieldTrie|undefined{let node:FieldTrie|undefined=root;for(const key of path){let next:FieldTrie|undefined=node?.children.get(key);if(!next&&create&&node)node.children.set(key,next={children:new Map()});node=next;}return node;}
+function fieldAt(root:FieldTrie,path:readonly string[],create:true):FieldTrie;
+function fieldAt(root:FieldTrie,path:readonly string[],create?:boolean):FieldTrie|undefined;
+function fieldAt(root:FieldTrie,path:readonly string[],create=false):FieldTrie|undefined{let node:FieldTrie|undefined=root;for(const key of path){let next:FieldTrie|undefined=node?.children.get(key);if(!next&&create&&node)node.children.set(key,next={children:new Map()});node=next;}if(create&&!node)throw new Error('Constructed publication index missing');return node;}
 function fieldNodes(node:FieldTrie|undefined,out:object[]):void{if(!node)return;if(node.field)out.push(node.field);for(const child of node.children.values())fieldNodes(child,out);}
-function slotNode(b:Binding,address:readonly string[],create=false):SlotTrie|undefined{let node:SlotTrie|undefined=b.slotTrie;for(const key of address){let next:SlotTrie|undefined=node?.children.get(key);if(!next&&create&&node)node.children.set(key,next={children:new Map(),slots:new Map()});node=next;}return node;}
-function indexSlot(b:Binding,slot:Slot):void{if(slot.address)slotNode(b,slot.address,true)!.slots.set(slot.child,slot);}
+function slotNode(b:Binding,address:readonly string[],create:true):SlotTrie;
+function slotNode(b:Binding,address:readonly string[],create?:boolean):SlotTrie|undefined;
+function slotNode(b:Binding,address:readonly string[],create=false):SlotTrie|undefined{let node:SlotTrie|undefined=b.slotTrie;for(const key of address){let next:SlotTrie|undefined=node?.children.get(key);if(!next&&create&&node)node.children.set(key,next={children:new Map(),slots:new Map()});node=next;}if(create&&!node)throw new Error('Constructed publication index missing');return node;}
+function indexSlot(b:Binding,slot:Slot):void{if(slot.address)slotNode(b,slot.address,true).slots.set(slot.child,slot);}
 function slotsAlong(b:Binding,address:readonly string[]):Slot[]{const result:Slot[]=[];let node:SlotTrie|undefined=b.slotTrie;const add=()=>{for(const slot of node?.slots.values()??[])if(b.presence.has(slot))result.push(slot);};add();for(const key of address){node=node?.children.get(key);if(!node)break;add();}return result;}
 
-function presenceForField(b:Binding,address:readonly string[]):Presence[]{return slotsAlong(b,address).map(slot=>b.presence.get(slot)!).filter(Boolean);}
+function fieldFact(b:Binding,field:object):Fact{const fact=b.fieldFacts.get(field);if(!fact)throw new Error('Indexed field fact missing');return fact;}
+function presenceForField(b:Binding,address:readonly string[]):Presence[]{return slotsAlong(b,address).flatMap(slot=>{const presence=b.presence.get(slot);return presence?[presence]:[];});}
 function pathValue(value:unknown,path:readonly string[]):{present:boolean;value:unknown}{for(const key of path){if(value===null||typeof value!=='object'||!Object.prototype.hasOwnProperty.call(value,key))return {present:false,value:undefined};value=(value as Record<string,unknown>)[key];}return {present:true,value};}
 function maskPayload(b:Binding):unknown{let result=b.valuePayload;for(const [slot,state]of b.completedPresence){if(state.present||!slot.address)continue;const relative=relativeSourceAddress(b.address??[],slot.address);if(!relative?.length)continue;const omit=(value:unknown,depth:number):unknown=>{if(value===null||typeof value!=='object')return value;const row={...value};const key=relative[depth];if(depth===relative.length-1)delete(row as Record<string,unknown>)[key];else if(Object.prototype.hasOwnProperty.call(row,key))Object.defineProperty(row,key,{value:omit((row as Record<string,unknown>)[key],depth+1),enumerable:true,configurable:true,writable:true});return row;};result=omit(result,0);}return result;}
 
@@ -143,7 +150,7 @@ function nativeInputs(node:object,supplied?:unknown,currentSource=false):lifecyc
 function nativeAuthorship(node:object):{known:Cell[];unknown:boolean}{
  const meta=getActiveWriteContext();const owner=getPositionRegistry(node)?.id;const id=meta?.transactionId;
  const cell=owner!==undefined&&typeof id==='number'?lifecycle.ownerCell(owner,id):undefined;
- return {known:cell?[cell]:[],unknown:meta?.origin!==undefined||(id!==undefined&&(!cell||meta?.transactionOwner!==lifecycle.ownerToken(owner!)))};
+ return {known:cell?[cell]:[],unknown:meta?.origin!==undefined||(id!==undefined&&(owner===undefined||!cell||meta?.transactionOwner!==lifecycle.ownerToken(owner)))};
 }
 registerNativePublicationFactory(node=>{
  const initial=lifecycle.initialRequirement();nativeValues.set(node,{present:true,value:undefined,requirement:initial});nativeViews.set(node,{requirement:initial});
@@ -157,11 +164,11 @@ registerNativePublicationFactory(node=>{
     if(!mutation.physicalChanged)return;
     // Physical inspection return is not new ordinary authorship. Replace only
     // the current view; older snapshot certificates keep their old view object.
-    const selected=nativeValues.get(node)!,priorView=nativeViews.get(node),priorRequirement=priorView?.requirement;
+    const selected=nativeValues.get(node);if(!selected)throw new Error('Native source endpoint missing');const priorView=nativeViews.get(node),priorRequirement=priorView?.requirement;
     return {record:{writes:[{map:nativeViews,key:node,value:{requirement:selected.requirement as lifecycle.NativeRequirement}}],adds:[]},completion:{requirement:selected.requirement},validate:()=>{if(nativeValues.get(node)!==selected||nativeViews.get(node)!==priorView||priorView?.requirement!==priorRequirement)throw new Error('Scalar physical view changed before installation');}};
    }
    const comparisonCutoff=lifecycle.comparisonCutoff();
-   const predecessor=nativeValues.get(node)!;
+   const predecessor=nativeValues.get(node);if(!predecessor)throw new Error('Native source endpoint missing');
    const existingView=nativeViews.get(node), physicalRequirement=existingView?.requirement;
    const authored=mutation.changed?nativeAuthorship(node):{known:[],unknown:false};
    const consumed=mutation.intent==='derive'?(input as {native?:readonly lifecycle.NativeInput[]}|undefined)?.native??[]:[];
@@ -187,7 +194,7 @@ registerNativePublicationFactory(node=>{
    const requirement=exact?retained.requirement as lifecycle.NativeRequirement:admitted&&!relevance?.size?prepared.requirement:lifecycle.combineScalarNativeRequirements(admitted?[prepared.requirement]:[retained.requirement as lifecycle.NativeRequirement,prepared.requirement],relevance);
    const endpoint=requirement===retained.requirement?retained:Object.freeze({...retained,requirement});
    const view=mutation.changed||mutation.physicalChanged||!existingView||existingView.requirement!==requirement?{requirement}:existingView;
-   return {record:combineTerminalRecords(prepared.record,selection?.record,{writes:[{map:nativeValues,key:node,value:endpoint},{map:nativeViews,key:node,value:view}],adds:[]})!,completion:{requirement,activation:prepared.requirement,relevance,comparison:lifecycle.comparisonAdmission(comparisonCutoff,prepared.requirement)},finalize:()=>lifecycle.finalizeNativeRequirement(prepared.requirement),validate:()=>{if(nativeValues.get(node)!==predecessor||nativeViews.get(node)!==existingView||existingView?.requirement!==physicalRequirement)throw new Error('Scalar publication selection changed before installation');}};
+   return {record:combineTerminalRecords(prepared.record,selection?.record,{writes:[{map:nativeValues,key:node,value:endpoint},{map:nativeViews,key:node,value:view}],adds:[]}),completion:{requirement,activation:prepared.requirement,relevance,comparison:lifecycle.comparisonAdmission(comparisonCutoff,prepared.requirement)},finalize:()=>lifecycle.finalizeNativeRequirement(prepared.requirement),validate:()=>{if(nativeValues.get(node)!==predecessor||nativeViews.get(node)!==existingView||existingView?.requirement!==physicalRequirement)throw new Error('Scalar publication selection changed before installation');}};
   },
   complete:(completion)=>{const unit=completion as {activation?:lifecycle.NativeRequirement;requirement?:lifecycle.NativeRequirement};lifecycle.completeScalarNativeRequirement(unit.requirement,unit.activation??unit.requirement);},
  };
@@ -196,7 +203,7 @@ function beginBranchInput(node:object,supplied?:unknown):object|undefined{
  const registry=getPositionRegistry(node),address=getNodeAddress(node);const recipients=new Map<object,InputEvidence>();
  if(registry&&address){const keys:object[]=[];let trie=tries.get(registry);if(trie){keys.push(...trie.channels);for(const part of address){trie=trie.children.get(part);if(!trie)break;keys.push(...trie.channels);}collect(trie,keys);}
   for(const key of new Set(keys)){const b=bindings.get(key);if(!b?.address)continue;const within=relativeSourceAddress(b.address,address);const encloses=relativeSourceAddress(address,b.address);if(within===undefined&&encloses===undefined)continue;const captured:Fact[]=[];let covered=false;
-   if(b.aggregate){if(within!==undefined)covered=true;const fields:object[]=[];fieldNodes(fieldAt(b.fieldTrie,within??[]),fields);captured.push(b.baselineStructure);for(const field of fields){const info=b.fields.get(field)!;const states=presenceForField(b,info.address);const absent=states.filter(state=>!state.present);captured.push(...(absent.length?absent.map(state=>state.fact):[b.fieldFacts.get(field)!,...states.map(state=>state.fact)]));}}
+   if(b.aggregate){if(within!==undefined)covered=true;const fields:object[]=[];fieldNodes(fieldAt(b.fieldTrie,within??[]),fields);captured.push(b.baselineStructure);for(const field of fields){const info=b.fields.get(field);if(!info)throw new Error('Indexed field metadata missing');const states=presenceForField(b,info.address);const absent=states.filter(state=>!state.present);captured.push(...(absent.length?absent.map(state=>state.fact):[fieldFact(b,field),...states.map(state=>state.fact)]));}}
    else captured.push(...((captureValueInput(key) as {facts:readonly Fact[]}|undefined)?.facts??[]));
    recipients.set(key,{facts:Object.freeze([...new Set(captured)]),recipientDomainUnknown:!covered});
   }
@@ -239,7 +246,7 @@ function prepareDescendantEnrollment(channel:object,b:Binding,edit:MembershipPub
  });
  const install={set(){
   for(const field of fields){b.fields.set(field.node,{address:field.address,relative:field.relative});
-   b.fieldFacts.set(field.node,field.fact);b.completedFields.set(field.node,field.fact);fieldAt(b.fieldTrie,field.relative,true)!.field=field.node;
+   b.fieldFacts.set(field.node,field.fact);b.completedFields.set(field.node,field.fact);fieldAt(b.fieldTrie,field.relative,true).field=field.node;
    field.registration.install();b.releases.push(field.registration.release);
   }
  }};
@@ -268,7 +275,7 @@ function prepareMembership(edit:MembershipPublicationEdit):PreparedPublicationUn
  const address=[...edit.address,edit.key],found:object[]=[];let cursor=tries.get(edit.registry);if(cursor)found.push(...cursor.channels);for(const key of address){cursor=cursor?.children.get(key);if(!cursor)break;found.push(...cursor.channels);}collect(trieFor(edit.registry,address,false),found);const channels=[...new Set(found)];
  if(!inspection)physicalView.requirement=native.requirement;
  const domain=nativeNegativeDomains.get(domainKey)??new Map<object,lifecycle.NativeRequirement>();
- const records=[combineTerminalRecords(native.record,{writes:[...viewWrites,{map:nativeMembers,key:edit.child,value:native.requirement},{map:nativeNegativeDomains,key:domainKey,value:domain},...(!edit.present?[{map:domain,key:edit.child,value:native.requirement}]:[])],deletes:edit.present?[{map:domain,key:edit.child},{map:viewDomain,key:edit.child}]:[],adds:[]})!];const parts:{channel:object;unit:Unit}[]=[];const finalizeRecipients:(()=>void)[]=[];const enrollments:NonNullable<ReturnType<typeof prepareDescendantEnrollment>>[]=[];
+ const records=[combineTerminalRecords(native.record,{writes:[...viewWrites,{map:nativeMembers,key:edit.child,value:native.requirement},{map:nativeNegativeDomains,key:domainKey,value:domain},...(!edit.present?[{map:domain,key:edit.child,value:native.requirement}]:[])],deletes:edit.present?[{map:domain,key:edit.child},{map:viewDomain,key:edit.child}]:[],adds:[]})];const parts:{channel:object;unit:Unit}[]=[];const finalizeRecipients:(()=>void)[]=[];const enrollments:NonNullable<ReturnType<typeof prepareDescendantEnrollment>>[]=[];
  for(const channel of channels){const b=bindings.get(channel);if(!b?.source||!b.address)continue;const inside=relativeSourceAddress(b.address,address);if(inside!==undefined){if(!b.aggregate&&(inside.length!==0||edit.child!==b.source))continue;}else if(!reaches(edit.child,b.address.slice(address.length),b.source))continue;
   const enrollment=prepareDescendantEnrollment(channel,b,edit,inspection?unavailableInput():native.requirement,inspection);
   if(enrollment){enrollments.push(enrollment);records.push(enrollment.record);finalizeRecipients.push(enrollment.validate);}
@@ -283,7 +290,7 @@ function prepareMembership(edit:MembershipPublicationEdit):PreparedPublicationUn
   const unit:Unit={native:native.requirement,coverageUnknown:unknown,fact,previous,payload:undefined,changed:(edit.ordinary?.before.present??b.presence.get(slot)?.present??true)!==edit.present,inputs:[],presence:{slot,state,ordinary:edit.ordinary},complete:false,resolve,promise};
   const record=lifecycle.prepareRevision(channel,fact,known?[known]:[],uncertainty,fact.blockers,native.requirement);
   if(record.finalize)finalizeRecipients.push(record.finalize);
-  records.push(combineTerminalRecords(record,{writes:[{map:bindings,key:channel,value:{...b,current:fact}},{map:b.presence,key:slot,value:state},{map:{set(){indexSlot(b,slot);}},key:edit.child,value:slot}],adds:[{set:b.pending,value:unit}]})!);parts.push({channel,unit});
+  records.push(combineTerminalRecords(record,{writes:[{map:bindings,key:channel,value:{...b,current:fact}},{map:b.presence,key:slot,value:state},{map:{set(){indexSlot(b,slot);}},key:edit.child,value:slot}],adds:[{set:b.pending,value:unit}]}));parts.push({channel,unit});
  }
  const record=combineTerminalRecords(...(inspection?[{writes:viewWrites,deletes:edit.present?[{map:viewDomain,key:edit.child}]:[],adds:[]},...enrollments.map(value=>value.record)]:records));return record?{record,completion:{parts,enrollments,native:native.requirement},finalize:()=>{lifecycle.finalizeNativeRequirement(native.requirement);for(const finalize of finalizeRecipients)finalize();}}:undefined;
 }
@@ -374,7 +381,7 @@ function ready(channel:object,b:Binding):void{
  }finally{b.delivery.reducing=false;}
 }
 function wakeChannel(channel:object):void{queueMicrotask(()=>{const b=bindings.get(channel);if(b)ready(channel,b);callbacks.get(channel)?.();});}
-function captureValueInput(channel:object,field?:object):object|undefined{const b=bindings.get(channel);if(!b)return;const info=field&&b.fields.get(field);const states=info?presenceForField(b,info.address):[...b.presence.values()];const absent=states.filter(state=>!state.present);return {facts:Object.freeze(absent.length?absent.map(state=>state.fact):[b.baselineStructure,field?b.fieldFacts.get(field)!:b.valueFact,...states.map(state=>state.fact)])};}
+function captureValueInput(channel:object,field?:object):object|undefined{const b=bindings.get(channel);if(!b)return;const info=field&&b.fields.get(field);const states=info?presenceForField(b,info.address):[...b.presence.values()];const absent=states.filter(state=>!state.present);return {facts:Object.freeze(absent.length?absent.map(state=>state.fact):[b.baselineStructure,field?fieldFact(b,field):b.valueFact,...states.map(state=>state.fact)])};}
 function prepareScalar(channel:object,mutation:IntrinsicMutation<unknown>,input?:object,field?:object,nativeUnit?:object):PreparedPublicationUnit|undefined{
  const b=bindings.get(channel);if(!b)return;
  const meta=getActiveWriteContext();if(meta?.participation==='inspection')return;
@@ -402,7 +409,7 @@ function prepareScalar(channel:object,mutation:IntrinsicMutation<unknown>,input?
  const plan=lifecycle.prepareRevision(channel,fact,nativeKnown,uncertainty,fact.blockers,native,b.aggregate,(nativeUnit as {activation?:lifecycle.NativeRequirement}|undefined)?.activation??native,relevance);
  const edits:import('../internals/intrinsic-mutation').TerminalRecordPlan['writes'][number][]=[{map:bindings,key:channel,value:{...b,current:fact,...(!field?{valueFact:fact}:{})}}];if(field)edits.push({map:b.fieldFacts,key:field,value:fact});
  const terminalEdits={writes:edits,adds:[{set:b.pending,value:unit},...(clean&&ingress?[{set:consumedIngress,value:ingress}]:[])]};
- return {record:combineTerminalRecords(plan,terminalEdits)!,completion:{channel,unit,cleanIngress:clean?ingress:undefined},finalize:plan.finalize,coveredRecipients:[channel]};
+ return {record:combineTerminalRecords(plan,terminalEdits),completion:{channel,unit,cleanIngress:clean?ingress:undefined},finalize:plan.finalize,coveredRecipients:[channel]};
 }
 export function acquiringCollection(channel:object,source:object):boolean {
  const binding=bindings.get(channel);return !!ingress&&!!binding&&ingress.channel===channel&&!ingress.collections.has(source);
@@ -416,7 +423,7 @@ export function currentNativePublicationInputs(): readonly lifecycle.NativeInput
 export function prepareSourceProjection(channel:object,mutation:IntrinsicMutation<unknown>,requirement:lifecycle.NativeRequirement,field?:object,collection?:{key:object;edits:readonly EntityContributorEdit[];acquired?:boolean},selected?:lifecycle.NativeRequirement):PreparedPublicationUnit|undefined {
  const prepared=prepareScalar(channel,mutation,undefined,field,{requirement});
  if(prepared){const unit=(prepared.completion as {unit:Unit}).unit;unit.collection=collection;unit.selected=selected;
-  if(collection?.acquired&&ingress)return {...prepared,record:combineTerminalRecords(prepared.record,{writes:[],adds:[{set:ingress.collections,value:collection.key}]})!};
+  if(collection?.acquired&&ingress)return {...prepared,record:combineTerminalRecords(prepared.record,{writes:[],adds:[{set:ingress.collections,value:collection.key}]})};
  }
  return prepared;
 }
@@ -458,8 +465,8 @@ export function bindSource(channel:object,owner:number,position:number,identity:
   proofs.set(fact,proof);ownProofs.set(fact,proof);factRequirements.set(fact,requirement);return fact;
  };
  const index=new RecipientOccurrences(()=>{
-  if(bindings.get(channel)?.index!==index)return;
-  const current=bindings.get(channel)!;
+  const current=bindings.get(channel);
+  if(!current||current.index!==index)return;
   if(current.delivery.projected&&current.current===current.delivery.projected.fact){
    const support=projectionSupport(current);
    proofs.set(current.current,lifecycle.projectRevision(channel,current.current,support.proof,index.unresolved()!==0));
@@ -485,7 +492,7 @@ export function bindSource(channel:object,owner:number,position:number,identity:
      const address=getNodeAddress(candidate),relative=address&&context?relativeSourceAddress(context.address,address):undefined;if(!address||relative===undefined)throw Error('Enrolled field has no relative address');
      binding.fields.set(candidate,{address,relative});if(pathValue(binding.valuePayload,relative).present)binding.initialized.add(candidate);
      const requirement=(nativeValues.get(candidate)?.requirement as lifecycle.NativeRequirement|undefined)??lifecycle.initialRequirement(),fact=nativeFact(requirement);
-     binding.fieldFacts.set(candidate,fact);binding.completedFields.set(candidate,fact);fieldAt(binding.fieldTrie,relative,true)!.field=candidate;
+     binding.fieldFacts.set(candidate,fact);binding.completedFields.set(candidate,fact);fieldAt(binding.fieldTrie,relative,true).field=candidate;
      installFact(binding,candidate,'value',fact,requirement);
      const release=preparePublicationMutations(candidate,(m,input,native)=>prepareScalar(channel,m,input,candidate,native),completeScalar,()=>captureValueInput(channel,candidate));if(release)binding.releases.push(release);return;
     }
@@ -499,7 +506,7 @@ export function bindSource(channel:object,owner:number,position:number,identity:
    binding.release=preparePublicationMutations(source,(m,input,native)=>prepareScalar(channel,m,input,undefined,native),completeScalar,()=>captureValueInput(channel));
   }
  }
- if(identity.supported&&context&&source){trieFor(context.registry,context.address,true)!.channels.add(channel);}
+ if(identity.supported&&context&&source){trieFor(context.registry,context.address,true).channels.add(channel);}
 }
 export function onEligibility(_owner:number,cb:()=>void,channel:object):()=>void{callbacks.set(channel,cb);return()=>{callbacks.delete(channel);};}
 export function acquire(channel:object,work:()=>void):void{const prev=ingress;ingress={channel,consumed:false,collections:new Set()};try{work();}finally{if(ingress)consumedIngress.delete(ingress);ingress=prev;}}

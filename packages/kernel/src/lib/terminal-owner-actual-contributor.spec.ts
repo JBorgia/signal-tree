@@ -4,7 +4,7 @@ type C=ReturnType<typeof link>&{declare(input:{kind:'independent'}|{kind:'depend
 const drain=async()=>{for(let i=0;i<120;i++)await Promise.resolve();};
 for(const route of ['leaf','whole'] as const)for(const role of ['validation','consumed-input'] as const)it(`confirmed destination preserves actual q through NEW equal ${route}: ${role}`,async()=>{
  const t=signalTree({pair:{x:0,y:0}},{enhancers:[transactions()]});const other=signalTree({q:0},{enhancers:[transactions()]});const sent:unknown[]=[];
- const c=link(t.$.pair,{set:v=>{sent.push(v);}}) as C;let off=()=>{};
+ const c=link(t.$.pair,{set:v=>{sent.push(v);}}) as C;let off=()=>{ /* Intentionally inert fixture hook; the surrounding protocol is asserted. */ };
  try{
   const q=other.transact(()=>other.$.q(7));let p!:ReturnType<typeof t.transact>;
   c.declare({kind:'dependent',owners:[q]},()=>{p=t.transact(()=>{

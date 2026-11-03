@@ -57,7 +57,7 @@ describe('independent authored removal preparation and completion', () => {
         }
         return undefined;
       },
-      complete() {},
+      complete() { /* This participant has no completion side effect. */ },
     });
     try {
       expect(caught(() => tree.$.rows.removeOne('x'))).toBe(failure);
@@ -84,7 +84,7 @@ describe('independent authored removal preparation and completion', () => {
         }
         return undefined;
       },
-      complete() {},
+      complete() { /* This participant has no completion side effect. */ },
     });
     try {
       expect(caught(() => tree.$.rows.removeOne('x'))).toBe(failure);
@@ -110,7 +110,7 @@ describe('independent authored removal preparation and completion', () => {
         }
         return undefined;
       },
-      complete() {},
+      complete() { /* This participant has no completion side effect. */ },
     });
     try {
       expect(caught(() => tree.$.rows.removeOne('x'))).toBe(failure);
@@ -135,7 +135,7 @@ describe('independent authored removal preparation and completion', () => {
         }
         return undefined;
       },
-      complete() {},
+      complete() { /* This participant has no completion side effect. */ },
     });
     try {
       expect(caught(() => tree.$.rows.removeOne('x'))).toBe(failure);
@@ -162,7 +162,7 @@ describe('independent authored removal preparation and completion', () => {
         }
         return undefined;
       },
-      complete() {},
+      complete() { /* This participant has no completion side effect. */ },
     });
     try {
       const error = caught(() => tree.$.rows.removeOne('x'));
@@ -196,7 +196,7 @@ describe('independent authored removal preparation and completion', () => {
         }
         return undefined;
       },
-      complete() {},
+      complete() { /* This participant has no completion side effect. */ },
     });
     try {
       const error = caught(() => tree.$.rows.removeOne('x'));

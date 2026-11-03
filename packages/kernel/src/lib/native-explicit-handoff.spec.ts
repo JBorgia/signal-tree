@@ -21,8 +21,8 @@ import type {ObservationAdapter} from './internals/observation-adapter';
 import type {ClaimedFieldEndpoint} from './internals/native-field-selection';
 it('native carrier preserves before/write/after/observer order with call-local selection across getter reentry',()=>{
  const events:string[]=[];let value=7,armed=false,entered=false;
- const adapter:ObservationAdapter={createToken:()=>({observe(){},invalidate(){}}),runInvalidationGroup:run=>run(),createWritableProjection:<T>(compute:()=>T)=>{
-   const cell=Object.assign(()=>compute(),{set:(_value:T)=>{},update:(_update:(current:T)=>T)=>{},asReadonly:()=>cell});
+ const adapter:ObservationAdapter={createToken:()=>({observe(){ /* This adapter fixture does not schedule reactive work. */ },invalidate(){ /* This adapter fixture does not schedule reactive work. */ }}),runInvalidationGroup:run=>run(),createWritableProjection:<T>(compute:()=>T)=>{
+   const cell=Object.assign(()=>compute(),{set:(_value:T)=>{ /* Destination values are intentionally discarded in this protocol fixture. */ },update:(_update:(current:T)=>T)=>{ /* Intentionally inert fixture hook; the surrounding protocol is asserted. */ },asReadonly:()=>cell});
    return {cell,peek:compute};
  }};
  const runtime=createNativeLocationRuntime(adapter);

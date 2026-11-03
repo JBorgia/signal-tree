@@ -20,16 +20,16 @@ it.each(cases)('public declare admits existing %s without changing foreign owner
   expect(sent).toEqual([fixture.expected]);expect(receipt.read()).toEqual({state:'started',basis:'declared'});
   expect(q.inspect()).toEqual(inspection);expect(owner.$.n()).toBe(7);
   expect(Object.isFrozen(receipt)).toBe(true);expect(Object.isFrozen(receipt.read())).toBe(true);
-  const empty=c.declare({kind:'independent'},()=>{});expect(empty.read()).toEqual({state:'no-write'});
+  const empty=c.declare({kind:'independent'},()=>{ /* Intentionally inert fixture hook; the surrounding protocol is asserted. */ });expect(empty.read()).toEqual({state:'no-write'});
   q.rollback();await flush();await c.settled();expect(owner.$.n()).toBe(0);expect(sent).toEqual([fixture.expected]);
  }finally{c.dispose();fixture.destroy();owner.destroy();}
 });
 it('public declaration error is the actual instance; disposed work never runs',()=>{
- const t=signalTree({x:0});const c=link(t.$.x,{set:()=>{}});c.dispose();let calls=0;
+ const t=signalTree({x:0});const c=link(t.$.x,{set:()=>{ /* Destination values are intentionally discarded in this protocol fixture. */ }});c.dispose();let calls=0;
  try{let error:unknown;try{c.declare({kind:'independent'},()=>{calls++;t.$.x(1);});}catch(e){error=e;}
  expect(error).toBeInstanceOf(SignalTreePublicationError);expect(error).toMatchObject({code:'SIGNALTREE_PUBLICATION_DECLARATION_INVALID',stage:'before-callback',reason:'disposed'});expect(calls).toBe(0);expect(t.$.x()).toBe(0);
  }finally{t.destroy();}
 });
 it('public typing does not grant an unowned callable runtime admission',()=>{
- expect(()=>link(()=>1,{set:()=>{}})).toThrow(/owned SignalTree location/);
+ expect(()=>link(()=>1,{set:()=>{ /* Destination values are intentionally discarded in this protocol fixture. */ }})).toThrow(/owned SignalTree location/);
 });

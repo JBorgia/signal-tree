@@ -1,6 +1,7 @@
 import { expect, it } from 'vitest';
 import { createComputed, createMemo, createRoot } from 'solid-js';
 import { signalTree, transactions } from '../index';
+// eslint-disable-next-line @nx/enforce-module-boundaries -- White-box regression exercises private kernel/realization coordination.
 import { registerMembershipPublication } from '../../../kernel/src/lib/internals/intrinsic-mutation';
 
 type Image = Record<string, { n: number }>;
@@ -47,7 +48,7 @@ it.each([
     const siblingBefore = tree.$.sibling();
     const old = installedRow(heldBranch['old']);
     const observed: (typeof before)[] = [];
-    let stopNative = () => {};
+    let stopNative = () => { /* Intentionally inert fixture hook; the surrounding protocol is asserted. */ };
     const native = createRoot((dispose) => {
       stopNative = dispose;
       const memo = createMemo(() => heldRoot());

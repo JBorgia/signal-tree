@@ -1,5 +1,6 @@
 import { expect, it } from 'vitest';
 import { signalTree, transactions, link } from '../index';
+// eslint-disable-next-line @nx/enforce-module-boundaries -- White-box regression exercises private kernel/realization coordination.
 import { realizeAs as withWriteContext } from '../../../kernel/src/transaction-realization-contract';
 const drain = async () => {
   for (let i = 0; i < 120; i++) await Promise.resolve();

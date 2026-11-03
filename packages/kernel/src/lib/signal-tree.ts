@@ -4,7 +4,6 @@ import { registerNativeOccurrenceRoot } from './internals/native-occurrence';
 import { beginBranchPublicationInput, endBranchPublicationInput, hasPublicationPreparation } from './internals/intrinsic-mutation';
 import {needsLocationAuthorityAdmission} from './internals/location-runtime';
 import { reportContainedObserverError } from './internals/error-reporter';
-import type { TerminalRecordPlan } from './internals/intrinsic-mutation';
 import {
   PRODUCTION_SUBSTRATE_STATS_ENABLED,
   recordProductionSubstrateStat,
@@ -221,7 +220,7 @@ function finalizeLeafSignal<TValue>(
   allocation?: ConstructionAllocation
 ): void {
   defineNodeAddress(leaf as object, address);
-  allocation?.add(()=>{},()=>{Reflect.deleteProperty(leaf,Symbol.for('SignalTree:PositionRegistry'));});
+  allocation?.add(()=>{ /* Already attached; register only rollback cleanup. */ },()=>{Reflect.deleteProperty(leaf,Symbol.for('SignalTree:PositionRegistry'));});
   for (const position of positionIds ?? [])
     registry?.registerPositionAddress(position, address);
   // A LOCATION MUST BE ABLE TO NAME ITS OWNER. Attaching the registry to the
@@ -245,7 +244,7 @@ function finalizeLeafSignal<TValue>(
       metadataStorage: buildPlan.leafMetadataStorage,
       captureRuntime,
     }, allocation ? {isActive:()=>allocation.installed} : {});
-    allocation?.add(()=>{},release);
+    allocation?.add(()=>{ /* Already attached; register only rollback cleanup. */ },release);
     return;
   }
 
@@ -903,7 +902,7 @@ function constructionContext(materializationContext:MaterializationContext,owned
  const base=constructionContexts.get(materializationContext)??materializationContext;
  const context:MaterializationContext={...base,allocatePositionId(parent){
    const id=base.allocatePositionId(parent);
-   owned.add(()=>{},()=>releaseConstructionPosition(base.positionRegistry,id));
+   owned.add(()=>{ /* Already attached; register only rollback cleanup. */ },()=>releaseConstructionPosition(base.positionRegistry,id));
    return id;
  }};
  constructionContexts.set(context,base);
@@ -1478,7 +1477,7 @@ function materializeOrdinaryBranch(
     defineTreeScalarSlotRuntime(accessor as object, scalarSlotRuntime);
     defineTreeScalarSlotRuntime(nested as object, scalarSlotRuntime);
   }
-  allocation?.add(()=>{},()=>{
+  allocation?.add(()=>{ /* Already attached; register only rollback cleanup. */ },()=>{
     for(const node of [accessor,nested]){
       Reflect.deleteProperty(node as object,Symbol.for('SignalTree:ScalarSlotRuntime'));
       Reflect.deleteProperty(node as object,Symbol.for('SignalTree:PositionRegistry'));
@@ -1618,7 +1617,7 @@ function createSignalStore<T>(
     } catch(error){owned.cancel();throw error;}
   });
 
-  allocation?.add(()=>{},()=>ordinaryMemberBuilders.delete(store));
+  allocation?.add(()=>{ /* Already attached; register only rollback cleanup. */ },()=>ordinaryMemberBuilders.delete(store));
 
   for (const [key, definedValue] of Object.entries(
     obj as Record<string, unknown>

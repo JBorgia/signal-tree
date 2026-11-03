@@ -75,7 +75,7 @@ it('unstepped duplicate physical subjects pair the first identity for every ordi
       expect(facts.field(1, 'y', 'physical')).not.toBe(prior);
       return undefined;
     },
-    complete() {},
+    complete() { /* This participant has no completion side effect. */ },
   });
   try {
     install(source, packet([aa, other, bb], [p1, p2, other]));
@@ -108,7 +108,7 @@ for (const mode of ['distinct', 'reused', 'later-missing'] as const)
           expect(facts.forEdit!(b).field(1, 'y', 'physical')).not.toBe(prior);
         return undefined;
       },
-      complete() {},
+      complete() { /* This participant has no completion side effect. */ },
     });
     try {
       install(
@@ -146,7 +146,7 @@ it('a step with no physical list does not borrow the packet physical match', () 
       expect(facts.forEdit!(a).field(1, 'y', 'physical')).not.toBe(prior);
       return undefined;
     },
-    complete() {},
+    complete() { /* This participant has no completion side effect. */ },
   });
   try {
     install(
@@ -187,7 +187,7 @@ it('authoredRemoval followed by same-subject restore keeps the restored edit phy
       expect(facts.forEdit!(restore).field(1, 'y', 'physical')).not.toBe(prior);
       return undefined;
     },
-    complete() {},
+    complete() { /* This participant has no completion side effect. */ },
   });
   try {
     install(
@@ -214,4 +214,36 @@ it('authoredRemoval followed by same-subject restore keeps the restored edit phy
     off();
     source.dispose();
   }
+});
+
+it('unique-subject prepared readers survive installation, refused preparation and later writes', () => {
+  const source = new EntityPublicationSource();
+  const first = initialRequirement(), second = initialRequirement(), later = initialRequirement();
+  const a: Edit = { ...edit(1, ['x'], { x: 1 }, undefined),
+    restoredFields: new Map([['x', { present: true, value: 1, requirement: first }]]) };
+  const b: Edit = { ...edit(2, ['x'], { x: 2 }, undefined),
+    restoredFields: new Map([['x', { present: true, value: 2, requirement: second }]]) };
+  let saved: Evidence | undefined;
+  const off = source.subscribe({ prepare(_packet, native) {
+    saved ??= (native as { facts: Evidence }).facts;
+    return undefined;
+  }, complete() { /* This participant only captures prepared readers. */ } });
+  const check = () => {
+    if (!saved?.forEdit) throw Error('missing per-edit readers');
+    expect(saved.forEdit(a).field(1, 'x', 'ordinary')).toBe(first);
+    expect(saved.forEdit(b).field(2, 'x', 'ordinary')).toBe(second);
+  };
+  try {
+    const unit = source.prepare(packet([a, b], [a, b]));
+    if (!unit) throw Error('missing native unit');
+    check(); unit.finalize?.(); installTerminalRecord(unit.record); source.complete(unit.completion); check();
+    const c: Edit = { ...edit(1, ['x'], { x: 3 }, { x: 1 }),
+      restoredFields: new Map([['x', { present: true, value: 3, requirement: later }]]) };
+    const refused = source.subscribe({ prepare() { throw Error('refusal'); },
+      complete() { throw Error('refused preparation cannot complete'); } });
+    try { expect(() => source.prepare(packet([c], [c]))).toThrow('refusal'); }
+    finally { refused(); }
+    check(); install(source, packet([c], [c])); check();
+    expect(source.evidence()?.field(1, 'x', 'ordinary')).toBe(later);
+  } finally { off(); source.dispose(); }
 });

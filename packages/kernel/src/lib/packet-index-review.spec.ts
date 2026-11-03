@@ -26,6 +26,6 @@ it('duplicate step and edit identities preserve reverse-find oracle and restored
 });
 it('later recipient finalizer source reentry refuses outer installation and retains newer facts',()=>{
  const source=new EntityPublicationSource();let entered=false;const install=(value:number)=>{const unit=source.prepare({owner:1,id:{},meta:undefined,ordinary:[edit(value)],physical:[]})!;unit.finalize?.();installTerminalRecord(unit.record);source.complete(unit.completion);};
- const off=source.subscribe({prepare(){return {record:{writes:[],adds:[]},completion:{},finalize(){if(!entered){entered=true;install(99);}}};},complete(){}});
+ const off=source.subscribe({prepare(){return {record:{writes:[],adds:[]},completion:{},finalize(){if(!entered){entered=true;install(99);}}};},complete(){ /* This participant has no completion side effect. */ }});
  try{expect(()=>install(7)).toThrow('source changed before installation');off();let value:unknown;source.prepare({owner:1,id:{},meta:undefined,ordinary:[],physical:[],prepareResponsibility:s=>{value=s!.before(1,'x').value;return undefined;}});expect(value).toBe(99);}finally{off();source.dispose();}
 });

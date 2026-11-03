@@ -1,6 +1,7 @@
 import { expect, it } from 'vitest';
 import { computed, isRef, nextTick, watchEffect } from 'vue';
 import { signalTree, transactions } from '../index';
+// eslint-disable-next-line @nx/enforce-module-boundaries -- White-box regression exercises private kernel/realization coordination.
 import { registerMembershipPublication } from '../../../kernel/src/lib/internals/intrinsic-mutation';
 
 type Image = Record<string, { n: number }>;

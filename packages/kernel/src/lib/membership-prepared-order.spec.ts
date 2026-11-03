@@ -70,7 +70,7 @@ it('inspection membership reports physical order without ordinary order adoption
   const t = signalTree({
     rows: entityMap<{ id: string; n: number }, string>(),
   });
-  let off = () => {};
+  let off = () => { /* Intentionally inert fixture hook; the surrounding protocol is asserted. */ };
   try {
     t.$.rows.setAll(seed);
     const reader = entityMembershipReader(t)!;
@@ -87,7 +87,7 @@ it('inspection membership reports physical order without ordinary order adoption
         packets.push(p);
         return undefined;
       },
-      complete() {},
+      complete() { /* This participant has no completion side effect. */ },
     });
     const events: EntityMembershipEvent[] = [];
     reader.subscribe((e) => events.push(e));

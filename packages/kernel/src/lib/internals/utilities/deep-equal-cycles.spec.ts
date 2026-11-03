@@ -154,7 +154,7 @@ describe('deepEqual: own keys only, never inherited', () => {
  */
 describe('deepEqual: the constructor gate', () => {
   class Row {
-    constructor(public id: number, public name: string) {}
+    constructor(public id: number, public name: string) { /* Intentionally inert fixture hook; the surrounding protocol is asserted. */ }
   }
 
   it('a class instance never equals a plain object with the same fields', () => {

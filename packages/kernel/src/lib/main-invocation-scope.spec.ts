@@ -27,6 +27,6 @@ it('preclaim projection getter cannot lend inverse authority to a nested setter'
  // First getter read after rollback is armed; no private metadata selects timing.
  const row={id:'a',get x(){if(armed&&!entered){entered=true;rows.updateOne('a',{x:0});nested=source.evidence()!.field(subject,'x','ordinary');}return 7;}};
  const q=tree.transact(()=>rows.replaceOne('a',row));await flush();
- const off=observeIntrinsicMutations(rows.byIdOrFail('a').x as object,()=>{});armed=true;
+ const off=observeIntrinsicMutations(rows.byIdOrFail('a').x as object,()=>{ /* Intentionally inert fixture hook; the surrounding protocol is asserted. */ });armed=true;
  try{let error:unknown;try{q.rollback();}catch(e){error=e;}expect(entered).toBe(true);expect(nested).not.toBe(baseline);expect(error).toBeDefined();expect(rows.byIdOrFail('a').x()).toBe(0);expect(()=>q.confirm()).not.toThrow();}finally{off?.();tree.destroy();}
 });

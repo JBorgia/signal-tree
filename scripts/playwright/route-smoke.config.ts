@@ -14,6 +14,7 @@ export default defineConfig({
   testDir: '.',
   testMatch: [
     'route-smoke.spec.ts',
+    'v16-candidate-workflow.spec.ts',
     'architecture-connectors.spec.ts',
     'benchmarks.spec.ts',
     'demo-production-bundle.spec.ts',

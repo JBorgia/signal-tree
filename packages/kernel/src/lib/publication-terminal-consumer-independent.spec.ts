@@ -11,7 +11,7 @@ const rejected=():lifecycle.NativeRequirement=>{
  return requirement(compactTerminalProof({owners:[owner],input:[owner],unknown:false,invalid:false}));
 };
 it('private delivery cannot early-admit a compacted terminal rejected source proof',()=>{
- const tree=signalTree({x:0});const channel={}; publication.bindSource(channel,981234,1,{supported:true},()=>{},tree.$.x,{registry:getPositionRegistry(tree.$.x)!,address:['x'],value:0,presence:[]});
+ const tree=signalTree({x:0});const channel={}; publication.bindSource(channel,981234,1,{supported:true},()=>{ /* Intentionally inert fixture hook; the surrounding protocol is asserted. */ },tree.$.x,{registry:getPositionRegistry(tree.$.x)!,address:['x'],value:0,presence:[]});
  try{
   const unit=publication.prepareSourceProjection(channel,{intent:'replace',before:0,after:7,changed:true},rejected());
   if(!unit)throw Error('Missing prepared source unit');unit.finalize?.();installTerminalRecord(unit.record);publication.completeSourceProjection(unit.completion);
@@ -26,7 +26,7 @@ it('private delivery cannot early-admit a compacted terminal rejected source pro
 });
 it('aggregate summary retains terminal input evidence from an untouched collection contributor',()=>{
  const tree=signalTree({rows:entityMap<{id:string},string>()});const channel={},registry=getPositionRegistry(tree.$.rows)!,collection=tree.$.rows;
- publication.bindSource(channel,981235,1,{supported:true},()=>{},collection,{registry,address:['rows'],value:[],aggregate:true,presence:[]});
+ publication.bindSource(channel,981235,1,{supported:true},()=>{ /* Intentionally inert fixture hook; the surrounding protocol is asserted. */ },collection,{registry,address:['rows'],value:[],aggregate:true,presence:[]});
  try{
   publication.registerCollectionProjection(channel,collection,undefined,new Map<string,object>([['field:old',rejected()]]));
   const unit=publication.prepareSourceProjection(channel,{intent:'replace',before:[],after:[7],changed:true},lifecycle.initialRequirement(),undefined,{key:collection,edits:[]});

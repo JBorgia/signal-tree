@@ -134,7 +134,7 @@ export function createEntityTopology(
   reload(seed);
 
   return {
-    fork: () => createEntityTopology(order.map(subjectId => ({subjectId, key: keys.get(subjectId)!, row: undefined}))),
+    fork: () => createEntityTopology(order.map(subjectId => {const key=keys.get(subjectId);if(key===undefined)throw new Error('Topology key missing');return {subjectId,key,row:undefined};})),
     reload,
     reorder: (afterSubjects) => {
       order = [...afterSubjects];

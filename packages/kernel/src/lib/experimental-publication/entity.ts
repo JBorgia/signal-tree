@@ -113,7 +113,11 @@ export const createEntityPublicationParticipant: () => EntityPublicationParticip
       const ordinaryEdits=entityPublicationOrdinary(packet);
       const singleton=ordinaryEdits.length===1?ordinaryEdits[0]:undefined;
       const lastOrdinaryBySubject=singleton?undefined:new Map<number,EntityPublicationEdit>();
-      if(lastOrdinaryBySubject)for(const edit of ordinaryEdits)lastOrdinaryBySubject.set(edit.subject,edit);
+      const repeatedSubjects=new Set<number>();
+      if(lastOrdinaryBySubject)for(const edit of ordinaryEdits){
+        if(lastOrdinaryBySubject.has(edit.subject))repeatedSubjects.add(edit.subject);
+        lastOrdinaryBySubject.set(edit.subject,edit);
+      }
       const selectedFields=new Map<number,Map<string,NativeFieldEndpoint>>();
       const beforeField=(subject:number,key:string):NativeFieldEndpoint=>fields.get(subject)?.get(key)??Object.freeze({present:false,value:undefined,requirement:members.get(subject)?.requirement??missing});
       const proposal=(subject:number,key:string):NativeFieldEndpoint=>{
@@ -191,10 +195,10 @@ export const createEntityPublicationParticipant: () => EntityPublicationParticip
           }else view.set(key,{requirement:fieldRequirement,present:own(physical?.after??edit.after,key)});
           acquisitions++;
         }
-        // A singleton's prepared ordinary row is its final version. Later units
-        // clone installed rows; multi-edit units still need per-edit snapshots.
-        const ordinaryRow=singleton?row:new Map(row),physicalRow=new Map(physical&&physicalAt.get(physical)||view);
-        for(const key of keys)physicalRow.set(key,{requirement:row.get(key)!.requirement as Requirement,present:own(physical?.after??edit.after,key)});
+        // A unique subject's prepared row is final within this admitted sequence.
+        // Later units clone installed rows; repeated subjects retain per-edit images.
+        const ordinaryRow=!repeatedSubjects.has(edit.subject)?row:new Map(row),physicalRow=new Map(physical&&physicalAt.get(physical)||view);
+        for(const key of keys){const endpoint=row.get(key);if(!endpoint)throw new Error('Missing prepared field endpoint');physicalRow.set(key,{requirement:endpoint.requirement as Requirement,present:own(physical?.after??edit.after,key)});}
         const member=nextMembers.get(edit.subject)??members.get(edit.subject),placement=nextPlacements.get(edit.subject)??placements.get(edit.subject);
         const ordinaryKey=nextMappings.get(edit.subject)??mappings.get(edit.subject)??missing,physicalKey=nextMappingViews.get(edit.subject)?.requirement??mappingViews.get(edit.subject)?.requirement??missing;
         selectedAt.set(edit,{
@@ -215,7 +219,7 @@ export const createEntityPublicationParticipant: () => EntityPublicationParticip
       selected.forEdit=edit=>selectedAt.get(edit)??selected;
       const support=(subject?:number,field?:string):Requirement=>{
         const sources:Requirement[]=[];
-        const selected=subject===undefined?[...new Set([...members.keys(),...fields.keys(),...(singleton?[singleton.subject]:lastOrdinaryBySubject!.keys())])]:[subject];
+        const selected=subject===undefined?[...new Set([...members.keys(),...fields.keys(),...(singleton?[singleton.subject]:lastOrdinaryBySubject?.keys()??[])])]:[subject];
         if(subject===undefined){const order=new Map(placements);for(const id of removed)order.delete(id);for(const [id,value]of nextPlacements)order.set(id,value);sources.push(...order.values());}
         for(const id of selected){
           const member=nextMembers.get(id)??members.get(id);if(member)sources.push(member.requirement);
@@ -227,7 +231,7 @@ export const createEntityPublicationParticipant: () => EntityPublicationParticip
         // Transport D/I/W unchanged; actual native consumption alone maps D→I.
         return lifecycle.combineNativeRequirements(sources);
       };
-      return {record:combineTerminalRecords(responsibility,prepared?.record,{writes,deletes,adds:[]})!,completion:inspection?{}:{requirement,support,facts:selected},finalize:()=>{
+      return {record:combineTerminalRecords(responsibility,prepared?.record,{writes,deletes,adds:[]}),completion:inspection?{}:{requirement,support,facts:selected},finalize:()=>{
         if(prepared)lifecycle.finalizeNativeRequirement(requirement);
       }};
     },
