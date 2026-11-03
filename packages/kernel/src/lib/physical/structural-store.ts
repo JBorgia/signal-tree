@@ -1,3 +1,8 @@
+import {
+  EntityPlacementStage,
+  type EntityPlacement,
+} from './entity-placement-stage';
+import type { prepareStructuralTarget } from './prepare-structural-target';
 import { recordProductionSubstrateStat } from '../internals/production-substrate-stats';
 
 export type SubjectLifetimeRecord<K extends string | number> = {
@@ -63,6 +68,7 @@ export type PreparedStructuralTarget<K extends string | number> = {
 };
 
 export class StructuralStore<K extends string | number> {
+  private keysCache: readonly K[] | undefined;
   private subjectIds = new Map<K, number>();
   private subjectStates = new Map<number, SubjectLifetimeRecord<K>>();
   private subjectRevisions = new Map<number, number>();
@@ -75,8 +81,31 @@ export class StructuralStore<K extends string | number> {
   private activeCount = 0;
   private orderFrontier: object = {};
 
+  placementForSubject(subject: number): EntityPlacement<K> {
+    const node = this.activeNodesBySubject.get(subject);
+    return node === undefined
+      ? { present: false }
+      : {
+          present: true,
+          key: node.key,
+          beforeSubject: node.prev?.subjectId,
+          afterSubject: node.next?.subjectId,
+        };
+  }
+  preparePlacement(): EntityPlacementStage<K> {
+    return new EntityPlacementStage(
+      (subject) => this.placementForSubject(subject),
+      this.activeHead?.subjectId,
+      this.activeTail?.subjectId
+    );
+  }
   activeOrderFrontier(): unknown {
     return this.orderFrontier;
+  }
+
+  /** Only a complete, lineage-validated compensation may restore this token. */
+  installCompensatedOrderFrontier(frontier: unknown): void {
+    this.orderFrontier = frontier as object;
   }
 
   planFreshSubjectIds(count: number): readonly number[] {
@@ -182,12 +211,28 @@ export class StructuralStore<K extends string | number> {
     return this.activeCount;
   }
 
+  /**
+   * Active keys in order, shared until the next list or key mutation. Every
+   * mutator of the active list (or of a node's key) clears it; a field write
+   * changes neither, so reading `ids()` after one no longer re-walks the list.
+   * Callers must not mutate the result.
+   */
   activeKeysSnapshot(): readonly K[] {
+    if (this.keysCache) return this.keysCache;
     const keys: K[] = [];
     for (let node = this.activeHead; node !== undefined; node = node.next) {
       keys.push(node.key);
     }
+    this.keysCache = keys;
     return keys;
+  }
+
+  /** Fills both arrays from one walk of the active order. */
+  snapshotActiveOrder(keys: K[], subjectIds: number[]): void {
+    for (let node = this.activeHead; node !== undefined; node = node.next) {
+      keys.push(node.key);
+      subjectIds.push(node.subjectId);
+    }
   }
 
   firstActiveKey(): K | undefined {
@@ -201,98 +246,20 @@ export class StructuralStore<K extends string | number> {
   prepareTarget(
     subjects: readonly StructuralTargetSubject<K>[],
     order: readonly number[],
-    orderFrontier: unknown
+    orderFrontier: unknown,
+    prepare: typeof prepareStructuralTarget<K>
   ): PreparedStructuralTarget<K> {
-    const subjectIds = new Map<K, number>();
-    const targetBySubject = new Map<number, StructuralTargetSubject<K>>();
-    for (const subject of subjects) {
-      if (
-        targetBySubject.has(subject.subjectId) ||
-        subjectIds.has(subject.key)
-      ) {
-        throw new Error('Structural target contains duplicate identity or key');
-      }
-      const current = this.subjectStates.get(subject.subjectId);
-      if (!current || (!current.active && !current.restoreAllowed)) {
-        throw new Error(
-          `Subject ${subject.subjectId} cannot enter the structural target`
-        );
-      }
-      targetBySubject.set(subject.subjectId, subject);
-      subjectIds.set(subject.key, subject.subjectId);
-    }
-    if (
-      order.length !== targetBySubject.size ||
-      new Set(order).size !== order.length ||
-      order.some((subjectId) => !targetBySubject.has(subjectId))
-    ) {
-      throw new Error(
-        'Structural target order does not match its active subjects'
-      );
-    }
-
-    const subjectStates = new Map(this.subjectStates);
-    const subjectRevisions = new Map(this.subjectRevisions);
-    for (const [subjectId, current] of this.subjectStates) {
-      const target = targetBySubject.get(subjectId);
-      if (!target) {
-        if (current.active) {
-          subjectStates.set(subjectId, {
-            active: false,
-            restoreAllowed: current.restoreAllowed,
-          });
-          subjectRevisions.set(subjectId, this.subjectRevision(subjectId) + 1);
-        }
-        continue;
-      }
-      if (!current.active || current.key !== target.key) {
-        subjectRevisions.set(subjectId, this.subjectRevision(subjectId) + 1);
-      }
-      subjectStates.set(subjectId, {
-        active: true,
-        key: target.key,
-        restoreAllowed: current.restoreAllowed,
-      });
-    }
-
-    const activeNodesByKey = new Map<K, ActiveNode<K>>();
-    const activeNodesBySubject = new Map<number, ActiveNode<K>>();
-    let activeHead: ActiveNode<K> | undefined;
-    let activeTail: ActiveNode<K> | undefined;
-    for (const subjectId of order) {
-      const target = targetBySubject.get(
-        subjectId
-      ) as StructuralTargetSubject<K>;
-      const node: ActiveNode<K> = {
-        key: target.key,
-        subjectId,
-        prev: activeTail,
-        next: undefined,
-      };
-      if (activeTail) {
-        activeTail.next = node;
-      } else {
-        activeHead = node;
-      }
-      activeTail = node;
-      activeNodesByKey.set(node.key, node);
-      activeNodesBySubject.set(node.subjectId, node);
-    }
-
-    return {
-      subjectIds,
-      subjectStates,
-      subjectRevisions,
-      activeNodesByKey,
-      activeNodesBySubject,
-      activeHead,
-      activeTail,
-      activeCount: order.length,
-      orderFrontier,
-    };
+    return prepare(
+      this.subjectStates,
+      this.subjectRevisions,
+      subjects,
+      order,
+      orderFrontier
+    );
   }
 
   installPreparedTarget(target: PreparedStructuralTarget<K>): void {
+    this.keysCache = undefined;
     this.subjectIds = target.subjectIds;
     this.subjectStates = target.subjectStates;
     this.subjectRevisions = target.subjectRevisions;
@@ -305,9 +272,17 @@ export class StructuralStore<K extends string | number> {
   }
 
   moveKeysToFront(keys: readonly K[]): void {
-    const nodes = keys
-      .map((key) => this.activeNodesByKey.get(key))
-      .filter((node): node is ActiveNode<K> => node !== undefined);
+    this.keysCache = undefined;
+    // Each node once, at its first position: a node prepended twice links to
+    // itself, and every later walk of the order never ends (v16 8f; the
+    // callers pass unique keys since the batch duplicate rule).
+    const nodes = [
+      ...new Set(
+        keys
+          .map((key) => this.activeNodesByKey.get(key))
+          .filter((node): node is ActiveNode<K> => node !== undefined)
+      ),
+    ];
 
     for (const node of nodes) {
       this.detachNode(node);
@@ -320,6 +295,22 @@ export class StructuralStore<K extends string | number> {
   }
 
   reorderActiveKeys(keys: readonly K[]): void {
+    // Already in this order (every load into an empty collection, and most
+    // refetches): nothing to relink and no order change, so the key snapshot
+    // and the order frontier stay as they are.
+    let current = this.activeHead;
+    let unchanged = true;
+    for (const key of keys) {
+      const node = this.activeNodesByKey.get(key);
+      if (node === undefined) continue;
+      if (node !== current) {
+        unchanged = false;
+        break;
+      }
+      current = current.next;
+    }
+    if (unchanged && current === undefined) return;
+    this.keysCache = undefined;
     this.activeHead = undefined;
     this.activeTail = undefined;
 
@@ -341,37 +332,6 @@ export class StructuralStore<K extends string | number> {
 
     this.activeCount = nextCount;
     this.orderFrontier = {};
-  }
-
-  restoreIndexForSubjects(
-    beforeSubject?: number,
-    afterSubject?: number
-  ): number {
-    const beforeNode =
-      beforeSubject === undefined
-        ? undefined
-        : this.activeNodesBySubject.get(beforeSubject);
-    const afterNode =
-      afterSubject === undefined
-        ? undefined
-        : this.activeNodesBySubject.get(afterSubject);
-
-    if (beforeNode !== undefined && afterNode !== undefined) {
-      if (this.nodePrecedes(beforeNode, afterNode)) {
-        return this.indexOfNode(beforeNode) + 1;
-      }
-      return this.indexOfNode(afterNode);
-    }
-
-    if (afterNode !== undefined) {
-      return this.indexOfNode(afterNode);
-    }
-
-    if (beforeNode !== undefined) {
-      return this.indexOfNode(beforeNode) + 1;
-    }
-
-    return this.activeCount;
   }
 
   neighborSubjectsForKey(key: K): {
@@ -423,6 +383,7 @@ export class StructuralStore<K extends string | number> {
 
     this.activeNodesByKey.delete(from);
     node.key = to;
+    this.keysCache = undefined;
     this.activeNodesByKey.set(to, node);
     this.activeNodesBySubject.set(subjectId, node);
   }
@@ -561,6 +522,36 @@ export class StructuralStore<K extends string | number> {
     this.appendDetachedNode(node);
   }
 
+  /** Relocate an active lifetime without retiring it or emitting lifecycle effects. */
+  placeActiveSubject(
+    subjectId: number,
+    beforeSubject?: number,
+    afterSubject?: number
+  ): void {
+    const node = this.activeNodesBySubject.get(subjectId);
+    if (!node) throw new Error('Placement lifetime is not active');
+    if (beforeSubject === subjectId || afterSubject === subjectId)
+      throw new Error('Placement cannot name its own lifetime');
+    const placement = this.resolveSubjectRestorePlacement(
+      beforeSubject,
+      afterSubject
+    );
+    const after =
+      placement.afterSubject === subjectId
+        ? undefined
+        : this.activeNodesBySubject.get(placement.afterSubject as number);
+    const before =
+      placement.beforeSubject === subjectId
+        ? undefined
+        : this.activeNodesBySubject.get(placement.beforeSubject as number);
+    this.detachNode(node);
+    if (after) this.insertDetachedNodeBefore(node, after);
+    else if (before) this.insertDetachedNodeAfter(node, before);
+    else this.appendDetachedNode(node);
+    this.keysCache = undefined;
+    this.orderFrontier = {};
+  }
+
   retireSubject(subjectId: number): void {
     this.subjectStates.set(subjectId, {
       active: false,
@@ -597,6 +588,7 @@ export class StructuralStore<K extends string | number> {
   }
 
   clear(): void {
+    this.keysCache = undefined;
     this.subjectIds.clear();
     this.subjectStates.clear();
     this.subjectRevisions.clear();
@@ -610,92 +602,8 @@ export class StructuralStore<K extends string | number> {
     this.orderFrontier = {};
   }
 
-  __assertActiveOrderIntegrityForTesting(): void {
-    if (this.activeHead?.prev !== undefined) {
-      throw new Error('Active head must not have a previous node.');
-    }
-
-    if (this.activeTail?.next !== undefined) {
-      throw new Error('Active tail must not have a next node.');
-    }
-
-    const reachableKeys = new Set<K>();
-    const reachableSubjects = new Set<number>();
-    let previous: ActiveNode<K> | undefined;
-    let count = 0;
-    let node = this.activeHead;
-
-    while (node !== undefined) {
-      if (node.prev !== previous) {
-        throw new Error('Broken prev link in active node chain.');
-      }
-
-      if (previous !== undefined && previous.next !== node) {
-        throw new Error('Broken next link in active node chain.');
-      }
-
-      if (reachableKeys.has(node.key)) {
-        throw new Error(`Duplicate reachable key ${String(node.key)}.`);
-      }
-
-      if (reachableSubjects.has(node.subjectId)) {
-        throw new Error(
-          `Duplicate reachable subject ${String(node.subjectId)}.`
-        );
-      }
-
-      if (this.activeNodesByKey.get(node.key) !== node) {
-        throw new Error(`Key lookup mismatch for ${String(node.key)}.`);
-      }
-
-      if (this.activeNodesBySubject.get(node.subjectId) !== node) {
-        throw new Error(
-          `Subject lookup mismatch for ${String(node.subjectId)}.`
-        );
-      }
-
-      if (this.subjectIds.get(node.key) !== node.subjectId) {
-        throw new Error(
-          `Subject id mapping mismatch for key ${String(node.key)}.`
-        );
-      }
-
-      const state = this.subjectStates.get(node.subjectId);
-      if (!state?.active || state.key !== node.key) {
-        throw new Error(
-          `Active state mismatch for subject ${String(node.subjectId)}.`
-        );
-      }
-
-      reachableKeys.add(node.key);
-      reachableSubjects.add(node.subjectId);
-      count += 1;
-      previous = node;
-      node = node.next;
-    }
-
-    if (previous !== this.activeTail) {
-      throw new Error('Active tail does not match the reachable chain tail.');
-    }
-
-    if (count !== this.activeCount) {
-      throw new Error('Active count does not match the reachable chain size.');
-    }
-
-    if (this.activeNodesByKey.size !== count) {
-      throw new Error(
-        'Active key index size does not match reachable node count.'
-      );
-    }
-
-    if (this.activeNodesBySubject.size !== count) {
-      throw new Error(
-        'Active subject index size does not match reachable node count.'
-      );
-    }
-  }
-
   private createAndAppendActiveNode(subjectId: number, key: K): void {
+    this.keysCache = undefined;
     const node: ActiveNode<K> = {
       key,
       subjectId,
@@ -710,11 +618,13 @@ export class StructuralStore<K extends string | number> {
   }
 
   private unregisterActiveNode(node: ActiveNode<K>): void {
+    this.keysCache = undefined;
     this.activeNodesByKey.delete(node.key);
     this.activeNodesBySubject.delete(node.subjectId);
   }
 
   private prependDetachedNode(node: ActiveNode<K>): void {
+    this.keysCache = undefined;
     node.prev = undefined;
     node.next = this.activeHead;
     if (this.activeHead !== undefined) {
@@ -726,6 +636,7 @@ export class StructuralStore<K extends string | number> {
   }
 
   private appendDetachedNode(node: ActiveNode<K>): void {
+    this.keysCache = undefined;
     node.next = undefined;
     node.prev = this.activeTail;
     if (this.activeTail !== undefined) {
@@ -740,6 +651,7 @@ export class StructuralStore<K extends string | number> {
     node: ActiveNode<K>,
     anchor: ActiveNode<K>
   ): void {
+    this.keysCache = undefined;
     node.prev = anchor;
     node.next = anchor.next;
     if (anchor.next !== undefined) {
@@ -754,6 +666,7 @@ export class StructuralStore<K extends string | number> {
     node: ActiveNode<K>,
     anchor: ActiveNode<K>
   ): void {
+    this.keysCache = undefined;
     node.next = anchor;
     node.prev = anchor.prev;
     if (anchor.prev !== undefined) {
@@ -765,6 +678,7 @@ export class StructuralStore<K extends string | number> {
   }
 
   private detachNode(node: ActiveNode<K>): void {
+    this.keysCache = undefined;
     if (node.prev !== undefined) {
       node.prev.next = node.next;
     } else {
@@ -791,20 +705,6 @@ export class StructuralStore<K extends string | number> {
     }
 
     return false;
-  }
-
-  private indexOfNode(target: ActiveNode<K>): number {
-    let index = 0;
-    let node = this.activeHead;
-    while (node !== undefined) {
-      if (node === target) {
-        return index;
-      }
-      index += 1;
-      node = node.next;
-    }
-
-    return -1;
   }
 
   private activateSubject(

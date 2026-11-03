@@ -1,0 +1,8 @@
+Command: node tools/check-spec-types.mjs --help
+The checker has no help branch; this executed its ordinary spec-types gate.
+Exit 0
+check-spec-types: OK — and 3 file(s) improved.
+  packages/kernel/src/lib/entity-bare-array-hydrate.spec.ts: 0 now, baseline 5
+  packages/kernel/src/lib/marker-snapshot-memo.spec.ts: 0 now, baseline 15
+  packages/kernel/src/lib/mut-participation.spec.ts: 6 now, baseline 7
+No baseline updates performed.

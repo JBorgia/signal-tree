@@ -1,0 +1,93 @@
+[
+  {
+    "command": [
+      "node",
+      "docs/research/prepared-selection-order-0/run.mjs",
+      "OAP",
+      "callback-controls.mjs",
+      "C",
+      "first"
+    ],
+    "exit": 0,
+    "stdout": "{\"lane\":\"OAP\",\"entry\":\"callback-controls.mjs\",\"control\":\"C\",\"exit\":0,\"stable\":true,\"out\":\"/private/tmp/st-prepared-selection-replay/runs/OAP-callback-controls.mjs-C-first\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/prepared-selection-order-0/run.mjs",
+      "OAP",
+      "callback-controls.mjs",
+      "C-then-X",
+      "first"
+    ],
+    "exit": 0,
+    "stdout": "{\"lane\":\"OAP\",\"entry\":\"callback-controls.mjs\",\"control\":\"C-then-X\",\"exit\":0,\"stable\":true,\"out\":\"/private/tmp/st-prepared-selection-replay/runs/OAP-callback-controls.mjs-C-then-X-first\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/prepared-selection-order-0/run.mjs",
+      "OAP",
+      "callback-controls.mjs",
+      "C-then-A",
+      "first"
+    ],
+    "exit": 0,
+    "stdout": "{\"lane\":\"OAP\",\"entry\":\"callback-controls.mjs\",\"control\":\"C-then-A\",\"exit\":0,\"stable\":true,\"out\":\"/private/tmp/st-prepared-selection-replay/runs/OAP-callback-controls.mjs-C-then-A-first\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/prepared-selection-order-0/run.mjs",
+      "OAP",
+      "callback-controls.mjs",
+      "nestedwrites",
+      "first"
+    ],
+    "exit": 0,
+    "stdout": "{\"lane\":\"OAP\",\"entry\":\"callback-controls.mjs\",\"control\":\"nestedwrites\",\"exit\":0,\"stable\":true,\"out\":\"/private/tmp/st-prepared-selection-replay/runs/OAP-callback-controls.mjs-nestedwrites-first\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/prepared-selection-order-0/run.mjs",
+      "OAP",
+      "callback-controls.mjs",
+      "callbackthrows",
+      "first"
+    ],
+    "exit": 0,
+    "stdout": "{\"lane\":\"OAP\",\"entry\":\"callback-controls.mjs\",\"control\":\"callbackthrows\",\"exit\":0,\"stable\":true,\"out\":\"/private/tmp/st-prepared-selection-replay/runs/OAP-callback-controls.mjs-callbackthrows-first\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/prepared-selection-order-0/run.mjs",
+      "OAP",
+      "callback-controls.mjs",
+      "callbackthrows-undefined",
+      "first"
+    ],
+    "exit": 0,
+    "stdout": "{\"lane\":\"OAP\",\"entry\":\"callback-controls.mjs\",\"control\":\"callbackthrows-undefined\",\"exit\":0,\"stable\":true,\"out\":\"/private/tmp/st-prepared-selection-replay/runs/OAP-callback-controls.mjs-callbackthrows-undefined-first\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/prepared-selection-order-0/run.mjs",
+      "OAP",
+      "callback-controls.mjs",
+      "removedselectedrows",
+      "first"
+    ],
+    "exit": 0,
+    "stdout": "{\"lane\":\"OAP\",\"entry\":\"callback-controls.mjs\",\"control\":\"removedselectedrows\",\"exit\":0,\"stable\":true,\"out\":\"/private/tmp/st-prepared-selection-replay/runs/OAP-callback-controls.mjs-removedselectedrows-first\"}\n",
+    "stderr": ""
+  }
+]

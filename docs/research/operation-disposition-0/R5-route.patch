@@ -1,0 +1,27 @@
+--- a/packages/kernel/src/enhancers/transactions/transactions.ts
++++ b/packages/kernel/src/enhancers/transactions/transactions.ts
+@@ -90,6 +90,7 @@
+   getTreeRealizationDescriptors,
+   getTreeRealizationPort,
+   rememberTreeRealizationDescriptor,
++  preparePointRealization,
+ } from '../../lib/internals/causal-runtime/tree-realization-adapter';
+ import { TurnStore } from '../../lib/internals/causal-runtime/turn-store';
+ import { interceptLeafSignals } from '../../lib/internals/intercept-leaf-signals';
+@@ -2693,7 +2694,15 @@
+                   // D2's additional mixed route keeps ordinary normalized
+                   // admission; it changes physical installation only.
+                   if (normalized.some(e => e.subjectId === undefined) && normalized.some(e => e.subjectId !== undefined)) {
+-                    rollbackPendingTarget(normalized, orderDeltas, completion);
++                    const point = preparePointRealization(tree, normalized);
++                    if (point) {
++                      if (completion) completion.selected = true;
++                      point.install();
++                      if (completion) completion.committed = true;
++                      point.publish();
++                    } else {
++                      rollbackPendingTarget(normalized, orderDeltas, completion);
++                    }
+                   } else {
+                     realizationPort.applyAtomically(normalized);
+                   }

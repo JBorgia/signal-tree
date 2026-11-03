@@ -1,0 +1,1 @@
+{"extends":"/private/tmp/st-unknown-access-candidate/tsconfig.typecheck-all.json","compilerOptions":{"rootDir":"/private/tmp","typeRoots":["/private/tmp/st-unknown-access-candidate/node_modules/@types"],"types":["node"],"baseUrl":"/private/tmp/st-unknown-access-candidate"},"include":["probe.ts"],"exclude":[]}

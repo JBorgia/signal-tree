@@ -99,6 +99,11 @@ export class NavigationComponent {
           title: 'Server updates',
           route: '/external-truth',
         },
+        {
+          id: 'independent-publication',
+          title: 'Independent publication · v16 preview',
+          route: '/independent-publication',
+        },
       ],
     },
     {

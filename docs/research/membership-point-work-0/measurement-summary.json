@@ -1,0 +1,852 @@
+[
+  {
+    "lane": "base",
+    "mode": "off",
+    "exit": 0,
+    "stable": true,
+    "bundle": "58db0fb1ee8839c53f6ff65c7c432e54054e0dfd036cf3d53db93176b64fca27",
+    "runs": [
+      {
+        "size": 100,
+        "status": "pass",
+        "summary": {
+          "publicMutations": 4,
+          "membershipEvents": 3,
+          "snapshotCalls": 0,
+          "cacheHits": 0,
+          "cacheMisses": 0,
+          "visitedKeys": 0,
+          "activeOrderWalkCalls": 0,
+          "activeOrderVisitedKeys": 0,
+          "lastActiveKeyCalls": 1,
+          "neighborSubjectsCalls": 2,
+          "frameCommits": 4,
+          "frameInstructions": 4,
+          "frameTouchedSubjects": 4
+        }
+      },
+      {
+        "size": 1000,
+        "status": "pass",
+        "summary": {
+          "publicMutations": 4,
+          "membershipEvents": 3,
+          "snapshotCalls": 0,
+          "cacheHits": 0,
+          "cacheMisses": 0,
+          "visitedKeys": 0,
+          "activeOrderWalkCalls": 0,
+          "activeOrderVisitedKeys": 0,
+          "lastActiveKeyCalls": 1,
+          "neighborSubjectsCalls": 2,
+          "frameCommits": 4,
+          "frameInstructions": 4,
+          "frameTouchedSubjects": 4
+        }
+      },
+      {
+        "size": 10000,
+        "status": "pass",
+        "summary": {
+          "publicMutations": 4,
+          "membershipEvents": 3,
+          "snapshotCalls": 0,
+          "cacheHits": 0,
+          "cacheMisses": 0,
+          "visitedKeys": 0,
+          "activeOrderWalkCalls": 0,
+          "activeOrderVisitedKeys": 0,
+          "lastActiveKeyCalls": 1,
+          "neighborSubjectsCalls": 2,
+          "frameCommits": 4,
+          "frameInstructions": 4,
+          "frameTouchedSubjects": 4
+        }
+      },
+      {
+        "size": 30000,
+        "status": "pass",
+        "summary": {
+          "publicMutations": 4,
+          "membershipEvents": 3,
+          "snapshotCalls": 0,
+          "cacheHits": 0,
+          "cacheMisses": 0,
+          "visitedKeys": 0,
+          "activeOrderWalkCalls": 0,
+          "activeOrderVisitedKeys": 0,
+          "lastActiveKeyCalls": 1,
+          "neighborSubjectsCalls": 2,
+          "frameCommits": 4,
+          "frameInstructions": 4,
+          "frameTouchedSubjects": 4
+        }
+      }
+    ]
+  },
+  {
+    "lane": "base",
+    "mode": "active",
+    "exit": 0,
+    "stable": true,
+    "bundle": "58db0fb1ee8839c53f6ff65c7c432e54054e0dfd036cf3d53db93176b64fca27",
+    "runs": [
+      {
+        "size": 100,
+        "status": "pass",
+        "summary": {
+          "publicMutations": 4,
+          "membershipEvents": 3,
+          "snapshotCalls": 0,
+          "cacheHits": 0,
+          "cacheMisses": 0,
+          "visitedKeys": 0,
+          "activeOrderWalkCalls": 0,
+          "activeOrderVisitedKeys": 0,
+          "lastActiveKeyCalls": 1,
+          "neighborSubjectsCalls": 2,
+          "frameCommits": 3,
+          "frameInstructions": 3,
+          "frameTouchedSubjects": 3
+        }
+      },
+      {
+        "size": 1000,
+        "status": "pass",
+        "summary": {
+          "publicMutations": 4,
+          "membershipEvents": 3,
+          "snapshotCalls": 0,
+          "cacheHits": 0,
+          "cacheMisses": 0,
+          "visitedKeys": 0,
+          "activeOrderWalkCalls": 0,
+          "activeOrderVisitedKeys": 0,
+          "lastActiveKeyCalls": 1,
+          "neighborSubjectsCalls": 2,
+          "frameCommits": 3,
+          "frameInstructions": 3,
+          "frameTouchedSubjects": 3
+        }
+      },
+      {
+        "size": 10000,
+        "status": "pass",
+        "summary": {
+          "publicMutations": 4,
+          "membershipEvents": 3,
+          "snapshotCalls": 0,
+          "cacheHits": 0,
+          "cacheMisses": 0,
+          "visitedKeys": 0,
+          "activeOrderWalkCalls": 0,
+          "activeOrderVisitedKeys": 0,
+          "lastActiveKeyCalls": 1,
+          "neighborSubjectsCalls": 2,
+          "frameCommits": 3,
+          "frameInstructions": 3,
+          "frameTouchedSubjects": 3
+        }
+      },
+      {
+        "size": 30000,
+        "status": "pass",
+        "summary": {
+          "publicMutations": 4,
+          "membershipEvents": 3,
+          "snapshotCalls": 0,
+          "cacheHits": 0,
+          "cacheMisses": 0,
+          "visitedKeys": 0,
+          "activeOrderWalkCalls": 0,
+          "activeOrderVisitedKeys": 0,
+          "lastActiveKeyCalls": 1,
+          "neighborSubjectsCalls": 2,
+          "frameCommits": 3,
+          "frameInstructions": 3,
+          "frameTouchedSubjects": 3
+        }
+      }
+    ]
+  },
+  {
+    "lane": "D2",
+    "mode": "off",
+    "exit": 0,
+    "stable": true,
+    "bundle": "fa076bf80af06894b32966610844606955b83d5283a743cb2a253b69ac631460",
+    "runs": [
+      {
+        "size": 100,
+        "status": "pass",
+        "summary": {
+          "publicMutations": 4,
+          "membershipEvents": 3,
+          "snapshotCalls": 4,
+          "cacheHits": 0,
+          "cacheMisses": 4,
+          "visitedKeys": 402,
+          "activeOrderWalkCalls": 0,
+          "activeOrderVisitedKeys": 0,
+          "lastActiveKeyCalls": 1,
+          "neighborSubjectsCalls": 3,
+          "frameCommits": 4,
+          "frameInstructions": 4,
+          "frameTouchedSubjects": 4
+        }
+      },
+      {
+        "size": 1000,
+        "status": "pass",
+        "summary": {
+          "publicMutations": 4,
+          "membershipEvents": 3,
+          "snapshotCalls": 4,
+          "cacheHits": 0,
+          "cacheMisses": 4,
+          "visitedKeys": 4002,
+          "activeOrderWalkCalls": 0,
+          "activeOrderVisitedKeys": 0,
+          "lastActiveKeyCalls": 1,
+          "neighborSubjectsCalls": 3,
+          "frameCommits": 4,
+          "frameInstructions": 4,
+          "frameTouchedSubjects": 4
+        }
+      },
+      {
+        "size": 10000,
+        "status": "pass",
+        "summary": {
+          "publicMutations": 4,
+          "membershipEvents": 3,
+          "snapshotCalls": 4,
+          "cacheHits": 0,
+          "cacheMisses": 4,
+          "visitedKeys": 40002,
+          "activeOrderWalkCalls": 0,
+          "activeOrderVisitedKeys": 0,
+          "lastActiveKeyCalls": 1,
+          "neighborSubjectsCalls": 3,
+          "frameCommits": 4,
+          "frameInstructions": 4,
+          "frameTouchedSubjects": 4
+        }
+      },
+      {
+        "size": 30000,
+        "status": "pass",
+        "summary": {
+          "publicMutations": 4,
+          "membershipEvents": 3,
+          "snapshotCalls": 4,
+          "cacheHits": 0,
+          "cacheMisses": 4,
+          "visitedKeys": 120002,
+          "activeOrderWalkCalls": 0,
+          "activeOrderVisitedKeys": 0,
+          "lastActiveKeyCalls": 1,
+          "neighborSubjectsCalls": 3,
+          "frameCommits": 4,
+          "frameInstructions": 4,
+          "frameTouchedSubjects": 4
+        }
+      }
+    ]
+  },
+  {
+    "lane": "D2",
+    "mode": "active",
+    "exit": 0,
+    "stable": true,
+    "bundle": "fa076bf80af06894b32966610844606955b83d5283a743cb2a253b69ac631460",
+    "runs": [
+      {
+        "size": 100,
+        "status": "pass",
+        "summary": {
+          "publicMutations": 4,
+          "membershipEvents": 3,
+          "snapshotCalls": 3,
+          "cacheHits": 0,
+          "cacheMisses": 3,
+          "visitedKeys": 302,
+          "activeOrderWalkCalls": 0,
+          "activeOrderVisitedKeys": 0,
+          "lastActiveKeyCalls": 1,
+          "neighborSubjectsCalls": 3,
+          "frameCommits": 3,
+          "frameInstructions": 3,
+          "frameTouchedSubjects": 3
+        }
+      },
+      {
+        "size": 1000,
+        "status": "pass",
+        "summary": {
+          "publicMutations": 4,
+          "membershipEvents": 3,
+          "snapshotCalls": 3,
+          "cacheHits": 0,
+          "cacheMisses": 3,
+          "visitedKeys": 3002,
+          "activeOrderWalkCalls": 0,
+          "activeOrderVisitedKeys": 0,
+          "lastActiveKeyCalls": 1,
+          "neighborSubjectsCalls": 3,
+          "frameCommits": 3,
+          "frameInstructions": 3,
+          "frameTouchedSubjects": 3
+        }
+      },
+      {
+        "size": 10000,
+        "status": "pass",
+        "summary": {
+          "publicMutations": 4,
+          "membershipEvents": 3,
+          "snapshotCalls": 3,
+          "cacheHits": 0,
+          "cacheMisses": 3,
+          "visitedKeys": 30002,
+          "activeOrderWalkCalls": 0,
+          "activeOrderVisitedKeys": 0,
+          "lastActiveKeyCalls": 1,
+          "neighborSubjectsCalls": 3,
+          "frameCommits": 3,
+          "frameInstructions": 3,
+          "frameTouchedSubjects": 3
+        }
+      },
+      {
+        "size": 30000,
+        "status": "pass",
+        "summary": {
+          "publicMutations": 4,
+          "membershipEvents": 3,
+          "snapshotCalls": 3,
+          "cacheHits": 0,
+          "cacheMisses": 3,
+          "visitedKeys": 90002,
+          "activeOrderWalkCalls": 0,
+          "activeOrderVisitedKeys": 0,
+          "lastActiveKeyCalls": 1,
+          "neighborSubjectsCalls": 3,
+          "frameCommits": 3,
+          "frameInstructions": 3,
+          "frameTouchedSubjects": 3
+        }
+      }
+    ]
+  },
+  {
+    "lane": "D2I",
+    "mode": "off",
+    "exit": 0,
+    "stable": true,
+    "bundle": "8989687bfaccd6d8d792e7ae6054a5e09acfb3ab7dceb6dad9cbff512bbe8067",
+    "runs": [
+      {
+        "size": 100,
+        "status": "pass",
+        "summary": {
+          "publicMutations": 4,
+          "membershipEvents": 3,
+          "snapshotCalls": 0,
+          "cacheHits": 0,
+          "cacheMisses": 0,
+          "visitedKeys": 0,
+          "activeOrderWalkCalls": 0,
+          "activeOrderVisitedKeys": 0,
+          "lastActiveKeyCalls": 2,
+          "neighborSubjectsCalls": 3,
+          "frameCommits": 4,
+          "frameInstructions": 4,
+          "frameTouchedSubjects": 4
+        }
+      },
+      {
+        "size": 1000,
+        "status": "pass",
+        "summary": {
+          "publicMutations": 4,
+          "membershipEvents": 3,
+          "snapshotCalls": 0,
+          "cacheHits": 0,
+          "cacheMisses": 0,
+          "visitedKeys": 0,
+          "activeOrderWalkCalls": 0,
+          "activeOrderVisitedKeys": 0,
+          "lastActiveKeyCalls": 2,
+          "neighborSubjectsCalls": 3,
+          "frameCommits": 4,
+          "frameInstructions": 4,
+          "frameTouchedSubjects": 4
+        }
+      },
+      {
+        "size": 10000,
+        "status": "pass",
+        "summary": {
+          "publicMutations": 4,
+          "membershipEvents": 3,
+          "snapshotCalls": 0,
+          "cacheHits": 0,
+          "cacheMisses": 0,
+          "visitedKeys": 0,
+          "activeOrderWalkCalls": 0,
+          "activeOrderVisitedKeys": 0,
+          "lastActiveKeyCalls": 2,
+          "neighborSubjectsCalls": 3,
+          "frameCommits": 4,
+          "frameInstructions": 4,
+          "frameTouchedSubjects": 4
+        }
+      },
+      {
+        "size": 30000,
+        "status": "pass",
+        "summary": {
+          "publicMutations": 4,
+          "membershipEvents": 3,
+          "snapshotCalls": 0,
+          "cacheHits": 0,
+          "cacheMisses": 0,
+          "visitedKeys": 0,
+          "activeOrderWalkCalls": 0,
+          "activeOrderVisitedKeys": 0,
+          "lastActiveKeyCalls": 2,
+          "neighborSubjectsCalls": 3,
+          "frameCommits": 4,
+          "frameInstructions": 4,
+          "frameTouchedSubjects": 4
+        }
+      }
+    ]
+  },
+  {
+    "lane": "D2I",
+    "mode": "active",
+    "exit": 0,
+    "stable": true,
+    "bundle": "8989687bfaccd6d8d792e7ae6054a5e09acfb3ab7dceb6dad9cbff512bbe8067",
+    "runs": [
+      {
+        "size": 100,
+        "status": "pass",
+        "summary": {
+          "publicMutations": 4,
+          "membershipEvents": 3,
+          "snapshotCalls": 0,
+          "cacheHits": 0,
+          "cacheMisses": 0,
+          "visitedKeys": 0,
+          "activeOrderWalkCalls": 0,
+          "activeOrderVisitedKeys": 0,
+          "lastActiveKeyCalls": 2,
+          "neighborSubjectsCalls": 3,
+          "frameCommits": 3,
+          "frameInstructions": 3,
+          "frameTouchedSubjects": 3
+        }
+      },
+      {
+        "size": 1000,
+        "status": "pass",
+        "summary": {
+          "publicMutations": 4,
+          "membershipEvents": 3,
+          "snapshotCalls": 0,
+          "cacheHits": 0,
+          "cacheMisses": 0,
+          "visitedKeys": 0,
+          "activeOrderWalkCalls": 0,
+          "activeOrderVisitedKeys": 0,
+          "lastActiveKeyCalls": 2,
+          "neighborSubjectsCalls": 3,
+          "frameCommits": 3,
+          "frameInstructions": 3,
+          "frameTouchedSubjects": 3
+        }
+      },
+      {
+        "size": 10000,
+        "status": "pass",
+        "summary": {
+          "publicMutations": 4,
+          "membershipEvents": 3,
+          "snapshotCalls": 0,
+          "cacheHits": 0,
+          "cacheMisses": 0,
+          "visitedKeys": 0,
+          "activeOrderWalkCalls": 0,
+          "activeOrderVisitedKeys": 0,
+          "lastActiveKeyCalls": 2,
+          "neighborSubjectsCalls": 3,
+          "frameCommits": 3,
+          "frameInstructions": 3,
+          "frameTouchedSubjects": 3
+        }
+      },
+      {
+        "size": 30000,
+        "status": "pass",
+        "summary": {
+          "publicMutations": 4,
+          "membershipEvents": 3,
+          "snapshotCalls": 0,
+          "cacheHits": 0,
+          "cacheMisses": 0,
+          "visitedKeys": 0,
+          "activeOrderWalkCalls": 0,
+          "activeOrderVisitedKeys": 0,
+          "lastActiveKeyCalls": 2,
+          "neighborSubjectsCalls": 3,
+          "frameCommits": 3,
+          "frameInstructions": 3,
+          "frameTouchedSubjects": 3
+        }
+      }
+    ]
+  },
+  {
+    "lane": "OAP",
+    "mode": "off",
+    "exit": 0,
+    "stable": true,
+    "bundle": "6fd65fbc291834331e3b61e76be2a3ca6d8e4ed22fa5fb35300de718810a1fd6",
+    "runs": [
+      {
+        "size": 100,
+        "status": "pass",
+        "summary": {
+          "publicMutations": 4,
+          "membershipEvents": 3,
+          "snapshotCalls": 4,
+          "cacheHits": 0,
+          "cacheMisses": 4,
+          "visitedKeys": 402,
+          "activeOrderWalkCalls": 0,
+          "activeOrderVisitedKeys": 0,
+          "lastActiveKeyCalls": 1,
+          "neighborSubjectsCalls": 3,
+          "frameCommits": 4,
+          "frameInstructions": 4,
+          "frameTouchedSubjects": 4
+        }
+      },
+      {
+        "size": 1000,
+        "status": "pass",
+        "summary": {
+          "publicMutations": 4,
+          "membershipEvents": 3,
+          "snapshotCalls": 4,
+          "cacheHits": 0,
+          "cacheMisses": 4,
+          "visitedKeys": 4002,
+          "activeOrderWalkCalls": 0,
+          "activeOrderVisitedKeys": 0,
+          "lastActiveKeyCalls": 1,
+          "neighborSubjectsCalls": 3,
+          "frameCommits": 4,
+          "frameInstructions": 4,
+          "frameTouchedSubjects": 4
+        }
+      },
+      {
+        "size": 10000,
+        "status": "pass",
+        "summary": {
+          "publicMutations": 4,
+          "membershipEvents": 3,
+          "snapshotCalls": 4,
+          "cacheHits": 0,
+          "cacheMisses": 4,
+          "visitedKeys": 40002,
+          "activeOrderWalkCalls": 0,
+          "activeOrderVisitedKeys": 0,
+          "lastActiveKeyCalls": 1,
+          "neighborSubjectsCalls": 3,
+          "frameCommits": 4,
+          "frameInstructions": 4,
+          "frameTouchedSubjects": 4
+        }
+      },
+      {
+        "size": 30000,
+        "status": "pass",
+        "summary": {
+          "publicMutations": 4,
+          "membershipEvents": 3,
+          "snapshotCalls": 4,
+          "cacheHits": 0,
+          "cacheMisses": 4,
+          "visitedKeys": 120002,
+          "activeOrderWalkCalls": 0,
+          "activeOrderVisitedKeys": 0,
+          "lastActiveKeyCalls": 1,
+          "neighborSubjectsCalls": 3,
+          "frameCommits": 4,
+          "frameInstructions": 4,
+          "frameTouchedSubjects": 4
+        }
+      }
+    ]
+  },
+  {
+    "lane": "OAP",
+    "mode": "active",
+    "exit": 0,
+    "stable": true,
+    "bundle": "6fd65fbc291834331e3b61e76be2a3ca6d8e4ed22fa5fb35300de718810a1fd6",
+    "runs": [
+      {
+        "size": 100,
+        "status": "pass",
+        "summary": {
+          "publicMutations": 4,
+          "membershipEvents": 3,
+          "snapshotCalls": 3,
+          "cacheHits": 0,
+          "cacheMisses": 3,
+          "visitedKeys": 302,
+          "activeOrderWalkCalls": 0,
+          "activeOrderVisitedKeys": 0,
+          "lastActiveKeyCalls": 1,
+          "neighborSubjectsCalls": 3,
+          "frameCommits": 3,
+          "frameInstructions": 3,
+          "frameTouchedSubjects": 3
+        }
+      },
+      {
+        "size": 1000,
+        "status": "pass",
+        "summary": {
+          "publicMutations": 4,
+          "membershipEvents": 3,
+          "snapshotCalls": 3,
+          "cacheHits": 0,
+          "cacheMisses": 3,
+          "visitedKeys": 3002,
+          "activeOrderWalkCalls": 0,
+          "activeOrderVisitedKeys": 0,
+          "lastActiveKeyCalls": 1,
+          "neighborSubjectsCalls": 3,
+          "frameCommits": 3,
+          "frameInstructions": 3,
+          "frameTouchedSubjects": 3
+        }
+      },
+      {
+        "size": 10000,
+        "status": "pass",
+        "summary": {
+          "publicMutations": 4,
+          "membershipEvents": 3,
+          "snapshotCalls": 3,
+          "cacheHits": 0,
+          "cacheMisses": 3,
+          "visitedKeys": 30002,
+          "activeOrderWalkCalls": 0,
+          "activeOrderVisitedKeys": 0,
+          "lastActiveKeyCalls": 1,
+          "neighborSubjectsCalls": 3,
+          "frameCommits": 3,
+          "frameInstructions": 3,
+          "frameTouchedSubjects": 3
+        }
+      },
+      {
+        "size": 30000,
+        "status": "pass",
+        "summary": {
+          "publicMutations": 4,
+          "membershipEvents": 3,
+          "snapshotCalls": 3,
+          "cacheHits": 0,
+          "cacheMisses": 3,
+          "visitedKeys": 90002,
+          "activeOrderWalkCalls": 0,
+          "activeOrderVisitedKeys": 0,
+          "lastActiveKeyCalls": 1,
+          "neighborSubjectsCalls": 3,
+          "frameCommits": 3,
+          "frameInstructions": 3,
+          "frameTouchedSubjects": 3
+        }
+      }
+    ]
+  },
+  {
+    "lane": "OAPI",
+    "mode": "off",
+    "exit": 0,
+    "stable": true,
+    "bundle": "c1c64b268a6c8f863c54ef71c49840ed9b0abaa6ecf6fa284c29aef09f90fb70",
+    "runs": [
+      {
+        "size": 100,
+        "status": "pass",
+        "summary": {
+          "publicMutations": 4,
+          "membershipEvents": 3,
+          "snapshotCalls": 0,
+          "cacheHits": 0,
+          "cacheMisses": 0,
+          "visitedKeys": 0,
+          "activeOrderWalkCalls": 0,
+          "activeOrderVisitedKeys": 0,
+          "lastActiveKeyCalls": 2,
+          "neighborSubjectsCalls": 3,
+          "frameCommits": 4,
+          "frameInstructions": 4,
+          "frameTouchedSubjects": 4
+        }
+      },
+      {
+        "size": 1000,
+        "status": "pass",
+        "summary": {
+          "publicMutations": 4,
+          "membershipEvents": 3,
+          "snapshotCalls": 0,
+          "cacheHits": 0,
+          "cacheMisses": 0,
+          "visitedKeys": 0,
+          "activeOrderWalkCalls": 0,
+          "activeOrderVisitedKeys": 0,
+          "lastActiveKeyCalls": 2,
+          "neighborSubjectsCalls": 3,
+          "frameCommits": 4,
+          "frameInstructions": 4,
+          "frameTouchedSubjects": 4
+        }
+      },
+      {
+        "size": 10000,
+        "status": "pass",
+        "summary": {
+          "publicMutations": 4,
+          "membershipEvents": 3,
+          "snapshotCalls": 0,
+          "cacheHits": 0,
+          "cacheMisses": 0,
+          "visitedKeys": 0,
+          "activeOrderWalkCalls": 0,
+          "activeOrderVisitedKeys": 0,
+          "lastActiveKeyCalls": 2,
+          "neighborSubjectsCalls": 3,
+          "frameCommits": 4,
+          "frameInstructions": 4,
+          "frameTouchedSubjects": 4
+        }
+      },
+      {
+        "size": 30000,
+        "status": "pass",
+        "summary": {
+          "publicMutations": 4,
+          "membershipEvents": 3,
+          "snapshotCalls": 0,
+          "cacheHits": 0,
+          "cacheMisses": 0,
+          "visitedKeys": 0,
+          "activeOrderWalkCalls": 0,
+          "activeOrderVisitedKeys": 0,
+          "lastActiveKeyCalls": 2,
+          "neighborSubjectsCalls": 3,
+          "frameCommits": 4,
+          "frameInstructions": 4,
+          "frameTouchedSubjects": 4
+        }
+      }
+    ]
+  },
+  {
+    "lane": "OAPI",
+    "mode": "active",
+    "exit": 0,
+    "stable": true,
+    "bundle": "c1c64b268a6c8f863c54ef71c49840ed9b0abaa6ecf6fa284c29aef09f90fb70",
+    "runs": [
+      {
+        "size": 100,
+        "status": "pass",
+        "summary": {
+          "publicMutations": 4,
+          "membershipEvents": 3,
+          "snapshotCalls": 0,
+          "cacheHits": 0,
+          "cacheMisses": 0,
+          "visitedKeys": 0,
+          "activeOrderWalkCalls": 0,
+          "activeOrderVisitedKeys": 0,
+          "lastActiveKeyCalls": 2,
+          "neighborSubjectsCalls": 3,
+          "frameCommits": 3,
+          "frameInstructions": 3,
+          "frameTouchedSubjects": 3
+        }
+      },
+      {
+        "size": 1000,
+        "status": "pass",
+        "summary": {
+          "publicMutations": 4,
+          "membershipEvents": 3,
+          "snapshotCalls": 0,
+          "cacheHits": 0,
+          "cacheMisses": 0,
+          "visitedKeys": 0,
+          "activeOrderWalkCalls": 0,
+          "activeOrderVisitedKeys": 0,
+          "lastActiveKeyCalls": 2,
+          "neighborSubjectsCalls": 3,
+          "frameCommits": 3,
+          "frameInstructions": 3,
+          "frameTouchedSubjects": 3
+        }
+      },
+      {
+        "size": 10000,
+        "status": "pass",
+        "summary": {
+          "publicMutations": 4,
+          "membershipEvents": 3,
+          "snapshotCalls": 0,
+          "cacheHits": 0,
+          "cacheMisses": 0,
+          "visitedKeys": 0,
+          "activeOrderWalkCalls": 0,
+          "activeOrderVisitedKeys": 0,
+          "lastActiveKeyCalls": 2,
+          "neighborSubjectsCalls": 3,
+          "frameCommits": 3,
+          "frameInstructions": 3,
+          "frameTouchedSubjects": 3
+        }
+      },
+      {
+        "size": 30000,
+        "status": "pass",
+        "summary": {
+          "publicMutations": 4,
+          "membershipEvents": 3,
+          "snapshotCalls": 0,
+          "cacheHits": 0,
+          "cacheMisses": 0,
+          "visitedKeys": 0,
+          "activeOrderWalkCalls": 0,
+          "activeOrderVisitedKeys": 0,
+          "lastActiveKeyCalls": 2,
+          "neighborSubjectsCalls": 3,
+          "frameCommits": 3,
+          "frameInstructions": 3,
+          "frameTouchedSubjects": 3
+        }
+      }
+    ]
+  }
+]

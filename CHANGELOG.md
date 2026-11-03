@@ -1,5 +1,50 @@
 ## 16.0.0-dev (unreleased)
 
+### Conditional publication declarations
+
+A supported owned Link can `declare(declaration, work)` around synchronous writes.
+Declare all contributing pending owners, independence only when there are no such
+inputs, or unknown completeness. A `PublicationReceipt` exposes a current
+`PublicationState` through `read()`; admission is distinct from endpoint delivery.
+Declarations do not transfer write ownership, infer hidden application inputs or
+provide backend authentication/durability.
+
+Invalid declarations throw `SignalTreePublicationError`. Its `stage` distinguishes
+rejection before the callback from validation after writes may already remain;
+`reason` identifies the rejection. Inspect state before recovery. A no-write
+receipt neither creates a new obligation nor clears an existing obligation.
+
+Native custom adapters must supply `createCurrentReadonlyCell(readCurrent)` so
+retained framework-native readers observe current values/errors on direct reads,
+including during nested writes. Missing capability rejects factory construction;
+ordinary cached readonly behavior is unchanged.
+
+### Read-only runtime observation
+
+Tooling can import `stateLocationReader`, `entityMembershipReader`,
+`linkStateReader`, `transactionLifecycleReader` and `restorationReader` from
+`@signal-tree/kernel/internals`. These observe the constructed tree; they do not
+install enhancers or confer mutation/settlement authority. Use the appropriate
+framework facade for application state, and reserve this entry point for tooling.
+
+- `stateLocationReader` resolves structured property/entity addresses and current
+  entity lifetimes. Do not parse dotted display paths as identity.
+- `entityMembershipReader` exposes current collection membership and changes.
+- `linkStateReader` observes Link state; local completion is not proof of remote
+  durable persistence beyond the endpoint's contract.
+- `transactionLifecycleReader` exposes pending transactions and settlement/refusal
+  observations, including whether pending authority remains.
+- `restorationReader` exposes history entries, recorded transaction lineage and undo/redo/jump outcomes.
+
+Check optional-reader availability before use; readers do not enable missing
+capabilities. Release subscriptions when the owning view/session ends, and destroy
+owned trees at teardown. Readers are not a retained audit log.
+`ConfirmedTurnEffectView.fieldSegments` preserves producer-known entity-field
+address segments; `plainBranchMembership` distinguishes member presence before
+and after an effect. Neither display paths nor an absent value can replace those
+facts. Confirmed-history access remains subject to configured retention.
+
+
 **TL;DR** — **Breaking, and deliberately so.** `tree.transaction()` is renamed
 to `tree.transact()` and the old spelling is **removed, not deprecated**. One
 `inspect()` on every transaction handle, plus three new public types. The transaction rollback
@@ -80,6 +125,110 @@ for retired entities.
 
 ### For users
 
+- **Undo, redo and `jumpTo()` never write state an omission has hidden.** A
+  location under an omitted member is restored by re-adding only the way to
+  it when an ordinary write omitted it, or refused with ST1034 when external
+  truth did. Before this, they wrote retained storage and reported success.
+  A pending `rollback()` under an omitted branch restores retained storage, so
+  a rejected value cannot return on a later re-add.
+- **A location under an omitted member reads absent, and writing it re-adds
+  its path.** After a whole-value write omits `a`, `$.a.b.keep()` reads
+  `undefined` (through a held handle too, and in held consumers, which also
+  follow the omission and a re-add); an updater there receives `undefined`.
+  `$.a.b.keep(9)` makes `a` `{ b: { keep: 9 } }`: every omitted member on the
+  path comes back with only that path, and `a`'s other members stay absent.
+  Undo, redo, `jumpTo()` and `rollback()` of that write make them absent
+  again. Before this, such reads returned retained storage and the write went
+  to hidden storage, and undo or rollback of a write that re-added an omitted
+  member left its key present with `undefined`. `updateAndReport()` re-adds
+  an omitted path it supplies too, and a whole value that supplies an omitted
+  key as `undefined` no longer brings it back with its retained value.
+- **An entity collection under an omitted member is absent and empty.**
+  `all()` is `[]`, `byId()` is `undefined`, `count()` is `0`, and held rows
+  read `undefined`. Adding rows re-adds the path with only those rows; the
+  retained rows never come back. Updating or removing a row throws "Entity
+  with id ... not found", as on an empty collection. Undo, redo, `jumpTo()`
+  and `rollback()` of a re-adding write make it absent again. This holds
+  for a collection omitted itself, and in a tree whose root holds only
+  collections. Before this, its methods read and wrote the retained rows.
+- **A row-adding write to an absent collection is checked first.** It is
+  validated and intercepted as on an empty collection before the retained
+  rows are removed, so a write an interceptor blocks, or one with bad input,
+  changes nothing. Before this, the retained rows were already gone.
+- **A write made inside a whole value or a reversal no longer vanishes.** A
+  tap or sync effect that writes an absent location while a whole value or a
+  reversal is applied re-adds that location's path, in any tree. Before this,
+  a write to the same tree went to retained storage and stayed invisible.
+- **Taps read the collection as it is.** Inside a transaction, an undo, a
+  redo, a jump or a rollback, a tap's `all()`, `count()`, `where()` and the
+  other projections, read through the collection, include the change the tap
+  reports; before, they read the collection as it was before the group. A
+  projection cell obtained before the tap still reads its cached value until
+  the group ends. Its row reads are absent-aware during a reversal too.
+- **A duplicated id in one batch call applies sequentially.** `addMany` and
+  `prependMany` in strict mode throw before any interceptor runs or anything
+  is written; `skip` keeps the first copy; `overwrite` keeps the last copy in
+  the first copy's place; `upsertMany` merges each later copy over the
+  earlier result. Interceptors run once per applied copy, and each key is
+  written, announced, tapped and returned once. Before this, the call put two
+  rows under one key, and `prependMany` corrupted the order so that the next
+  read threw `RangeError: Invalid array length` (v15 `778f86ef`,
+  `e02238f4`).
+- **Reversing a turn that omits a member and writes under it is exact.**
+  Undo or rollback of such a turn restored the members it had written under
+  as `undefined`; history now records what storage held.
+- **Undo, redo, `jumpTo()` and `rollback()` of a write that omitted an entity
+  collection bring it back.** A whole value that leaves out a collection key
+  omits the collection; reversing that write now restores it with the rows it
+  held. Before this, the reversal reported success and left it omitted. If
+  something other than the reversal changed its rows while it was hidden,
+  itself or inside an omitted branch, the reversal refuses and names it; that
+  includes a reversal that re-adds the branch around it.
+- **Settle the newest open transaction first, including across omitted
+  branches.** Rolling back an older transaction while a newer pending one has
+  omitted or re-added a branch enclosing its writes now refuses with the
+  retryable `later-confirmed-dependency`, as an overlapping write already
+  did. Otherwise the older rollback could succeed and the newer one's
+  rollback then bring the rejected value back (as on 15.x). Retry once the
+  newer one settles; that includes a branch holding entity collections,
+  whose rollback no longer fails with "Plain branch target contains an
+  unavailable member".
+- **Link and path observers see what the tree exposes.** A Link (`link()`)
+  endpoint whose location an omission hides (the location, or a member
+  above it) receives `undefined`, or `[]` for a collection. A re-add sends
+  what the location then reads. Undo, redo, `jumpTo()` and `rollback()`
+  publish nothing for a location they leave absent, although they also write
+  its retained storage. **Behaviour change:** an endpoint receives a send
+  when an omission hides its location, or a reversal hides it again. Before
+  this, it kept the last value it was sent, and later received the retained
+  value from a reversal's announcement while the location read absent (v15
+  `c6258aab`).
+- **`jumpTo()` restores what undo and redo restore.** A jump applies every
+  turn it crosses as one installation. Across omissions, re-adds and reused
+  row ids it could report success with a partial, wrong state: a re-added
+  member's older value overwrote the jump's own target, a member it re-added
+  was hidden again, an earlier turn's value won over a later re-add, or rows
+  came back in another order.
+- **A turn that omits and re-adds within itself undoes, redoes and rolls
+  back to its own start and end.** Before this, undo of
+  `x(5); omit g; re-add g` gave back `x` 5, and redo of two path re-adds
+  under one omitted member lost the second. A transaction's rollback had the
+  same defect.
+- **A turn holding two `setAll`s redoes exactly.** Redo of
+  `setAll([a, c]); setAll([a])` in one turn, or a jump over such a turn,
+  threw "no live placement anchor".
+- **A collection order an undo, redo or jump cannot reconstruct is a typed
+  refusal.** It refuses with ST1034, names the collection and says why, and
+  the restoration reader reports `refused`. Nothing changes. **Behaviour
+  change:** before, it threw a plain error (with nothing changed too) that
+  named no collection. The shapes that still refuse are tracked for the
+  15.4.x carry.
+- **Reads, writes and partial merges after an omission cost what they did
+  before omissions existed.** Once every omitted member is back, reads and
+  writes no longer check presence. While one is omitted, each location's
+  check is cached. A partial merge (`updateAndReport()`) no longer examines
+  every key of its branch unless the branch has an omitted member. Each node
+  keeps one copy of its address.
 - **`transact()` — the same optimistic turn, named as a verb.** It matches the
   handle operations it opens (`confirm()`, `rollback()`), and it is the verb
   form of the noun the glossary already teaches. `transaction()` was a noun used

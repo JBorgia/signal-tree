@@ -25,6 +25,11 @@
  */
 import { execFileSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
+
+if (process.argv.includes('--verify-classification')) {
+  execFileSync(process.execPath, ['--test', fileURLToPath(new URL('./check-source-controls.spec.mjs', import.meta.url))], { stdio: 'inherit' });
+}
 
 /** TAB, LF, CR are expected in text. Everything else in C0, plus DEL, is not. */
 const ALLOWED = new Set([0x09, 0x0a, 0x0d]);
@@ -46,7 +51,7 @@ function trackedTextFiles() {
   const out = execFileSync('git', ['ls-files', '-z'], { encoding: 'buffer' });
   const files = out.toString('utf8').split('\0').filter(Boolean);
   // Binary formats legitimately contain C0 bytes; they are not "sources".
-  const BINARY = /\.(png|jpe?g|gif|webp|ico|pdf|woff2?|ttf|eot|zip|gz|docx?|xlsx?|pptx?|mp4|webm|wasm)$/i;
+  const BINARY = /\.(png|jpe?g|gif|webp|ico|pdf|woff2?|ttf|eot|zip|gz|xz|docx?|xlsx?|pptx?|mp4|webm|wasm)$/i;
   return files.filter((f) => !BINARY.test(f));
 }
 

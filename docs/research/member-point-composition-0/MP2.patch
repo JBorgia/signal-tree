@@ -1,0 +1,218 @@
+--- a/packages/kernel/src/lib/internals/plain-branch-membership.ts
++++ b/packages/kernel/src/lib/internals/plain-branch-membership.ts
+@@ -862,10 +862,12 @@
+       readonly value: unknown;
+       readonly turn?: number;
+     }
+-  >
++  >,
++  scalarTargets?: readonly { owner: number; after: unknown; turn?: number }[]
+ ): {
+   install(): void;
+   publish(): void;
++  invalidate(): void;
+   readonly staged: ReadonlyMap<number, number>;
+ } {
+   const registry = getPositionRegistry(root);
+@@ -989,16 +991,70 @@
+   const staged = new Map<number, number>();
+   for (const { position, turn } of values.values())
+     if (turn !== undefined) staged.set(position, turn);
++  // Member values and scalar endpoints share one final frame. Preparing two
++  // frames independently can elide a scalar whose pre-member value is equal.
++  for (const target of scalarTargets ?? []) {
++    if (target.turn !== undefined && (staged.get(target.owner) ?? target.turn) > target.turn) continue;
++    const node = runtime.resolveScalarLeaf(target.owner);
++    if (!node) throw new Error('Plain branch scalar target is unavailable');
++    const { slot, position } = resolveSlot(node);
++    values.set(slot, { node, position,
++      before: values.has(slot) ? values.get(slot)!.before : unwrapBranchForWriteCapture(node),
++      after: target.after, turn: target.turn });
++  }
+   const frame = runtime.beginFrame();
+   for (const [slot, value] of values) frame.set(slot, value.after);
++  const installFrame = scalarTargets === undefined
++    ? () => frame.commit({ advanceRevision: false, publish: false })
++    : frame.prepareCommit?.({ advanceRevision: false, publish: false });
++  if (!installFrame) throw new Error('Plain branch scalar frame cannot be prepared');
+   let result: ScalarSlotCommitResult | undefined;
++  let invalidated = false;
+   let published = false;
+   const changedSlots = new Set<number>();
+   const changedBranches = new Set<object>();
+   const changedBranchMembers: MemberAddress[] = [];
+   let changes: PlainBranchMembershipChange[] = [];
++  const captureChanges = (): void => {
++      const byBranch = new Map<object, PlainBranchMemberChange[]>();
++      for (const { address, present, before } of members.values()) {
++        if (before.present === present) continue;
++        let entries = byBranch.get(address.branch);
++        if (!entries) byBranch.set(address.branch, (entries = []));
++        entries.push({
++          key: address.key,
++          positionIds: getOwnedPositionIds(address.node),
++          before,
++          after: present
++            ? {
++                present: true,
++                value: unwrapBranchForWriteCapture(address.node),
++              }
++            : { present: false },
++        });
++      }
++      changes = [...byBranch].map(([branch, members]) => ({
++        kind: 'plain-branch-membership',
++        branch,
++        members,
++      }));
++  };
++  const invalidate = (): void => {
++    if (!result) throw new Error('Plain branch target invalidated before installation');
++    if (invalidated) return;
++    invalidated = true;
++    withWriteContext({ ...getActiveWriteContext(), intent: 'system', participation: 'realized' }, () => runtime.runInvalidationGroup(() => {
++      for (const branch of changedBranches) publishMembershipChange(branch);
++      for (const { branch, key, node } of changedBranchMembers) {
++        republishMembers(branch, [key]);
++        if (!Object.getOwnPropertyDescriptor(branch, key)?.enumerable) rememberHiddenRows(node);
++      }
++      runtime.publishPrepared({ revision: result!.revision, changedSlots: [...changedSlots] });
++    }));
++  };
+   return {
+     staged,
++    invalidate,
+     install(): void {
+       if (result) return;
+       // Revalidate every retained handle before the first physical write.
+@@ -1014,7 +1070,7 @@
+           );
+         }
+       }
+-      result = frame.commit({ advanceRevision: false, publish: false });
++      result = installFrame();
+       for (const slot of result.changedSlots) changedSlots.add(slot);
+       for (const { address, present } of members.values()) {
+         if (
+@@ -1030,28 +1086,7 @@
+           else changedBranchMembers.push(address);
+         }
+       }
+-      const byBranch = new Map<object, PlainBranchMemberChange[]>();
+-      for (const { address, present, before } of members.values()) {
+-        if (before.present === present) continue;
+-        let entries = byBranch.get(address.branch);
+-        if (!entries) byBranch.set(address.branch, (entries = []));
+-        entries.push({
+-          key: address.key,
+-          positionIds: getOwnedPositionIds(address.node),
+-          before,
+-          after: present
+-            ? {
+-                present: true,
+-                value: unwrapBranchForWriteCapture(address.node),
+-              }
+-            : { present: false },
+-        });
+-      }
+-      changes = [...byBranch].map(([branch, members]) => ({
+-        kind: 'plain-branch-membership',
+-        branch,
+-        members,
+-      }));
++      if (scalarTargets === undefined) captureChanges();
+     },
+     publish(): void {
+       const installed = result;
+@@ -1065,20 +1100,8 @@
+         participation: 'realized',
+       };
+       withWriteContext(meta, () => {
+-        runtime.runInvalidationGroup(() => {
+-          for (const branch of changedBranches) publishMembershipChange(branch);
+-          // What a branch member's presence changes below it (v16 8d).
+-          for (const { branch, key, node } of changedBranchMembers) {
+-            republishMembers(branch, [key]);
+-            // Every participant is installed: these are the rows it keeps.
+-            if (!Object.getOwnPropertyDescriptor(branch, key)?.enumerable)
+-              rememberHiddenRows(node);
+-          }
+-          runtime.publishPrepared({
+-            revision: installed.revision,
+-            changedSlots: [...changedSlots],
+-          });
+-        });
++        invalidate();
++        if (scalarTargets !== undefined) captureChanges();
+         for (const [slot, value] of values) {
+           if (!installed.changedSlots.includes(slot)) continue;
+           const path = getOwnedOwnerPath(value.node);
+--- a/packages/kernel/src/lib/internals/causal-runtime/tree-realization-adapter.ts
++++ b/packages/kernel/src/lib/internals/causal-runtime/tree-realization-adapter.ts
+@@ -654,7 +654,7 @@
+   tree: ISignalTree<object>,
+   effects: readonly ReversalEffect[]
+ ): { install(): void; publish(): void } | undefined {
+-  if (!effects.length || effects.some(effect => effect.structural || effect.plainBranchMembership) ||
++  if (!effects.length || effects.some(effect => effect.structural) ||
+       !effects.some(effect => typeof effect.subjectId === 'number')) return undefined;
+   const descriptors = getTreeRealizationDescriptors(tree.$);
+   const slots = getTreeScalarSlotRuntime(tree) ?? getTreeScalarSlotRuntime(tree.$);
+@@ -662,10 +662,17 @@
+   if (!descriptors || !slots || !clock) return undefined;
+   const baseRevision = clock.revision();
+   const owners = indexStructuralOwnerPaths(tree.$);
++  const memberTargets = new Map<number, { present: boolean; value: unknown; turn?: number }>();
++  for (const effect of effects) if (effect.plainBranchMembership) {
++    memberTargets.delete(effect.owner);
++    memberTargets.set(effect.owner, { present: effect.plainBranchMembership.after, value: effect.after,
++      ...(effect.turn === undefined ? {} : { turn: effect.turn }) });
++  }
+   const rows = new Map<CollectionNode, Map<number, { subjectId: number; key: string | number; value: unknown }>>();
+   const scalarEffects: ReversalEffect[] = [];
+   const frame = slots.beginFrame();
+   for (const effect of effects) {
++    if (effect.plainBranchMembership) continue;
+     if (typeof effect.subjectId !== 'number') {
+       if (effect.subjectFieldSegments !== undefined || hasInlineScopedAddress(effect) || hasInlineSubjectAddress(effect)) return undefined;
+       const slot = slots.resolveScalarSlot(effect.owner);
+@@ -692,30 +699,34 @@
+     else if (effect.fieldPresence?.after === false) row.value = withoutFieldAtSegments(row.value, path);
+     else assignPreparedSubjectValue(row.value, path, effect.after);
+   }
++  const members = memberTargets.size ? preparePlainBranchMembers(tree.$, memberTargets, scalarEffects) : undefined;
+   const collections = [...rows].map(([collection, subjects]) => collection.__preparePointValues!([...subjects.values()]));
+   if (!frame.prepareCommit) return undefined;
+-  const installScalars = frame.prepareCommit({ advanceRevision: false, publish: false });
++  const installScalars = members ? undefined : frame.prepareCommit({ advanceRevision: false, publish: false });
+   if (clock.revision() !== baseRevision) throw new Error('Point realization preparation reentered installation');
+   let result: ReturnType<typeof frame.commit> | undefined;
+   let installed = false;
+   return {
+     install(): void {
+       if (installed || clock.revision() !== baseRevision) throw new Error('Point realization base revision is stale');
+-      result = installScalars();
++      if (members) members.install();
++      else result = installScalars!();
+       for (const collection of collections) collection.install();
+       clock.advance();
+       installed = true;
+     },
+     publish(): void {
+-      if (!installed || !result) throw new Error('Point realization published before installation');
++      if (!installed || (!members && !result)) throw new Error('Point realization published before installation');
+       // Complete all owned invalidation staging before any path or replay callback.
+       let failed = false;
+       let firstError: unknown;
+       const run = (fn: () => void) => { try { fn(); } catch (error) { if (!failed) { failed = true; firstError = error; } } };
+       for (const collection of collections) run(() => collection.invalidate());
+-      run(() => slots.publishPrepared(result!));
++      if (members) run(() => members.invalidate());
++      else run(() => slots.publishPrepared(result!));
++      if (members) run(() => members.publish());
+       for (const collection of collections) run(() => collection.publish());
+-      for (const effect of scalarEffects) run(() => {
++      for (const effect of members ? [] : scalarEffects) run(() => {
+         const descriptor = descriptors.get(effect.owner);
+         const path = resolveNotifyPath(tree, descriptor, owners, effect);
+         if (path) getPathNotifier().notify(path, effect.after, effect.before,

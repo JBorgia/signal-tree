@@ -425,7 +425,9 @@ describe('restoration enhancer', () => {
     if (!realizationPort) {
       throw new Error('Expected tree-owned realization port');
     }
-    const applySpy = vi.spyOn(realizationPort, 'applyAtomically');
+    // Selected scalar compensation prepares on this port; public restored values below witness installation.
+    const prepareSpy = vi.spyOn(realizationPort, 'prepareSelectedUnit');
+    try {
 
     expect(() =>
       store.transact(() => {
@@ -436,10 +438,11 @@ describe('restoration enhancer', () => {
     ).toThrow('boom');
 
     expect(store.$()).toEqual({ left: '', right: '' });
-    expect(applySpy).toHaveBeenCalledTimes(1);
+    expect(prepareSpy).toHaveBeenCalledTimes(1);
 
     const turns = t.getTurns();
     expect(turns).toHaveLength(baseline);
+    } finally { prepareSpy.mockRestore(); }
   });
 
   it('preserves causal order when a pending transaction is confirmed after a later confirmed turn', async () => {
@@ -499,7 +502,9 @@ describe('restoration enhancer', () => {
     if (!realizationPort) {
       throw new Error('Expected tree-owned realization port');
     }
-    const applySpy = vi.spyOn(realizationPort, 'applyAtomically');
+    // Selected scalar compensation prepares on this port; public restored values below witness installation.
+    const prepareSpy = vi.spyOn(realizationPort, 'prepareSelectedUnit');
+    try {
 
     const pending = store.transact(() => {
       undoable(() => store.$.a.x(10));
@@ -511,11 +516,12 @@ describe('restoration enhancer', () => {
 
     pending.rollback();
 
-    expect(applySpy).toHaveBeenCalledTimes(1);
+    expect(prepareSpy).toHaveBeenCalledTimes(1);
     expect(store.$()).toEqual({
       a: { x: 1 },
       b: { y: 20 },
     });
+    } finally { prepareSpy.mockRestore(); }
   });
 
   it('rolls back a pending write while preserving a later sibling write under the same owner', async () => {

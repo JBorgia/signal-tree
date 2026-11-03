@@ -367,8 +367,50 @@ try {
 
 The one ordering to know: settle the **newest** open transaction first. Rolling
 an older one back while a newer overlapping one is open refuses with
-`cause.kind === 'later-pending-dependency'`, because the newer transaction's
-before-image records what the field *held*, not who owns it.
+`cause.kind === 'later-confirmed-dependency'`, because the newer transaction's
+before-image records what the field *held*, not who owns it. A newer pending
+transaction that omitted or re-added a branch enclosing the older one's writes
+overlaps in the same way. The refusal is retryable once the newer transaction
+settles.
+
+### v16 settlement scope
+
+For v16, the supported overlapping workflow is **newest open transaction first**.
+An older overlapping rollback may refuse atomically and remain pending; it does
+not promise successful arbitrary-order removal of contributions. Inspection and
+errors must explain the restriction, and unrelated work—including Link traffic—
+must remain independent. The readiness controller tracks remaining violations;
+this scope statement is not a claim that the current development build is ready.
+
+When the application chooses to reject both overlapping edits, settle the newer
+one before retrying the older one:
+
+```typescript
+import { signalTree, transactions, SignalTreeRollbackError } from '@signal-tree/kernel';
+
+const tree = signalTree({ count: 0 }, { enhancers: [transactions()] });
+try {
+  const older = tree.transact(() => tree.$.count(1));
+  const newer = tree.transact(() => tree.$.count(2));
+
+  try {
+    older.rollback();
+  } catch (error) {
+    if (!(error instanceof SignalTreeRollbackError)) throw error;
+    // Refusal left count=2 and both operations settleable.
+    // Application policy here is to reject both edits.
+    newer.rollback(); // count=1
+    older.rollback(); // count=0; useful retry of retained authority
+  }
+} finally {
+  tree.destroy();
+}
+```
+
+This neutral-kernel example uses callable leaves; framework facades retain their
+native leaf write syntax. It is not a server-conflict policy: applications decide
+which operations to confirm/reject and how to reconcile external responses. The
+library does not promise automatic canonical-server projection or revision arbitration.
 
 ### What `transactions()` does not decide for you
 

@@ -1,0 +1,132 @@
+[
+  {
+    "command": [
+      "node",
+      "docs/research/membership-point-work-0/run.mjs",
+      "base",
+      "point-work.mjs",
+      "off",
+      "first"
+    ],
+    "exit": 1,
+    "stdout": "",
+    "stderr": "\u2718 [ERROR] Could not resolve \"@signal-tree/kernel/internals\"\n\n    docs/research/membership-point-work-0/point-work.mjs:3:39:\n      3 \u2502 ...rt { entityMembershipReader } from '@signal-tree/kernel/internals';\n        \u2575                                       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n\n  The module \"./dist/internals.js\" was not found on the file system:\n\n    node_modules/@signal-tree/kernel/package.json:25:16:\n      25 \u2502       \"import\": \"./dist/internals.js\",\n         \u2575                 ~~~~~~~~~~~~~~~~~~~~~\n\n  You can mark the path \"@signal-tree/kernel/internals\" as external to exclude it from the bundle, which will remove this error and leave the unresolved path in the bundle.\n\n/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/esbuild@0.25.12/node_modules/esbuild/lib/main.js:1467\n  let error = new Error(text);\n              ^\n\nError: Build failed with 1 error:\ndocs/research/membership-point-work-0/point-work.mjs:3:39: ERROR: Could not resolve \"@signal-tree/kernel/internals\"\n    at failureErrorWithLog (/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/esbuild@0.25.12/node_modules/esbuild/lib/main.js:1467:15)\n    at /Users/jonathanborgia/code/signaltree/node_modules/.pnpm/esbuild@0.25.12/node_modules/esbuild/lib/main.js:926:25\n    at runOnEndCallbacks (/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/esbuild@0.25.12/node_modules/esbuild/lib/main.js:1307:45)\n    at buildResponseToResult (/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/esbuild@0.25.12/node_modules/esbuild/lib/main.js:924:7)\n    at /Users/jonathanborgia/code/signaltree/node_modules/.pnpm/esbuild@0.25.12/node_modules/esbuild/lib/main.js:951:16\n    at responseCallbacks.<computed> (/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/esbuild@0.25.12/node_modules/esbuild/lib/main.js:603:9)\n    at handleIncomingPacket (/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/esbuild@0.25.12/node_modules/esbuild/lib/main.js:658:12)\n    at Socket.readFromStdout (/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/esbuild@0.25.12/node_modules/esbuild/lib/main.js:581:7)\n    at Socket.emit (node:events:509:28)\n    at addChunk (node:internal/streams/readable:563:12) {\n  errors: [Getter/Setter],\n  warnings: [Getter/Setter]\n}\n\nNode.js v24.15.0\n"
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/membership-point-work-0/run.mjs",
+      "base",
+      "point-work.mjs",
+      "active",
+      "first"
+    ],
+    "exit": 1,
+    "stdout": "",
+    "stderr": "\u2718 [ERROR] Could not resolve \"@signal-tree/kernel/internals\"\n\n    docs/research/membership-point-work-0/point-work.mjs:3:39:\n      3 \u2502 ...rt { entityMembershipReader } from '@signal-tree/kernel/internals';\n        \u2575                                       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n\n  The module \"./dist/internals.js\" was not found on the file system:\n\n    node_modules/@signal-tree/kernel/package.json:25:16:\n      25 \u2502       \"import\": \"./dist/internals.js\",\n         \u2575                 ~~~~~~~~~~~~~~~~~~~~~\n\n  You can mark the path \"@signal-tree/kernel/internals\" as external to exclude it from the bundle, which will remove this error and leave the unresolved path in the bundle.\n\n/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/esbuild@0.25.12/node_modules/esbuild/lib/main.js:1467\n  let error = new Error(text);\n              ^\n\nError: Build failed with 1 error:\ndocs/research/membership-point-work-0/point-work.mjs:3:39: ERROR: Could not resolve \"@signal-tree/kernel/internals\"\n    at failureErrorWithLog (/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/esbuild@0.25.12/node_modules/esbuild/lib/main.js:1467:15)\n    at /Users/jonathanborgia/code/signaltree/node_modules/.pnpm/esbuild@0.25.12/node_modules/esbuild/lib/main.js:926:25\n    at runOnEndCallbacks (/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/esbuild@0.25.12/node_modules/esbuild/lib/main.js:1307:45)\n    at buildResponseToResult (/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/esbuild@0.25.12/node_modules/esbuild/lib/main.js:924:7)\n    at /Users/jonathanborgia/code/signaltree/node_modules/.pnpm/esbuild@0.25.12/node_modules/esbuild/lib/main.js:951:16\n    at responseCallbacks.<computed> (/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/esbuild@0.25.12/node_modules/esbuild/lib/main.js:603:9)\n    at handleIncomingPacket (/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/esbuild@0.25.12/node_modules/esbuild/lib/main.js:658:12)\n    at Socket.readFromStdout (/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/esbuild@0.25.12/node_modules/esbuild/lib/main.js:581:7)\n    at Socket.emit (node:events:509:28)\n    at addChunk (node:internal/streams/readable:563:12) {\n  errors: [Getter/Setter],\n  warnings: [Getter/Setter]\n}\n\nNode.js v24.15.0\n"
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/membership-point-work-0/run.mjs",
+      "D2",
+      "point-work.mjs",
+      "off",
+      "first"
+    ],
+    "exit": 1,
+    "stdout": "",
+    "stderr": "\u2718 [ERROR] Could not resolve \"@signal-tree/kernel/internals\"\n\n    docs/research/membership-point-work-0/point-work.mjs:3:39:\n      3 \u2502 ...rt { entityMembershipReader } from '@signal-tree/kernel/internals';\n        \u2575                                       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n\n  The module \"./dist/internals.js\" was not found on the file system:\n\n    node_modules/@signal-tree/kernel/package.json:25:16:\n      25 \u2502       \"import\": \"./dist/internals.js\",\n         \u2575                 ~~~~~~~~~~~~~~~~~~~~~\n\n  You can mark the path \"@signal-tree/kernel/internals\" as external to exclude it from the bundle, which will remove this error and leave the unresolved path in the bundle.\n\n/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/esbuild@0.25.12/node_modules/esbuild/lib/main.js:1467\n  let error = new Error(text);\n              ^\n\nError: Build failed with 1 error:\ndocs/research/membership-point-work-0/point-work.mjs:3:39: ERROR: Could not resolve \"@signal-tree/kernel/internals\"\n    at failureErrorWithLog (/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/esbuild@0.25.12/node_modules/esbuild/lib/main.js:1467:15)\n    at /Users/jonathanborgia/code/signaltree/node_modules/.pnpm/esbuild@0.25.12/node_modules/esbuild/lib/main.js:926:25\n    at runOnEndCallbacks (/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/esbuild@0.25.12/node_modules/esbuild/lib/main.js:1307:45)\n    at buildResponseToResult (/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/esbuild@0.25.12/node_modules/esbuild/lib/main.js:924:7)\n    at /Users/jonathanborgia/code/signaltree/node_modules/.pnpm/esbuild@0.25.12/node_modules/esbuild/lib/main.js:951:16\n    at responseCallbacks.<computed> (/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/esbuild@0.25.12/node_modules/esbuild/lib/main.js:603:9)\n    at handleIncomingPacket (/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/esbuild@0.25.12/node_modules/esbuild/lib/main.js:658:12)\n    at Socket.readFromStdout (/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/esbuild@0.25.12/node_modules/esbuild/lib/main.js:581:7)\n    at Socket.emit (node:events:509:28)\n    at addChunk (node:internal/streams/readable:563:12) {\n  errors: [Getter/Setter],\n  warnings: [Getter/Setter]\n}\n\nNode.js v24.15.0\n"
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/membership-point-work-0/run.mjs",
+      "D2",
+      "point-work.mjs",
+      "active",
+      "first"
+    ],
+    "exit": 1,
+    "stdout": "",
+    "stderr": "\u2718 [ERROR] Could not resolve \"@signal-tree/kernel/internals\"\n\n    docs/research/membership-point-work-0/point-work.mjs:3:39:\n      3 \u2502 ...rt { entityMembershipReader } from '@signal-tree/kernel/internals';\n        \u2575                                       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n\n  The module \"./dist/internals.js\" was not found on the file system:\n\n    node_modules/@signal-tree/kernel/package.json:25:16:\n      25 \u2502       \"import\": \"./dist/internals.js\",\n         \u2575                 ~~~~~~~~~~~~~~~~~~~~~\n\n  You can mark the path \"@signal-tree/kernel/internals\" as external to exclude it from the bundle, which will remove this error and leave the unresolved path in the bundle.\n\n/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/esbuild@0.25.12/node_modules/esbuild/lib/main.js:1467\n  let error = new Error(text);\n              ^\n\nError: Build failed with 1 error:\ndocs/research/membership-point-work-0/point-work.mjs:3:39: ERROR: Could not resolve \"@signal-tree/kernel/internals\"\n    at failureErrorWithLog (/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/esbuild@0.25.12/node_modules/esbuild/lib/main.js:1467:15)\n    at /Users/jonathanborgia/code/signaltree/node_modules/.pnpm/esbuild@0.25.12/node_modules/esbuild/lib/main.js:926:25\n    at runOnEndCallbacks (/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/esbuild@0.25.12/node_modules/esbuild/lib/main.js:1307:45)\n    at buildResponseToResult (/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/esbuild@0.25.12/node_modules/esbuild/lib/main.js:924:7)\n    at /Users/jonathanborgia/code/signaltree/node_modules/.pnpm/esbuild@0.25.12/node_modules/esbuild/lib/main.js:951:16\n    at responseCallbacks.<computed> (/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/esbuild@0.25.12/node_modules/esbuild/lib/main.js:603:9)\n    at handleIncomingPacket (/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/esbuild@0.25.12/node_modules/esbuild/lib/main.js:658:12)\n    at Socket.readFromStdout (/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/esbuild@0.25.12/node_modules/esbuild/lib/main.js:581:7)\n    at Socket.emit (node:events:509:28)\n    at addChunk (node:internal/streams/readable:563:12) {\n  errors: [Getter/Setter],\n  warnings: [Getter/Setter]\n}\n\nNode.js v24.15.0\n"
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/membership-point-work-0/run.mjs",
+      "D2I",
+      "point-work.mjs",
+      "off",
+      "first"
+    ],
+    "exit": 1,
+    "stdout": "",
+    "stderr": "\u2718 [ERROR] Could not resolve \"@signal-tree/kernel/internals\"\n\n    docs/research/membership-point-work-0/point-work.mjs:3:39:\n      3 \u2502 ...rt { entityMembershipReader } from '@signal-tree/kernel/internals';\n        \u2575                                       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n\n  The module \"./dist/internals.js\" was not found on the file system:\n\n    node_modules/@signal-tree/kernel/package.json:25:16:\n      25 \u2502       \"import\": \"./dist/internals.js\",\n         \u2575                 ~~~~~~~~~~~~~~~~~~~~~\n\n  You can mark the path \"@signal-tree/kernel/internals\" as external to exclude it from the bundle, which will remove this error and leave the unresolved path in the bundle.\n\n/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/esbuild@0.25.12/node_modules/esbuild/lib/main.js:1467\n  let error = new Error(text);\n              ^\n\nError: Build failed with 1 error:\ndocs/research/membership-point-work-0/point-work.mjs:3:39: ERROR: Could not resolve \"@signal-tree/kernel/internals\"\n    at failureErrorWithLog (/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/esbuild@0.25.12/node_modules/esbuild/lib/main.js:1467:15)\n    at /Users/jonathanborgia/code/signaltree/node_modules/.pnpm/esbuild@0.25.12/node_modules/esbuild/lib/main.js:926:25\n    at runOnEndCallbacks (/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/esbuild@0.25.12/node_modules/esbuild/lib/main.js:1307:45)\n    at buildResponseToResult (/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/esbuild@0.25.12/node_modules/esbuild/lib/main.js:924:7)\n    at /Users/jonathanborgia/code/signaltree/node_modules/.pnpm/esbuild@0.25.12/node_modules/esbuild/lib/main.js:951:16\n    at responseCallbacks.<computed> (/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/esbuild@0.25.12/node_modules/esbuild/lib/main.js:603:9)\n    at handleIncomingPacket (/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/esbuild@0.25.12/node_modules/esbuild/lib/main.js:658:12)\n    at Socket.readFromStdout (/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/esbuild@0.25.12/node_modules/esbuild/lib/main.js:581:7)\n    at Socket.emit (node:events:509:28)\n    at addChunk (node:internal/streams/readable:563:12) {\n  errors: [Getter/Setter],\n  warnings: [Getter/Setter]\n}\n\nNode.js v24.15.0\n"
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/membership-point-work-0/run.mjs",
+      "D2I",
+      "point-work.mjs",
+      "active",
+      "first"
+    ],
+    "exit": 1,
+    "stdout": "",
+    "stderr": "\u2718 [ERROR] Could not resolve \"@signal-tree/kernel/internals\"\n\n    docs/research/membership-point-work-0/point-work.mjs:3:39:\n      3 \u2502 ...rt { entityMembershipReader } from '@signal-tree/kernel/internals';\n        \u2575                                       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n\n  The module \"./dist/internals.js\" was not found on the file system:\n\n    node_modules/@signal-tree/kernel/package.json:25:16:\n      25 \u2502       \"import\": \"./dist/internals.js\",\n         \u2575                 ~~~~~~~~~~~~~~~~~~~~~\n\n  You can mark the path \"@signal-tree/kernel/internals\" as external to exclude it from the bundle, which will remove this error and leave the unresolved path in the bundle.\n\n/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/esbuild@0.25.12/node_modules/esbuild/lib/main.js:1467\n  let error = new Error(text);\n              ^\n\nError: Build failed with 1 error:\ndocs/research/membership-point-work-0/point-work.mjs:3:39: ERROR: Could not resolve \"@signal-tree/kernel/internals\"\n    at failureErrorWithLog (/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/esbuild@0.25.12/node_modules/esbuild/lib/main.js:1467:15)\n    at /Users/jonathanborgia/code/signaltree/node_modules/.pnpm/esbuild@0.25.12/node_modules/esbuild/lib/main.js:926:25\n    at runOnEndCallbacks (/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/esbuild@0.25.12/node_modules/esbuild/lib/main.js:1307:45)\n    at buildResponseToResult (/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/esbuild@0.25.12/node_modules/esbuild/lib/main.js:924:7)\n    at /Users/jonathanborgia/code/signaltree/node_modules/.pnpm/esbuild@0.25.12/node_modules/esbuild/lib/main.js:951:16\n    at responseCallbacks.<computed> (/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/esbuild@0.25.12/node_modules/esbuild/lib/main.js:603:9)\n    at handleIncomingPacket (/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/esbuild@0.25.12/node_modules/esbuild/lib/main.js:658:12)\n    at Socket.readFromStdout (/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/esbuild@0.25.12/node_modules/esbuild/lib/main.js:581:7)\n    at Socket.emit (node:events:509:28)\n    at addChunk (node:internal/streams/readable:563:12) {\n  errors: [Getter/Setter],\n  warnings: [Getter/Setter]\n}\n\nNode.js v24.15.0\n"
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/membership-point-work-0/run.mjs",
+      "OAP",
+      "point-work.mjs",
+      "off",
+      "first"
+    ],
+    "exit": 1,
+    "stdout": "",
+    "stderr": "\u2718 [ERROR] Could not resolve \"@signal-tree/kernel/internals\"\n\n    docs/research/membership-point-work-0/point-work.mjs:3:39:\n      3 \u2502 ...rt { entityMembershipReader } from '@signal-tree/kernel/internals';\n        \u2575                                       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n\n  The module \"./dist/internals.js\" was not found on the file system:\n\n    node_modules/@signal-tree/kernel/package.json:25:16:\n      25 \u2502       \"import\": \"./dist/internals.js\",\n         \u2575                 ~~~~~~~~~~~~~~~~~~~~~\n\n  You can mark the path \"@signal-tree/kernel/internals\" as external to exclude it from the bundle, which will remove this error and leave the unresolved path in the bundle.\n\n/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/esbuild@0.25.12/node_modules/esbuild/lib/main.js:1467\n  let error = new Error(text);\n              ^\n\nError: Build failed with 1 error:\ndocs/research/membership-point-work-0/point-work.mjs:3:39: ERROR: Could not resolve \"@signal-tree/kernel/internals\"\n    at failureErrorWithLog (/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/esbuild@0.25.12/node_modules/esbuild/lib/main.js:1467:15)\n    at /Users/jonathanborgia/code/signaltree/node_modules/.pnpm/esbuild@0.25.12/node_modules/esbuild/lib/main.js:926:25\n    at runOnEndCallbacks (/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/esbuild@0.25.12/node_modules/esbuild/lib/main.js:1307:45)\n    at buildResponseToResult (/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/esbuild@0.25.12/node_modules/esbuild/lib/main.js:924:7)\n    at /Users/jonathanborgia/code/signaltree/node_modules/.pnpm/esbuild@0.25.12/node_modules/esbuild/lib/main.js:951:16\n    at responseCallbacks.<computed> (/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/esbuild@0.25.12/node_modules/esbuild/lib/main.js:603:9)\n    at handleIncomingPacket (/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/esbuild@0.25.12/node_modules/esbuild/lib/main.js:658:12)\n    at Socket.readFromStdout (/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/esbuild@0.25.12/node_modules/esbuild/lib/main.js:581:7)\n    at Socket.emit (node:events:509:28)\n    at addChunk (node:internal/streams/readable:563:12) {\n  errors: [Getter/Setter],\n  warnings: [Getter/Setter]\n}\n\nNode.js v24.15.0\n"
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/membership-point-work-0/run.mjs",
+      "OAP",
+      "point-work.mjs",
+      "active",
+      "first"
+    ],
+    "exit": 1,
+    "stdout": "",
+    "stderr": "\u2718 [ERROR] Could not resolve \"@signal-tree/kernel/internals\"\n\n    docs/research/membership-point-work-0/point-work.mjs:3:39:\n      3 \u2502 ...rt { entityMembershipReader } from '@signal-tree/kernel/internals';\n        \u2575                                       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n\n  The module \"./dist/internals.js\" was not found on the file system:\n\n    node_modules/@signal-tree/kernel/package.json:25:16:\n      25 \u2502       \"import\": \"./dist/internals.js\",\n         \u2575                 ~~~~~~~~~~~~~~~~~~~~~\n\n  You can mark the path \"@signal-tree/kernel/internals\" as external to exclude it from the bundle, which will remove this error and leave the unresolved path in the bundle.\n\n/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/esbuild@0.25.12/node_modules/esbuild/lib/main.js:1467\n  let error = new Error(text);\n              ^\n\nError: Build failed with 1 error:\ndocs/research/membership-point-work-0/point-work.mjs:3:39: ERROR: Could not resolve \"@signal-tree/kernel/internals\"\n    at failureErrorWithLog (/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/esbuild@0.25.12/node_modules/esbuild/lib/main.js:1467:15)\n    at /Users/jonathanborgia/code/signaltree/node_modules/.pnpm/esbuild@0.25.12/node_modules/esbuild/lib/main.js:926:25\n    at runOnEndCallbacks (/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/esbuild@0.25.12/node_modules/esbuild/lib/main.js:1307:45)\n    at buildResponseToResult (/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/esbuild@0.25.12/node_modules/esbuild/lib/main.js:924:7)\n    at /Users/jonathanborgia/code/signaltree/node_modules/.pnpm/esbuild@0.25.12/node_modules/esbuild/lib/main.js:951:16\n    at responseCallbacks.<computed> (/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/esbuild@0.25.12/node_modules/esbuild/lib/main.js:603:9)\n    at handleIncomingPacket (/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/esbuild@0.25.12/node_modules/esbuild/lib/main.js:658:12)\n    at Socket.readFromStdout (/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/esbuild@0.25.12/node_modules/esbuild/lib/main.js:581:7)\n    at Socket.emit (node:events:509:28)\n    at addChunk (node:internal/streams/readable:563:12) {\n  errors: [Getter/Setter],\n  warnings: [Getter/Setter]\n}\n\nNode.js v24.15.0\n"
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/membership-point-work-0/run.mjs",
+      "OAPI",
+      "point-work.mjs",
+      "off",
+      "first"
+    ],
+    "exit": 1,
+    "stdout": "",
+    "stderr": "\u2718 [ERROR] Could not resolve \"@signal-tree/kernel/internals\"\n\n    docs/research/membership-point-work-0/point-work.mjs:3:39:\n      3 \u2502 ...rt { entityMembershipReader } from '@signal-tree/kernel/internals';\n        \u2575                                       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n\n  The module \"./dist/internals.js\" was not found on the file system:\n\n    node_modules/@signal-tree/kernel/package.json:25:16:\n      25 \u2502       \"import\": \"./dist/internals.js\",\n         \u2575                 ~~~~~~~~~~~~~~~~~~~~~\n\n  You can mark the path \"@signal-tree/kernel/internals\" as external to exclude it from the bundle, which will remove this error and leave the unresolved path in the bundle.\n\n/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/esbuild@0.25.12/node_modules/esbuild/lib/main.js:1467\n  let error = new Error(text);\n              ^\n\nError: Build failed with 1 error:\ndocs/research/membership-point-work-0/point-work.mjs:3:39: ERROR: Could not resolve \"@signal-tree/kernel/internals\"\n    at failureErrorWithLog (/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/esbuild@0.25.12/node_modules/esbuild/lib/main.js:1467:15)\n    at /Users/jonathanborgia/code/signaltree/node_modules/.pnpm/esbuild@0.25.12/node_modules/esbuild/lib/main.js:926:25\n    at runOnEndCallbacks (/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/esbuild@0.25.12/node_modules/esbuild/lib/main.js:1307:45)\n    at buildResponseToResult (/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/esbuild@0.25.12/node_modules/esbuild/lib/main.js:924:7)\n    at /Users/jonathanborgia/code/signaltree/node_modules/.pnpm/esbuild@0.25.12/node_modules/esbuild/lib/main.js:951:16\n    at responseCallbacks.<computed> (/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/esbuild@0.25.12/node_modules/esbuild/lib/main.js:603:9)\n    at handleIncomingPacket (/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/esbuild@0.25.12/node_modules/esbuild/lib/main.js:658:12)\n    at Socket.readFromStdout (/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/esbuild@0.25.12/node_modules/esbuild/lib/main.js:581:7)\n    at Socket.emit (node:events:509:28)\n    at addChunk (node:internal/streams/readable:563:12) {\n  errors: [Getter/Setter],\n  warnings: [Getter/Setter]\n}\n\nNode.js v24.15.0\n"
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/membership-point-work-0/run.mjs",
+      "OAPI",
+      "point-work.mjs",
+      "active",
+      "first"
+    ],
+    "exit": 1,
+    "stdout": "",
+    "stderr": "\u2718 [ERROR] Could not resolve \"@signal-tree/kernel/internals\"\n\n    docs/research/membership-point-work-0/point-work.mjs:3:39:\n      3 \u2502 ...rt { entityMembershipReader } from '@signal-tree/kernel/internals';\n        \u2575                                       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n\n  The module \"./dist/internals.js\" was not found on the file system:\n\n    node_modules/@signal-tree/kernel/package.json:25:16:\n      25 \u2502       \"import\": \"./dist/internals.js\",\n         \u2575                 ~~~~~~~~~~~~~~~~~~~~~\n\n  You can mark the path \"@signal-tree/kernel/internals\" as external to exclude it from the bundle, which will remove this error and leave the unresolved path in the bundle.\n\n/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/esbuild@0.25.12/node_modules/esbuild/lib/main.js:1467\n  let error = new Error(text);\n              ^\n\nError: Build failed with 1 error:\ndocs/research/membership-point-work-0/point-work.mjs:3:39: ERROR: Could not resolve \"@signal-tree/kernel/internals\"\n    at failureErrorWithLog (/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/esbuild@0.25.12/node_modules/esbuild/lib/main.js:1467:15)\n    at /Users/jonathanborgia/code/signaltree/node_modules/.pnpm/esbuild@0.25.12/node_modules/esbuild/lib/main.js:926:25\n    at runOnEndCallbacks (/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/esbuild@0.25.12/node_modules/esbuild/lib/main.js:1307:45)\n    at buildResponseToResult (/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/esbuild@0.25.12/node_modules/esbuild/lib/main.js:924:7)\n    at /Users/jonathanborgia/code/signaltree/node_modules/.pnpm/esbuild@0.25.12/node_modules/esbuild/lib/main.js:951:16\n    at responseCallbacks.<computed> (/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/esbuild@0.25.12/node_modules/esbuild/lib/main.js:603:9)\n    at handleIncomingPacket (/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/esbuild@0.25.12/node_modules/esbuild/lib/main.js:658:12)\n    at Socket.readFromStdout (/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/esbuild@0.25.12/node_modules/esbuild/lib/main.js:581:7)\n    at Socket.emit (node:events:509:28)\n    at addChunk (node:internal/streams/readable:563:12) {\n  errors: [Getter/Setter],\n  warnings: [Getter/Setter]\n}\n\nNode.js v24.15.0\n"
+  }
+]

@@ -1,0 +1,15 @@
+import {createRequire} from 'node:module';
+import {readFileSync,writeFileSync} from 'node:fs';
+import {createHash} from 'node:crypto';
+import {execFileSync} from 'node:child_process';
+const root='/Users/jonathanborgia/.codex/worktrees/v16-incumbent-readiness/signaltree';
+const dir='/private/tmp/link-adoption-outbox';
+const {build}=createRequire(root+'/package.json')('esbuild');
+const hash=s=>createHash('sha256').update(s).digest('hex');
+const inputs={};
+const b=await build({entryPoints:[dir+'/test.ts'],bundle:true,write:false,platform:'node',format:'esm',target:'node24',alias:{'@signal-tree/kernel/internals':root+'/packages/kernel/src/internals.ts','@signal-tree/kernel':root+'/packages/kernel/src/index.ts'},plugins:[{name:'receipt',setup(b){b.onLoad({filter:/\.ts$/},({path})=>{const contents=readFileSync(path,'utf8');inputs[path]=hash(contents);return {contents,loader:'ts'};});}}]});
+const receipt={head:execFileSync('git',['rev-parse','HEAD'],{cwd:root,encoding:'utf8'}).trim(),node:process.version,inputs,bundleHash:hash(b.outputFiles[0].text)};
+writeFileSync(dir+'/source-receipt.json',JSON.stringify(receipt,null,2)+'\n');
+writeFileSync(dir+'/bundle.mjs',b.outputFiles[0].text);
+const result=await(await import(dir+'/bundle.mjs?run='+Date.now())).run();
+writeFileSync(dir+'/results.json',JSON.stringify(result,null,2)+'\n');

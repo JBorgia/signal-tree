@@ -1,0 +1,22 @@
+import { expect, it } from 'vitest';
+import { EntityPlacementStage } from './entity-placement-stage';
+import { EntityOrdinaryTopology } from './entity-ordinary-topology';
+it('reuses only an explicitly supplied immutable after-row and never freezes the live row', () => {
+  const stage = new EntityPlacementStage<string>(() => ({present:false}), undefined, undefined);
+  stage.insert(1, 'a');
+  const live=stage.patch.get(1)!;
+  const entries=stage.capturePatch();
+  expect(entries[0][1]).not.toBe(live);
+  expect(Object.isFrozen(live)).toBe(false);
+  const topology=new EntityOrdinaryTopology<string>();
+  const shared=topology.prepareInterval(stage,entries);
+  expect(shared.pairs[0].after).toBe(entries[0][1]);
+  const mutableEntries=[...stage.patch];
+  const defensive=topology.prepareInterval(stage,mutableEntries);
+  expect(defensive.pairs[0].after).not.toBe(live);
+  const ordinary=topology.prepareInterval(stage);
+  expect(ordinary.pairs[0].after).not.toBe(live);
+  stage.rekey(1,'b');
+  expect(shared.pairs[0].after).toEqual({present:true,key:'a',beforeSubject:undefined,afterSubject:undefined});
+  expect(defensive.pairs[0].after).toEqual(shared.pairs[0].after);
+});

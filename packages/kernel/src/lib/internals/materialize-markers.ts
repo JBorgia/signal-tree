@@ -1,5 +1,13 @@
+import type {ConstructionAllocation,PreparedMemberConstruction} from './construction-allocation';
+import { inheritObservationForAddedMember } from './observation-substrate';
+import { installTerminalRecord, combineTerminalRecords, membershipPublicationPreparer, completePreparedPublication } from './intrinsic-mutation';
+import { reportContainedObserverError } from './error-reporter';
+import type { TerminalRecordPlan } from './intrinsic-mutation';
 import { getOwnedPositionIds } from './owned-metadata';
 import {
+  childAddressOf,
+  getNodeAddress,
+  getPositionRegistry,
   createPositionRegistry,
   defineNodeAddress,
   type PositionRegistry,
@@ -17,11 +25,15 @@ import type { RuntimeTreePlan } from './runtime-tree-plan';
 import type { TreeCapability } from '../types';
 import {
   bindSnapshotParent,
+  markSnapshotInstalled,
   markSnapshotVolatile,
   materializeSnapshotNode,
   publishMembershipChange,
 } from './snapshot-authority';
 import { pathObservation } from './path-observation-port';
+import { ordinaryMemberSnapshot } from './plain-branch-membership';
+import { prepareNativeMemberOccurrences } from './native-occurrence';
+import { linkAddedMember, prepareFreshMemberPresence } from './member-membership';
 // ⚠️ THE PORT, NOT THE ENGINE. Marker processors are handed the neutral
 // observation port; the only thing any of them calls on it is `notify`. Typing
 // this as `PathObservationPort` claimed the whole engine surface and is what let a
@@ -84,6 +96,8 @@ declare const ngDevMode: boolean | undefined;
 export type HydrateMode = 'merge' | 'restore' | 'rehydrate' | 'transfer';
 
 export interface MaterializationContext {
+  onDispose?: (callback: () => void) => () => void;
+  dispose?: () => void;
   readonly locationRuntime: LocationRuntime;
   positionRegistry: PositionRegistry;
   positionTopologyEnabled: boolean;
@@ -138,7 +152,20 @@ export function createMaterializationContext(
   )
 ): MaterializationContext {
   const positionRegistry = createPositionRegistry();
+  const cleanup = new Set<() => void>();
+  let disposed = false;
   return {
+    onDispose(callback) {
+      if (disposed) { callback(); return () => undefined; }
+      cleanup.add(callback);
+      return () => { cleanup.delete(callback); };
+    },
+    dispose() {
+      if (disposed) return;
+      disposed = true;
+      for (const callback of cleanup) callback();
+      cleanup.clear();
+    },
     locationRuntime,
     positionRegistry,
     positionTopologyEnabled,
@@ -758,8 +785,50 @@ export function materializeMember(
   ];
   if (!bind) return undefined;
 
-  const child = bind(key, value); // may throw — nothing observable yet
+  const prepared = bind(key, value); // source owns cancellation if construction throws
+  try {
+    installPreparedMember(branch as object,key,prepared.child,prepared.responsibility,prepared.allocation);
+    return prepared.child;
+  } finally {prepared.allocation.cancel();}
+}
 
+/** Install both physical halves and their records. Construction-owned children
+ * invalidate membership before callback-capable completion; other callers own
+ * their existing publication boundary. */
+export function installPreparedMember(
+  branch: object,
+  key: string,
+  child: unknown,
+  responsibility?: TerminalRecordPlan,
+  allocation?: ConstructionAllocation
+): void {
+  const constructionTargets = allocation ? [branch,...((branch as Record<symbol,unknown>)[NODE_STORE_SYMBOL]
+    && (branch as Record<symbol,unknown>)[NODE_STORE_SYMBOL]!==branch
+    ? [(branch as Record<symbol,unknown>)[NODE_STORE_SYMBOL] as object] : [])]
+    .map(target=>({target,before:Object.getOwnPropertyDescriptor(target,key)})) : [];
+  const prepare = membershipPublicationPreparer;
+  const registry = prepare ? getPositionRegistry(branch) : undefined;
+  const address = registry ? getNodeAddress(branch) : undefined;
+  const fresh = isTraversableNode(child) ? prepareFreshMemberPresence(branch,key,child) : undefined;
+  const occurrence = prepare && registry && address && isTraversableNode(child)
+    ? prepareNativeMemberOccurrences(branch,key,child) : undefined;
+  // Read the detached canonical child's ordinary image before any install or delivery.
+  const ordinary = fresh ? {before:{present:false as const},after:fresh.present
+    ? {present:true as const,value:ordinaryMemberSnapshot(child)} : {present:false as const}} : undefined;
+  const unit = prepare && registry && address && isTraversableNode(child)
+    ? prepare({registry,branch,address,key,child,present:true,ordinary,preparedOccurrences:occurrence?.occurrences}) : undefined;
+  fresh?.validate();occurrence?.validate();allocation?.validate();
+  for(const {target,before} of constructionTargets){
+    const after=Object.getOwnPropertyDescriptor(target,key);
+    const same=before===undefined ? after===undefined : after!==undefined &&
+      before.value===after.value && before.get===after.get && before.set===after.set &&
+      before.configurable===after.configurable && before.enumerable===after.enumerable && before.writable===after.writable;
+    if(!same || (after ? !after.configurable : !Object.isExtensible(target)))
+      throw new Error('Prepared member target changed');
+  }
+  const records = combineTerminalRecords(responsibility,unit?.record);
+  let failed = false;
+  try {
   // ⚠️ BOTH THE ACCESSOR AND ITS BACKING STORE. A node accessor COPIES its
   // store's properties, but its CALL path closes over the original store — so
   // installing only on the accessor leaves `branch()` and every snapshot blind
@@ -772,15 +841,37 @@ export function materializeMember(
       configurable: true,
     });
   };
+  allocation?.install();
   define(branch as object);
   const backingStore = (branch as Record<symbol, unknown>)[
     NODE_STORE_SYMBOL
   ] as object | undefined;
   if (backingStore && backingStore !== branch) define(backingStore);
+  // Internal prepared data only: no observer, equality or user callback may
+  // separate physical membership from its settlement responsibility.
+  if (records) {
+    installTerminalRecord(records);
+  }
+  fresh?.install();
+  // Under a branch that has been omitted before, so an omission above it is
+  // visible to the new member too (`isAbsentMember`).
+  linkAddedMember(branch as object, key, child);
+  markSnapshotInstalled(branch);
+  // Claim only the child that actually installed; abandoned plans own no live observer.
+  inheritObservationForAddedMember(branch, child);
 
-  index?.set(key, child);
-  publishMembershipChange(branch as object);
-  return child;
+  (branch as Record<symbol, Map<string, unknown> | undefined>)[KEY_INDEX]?.set(
+    key,
+    child
+  );
+  // Completion can throw after installation. Invalidate the installed shape
+  // first so an error cannot strand its cached snapshot at the old membership.
+  if(allocation)publishMembershipChange(branch);
+  } catch(error){failed=true;throw error;}
+  finally {
+    if(unit)try {completePreparedPublication(unit.completion);}
+    catch(error){if(!failed)throw error;reportContainedObserverError({error,operation:'notify:subscriber'});}
+  }
 }
 
 /**
@@ -831,7 +922,7 @@ export type OrdinaryStateMaterializer = (
  * DERIVED from the owning branch, so there is no argument through which a caller
  * could target topology elsewhere in the tree.
  */
-export type MemberMaterializer = (key: string, value: unknown) => unknown;
+export type MemberMaterializer = (key: string, value: unknown) => PreparedMemberConstruction;
 
 /**
  * @internal The canonical construction authority as seen by the marker
@@ -881,7 +972,7 @@ function materializeKeyedAware(
 export function materializeMarkers(
   node: unknown,
   notifier?: PathObservationPort,
-  path: string[] = [],
+  path: readonly string[] = [],
   context: MaterializationContext = createMaterializationContext(),
   authority?: OrdinaryConstructionAuthority
 ): void {
@@ -903,7 +994,7 @@ export function materializeMarkers(
 
   for (const key of keys) {
     const value = (node as Record<string, unknown>)[key];
-    const currentPath = [...path, key];
+    const currentPath = childAddressOf(path, key);
     const pathString = currentPath.join('.');
 
     // Check each registered marker processor

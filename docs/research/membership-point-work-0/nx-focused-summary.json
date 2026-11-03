@@ -1,0 +1,263 @@
+{
+  "runs": [
+    {
+      "label": "D2I-membership",
+      "command": [
+        "pnpm",
+        "nx",
+        "test",
+        "kernel",
+        "--testFile=packages/kernel/src/enhancers/restoration/entity-membership-capture.spec.ts",
+        "--maxWorkers=1"
+      ],
+      "exit": 0,
+      "passed": 11,
+      "skipped": 0
+    },
+    {
+      "label": "OAPI-membership",
+      "command": [
+        "pnpm",
+        "nx",
+        "test",
+        "kernel",
+        "--testFile=packages/kernel/src/enhancers/restoration/entity-membership-capture.spec.ts",
+        "--maxWorkers=1"
+      ],
+      "exit": 0,
+      "passed": 11,
+      "skipped": 0
+    },
+    {
+      "label": "OAPI-kernel-setAll-staging",
+      "command": [
+        "pnpm",
+        "nx",
+        "test",
+        "kernel",
+        "--testFile=packages/kernel/src/lib/entity-set-all-staging.spec.ts",
+        "--maxWorkers=1"
+      ],
+      "exit": 0,
+      "passed": 12,
+      "skipped": 0
+    },
+    {
+      "label": "OAPI-kernel-addMany-anchors",
+      "command": [
+        "pnpm",
+        "nx",
+        "test",
+        "kernel",
+        "--testFile=packages/kernel/src/lib/entity-add-many-anchors.spec.ts",
+        "--maxWorkers=1"
+      ],
+      "exit": 0,
+      "passed": 4,
+      "skipped": 0
+    },
+    {
+      "label": "OAPI-kernel-setAll-order",
+      "command": [
+        "pnpm",
+        "nx",
+        "test",
+        "kernel",
+        "--testFile=packages/kernel/src/enhancers/restoration/set-all-order-reversal.spec.ts",
+        "--maxWorkers=1"
+      ],
+      "exit": 0,
+      "passed": 36,
+      "skipped": 0
+    },
+    {
+      "label": "OAPI-kernel-addMany-redo",
+      "command": [
+        "pnpm",
+        "nx",
+        "test",
+        "kernel",
+        "--testFile=packages/kernel/src/enhancers/restoration/add-many-redo-order.spec.ts",
+        "--maxWorkers=1"
+      ],
+      "exit": 0,
+      "passed": 12,
+      "skipped": 0
+    },
+    {
+      "label": "OAPI-kernel-addMany-overwrite",
+      "command": [
+        "pnpm",
+        "nx",
+        "test",
+        "kernel",
+        "--testFile=packages/kernel/src/enhancers/restoration/add-many-overwrite-reversal.spec.ts",
+        "--maxWorkers=1"
+      ],
+      "exit": 0,
+      "passed": 48,
+      "skipped": 0
+    },
+    {
+      "label": "OAPI-react-4de",
+      "command": [
+        "pnpm",
+        "nx",
+        "test",
+        "react",
+        "transaction-realization.spec.tsx",
+        "--testNamePattern=4[de] ",
+        "--maxWorkers=1"
+      ],
+      "exit": 0,
+      "passed": 18,
+      "skipped": 8
+    },
+    {
+      "label": "OAPI-vue-4de",
+      "command": [
+        "pnpm",
+        "nx",
+        "test",
+        "vue",
+        "transaction-realization.spec.ts",
+        "--testNamePattern=4[de] ",
+        "--maxWorkers=1"
+      ],
+      "exit": 0,
+      "passed": 18,
+      "skipped": 8
+    },
+    {
+      "label": "OAPI-solid-4de",
+      "command": [
+        "pnpm",
+        "nx",
+        "test",
+        "solid",
+        "transaction-realization.spec.ts",
+        "--testNamePattern=4[de] ",
+        "--maxWorkers=1"
+      ],
+      "exit": 0,
+      "passed": 18,
+      "skipped": 8
+    },
+    {
+      "label": "OAPI-angular-4de",
+      "command": [
+        "pnpm",
+        "nx",
+        "test",
+        "angular",
+        "transaction-realization.spec.ts",
+        "--testNamePattern=4[de] ",
+        "--maxWorkers=1"
+      ],
+      "exit": 0,
+      "passed": 18,
+      "skipped": 8
+    },
+    {
+      "label": "OAPI-vue-selection",
+      "command": [
+        "pnpm",
+        "nx",
+        "test",
+        "vue",
+        "entity-selection-lifetime.spec.ts",
+        "--maxWorkers=1"
+      ],
+      "exit": 0,
+      "passed": 9,
+      "skipped": 0
+    },
+    {
+      "label": "OAPI-vue-projection",
+      "command": [
+        "pnpm",
+        "nx",
+        "test",
+        "vue",
+        "entity-projection-publication.spec.ts",
+        "--maxWorkers=1"
+      ],
+      "exit": 0,
+      "passed": 13,
+      "skipped": 0
+    },
+    {
+      "label": "OAPI-vue-prepared",
+      "command": [
+        "pnpm",
+        "nx",
+        "test",
+        "vue",
+        "prepared-selection-publication.spec.ts",
+        "--maxWorkers=1"
+      ],
+      "exit": 0,
+      "passed": 8,
+      "skipped": 0
+    },
+    {
+      "label": "OAPI-kernel-selection",
+      "command": [
+        "pnpm",
+        "nx",
+        "test",
+        "kernel",
+        "--testFile=packages/kernel/src/lib/entity-selection-lifetime.spec.ts",
+        "--maxWorkers=1"
+      ],
+      "exit": 0,
+      "passed": 6,
+      "skipped": 0
+    },
+    {
+      "label": "OAPI-kernel-structural",
+      "command": [
+        "pnpm",
+        "nx",
+        "test",
+        "kernel",
+        "--testFile=packages/kernel/src/enhancers/restoration/declarative-structural-transition-0.spec.ts",
+        "--maxWorkers=1"
+      ],
+      "exit": 0,
+      "passed": 8,
+      "skipped": 0
+    },
+    {
+      "label": "OAPI-kernel-tap-reads",
+      "command": [
+        "pnpm",
+        "nx",
+        "test",
+        "kernel",
+        "--testFile=packages/kernel/src/lib/entity-tap-reads.spec.ts",
+        "--maxWorkers=1"
+      ],
+      "exit": 0,
+      "passed": 13,
+      "skipped": 0
+    },
+    {
+      "label": "OAPI-kernel-replay-taps",
+      "command": [
+        "pnpm",
+        "nx",
+        "test",
+        "kernel",
+        "--testFile=packages/kernel/src/lib/entity-replay-tap-boundaries.spec.ts",
+        "--maxWorkers=1"
+      ],
+      "exit": 0,
+      "passed": 8,
+      "skipped": 0
+    }
+  ],
+  "total_passed": 271,
+  "all_exit_zero": true,
+  "restored": true
+}

@@ -1,0 +1,19 @@
+[
+  "packages/kernel/src/enhancers/transactions/occupancy-composition.spec.ts",
+  "packages/kernel/src/enhancers/transactions/occupancy-composition.ts",
+  "packages/kernel/src/enhancers/transactions/occupancy-inspection-chronology.spec.ts",
+  "packages/kernel/src/enhancers/transactions/transactions.ts",
+  "packages/kernel/src/lib/entity-occupancy-steps.spec.ts",
+  "packages/kernel/src/lib/entity-signal.ts",
+  "packages/kernel/src/lib/internals/causal-runtime/ordinary-realization.ts",
+  "packages/kernel/src/lib/internals/causal-runtime/target-transition.ts",
+  "packages/kernel/src/lib/internals/causal-runtime/tree-realization-adapter.ts",
+  "packages/kernel/src/lib/link.ts",
+  "packages/kernel/src/lib/occupancy-successor-composition.spec.ts",
+  "packages/kernel/src/lib/occupancy-successor-point-work.spec.ts",
+  "packages/kernel/src/lib/occupancy-successor-realization.spec.ts",
+  "packages/kernel/src/lib/path-notifier.ts",
+  "packages/kernel/src/lib/physical/entity-mutation-frame.ts",
+  "packages/kernel/src/lib/physical/prepare-entity-target.ts",
+  "packages/kernel/src/lib/physical/structural-store.ts"
+]

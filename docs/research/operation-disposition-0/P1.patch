@@ -1,0 +1,46 @@
+--- a/packages/kernel/src/lib/internals/tree-scalar-slot-runtime.ts
++++ b/packages/kernel/src/lib/internals/tree-scalar-slot-runtime.ts
+@@ -171,6 +171,7 @@
+     const changed: Array<{ slotIndex: SlotIndex; nextValue: unknown }> = [];
+     for (const [slotIndex, nextValue] of staged) {
+       assertSlotIndex(slotIndex);
++      if (PRODUCTION_SUBSTRATE_STATS_ENABLED) recordProductionSubstrateStat('equalityChecks');
+       if (!equalities[slotIndex](values[slotIndex], nextValue)) changed.push({slotIndex, nextValue});
+     }
+     if (getCommittedRevision() !== base) throw new Error('Reentrant scalar preparation');
+@@ -179,8 +180,12 @@
+       if (used) throw new Error('Prepared scalar commit already used');
+       if (getCommittedRevision() !== base) throw new Error('Stale prepared scalar commit');
+       used = true;
+-      for (const {slotIndex,nextValue} of changed) values[slotIndex] = nextValue;
++      for (const {slotIndex,nextValue} of changed) {
++        values[slotIndex] = nextValue;
++        if (PRODUCTION_SUBSTRATE_STATS_ENABLED) recordProductionSubstrateStat('slotWrites');
++      }
+       const revision = changed.length && options?.advanceRevision !== false ? advanceRevision() : getCommittedRevision();
++      if (changed.length && options?.advanceRevision !== false && PRODUCTION_SUBSTRATE_STATS_ENABLED) recordProductionSubstrateStat('revisionIncrements');
+       return {revision,changedSlots:changed.map(x=>x.slotIndex)};
+     };
+   };
+@@ -303,6 +308,7 @@
+     commitRecorded<T>(slotIndex: SlotIndex, value: T, prepare?: () => TerminalRecordPlan | undefined): boolean {
+       assertSlotIndex(slotIndex);
+       const base=getCommittedRevision();
++      if (PRODUCTION_SUBSTRATE_STATS_ENABLED) recordProductionSubstrateStat('equalityChecks');
+       const equal=equalities[slotIndex](values[slotIndex],value);
+       if(getCommittedRevision()!==base)throw new Error('Scalar equality reentered physical installation');
+       if(equal)return false;
+@@ -311,11 +317,13 @@
+       // Prepared internal data only below. No returned closure, value reflection,
+       // equality, observer, or record sink between value and evidence installation.
+       values[slotIndex]=value;
++      if (PRODUCTION_SUBSTRATE_STATS_ENABLED) recordProductionSubstrateStat('slotWrites');
+       if(plan){
+         for(let i=0;i<plan.writes.length;i++){const w=plan.writes[i];w.map.set(w.key,w.value);}
+         for(let i=0;i<plan.adds.length;i++){const a=plan.adds[i];a.set.add(a.value);}
+       }
+       advanceRevision();
++      if (PRODUCTION_SUBSTRATE_STATS_ENABLED) recordProductionSubstrateStat('revisionIncrements');
+       return true;
+     },
+     commitSlot<T>(slotIndex: SlotIndex, value: T): SingleSlotCommitResult {

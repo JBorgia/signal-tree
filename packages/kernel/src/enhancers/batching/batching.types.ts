@@ -45,8 +45,8 @@ export {};
 /**
  * Configuration for the batching enhancer.
  *
- * IMPORTANT: Signal writes are ALWAYS synchronous.
- * Batching only affects change detection notification timing.
+ * Ordinary writes and `batch()` are synchronous. `coalesce()` explicitly
+ * defers replacement writes.
  */
 export interface BatchingConfig {
   /**
@@ -87,8 +87,9 @@ export interface BatchingMethods {
   // a `batch()` callback is the NEW value; inside `coalesce()` it is the OLD one.
 
   /**
-   * Coalesce rapid updates to the same path.
-   * Only the final value for each path is written.
+   * Coalesce replacement writes to the same location within each uninterrupted
+   * compatible classification. Changes in external/write context or undo
+   * designation remain distinct and are applied in order.
    *
    * ## `batch()` vs `coalesce()` — they are NOT interchangeable
    *
@@ -103,7 +104,9 @@ export interface BatchingMethods {
    * MEASURED: writing `'X'` then reading inside the callback gives `'X'` under
    * `batch()` and `''` under `coalesce()`. `batch()` writes synchronously and
    * defers only change-detection notification; `coalesce()` defers the WRITE
-   * itself and applies the last value per path on exit.
+   * itself and applies the last replacement per location within each compatible
+   * classification on exit. `external()` and `undoable()` classification changes
+   * are preserved rather than deduplicated together.
    *
    * So `coalesce()` is wrong for any callback that reads back what it wrote, and
    * `batch()` is wrong when you specifically want intermediate values discarded.
@@ -112,7 +115,7 @@ export interface BatchingMethods {
   * deliberately. An
    * updater is a read-modify-write, so keeping only the last of three `+1`s would
    * mean `+1`. Updaters apply immediately, after draining any pending coalesced
-  * replacement on the same path.
+   * replacement on the same location and writes from preceding classifications.
    * Use for high-frequency updates (typing, dragging, etc.)
    *
    * @example

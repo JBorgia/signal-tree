@@ -1,3 +1,12 @@
+import {
+  getEntityMembershipSource,
+  MEMBERSHIP_OPEN_ORDER,
+  MEMBERSHIP_CLOSE,
+} from '../internals/entity-membership-source';
+import {
+  prepareEntityTransitionTarget,
+  type EntityTargetPreparer,
+} from './prepare-entity-target';
 import { describe, expect, it } from 'vitest';
 
 import { entityMap } from '../markers/entity-map';
@@ -13,7 +22,10 @@ type TargetBinding = {
   ): { subjectId: number } | undefined;
   __prepareTransitionTarget: {
     readSource(): CollectionTransitionTarget;
-    prepareTarget(target: CollectionTransitionTarget): {
+    prepareTarget(
+      target: CollectionTransitionTarget,
+      prepare: EntityTargetPreparer
+    ): {
       install(): void;
       publish(): void;
     };
@@ -21,6 +33,43 @@ type TargetBinding = {
 };
 
 describe('declarative collection target binding', () => {
+  it('uses the installation-time membership tap and balances the original tap under replacement', () => {
+    const tree = signalTree(
+      { rows: entityMap<Row, string>({ selectId: (row) => row.id }) },
+      { capabilities: ['causal-runtime'] }
+    );
+    try {
+      tree.$.rows.setAll([
+        { id: 'a', value: 1 },
+        { id: 'b', value: 2 },
+      ]);
+      const binding = (tree.$.rows as unknown as TargetBinding)
+        .__prepareTransitionTarget;
+      const source = binding.readSource();
+      const prepared = binding.prepareTarget(
+        { ...source, order: [...source.order].reverse(), orderFrontier: {} },
+        prepareEntityTransitionTarget
+      );
+      const attach = getEntityMembershipSource(tree.$.rows);
+      if (!attach) throw new Error('Expected membership source');
+      const original: number[] = [];
+      const replacement: number[] = [];
+      // Attach AFTER preparation; replacing during open must not steal close.
+      attach((phase) => {
+        original.push(phase);
+        if (phase === MEMBERSHIP_OPEN_ORDER)
+          attach((next) => replacement.push(next));
+      });
+      prepared.install();
+      prepared.publish();
+      expect(original).toEqual([MEMBERSHIP_OPEN_ORDER, MEMBERSHIP_CLOSE]);
+      expect(replacement).toEqual([]);
+      expect(tree.$.rows.ids()).toEqual(['b', 'a']);
+    } finally {
+      tree.destroy();
+    }
+  });
+
   it('installs a prepared reorder while preserving held SubjectId facades', () => {
     const tree = signalTree(
       {
@@ -50,16 +99,19 @@ describe('declarative collection target binding', () => {
       throw new Error('Expected seeded subjects');
     }
 
-    const prepared = binding.__prepareTransitionTarget.prepareTarget({
-      owner,
-      subjects: [
-        { subject: subjectA, key: 'a', value: { id: 'a', value: 1 } },
-        { subject: subjectB, key: 'b', value: { id: 'b', value: 2 } },
-        { subject: subjectC, key: 'c', value: { id: 'c', value: 3 } },
-      ],
-      order: [subjectC, subjectB, subjectA],
-      orderFrontier: {},
-    });
+    const prepared = binding.__prepareTransitionTarget.prepareTarget(
+      {
+        owner,
+        subjects: [
+          { subject: subjectA, key: 'a', value: { id: 'a', value: 1 } },
+          { subject: subjectB, key: 'b', value: { id: 'b', value: 2 } },
+          { subject: subjectC, key: 'c', value: { id: 'c', value: 3 } },
+        ],
+        order: [subjectC, subjectB, subjectA],
+        orderFrontier: {},
+      },
+      prepareEntityTransitionTarget
+    );
 
     expect(tree.$.rows.ids()).toEqual(['a', 'b', 'c']);
     expect(binding.__prepareTransitionTarget.readSource().order).toEqual([
@@ -104,15 +156,18 @@ describe('declarative collection target binding', () => {
       throw new Error('Expected seeded subjects');
     }
 
-    const prepared = binding.__prepareTransitionTarget.prepareTarget({
-      owner,
-      subjects: [
-        { subject: subjectA, key: 'b', value: { id: 'a', value: 1 } },
-        { subject: subjectB, key: 'a', value: { id: 'b', value: 2 } },
-      ],
-      order: [subjectA, subjectB],
-      orderFrontier: {},
-    });
+    const prepared = binding.__prepareTransitionTarget.prepareTarget(
+      {
+        owner,
+        subjects: [
+          { subject: subjectA, key: 'b', value: { id: 'a', value: 1 } },
+          { subject: subjectB, key: 'a', value: { id: 'b', value: 2 } },
+        ],
+        order: [subjectA, subjectB],
+        orderFrontier: {},
+      },
+      prepareEntityTransitionTarget
+    );
     prepared.install();
     prepared.publish();
 
@@ -140,12 +195,15 @@ describe('declarative collection target binding', () => {
       throw new Error('Expected seeded subject');
     }
     const value = { id: 'a', value: 2 };
-    const prepared = binding.__prepareTransitionTarget.prepareTarget({
-      owner,
-      subjects: [{ subject, key: 'a', value }],
-      order: [subject],
-      orderFrontier: {},
-    });
+    const prepared = binding.__prepareTransitionTarget.prepareTarget(
+      {
+        owner,
+        subjects: [{ subject, key: 'a', value }],
+        order: [subject],
+        orderFrontier: {},
+      },
+      prepareEntityTransitionTarget
+    );
 
     value.value = 99;
     prepared.install();

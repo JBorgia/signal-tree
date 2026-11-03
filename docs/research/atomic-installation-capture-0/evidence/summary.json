@@ -1,0 +1,163 @@
+[
+  {
+    "lane": "base",
+    "entry": "mixed.mjs",
+    "control": "capture-error",
+    "exit": 1,
+    "stable": true
+  },
+  {
+    "lane": "base",
+    "entry": "settlement.mjs",
+    "control": "explicit-rollback-fault",
+    "exit": 1,
+    "stable": true
+  },
+  {
+    "lane": "candidate",
+    "entry": "equality-owner.mjs",
+    "control": "error",
+    "exit": 0,
+    "stable": true
+  },
+  {
+    "lane": "candidate",
+    "entry": "equality-owner.mjs",
+    "control": "reentry",
+    "exit": 0,
+    "stable": true
+  },
+  {
+    "lane": "candidate",
+    "entry": "equality-owner.mjs",
+    "control": "undefined",
+    "exit": 0,
+    "stable": true
+  },
+  {
+    "lane": "candidate",
+    "entry": "freshness.mjs",
+    "control": "rollback",
+    "exit": 0,
+    "stable": true
+  },
+  {
+    "lane": "candidate",
+    "entry": "kernel.mjs",
+    "control": "suite",
+    "exit": 0,
+    "stable": true
+  },
+  {
+    "lane": "candidate",
+    "entry": "mixed.mjs",
+    "control": "capture-error",
+    "exit": 1,
+    "stable": true
+  },
+  {
+    "lane": "candidate",
+    "entry": "mixed.mjs",
+    "control": "capture-undefined",
+    "exit": 1,
+    "stable": true
+  },
+  {
+    "lane": "candidate",
+    "entry": "mixed.mjs",
+    "control": "control",
+    "exit": 0,
+    "stable": true
+  },
+  {
+    "lane": "candidate",
+    "entry": "prepare-neutral.mjs",
+    "control": "error",
+    "exit": 0,
+    "stable": true
+  },
+  {
+    "lane": "candidate",
+    "entry": "prepare-neutral.mjs",
+    "control": "reentry",
+    "exit": 0,
+    "stable": true
+  },
+  {
+    "lane": "candidate",
+    "entry": "prepare.mjs",
+    "control": "error",
+    "exit": 0,
+    "stable": true
+  },
+  {
+    "lane": "candidate",
+    "entry": "prepare.mjs",
+    "control": "reentry",
+    "exit": 0,
+    "stable": true
+  },
+  {
+    "lane": "candidate",
+    "entry": "prepare.mjs",
+    "control": "undefined",
+    "exit": 0,
+    "stable": true
+  },
+  {
+    "lane": "candidate",
+    "entry": "reentry.mjs",
+    "control": "reentry",
+    "exit": 0,
+    "stable": true
+  },
+  {
+    "lane": "candidate",
+    "entry": "settlement.mjs",
+    "control": "callback-refusal",
+    "exit": 0,
+    "stable": true
+  },
+  {
+    "lane": "candidate",
+    "entry": "settlement.mjs",
+    "control": "explicit-rollback-fault",
+    "exit": 0,
+    "stable": true
+  },
+  {
+    "lane": "candidate",
+    "entry": "spec.mjs",
+    "control": "record:abort",
+    "exit": 0,
+    "stable": true
+  },
+  {
+    "lane": "candidate",
+    "entry": "spec.mjs",
+    "control": "record:body",
+    "exit": 0,
+    "stable": true
+  },
+  {
+    "lane": "candidate",
+    "entry": "spec.mjs",
+    "control": "record:handle",
+    "exit": 0,
+    "stable": true
+  },
+  {
+    "lane": "candidate",
+    "entry": "spec.mjs",
+    "control": "record:publisher",
+    "exit": 0,
+    "stable": true
+  },
+  {
+    "lane": "candidate",
+    "entry": "spec.mjs",
+    "control": "record:publisher-undefined",
+    "exit": 0,
+    "stable": true
+  }
+]

@@ -22,7 +22,8 @@ import {
   resetProductionSubstrateStatsForTesting,
 } from '../production-substrate-stats';
 import { getPhysicalCommitClock } from '../physical-commit-clock';
-import { getTreeScalarSlotRuntime } from '../tree-scalar-slot-port';
+import { getTreeScalarSlotRuntime, type ScalarSlotMutationFrame } from '../tree-scalar-slot-port';
+import { getEntityPublicationBinding } from '../entity-publication';
 
 import { createTransactionCaptureBridge } from './transaction-capture-bridge';
 import {
@@ -1036,7 +1037,7 @@ describe('tree realization adapter', () => {
     }
   });
 
-  it('keeps restore planning side-effect free when later scalar frame preparation fails', () => {
+  it('keeps restore planning side-effect free when current source preparation fails', () => {
     const tree = signalTree(
       {
         users: entityMap<{ id: string; name: string }, string>({
@@ -1136,55 +1137,37 @@ describe('tree realization adapter', () => {
 
     expect(adapter.validateEffects([addEffect, scalarEffect])).toBeUndefined();
 
-    const collectionInternal = tree.$.users as typeof tree.$.users & {
-      __planRestore?: (
-        key: string,
-        entity: { id: string; name: string },
-        subjectId: number,
-        beforeSubject?: number,
-        afterSubject?: number
-      ) => {
-        commit(options?: { advancePhysicalRevision?: boolean }): void;
-        publish(metaOverride?: WriteMetadata): void;
-      };
-    };
-    if (!collectionInternal.__planRestore) {
-      throw new Error(
-        'Expected deferred restore planner for restore planning test'
-      );
-    }
-
-    const originalPlanRestore =
-      collectionInternal.__planRestore.bind(collectionInternal);
-    const planRestoreSpy = vi
-      .spyOn(collectionInternal, '__planRestore')
-      .mockImplementation(() => {
-        const plan = originalPlanRestore(
-          'u1',
-          { id: 'u1', name: 'Alicia' },
-          subjectId
-        );
-        return {
-          commit: (_options) => {
-            throw new Error('Prepared scalar frame failure');
-          },
-          publish: plan.publish.bind(plan),
-        };
-      });
-
-    expect(() => adapter.applyAtomically([addEffect, scalarEffect])).toThrow(
-      'Prepared scalar frame failure'
-    );
+    // The grouped writer no longer calls __planRestore.commit. Fail through
+    // the source preparation used by that grouped writer, before any store.
+    const source = getEntityPublicationBinding(tree.$.users)?.source;
+    if (!source) throw new Error('Expected restore publication source');
+    const sentinel = new Error('Prepared scalar frame failure');
+    let preparations = 0;
+    const releasePreparation = source.subscribe({
+      prepare() { preparations++; throw sentinel; },
+      complete() { throw new Error('Refused preparation must not complete'); },
+    });
+    try {
+    let caught: unknown;
+    expect(() => {
+      try { adapter.applyAtomically([addEffect, scalarEffect]); }
+      catch (error) { caught = error; throw error; }
+    }).toThrow('Prepared scalar frame failure');
+    expect(caught).toBe(sentinel);
     getPathNotifier().flushSync();
 
+    expect(preparations).toBe(1);
     expect(tree.$.users.ids()).toEqual([]);
     expect(heldRow()).toBeUndefined();
     expect(heldName()).toBeUndefined();
     expect(physicalCommitClock?.revision()).toBe(beforeRevision);
     expect(notifications).toEqual([]);
 
-    planRestoreSpy.mockRestore();
-    unsubscribe();
+    } finally {
+      releasePreparation();
+      unsubscribe();
+      tree.destroy();
+    }
   });
 
   it('realizes same-turn restore then rekey against prepared subject state', () => {
@@ -4184,21 +4167,27 @@ describe('tree realization adapter', () => {
 
     const originalBeginFrame =
       scalarSlotRuntime.beginFrame.bind(scalarSlotRuntime);
+    let preparationCalls = 0;
     const beginFrameSpy = vi
       .spyOn(scalarSlotRuntime, 'beginFrame')
       .mockImplementation(() => {
         const frame = originalBeginFrame();
+        const prepareCommit = frame.prepareCommit;
+        if (!prepareCommit) throw new Error('Expected current frame preparation');
         return {
           set: frame.set.bind(frame),
           update: frame.update.bind(frame),
           discard: frame.discard.bind(frame),
-          commit: (options) => {
+          prepareCommit: (options) => {
+            preparationCalls++;
             undoable(() => tree.$.other('updated elsewhere'));
-            return frame.commit(options);
+            return prepareCommit.call(frame, options);
           },
-        };
+          commit: frame.commit.bind(frame),
+        } satisfies Required<ScalarSlotMutationFrame>;
       });
 
+    try {
     expect(
       adapter.validateEffects([
         {
@@ -4223,7 +4212,8 @@ describe('tree realization adapter', () => {
         },
         { owner: statusOwner, before: 'pending', after: 'shipped' },
       ])
-    ).toThrow('ScalarSlotMutationFrame base revision is stale.');
+    ).toThrow('Stale scalar preparation');
+    expect(preparationCalls).toBe(1);
 
     getPathNotifier().flushSync();
 
@@ -4234,8 +4224,11 @@ describe('tree realization adapter', () => {
     expect(tree.getRestorationHistory().length).toBe(baselineHistory + 1);
     expect(observedNotifications).toEqual([]);
 
-    unsubscribe();
-    beginFrameSpy.mockRestore();
+    } finally {
+      unsubscribe();
+      beginFrameSpy.mockRestore();
+      tree.destroy();
+    }
   });
 
   it('commits a root-scalar and structural realization under one shared physical revision', () => {

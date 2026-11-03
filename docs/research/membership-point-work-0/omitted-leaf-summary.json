@@ -1,0 +1,761 @@
+{
+  "cwd": "/Users/jonathanborgia/.codex/worktrees/atomic-capture-proof/signaltree",
+  "baseline": "19a5bd034d5ebef262f637c397bb41fe50a6a1e3",
+  "faultInjection": false,
+  "runs": [
+    {
+      "lane": "base",
+      "command": "ST_PROOF_OUTPUT=/private/tmp/st-omitted-leaf-attribution node docs/research/membership-point-work-0/run.mjs base omitted-leaf-replay.mjs suite first",
+      "exit": 0,
+      "stable": true,
+      "passes": 4,
+      "cases": [
+        {
+          "scenario": "directly omitted leaf",
+          "order": "transactions alone",
+          "status": "pass",
+          "first": {
+            "threw": false
+          },
+          "after": {
+            "value": {
+              "name": "Ada"
+            },
+            "keys": [
+              "name"
+            ],
+            "age": {
+              "diagnosticUndefined": true
+            },
+            "pending": 0,
+            "scope": false
+          },
+          "retry": {
+            "threw": false
+          },
+          "failedAssertions": []
+        },
+        {
+          "scenario": "directly omitted leaf",
+          "order": "transactions first",
+          "status": "pass",
+          "first": {
+            "threw": false
+          },
+          "after": {
+            "value": {
+              "name": "Ada"
+            },
+            "keys": [
+              "name"
+            ],
+            "age": {
+              "diagnosticUndefined": true
+            },
+            "pending": 0,
+            "scope": false
+          },
+          "retry": {
+            "threw": false
+          },
+          "failedAssertions": []
+        },
+        {
+          "scenario": "directly omitted leaf",
+          "order": "restoration first",
+          "status": "pass",
+          "first": {
+            "threw": false
+          },
+          "after": {
+            "value": {
+              "name": "Ada"
+            },
+            "keys": [
+              "name"
+            ],
+            "age": {
+              "diagnosticUndefined": true
+            },
+            "pending": 0,
+            "scope": false
+          },
+          "retry": {
+            "threw": false
+          },
+          "failedAssertions": []
+        },
+        {
+          "scenario": "original scalar baseline before later omission",
+          "order": "transactions alone",
+          "status": "pass",
+          "first": {
+            "threw": false
+          },
+          "after": {
+            "value": {
+              "name": "Ada",
+              "age": 42
+            },
+            "keys": [
+              "name",
+              "age"
+            ],
+            "age": 42,
+            "pending": 0,
+            "scope": false
+          },
+          "retry": {
+            "threw": false
+          },
+          "failedAssertions": []
+        }
+      ],
+      "artifact": "/private/tmp/st-omitted-leaf-attribution/runs/base-omitted-leaf-replay.mjs-suite-first"
+    },
+    {
+      "lane": "D2",
+      "command": "ST_PROOF_OUTPUT=/private/tmp/st-omitted-leaf-attribution node docs/research/membership-point-work-0/run.mjs D2 omitted-leaf-replay.mjs suite first",
+      "exit": 1,
+      "stable": true,
+      "passes": 0,
+      "cases": [
+        {
+          "scenario": "directly omitted leaf",
+          "order": "transactions alone",
+          "status": "fail",
+          "first": {
+            "threw": true,
+            "code": "SIGNALTREE_ROLLBACK_FAILED",
+            "name": "SignalTreeRollbackError",
+            "message": "SignalTree could not rollback the pending transaction: compensating turn 2 failed validation \u2014 Installed operation lacks a matching settlement disposition [effect-validation-failed]",
+            "undefined": false
+          },
+          "after": {
+            "value": {
+              "name": "Ada",
+              "age": 50
+            },
+            "keys": [
+              "name",
+              "age"
+            ],
+            "age": 50,
+            "pending": 1,
+            "scope": true
+          },
+          "retry": {
+            "threw": true,
+            "code": "SIGNALTREE_ROLLBACK_FAILED",
+            "name": "SignalTreeRollbackError",
+            "message": "SignalTree could not rollback the pending transaction: compensating turn 2 failed validation \u2014 Installed operation lacks a matching settlement disposition [effect-validation-failed]",
+            "undefined": false
+          },
+          "failedAssertions": [
+            "original member-absence assertion",
+            "original leaf-read assertion",
+            "successful settlement is complete and terminal",
+            "terminal retry is nonmutating"
+          ]
+        },
+        {
+          "scenario": "directly omitted leaf",
+          "order": "transactions first",
+          "status": "fail",
+          "first": {
+            "threw": true,
+            "code": "SIGNALTREE_ROLLBACK_FAILED",
+            "name": "SignalTreeRollbackError",
+            "message": "SignalTree could not rollback the pending transaction: compensating turn 2 failed validation \u2014 Installed operation lacks a matching settlement disposition [effect-validation-failed]",
+            "undefined": false
+          },
+          "after": {
+            "value": {
+              "name": "Ada",
+              "age": 50
+            },
+            "keys": [
+              "name",
+              "age"
+            ],
+            "age": 50,
+            "pending": 1,
+            "scope": true
+          },
+          "retry": {
+            "threw": true,
+            "code": "SIGNALTREE_ROLLBACK_FAILED",
+            "name": "SignalTreeRollbackError",
+            "message": "SignalTree could not rollback the pending transaction: compensating turn 2 failed validation \u2014 Installed operation lacks a matching settlement disposition [effect-validation-failed]",
+            "undefined": false
+          },
+          "failedAssertions": [
+            "original member-absence assertion",
+            "original leaf-read assertion",
+            "successful settlement is complete and terminal",
+            "terminal retry is nonmutating"
+          ]
+        },
+        {
+          "scenario": "directly omitted leaf",
+          "order": "restoration first",
+          "status": "fail",
+          "first": {
+            "threw": true,
+            "code": "SIGNALTREE_ROLLBACK_FAILED",
+            "name": "SignalTreeRollbackError",
+            "message": "SignalTree could not rollback the pending transaction: compensating turn 2 failed validation \u2014 Installed operation lacks a matching settlement disposition [effect-validation-failed]",
+            "undefined": false
+          },
+          "after": {
+            "value": {
+              "name": "Ada",
+              "age": 50
+            },
+            "keys": [
+              "name",
+              "age"
+            ],
+            "age": 50,
+            "pending": 1,
+            "scope": true
+          },
+          "retry": {
+            "threw": true,
+            "code": "SIGNALTREE_ROLLBACK_FAILED",
+            "name": "SignalTreeRollbackError",
+            "message": "SignalTree could not rollback the pending transaction: compensating turn 2 failed validation \u2014 Installed operation lacks a matching settlement disposition [effect-validation-failed]",
+            "undefined": false
+          },
+          "failedAssertions": [
+            "original member-absence assertion",
+            "original leaf-read assertion",
+            "successful settlement is complete and terminal",
+            "terminal retry is nonmutating"
+          ]
+        },
+        {
+          "scenario": "original scalar baseline before later omission",
+          "order": "transactions alone",
+          "status": "fail",
+          "first": {
+            "threw": true,
+            "code": "SIGNALTREE_ROLLBACK_FAILED",
+            "name": "SignalTreeRollbackError",
+            "message": "SignalTree could not rollback the pending transaction: compensating turn 1 failed validation \u2014 Installed operation lacks a matching settlement disposition [effect-validation-failed]",
+            "undefined": false
+          },
+          "after": {
+            "value": {
+              "name": "Grace"
+            },
+            "keys": [
+              "name"
+            ],
+            "age": {
+              "diagnosticUndefined": true
+            },
+            "pending": 1,
+            "scope": true
+          },
+          "retry": {
+            "threw": true,
+            "code": "SIGNALTREE_ROLLBACK_FAILED",
+            "name": "SignalTreeRollbackError",
+            "message": "SignalTree could not rollback the pending transaction: compensating turn 1 failed validation \u2014 Installed operation lacks a matching settlement disposition [effect-validation-failed]",
+            "undefined": false
+          },
+          "failedAssertions": [
+            "original full-baseline assertion",
+            "successful settlement is complete and terminal",
+            "terminal retry is nonmutating"
+          ]
+        }
+      ],
+      "artifact": "/private/tmp/st-omitted-leaf-attribution/runs/D2-omitted-leaf-replay.mjs-suite-first"
+    },
+    {
+      "lane": "D2I",
+      "command": "ST_PROOF_OUTPUT=/private/tmp/st-omitted-leaf-attribution node docs/research/membership-point-work-0/run.mjs D2I omitted-leaf-replay.mjs suite first",
+      "exit": 1,
+      "stable": true,
+      "passes": 0,
+      "cases": [
+        {
+          "scenario": "directly omitted leaf",
+          "order": "transactions alone",
+          "status": "fail",
+          "first": {
+            "threw": true,
+            "code": "SIGNALTREE_ROLLBACK_FAILED",
+            "name": "SignalTreeRollbackError",
+            "message": "SignalTree could not rollback the pending transaction: compensating turn 2 failed validation \u2014 Installed operation lacks a matching settlement disposition [effect-validation-failed]",
+            "undefined": false
+          },
+          "after": {
+            "value": {
+              "name": "Ada",
+              "age": 50
+            },
+            "keys": [
+              "name",
+              "age"
+            ],
+            "age": 50,
+            "pending": 1,
+            "scope": true
+          },
+          "retry": {
+            "threw": true,
+            "code": "SIGNALTREE_ROLLBACK_FAILED",
+            "name": "SignalTreeRollbackError",
+            "message": "SignalTree could not rollback the pending transaction: compensating turn 2 failed validation \u2014 Installed operation lacks a matching settlement disposition [effect-validation-failed]",
+            "undefined": false
+          },
+          "failedAssertions": [
+            "original member-absence assertion",
+            "original leaf-read assertion",
+            "successful settlement is complete and terminal",
+            "terminal retry is nonmutating"
+          ]
+        },
+        {
+          "scenario": "directly omitted leaf",
+          "order": "transactions first",
+          "status": "fail",
+          "first": {
+            "threw": true,
+            "code": "SIGNALTREE_ROLLBACK_FAILED",
+            "name": "SignalTreeRollbackError",
+            "message": "SignalTree could not rollback the pending transaction: compensating turn 2 failed validation \u2014 Installed operation lacks a matching settlement disposition [effect-validation-failed]",
+            "undefined": false
+          },
+          "after": {
+            "value": {
+              "name": "Ada",
+              "age": 50
+            },
+            "keys": [
+              "name",
+              "age"
+            ],
+            "age": 50,
+            "pending": 1,
+            "scope": true
+          },
+          "retry": {
+            "threw": true,
+            "code": "SIGNALTREE_ROLLBACK_FAILED",
+            "name": "SignalTreeRollbackError",
+            "message": "SignalTree could not rollback the pending transaction: compensating turn 2 failed validation \u2014 Installed operation lacks a matching settlement disposition [effect-validation-failed]",
+            "undefined": false
+          },
+          "failedAssertions": [
+            "original member-absence assertion",
+            "original leaf-read assertion",
+            "successful settlement is complete and terminal",
+            "terminal retry is nonmutating"
+          ]
+        },
+        {
+          "scenario": "directly omitted leaf",
+          "order": "restoration first",
+          "status": "fail",
+          "first": {
+            "threw": true,
+            "code": "SIGNALTREE_ROLLBACK_FAILED",
+            "name": "SignalTreeRollbackError",
+            "message": "SignalTree could not rollback the pending transaction: compensating turn 2 failed validation \u2014 Installed operation lacks a matching settlement disposition [effect-validation-failed]",
+            "undefined": false
+          },
+          "after": {
+            "value": {
+              "name": "Ada",
+              "age": 50
+            },
+            "keys": [
+              "name",
+              "age"
+            ],
+            "age": 50,
+            "pending": 1,
+            "scope": true
+          },
+          "retry": {
+            "threw": true,
+            "code": "SIGNALTREE_ROLLBACK_FAILED",
+            "name": "SignalTreeRollbackError",
+            "message": "SignalTree could not rollback the pending transaction: compensating turn 2 failed validation \u2014 Installed operation lacks a matching settlement disposition [effect-validation-failed]",
+            "undefined": false
+          },
+          "failedAssertions": [
+            "original member-absence assertion",
+            "original leaf-read assertion",
+            "successful settlement is complete and terminal",
+            "terminal retry is nonmutating"
+          ]
+        },
+        {
+          "scenario": "original scalar baseline before later omission",
+          "order": "transactions alone",
+          "status": "fail",
+          "first": {
+            "threw": true,
+            "code": "SIGNALTREE_ROLLBACK_FAILED",
+            "name": "SignalTreeRollbackError",
+            "message": "SignalTree could not rollback the pending transaction: compensating turn 1 failed validation \u2014 Installed operation lacks a matching settlement disposition [effect-validation-failed]",
+            "undefined": false
+          },
+          "after": {
+            "value": {
+              "name": "Grace"
+            },
+            "keys": [
+              "name"
+            ],
+            "age": {
+              "diagnosticUndefined": true
+            },
+            "pending": 1,
+            "scope": true
+          },
+          "retry": {
+            "threw": true,
+            "code": "SIGNALTREE_ROLLBACK_FAILED",
+            "name": "SignalTreeRollbackError",
+            "message": "SignalTree could not rollback the pending transaction: compensating turn 1 failed validation \u2014 Installed operation lacks a matching settlement disposition [effect-validation-failed]",
+            "undefined": false
+          },
+          "failedAssertions": [
+            "original full-baseline assertion",
+            "successful settlement is complete and terminal",
+            "terminal retry is nonmutating"
+          ]
+        }
+      ],
+      "artifact": "/private/tmp/st-omitted-leaf-attribution/runs/D2I-omitted-leaf-replay.mjs-suite-first"
+    },
+    {
+      "lane": "OAP",
+      "command": "ST_PROOF_OUTPUT=/private/tmp/st-omitted-leaf-attribution node docs/research/membership-point-work-0/run.mjs OAP omitted-leaf-replay.mjs suite first",
+      "exit": 1,
+      "stable": true,
+      "passes": 0,
+      "cases": [
+        {
+          "scenario": "directly omitted leaf",
+          "order": "transactions alone",
+          "status": "fail",
+          "first": {
+            "threw": true,
+            "code": "SIGNALTREE_ROLLBACK_FAILED",
+            "name": "SignalTreeRollbackError",
+            "message": "SignalTree could not rollback the pending transaction: compensating turn 2 failed validation \u2014 Installed operation lacks a matching settlement disposition [effect-validation-failed]",
+            "undefined": false
+          },
+          "after": {
+            "value": {
+              "name": "Ada",
+              "age": 50
+            },
+            "keys": [
+              "name",
+              "age"
+            ],
+            "age": 50,
+            "pending": 1,
+            "scope": true
+          },
+          "retry": {
+            "threw": true,
+            "code": "SIGNALTREE_ROLLBACK_FAILED",
+            "name": "SignalTreeRollbackError",
+            "message": "SignalTree could not rollback the pending transaction: compensating turn 2 failed validation \u2014 Installed operation lacks a matching settlement disposition [effect-validation-failed]",
+            "undefined": false
+          },
+          "failedAssertions": [
+            "original member-absence assertion",
+            "original leaf-read assertion",
+            "successful settlement is complete and terminal",
+            "terminal retry is nonmutating"
+          ]
+        },
+        {
+          "scenario": "directly omitted leaf",
+          "order": "transactions first",
+          "status": "fail",
+          "first": {
+            "threw": true,
+            "code": "SIGNALTREE_ROLLBACK_FAILED",
+            "name": "SignalTreeRollbackError",
+            "message": "SignalTree could not rollback the pending transaction: compensating turn 2 failed validation \u2014 Installed operation lacks a matching settlement disposition [effect-validation-failed]",
+            "undefined": false
+          },
+          "after": {
+            "value": {
+              "name": "Ada",
+              "age": 50
+            },
+            "keys": [
+              "name",
+              "age"
+            ],
+            "age": 50,
+            "pending": 1,
+            "scope": true
+          },
+          "retry": {
+            "threw": true,
+            "code": "SIGNALTREE_ROLLBACK_FAILED",
+            "name": "SignalTreeRollbackError",
+            "message": "SignalTree could not rollback the pending transaction: compensating turn 2 failed validation \u2014 Installed operation lacks a matching settlement disposition [effect-validation-failed]",
+            "undefined": false
+          },
+          "failedAssertions": [
+            "original member-absence assertion",
+            "original leaf-read assertion",
+            "successful settlement is complete and terminal",
+            "terminal retry is nonmutating"
+          ]
+        },
+        {
+          "scenario": "directly omitted leaf",
+          "order": "restoration first",
+          "status": "fail",
+          "first": {
+            "threw": true,
+            "code": "SIGNALTREE_ROLLBACK_FAILED",
+            "name": "SignalTreeRollbackError",
+            "message": "SignalTree could not rollback the pending transaction: compensating turn 2 failed validation \u2014 Installed operation lacks a matching settlement disposition [effect-validation-failed]",
+            "undefined": false
+          },
+          "after": {
+            "value": {
+              "name": "Ada",
+              "age": 50
+            },
+            "keys": [
+              "name",
+              "age"
+            ],
+            "age": 50,
+            "pending": 1,
+            "scope": true
+          },
+          "retry": {
+            "threw": true,
+            "code": "SIGNALTREE_ROLLBACK_FAILED",
+            "name": "SignalTreeRollbackError",
+            "message": "SignalTree could not rollback the pending transaction: compensating turn 2 failed validation \u2014 Installed operation lacks a matching settlement disposition [effect-validation-failed]",
+            "undefined": false
+          },
+          "failedAssertions": [
+            "original member-absence assertion",
+            "original leaf-read assertion",
+            "successful settlement is complete and terminal",
+            "terminal retry is nonmutating"
+          ]
+        },
+        {
+          "scenario": "original scalar baseline before later omission",
+          "order": "transactions alone",
+          "status": "fail",
+          "first": {
+            "threw": true,
+            "code": "SIGNALTREE_ROLLBACK_FAILED",
+            "name": "SignalTreeRollbackError",
+            "message": "SignalTree could not rollback the pending transaction: compensating turn 1 failed validation \u2014 Installed operation lacks a matching settlement disposition [effect-validation-failed]",
+            "undefined": false
+          },
+          "after": {
+            "value": {
+              "name": "Grace"
+            },
+            "keys": [
+              "name"
+            ],
+            "age": {
+              "diagnosticUndefined": true
+            },
+            "pending": 1,
+            "scope": true
+          },
+          "retry": {
+            "threw": true,
+            "code": "SIGNALTREE_ROLLBACK_FAILED",
+            "name": "SignalTreeRollbackError",
+            "message": "SignalTree could not rollback the pending transaction: compensating turn 1 failed validation \u2014 Installed operation lacks a matching settlement disposition [effect-validation-failed]",
+            "undefined": false
+          },
+          "failedAssertions": [
+            "original full-baseline assertion",
+            "successful settlement is complete and terminal",
+            "terminal retry is nonmutating"
+          ]
+        }
+      ],
+      "artifact": "/private/tmp/st-omitted-leaf-attribution/runs/OAP-omitted-leaf-replay.mjs-suite-first"
+    },
+    {
+      "lane": "OAPI",
+      "command": "ST_PROOF_OUTPUT=/private/tmp/st-omitted-leaf-attribution node docs/research/membership-point-work-0/run.mjs OAPI omitted-leaf-replay.mjs suite first",
+      "exit": 1,
+      "stable": true,
+      "passes": 0,
+      "cases": [
+        {
+          "scenario": "directly omitted leaf",
+          "order": "transactions alone",
+          "status": "fail",
+          "first": {
+            "threw": true,
+            "code": "SIGNALTREE_ROLLBACK_FAILED",
+            "name": "SignalTreeRollbackError",
+            "message": "SignalTree could not rollback the pending transaction: compensating turn 2 failed validation \u2014 Installed operation lacks a matching settlement disposition [effect-validation-failed]",
+            "undefined": false
+          },
+          "after": {
+            "value": {
+              "name": "Ada",
+              "age": 50
+            },
+            "keys": [
+              "name",
+              "age"
+            ],
+            "age": 50,
+            "pending": 1,
+            "scope": true
+          },
+          "retry": {
+            "threw": true,
+            "code": "SIGNALTREE_ROLLBACK_FAILED",
+            "name": "SignalTreeRollbackError",
+            "message": "SignalTree could not rollback the pending transaction: compensating turn 2 failed validation \u2014 Installed operation lacks a matching settlement disposition [effect-validation-failed]",
+            "undefined": false
+          },
+          "failedAssertions": [
+            "original member-absence assertion",
+            "original leaf-read assertion",
+            "successful settlement is complete and terminal",
+            "terminal retry is nonmutating"
+          ]
+        },
+        {
+          "scenario": "directly omitted leaf",
+          "order": "transactions first",
+          "status": "fail",
+          "first": {
+            "threw": true,
+            "code": "SIGNALTREE_ROLLBACK_FAILED",
+            "name": "SignalTreeRollbackError",
+            "message": "SignalTree could not rollback the pending transaction: compensating turn 2 failed validation \u2014 Installed operation lacks a matching settlement disposition [effect-validation-failed]",
+            "undefined": false
+          },
+          "after": {
+            "value": {
+              "name": "Ada",
+              "age": 50
+            },
+            "keys": [
+              "name",
+              "age"
+            ],
+            "age": 50,
+            "pending": 1,
+            "scope": true
+          },
+          "retry": {
+            "threw": true,
+            "code": "SIGNALTREE_ROLLBACK_FAILED",
+            "name": "SignalTreeRollbackError",
+            "message": "SignalTree could not rollback the pending transaction: compensating turn 2 failed validation \u2014 Installed operation lacks a matching settlement disposition [effect-validation-failed]",
+            "undefined": false
+          },
+          "failedAssertions": [
+            "original member-absence assertion",
+            "original leaf-read assertion",
+            "successful settlement is complete and terminal",
+            "terminal retry is nonmutating"
+          ]
+        },
+        {
+          "scenario": "directly omitted leaf",
+          "order": "restoration first",
+          "status": "fail",
+          "first": {
+            "threw": true,
+            "code": "SIGNALTREE_ROLLBACK_FAILED",
+            "name": "SignalTreeRollbackError",
+            "message": "SignalTree could not rollback the pending transaction: compensating turn 2 failed validation \u2014 Installed operation lacks a matching settlement disposition [effect-validation-failed]",
+            "undefined": false
+          },
+          "after": {
+            "value": {
+              "name": "Ada",
+              "age": 50
+            },
+            "keys": [
+              "name",
+              "age"
+            ],
+            "age": 50,
+            "pending": 1,
+            "scope": true
+          },
+          "retry": {
+            "threw": true,
+            "code": "SIGNALTREE_ROLLBACK_FAILED",
+            "name": "SignalTreeRollbackError",
+            "message": "SignalTree could not rollback the pending transaction: compensating turn 2 failed validation \u2014 Installed operation lacks a matching settlement disposition [effect-validation-failed]",
+            "undefined": false
+          },
+          "failedAssertions": [
+            "original member-absence assertion",
+            "original leaf-read assertion",
+            "successful settlement is complete and terminal",
+            "terminal retry is nonmutating"
+          ]
+        },
+        {
+          "scenario": "original scalar baseline before later omission",
+          "order": "transactions alone",
+          "status": "fail",
+          "first": {
+            "threw": true,
+            "code": "SIGNALTREE_ROLLBACK_FAILED",
+            "name": "SignalTreeRollbackError",
+            "message": "SignalTree could not rollback the pending transaction: compensating turn 1 failed validation \u2014 Installed operation lacks a matching settlement disposition [effect-validation-failed]",
+            "undefined": false
+          },
+          "after": {
+            "value": {
+              "name": "Grace"
+            },
+            "keys": [
+              "name"
+            ],
+            "age": {
+              "diagnosticUndefined": true
+            },
+            "pending": 1,
+            "scope": true
+          },
+          "retry": {
+            "threw": true,
+            "code": "SIGNALTREE_ROLLBACK_FAILED",
+            "name": "SignalTreeRollbackError",
+            "message": "SignalTree could not rollback the pending transaction: compensating turn 1 failed validation \u2014 Installed operation lacks a matching settlement disposition [effect-validation-failed]",
+            "undefined": false
+          },
+          "failedAssertions": [
+            "original full-baseline assertion",
+            "successful settlement is complete and terminal",
+            "terminal retry is nonmutating"
+          ]
+        }
+      ],
+      "artifact": "/private/tmp/st-omitted-leaf-attribution/runs/OAPI-omitted-leaf-replay.mjs-suite-first"
+    }
+  ]
+}

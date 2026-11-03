@@ -203,8 +203,13 @@ const TARGETS = {
     // itself. Raised to the measurement plus the usual narrow headroom rather
     // than clawed back, because reclaiming it is a performance change and
     // belongs in its own release.
-    devKB: 12.45,
-    prodKB: 10.25,
+    // Owner-approved v16 cost after reduction audit; rationale and exact
+    // measurements: docs/research/v16-candidate-acceptance-0/README.md.
+    // Owner approved October 18: whole-value new-key correctness cost.
+    // Exact attribution, reductions, uncertainty and preserved headroom:
+    // docs/audits/2026-10-17-incumbent-readiness/ARTIFACT-ACCEPTANCE.md.
+    devKB: 14.79,
+    prodKB: 12.41,
     code: `
       import { signalTree } from ${JSON.stringify(CORE)};
       const t = signalTree({ count: 0, user: { name: 'a' } });
@@ -376,8 +381,10 @@ const TARGETS = {
     // 25.10KB dev. entity-signal.ts carries the per-subject epoch registry
     // (subjectEpochs / pendingSubjectEpochs) on top of the shared kernel
     // growth above. Same disposition and same reason.
-    devKB: 25.25,
-    prodKB: 22.6,
+    // Same v16 approval; keeps diagnostics and correctness intact.
+    // Same October 18 artifact-only approval; no performance-neutrality claim.
+    devKB: 28.98,
+    prodKB: 26.16,
     code: `
       import { signalTree, entityMap } from ${JSON.stringify(CORE)};
       const t = signalTree({ count: 0, users: entityMap() });
@@ -436,14 +443,15 @@ for (const [id, { code, devKB, prodKB }] of Object.entries(TARGETS)) {
 if (failed) {
   console.error(
     '\n❌ Bundle budget exceeded.\n\n' +
-      '  PROD over  — this is what users ship, so treat it as a real regression.\n' +
-      '               Find the statically-reachable optional module and make it\n' +
-      '               tree-shakeable (subpath or injected feature).\n\n' +
-      '  DEV over   — usually a new diagnostic string. Check it FOLDS first\n' +
-      '               (`node tools/check-devmode-foldable.mjs`): the ngDevMode\n' +
-      '               guard must be inline at the call site, not inside the\n' +
-      '               callee, or the message ships to production. If prod is\n' +
-      '               flat, raising the dev budget is the right call.\n'
+      '  PROD over  — the shipped artifact exceeds its current limit. Compare a\n' +
+      '               fresh baseline with the same toolchain, then inspect the\n' +
+      '               emitted graph. Distinguish optional reachability from\n' +
+      '               required behavior; do not assume an optional-module leak.\n\n' +
+      '  DEV over   — measure the production/development difference and check\n' +
+      '               diagnostic folding (`node tools/check-devmode-foldable.mjs`).\n' +
+      '               A flat production result alone does not justify a higher\n' +
+      '               development limit. Budget changes need measured rationale\n' +
+      '               and owner approval; this result remains failed.\n'
   );
   process.exit(1);
 }

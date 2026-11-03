@@ -1,0 +1,30 @@
+# Bounded matched heap attribution — plan only
+
+Focus: `entity-large-batches.spec.ts` → “undo and redo of a setAll that replaced every row.” No experiments or runtime edits authorized/executed here. Read docs/performance/measurement-contract.md. This is memory attribution, not timing, budget relaxation or another130k attempt.
+
+## Established evidence / limits
+
+- Indexed prototype large-entity-corrected: unchanged source fixture,1 passed of11, worker failure; V8 reports ~4056 MB after Mark-Compact and “Reached heap limit … heap out of memory.” Parent exit1/no watchdog. This establishes V8 allocation exhaustion, not which internal operation allocated it or an index-specific regression. No precise stage markers identify whether the replacement/undo workload was in preparation, install, publication or teardown.
+- Original unchanged R3 broad run: membership-observed first case passed, then180s without progress and owned-process termination. No OOM was observed. Different campaign/history and stopping conditions prevent interpreting this as a matched heap comparison.
+- Indexed `large-batch-restoration-v16-controls.spec.ts`: raw log2/2 pass, exit0/no timeout at130k. Keep this separate successful qualification; not all large workloads fail. No repeat proposed.
+- Base manifests serialize differently (`fa371d…` versus frozen R3 `e0b64d…`) but all3,095 path/hash entries are equal. The indexed adapter hash is `0e9e8347f26bec9a360b0db5080fb52b0949b3f30da011db93efe018a8d57fce`; original R3 adapter is `108517fe533b6e5f0c4abbbb700ed1d358ac3db170fbac6bf3ed270872018eb6`. Reverify complete arms before execution; no claim that a source hash is a built artifact receipt.
+
+## First bounded experiment, if Main authorizes
+
+Use original R3 versus the final prepared-index prototype, exact pinned installed Node/pnpm/Vitest/framework dependencies, same source import graph and target configuration. Fresh owned Nx worker/process for every arm/sample, sequential, no unrelated heavy work. Record actual worker PID/execArgv/V8 heap_size_limit, versions, lock/config hashes and host contention. Do not raise heap limits or production timeouts/budgets.
+
+Use N=128,512,2048; only change LARGE in disposable test-only copies, preserving original row construction, offset=N, restoration enhancer, undoable,12-microtask drains and every existing assertion/finally. Initially select the first membership-observed case followed by replace-every-row undo/redo in the **same fresh worker**, preserving original preceding-work history. No findIndex/filter wrappers or other cost tests. Run both arms once per N; duplicate N512 once per arm as an A/A noise/control sample, without replacing first results. Alternate arm order. Eight bounded invocations maximum; stop escalation on failure or steep unexpected growth.
+
+Append primitive-only stage rows: before/after tree creation, seed+drain, replacement+drain, undo, existing undo assertions, redo, existing redo assertion, destroy, bounded drain. Record process.memoryUsage fields (heapUsed/heapTotal/RSS/external/arrayBuffers) and V8 heap statistics. No extra tree reads between operations; do not retain trees, payloads, plans, errors or stacks in a recording array. Stream to own JSONL. Samples are boundary whole-process heap, **not peaks, allocation bytes or retained/dominator sizes**. No forced GC inside the workload or preparation. Existing observer/stop and teardown stay unchanged.
+
+## Attribute temporary index refs versus shared work
+
+If boundary samples locate divergence near heterogeneous preparation, use a separate, equally instrumented pair at N512 then2048 only. Output-only private hooks at before ordinary-plan creation, after ordinary plans, after index construction (same logical boundary on baseline), after installation, after publication/completion. No hooks in atomic installation; no extra callback into user code. Record primitive cardinalities already present: total ordinary changes C, distinct owner/subject groups G, index grouped-reference count, selected-disposition copy lengths and live operation/frame counts where existing local collections expose them. Do not traverse arbitrary payloads or recursively walk proof graphs.
+
+Source hypothesis: index adds O(G) map/array headers plus C references to **existing** change objects; it does not clone change payloads. Per-call slice copies remain in both arms' publication task. Count C/G and references explicitly; never equate C with rows without evidence. Similar baseline/indexed growth before index construction or persisting after unit release points away from the map alone. An added post-index component scaling with C supports a temporary-storage contribution, not whole-OOM causality. Map lifetime/closure retention must be distinguished from shared proof/owner structures.
+
+For retention discrimination only after useful assertions/cleanup pass, add a separately labeled matched N512 sample with exposed worker GC: quiescent post-drain, post-destroy/drain, then three fixed GC/drain samples. Both arms identical; no mid-prepare GC. This estimates reachable whole heap after GC, not dominators or a universal leak bound. If carryover from case1 remains plausible, one fresh second-case-only N512 pair distinguishes that history; do not silently replace the matched first-two-case experiment.
+
+Finite decision: temporary index excess that disappears after completion; persistent extra reachability requiring a narrow root/lifetime audit; or substantial common pre-index/lifecycle cost requiring a different local discriminator. Preserve uncertainty if these cannot separate causes. No full heap dump initially. Request a sampled allocation profile only if bounded counters/boundaries remain ambiguous, with matched semantics and explicit overhead; no automatic profiler/heapdump expansion.
+
+Containment: external180s no-progress/360s absolute owned-job cap, birth-matched descendant cleanup; sample memory growth stops subsequent size escalation. Preserve first failures and exact hashes/commands. No speed ranking, extrapolated130k pass, ceiling change, production patch or release claim.

@@ -1,0 +1,119 @@
+[
+  {
+    "command": [
+      "node",
+      "docs/research/membership-point-work-0/run.mjs",
+      "base",
+      "point-work.mjs",
+      "active",
+      "alias-fixed"
+    ],
+    "exit": 0,
+    "stdout": "{\"lane\":\"base\",\"entry\":\"point-work.mjs\",\"control\":\"active\",\"exit\":0,\"stable\":true,\"out\":\"/private/tmp/st-membership-point-replay/runs/base-point-work.mjs-active-alias-fixed\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/membership-point-work-0/run.mjs",
+      "D2",
+      "point-work.mjs",
+      "off",
+      "alias-fixed"
+    ],
+    "exit": 0,
+    "stdout": "{\"lane\":\"D2\",\"entry\":\"point-work.mjs\",\"control\":\"off\",\"exit\":0,\"stable\":true,\"out\":\"/private/tmp/st-membership-point-replay/runs/D2-point-work.mjs-off-alias-fixed\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/membership-point-work-0/run.mjs",
+      "D2",
+      "point-work.mjs",
+      "active",
+      "alias-fixed"
+    ],
+    "exit": 0,
+    "stdout": "{\"lane\":\"D2\",\"entry\":\"point-work.mjs\",\"control\":\"active\",\"exit\":0,\"stable\":true,\"out\":\"/private/tmp/st-membership-point-replay/runs/D2-point-work.mjs-active-alias-fixed\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/membership-point-work-0/run.mjs",
+      "D2I",
+      "point-work.mjs",
+      "off",
+      "alias-fixed"
+    ],
+    "exit": 0,
+    "stdout": "{\"lane\":\"D2I\",\"entry\":\"point-work.mjs\",\"control\":\"off\",\"exit\":0,\"stable\":true,\"out\":\"/private/tmp/st-membership-point-replay/runs/D2I-point-work.mjs-off-alias-fixed\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/membership-point-work-0/run.mjs",
+      "D2I",
+      "point-work.mjs",
+      "active",
+      "alias-fixed"
+    ],
+    "exit": 0,
+    "stdout": "{\"lane\":\"D2I\",\"entry\":\"point-work.mjs\",\"control\":\"active\",\"exit\":0,\"stable\":true,\"out\":\"/private/tmp/st-membership-point-replay/runs/D2I-point-work.mjs-active-alias-fixed\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/membership-point-work-0/run.mjs",
+      "OAP",
+      "point-work.mjs",
+      "off",
+      "alias-fixed"
+    ],
+    "exit": 0,
+    "stdout": "{\"lane\":\"OAP\",\"entry\":\"point-work.mjs\",\"control\":\"off\",\"exit\":0,\"stable\":true,\"out\":\"/private/tmp/st-membership-point-replay/runs/OAP-point-work.mjs-off-alias-fixed\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/membership-point-work-0/run.mjs",
+      "OAP",
+      "point-work.mjs",
+      "active",
+      "alias-fixed"
+    ],
+    "exit": 0,
+    "stdout": "{\"lane\":\"OAP\",\"entry\":\"point-work.mjs\",\"control\":\"active\",\"exit\":0,\"stable\":true,\"out\":\"/private/tmp/st-membership-point-replay/runs/OAP-point-work.mjs-active-alias-fixed\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/membership-point-work-0/run.mjs",
+      "OAPI",
+      "point-work.mjs",
+      "off",
+      "alias-fixed"
+    ],
+    "exit": 0,
+    "stdout": "{\"lane\":\"OAPI\",\"entry\":\"point-work.mjs\",\"control\":\"off\",\"exit\":0,\"stable\":true,\"out\":\"/private/tmp/st-membership-point-replay/runs/OAPI-point-work.mjs-off-alias-fixed\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/membership-point-work-0/run.mjs",
+      "OAPI",
+      "point-work.mjs",
+      "active",
+      "alias-fixed"
+    ],
+    "exit": 0,
+    "stdout": "{\"lane\":\"OAPI\",\"entry\":\"point-work.mjs\",\"control\":\"active\",\"exit\":0,\"stable\":true,\"out\":\"/private/tmp/st-membership-point-replay/runs/OAPI-point-work.mjs-active-alias-fixed\"}\n",
+    "stderr": ""
+  }
+]

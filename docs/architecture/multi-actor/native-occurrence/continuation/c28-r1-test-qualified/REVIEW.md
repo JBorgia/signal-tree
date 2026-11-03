@@ -1,0 +1,9 @@
+# Authorized test-only type/classification correction
+
+Separate copy of frozen R1; original candidate, fixtures and compiler failures untouched. Three spec files changed, zero runtime/config/gate/baseline/discovery changes. SNAPSHOT.json/MANIFEST.json and tests.patch record exact identity. ORIGINAL-SPEC-TYPES-FIRST.log preserves the independent five-error first failure.
+
+Central instruction selects Object.assign fallback diagnostic forms preserving property overwrite order, replacing the duplicate name/message spreads. Two internal nested-updater calls now carry narrow @ts-expect-error TS2322 comments. They remain executed runtime controls, explicitly labeled internal-runtime, not supported public typed inputs. Unused directives will fail if public input acceptance expands; this is negative-type coverage, not a cast or positive public type claim. All runtime assertions remain unchanged. Callable/report routes remain positive public coverage. No public API change.
+
+Affected Nx run: `corepack pnpm nx test kernel cached-current-input.spec.ts current-capture-r1.spec.ts opaque-current-input.spec.ts --skip-nx-cache --maxWorkers=1`:17/17 pass, exit0, no timeout/source unchanged. Separate unchanged gate: `corepack pnpm exec node tools/check-spec-types.mjs`:exit0, no timeout/source unchanged. Existing ratchet-improvement suggestions remain in raw output; no --update/baseline edit. Pinned Node24.15.0/pnpm10.17.0, run-owned cache/data/temp and process-group cap180s. Commands, launch identities, first logs, observations and source hashes preserved.
+
+This packet supersedes only the earlier TYPE-PROPOSAL diagnostic syntax/route-replacement suggestion, per explicit central disposition. It does not qualify R1 runtime or waive the approved A/B failure preserved separately under /private/tmp/st-c28-r1-qualification. No build/full suite/framework or source-type duplication.

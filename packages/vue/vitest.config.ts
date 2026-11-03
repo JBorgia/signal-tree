@@ -5,6 +5,10 @@ export default defineConfig({
   root: import.meta.dirname,
   resolve: {
     alias: {
+      // Before the root alias: the supported tooling entry is its own source.
+      '@signal-tree/kernel/internals': fileURLToPath(
+        new URL('../kernel/src/internals.ts', import.meta.url)
+      ),
       '@signal-tree/kernel/adapter': fileURLToPath(
         new URL('../kernel/src/adapter.ts', import.meta.url)
       ),

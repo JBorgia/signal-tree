@@ -30,7 +30,6 @@ describe('E — is granular write/observation obtainable without a collection pr
     // `a` is untouched, by identity — not merely by value.
     expect(tree.$.rows.a()).toBe(beforeA);
   });
-
 });
 
 /**
@@ -53,9 +52,12 @@ describe('E — the 2x2: membership vs granularity', () => {
 });
 
 describe('E — identity across a key change', () => {
-  it('RECORD: membership is FIXED AT CONSTRUCTION — no add, no remove', () => {
+  it('RECORD: whole values add supplied keys and omit missing keys', () => {
     const tree = signalTree({
-      rows: { a: { id: 'a', n: 1 } } as Record<string, { id: string; n: number }>,
+      rows: { a: { id: 'a', n: 1 } } as Record<
+        string,
+        { id: string; n: number }
+      >,
     });
 
     // A nested accessor is not a settable signal; it is a callable that merges.
@@ -67,9 +69,9 @@ describe('E — identity across a key change', () => {
 
     const now = tree.$.rows() as Record<string, unknown>;
 
-    // MEASURED: `b` was NOT added. The tree materialises `rows` with the keys
-    // present at construction, and a write reaches only those positions.
-    expect(now['b']).toBeUndefined();
+    // Owner-authorized v16 change: newly supplied ordinary keys materialize.
+    // The prior discard observation remains in the baseline and first-run log.
+    expect(now['b']).toEqual({ id: 'b', n: 1 });
 
     // ⚠️ UPDATED IN 15.0 — the REMOVE half of this record no longer holds.
     //
@@ -114,9 +116,12 @@ describe('E — identity across a key change', () => {
   //
   // ⚠️ WHEN THIS STARTS PASSING, THE SUITE GOES RED and `.fails` must be
   // removed. That is the point: nobody has to remember to flip a flag.
-  it.fails('OPEN-KEY: a Record whole assignment installs the complete T', () => {
+  it('OPEN-KEY: a Record whole assignment installs the complete T', () => {
     const tree = signalTree({
-      rows: { a: { id: 'a', n: 1 } } as Record<string, { id: string; n: number }>,
+      rows: { a: { id: 'a', n: 1 } } as Record<
+        string,
+        { id: string; n: number }
+      >,
     });
 
     (tree.$.rows as unknown as (v: object) => void)({ b: { id: 'b', n: 1 } });

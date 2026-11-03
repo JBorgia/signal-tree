@@ -1,0 +1,464 @@
+{
+  "mode": "rollback",
+  "inside": [
+    {
+      "step": "a",
+      "direct": [
+        1,
+        0,
+        0,
+        0
+      ],
+      "derived": [
+        1,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "step": "b",
+      "direct": [
+        1,
+        1,
+        0,
+        0
+      ],
+      "derived": [
+        1,
+        1,
+        0,
+        0
+      ]
+    },
+    {
+      "step": "all",
+      "direct": [
+        1,
+        1,
+        1,
+        1
+      ],
+      "derived": [
+        1,
+        1,
+        1,
+        0
+      ]
+    }
+  ],
+  "native": [
+    {
+      "direct": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "derived": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "direct": [
+        1,
+        1,
+        1,
+        1
+      ],
+      "derived": [
+        1,
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "direct": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "derived": [
+        0,
+        0,
+        0,
+        0
+      ]
+    }
+  ],
+  "tooling": [
+    {
+      "path": "a",
+      "direct": [
+        1,
+        1,
+        1,
+        1
+      ],
+      "derived": [
+        1,
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "path": "b",
+      "direct": [
+        1,
+        1,
+        1,
+        1
+      ],
+      "derived": [
+        1,
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "path": "c",
+      "direct": [
+        1,
+        1,
+        1,
+        1
+      ],
+      "derived": [
+        1,
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "path": "rows.A",
+      "direct": [
+        1,
+        1,
+        1,
+        1
+      ],
+      "derived": [
+        1,
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "path": "rows",
+      "direct": [
+        1,
+        1,
+        1,
+        1
+      ],
+      "derived": [
+        1,
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "path": "rows.A",
+      "origin": "transaction-rollback",
+      "direct": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "derived": [
+        0,
+        0,
+        0,
+        0
+      ]
+    }
+  ],
+  "hits": 0,
+  "callbackReached": false,
+  "beforeDemand": {
+    "native": [
+      {
+        "direct": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "derived": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "direct": [
+          1,
+          1,
+          1,
+          1
+        ],
+        "derived": [
+          1,
+          1,
+          1,
+          1
+        ]
+      },
+      {
+        "direct": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "derived": [
+          0,
+          0,
+          0,
+          0
+        ]
+      }
+    ],
+    "tooling": [
+      {
+        "path": "a",
+        "direct": [
+          1,
+          1,
+          1,
+          1
+        ],
+        "derived": [
+          1,
+          1,
+          1,
+          1
+        ]
+      },
+      {
+        "path": "b",
+        "direct": [
+          1,
+          1,
+          1,
+          1
+        ],
+        "derived": [
+          1,
+          1,
+          1,
+          1
+        ]
+      },
+      {
+        "path": "c",
+        "direct": [
+          1,
+          1,
+          1,
+          1
+        ],
+        "derived": [
+          1,
+          1,
+          1,
+          1
+        ]
+      },
+      {
+        "path": "rows.A",
+        "direct": [
+          1,
+          1,
+          1,
+          1
+        ],
+        "derived": [
+          1,
+          1,
+          1,
+          1
+        ]
+      },
+      {
+        "path": "rows",
+        "direct": [
+          1,
+          1,
+          1,
+          1
+        ],
+        "derived": [
+          1,
+          1,
+          1,
+          1
+        ]
+      }
+    ]
+  },
+  "afterQueuedBeforeDemand": {
+    "native": [
+      {
+        "direct": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "derived": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "direct": [
+          1,
+          1,
+          1,
+          1
+        ],
+        "derived": [
+          1,
+          1,
+          1,
+          1
+        ]
+      },
+      {
+        "direct": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "derived": [
+          0,
+          0,
+          0,
+          0
+        ]
+      }
+    ],
+    "tooling": [
+      {
+        "path": "a",
+        "direct": [
+          1,
+          1,
+          1,
+          1
+        ],
+        "derived": [
+          1,
+          1,
+          1,
+          1
+        ]
+      },
+      {
+        "path": "b",
+        "direct": [
+          1,
+          1,
+          1,
+          1
+        ],
+        "derived": [
+          1,
+          1,
+          1,
+          1
+        ]
+      },
+      {
+        "path": "c",
+        "direct": [
+          1,
+          1,
+          1,
+          1
+        ],
+        "derived": [
+          1,
+          1,
+          1,
+          1
+        ]
+      },
+      {
+        "path": "rows.A",
+        "direct": [
+          1,
+          1,
+          1,
+          1
+        ],
+        "derived": [
+          1,
+          1,
+          1,
+          1
+        ]
+      },
+      {
+        "path": "rows",
+        "direct": [
+          1,
+          1,
+          1,
+          1
+        ],
+        "derived": [
+          1,
+          1,
+          1,
+          1
+        ]
+      },
+      {
+        "path": "rows.A",
+        "origin": "transaction-rollback",
+        "direct": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "derived": [
+          0,
+          0,
+          0,
+          0
+        ]
+      }
+    ]
+  },
+  "finalDirect": [
+    0,
+    0,
+    0,
+    0
+  ],
+  "pending": 0,
+  "error": {
+    "threw": false,
+    "body": false,
+    "publisher": false
+  },
+  "status": "pass"
+}

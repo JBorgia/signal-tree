@@ -1,0 +1,23 @@
+✔ direct fresh independent input progresses while x is pending (explicit boundary) (0.584ms)
+✔ argument-only synchronous copy held without getter (0.310375ms)
+✔ multi-hop retains token and useful confirmation releases final value (0.069208ms)
+✔ tracked getter supplies dependency without notification frame (0.058166ms)
+✔ overwrite replaces only authored location dependencies (0.061416ms)
+✔ equal-value overwrite still replaces provenance (0.064625ms)
+✔ constant after dependent read in same execution conservatively held (0.03975ms)
+✔ rejection cannot cleanse a surviving speculative copy (0.065458ms)
+✔ nested delivery and settlement retain other pending token; stable retry (0.06ms)
+✔ throw restores frame and retains installed write responsibility (0.173625ms)
+✔ queued old revision carries dependency after source overwritten (0.056792ms)
+✔ endpoint rechecks reentrant payload before publication (0.045042ms)
+✔ unknown callbacks remain unknown after all transaction settlement (0.045459ms)
+✔ diagnostic roots release after overwrite, queue drain and destruction (0.075083ms)
+✔ unscoped policies cannot satisfy both async safety and direct progress (0.054542ms)
+ℹ tests 15
+ℹ suites 0
+ℹ pass 15
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 38.451583

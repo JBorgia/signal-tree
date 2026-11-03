@@ -20,11 +20,11 @@ import { signalTree } from './signal-tree';
  * pins four properties that must survive while the runtime changes underneath:
  *
  *     recursive KNOWN-key inference
- *     recursive OPEN-key inference
+ *     honest OPEN-key uncertainty
  *     HYBRID named-key inference
  *     CLOSED arbitrary-key REJECTION
  *
- * Reintroduce a `string extends keyof T` special case and this goes red at once.
+ * The authorized v16 open-key migration must preserve named/hybrid topology.
  *
  * ⚠️ NO CASTS on the assertions themselves — §29.7a. The subject IS what the
  * public typing infers.
@@ -48,12 +48,15 @@ describe('TYPE-SURFACE-PROTECTION-0', () => {
     // @ts-expect-error a closed object type must not admit an arbitrary key
     void closed.$.user.arbitrary;
 
-    // ── recursive OPEN-key inference ────────────────────────────────────────
-    // Descendants of an open-keyed object still infer the full `Row` shape.
+    // ── honest OPEN-key uncertainty ────────────────────────────────────────
+    // The original unchecked promises are retained below as rejected accesses.
+    // Unknown dynamic access is the owner-authorized v16 compatibility change.
     // (Bracket syntax is forced by `noPropertyAccessFromIndexSignature`; it is a
     // lint affordance, not an API design statement.)
     const open = signalTree({ rows: { a: { id: 'a', n: 1 } } as Record<string, Row> });
+    // @ts-expect-error arbitrary Record access has no proven handle topology
     const _openId: string = open.$.rows['arbitrary'].id();
+    // @ts-expect-error arbitrary Record access has no proven handle topology
     const _openN: number = open.$.rows['arbitrary'].n();
     void _openId;
     void _openN;

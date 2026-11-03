@@ -1,3 +1,58 @@
+import { ordinaryEntityEntries } from '../../lib/internals/ordinary-entity-entries';
+import {
+  entityValueTransition,
+  getEntityOrdinaryChanges,
+  withoutEntityOrdinaryChanges,
+  ordinaryEntityEntry,
+} from '../../lib/internals/entity-value-transition';
+import {
+  completeOrderCapture,
+  type OrderBoundaryEvidence,
+} from './order-boundary-evidence';
+import { placeFieldReversalsWhileRowsExist } from '../../lib/internals/causal-runtime/pending-rollback';
+import { publishingExposedOnly } from '../../lib/internals/exposed-publication';
+import {
+  forgetTransientRows,
+  rememberTransientRow,
+  withTransientRows,
+} from '../../lib/internals/causal-runtime/transient-rows';
+import {
+  defineRestorationSource,
+  restorationRefusal,
+  type RestorationEntryId,
+  type RestorationObserver,
+} from '../../lib/internals/restoration-source';
+import { holdEntityMembershipDelivery } from '../../lib/internals/entity-membership-source';
+import {
+  applyPlainBranchMemberSnapshot,
+  canRealizePlainBranchMember,
+  changedOmittedCollection,
+  collectionBindingAt,
+  composeHiddenMemberValue,
+  composePlainBranchMemberEffect,
+  settleTurnMemberEffects,
+  hidingMembers,
+  isReAddableMember,
+  type HiddenMemberTarget,
+  plainBranchMembershipEffects,
+  preparePlainBranchMembers,
+  readPlainBranchMember,
+  type PlainBranchMemberPresence,
+} from '../../lib/internals/plain-branch-membership';
+import {
+  beginStructuralWrite,
+  endStructuralWrite,
+} from '../../lib/internals/member-membership';
+import {
+  openPhysicalRows,
+  physicalRows,
+} from '../../lib/internals/physical-rows';
+import type { FieldPresence } from '../../lib/internals/causal-runtime/causal-types';
+import {
+  applyInInvalidationGroup,
+  applicationFailureCause,
+  wasAppliedBeforeFailure,
+} from '../../lib/internals/causal-runtime/post-application-failure';
 import type {
   ConstructionOf,
   SnapshotValue,
@@ -17,12 +72,13 @@ import { getTreeScalarSlotRuntime } from '../../lib/internals/tree-scalar-slot-p
 import { markOwnerInvalidatedFrom } from '../../lib/internals/owner-invalidation-port';
 import { rootAuthorityFor } from '../../lib/internals/root-source';
 
-import { isTraversableNode, snapshotState } from '../../lib/utils';
+import { deepEqual, isTraversableNode, snapshotState } from '../../lib/utils';
 import { interceptLeafSignals } from '../../lib/internals/intercept-leaf-signals';
 import { getMutationCaptureRuntime } from '../../lib/internals/mutation-capture-runtime';
 import type { CollectionOrderCapture } from '../../lib/internals/mutation-capture-runtime';
 import {
   deriveCollectionOrderDelta,
+  CollectionOrderConflict,
   deriveDeclarativeTransitionTarget,
   prepareDeclarativeTransitionInstallation,
   requiresDeclarativeStructuralTarget,
@@ -84,6 +140,7 @@ import type {
 // `SignalTreeRollbackError` is no longer imported here: rollback errors are
 // raised by `transactions()`, which owns rollback (TX-SURFACE-0).
 import { ENHANCER_META } from '../../lib/types';
+import { appendAll } from '../../lib/internals/utilities/append-all';
 
 // Angular's build-time flag takes precedence. Framework-neutral runtimes use an
 // explicit Node environment when available; unknown browser environments take
@@ -123,9 +180,15 @@ export type { RestorationConfig, RestorationHistoryEntry };
  * Internal restoration state management
  */
 
+const noop = (): void => undefined;
+
 type CanonicalTurn<T> = Omit<RestorationHistoryEntry<T>, 'state'> & {
   state?: T;
   id: number;
+  /** Reader identity. Never reused, including after a history reset. */
+  entryId: RestorationEntryId;
+  /** Only a relation the owner recorded: the transaction that staged it. */
+  __transactionId?: number;
   historyIndex: number;
   /**
    * RESTORATION CLAIM SET — the subjects whose backing must conservatively
@@ -169,6 +232,8 @@ type ScalarSetEffect = TurnEffectBase & {
   kind: 'set';
   subject?: number;
   subjectFieldSegments?: readonly string[];
+  plainBranchMembership?: PlainBranchMemberPresence;
+  fieldPresence?: FieldPresence;
   before: unknown;
   after: unknown;
   mutationIntent?: 'replace' | 'derive';
@@ -209,6 +274,11 @@ type DirectedTurnApplication = {
   readonly effects: TurnEffect[];
   readonly orderDeltas: CollectionOrderDelta[];
   readonly direction: 'undo' | 'redo';
+  /**
+   * Per effect, the ordinal of its turn among all the turns being applied;
+   * present only when they are more than one (`ReversalEffect.turn`).
+   */
+  readonly turns?: number[];
 };
 
 type TreeRealizationDescriptorStore = Map<
@@ -240,6 +310,21 @@ type TreeRealizationDescriptorStore = Map<
 // Rollback is `transactions()`' concern and it declares its own equivalents,
 // built from its own captured effects rather than from restoration history.
 
+/** Mapping creates semantic reversals; normalization cannot cross an application. */
+function compileReversalApplications(
+  applications: readonly DirectedTurnApplication[]
+): ReversalEffect[] {
+  return applications.flatMap((application) =>
+    placeFieldReversalsWhileRowsExist(
+      application.effects.map((effect, index) => {
+        const reversal = toReversalEffect(effect, application.direction);
+        const turn = application.turns?.[index];
+        return turn === undefined ? reversal : { ...reversal, turn };
+      })
+    )
+  );
+}
+
 function toReversalEffect(
   effect: TurnEffect,
   direction: 'undo' | 'redo'
@@ -252,6 +337,22 @@ function toReversalEffect(
         after: direction === 'undo' ? effect.before : effect.after,
         subjectId: effect.subject,
         subjectFieldSegments: effect.subjectFieldSegments,
+        plainBranchMembership: effect.plainBranchMembership
+          ? direction === 'undo'
+            ? {
+                before: effect.plainBranchMembership.after,
+                after: effect.plainBranchMembership.before,
+              }
+            : effect.plainBranchMembership
+          : undefined,
+        fieldPresence: effect.fieldPresence
+          ? direction === 'undo'
+            ? {
+                before: effect.fieldPresence.after,
+                after: effect.fieldPresence.before,
+              }
+            : effect.fieldPresence
+          : undefined,
         path: effect.path,
         ownerPath: effect.ownerPath,
       };
@@ -331,6 +432,7 @@ type CaptureBucket = {
   positionIds: Set<number>;
   effects: PendingEffectMap;
   collectionOrders: Map<number, PendingCollectionOrder>;
+  orderBoundaries: Map<number, OrderBoundaryEvidence[]>;
   descriptorInputs: Array<
     Omit<Parameters<typeof rememberTreeRealizationDescriptor>[0], 'descriptors'>
   >;
@@ -430,6 +532,11 @@ class RestorationManager<TSource, T> {
   private positionTurnIds = new Map<number, number[]>();
   private positionFrontiers = new Map<number, number>();
   private nextTurnId = 1;
+  private nextEntryId = 1;
+  /** Restoration reader (internals only); undefined until one attaches. */
+  private observer?: RestorationObserver;
+  /** Entries applied by the running operation, tracked only while observed. */
+  private activeOperation?: Set<RestorationEntryId>;
   private historicalEvents: HistoricalEvent[] = [];
   private nextHistoricalOrdinal = 1;
 
@@ -481,6 +588,14 @@ class RestorationManager<TSource, T> {
     return this.maxHistorySize > 0;
   }
 
+  /**
+   * Retained (including redo) or pending history exists, so a later boundary
+   * may have to reconstruct an earlier one through external gaps.
+   */
+  hasRetainedOrPendingHistory(): boolean {
+    return this.history.length > 0 || this.pendingTurns.size > 0;
+  }
+
   appendHistoricalGap(
     effects: TurnEffect[],
     collectionOrders: PendingCollectionOrder[],
@@ -500,7 +615,7 @@ class RestorationManager<TSource, T> {
       designated &&
       collectionOrders.length === 0
     ) {
-      lastEvent.effects.push(...effects.map(cloneTurnEffect));
+      appendAll(lastEvent.effects, effects.map(cloneTurnEffect));
       return;
     }
     this.appendHistoricalEvent(effects, collectionOrders);
@@ -518,11 +633,18 @@ class RestorationManager<TSource, T> {
           order.beforeSubjects,
           order.afterSubjects,
           order.beforeFrontier,
-          order.afterFrontier
+          order.afterFrontier,
+          order.ordinaryEndpoints
         )
       )
       .filter((delta) => delta.participants.length > 0);
-    if (effects.length === 0 && orderDeltas.length === 0) {
+    // A physically net-zero batch can still contain an authored turn (external
+    // 0 -> 5, authored 5 -> 0). Its boundary must remain materializable.
+    if (
+      effects.length === 0 &&
+      orderDeltas.length === 0 &&
+      boundaryTurnId === undefined
+    ) {
       return undefined;
     }
     const ordinal = this.nextHistoricalOrdinal++;
@@ -533,6 +655,83 @@ class RestorationManager<TSource, T> {
       boundaryTurnId,
     });
     return ordinal;
+  }
+
+  /** A delivery failure belongs to the operation whose reversal applied. */
+  private deliveryFailure: { error: unknown } | undefined;
+
+  /**
+   * Run one undo/redo/jump. While a restoration reader observes, report what
+   * it actually did to the tree: the entries whose reversal installed, not
+   * what history looks like after callbacks it triggered (a subscriber may
+   * reset or trim history during delivery).
+   */
+  private runOperation(
+    operation: 'undo' | 'redo' | 'jump',
+    run: () => boolean
+  ): boolean {
+    const observer = this.observer;
+    const applied = observer && new Set<RestorationEntryId>();
+    const previous = this.activeOperation;
+    const previousFailure = this.deliveryFailure;
+    this.activeOperation = applied;
+    this.deliveryFailure = undefined;
+    let failure: { error: unknown } | undefined;
+    let completed = false;
+    try {
+      const result = run();
+      completed = true;
+      // Application completed; frontiers/indexes now describe the installed state.
+      const delivery = this.deliveryFailure as { error: unknown } | undefined;
+      if (delivery) throw applicationFailureCause(delivery.error);
+      return result;
+    } catch (error) {
+      if (!completed) failure = { error };
+      throw error;
+    } finally {
+      this.activeOperation = previous;
+      this.deliveryFailure = previousFailure;
+      if (applied) observer?.operation(operation, applied, failure);
+    }
+  }
+
+  /**
+   * Entry ids of `turnIds`, resolved BEFORE applying (a subscriber may reset
+   * history during delivery), and recorded only once application returned.
+   */
+  private recordAppliedEntries(turnIds: readonly number[]): () => void {
+    const active = this.activeOperation;
+    if (!active) return noop;
+    const ids: RestorationEntryId[] = [];
+    for (const id of turnIds) {
+      const entry = this.turns.get(id);
+      if (entry) ids.push(entry.entryId);
+    }
+    return () => {
+      for (const id of ids) active.add(id);
+    };
+  }
+
+  private applyReversal(apply: () => void): void {
+    // A reversal installs physical truth and its own membership effects: it
+    // reads and writes a hidden collection's retained rows (`physicalRows`),
+    // and re-adds no path implicitly (`structuralWrites`, v16 8e).
+    beginStructuralWrite();
+    openPhysicalRows(this.positionRegistry);
+    let failed = true;
+    try {
+      // Path observers see what the tree exposes, never a location's
+      // retained storage (`publishingExposedOnly`, v16 8g).
+      publishingExposedOnly(this.tree.$ as object, apply);
+      failed = false;
+    } catch (error) {
+      if (!wasAppliedBeforeFailure(error)) throw error;
+      // Finish operation bookkeeping before surfacing a post-application error.
+      this.deliveryFailure ??= { error };
+    } finally {
+      physicalRows.pop();
+      endStructuralWrite(failed);
+    }
   }
 
   private maxHistorySize: number;
@@ -549,6 +748,19 @@ class RestorationManager<TSource, T> {
     this.historyVersion = locations.createCell(0);
     this.frontierVersion = locations.createCell(0);
     this.maxHistorySize = normaliseMaxHistorySize(config.maxHistorySize);
+    defineRestorationSource(tree.$ as unknown as object, {
+      treeId: this.positionRegistry.id,
+      read: () => ({
+        entries: this.history,
+        statusOf: (turnId) => this.getTurnStatus(turnId),
+        currentIndex: this.currentIndex,
+        canUndo: this.canUndoConfirmed(),
+        canRedo: this.canRedoConfirmed(),
+      }),
+      attach: (observer) => {
+        this.observer = observer;
+      },
+    });
   }
 
   /**
@@ -580,7 +792,11 @@ class RestorationManager<TSource, T> {
     effects?: TurnEffect[],
     collectionOrders?: PendingCollectionOrder[],
     explicitTurnId?: number,
-    beforeInsert?: () => void
+    beforeInsert?: () => void,
+    historicalCapture?: {
+      effects: TurnEffect[];
+      collectionOrders: PendingCollectionOrder[];
+    }
   ): boolean {
     this.prepareConfirmedInsertion();
     const entry = this.buildTurn(
@@ -589,7 +805,8 @@ class RestorationManager<TSource, T> {
       effects,
       collectionOrders,
       explicitTurnId,
-      false
+      false,
+      historicalCapture
     );
     if (!entry) {
       return false;
@@ -604,7 +821,8 @@ class RestorationManager<TSource, T> {
     positionIds?: number[],
     effects?: TurnEffect[],
     collectionOrders?: PendingCollectionOrder[],
-    explicitTurnId?: number
+    explicitTurnId?: number,
+    transactionId?: number
   ): CanonicalTurn<T> | undefined {
     const entry = this.buildTurn(
       subjectIds,
@@ -618,7 +836,9 @@ class RestorationManager<TSource, T> {
       return undefined;
     }
 
+    entry.__transactionId = transactionId;
     this.pendingTurns.set(entry.id, entry);
+    this.observer?.historyChanged();
     return {
       ...entry,
       restorationSubjectIds: entry.restorationSubjectIds
@@ -665,7 +885,6 @@ class RestorationManager<TSource, T> {
     return this.pendingTurns.has(turnId);
   }
 
-
   // `getPendingRollbackPlan()` was DELETED in 15.0 with restoration()'s duplicate
   // `transaction()` (TX-SURFACE-0).
   //
@@ -688,7 +907,11 @@ class RestorationManager<TSource, T> {
     effects?: TurnEffect[],
     collectionOrders?: PendingCollectionOrder[],
     explicitTurnId?: number,
-    retainPendingState = false
+    retainPendingState = false,
+    historicalCapture?: {
+      effects: TurnEffect[];
+      collectionOrders: PendingCollectionOrder[];
+    }
   ): CanonicalTurn<T> | undefined {
     // A restoration history entry IS the snapshot — no clone.
     //
@@ -748,6 +971,7 @@ class RestorationManager<TSource, T> {
     ).sort((left, right) => left - right);
     const entry: CanonicalTurn<T> = {
       id: turnId,
+      entryId: `restoration-entry:${this.nextEntryId++}`,
       historyIndex: this.history.length,
       ...(pendingState === undefined ? {} : { state: pendingState }),
     };
@@ -758,7 +982,8 @@ class RestorationManager<TSource, T> {
           order.beforeSubjects,
           order.afterSubjects,
           order.beforeFrontier,
-          order.afterFrontier
+          order.afterFrontier,
+          order.ordinaryEndpoints
         )
       )
       .filter((delta) => delta.participants.length > 0);
@@ -812,9 +1037,12 @@ class RestorationManager<TSource, T> {
     // The reference-dedup above stays: it is O(1), structural rather than
     // semantic, and collapsing an identical snapshot loses nothing.
 
+    // The boundary's historical event carries every physical change of the
+    // flush (external truth included) for reconstruction; the turn's own
+    // effects stay authored-only for reversal.
     const eventOrdinal = this.appendHistoricalEvent(
-      effects ?? [],
-      collectionOrders ?? [],
+      historicalCapture?.effects ?? effects ?? [],
+      historicalCapture?.collectionOrders ?? collectionOrders ?? [],
       turnId
     );
     if (eventOrdinal !== undefined) {
@@ -877,6 +1105,7 @@ class RestorationManager<TSource, T> {
 
     this.rebuildTurnIndexes();
     this.pruneHistoricalEventsBeforeOldestBoundary();
+    this.observer?.historyChanged();
     return true;
   }
 
@@ -1385,6 +1614,10 @@ class RestorationManager<TSource, T> {
   }
 
   undoAt(positionId: number): boolean {
+    return this.runOperation('undo', () => this.runUndoAt(positionId));
+  }
+
+  private runUndoAt(positionId: number): boolean {
     if (!this.canUndoAt(positionId)) {
       return false;
     }
@@ -1410,6 +1643,10 @@ class RestorationManager<TSource, T> {
   }
 
   redoAt(positionId: number): boolean {
+    return this.runOperation('redo', () => this.runRedoAt(positionId));
+  }
+
+  private runRedoAt(positionId: number): boolean {
     if (!this.canRedoAt(positionId)) {
       return false;
     }
@@ -1491,6 +1728,10 @@ class RestorationManager<TSource, T> {
   }
 
   undoConfirmed(): boolean {
+    return this.runOperation('undo', () => this.runUndoConfirmed());
+  }
+
+  private runUndoConfirmed(): boolean {
     if (!this.canUndoConfirmed()) {
       return false;
     }
@@ -1540,6 +1781,10 @@ class RestorationManager<TSource, T> {
   }
 
   redoConfirmed(): boolean {
+    return this.runOperation('redo', () => this.runRedoConfirmed());
+  }
+
+  private runRedoConfirmed(): boolean {
     if (!this.canRedoConfirmed()) {
       return false;
     }
@@ -1577,7 +1822,12 @@ class RestorationManager<TSource, T> {
           `Historical state ${entry.id} could not be materialized`
         );
       }
-      return { ...entry, state };
+      const { entryId, __transactionId, ...existingView } = entry;
+      // Lineage belongs to the dedicated reader; preserve the existing history
+      // API's runtime shape as well as its declared type.
+      void entryId;
+      void __transactionId;
+      return { ...existingView, state };
     });
   }
 
@@ -1614,8 +1864,8 @@ class RestorationManager<TSource, T> {
         direction === 'undo'
           ? [...(turn.__effects ?? [])].reverse()
           : [...(turn.__effects ?? [])];
-      const reversalEffects = effects.map((effect) =>
-        toReversalEffect(effect, direction)
+      const reversalEffects = placeFieldReversalsWhileRowsExist(
+        effects.map((effect) => toReversalEffect(effect, direction))
       );
       const collectionOwners = new Set([
         ...(turn.__orderDeltas ?? []).map(({ owner }) => owner),
@@ -1664,7 +1914,15 @@ class RestorationManager<TSource, T> {
         if (typeof effect.path !== 'string') {
           throw new Error('Historical scalar effect has no path');
         }
-        natural = setDetachedNaturalValue(natural, effect.path, effect.after);
+        natural = effect.plainBranchMembership
+          ? applyPlainBranchMemberSnapshot(
+              this.tree.$,
+              natural,
+              effect.owner,
+              effect.plainBranchMembership.after,
+              effect.after
+            )
+          : setDetachedNaturalValue(natural, effect.path, effect.after);
       }
     };
 
@@ -1685,9 +1943,11 @@ class RestorationManager<TSource, T> {
           states[historyIndex] = natural;
         }
       }
-      const reversalEffects = [...event.effects]
-        .reverse()
-        .map((effect) => toReversalEffect(effect, 'undo'));
+      const reversalEffects = placeFieldReversalsWhileRowsExist(
+        [...event.effects]
+          .reverse()
+          .map((effect) => toReversalEffect(effect, 'undo'))
+      );
       const collectionOwners = new Set([
         ...event.orderDeltas.map(({ owner }) => owner),
         ...reversalEffects
@@ -1736,7 +1996,15 @@ class RestorationManager<TSource, T> {
         if (typeof effect.path !== 'string') {
           throw new Error('Historical scalar effect has no path');
         }
-        natural = setDetachedNaturalValue(natural, effect.path, effect.after);
+        natural = effect.plainBranchMembership
+          ? applyPlainBranchMemberSnapshot(
+              this.tree.$,
+              natural,
+              effect.owner,
+              effect.plainBranchMembership.after,
+              effect.after
+            )
+          : setDetachedNaturalValue(natural, effect.path, effect.after);
       }
     }
 
@@ -1759,9 +2027,14 @@ class RestorationManager<TSource, T> {
     this.isTemporalViewActive = false;
     this.bumpRestorationHistory();
     this.currentIndex = -1;
+    this.observer?.historyChanged();
   }
 
   jumpTo(index: number): boolean {
+    return this.runOperation('jump', () => this.runJumpTo(index));
+  }
+
+  private runJumpTo(index: number): boolean {
     if (index < 0 || index >= this.history.length) {
       return false;
     }
@@ -1888,6 +2161,8 @@ class RestorationManager<TSource, T> {
 
     const effects: TurnEffect[] = [];
     const orderDeltas: CollectionOrderDelta[] = [];
+    const turns: number[] = [];
+    let ordinal = 0;
     for (const turnId of turnIds) {
       recordProductionSubstrateStat('turnIndexLookups');
       const turn = this.turns.get(turnId);
@@ -1907,17 +2182,35 @@ class RestorationManager<TSource, T> {
           effects.push(turnEffects[i]);
         }
       } else {
-        effects.push(...turnEffects);
+        appendAll(effects, turnEffects);
       }
+      for (let i = 0; i < turnEffects.length; i++) turns.push(ordinal);
+      ordinal++;
     }
 
     for (const effect of effects) {
       if (!this.isSupportedEffect(effect)) {
-        throw new Error(`Unsupported scoped undo effect at ${effect.path}`);
+        // Owner-made and raised before anything applies: a refusal, like
+        // ST1034 and the structured validation refusals (v16 integration 8b).
+        throw restorationRefusal(
+          `Unsupported scoped undo effect at ${effect.path}`
+        );
       }
     }
 
-    this.applyEffectsFn([{ effects, direction, orderDeltas }]);
+    const recordApplied = this.recordAppliedEntries(turnIds);
+    const applyEffects = this.applyEffectsFn;
+    this.applyReversal(() =>
+      applyEffects([
+        {
+          effects,
+          direction,
+          orderDeltas,
+          ...(ordinal > 1 ? { turns } : {}),
+        },
+      ])
+    );
+    recordApplied();
   }
 
   private applyDirectedTurnTransition(
@@ -1927,7 +2220,11 @@ class RestorationManager<TSource, T> {
     if (!this.applyEffectsFn) {
       return;
     }
-    const applications: DirectedTurnApplication[] = [];
+    const applications: Array<DirectedTurnApplication & { turns: number[] }> =
+      [];
+    // A jump concatenates every turn it crosses; each effect keeps its turn's
+    // ordinal, counted across both directions (`ReversalEffect.turn`).
+    let ordinal = 0;
     for (const [turnIds, direction] of [
       [turnIdsToUndo, 'undo'],
       [turnIdsToRedo, 'redo'],
@@ -1937,6 +2234,7 @@ class RestorationManager<TSource, T> {
       }
       const effects: TurnEffect[] = [];
       const orderDeltas: CollectionOrderDelta[] = [];
+      const turns: number[] = [];
       for (const turnId of turnIds) {
         recordProductionSubstrateStat('turnIndexLookups');
         const turn = this.turns.get(turnId);
@@ -1945,24 +2243,55 @@ class RestorationManager<TSource, T> {
         }
         const turnEffects = turn.__effects ?? [];
         if (direction === 'undo') {
-          effects.push(...[...turnEffects].reverse());
+          for (let i = turnEffects.length - 1; i >= 0; i--)
+            effects.push(turnEffects[i]);
         } else {
-          effects.push(...turnEffects);
+          appendAll(effects, turnEffects);
         }
+        for (let i = 0; i < turnEffects.length; i++) turns.push(ordinal);
+        ordinal++;
         orderDeltas.push(
           ...(turn.__orderDeltas ?? []).map(cloneCollectionOrderDelta)
         );
       }
-      applications.push({ effects, orderDeltas, direction });
+      applications.push({ effects, orderDeltas, direction, turns });
     }
+    if (ordinal <= 1)
+      for (const application of applications) application.turns.length = 0;
     if (applications.length > 0) {
-      this.applyEffectsFn(applications);
+      const recordApplied = this.recordAppliedEntries([
+        ...turnIdsToUndo,
+        ...turnIdsToRedo,
+      ]);
+      const applyEffects = this.applyEffectsFn;
+      this.applyReversal(() => applyEffects(applications));
+      recordApplied();
     }
   }
 
   private isSupportedEffect(effect: TurnEffect): boolean {
     switch (effect.kind) {
       case 'set':
+        if (effect.plainBranchMembership)
+          return canRealizePlainBranchMember(this.tree.$, effect.position);
+        // A registered terminal restores one value whatever its payload's
+        // shape (v15 2892b650). Registration admits the effect kind only;
+        // whether the terminal is still live is the membership and
+        // external-truth checks' decision, made before anything is applied.
+        if (
+          effect.subject === undefined &&
+          (
+            getTreeScalarSlotRuntime(this.tree) ??
+            getTreeScalarSlotRuntime(this.tree.$)
+          )?.resolveScalarSlot(effect.position) !== undefined
+        )
+          return true;
+        if (
+          effect.subject !== undefined &&
+          effect.subjectFieldSegments !== undefined &&
+          effect.subjectFieldSegments.length > 0
+        )
+          return true;
         return (
           (this.isScalarValue(effect.before) &&
             this.isScalarValue(effect.after)) ||
@@ -2044,8 +2373,9 @@ class RestorationManager<TSource, T> {
     }
     const newlyUnowned: number[] = [];
     for (const entry of entries) {
-      newlyUnowned.push(
-        ...claims.release(this.restorationClaimOwner(entry.id))
+      appendAll(
+        newlyUnowned,
+        claims.release(this.restorationClaimOwner(entry.id))
       );
     }
     if (newlyUnowned.length > 0) {
@@ -2375,11 +2705,7 @@ export function restoration(
       applications: DirectedTurnApplication[]
     ): void => {
       readQueuedExternalAuthority();
-      const reversalEffects = applications.flatMap((application) =>
-        application.effects.map((effect) =>
-          toReversalEffect(effect, application.direction)
-        )
-      );
+      const reversalEffects = compileReversalApplications(applications);
       const orderDeltas = applications.flatMap(
         (application) => application.orderDeltas
       );
@@ -2390,6 +2716,10 @@ export function restoration(
         ...[...pendingTransactions.values()].map((bucket) => ({
           effects: [...bucket.effects.values()],
           collectionOrders: [...bucket.collectionOrders.values()],
+        })),
+        ...[...pendingFootprints.values()].map((footprints) => ({
+          effects: [...footprints.values()],
+          collectionOrders: [],
         })),
       ]) {
         const overlaps =
@@ -2418,10 +2748,223 @@ export function restoration(
               orderDeltas.some((delta) => delta.owner === order.owner)
           );
         if (overlaps) {
-          throw new Error(
+          throw restorationRefusal(
             'ST1034: restoration refused — overlapping transaction is pending. ' +
               'Nothing was changed; the history position is unmoved.'
           );
+        }
+      }
+      // A location under an omitted member (the location itself or a plain
+      // branch above it) is not current, whatever its retained state holds:
+      // writing it would report success while nothing can read the value.
+      // Registered slots and entity collections alike. An external omission
+      // keeps external truth's protection (ST1034). An ordinary authored
+      // omission is reversed like any later ordinary write (15.4.2): the
+      // outermost hidden member is re-added, carrying the reversal's slot
+      // targets, unless re-adding it would expose pending work. Anything that
+      // cannot be re-added is refused. Nothing is applied before this
+      // decision. (v16 integration 8b.)
+      let hiddenRefusal: string | undefined;
+      let appliedEffects = reversalEffects;
+      {
+        const registry = getPositionRegistry(tree.$);
+        const reversedMembers = new Set<number>();
+        for (const effect of reversalEffects)
+          if (effect.plainBranchMembership) reversedMembers.add(effect.owner);
+        const readded = new Map<
+          number,
+          {
+            member: { node: object; path: string | undefined };
+            targets: HiddenMemberTarget[];
+          }
+        >();
+        const replaced = new Set<ReversalEffect>();
+        const unmoved = 'Nothing was changed; the history position is unmoved.';
+        // A hidden entity collection comes back with the rows it retains,
+        // whether it was omitted itself or with a branch the reversal
+        // re-adds. Restored fully only if nothing but the reversal's own
+        // effects changed them after it was hidden; otherwise refused, never
+        // re-added silently (v16 integration 8d (b)).
+        const ownRows = new Map<number, Set<unknown>>();
+        for (const effect of reversalEffects)
+          if (effect.subjectId !== undefined) {
+            let rows = ownRows.get(effect.owner);
+            if (!rows) ownRows.set(effect.owner, (rows = new Set()));
+            rows.add(effect.subjectId);
+          }
+        const reordered = new Set(orderDeltas.map(({ owner }) => owner));
+        const refuseChangedRows = (member: number): void => {
+          const changed = changedOmittedCollection(
+            tree.$,
+            member,
+            (owner) => ownRows.get(owner) ?? new Set(),
+            (owner) => reordered.has(owner)
+          );
+          if (changed !== undefined)
+            hiddenRefusal ??=
+              `Unsupported scoped undo effect at '${changed}': the entity ` +
+              'collection was omitted and changed after that, so re-adding it ' +
+              `would not restore it as it was. ${unmoved}`;
+        };
+        for (const effect of reversalEffects)
+          if (effect.plainBranchMembership?.after === true)
+            refuseChangedRows(effect.owner);
+        // Presentation only (a display path or the structured address).
+        const label = (effect: ReversalEffect): string =>
+          effect.path ??
+          registry?.addressFor(effect.owner)?.join('.') ??
+          `position ${effect.owner}`;
+        // One walk per location: a collection's many row effects share it.
+        const walked = new Map<number, ReturnType<typeof hidingMembers>>();
+        // A collection's order delta reaches its collection like a row effect.
+        const orderOnly = orderDeltas.map(
+          ({ owner }): ReversalEffect => ({
+            owner,
+            before: undefined,
+            after: undefined,
+            subjectId: owner,
+          })
+        );
+        for (const effect of [...reversalEffects, ...orderOnly]) {
+          if (effect.plainBranchMembership) continue;
+          const slot =
+            effect.subjectId === undefined && effect.structural === undefined;
+          if (
+            slot &&
+            scalarSlotRuntime?.resolveScalarSlot(effect.owner) === undefined
+          )
+            continue;
+          if (!walked.has(effect.owner))
+            walked.set(effect.owner, hidingMembers(tree.$, effect.owner));
+          const found = walked.get(effect.owner);
+          if (!found) {
+            // An address that exists but no longer walks to its owner is not
+            // evidence that the location is current. Defensive: v16 never
+            // deletes a member (omission makes it non-enumerable, dynamic
+            // members reactivate with their identity), so every registered
+            // address still leads to its owner, as slice 6 found for the
+            // state-location reader (mutation survivor S5). Kept so that a
+            // future producer that breaks this refuses instead of writing.
+            if (registry?.addressFor(effect.owner))
+              hiddenRefusal ??=
+                `Unsupported scoped undo effect at '${label(effect)}': ` +
+                `its structured address no longer leads to the location. ${unmoved}`;
+            continue;
+          }
+          const hiding = found.filter(
+            ({ position }) =>
+              position === undefined || !reversedMembers.has(position)
+          );
+          if (!hiding.length) continue;
+          const external = hiding.find(
+            ({ position }) =>
+              position !== undefined &&
+              externalMembershipTruth.get(position)?.present === false
+          );
+          const [outer] = hiding;
+          if (external) {
+            const location = label(effect);
+            const member = external.path ?? location;
+            hiddenRefusal ??=
+              'ST1034: restoration refused — ' +
+              (member === location
+                ? `'${location}' was omitted by external truth after the operation being reversed`
+                : `'${member}' was omitted by external truth after the operation being reversed, and '${location}' lies under it`) +
+              `; restoring '${location}' would overwrite that omission. ${unmoved}`;
+            continue;
+          }
+          // Every hidden member on the way must come back, not only the
+          // outermost: the re-add stages the inner ones from its value.
+          const blocked =
+            outer.position === undefined ||
+            !canRealizePlainBranchMember(tree.$, outer.position)
+              ? outer
+              : hiding.find(
+                  (member) =>
+                    member.position === undefined ||
+                    !isReAddableMember(member.node)
+                );
+          if (blocked) {
+            // Reached by an omitted entity collection, which is not a
+            // membership-managed location, at any depth. A plain member whose
+            // retained location is unavailable is defensive: restoration
+            // registers a member's location whenever it observes the
+            // omission, which every re-add case depends on.
+            const location = label(effect);
+            const member = blocked.path ?? location;
+            hiddenRefusal ??=
+              `Unsupported scoped undo effect at '${location}': ` +
+              (member === location
+                ? 'it was omitted'
+                : `its enclosing member '${member}' was omitted`) +
+              ' and cannot be re-added, because ' +
+              (isReAddableMember(blocked.node)
+                ? 'its retained location is no longer available'
+                : 'it is not a plain state location (an entity collection, for example)') +
+              `. ${unmoved}`;
+            continue;
+          }
+          // Not blocked, so the outermost member has a position.
+          const owner = outer.position as number;
+          let entry = readded.get(owner);
+          if (!entry)
+            readded.set(owner, (entry = { member: outer, targets: [] }));
+          // A slot's value travels with the re-add; an entity effect applies
+          // as usual once the way to its collection is current again.
+          if (slot) {
+            entry.targets.push({
+              below: outer.below,
+              value: { value: effect.after },
+            });
+            replaced.add(effect);
+          } else entry.targets.push({ below: outer.below });
+        }
+        for (const owner of readded.keys()) refuseChangedRows(owner);
+        if (readded.size && !hiddenRefusal) {
+          // Re-adding a member exposes what it retains. Pending work under it
+          // owns that state until settlement.
+          const encloses = (outer: number, position: number): boolean => {
+            const prefix = registry?.addressFor(outer);
+            const address = registry?.addressFor(position);
+            return (
+              !!prefix &&
+              !!address &&
+              prefix.length <= address.length &&
+              prefix.every((key, index) => key === address[index])
+            );
+          };
+          const pendingPositions: number[] = [];
+          for (const pending of [
+            ...stagedTransactionEffects.values(),
+            ...pendingTransactions.values(),
+          ]) {
+            for (const effect of pending.effects.values())
+              pendingPositions.push(effect.position);
+            for (const order of pending.collectionOrders.values())
+              pendingPositions.push(order.owner);
+          }
+          for (const footprints of pendingFootprints.values())
+            for (const effect of footprints.values())
+              pendingPositions.push(effect.position);
+          for (const owner of readded.keys())
+            if (pendingPositions.some((position) => encloses(owner, position)))
+              throw restorationRefusal(
+                'ST1034: restoration refused — overlapping transaction is pending. ' +
+                  'Nothing was changed; the history position is unmoved.'
+              );
+          appliedEffects = reversalEffects.filter(
+            (effect) => !replaced.has(effect)
+          );
+          for (const [owner, { member, targets }] of readded) {
+            appliedEffects.push({
+              owner,
+              before: undefined,
+              after: composeHiddenMemberValue(member.node, targets),
+              plainBranchMembership: { before: false, after: true },
+              path: member.path,
+              ownerPath: member.path,
+            });
+          }
         }
       }
       const orderEndpoints = new Map<number, 'before' | 'after'>();
@@ -2452,6 +2995,11 @@ export function restoration(
               if (candidate?.owner === owner) binding = candidate;
               return undefined;
             });
+            // A collection under a member being re-added (by the hidden-member
+            // decision above, or by the replayed turn's own membership
+            // effects) is hidden from the current-tree walk; its binding is
+            // found along its address.
+            binding ??= collectionBindingAt(tree.$, owner);
             return binding?.readSource();
           })) &&
         reversalEffects.every(
@@ -2459,10 +3007,36 @@ export function restoration(
             typeof effect.subjectId === 'number' ||
             effect.structural === undefined
         );
+      // ⚠️ AN ORDER THIS TRANSITION CANNOT RECONSTRUCT IS REFUSED, typed and
+      // with nothing changed: every failure below is raised while the target
+      // is derived and prepared, before anything installs. Thrown as plain
+      // errors, a reader reported them as failures and their text named no
+      // collection (v16 8g). v15 15.4.x reconstructs them; the carry list
+      // names the commit each shape needs.
+      // The underlying failure stays in the text, in parentheses.
+      const orderRefusal = (
+        owner: PositionId,
+        reason: string,
+        failure: string
+      ): Error =>
+        restorationRefusal(
+          `ST1034: restoration refused — the order of '${
+            getPositionRegistry(tree.$)?.addressFor(owner)?.join('.') ??
+            `position ${owner}`
+          }' cannot be restored: ${reason} (${failure}). Nothing was changed; the history position is unmoved.`
+        );
       const applyDeclarativeTarget = (): void => {
         const deltaOwners = new Set(orderDeltas.map(({ owner }) => owner));
         if (deltaOwners.size !== orderDeltas.length) {
-          throw new Error(
+          const seen = new Set<PositionId>();
+          const repeated = orderDeltas.find(({ owner }) => {
+            if (seen.has(owner)) return true;
+            seen.add(owner);
+            return false;
+          });
+          throw orderRefusal(
+            repeated?.owner as PositionId,
+            'this would reverse more than one of its order changes at once',
             'Declarative order replay requires transition-level delta composition'
           );
         }
@@ -2476,7 +3050,7 @@ export function restoration(
           externalOrderOwners.has(owner)
         );
         if (conflictingOrderOwner !== undefined) {
-          throw new Error(
+          throw restorationRefusal(
             `ST1034: restoration refused — collection order ${conflictingOrderOwner} ` +
               'changed after the operation being reversed. Nothing was changed; ' +
               'the history position is unmoved.'
@@ -2495,18 +3069,59 @@ export function restoration(
           return undefined;
         });
         const sources = [...targetOwners].map((owner) => {
-          const binding = bindings.get(owner);
+          // A collection under a member being re-added is hidden from the
+          // current-tree walk; its binding is found along its address. The
+          // replayed turn may re-add it itself: redo of a write that re-added
+          // a hidden collection starts with it hidden (v16 8e review, M2).
+          const binding =
+            bindings.get(owner) ?? collectionBindingAt(tree.$, owner);
+          if (binding) bindings.set(owner, binding);
           if (!binding) {
             throw new Error(`Declarative order replay has no binding ${owner}`);
           }
           return binding.readSource();
         });
-        const target = deriveDeclarativeTransitionTarget({
-          collections: sources,
-          effects: reversalEffects,
-          orderDeltas,
-          orderEndpoints,
-        });
+        let target: ReturnType<typeof deriveDeclarativeTransitionTarget>;
+        try {
+          target = deriveDeclarativeTransitionTarget({
+            collections: sources,
+            effects: appliedEffects,
+            orderDeltas,
+            orderEndpoints,
+          });
+          target = {
+            ...target,
+            collections: new Map(
+              [...target.collections].map(([owner, collection]) => [
+                owner,
+                {
+                  ...collection,
+                  admittedEffects: appliedEffects.filter(
+                    (effect) => effect.owner === owner
+                  ),
+                  admittedOrder: (() => {
+                    const ordinary = orderDeltas.find(
+                      (delta) => delta.owner === owner
+                    )?.ordinaryEndpoints;
+                    return (
+                      orderEndpoints.get(owner) === 'before'
+                        ? ordinary?.before
+                        : ordinary?.after
+                    )?.filter(
+                      (subject) =>
+                        ordinary?.domain === undefined ||
+                        ordinary.domain.includes(subject)
+                    );
+                  })(),
+                },
+              ])
+            ),
+          };
+        } catch (failure) {
+          if (failure instanceof CollectionOrderConflict)
+            throw orderRefusal(failure.owner, failure.reason, failure.message);
+          throw failure;
+        }
         const scalarBinding: ScalarTransitionTargetBinding | undefined =
           scalarSlotRuntime
             ? {
@@ -2522,13 +3137,12 @@ export function restoration(
                     }
                     frame.set(slot, value);
                   }
+                  const install = frame.prepareCommit?.({advanceRevision:false,publish:false,admissionParticipation:'realized'});
+                  if (!install) throw new Error('Declarative scalar preparation unavailable');
                   let result: ReturnType<typeof frame.commit> | undefined;
                   return {
                     install(): void {
-                      result = frame.commit({
-                        advanceRevision: false,
-                        publish: false,
-                      });
+                      result = install();
                     },
                     publish(): void {
                       if (!result) {
@@ -2542,11 +3156,19 @@ export function restoration(
                 },
               }
             : undefined;
-        const prepared = prepareDeclarativeTransitionInstallation(
+        const prepared = withWriteContext(
+          {origin:'restoration', ownerId:getPositionRegistry(tree.$)?.id},
+          () => prepareDeclarativeTransitionInstallation(
           target,
           bindings,
-          scalarBinding
-        );
+          scalarBinding,
+          {
+            prepareTarget: (members, scalars, turns) => ({
+              ...preparePlainBranchMembers(tree.$ as object, members, [...(scalars ?? [])].map(([owner,after])=>({owner,after,turn:turns?.get(owner)})),undefined,'realized'),
+              includesScalars: true,
+            }),
+          }
+        ));
         isRestoring = true;
         try {
           const apply = () =>
@@ -2557,11 +3179,13 @@ export function restoration(
               },
               () => prepared.install()
             );
-          const locations = getLocationRuntime(tree.$);
-          if (locations) {
-            locations.runInvalidationGroup(apply);
-          } else {
-            apply();
+          // Membership listeners run once every collection of the reversal
+          // has installed and published, in commit order, whatever throws.
+          const releaseMembership = holdEntityMembershipDelivery(tree.$);
+          try {
+            applyInInvalidationGroup(tree.$, apply);
+          } finally {
+            releaseMembership();
           }
         } finally {
           isRestoring = false;
@@ -2588,6 +3212,32 @@ export function restoration(
       };
 
       const externalConflict = ((): ReversalRefusal | undefined => {
+        for (const effect of reversalEffects) {
+          if (effect.subjectId !== undefined || effect.structural !== undefined)
+            continue;
+          const truth = externalMembershipTruth.get(effect.owner);
+          if (!truth) continue;
+          const current = readPlainBranchMember(tree.$, effect.owner);
+          if (!current || current.present !== truth.present) continue;
+          const targetPresent = effect.plainBranchMembership?.after ?? true;
+          // Presence has its own authority. A fresh branch snapshot is not
+          // evidence that the realized membership has been superseded.
+          if (
+            targetPresent !== truth.present ||
+            (targetPresent &&
+              current.present &&
+              deepEqual(current.value, truth.value) &&
+              !deepEqual(effect.after, truth.value))
+          ) {
+            return {
+              kind: 'value-drift',
+              path: effect.path ?? '',
+              current: truth.value,
+              expected: effect.after,
+            };
+          }
+        }
+
         if (
           externalTruthByPath.size === 0 &&
           externalTruthBySubject.size === 0
@@ -2646,11 +3296,21 @@ export function restoration(
         return undefined;
       })();
 
+      if (hiddenRefusal) throw restorationRefusal(hiddenRefusal);
+      // Carry selected ordinary authority through the same private lowering as
+      // transaction compensation. Validate and install this exact paired array;
+      // physical revival alone must not leave ordinary membership absent.
+      // Existing external/hidden refusals retain precedence over preparation.
+      const preparedEffects =
+        !externalConflict && !usesDeclarativeTarget
+          ? realizationPort.prepareOrdinaryEffects?.(appliedEffects) ??
+            appliedEffects
+          : appliedEffects;
       const refusal =
         externalConflict ??
         (usesDeclarativeTarget
           ? undefined
-          : realizationPort.validateEffects(reversalEffects));
+          : realizationPort.validateEffects(preparedEffects));
       if (refusal) {
         if (refusal.kind === 'value-drift') {
           // RESTORE-P0 P0-C. An undo either reverses the authored operation or
@@ -2661,7 +3321,7 @@ export function restoration(
           //     different door
           //   let the inverse win -> history overwrites external truth it does
           //     not own, which is the case-6 defect
-          throw new Error(
+          throw restorationRefusal(
             `ST1034: restoration refused — '${refusal.path}' changed after the ` +
               `operation being reversed. Expected ${JSON.stringify(
                 refusal.expected
@@ -2670,7 +3330,10 @@ export function restoration(
               )}. Nothing was changed; the history position is unmoved.`
           );
         }
-        throw new Error(`Unsupported scoped undo effect at ${refusal.kind}`);
+        // A structured refusal from validation: nothing was applied.
+        throw restorationRefusal(
+          `Unsupported scoped undo effect at ${refusal.kind}`
+        );
       }
 
       if (usesDeclarativeTarget) {
@@ -2682,6 +3345,7 @@ export function restoration(
       const replayOwnerId = getPositionRegistry(
         (tree as { $?: object }).$ ?? tree
       )?.id;
+      let deliveryFailure: { error: unknown } | undefined;
       try {
         // State the origin so the port propagates it. `isRestoring` is a
         // synchronous flag and is already false by the time the notifier
@@ -2700,9 +3364,12 @@ export function restoration(
         withWriteContext(
           { origin: 'restoration', ownerId: replayOwnerId },
           () => {
-            realizationPort.applyAtomically(reversalEffects);
+            realizationPort.applyAtomically(preparedEffects);
           }
         );
+      } catch (error) {
+        if (!wasAppliedBeforeFailure(error)) throw error;
+        deliveryFailure = { error };
       } finally {
         isRestoring = false;
       }
@@ -2745,6 +3412,7 @@ export function restoration(
           }
         }
       }
+      if (deliveryFailure) throw deliveryFailure.error;
     };
 
     const positionRegistry = getPositionRegistry(tree.$);
@@ -2786,10 +3454,25 @@ export function restoration(
       positionIds: new Set<number>(),
       effects: new Map(),
       collectionOrders: new Map(),
+      orderBoundaries: new Map(),
       descriptorInputs: [],
       designated: false,
     });
     const pendingCapture = createCaptureBucket();
+    // Reconstruction needs every physical change, including external truth.
+    // Reversal owns authored work only. Sharing their effect map let an
+    // external 0 -> 5 contaminate a later authored 5 -> 6 undo with before=0.
+    // Before any retained/pending boundary exists, authored effects alone are
+    // sufficient: there is no earlier historical snapshot to reconstruct.
+    let historicalCapture: CaptureBucket | undefined;
+    const getHistoricalCapture = (): CaptureBucket | undefined => {
+      if (!restorationManager.hasRetainedOrPendingHistory()) return undefined;
+      return (historicalCapture ??= createCaptureBucket());
+    };
+    const clearHistoricalCapture = (): void => {
+      if (historicalCapture) clearCaptureBucket(historicalCapture);
+      historicalCapture = undefined;
+    };
 
     /**
      * RESTORE-P0 P0-C — the last value a REALIZATION wrote at a scalar path,
@@ -2809,6 +3492,39 @@ export function restoration(
      * value does not leave a stale conflict behind.
      */
     const externalTruthByPath = new Map<string, unknown>();
+    type MembershipTruth = { present: boolean; value: unknown };
+    const externalMembershipTruth = new Map<number, MembershipTruth>();
+    const displacedMembershipTruth = new Map<
+      number,
+      Map<number, MembershipTruth | undefined>
+    >();
+    const rememberMembershipTruth = (
+      transactionId: number | undefined,
+      position: number
+    ): void => {
+      if (transactionId === undefined) return;
+      let previous = displacedMembershipTruth.get(transactionId);
+      if (!previous)
+        displacedMembershipTruth.set(transactionId, (previous = new Map()));
+      if (!previous.has(position))
+        previous.set(position, externalMembershipTruth.get(position));
+    };
+    const restoreMembershipTruth = (
+      transactionId: number | undefined,
+      position: number
+    ): void => {
+      const previous =
+        transactionId === undefined
+          ? undefined
+          : displacedMembershipTruth.get(transactionId);
+      if (!previous?.has(position)) return;
+      const truth = previous.get(position);
+      if (truth) externalMembershipTruth.set(position, truth);
+      else externalMembershipTruth.delete(position);
+      previous.delete(position);
+      if (previous.size === 0)
+        displacedMembershipTruth.delete(transactionId as number);
+    };
 
     // Entity writes publish whole rows while reversal effects address fields.
     // Keep provenance at the same field granularity as those effects, keyed by
@@ -2928,6 +3644,20 @@ export function restoration(
     // rather than assuming provenance would be sufficient.
 
     const pendingTransactions = new Map<number, CaptureBucket>();
+    /**
+     * Admission evidence for a foreign transaction that is open or pending,
+     * recorded when its write COMMITS (entity rows) or is ENQUEUED (any
+     * location) — before notifier delivery can re-enter restoration. The
+     * capture buckets below only learn a write when it is delivered, so an
+     * undo/redo run inside the transaction callback, or by an earlier
+     * subscriber of the same delivery, found the location unowned and
+     * overwrote pending truth.
+     *
+     * Addresses only: values stay owned by transactions(), and nothing here
+     * becomes history. Released by the owner's confirmed/rolled-back event or
+     * by destroy. A history reset is not a settlement and keeps it.
+     */
+    const pendingFootprints = new Map<number, Map<string, TurnEffect>>();
     // Capture evidence for all staged transactions, including non-undoable ones.
     const stagedTransactionEffects = new Map<
       number,
@@ -3071,7 +3801,10 @@ export function restoration(
     // safe must not execute user observers or advance any history boundary.
     const readQueuedExternalAuthority = (): void => {
       const ownerId = getPositionRegistry(tree.$)?.id;
-      for (const entry of getPathNotifier()?.readPending() ?? []) {
+      for (const rawEntry of (getPathNotifier()?.readPending() ?? []).flatMap(
+        ordinaryEntityEntries
+      )) {
+        const entry = rawEntry;
         const meta = entry.meta;
         if (
           (entry.ownerId ?? meta?.ownerId) !== ownerId ||
@@ -3085,6 +3818,28 @@ export function restoration(
         // Pending authority is checked separately. Its normal capture path
         // must still remember the external authority that it displaced.
         if (!realized && resolveTransactionId(meta) !== undefined) continue;
+        const membership = plainBranchMembershipEffects(meta);
+        if (membership) {
+          for (const effect of membership) {
+            if (realized)
+              externalMembershipTruth.set(effect.position, {
+                present: effect.plainBranchMembership.after,
+                value: effect.after,
+              });
+            else externalMembershipTruth.delete(effect.position);
+          }
+          continue;
+        }
+        if (!entry.subjectIds?.length) {
+          for (const position of entry.positionIds ?? []) {
+            if (!realized) externalMembershipTruth.delete(position);
+            else if (externalMembershipTruth.has(position))
+              externalMembershipTruth.set(position, {
+                present: true,
+                value: entry.newValue,
+              });
+          }
+        }
         const subjectKey = subjectTruthKey(
           entry.positionIds?.[0],
           entry.subjectIds?.[0]
@@ -3172,7 +3927,18 @@ export function restoration(
       !(value instanceof Date) &&
       !(value instanceof Map) &&
       !(value instanceof Set);
-    const drainCaptureBucket = (
+    const clearCaptureBucket = (bucket: CaptureBucket): void => {
+      bucket.ownerPaths.clear();
+      bucket.subjectIds.clear();
+      bucket.positionIds.clear();
+      forgetTransientRows(bucket.effects);
+      bucket.effects.clear();
+      bucket.collectionOrders.clear();
+      bucket.orderBoundaries.clear();
+      bucket.descriptorInputs.length = 0;
+      bucket.designated = false;
+    };
+    const prepareCaptureBucket = (
       bucket: CaptureBucket
     ): {
       ownerPaths: string[];
@@ -3184,28 +3950,32 @@ export function restoration(
       designated: boolean;
     } => {
       const ownerPaths = Array.from(bucket.ownerPaths).sort();
-      bucket.ownerPaths.clear();
       const subjectIds = Array.from(bucket.subjectIds).sort(
         (left, right) => left - right
       );
-      bucket.subjectIds.clear();
       const positionIds = Array.from(bucket.positionIds).sort(
         (left, right) => left - right
       );
-      bucket.positionIds.clear();
-      const effects = Array.from(bucket.effects.values()).map(cloneTurnEffect);
-      bucket.effects.clear();
-      const collectionOrders = Array.from(bucket.collectionOrders.values()).map(
-        (order) => ({
-          ...order,
-          beforeSubjects: [...order.beforeSubjects],
-          afterSubjects: [...order.afterSubjects],
-        })
+      // Member images become the turn's endpoints, and net no-ops are dropped
+      // only now (`settleTurnMemberEffects`, v16 8g).
+      // A row the turn created and removed stays as a ghost pair where a kept
+      // row's recorded neighbour is it (`withTransientRows`, v16 8g).
+      const effects = settleTurnMemberEffects(
+        tree.$ as object,
+        withTransientRows(
+          Array.from(bucket.effects.values()).map(cloneTurnEffect),
+          bucket.effects
+        )
       );
-      bucket.collectionOrders.clear();
-      const descriptorInputs = bucket.descriptorInputs.splice(0);
+      const collectionOrders = Array.from(bucket.collectionOrders.values()).map(
+        (order) =>
+          completeOrderCapture(
+            order,
+            bucket.orderBoundaries.get(order.owner) ?? []
+          )
+      );
+      const descriptorInputs = [...bucket.descriptorInputs];
       const designated = bucket.designated;
-      bucket.designated = false;
       return {
         ownerPaths,
         subjectIds,
@@ -3215,6 +3985,12 @@ export function restoration(
         descriptorInputs,
         designated,
       };
+    };
+
+    const drainCaptureBucket = (bucket: CaptureBucket) => {
+      const prepared = prepareCaptureBucket(bucket);
+      clearCaptureBucket(bucket);
+      return prepared;
     };
 
     const retainDescriptorInputs = (
@@ -3335,14 +4111,26 @@ export function restoration(
       const existing = effectMap.get(key);
       if (existing) {
         if (existing.kind === 'set' && effect.kind === 'set') {
-          existing.after = effect.after;
+          if (!composePlainBranchMemberEffect(existing, effect)) {
+            existing.after = effect.after;
+            // Preserve first own-presence before and latest own-presence after.
+            const beforePresent = existing.fieldPresence?.before ?? true;
+            const afterPresent = effect.fieldPresence?.after ?? true;
+            if (beforePresent && afterPresent) delete existing.fieldPresence;
+            else
+              existing.fieldPresence = {
+                before: beforePresent,
+                after: afterPresent,
+              };
+          }
           existing.mutationIntent = combineScalarMutationIntent(
             existing.mutationIntent,
             effect.mutationIntent
           );
-          if (existing.before === existing.after) {
-            effectMap.delete(key);
-          }
+          // ⚠️ A NET NO-OP STAYS UNTIL THE TURN IS DRAINED. Its pre-turn value
+          // is what a member image the turn captured after the first write
+          // needs (`settleTurnMemberEffects`, which drops it). Dropped here,
+          // undo of `x(5); omit g; re-add g` came back with x 5 (v16 8g).
           return;
         }
 
@@ -3351,6 +4139,9 @@ export function restoration(
           // before the turn and does not exist after it, so the turn has NO
           // structural effect on it. P0-A.
           if (existing.kind === 'add' && effect.kind === 'remove') {
+            // Remembered: a kept row's recorded neighbour can be this row
+            // (`withTransientRows`, v16 8g).
+            rememberTransientRow(effectMap, existing, effect);
             effectMap.delete(key);
             return;
           }
@@ -3435,14 +4226,46 @@ export function restoration(
       subjectIds?: number[],
       positionIds?: number[]
     ): void => {
+      if (getEntityOrdinaryChanges(meta) !== undefined) {
+        for (const entry of ordinaryEntityEntries({
+          path,
+          newValue: next,
+          oldValue: prev,
+          meta,
+          subjectIds,
+        })) {
+          captureEffects(
+            effectMap,
+            entry.path,
+            entry.newValue,
+            entry.oldValue,
+            entry.meta,
+            ownerPath,
+            entry.subjectIds,
+            positionIds
+          );
+        }
+        return;
+      }
+      const membership = plainBranchMembershipEffects(meta);
+      if (membership) {
+        for (const effect of membership)
+          enqueueEffect(effectMap, { ...effect });
+        return;
+      }
       const enqueueScalarDiff = (
         diffPath: string,
         before: unknown,
         after: unknown,
-        subjectFieldSegments: readonly string[] | undefined
+        subjectFieldSegments: readonly string[] | undefined,
+        presence?: FieldPresence
       ): void => {
         const position = positionIds?.[0];
-        if (position === undefined || before === after) {
+        if (
+          position === undefined ||
+          (before === after &&
+            (presence === undefined || presence.before === presence.after))
+        ) {
           return;
         }
 
@@ -3455,7 +4278,11 @@ export function restoration(
               after[key],
               subjectFieldSegments === undefined
                 ? undefined
-                : [...subjectFieldSegments, key]
+                : [...subjectFieldSegments, key],
+              {
+                before: Object.prototype.hasOwnProperty.call(before, key),
+                after: Object.prototype.hasOwnProperty.call(after, key),
+              }
             );
           }
           return;
@@ -3468,6 +4295,11 @@ export function restoration(
           position,
           subject: subjectIds?.[0],
           subjectFieldSegments,
+          ...(subjectIds?.length &&
+          presence !== undefined &&
+          !(presence.before && presence.after)
+            ? { fieldPresence: { ...presence } }
+            : {}),
           before,
           after,
           mutationIntent: meta?.mutationIntent,
@@ -3492,7 +4324,17 @@ export function restoration(
         return;
       }
 
-      if (isPlainRecord(next) && isPlainRecord(prev)) {
+      // Payload shape is not topology (v15 2892b650): a registered terminal
+      // slot owns its whole value. Only branch and subject values decompose.
+      if (
+        isPlainRecord(next) &&
+        isPlainRecord(prev) &&
+        !(
+          !subjectIds?.length &&
+          positionIds?.[0] !== undefined &&
+          scalarSlotRuntime?.resolveScalarSlot(positionIds[0]) !== undefined
+        )
+      ) {
         // Subject notifications carry the complete row. Its property keys are
         // the address; the display path may contain dots in either ID or key.
         enqueueScalarDiff(
@@ -3546,6 +4388,15 @@ export function restoration(
         bucket.designated = true;
       }
 
+      const membership = plainBranchMembershipEffects(meta);
+      if (membership) {
+        for (const effect of membership) {
+          bucket.positionIds.add(effect.position);
+          bucket.ownerPaths.add(effect.ownerPath);
+          enqueueEffect(bucket.effects, { ...effect });
+        }
+        return;
+      }
       const resolvedPositionIds =
         positionIds && positionIds.length > 0
           ? positionIds
@@ -3596,6 +4447,28 @@ export function restoration(
         afterSubjects: [...capture.afterSubjects],
         beforeFrontier: existing?.beforeFrontier ?? capture.beforeFrontier,
         afterFrontier: capture.afterFrontier,
+        ordinaryEndpoints:
+          capture.ordinaryEndpoints && (!existing || existing.ordinaryEndpoints)
+            ? Object.freeze({
+                beforeToken:
+                  existing?.ordinaryEndpoints?.beforeToken ??
+                  capture.ordinaryEndpoints.beforeToken,
+                afterToken: capture.ordinaryEndpoints.afterToken,
+                before:
+                  existing?.ordinaryEndpoints?.before ??
+                  capture.ordinaryEndpoints.before,
+                after: capture.ordinaryEndpoints.after,
+                domain: Object.freeze([
+                  ...new Set([
+                    ...(existing?.ordinaryEndpoints?.domain ??
+                      capture.ordinaryEndpoints.domain ??
+                      capture.ordinaryEndpoints.before),
+                    ...(capture.ordinaryEndpoints.domain ??
+                      capture.ordinaryEndpoints.after),
+                  ]),
+                ]),
+              })
+            : undefined,
       });
       bucket.ownerPaths.add(capture.ownerPath);
       bucket.positionIds.add(capture.owner);
@@ -3657,7 +4530,6 @@ export function restoration(
       transactionId: number
     ): CanonicalTurn<Snapshot> | undefined => {
       const bucket = pendingTransactions.get(transactionId);
-      pendingTransactions.delete(transactionId);
       // NOT `supersededExternalTruth.delete` here. This runs at 'staged' —
       // every transaction stages, decided or not — so discarding the displaced
       // provenance at this point destroys it before a rollback can restore it.
@@ -3673,6 +4545,7 @@ export function restoration(
         descriptorInputs,
         designated,
       } = drainCaptureBucket(bucket);
+      pendingTransactions.delete(transactionId);
       stagedTransactionEffects.set(transactionId, {
         effects,
         collectionOrders,
@@ -3690,13 +4563,122 @@ export function restoration(
         subjectIds.length > 0 ? subjectIds : undefined,
         positionIds.length > 0 ? positionIds : undefined,
         effects.length > 0 ? effects : undefined,
-        collectionOrders.length > 0 ? collectionOrders : undefined
+        collectionOrders.length > 0 ? collectionOrders : undefined,
+        undefined,
+        transactionId
       );
       if (entry) {
         pendingDescriptorInputs.set(entry.id, descriptorInputs);
       }
       return entry;
     };
+    const rememberPendingFootprints = (
+      transactionId: number,
+      effects: Iterable<TurnEffect>
+    ): void => {
+      let footprints = pendingFootprints.get(transactionId);
+      for (const effect of effects) {
+        if (!footprints)
+          pendingFootprints.set(transactionId, (footprints = new Map()));
+        const footprint: TurnEffect =
+          effect.kind === 'set'
+            ? { ...effect, before: undefined, after: undefined }
+            : effect.kind === 'rekey'
+            ? { ...effect }
+            : { ...effect, value: undefined };
+        footprints.set(effectKey(footprint), footprint);
+      }
+    };
+    // Foreign owners only: their lifecycle events are what release footprints.
+    const pendingFootprintTransaction = (
+      meta: WriteMetadata | undefined
+    ): number | undefined =>
+      isRestoring ||
+      meta?.transactionOwner === transactionOwnerToken ||
+      meta?.origin === 'restoration' ||
+      isInspectionWrite(meta) ||
+      isCompensationWrite(meta) ||
+      getWriteParticipation(meta) === 'realized'
+        ? undefined
+        : resolveTransactionId(meta);
+    /**
+     * Installed when a foreign transaction opens and released when none is
+     * open or pending, so a tree that never transacts pays for neither channel.
+     * Two producers, one evidence store: committed entity capture (published
+     * after a whole multi-row commit applies, before its first notification)
+     * and the notifier's enqueue witness (synchronous with every write). A
+     * reader of the queue at admission time would miss an entry already
+     * dequeued for delivery to an earlier subscriber.
+     */
+    let releasePendingObservation: (() => void) | undefined;
+    const observePendingFootprints = (): void => {
+      if (releasePendingObservation) return;
+      const releaseCommitted = getMutationCaptureRuntime(
+        tree
+      )?.subscribeEntityWitness?.((capture) => {
+        const transactionId = pendingFootprintTransaction(capture.meta);
+        if (transactionId === undefined) return;
+        const scratch: PendingEffectMap = new Map();
+        for (const change of capture.changes) {
+          if (change.structural) {
+            // Membership or key change: the whole lifetime is claimed.
+            const footprint: TurnEffect = {
+              kind: 'set',
+              position: capture.owner,
+              ownerPath: capture.ownerPath,
+              path: capture.ownerPath,
+              subject: change.subject,
+              subjectFieldSegments: [],
+              before: undefined,
+              after: undefined,
+            };
+            scratch.set(effectKey(footprint), footprint);
+          } else {
+            captureEffects(
+              scratch,
+              capture.ownerPath,
+              change.after,
+              change.before,
+              withoutEntityOrdinaryChanges(capture.meta),
+              capture.ownerPath,
+              [change.subject],
+              [capture.owner]
+            );
+          }
+        }
+        rememberPendingFootprints(transactionId, scratch.values());
+      });
+      const ownerId = getPositionRegistry(tree.$)?.id;
+      const releaseEnqueued =
+        ownerId === undefined
+          ? undefined
+          : getPathNotifier()?.observeEnqueue(ownerId, (rawEntry) => {
+              const entry = ordinaryEntityEntry(rawEntry);
+              const transactionId = pendingFootprintTransaction(entry.meta);
+              if (transactionId === undefined) return;
+              const scratch: PendingEffectMap = new Map();
+              captureEffects(
+                scratch,
+                entry.path,
+                entry.newValue,
+                entry.oldValue,
+                entry.meta,
+                entry.ownerPath,
+                entry.subjectIds ? [...entry.subjectIds] : undefined,
+                entry.positionIds ? [...entry.positionIds] : undefined
+              );
+              rememberPendingFootprints(transactionId, scratch.values());
+            });
+      releasePendingObservation = () => {
+        releasePendingObservation = undefined;
+        try {
+          releaseCommitted?.();
+        } finally {
+          releaseEnqueued?.();
+        }
+      };
+    };
+
     /**
      * TURN-FEED-0 — observe a FOREIGN transaction's lifecycle.
      *
@@ -3725,6 +4707,7 @@ export function restoration(
         // Registered BEFORE the transaction's writes arrive, which is why the
         // announcement has to precede the callback.
         activeForeignTransactions.set(key, event.id);
+        observePendingFootprints();
         return;
       }
 
@@ -3747,6 +4730,8 @@ export function restoration(
 
       activeForeignTransactions.delete(key);
       stagedTransactionEffects.delete(event.id);
+      pendingFootprints.delete(event.id);
+      if (activeForeignTransactions.size === 0) releasePendingObservation?.();
       if (event.kind === 'rolled-back') {
         pendingTransactions.delete(event.id);
         // NOT restored here. Measured: this event fires BEFORE the rollback's
@@ -3760,6 +4745,7 @@ export function restoration(
         // superseded the realization, so the displaced provenance is dropped.
         supersededExternalTruth.delete(event.id);
         supersededExternalRows.delete(event.id);
+        displacedMembershipTruth.delete(event.id);
       }
       const stagedTurnId = stagedForeignTurns.get(key);
       stagedForeignTurns.delete(key);
@@ -3798,15 +4784,76 @@ export function restoration(
     let unsubscribeNotifications: (() => void) | null = null;
     let unsubscribeReset: (() => void) | null = null;
     let unsubscribeCollectionOrders: (() => void) | null = null;
+    let unsubscribeOrderBoundaries: (() => void) | undefined;
     const releaseCapture = getMutationCaptureRuntime(tree)?.activateCapture();
     try {
+      unsubscribeOrderBoundaries = getMutationCaptureRuntime(
+        tree
+      )?.subscribeStructuralWitness?.((capture) => {
+        if (
+          (!capture.topologyUnit &&
+            (!capture.structuralFrontier || !capture.structuralRecords)) ||
+          capture.meta?.origin === 'restoration' ||
+          isCompensationWrite(capture.meta) ||
+          isInspectionWrite(capture.meta)
+        )
+          return;
+        const evidence: OrderBoundaryEvidence = {
+          before:
+            capture.topologyUnit?.physical.before ??
+            capture.structuralFrontier!.before,
+          after:
+            capture.topologyUnit?.physical.after ??
+            capture.structuralFrontier!.after,
+          records: capture.structuralRecords ?? [],
+          physical: capture.topologyUnit?.physical,
+          ordinary: capture.topologyUnit?.ordinary,
+        };
+        const retain = (bucket: CaptureBucket): void => {
+          let records = bucket.orderBoundaries.get(capture.owner);
+          if (!records)
+            bucket.orderBoundaries.set(capture.owner, (records = []));
+          records.push(evidence);
+        };
+        const transactionId = resolveTransactionId(capture.meta);
+        if (
+          getWriteParticipation(capture.meta) === 'realized' ||
+          transactionId === undefined
+        ) {
+          const historical = getHistoricalCapture();
+          if (historical) retain(historical);
+        }
+        if (getWriteParticipation(capture.meta) === 'realized') return;
+        retain(
+          transactionId === undefined
+            ? pendingCapture
+            : getTransactionBucket(transactionId)
+        );
+      });
       unsubscribeCollectionOrders =
         getMutationCaptureRuntime(tree)?.subscribeCollectionOrder?.(
           (capture) => {
+            // Pending work never entered completed history. Its compensation
+            // returns to that baseline; it is not a new order gap or authority.
+            // Inspection owns neither history nor external-order authority.
+            if (
+              capture.meta?.origin === 'restoration' ||
+              isCompensationWrite(capture.meta) ||
+              isInspectionWrite(capture.meta)
+            ) {
+              return;
+            }
+            if (
+              getWriteParticipation(capture.meta) === 'realized' ||
+              resolveTransactionId(capture.meta) === undefined
+            ) {
+              const historical = getHistoricalCapture();
+              if (historical)
+                captureCollectionOrderIntoBucket(historical, capture);
+            }
             if (getWriteParticipation(capture.meta) === 'realized') {
               externalOrderOwners.add(capture.owner);
               selfDirty = true;
-              captureCollectionOrderIntoBucket(pendingCapture, capture);
               return;
             }
             externalOrderOwners.delete(capture.owner);
@@ -3829,7 +4876,7 @@ export function restoration(
           unsubscribeNotifications?.();
           unsubscribeNotifications = notifier.subscribe(
             '**',
-            (
+            function receiveOrdinaryNotification(
               next,
               prev,
               path,
@@ -3838,7 +4885,33 @@ export function restoration(
               subjectIds,
               positionIds,
               meta
-            ) => {
+            ) {
+              if (getEntityOrdinaryChanges(meta) !== undefined) {
+                for (const entry of ordinaryEntityEntries({
+                  path,
+                  newValue: next,
+                  oldValue: prev,
+                  meta,
+                  subjectIds,
+                })) {
+                  receiveOrdinaryNotification(
+                    entry.newValue,
+                    entry.oldValue,
+                    entry.path,
+                    ownerPath,
+                    origin,
+                    entry.subjectIds,
+                    positionIds,
+                    entry.meta
+                  );
+                }
+                return;
+              }
+              const transition = entityValueTransition(meta);
+              if (transition) {
+                next = transition.ordinaryAfter;
+                prev = transition.ordinaryBefore;
+              }
               if (origin === 'restoration') {
                 return;
               }
@@ -3870,6 +4943,88 @@ export function restoration(
               if (isInspectionWrite(meta)) {
                 return;
               }
+              // External truth and ordinary authored work both shape later
+              // historical boundaries; only authored work enters reversal.
+              if (
+                !isCompensationWrite(meta) &&
+                (getWriteParticipation(meta) === 'realized' ||
+                  resolveTransactionId(meta) === undefined)
+              ) {
+                const historical = getHistoricalCapture();
+                if (historical)
+                  captureEffects(
+                    historical.effects,
+                    path,
+                    next,
+                    prev,
+                    meta,
+                    ownerPath,
+                    subjectIds,
+                    positionIds
+                  );
+              }
+              const membership = plainBranchMembershipEffects(meta);
+              if (membership) {
+                const transactionId = resolveTransactionId(meta);
+                const compensation = isCompensationWrite(meta);
+                const realized = getWriteParticipation(meta) === 'realized';
+                for (const effect of membership) {
+                  if (compensation) {
+                    restoreMembershipTruth(
+                      compensationTransactionId(meta),
+                      effect.position
+                    );
+                  } else if (realized) {
+                    externalMembershipTruth.set(effect.position, {
+                      present: effect.plainBranchMembership.after,
+                      value: effect.after,
+                    });
+                  } else {
+                    rememberMembershipTruth(transactionId, effect.position);
+                    externalMembershipTruth.delete(effect.position);
+                  }
+                }
+                if (compensation) return;
+                if (realized) {
+                  selfDirty = true;
+                } else {
+                  captureIntoBucket(
+                    transactionId === undefined
+                      ? pendingCapture
+                      : getTransactionBucket(transactionId),
+                    path,
+                    next,
+                    prev,
+                    meta,
+                    ownerPath,
+                    subjectIds,
+                    positionIds
+                  );
+                  if (transactionId === undefined) selfDirty = true;
+                }
+                return;
+              }
+              if (!subjectIds?.length) {
+                for (const position of positionIds ?? []) {
+                  if (isCompensationWrite(meta)) {
+                    restoreMembershipTruth(
+                      compensationTransactionId(meta),
+                      position
+                    );
+                  } else if (getWriteParticipation(meta) !== 'realized') {
+                    rememberMembershipTruth(
+                      resolveTransactionId(meta),
+                      position
+                    );
+                    externalMembershipTruth.delete(position);
+                  } else if (externalMembershipTruth.has(position)) {
+                    externalMembershipTruth.set(position, {
+                      present: true,
+                      value: next,
+                    });
+                  }
+                }
+              }
               if (getWriteParticipation(meta) === 'realized') {
                 // RESTORE-P0 P0-C. Recorded HERE rather than only in the leaf
                 // interceptor: measured, that interceptor is not installed for
@@ -3895,9 +5050,25 @@ export function restoration(
                       next
                     );
                   }
-                } else if (next === undefined) {
+                  // A discarded pending turn never entered completed history.
+                  // Keep its inverse out of the ordinary capture bucket: a
+                  // same-tick authored write must start at the restored value,
+                  // not cancel against or inherit the speculative baseline.
+                  return;
+                } else if (
+                  next === undefined &&
+                  !(
+                    !subjectIds?.length &&
+                    positionIds?.[0] !== undefined &&
+                    scalarSlotRuntime?.resolveScalarSlot(positionIds[0]) !==
+                      undefined
+                  )
+                ) {
                   externalTruthByPath.delete(path);
                 } else {
+                  // A terminal can hold undefined as external truth (v15
+                  // 2892b650). Collection notifications with no value still
+                  // take the branch above.
                   externalTruthByPath.set(path, next);
                 }
                 // Only a row-shaped payload is useful here; the collection also
@@ -3917,16 +5088,6 @@ export function restoration(
                   );
                 }
                 selfDirty = true;
-                captureEffects(
-                  pendingCapture.effects,
-                  path,
-                  next,
-                  prev,
-                  meta,
-                  ownerPath,
-                  subjectIds,
-                  positionIds
-                );
                 return;
               }
               // An authored write returns this location to history's control —
@@ -4094,6 +5255,7 @@ export function restoration(
               suppressNextFlushRecord = false;
               selfDirty = false;
               drainCaptureBucket(pendingCapture);
+              clearHistoricalCapture();
               return;
             }
             // `onFlush` is on the GLOBAL PathNotifier, so this fires for writes
@@ -4104,7 +5266,6 @@ export function restoration(
             // 10k-leaf trees were kept alive. Cost that scales with OTHER
             // people's trees is the worst kind.
             if (!selfDirty) return;
-            selfDirty = false;
             const {
               subjectIds,
               positionIds,
@@ -4112,7 +5273,14 @@ export function restoration(
               collectionOrders,
               descriptorInputs,
               designated,
-            } = drainCaptureBucket(pendingCapture);
+            } = prepareCaptureBucket(pendingCapture);
+            const historical = historicalCapture
+              ? prepareCaptureBucket(historicalCapture)
+              : undefined;
+            // Both channels must prepare before either relinquishes evidence.
+            clearCaptureBucket(pendingCapture);
+            clearHistoricalCapture();
+            selfDirty = false;
             const eligible =
               isTurnEligible(designated) &&
               restorationManager.retainsCompletedHistory() &&
@@ -4124,13 +5292,14 @@ export function restoration(
                   effects.length > 0 ? effects : undefined,
                   collectionOrders.length > 0 ? collectionOrders : undefined,
                   undefined,
-                  () => retainDescriptorInputs(descriptorInputs)
+                  () => retainDescriptorInputs(descriptorInputs),
+                  historical
                 )
               : false;
             if (!recorded) {
               restorationManager.appendHistoricalGap(
-                effects,
-                collectionOrders,
+                historical?.effects ?? effects,
+                historical?.collectionOrders ?? collectionOrders,
                 designated
               );
             }
@@ -4183,14 +5352,21 @@ export function restoration(
     ] = () => restorationManager.getRestorationHistory();
     const resetRestorationRetention = (): void => {
       restorationManager.resetRestorationHistory();
+      clearCaptureBucket(pendingCapture);
+      clearHistoricalCapture();
       pendingDescriptorInputs.clear();
       stagedForeignTurns.clear();
       pendingTransactions.clear();
       supersededExternalTruth.clear();
       supersededExternalRows.clear();
-      stagedTransactionEffects.clear();
-      activeForeignTransactions.clear();
+      // NOT stagedTransactionEffects / activeForeignTransactions /
+      // pendingFootprints: a history reset is not a settlement. Clearing the
+      // open set made a still-open transaction's later writes look ordinary,
+      // and clearing staged evidence let undo overwrite still-pending truth.
+      // Only the owner's lifecycle event or destroy releases pending ownership.
       externalTruthByPath.clear();
+      externalMembershipTruth.clear();
+      displacedMembershipTruth.clear();
       externalTruthBySubject.clear();
       externalOrderOwners.clear();
     };
@@ -4271,6 +5447,7 @@ export function restoration(
         }
         try {
           unsubscribeCollectionOrders?.();
+          unsubscribeOrderBoundaries?.();
         } catch {
           /* ignore */
         }
@@ -4291,6 +5468,8 @@ export function restoration(
         supersededExternalRows.clear();
         stagedTransactionEffects.clear();
         activeForeignTransactions.clear();
+        pendingFootprints.clear();
+        releasePendingObservation?.();
       });
     }
 

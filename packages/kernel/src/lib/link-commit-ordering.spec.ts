@@ -145,31 +145,23 @@ describe('public Link publication respects the commit boundary', () => {
     expect(tree.$.a()).toBe('a0');
   });
 
-  it('one tree open transaction does not block another tree publication', async () => {
+  it('undeclared foreign write holds then publishes after owner confirmation', async () => {
     const recBlocked = recordingStorage();
     const recFree = recordingStorage();
-
     const blocked = makeTree(recBlocked, 'pco-blocked');
     const free = makeTree(recFree, 'pco-free');
-
-    const pending = blocked.transact(() => {
-      blocked.$.a('a1');
-    });
-
-    // A perfectly ordinary write on an unrelated tree.
+    await flush(); recBlocked.writes.length = 0; recFree.writes.length = 0;
+    const pending = blocked.transact(() => blocked.$.a('a1'));
     free.$.a('free1');
-
     await flush();
-
-    // Scope presence is keyed by tree identity, so the second tree is
-    // unaffected by the first tree's pending transaction.
+    expect(free.$.a()).toBe('free1');
     expect(recBlocked.writes).toEqual([]);
-    expect(recFree.writes.length).toBeGreaterThan(0);
-    expect(recFree.writes[recFree.writes.length - 1]).toMatchObject({
-      a: 'free1',
-    });
-
+    expect(recFree.writes).toEqual([]);
     pending.confirm();
+    await flush();
+    expect(recFree.writes.length).toBeGreaterThan(0);
+    expect(recFree.writes.at(-1)).toEqual({ a: 'free1', b: 'b0' });
+    expect(recBlocked.writes.at(-1)).toEqual({ a: 'a1', b: 'b0' });
   });
 });
 
@@ -183,26 +175,45 @@ describe('public Link publication survives a refused rollback', () => {
     const rec = recordingStorage();
     const tree = makeTree(rec, 'pco-refused');
 
-    // Force the fail-closed refusal path.
-    const port = getTreeRealizationPort(
-      (tree as unknown as { $: object }).$
-    ) as { validateEffects?: (...args: unknown[]) => unknown } | undefined;
-    const original = port?.validateEffects;
-    if (port && typeof original === 'function') {
-      port.validateEffects = () => ({ kind: 'structural-drift' });
+    const { transactionLifecycleReader } = await import(
+      './internals/transaction-lifecycle-view'
+    );
+    const port = getTreeRealizationPort(tree.$);
+    if (!port?.prepareSelectedUnit) {
+      throw new Error('Expected selected preparation port');
     }
-
+    const original = port.prepareSelectedUnit;
     const pending = tree.transact(() => {
       tree.$.a('a1');
     });
+    const reader = transactionLifecycleReader(tree);
+    if (!reader) throw new Error('Expected transaction lifecycle reader');
+    const beforePending = reader.snapshot().pending;
+    expect(beforePending).toHaveLength(1);
+    const beforeState = tree.$();
+    expect(beforeState).toEqual({ a: 'a1', b: 'b0' });
 
+    // Inject generic selected-preparation refusal before any installable plan.
+    // This is not an authentic structural-drift witness.
+    const refusal = new Error('injected pre-install selected preparation failure');
+    let refusalCalls = 0;
+    let returnedPlans = 0;
+    port.prepareSelectedUnit = function (...args) {
+      refusalCalls++;
+      if (refusalCalls === 1) throw refusal;
+      const plan = original.apply(this, args);
+      returnedPlans++;
+      return plan;
+    };
     expect(original).toBeTypeOf('function');
     try {
       expect(() => pending.rollback()).toThrow();
+      expect(refusalCalls).toBe(1);
+      expect(returnedPlans).toBe(0);
+      expect(tree.$()).toEqual(beforeState);
+      expect(reader.snapshot().pending).toEqual(beforePending);
     } finally {
-      if (port && typeof original === 'function') {
-        port.validateEffects = original as typeof port.validateEffects;
-      }
+      port.prepareSelectedUnit = original;
     }
 
     // Refusal did not settle the tree, even if the next write is unrelated.

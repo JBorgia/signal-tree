@@ -1,0 +1,2 @@
+import * as k from '@signal-tree/kernel';
+for(const name of ['angular','react','vue','solid']){const a=await import('@signal-tree/'+name);if(a.link!==k.link)throw Error(name+' duplicate Link');if(a.SignalTreePublicationError!==k.SignalTreePublicationError)throw Error(name+' duplicate error');}if('createEntityPublicationParticipant' in k)throw Error('private factory leaked publicly');console.log('five facade imports share Link/error; private factory absent from public barrel');

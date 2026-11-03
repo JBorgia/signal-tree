@@ -1,0 +1,29 @@
+
+> nx run vue:test --testNamePattern=Vue owned collection publication
+
+> pnpm exec tsc --noEmit -p packages/vue/tsconfig.spec.json && npx vitest run --config packages/vue/vitest.config.ts --testNamePattern="Vue owned collection publication"
+
+(node:63337) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+packages/vue/src/lib/settlement-publication.spec.ts(175,18): error TS2722: Cannot invoke an object which is possibly 'undefined'.
+packages/vue/src/lib/settlement-publication.spec.ts(175,18): error TS2352: Conversion of type 'ReadableCell<number>' to type 'ComputedRef<number>' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
+packages/vue/src/lib/settlement-publication.spec.ts(226,18): error TS2722: Cannot invoke an object which is possibly 'undefined'.
+packages/vue/src/lib/settlement-publication.spec.ts(226,18): error TS2352: Conversion of type 'ReadableCell<number>' to type 'ComputedRef<number>' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
+Warning: command "pnpm exec tsc --noEmit -p packages/vue/tsconfig.spec.json && npx vitest run --config packages/vue/vitest.config.ts --testNamePattern="Vue owned collection publication"" exited with non-zero status code
+
+
+ NX   Running target test for project vue failed
+
+Failed tasks:
+
+- vue:test
+
+Hint: run the command with --verbose for more details.
+
+  Run duration:      4.3s
+  Critical path:     4.2s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Speed up or split the longest tasks on the critical path:
+        vue:test    4.2s

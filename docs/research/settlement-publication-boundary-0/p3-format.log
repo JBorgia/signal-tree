@@ -1,0 +1,5 @@
+packages/kernel/src/lib/internals/observation-adapter.ts 265ms
+packages/kernel/src/lib/internals/location-runtime.ts 127ms
+packages/kernel/src/lib/internals/native-location-realization.ts 32ms
+packages/kernel/src/lib/entity-signal.ts 471ms
+packages/vue/src/lib/vue-observation.ts 38ms

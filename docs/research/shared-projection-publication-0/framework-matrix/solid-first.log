@@ -1,0 +1,94 @@
+
+> nx run solid:test --testNamePattern=4d owned projection
+
+> pnpm exec tsc --noEmit -p packages/solid/tsconfig.spec.json && npx vitest run --config packages/solid/vitest.config.ts --testNamePattern="4d owned projection"
+
+(node:89528) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+npm warn Unknown env config "verify-deps-before-run". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown project config "auto-install-peers". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown project config "shamefully-hoist". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+(node:92675) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:93828) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /Users/jonathanborgia/.codex/worktrees/atomic-capture-proof/signaltree/packages/solid
+
+(node:95601) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:95605) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:95604) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:95599) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:95610) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:95600) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:95602) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:95603) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:95606) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ❯ src/lib/transaction-realization.spec.ts (14 tests | 1 failed | 8 skipped) 261ms
+     × 4d owned projection settlement — remove, primed 39ms
+(node:96768) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:96767) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/lib/transaction-realization.spec.ts > @signal-tree/solid — pending realization conformance > 4d owned projection settlement — remove, primed
+AssertionError: [{"phase":"setup","scalar":0,"projections":{"all":["A:Original"],"ids":["A"],"count":1,"empty":false,"map":["A:Original"],"hasA":true,"where":["A:Original"],"find":"A:Original","slice":["Original"],"activeId":"A","activeEntity":"A:Original","row":"Original","field":"Original"}},{"phase":"authoring","scalar":7,"projections":{"all":[],"ids":[],"count":0,"empty":true,"map":[],"hasA":false,"where":[],"find":null,"slice":[],"activeId":"A","activeEntity":null,"row":null,"field":null}},{"phase":"inside-rollback","scalar":0,"projections":{"all":["A:Original"],"ids":["A"],"count":1,"empty":false,"map":["A:Original"],"hasA":true,"where":["A:Original"],"find":"A:Original","slice":["Original"],"activeId":"A","activeEntity":null,"row":"Original","field":"Original"}}]: expected { all: [ 'A:Original' ], …(12) } to deeply equal { all: [ 'A:Original' ], …(12) }
+
+- Expected
++ Received
+
+@@ -1,7 +1,7 @@
+  {
+-   "activeEntity": "A:Original",
++   "activeEntity": null,
+    "activeId": "A",
+    "all": [
+      "A:Original",
+    ],
+    "count": 1,
+
+ ❯ ../kernel/src/transaction-realization-contract.ts:371:72
+    369|             for (const frame of delivered) {
+    370|               expect(frame.scalar).toBe(0);
+    371|               expect(frame.projections, JSON.stringify(observed.seen))…
+       |                                                                        ^
+    372|                 snapshot(operation !== 'add', true)
+    373|               );
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed | 10 skipped (11)
+      Tests  1 failed | 5 passed | 84 skipped (90)
+   Start at  16:27:43
+   Duration  28.70s (transform 143.77s, setup 0ms, import 186.37s, tests 261ms, environment 5ms)
+
+Warning: command "pnpm exec tsc --noEmit -p packages/solid/tsconfig.spec.json && npx vitest run --config packages/solid/vitest.config.ts --testNamePattern="4d owned projection"" exited with non-zero status code
+
+
+ NX   Running target test for project solid failed
+
+Failed tasks:
+
+- solid:test
+
+Hint: run the command with --verbose for more details.
+
+  Run duration:      2m 46s
+  Critical path:     2m 46s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Speed up or split the longest tasks on the critical path:
+        solid:test    2m 46s

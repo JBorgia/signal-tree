@@ -1,0 +1,68 @@
+{
+  "mode": "capture-error",
+  "hits": 3,
+  "reports": [
+    {
+      "operation": "notify:subscriber",
+      "marker": true
+    }
+  ],
+  "checks": [
+    {
+      "name": "capture injection is reached",
+      "pass": true
+    },
+    {
+      "name": "rollback succeeds completely or honestly retains responsibility",
+      "pass": false,
+      "error": "AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:\n+ actual - expected\n\n  [\n    0,\n+   1\n-   0\n  ]\n"
+    },
+    {
+      "name": "retry cannot falsely succeed",
+      "pass": false,
+      "error": "AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:\n+ actual - expected\n\n  [\n    0,\n+   1\n-   0\n  ]\n"
+    },
+    {
+      "name": "independent later progress",
+      "pass": true
+    }
+  ],
+  "afterWrite": {
+    "pair": [
+      1,
+      1
+    ],
+    "pending": 1
+  },
+  "inspection": {
+    "threw": true
+  },
+  "first": {
+    "threw": false,
+    "marker": false,
+    "state": {
+      "pair": [
+        0,
+        1
+      ],
+      "pending": 0
+    }
+  },
+  "retry": {
+    "threw": false,
+    "state": {
+      "pair": [
+        0,
+        1
+      ],
+      "pending": 0
+    }
+  },
+  "next": {
+    "pair": [
+      2,
+      2
+    ],
+    "pending": 0
+  }
+}

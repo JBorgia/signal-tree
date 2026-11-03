@@ -1,0 +1,54 @@
+[
+  {
+    "command": [
+      "node",
+      "docs/research/shared-projection-publication-0/run.mjs",
+      "base",
+      "review-active-restoration.mjs",
+      "suite",
+      "first"
+    ],
+    "exit": 1,
+    "stdout": "{\"lane\":\"base\",\"entry\":\"review-active-restoration.mjs\",\"control\":\"suite\",\"exit\":1,\"stable\":true,\"out\":\"/private/tmp/st-shared-publication-replay/runs/base-review-active-restoration.mjs-suite-first\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/shared-projection-publication-0/run.mjs",
+      "D2",
+      "review-active-restoration.mjs",
+      "suite",
+      "first"
+    ],
+    "exit": 1,
+    "stdout": "{\"lane\":\"D2\",\"entry\":\"review-active-restoration.mjs\",\"control\":\"suite\",\"exit\":1,\"stable\":true,\"out\":\"/private/tmp/st-shared-publication-replay/runs/D2-review-active-restoration.mjs-suite-first\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/shared-projection-publication-0/run.mjs",
+      "S1",
+      "review-active-restoration.mjs",
+      "suite",
+      "first"
+    ],
+    "exit": 1,
+    "stdout": "{\"lane\":\"S1\",\"entry\":\"review-active-restoration.mjs\",\"control\":\"suite\",\"exit\":1,\"stable\":true,\"out\":\"/private/tmp/st-shared-publication-replay/runs/S1-review-active-restoration.mjs-suite-first\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/shared-projection-publication-0/run.mjs",
+      "DS1",
+      "review-active-restoration.mjs",
+      "suite",
+      "first"
+    ],
+    "exit": 1,
+    "stdout": "{\"lane\":\"DS1\",\"entry\":\"review-active-restoration.mjs\",\"control\":\"suite\",\"exit\":1,\"stable\":true,\"out\":\"/private/tmp/st-shared-publication-replay/runs/DS1-review-active-restoration.mjs-suite-first\"}\n",
+    "stderr": ""
+  }
+]

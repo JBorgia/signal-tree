@@ -137,10 +137,8 @@ const RULES = [
 
   { file: 'lib/physical/structural-store.ts', family: 'A entity structural identity', default: true },
   { file: 'lib/physical/structural-store.ts', family: 'C restoration claim / reclamation',
-    fns: ['forgetSubject', 'retireSubject', 'restoreSubject', 'restoreIndexForSubjects',
+    fns: ['forgetSubject', 'retireSubject', 'restoreSubject',
           'restoreSubjectAtResolvedPlacement', 'resolveSubjectRestorePlacement'] },
-  { file: 'lib/physical/structural-store.ts', family: 'F diagnostics',
-    fns: ['__assertActiveOrderIntegrityForTesting'] },
 
   { file: 'lib/physical/entity-mutation-frame.ts', family: 'A entity structural identity', default: true },
   { file: 'lib/physical/entity-value-store.ts', family: 'A entity structural identity', default: true },

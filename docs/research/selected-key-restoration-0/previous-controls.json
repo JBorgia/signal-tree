@@ -1,0 +1,353 @@
+[
+  {
+    "command": [
+      "node",
+      "docs/research/selected-key-restoration-0/run.mjs",
+      "DSK1",
+      "timing.mjs",
+      "suite",
+      "selected-first"
+    ],
+    "exit": 0,
+    "stdout": "{\"lane\":\"DSK1\",\"entry\":\"timing.mjs\",\"control\":\"suite\",\"exit\":0,\"stable\":true,\"out\":\"/private/tmp/st-selected-key-replay/runs/DSK1-timing.mjs-suite-selected-first\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/selected-key-restoration-0/run.mjs",
+      "DSK1",
+      "owned-read-controls.mjs",
+      "reentry",
+      "selected-first"
+    ],
+    "exit": 0,
+    "stdout": "{\"lane\":\"DSK1\",\"entry\":\"owned-read-controls.mjs\",\"control\":\"reentry\",\"exit\":0,\"stable\":true,\"out\":\"/private/tmp/st-selected-key-replay/runs/DSK1-owned-read-controls.mjs-reentry-selected-first\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/selected-key-restoration-0/run.mjs",
+      "DSK1",
+      "owned-read-controls-v2.mjs",
+      "reentry",
+      "selected-first"
+    ],
+    "exit": 0,
+    "stdout": "{\"lane\":\"DSK1\",\"entry\":\"owned-read-controls-v2.mjs\",\"control\":\"reentry\",\"exit\":0,\"stable\":true,\"out\":\"/private/tmp/st-selected-key-replay/runs/DSK1-owned-read-controls-v2.mjs-reentry-selected-first\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/selected-key-restoration-0/run.mjs",
+      "DSK1",
+      "review-readonly-memo.mjs",
+      "suite",
+      "selected-first"
+    ],
+    "exit": 0,
+    "stdout": "{\"lane\":\"DSK1\",\"entry\":\"review-readonly-memo.mjs\",\"control\":\"suite\",\"exit\":0,\"stable\":true,\"out\":\"/private/tmp/st-selected-key-replay/runs/DSK1-review-readonly-memo.mjs-suite-selected-first\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/selected-key-restoration-0/run.mjs",
+      "DSK1",
+      "review-empty.mjs",
+      "suite",
+      "selected-first"
+    ],
+    "exit": 0,
+    "stdout": "{\"lane\":\"DSK1\",\"entry\":\"review-empty.mjs\",\"control\":\"suite\",\"exit\":0,\"stable\":true,\"out\":\"/private/tmp/st-selected-key-replay/runs/DSK1-review-empty.mjs-suite-selected-first\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/selected-key-restoration-0/run.mjs",
+      "DSK1",
+      "review-active.mjs",
+      "suite",
+      "selected-first"
+    ],
+    "exit": 0,
+    "stdout": "{\"lane\":\"DSK1\",\"entry\":\"review-active.mjs\",\"control\":\"suite\",\"exit\":0,\"stable\":true,\"out\":\"/private/tmp/st-selected-key-replay/runs/DSK1-review-active.mjs-suite-selected-first\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/selected-key-restoration-0/run.mjs",
+      "DSK1",
+      "mixed-no-inspect.mjs",
+      "capture-error",
+      "selected-first"
+    ],
+    "exit": 0,
+    "stdout": "{\"lane\":\"DSK1\",\"entry\":\"mixed-no-inspect.mjs\",\"control\":\"capture-error\",\"exit\":0,\"stable\":true,\"out\":\"/private/tmp/st-selected-key-replay/runs/DSK1-mixed-no-inspect.mjs-capture-error-selected-first\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/selected-key-restoration-0/run.mjs",
+      "DSK1",
+      "mixed-add.mjs",
+      "capture-error",
+      "selected-first"
+    ],
+    "exit": 0,
+    "stdout": "{\"lane\":\"DSK1\",\"entry\":\"mixed-add.mjs\",\"control\":\"capture-error\",\"exit\":0,\"stable\":true,\"out\":\"/private/tmp/st-selected-key-replay/runs/DSK1-mixed-add.mjs-capture-error-selected-first\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/selected-key-restoration-0/run.mjs",
+      "DSK1",
+      "inspection-v2.mjs",
+      "control",
+      "selected-first"
+    ],
+    "exit": 0,
+    "stdout": "{\"lane\":\"DSK1\",\"entry\":\"inspection-v2.mjs\",\"control\":\"control\",\"exit\":0,\"stable\":true,\"out\":\"/private/tmp/st-selected-key-replay/runs/DSK1-inspection-v2.mjs-control-selected-first\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/selected-key-restoration-0/run.mjs",
+      "DSK1",
+      "disposition.mjs",
+      "rollback",
+      "selected-first"
+    ],
+    "exit": 0,
+    "stdout": "{\"lane\":\"DSK1\",\"entry\":\"disposition.mjs\",\"control\":\"rollback\",\"exit\":0,\"stable\":true,\"out\":\"/private/tmp/st-selected-key-replay/runs/DSK1-disposition.mjs-rollback-selected-first\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/selected-key-restoration-0/run.mjs",
+      "DSK1",
+      "disposition.mjs",
+      "confirm",
+      "selected-first"
+    ],
+    "exit": 0,
+    "stdout": "{\"lane\":\"DSK1\",\"entry\":\"disposition.mjs\",\"control\":\"confirm\",\"exit\":0,\"stable\":true,\"out\":\"/private/tmp/st-selected-key-replay/runs/DSK1-disposition.mjs-confirm-selected-first\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/selected-key-restoration-0/run.mjs",
+      "DSK1",
+      "recovery.mjs",
+      "rollback",
+      "selected-first"
+    ],
+    "exit": 0,
+    "stdout": "{\"lane\":\"DSK1\",\"entry\":\"recovery.mjs\",\"control\":\"rollback\",\"exit\":0,\"stable\":true,\"out\":\"/private/tmp/st-selected-key-replay/runs/DSK1-recovery.mjs-rollback-selected-first\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/selected-key-restoration-0/run.mjs",
+      "DSK1",
+      "recovery.mjs",
+      "confirm",
+      "selected-first"
+    ],
+    "exit": 0,
+    "stdout": "{\"lane\":\"DSK1\",\"entry\":\"recovery.mjs\",\"control\":\"confirm\",\"exit\":0,\"stable\":true,\"out\":\"/private/tmp/st-selected-key-replay/runs/DSK1-recovery.mjs-confirm-selected-first\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/selected-key-restoration-0/run.mjs",
+      "DSK1",
+      "controls.mjs",
+      "repeat",
+      "selected-first"
+    ],
+    "exit": 0,
+    "stdout": "{\"lane\":\"DSK1\",\"entry\":\"controls.mjs\",\"control\":\"repeat\",\"exit\":0,\"stable\":true,\"out\":\"/private/tmp/st-selected-key-replay/runs/DSK1-controls.mjs-repeat-selected-first\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/selected-key-restoration-0/run.mjs",
+      "DSK1",
+      "controls.mjs",
+      "prepare-reentry",
+      "selected-first"
+    ],
+    "exit": 0,
+    "stdout": "{\"lane\":\"DSK1\",\"entry\":\"controls.mjs\",\"control\":\"prepare-reentry\",\"exit\":0,\"stable\":true,\"out\":\"/private/tmp/st-selected-key-replay/runs/DSK1-controls.mjs-prepare-reentry-selected-first\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/selected-key-restoration-0/run.mjs",
+      "DSK1",
+      "prepare.mjs",
+      "undefined",
+      "selected-first"
+    ],
+    "exit": 0,
+    "stdout": "{\"lane\":\"DSK1\",\"entry\":\"prepare.mjs\",\"control\":\"undefined\",\"exit\":0,\"stable\":true,\"out\":\"/private/tmp/st-selected-key-replay/runs/DSK1-prepare.mjs-undefined-selected-first\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/selected-key-restoration-0/run.mjs",
+      "DSK1",
+      "prepare.mjs",
+      "reentry",
+      "selected-first"
+    ],
+    "exit": 0,
+    "stdout": "{\"lane\":\"DSK1\",\"entry\":\"prepare.mjs\",\"control\":\"reentry\",\"exit\":0,\"stable\":true,\"out\":\"/private/tmp/st-selected-key-replay/runs/DSK1-prepare.mjs-reentry-selected-first\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/selected-key-restoration-0/run.mjs",
+      "DSK1",
+      "spec.mjs",
+      "atomic:body",
+      "selected-first"
+    ],
+    "exit": 0,
+    "stdout": "{\"lane\":\"DSK1\",\"entry\":\"spec.mjs\",\"control\":\"atomic:body\",\"exit\":0,\"stable\":true,\"out\":\"/private/tmp/st-selected-key-replay/runs/DSK1-spec.mjs-atomic:body-selected-first\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/selected-key-restoration-0/run.mjs",
+      "DSK1",
+      "settlement.mjs",
+      "explicit-rollback-fault",
+      "selected-first"
+    ],
+    "exit": 0,
+    "stdout": "{\"lane\":\"DSK1\",\"entry\":\"settlement.mjs\",\"control\":\"explicit-rollback-fault\",\"exit\":0,\"stable\":true,\"out\":\"/private/tmp/st-selected-key-replay/runs/DSK1-settlement.mjs-explicit-rollback-fault-selected-first\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/selected-key-restoration-0/run.mjs",
+      "DSK1",
+      "review-shared-controls-v2.mjs",
+      "readonly",
+      "selected-first"
+    ],
+    "exit": 0,
+    "stdout": "{\"lane\":\"DSK1\",\"entry\":\"review-shared-controls-v2.mjs\",\"control\":\"readonly\",\"exit\":0,\"stable\":true,\"out\":\"/private/tmp/st-selected-key-replay/runs/DSK1-review-shared-controls-v2.mjs-readonly-selected-first\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/selected-key-restoration-0/run.mjs",
+      "DSK1",
+      "review-shared-controls-v2.mjs",
+      "primed",
+      "selected-first"
+    ],
+    "exit": 0,
+    "stdout": "{\"lane\":\"DSK1\",\"entry\":\"review-shared-controls-v2.mjs\",\"control\":\"primed\",\"exit\":0,\"stable\":true,\"out\":\"/private/tmp/st-selected-key-replay/runs/DSK1-review-shared-controls-v2.mjs-primed-selected-first\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/selected-key-restoration-0/run.mjs",
+      "DSK1",
+      "review-shared-controls-v2.mjs",
+      "dynamic",
+      "selected-first"
+    ],
+    "exit": 0,
+    "stdout": "{\"lane\":\"DSK1\",\"entry\":\"review-shared-controls-v2.mjs\",\"control\":\"dynamic\",\"exit\":0,\"stable\":true,\"out\":\"/private/tmp/st-selected-key-replay/runs/DSK1-review-shared-controls-v2.mjs-dynamic-selected-first\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/selected-key-restoration-0/run.mjs",
+      "DSK1",
+      "review-shared-controls-v2.mjs",
+      "errors",
+      "selected-first"
+    ],
+    "exit": 0,
+    "stdout": "{\"lane\":\"DSK1\",\"entry\":\"review-shared-controls-v2.mjs\",\"control\":\"errors\",\"exit\":0,\"stable\":true,\"out\":\"/private/tmp/st-selected-key-replay/runs/DSK1-review-shared-controls-v2.mjs-errors-selected-first\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/selected-key-restoration-0/run.mjs",
+      "DSK1",
+      "review-shared-controls-v2.mjs",
+      "writable-token",
+      "selected-first"
+    ],
+    "exit": 0,
+    "stdout": "{\"lane\":\"DSK1\",\"entry\":\"review-shared-controls-v2.mjs\",\"control\":\"writable-token\",\"exit\":0,\"stable\":true,\"out\":\"/private/tmp/st-selected-key-replay/runs/DSK1-review-shared-controls-v2.mjs-writable-token-selected-first\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/selected-key-restoration-0/run.mjs",
+      "DSK1",
+      "review-shared-controls-v2.mjs",
+      "body-error",
+      "selected-first"
+    ],
+    "exit": 0,
+    "stdout": "{\"lane\":\"DSK1\",\"entry\":\"review-shared-controls-v2.mjs\",\"control\":\"body-error\",\"exit\":0,\"stable\":true,\"out\":\"/private/tmp/st-selected-key-replay/runs/DSK1-review-shared-controls-v2.mjs-body-error-selected-first\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/selected-key-restoration-0/run.mjs",
+      "DSK1",
+      "review-shared-controls-v2.mjs",
+      "reentry",
+      "selected-first"
+    ],
+    "exit": 0,
+    "stdout": "{\"lane\":\"DSK1\",\"entry\":\"review-shared-controls-v2.mjs\",\"control\":\"reentry\",\"exit\":0,\"stable\":true,\"out\":\"/private/tmp/st-selected-key-replay/runs/DSK1-review-shared-controls-v2.mjs-reentry-selected-first\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/selected-key-restoration-0/run.mjs",
+      "DSK1",
+      "review-shared-multitree.mjs",
+      "suite",
+      "selected-first"
+    ],
+    "exit": 0,
+    "stdout": "{\"lane\":\"DSK1\",\"entry\":\"review-shared-multitree.mjs\",\"control\":\"suite\",\"exit\":0,\"stable\":true,\"out\":\"/private/tmp/st-selected-key-replay/runs/DSK1-review-shared-multitree.mjs-suite-selected-first\"}\n",
+    "stderr": ""
+  }
+]

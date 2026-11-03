@@ -1,0 +1,331 @@
+--- a/packages/angular/src/lib/observation-adapter.ts
++++ b/packages/angular/src/lib/observation-adapter.ts
+@@ -4,12 +4,60 @@
+   signal,
+   untracked,
+   type WritableSignal,
++  type Signal,
+ } from '@angular/core';
+ 
+ import type {
+   ObservationAdapter,
+   ObservationToken,
+ } from '@signal-tree/kernel/adapter';
++
++/** One native producer per reader, with source-current direct reads. */
++function currentReadonly<T>(readCurrent: () => T): Signal<T> {
++  let active: { evaluated: boolean } | undefined;
++  let computing = false;
++  let nativeFault: { error: unknown } | undefined;
++  let ownFailure: { error: unknown } | undefined;
++  const pendingNativeFault = (): { error: unknown } | undefined => nativeFault;
++  const source = computed(() => {
++    if (active) active.evaluated = true;
++    computing = true;
++    nativeFault = undefined;
++    try {
++      const value = readCurrent();
++      ownFailure = undefined;
++      return value;
++    } catch (error) {
++      // Do not reclassify a nested native/cycle error as a source-owned error
++      // merely because it propagated through the supplied recipe.
++      const fault = pendingNativeFault();
++      ownFailure = fault && Object.is(fault.error, error) ? undefined : { error };
++      throw error;
++    } finally { computing = false; }
++  });
++  return new Proxy(source, {
++    apply() {
++      const previous = active;
++      const frame = { evaluated: false };
++      active = frame;
++      try {
++        let value: T;
++        try { value = source(); }
++        catch (error) {
++          if (!frame.evaluated && computing) {
++            nativeFault = { error };
++            throw error;
++          }
++          // Only this computation's remembered own-recipe failure qualifies.
++          // Marker=false alone also describes fresh dependency/cycle failures.
++          if (frame.evaluated || !ownFailure || !Object.is(ownFailure.error, error)) throw error;
++          return readCurrent();
++        }
++        return frame.evaluated ? value : readCurrent();
++      } finally { active = previous; }
++    },
++  });
++}
+ 
+ /** Angular dependency tracking for kernel-owned locations. */
+ export const ANGULAR_OBSERVATION_ADAPTER: ObservationAdapter = {
+@@ -38,6 +86,7 @@
+   },
+ 
+   createReadonlyCell: <T,>(compute: () => T) => computed(compute),
++  createCurrentReadonlyCell: currentReadonly,
+ 
+   createWritableProjection: <T,>(compute: () => T) => {
+     const cell = linkedSignal(compute);
+--- a/packages/kernel/src/adapter.ts
++++ b/packages/kernel/src/adapter.ts
+@@ -91,6 +91,9 @@
+       observation.createWritableProjection &&
+       observation.createReadonlyCell
+   );
++  if (hasNativeCarrier && typeof observation.createCurrentReadonlyCell !== 'function') {
++    throw new Error('Native observation adapters require createCurrentReadonlyCell');
++  }
+   return createKernelSignalTreeFactory(
+     observation,
+     hasNativeCarrier
+@@ -98,7 +101,7 @@
+           createNativeTreeScalarLeafRuntime(physicalCommitClock, observation)
+       : undefined,
+     hasNativeCarrier
+-      ? () => createNativeLocationRuntime(observation)
++      ? (boundObservation) => createNativeLocationRuntime(boundObservation)
+       : undefined
+   );
+ };
+--- a/packages/kernel/src/lib/entity-signal.ts
++++ b/packages/kernel/src/lib/entity-signal.ts
+@@ -629,11 +629,13 @@
+    * an adapter's computed) depends on the collection as the cached projection
+    * would. Outside taps this is one comparison per access.
+    */
+-  const fresh = <T>(read: () => T): ReadableCell<T> =>
+-    (() => {
++  const fresh = <T>(read: () => T): ReadableCell<T> => {
++    const current = (): T => {
+       version();
+       return read();
+-    }) as ReadableCell<T>;
++    };
++    return locations.createCurrentReadonly(current);
++  };
+   const inTap = <T>(cell: ReadableCell<T>, read: () => T): ReadableCell<T> =>
+     taps.depth ? fresh(read) : cell;
+   // Identity-stable across value-only writes: the key snapshot is shared until
+@@ -1008,7 +1010,7 @@
+         // RESTORATION-REKEY-CLAIM-WIDTH-0.
+         lastSubjectIds = [subjectId];
+ 
+-        if (activeIdSignal() === from) {
++        if (activeIdValue === from) {
+           replaceLocation(activeIdSignal, to);
+         }
+ 
+@@ -1034,7 +1036,21 @@
+   }
+ 
+   /** Active-entity selection. See the `activeId`/`activeEntity` accessors. */
+-  const activeIdSignal = locations.createCell<K | undefined>(undefined);
++  // Keep the source-owned selection readable while grouped publication is held.
++  // The realization still controls dependency tracking and observer delivery.
++  let activeIdValue: K | undefined;
++  const activeIdSignal = locations.createWritable<K | undefined>(
++    () => activeIdValue,
++    (next) => {
++      if (Object.is(activeIdValue, next)) return false;
++      activeIdValue = next;
++      return true;
++    }
++  ).location;
++  const readActiveId = (): K | undefined => {
++    activeIdSignal();
++    return activeIdValue;
++  };
+   let cachedActiveEntity: ReadableCell<E | undefined> | undefined;
+ 
+   function publishOrderChange(
+@@ -2604,7 +2620,7 @@
+ 
+     // ── Active entity ───────────────────────────────────────────────────────
+     get activeId(): ReadableCell<K | undefined> {
+-      return activeIdSignal.asReadonly();
++      return inTap(activeIdSignal.asReadonly(), readActiveId);
+     },
+ 
+     /**
+@@ -2618,7 +2634,7 @@
+      */
+     get activeEntity(): ReadableCell<E | undefined> {
+       const read = () => {
+-        const id = activeIdSignal();
++        const id = taps.depth ? readActiveId() : activeIdSignal();
+         if (id === undefined) return undefined;
+         // A selection names a key even while no subject occupies it. Keep the
+         // membership edge only while absent; a present selection stays scoped
+@@ -2634,15 +2650,15 @@
+       // Not an error when the id is absent: selection frequently outlives the
+       // row (a delete arriving from a socket while a detail pane is open), and
+       // `activeEntity` already resolves to undefined in that case.
+-      const previous = activeIdSignal();
++      const previous = activeIdValue;
+       replaceLocation(activeIdSignal, id);
+-      if (!Object.is(previous, activeIdSignal())) markOwnerInvalidated(ownerId);
++      if (!Object.is(previous, activeIdValue)) markOwnerInvalidated(ownerId);
+     },
+ 
+     clearActiveId(): void {
+-      const previous = activeIdSignal();
++      const previous = activeIdValue;
+       replaceLocation(activeIdSignal, undefined);
+-      if (!Object.is(previous, activeIdSignal())) markOwnerInvalidated(ownerId);
++      if (!Object.is(previous, activeIdValue)) markOwnerInvalidated(ownerId);
+     },
+ 
+     has(id: K): ReadableCell<boolean> {
+--- a/packages/kernel/src/lib/internals/location-runtime.ts
++++ b/packages/kernel/src/lib/internals/location-runtime.ts
+@@ -3,6 +3,7 @@
+ import type {
+   Location,
+   ReadonlyLocation,
++  ReadableCell,
+   WritableCell,
+ } from './cell-runtime';
+ import type {
+@@ -292,6 +293,7 @@
+     equal?: (left: T, right: T) => boolean
+   ): Location<T>;
+   createDerived<T>(compute: () => T): ReadonlyLocation<T>;
++  createCurrentReadonly<T>(read: () => T): ReadableCell<T>;
+   createWritable<T>(
+     /**
+      * The location's read. `stored` asks for the stored value whatever the
+@@ -670,6 +672,10 @@
+   return {
+     createCell,
+     createDerived,
++    createCurrentReadonly: <T>(read: () => T): ReadableCell<T> =>
++      realization.createCurrentReadonlyCell
++        ? realization.createCurrentReadonlyCell(read)
++        : read,
+     createWritable,
+     createEpoch,
+     advanceEpoch,
+--- a/packages/kernel/src/lib/internals/native-location-realization.ts
++++ b/packages/kernel/src/lib/internals/native-location-realization.ts
+@@ -2,6 +2,7 @@
+ import type {
+   Location,
+   ReadonlyLocation,
++  ReadableCell,
+   WritableCell,
+ } from './cell-runtime';
+ import {
+@@ -323,6 +324,12 @@
+     createEpoch,
+     advanceEpoch,
+     createDerived,
++    createCurrentReadonly: <T>(read: () => T): ReadableCell<T> => {
++      if (!observation.createCurrentReadonlyCell) {
++        throw new Error('Native observation adapters require createCurrentReadonlyCell');
++      }
++      return observation.createCurrentReadonlyCell(read);
++    },
+     createWritable,
+     createWritableProjection,
+     publish,
+--- a/packages/kernel/src/lib/internals/observation-adapter.ts
++++ b/packages/kernel/src/lib/internals/observation-adapter.ts
+@@ -48,6 +48,14 @@
+   };
+   createReadonlyCell?<T>(compute: () => T): ReadableCell<T>;
+   /**
++   * Realize a lazy, source-current readonly reader with the adapter's native
++   * shape and stable same-source metadata. Each direct read evaluates the
++   * source once, without publishing or advancing application computed caches.
++   * Required for v16 adapters selected by the existing three-factory native
++   * classification; portable adapters may retain a neutral callable.
++   */
++  createCurrentReadonlyCell?<T>(readCurrent: () => T): ReadableCell<T>;
++  /**
+    * `ANGULAR-NATIVE-EPOCH-0`. The framework's cheapest read-dependency
+    * primitive, for a per-subject invalidation anchor that carries no value
+    * anyone reads.
+--- a/packages/kernel/src/lib/signal-tree.ts
++++ b/packages/kernel/src/lib/signal-tree.ts
+@@ -2409,6 +2409,10 @@
+     createWritableProjection:
+       observation.createWritableProjection?.bind(observation),
+     createReadonlyCell: observation.createReadonlyCell?.bind(observation),
++    createCurrentReadonlyCell:
++      observation.createCurrentReadonlyCell?.bind(observation),
++    createEpoch: observation.createEpoch?.bind(observation),
++    advanceEpoch: observation.advanceEpoch?.bind(observation),
+     runInvalidationGroup: observation.runInvalidationGroup.bind(observation),
+   };
+   return ((initialState: object, config?: TreeConfig) =>
+--- a/packages/solid/src/lib/solid-observation.ts
++++ b/packages/solid/src/lib/solid-observation.ts
+@@ -65,6 +65,7 @@
+   return {
+     dispose,
+     createToken: createObservationToken,
++    createCurrentReadonlyCell: <T>(readCurrent: () => T) => readCurrent,
+ 
+     createWritableCell: <T>(read: () => T) => {
+       const [track, bump] = createSignal(0, { equals: false });
+--- a/packages/vue/src/lib/vue-observation.ts
++++ b/packages/vue/src/lib/vue-observation.ts
+@@ -32,19 +32,44 @@
+   asReadonly(): VueReadonlyCell<T>;
+ }
+ 
+-const wrapReadonlyCell = <T>(source: ComputedRef<T>): VueReadonlyCell<T> => {
+-  const cell = (() => source.value) as VueReadonlyCell<T>;
++const wrapReadonlyCell = <T>(
++  source: ComputedRef<T>,
++  read: () => T = () => source.value
++): VueReadonlyCell<T> => {
++  const cell = (() => read()) as VueReadonlyCell<T>;
+   Object.defineProperties(cell, {
+     __v_isRef: { value: true },
+     __v_isReadonly: { value: true },
+     effect: { value: source.effect },
+-    value: { get: () => source.value },
++    value: { get: read },
+   });
+   return cell;
+ };
+ 
+ const createReadonlyCell = <T>(read: () => T): VueReadonlyCell<T> =>
+   wrapReadonlyCell(computed(read));
++
++// The marker avoids double recipe execution on a native cache miss. Each
++// invocation owns its frame so nested reads and exceptions restore the caller.
++const createCurrentReadonlyCell = <T>(readCurrent: () => T): VueReadonlyCell<T> => {
++  let active: { evaluated: boolean } | undefined;
++  const source = computed(() => {
++    if (active) active.evaluated = true;
++    return readCurrent();
++  });
++  const read = (): T => {
++    const previous = active;
++    const frame = { evaluated: false };
++    active = frame;
++    try {
++      // Vue may throw while polling a dependency before this recipe runs.
++      // That is a fresh error, not evidence of a cached own-recipe failure.
++      const value = source.value;
++      return frame.evaluated ? value : readCurrent();
++    } finally { active = previous; }
++  };
++  return wrapReadonlyCell(source, read);
++};
+ 
+ const createWritableCell = <T>(read: () => T): VueWritableCell<T> => {
+   const cell = (() => read()) as VueWritableCell<T>;
+@@ -102,6 +127,7 @@
+   };
+ 
+   return {
++    createCurrentReadonlyCell,
+     createToken: createObservationToken,
+ 
+     createWritableCell: <T>(read: () => T) => {

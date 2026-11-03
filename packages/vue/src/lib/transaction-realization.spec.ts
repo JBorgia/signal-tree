@@ -8,8 +8,10 @@ import { describe } from 'vitest';
 import {
   transactionRealizationContract,
   type ConformanceRow,
+  type EntityProjectionFrame,
   type MixedFrame,
   type Observation,
+  type ValuePublicationFrame,
 } from '../../../kernel/src/transaction-realization-contract';
 import { entityMap, signalTree, transactions } from '../index';
 
@@ -27,21 +29,61 @@ const build = () =>
   signalTree(
     {
       scalar: 0,
-      rows: entityMap<ConformanceRow, string>({ selectId: (r) => r.id }),
+      rows: entityMap<ConformanceRow, string>({
+        selectId: (r) => r.id,
+      }).computed('names', (rows) => rows.map((row) => row.name)),
     },
     { enhancers: [transactions()] }
   );
 
-const observe = <T>(read: () => T): Observation<T> => {
+const observe = <T>(
+  read: () => T,
+  flush: 'pre' | 'sync' = 'pre'
+): Observation<T> => {
   const seen: T[] = [];
   let latest!: T;
-  const stop = watchEffect(() => {
-    const value = read();
-    latest = value;
-    seen.push(value);
-  });
+  const stop = watchEffect(
+    () => {
+      const value = read();
+      latest = value;
+      seen.push(value);
+    },
+    { flush }
+  );
   return { seen, current: () => latest, dispose: stop };
 };
+
+const projectionFrame = (
+  $: Tree['$'],
+  phase: string,
+  enabled: boolean
+): EntityProjectionFrame => {
+  const scalar = $.scalar.value;
+  if (!enabled) return { phase, scalar, projections: null };
+  const node = $.rows.byId('A');
+  const encode = (row: ConformanceRow | undefined) =>
+    row ? `${row.id}:${row.name}` : null;
+  return {
+    phase,
+    scalar,
+    projections: {
+      all: $.rows.all.value.map((row) => `${row.id}:${row.name}`),
+      ids: [...$.rows.ids.value],
+      count: $.rows.count.value,
+      empty: $.rows.empty.value,
+      map: [...$.rows.asMap.value].map(([key, row]) => `${key}:${row.name}`),
+      hasA: $.rows.has('A').value,
+      where: $.rows.where(matchesA).value.map((row) => `${row.id}:${row.name}`),
+      find: encode($.rows.find(matchesA).value),
+      slice: [...$.rows.names.value],
+      activeId: $.rows.activeId.value ?? null,
+      activeEntity: encode($.rows.activeEntity.value),
+      row: node?.()?.name ?? null,
+      field: node?.name.value ?? null,
+    },
+  };
+};
+const matchesA = (row: ConformanceRow) => row.id === 'A';
 
 describe('@signal-tree/vue — pending realization conformance', () => {
   transactionRealizationContract<Tree>({
@@ -74,6 +116,31 @@ describe('@signal-tree/vue — pending realization conformance', () => {
         scalar: tree.$.scalar.value,
         ids: [...tree.$.rows.ids.value],
       })),
+
+    observeValues: (tree, phase) => [
+      observe<ValuePublicationFrame>(() => ({
+        phase: phase(),
+        scalar: tree.$.scalar.value,
+        row: tree.$.rows.byId('A')?.()?.name,
+        all: tree.$.rows.all.value.find((row) => row.id === 'A')?.name,
+      })),
+      observe<ValuePublicationFrame>(
+        () => ({
+          phase: phase(),
+          scalar: tree.$.scalar.value,
+          row: tree.$.rows.byId('A')?.()?.name,
+          all: tree.$.rows.all.value.find((row) => row.id === 'A')?.name,
+        }),
+        'sync'
+      ),
+    ],
+
+    selectRow: (tree, id) => tree.$.rows.setActiveId(id),
+    rekeyRow: (tree, from, to) => tree.$.rows.changeId(from, to),
+    observeProjections: (tree, phase, enabled) => [
+      observe(() => projectionFrame(tree.$, phase(), enabled())),
+      observe(() => projectionFrame(tree.$, phase(), enabled()), 'sync'),
+    ],
 
     flush: async () => {
       await nextTick();

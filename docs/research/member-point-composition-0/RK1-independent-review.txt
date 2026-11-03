@@ -1,0 +1,10 @@
+RK1 independent premise/source review, 2026-10-13
+Reviewed /private/tmp/st-rk1/RK1.patch (5 runtime lines plus new public regression).
+
+No concrete blocker in the bounded correction. Existing rollbackAddressKey gives rekeys collection owner alone, whereas all lifetimes in collection share owner. Two rekeys are both retained upstream but dedup drops second. Ordinary baseline/CPRD minimized controls establish the contract violation without fault injection.
+
+Patch adds JSON([owner,subjectId,'rekey']) only for structural rekey with defined subject. Membership special case remains first; subjectFieldSegments tuple remains unchanged. String vs numeric identities remain distinct; third tuple string cannot collide with existing field-segments array. Same-subject repeated rekeys still share dedup key, while upstream effectKey/ enqueueEffect already composes structural operations of one lifetime into net before/after. No add/remove dominance, field scheduling, turn boundaries, or refusal changes.
+
+History: ebd0097a introduced membership's separate address after owner-only dedup lost it; 19a5bd03 preserved field/reversal ordering without changing this address function. transactions.ts effectKey explicitly composes structural kinds by ownerPath+position+subject under RESTORE-P0 P0-B, deliberately not by operation kind; RK1 does not change that upstream composition. pending-rollback.spec.ts production witness1256 demonstrates collection owner shared across fields, making scoped address distinction intentional.
+
+New public regression is meaningful: speculative B,E required; rollback A,D required; exact held references for both, B/E absent, original values, retry. No existing assertion changed. Recommend unchanged pending-rollback and rekey-supersession tests plus A->B->C same-lifetime and fields+rekey controls before acceptance. Source review is not an execution claim. No claim arbitrary object-valued subjects are supported (production numeric; existing causal fixtures strings).

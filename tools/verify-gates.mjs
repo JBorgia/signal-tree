@@ -51,9 +51,9 @@
  * byte-for-byte against a hash taken before the mutation. If any file cannot be
  * restored the harness aborts loudly rather than leaving a mutated tree behind.
  */
-import { createHash } from 'node:crypto';
+import { createHash, randomUUID } from 'node:crypto';
 import { execFileSync } from 'node:child_process';
-import { existsSync, readFileSync, writeFileSync } from 'node:fs';
+import { existsSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -110,7 +110,7 @@ const GATES = [
   },
   {
     name: 'test:all',
-    covers: 'behaviour across all published packages AND the demo app',
+    covers: 'ordinary behaviour suites across published packages and the demo; retention-gc and forwarding-retention-gc run separately; diagnostic recording uses explicit replay',
     // Was `nx test kernel`. The gate's own name said "core" and its summary line
     // said "core behaviour", so it was honest about what it covered — and what
     // it covered was one package of eight. The other seven have real suites
@@ -415,7 +415,7 @@ const GATES = [
     name: 'source-controls',
     covers:
       'no raw NUL or unexpected C0 control character in any tracked source',
-    cmd: ['node', 'tools/check-source-controls.mjs'],
+    cmd: ['node', 'tools/check-source-controls.mjs', '--verify-classification'],
     // Earned by a real incident: an invisible NUL reached committed source,
     // propagated into the script written to fix it, and was found only because
     // Python refused to parse that script. TypeScript, ESLint and the tests were
@@ -1110,9 +1110,9 @@ const GATES = [
     // against the arm-order contamination this tool's first draft shipped.
     mutation: {
       file: 'tools/bench-raw-signals.mjs',
-      find: '  for (let i = 0; i < WRITES; i++) field.set(i + round * WRITES);\n  const ns = Number(process.hrtime.bigint() - t) / WRITES;\n  sink += field();',
+      find: '  for (let i = 0; i < WRITES; i++) arm.write(field, i + round * WRITES);\n  const ns = Number(process.hrtime.bigint() - t) / WRITES;\n  sink += field();',
       replace:
-        '  for (let i = 0; i < WRITES; i++) void (i + round * WRITES);\n  const ns = Number(process.hrtime.bigint() - t) / WRITES;\n  sink += field();',
+        '  for (let i = 0; i < WRITES; i++) if (arm.name !== \'raw\') arm.write(field, i + round * WRITES);\n  const ns = Number(process.hrtime.bigint() - t) / WRITES;\n  sink += field();',
     },
   },
   {
@@ -1191,12 +1191,29 @@ const GATES = [
       'packages/kernel',
       '--config',
       'vitest.retention.config.ts',
+      'src/lib/internals/diagnostics/diag-journal-1-eviction.spec.ts',
+      'src/lib/link-lifetime.spec.ts',
+      'src/lib/internals/location-runtime-retention.spec.ts',
     ],
     env: { NODE_OPTIONS: '--expose-gc' },
     mutation: {
       file: 'packages/kernel/src/lib/link-lifetime.spec.ts',
       find: "  if (mode === 'disposed') connection?.dispose();",
       replace: "  if (mode === 'disposed') void connection;",
+    },
+  },
+  {
+    name: 'forwarding-retention-gc',
+    covers:
+      'nine forwarding plus three held-continuation GC fixtures: closed callbacks refuse replay, sampled receivers/errors release, explicit held values/rows survive, with positive/negative controls',
+    cmd: ['node', 'tools/check-forwarding-retention.mjs'],
+    env: { NODE_OPTIONS: '--expose-gc' },
+    // Deliberately retain the destroyed receiver in the fixture, not runtime.
+    // The unchanged WeakRef assertions must reject this retained tree.
+    mutation: {
+      file: 'packages/kernel/src/lib/forwarding-retention-probe.spec.ts',
+      find: ' tree.destroy();await flush();',
+      replace: ' tree.destroy();Object.assign(box,{__gateRetainedTree:tree});await flush();',
     },
   },
   {
@@ -1355,12 +1372,20 @@ const GATES = [
     // package-hygiene checks presence. Comments now stay in both outputs and the
     // strip plugin in tools/build/create-rollup-config.mjs removes them from JS.
     //
-    // Strip the shipped root declarations, reproducing removeComments rather
-    // than moving the checker threshold. The old 168 -> 169 mutation became
-    // inert when the tooling entrypoint increased shipped documentation to 197.
-    // Keep the production floor intact and test the actual damaged artifact.
+    // Public root/adapter contracts live in the shared declaration chunk.
+    // Stripping index.d.ts alone leaves enough aggregate docs to pass. Damage
+    // the shared artifact instead; preserve the checker's production floor.
     mutation: {
-      file: 'dist/packages/kernel/dist/index.d.ts',
+      get file() {
+        const dir = 'dist/packages/kernel/dist';
+        const matches = readdirSync(join(ROOT, dir)).filter((name) =>
+          /^_adapter-.*\.d\.ts$/.test(name)
+        );
+        if (matches.length !== 1) {
+          throw new Error('Expected one shared kernel declaration chunk; review mutation target');
+        }
+        return `${dir}/${matches[0]}`;
+      },
       generate: (original) => original.replace(/\/\*\*[\s\S]*?\*\//g, ''),
     },
   },
@@ -1457,6 +1482,26 @@ const GATES = [
       file: 'dist/packages/kernel/package.json',
       find: '"files": [',
       replace: '"files": [\n    "this-entry-matches-nothing/**/*",',
+    },
+  },
+  {
+    name: 'entity-registration-artifacts',
+    covers: 'packed and production-bundled entity registration: original 8 + lifecycle 6 + receipt 6, with selective no-Link control',
+    cmd: ['node', 'tools/verify-entity-registration-artifacts.mjs'],
+    needsBuild: true,
+    provenBy: 'entity-registration-artifacts:self',
+  },
+  {
+    name: 'entity-registration-artifacts:self',
+    mutationProof: 'entity-registration-classifier-blindness-v1',
+    covers: 'missing built factory registration causes behavioral failures; clean recovery and no-Link isolation survive',
+    cmd: ['node', 'tools/verify-entity-registration-artifacts.mjs', '--self-test'],
+    needsBuild: true,
+    slow: true,
+    mutation: {
+      file: 'tools/verify-entity-registration-artifacts.mjs',
+      find: "  return results.filter((result) => result.kind === 'behavior');",
+      replace: '  return [];',
     },
   },
   {
@@ -1831,6 +1876,31 @@ function coverageOf(gate) {
   }
 }
 
+// Opt-in only: setup-sensitive mutation proofs must identify the intended
+// detector failure, rather than treating any process failure as evidence.
+function validMutationProof(gate, result, token) {
+  if (result.code !== 42 || !token) return false;
+  const prefix = 'SIGNALTREE_MUTATION_PROOF ';
+  const lines = result.output.split('\n').filter((line) => line.startsWith(prefix));
+  if (lines.length !== 1) return false;
+  try {
+    const proof = JSON.parse(lines[0].slice(prefix.length));
+    const expected = {
+      kind: gate.mutationProof,
+      token,
+      baseline: 'passed',
+      mutant: 'behavioral-failures-both-modes',
+      controls: 'passed',
+      recovery: 'passed',
+      inputs: 'unchanged',
+    };
+    return Object.keys(proof).length === Object.keys(expected).length &&
+      Object.entries(expected).every(([key, value]) => proof[key] === value);
+  } catch {
+    return false;
+  }
+}
+
 if (has('--self-test')) {
   console.log(
     `\nGate self-test — each gate must FAIL against its own mutation\n`
@@ -1838,6 +1908,11 @@ if (has('--self-test')) {
   for (const gate of selected) {
     if (!gate.mutation) {
       if (gate.provenBy) {
+        if (GATES.find((g) => g.name === gate.provenBy)?.mutationProof) {
+          results.push({ gate, state: 'pending-proof' });
+          console.log(`  · ${gate.name} awaiting validated ${gate.provenBy}`);
+          continue;
+        }
         // Not unproven — proven INDIRECTLY, by a companion gate that mutates the
         // checker itself. Counted as proven so the summary is not pessimistic,
         // and named so the link is visible rather than assumed.
@@ -1858,13 +1933,26 @@ if (has('--self-test')) {
       `  · ${gate.name.padEnd(20)} mutating ${gate.mutation.file} ... `
     );
     let result;
+    const proofToken = gate.mutationProof ? randomUUID() : undefined;
     try {
       result = withMutation(gate.mutation, () =>
-        run(gate.mutationCmd ? { ...gate, cmd: gate.mutationCmd } : gate)
+        run({
+          ...gate,
+          cmd: gate.mutationCmd ?? gate.cmd,
+          ...(proofToken ? {
+            env: { ...gate.env, SIGNAL_TREE_MUTATION_PROOF_TOKEN: proofToken },
+          } : {}),
+        })
       );
     } catch (err) {
       results.push({ gate, state: 'error' });
       console.log(`ERROR\n      ${err.message}`);
+      continue;
+    }
+    if (gate.mutationProof && !validMutationProof(gate, result, proofToken)) {
+      results.push({ gate, state: 'error' });
+      console.log(`ERROR — no validated ${gate.mutationProof} witness (exit ${result.code})`);
+      if (result.output.trim()) console.log(result.output.trim().slice(-12000));
       continue;
     }
     if (result.code !== 0) {
@@ -1892,6 +1980,16 @@ if (has('--self-test')) {
         );
       }
     }
+  }
+  // Only companions opting into the witness contract affect this deferred
+  // path. Existing unrelated provenBy and generic mutation semantics stay put.
+  for (const result of results.filter((r) => r.state === 'pending-proof')) {
+    const proven = results.some((r) =>
+      r.gate.name === result.gate.provenBy && r.state === 'proven');
+    result.state = proven ? 'proven-by' : 'error';
+    console.log(proven
+      ? `  · ${result.gate.name} proven via validated ${result.gate.provenBy} ✓`
+      : `  · ${result.gate.name} ERROR — companion proof absent or invalid`);
   }
 } else {
   console.log(`\nRunning ${selected.length} gates\n`);

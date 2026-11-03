@@ -170,6 +170,8 @@ export { link } from './lib/link';
 // and no third-party authoring need has earned the symbol. It stays exported
 // from `link.ts` for declaration emit only.
 export type { Link, LinkEndpoint } from './lib/link';
+export type { PublicationDeclaration, PublicationReceipt, PublicationState } from './lib/publication-declaration';
+export { SignalTreePublicationError } from './lib/experimental-publication/lifecycle';
 
 // `getPathNotifier` is not root app API. `composeEnhancers` left the root barrel
 // in v12 too and was deleted outright in 15.0 — pass the enhancers declaratively:

@@ -145,7 +145,7 @@ describe('the durable commit boundary, carried by public Link', () => {
     expect(durable(writes).at(-1)?.a).toBe(tree.$.a());
   });
 
-  it("a FOREIGN tree's open transaction neither absorbs nor delays this tree's write", async () => {
+  it("a foreign possible owner holds then rejection wakes this tree's surviving write", async () => {
     resetPathNotifier();
     const mine = recordingAdapter();
     const theirs = recordingAdapter();
@@ -157,17 +157,20 @@ describe('the durable commit boundary, carried by public Link', () => {
 
     const foreignPending = foreign.transact(() => foreign.$.a('THEIRS'));
 
-    // My write is not inside anybody's scope, so it must be durable now.
+    // Undeclared origin captures the pending foreign owner conservatively.
     tree.$.a('MINE');
     await flush();
 
-    expect(durable(mine.writes).at(-1)?.a).toBe('MINE');
+    expect(tree.$.a()).toBe('MINE');
+    expect(mine.writes).toEqual([]);
     expect(theirs.writes).toEqual([]); // and theirs is still held
 
     foreignPending.rollback();
     await flush();
 
-    // Their rollback does not reach into my durable truth.
+    // Successful rejection wakes fresh ordinary evaluation; no extra write.
     expect(durable(mine.writes).at(-1)?.a).toBe('MINE');
+    expect(foreign.$.a()).toBe('a0');
+    expect(durable(theirs.writes).some(value => value.a === 'THEIRS')).toBe(false);
   });
 });

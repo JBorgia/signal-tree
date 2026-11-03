@@ -49,8 +49,8 @@ function interceptThroughPort(
 /**
  * Batching enhancer for SignalTree.
  *
- * KEY PRINCIPLE: Signal writes are ALWAYS synchronous.
- * Batching only affects change detection notification timing.
+ * Ordinary writes and `batch()` are synchronous; `coalesce()` explicitly
+ * defers replacement writes and deduplicates compatible classifications.
  *
  * This aligns with the canonical location contract:
  * - location(x) updates the value immediately
@@ -110,7 +110,12 @@ export function batching(
     let coalesceOwner: object | undefined;
 
     // Coalescing keys are physical locations, never presentation paths.
-    const coalescedUpdates = new Map<object, () => void>();
+    type PendingScope = {
+      context: ReturnType<typeof getActiveWriteContext>;
+      designated: boolean;
+      updates: Map<object, () => void>;
+    };
+    const coalescedScopes: PendingScope[] = [];
     let active = true;
     const intercepted = new WeakSet<object>();
     const releaseWriteInterceptors: Array<() => void> = [];
@@ -155,10 +160,7 @@ export function batching(
     /**
      * Execute coalesced updates.
      */
-    const flushCoalescedUpdates = (): void => {
-      const updates = Array.from(coalescedUpdates.values());
-      coalescedUpdates.clear();
-
+    const applyCoalescedUpdates = (updates: Array<() => void>): void => {
       let failed = false;
       let firstFailure: unknown;
       for (const update of updates) {
@@ -170,6 +172,13 @@ export function batching(
         }
       }
       if (failed) throw firstFailure;
+    };
+
+    const flushCoalescedUpdates = (): void => {
+      const updates = coalescedScopes
+        .splice(0)
+        .flatMap((scope) => [...scope.updates.values()]);
+      applyCoalescedUpdates(updates);
     };
 
     // ========================================
@@ -198,18 +207,48 @@ export function batching(
         if (operation.intent === 'replace' && inCoalesce) {
           const capturedMeta = { ...(meta ?? {}) };
           const designated = isRestorationDesignated();
-          coalescedUpdates.set(node, () =>
+          let scope = coalescedScopes[coalescedScopes.length - 1];
+          // Deduplicate only within one uninterrupted classification. Grouping
+          // by location across scopes would lose designation/external evidence
+          // or move a later write ahead of another location's contribution.
+          if (
+            !scope ||
+            scope.context !== meta ||
+            scope.designated !== designated
+          ) {
+            scope = { context: meta, designated, updates: new Map() };
+            coalescedScopes.push(scope);
+          }
+          scope.updates.set(node, () =>
             withWriteContext(capturedMeta, () =>
               withCapturedRestorationDesignation(designated, proceed)
             )
           );
         } else {
           if (inCoalesce) {
-            const pendingReplace = coalescedUpdates.get(node);
+            const scope = coalescedScopes[coalescedScopes.length - 1];
+            const sameScope =
+              scope &&
+              scope.context === meta &&
+              scope.designated === isRestorationDesignated();
+            // Earlier contexts precede this updater, including writes to other
+            // locations. Within its own context retain the existing same-node
+            // updater drain and leave other replacements deferred.
+            const earlier = coalescedScopes.splice(
+              0,
+              coalescedScopes.length - (sameScope ? 1 : 0)
+            );
+            const updates = earlier.flatMap((entry) => [
+              ...entry.updates.values(),
+            ]);
+            const pendingReplace = sameScope
+              ? scope.updates.get(node)
+              : undefined;
             if (pendingReplace) {
-              coalescedUpdates.delete(node);
-              pendingReplace();
+              scope.updates.delete(node);
+              updates.push(pendingReplace);
             }
+            applyCoalescedUpdates(updates);
           }
           proceed();
         }
@@ -283,8 +322,8 @@ export function batching(
       },
 
       /**
-       * coalesce() - Deduplicate same-path updates
-       * Only the final value for each path is written.
+       * coalesce() - Deduplicate replacements within each uninterrupted
+       * compatible classification. Context/designation changes stay ordered.
        */
       coalesce(fn: () => void): void {
         const wasCoalescing = inCoalesce;
@@ -368,7 +407,7 @@ export function batching(
           clearTimeout(notificationTimeoutId);
           notificationTimeoutId = undefined;
         }
-        coalescedUpdates.clear();
+        coalescedScopes.length = 0;
         for (const release of releaseWriteInterceptors) release();
         releaseWriteInterceptors.length = 0;
       });

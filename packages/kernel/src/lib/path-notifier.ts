@@ -1,3 +1,14 @@
+import { mergeScalarPublicationCoverage } from './internals/scalar-publication-coverage';
+import {
+  entityValueTransition,
+  mergeEntityValueTransition,
+} from './internals/entity-value-transition';
+import {
+  annotate as researchAnnotate,
+  complete as researchComplete,
+  stampSource as researchStampSource,
+  deliverEqual as researchDeliverEqual,
+} from './experimental-publication/private';
 /**
  * PathNotifier - Simple internal notification system for all mutations
  *
@@ -18,12 +29,21 @@ import {
 } from './internals/write-observation-scope';
 import {
   isRestorationDesignated,
+  isMetaDesignated,
   markMetaDesignated,
 } from './internals/restoration-eligibility';
 
 import { getWriteParticipation } from './write-participation';
 
-import { installPathDeliveryRuntime } from './internals/path-observation-port';
+import {
+  installPathDeliveryRuntime,
+  installBranchMembershipCapture,
+} from './internals/path-observation-port';
+import {
+  capturePathReAdd,
+  capturePlainBranchMembership,
+  plainBranchMembershipChange,
+} from './internals/plain-branch-membership';
 import { reportContainedObserverError } from './internals/error-reporter';
 import type { TreeId } from './internals/position-registry';
 import type { WriteMetadata } from './mutation-types';
@@ -56,6 +76,7 @@ type PendingEntry = {
   ownerPath?: string;
   origin?: string;
   meta?: WriteMetadata;
+  projectionMeta?: WriteMetadata;
   declaredScopes?: DeclaredWriteScopes;
   subjectId?: number;
   positionId?: number;
@@ -128,6 +149,7 @@ export class PathNotifier {
 
   // Map of pattern -> Set of handlers
   private subscribers = new Map<string, Set<PathNotifierHandler>>();
+  private projectionHandlers = new WeakSet<PathNotifierHandler>();
 
   // Batching state
   private resetCallbacks = new Set<() => void>();
@@ -135,7 +157,19 @@ export class PathNotifier {
   private batchIdentityMode: BatchIdentityMode = 'path-position-subject';
   private pendingFlush = false;
   private pending = new Map<string, PendingSlot>();
+  private pendingBeforeMembership: PendingSlot[] = [];
   private flushCallbacks = new Set<() => void>();
+
+  /**
+   * @internal Installed while a reversal or rollback applies
+   * (`publishingExposedOnly`): true for a realized write to a location the
+   * operation leaves absent, which is then not published. Path observers see
+   * what the tree exposes, never retained storage (v15 c6258aab, v16 8g).
+   */
+  absentRealized?: (
+    positionIds: number[] | undefined,
+    meta: WriteMetadata | undefined
+  ) => boolean;
   private enqueueObservers = new Map<
     number,
     Set<(entry: Readonly<PendingEntry>) => void>
@@ -212,6 +246,14 @@ export class PathNotifier {
    * Subscribe to mutations matching a path pattern
    * Returns unsubscribe function
    */
+  /** Internal projection view retains constituent receipts without changing
+   * ordinary subscribers' coalesced metadata or callback count. */
+  subscribeProjection(handler: PathNotifierHandler): () => void {
+    this.projectionHandlers.add(handler);
+    const release=this.subscribe('**',handler);
+    return ()=>{this.projectionHandlers.delete(handler);release();};
+  }
+
   subscribe(pattern: string, handler: PathNotifierHandler): () => void {
     if (!this.subscribers.has(pattern)) {
       this.subscribers.set(pattern, new Set());
@@ -250,6 +292,7 @@ export class PathNotifier {
     subjectFieldFootprint?: readonly string[] | null
   ): void {
     const ambientMeta = metaOverride ?? getActiveWriteContext();
+    if (this.absentRealized?.(positionIds, ambientMeta)) return;
     // HIST-C2. Captured HERE, at the synchronous observation of the write, for
     // exactly the reason the `origin` comment below gives: the flush that
     // delivers this entry is deferred to a microtask, so a designation scope
@@ -268,7 +311,7 @@ export class PathNotifier {
     // whose tree it belongs to. Folded in here rather than added as a delivery
     // parameter: every consumer already receives `meta`, and the handler
     // signature is enhancer-facing.
-    const meta =
+    let meta =
       ownerId === undefined
         ? metaBeforeOwner
         : { ...(metaBeforeOwner ?? {}), ownerId };
@@ -311,7 +354,12 @@ export class PathNotifier {
         }
       }
     }
-    const fieldKeys = changedSubjectFieldKeys(prev, value, subjectIds);
+    const transition = entityValueTransition(meta);
+    const fieldKeys = changedSubjectFieldKeys(
+      transition ? transition.ordinaryBefore : prev,
+      transition ? transition.ordinaryAfter : value,
+      subjectIds
+    );
     const footprintKeys = subjectFieldFootprint ?? fieldKeys;
     const knownFootprint =
       subjectFieldFootprint === null
@@ -319,6 +367,13 @@ export class PathNotifier {
         : footprintKeys === undefined
         ? undefined
         : Object.freeze([...footprintKeys]);
+    meta = researchAnnotate(
+      researchStampSource(meta, subjectIds, knownFootprint, value, prev),
+      ownerId ?? meta?.ownerId,
+      positionIds,
+      getWriteParticipation(meta) === 'authored',
+      value
+    );
     if (!this.batchingEnabled) {
       // Synchronous path: run subscribers immediately
       const deliveryMeta = materializeDeliveryMeta(meta);
@@ -344,6 +399,7 @@ export class PathNotifier {
       ownerPath,
       origin,
       meta,
+      projectionMeta:meta,
       declaredScopes,
       subjectId: subjectIds?.[0],
       positionId: positionIds?.[0],
@@ -380,7 +436,8 @@ export class PathNotifier {
     declaredScopes?: DeclaredWriteScopes,
     ownerId?: number,
     subjectFieldFootprint?: readonly string[] | null,
-    isolateSubscribers = false
+    isolateSubscribers = false,
+    projectionMeta?: WriteMetadata
   ): void {
     // ⚠️ THE INTERCEPTOR LOOP WAS DELETED IN 15.0 — PATH-NOTIFIER-INTERCEPT-
     // SURVIVAL-0. It ran here, before subscribers, and could suppress delivery
@@ -428,7 +485,7 @@ export class PathNotifier {
                 origin,
                 subjectIds,
                 positionIds,
-                meta,
+                this.projectionHandlers.has(handler) ? projectionMeta ?? meta : meta,
                 declaredScopes,
                 ownerId,
                 subjectFieldFootprint
@@ -461,11 +518,18 @@ export class PathNotifier {
    */
   private flush(): void {
     // Snapshot and clear before notifying to allow re-entrant behavior
-    const toNotify = new Map(this.pending);
+    const toNotify = [
+      ...this.pendingBeforeMembership,
+      ...this.pending.values(),
+    ];
+    this.pendingBeforeMembership = [];
     this.pending.clear();
     this.pendingFlush = false;
+    for (const slot of toNotify)
+      for (const entry of Array.isArray(slot) ? slot : [slot])
+        researchComplete(entry.meta);
 
-    for (const slot of toNotify.values()) {
+    for (const slot of toNotify) {
       const entries = Array.isArray(slot) ? slot : [slot];
       for (const entry of entries) {
         const isOwnerOnlyMarkerSignal =
@@ -476,9 +540,11 @@ export class PathNotifier {
         // If value didn't change compared to original oldValue, skip
         if (
           entry.newValue === entry.oldValue &&
+          !entry.subjectFieldKeys?.length &&
           !isOwnerOnlyMarkerSignal &&
           !hasStructuralEffect
         ) {
+          researchDeliverEqual(entry);
           continue;
         }
 
@@ -495,7 +561,8 @@ export class PathNotifier {
           entry.declaredScopes,
           entry.ownerId,
           entry.subjectFieldFootprint,
-          true
+          true,
+          entry.projectionMeta
         );
       }
     }
@@ -515,9 +582,9 @@ export class PathNotifier {
    */
   flushSync(): void {
     // Process until no pending notifications exist
-    while (this.pending.size > 0 || this.pendingFlush) {
+    while (this.hasPending() || this.pendingFlush) {
       // If a pendingFlush was scheduled but not yet processed, clear flag and process
-      if (this.pendingFlush && this.pending.size === 0) {
+      if (this.pendingFlush && !this.hasPending()) {
         // nothing queued - clear and continue
         this.pendingFlush = false;
         break;
@@ -538,13 +605,14 @@ export class PathNotifier {
    * Include net-equal entries: an ABA write still changed ownership.
    */
   readPending(): readonly Readonly<PendingEntry>[] {
-    return [...this.pending.values()].flatMap((slot) =>
-      (Array.isArray(slot) ? slot : [slot]).map((entry) => ({
-        ...entry,
-        subjectFieldKeys: entry.subjectFieldKeys
-          ? [...entry.subjectFieldKeys]
-          : undefined,
-      }))
+    return [...this.pendingBeforeMembership, ...this.pending.values()].flatMap(
+      (slot) =>
+        (Array.isArray(slot) ? slot : [slot]).map((entry) => ({
+          ...entry,
+          subjectFieldKeys: entry.subjectFieldKeys
+            ? [...entry.subjectFieldKeys]
+            : undefined,
+        }))
     );
   }
 
@@ -552,7 +620,7 @@ export class PathNotifier {
    * Check if there are pending notifications
    */
   hasPending(): boolean {
-    return this.pending.size > 0;
+    return this.pending.size > 0 || this.pendingBeforeMembership.length > 0;
   }
 
   /**
@@ -575,6 +643,16 @@ export class PathNotifier {
   }
 
   private enqueuePending(entry: PendingEntry): void {
+    if (plainBranchMembershipChange(entry.meta)) {
+      // Membership is a chronological barrier across paths. Keep queued
+      // descendant writes on the side of the transition where they occurred.
+      for (const slot of this.pending.values())
+        this.pendingBeforeMembership.push(slot);
+      this.pendingBeforeMembership.push(entry);
+      this.pending.clear();
+      return;
+    }
+
     const path = entry.path;
     const existing = this.pending.get(path);
     if (!existing) {
@@ -658,7 +736,10 @@ export class PathNotifier {
     // too. Entries from emitters that do not supply one both carry `undefined`
     // and compare exactly as they did before — the fix cannot make a
     // single-tree case newly distinct.
-    if (left.ownerId !== right.ownerId) {
+    if (
+      (left.ownerId ?? left.meta?.ownerId) !==
+      (right.ownerId ?? right.meta?.ownerId)
+    ) {
       return false;
     }
 
@@ -723,7 +804,10 @@ export class PathNotifier {
     right: PendingEntry
   ): boolean {
     return (
-      getWriteParticipation(left.meta) !== getWriteParticipation(right.meta)
+      getWriteParticipation(left.meta) !== getWriteParticipation(right.meta) ||
+      left.origin !== right.origin ||
+      left.meta?.transactionId !== right.meta?.transactionId ||
+      left.meta?.transactionOwner !== right.meta?.transactionOwner
     );
   }
 
@@ -755,7 +839,9 @@ export class PathNotifier {
     target.newValue = next.newValue;
     target.ownerPath = next.ownerPath;
     target.origin = this.mergeOrigin(target.origin, next.origin);
-    target.meta = this.mergeMeta(target.meta, next.meta);
+    const merged=this.mergeMeta(target.meta, next.meta);
+    target.projectionMeta=mergeScalarPublicationCoverage(target.projectionMeta ?? {},next.projectionMeta ?? {},merged);
+    target.meta = merged;
     target.subjectId = next.subjectId;
     target.positionId = next.positionId;
     target.subjectIds = next.subjectIds;
@@ -789,13 +875,19 @@ export class PathNotifier {
     ) {
       return undefined;
     }
-    if (left.structuralEffect && !right.structuralEffect) {
-      return {
-        ...right,
-        structuralEffect: left.structuralEffect,
-      };
-    }
-    return right;
+    const merged =
+      left.structuralEffect && !right.structuralEffect
+        ? { ...right, structuralEffect: left.structuralEffect }
+        : right;
+    // Consistent attribution permits coalescing values, but eligibility belongs
+    // to the entire authored turn: a later undesignated write cannot erase it.
+    return mergeEntityValueTransition(
+      left,
+      right,
+      isMetaDesignated(left)
+        ? { ...merged, ...markMetaDesignated(undefined) }
+        : merged
+    );
   }
 
   private getCompositeBatchKey(entry: PendingEntry): string {
@@ -811,6 +903,7 @@ export class PathNotifier {
   clear(): void {
     this.subscribers.clear();
     this.pending.clear();
+    this.pendingBeforeMembership = [];
     // Note: do NOT clear flush callbacks here. Enhancers may have
     // registered onFlush listeners that should survive a runtime reset
     // (e.g., resetPathNotifier) to avoid losing subscriptions silently.
@@ -867,6 +960,10 @@ export function getPathNotifier(): PathNotifier {
   // delivery implementation tree-shake out of a subscriber-less bundle.
   // Re-installing the same singleton keeps ONE DELIVERY AUTHORITY.
   installPathDeliveryRuntime(globalPathNotifier);
+  installBranchMembershipCapture(
+    capturePlainBranchMembership,
+    capturePathReAdd
+  );
   return globalPathNotifier;
 }
 

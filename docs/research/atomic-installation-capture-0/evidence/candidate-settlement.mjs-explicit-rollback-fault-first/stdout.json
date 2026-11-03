@@ -1,0 +1,314 @@
+{
+  "control": "explicit-rollback-fault",
+  "seen": [
+    [
+      0,
+      0
+    ],
+    [
+      1,
+      1
+    ],
+    [
+      0,
+      0
+    ],
+    [
+      2,
+      2
+    ]
+  ],
+  "scalarSeen": [
+    0,
+    1,
+    0,
+    2
+  ],
+  "rowSeen": [
+    0,
+    1,
+    0,
+    2
+  ],
+  "frames": [
+    {
+      "depth": 1,
+      "returnedNormally": true
+    },
+    {
+      "depth": 2,
+      "returnedNormally": true
+    },
+    {
+      "depth": 2,
+      "returnedNormally": true
+    },
+    {
+      "depth": 1,
+      "returnedNormally": true
+    },
+    {
+      "depth": 2,
+      "returnedNormally": true
+    },
+    {
+      "depth": 3,
+      "returnedNormally": true
+    },
+    {
+      "depth": 3,
+      "returnedNormally": true
+    },
+    {
+      "depth": 2,
+      "returnedNormally": true
+    },
+    {
+      "depth": 1,
+      "returnedNormally": true
+    },
+    {
+      "depth": 2,
+      "returnedNormally": true
+    },
+    {
+      "depth": 2,
+      "returnedNormally": true
+    },
+    {
+      "depth": 1,
+      "returnedNormally": true
+    }
+  ],
+  "faultHits": 1,
+  "reentryHits": 0,
+  "snapshots": [
+    {
+      "label": "pending-before-rollback",
+      "seen": [
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          1
+        ]
+      ],
+      "scalarSeen": [
+        0,
+        1
+      ],
+      "rowSeen": [
+        0,
+        1
+      ],
+      "faultHits": 0,
+      "reentryHits": 0,
+      "frames": [
+        {
+          "depth": 1,
+          "returnedNormally": true
+        },
+        {
+          "depth": 2,
+          "returnedNormally": true
+        },
+        {
+          "depth": 2,
+          "returnedNormally": true
+        }
+      ],
+      "source": [
+        1,
+        1
+      ],
+      "pending": 1,
+      "openScope": true
+    },
+    {
+      "label": "rollback-return",
+      "seen": [
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          0,
+          0
+        ]
+      ],
+      "scalarSeen": [
+        0,
+        1,
+        0
+      ],
+      "rowSeen": [
+        0,
+        1,
+        0
+      ],
+      "faultHits": 1,
+      "reentryHits": 0,
+      "frames": [
+        {
+          "depth": 1,
+          "returnedNormally": true
+        },
+        {
+          "depth": 2,
+          "returnedNormally": true
+        },
+        {
+          "depth": 2,
+          "returnedNormally": true
+        },
+        {
+          "depth": 1,
+          "returnedNormally": true
+        },
+        {
+          "depth": 2,
+          "returnedNormally": true
+        },
+        {
+          "depth": 3,
+          "returnedNormally": true
+        },
+        {
+          "depth": 3,
+          "returnedNormally": true
+        },
+        {
+          "depth": 2,
+          "returnedNormally": true
+        }
+      ],
+      "source": [
+        0,
+        0
+      ],
+      "pending": 0,
+      "openScope": false
+    },
+    {
+      "label": "next-successful-transaction",
+      "seen": [
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          2,
+          2
+        ]
+      ],
+      "scalarSeen": [
+        0,
+        1,
+        0,
+        2
+      ],
+      "rowSeen": [
+        0,
+        1,
+        0,
+        2
+      ],
+      "faultHits": 1,
+      "reentryHits": 0,
+      "frames": [
+        {
+          "depth": 1,
+          "returnedNormally": true
+        },
+        {
+          "depth": 2,
+          "returnedNormally": true
+        },
+        {
+          "depth": 2,
+          "returnedNormally": true
+        },
+        {
+          "depth": 1,
+          "returnedNormally": true
+        },
+        {
+          "depth": 2,
+          "returnedNormally": true
+        },
+        {
+          "depth": 3,
+          "returnedNormally": true
+        },
+        {
+          "depth": 3,
+          "returnedNormally": true
+        },
+        {
+          "depth": 2,
+          "returnedNormally": true
+        },
+        {
+          "depth": 1,
+          "returnedNormally": true
+        },
+        {
+          "depth": 2,
+          "returnedNormally": true
+        },
+        {
+          "depth": 2,
+          "returnedNormally": true
+        }
+      ],
+      "source": [
+        2,
+        2
+      ],
+      "pending": 0,
+      "openScope": false
+    }
+  ],
+  "pendingInspection": {
+    "changes": [
+      {
+        "path": "scalar",
+        "address": [
+          "scalar"
+        ],
+        "status": "current"
+      },
+      {
+        "path": "rows.A.v",
+        "address": [
+          "rows",
+          "v"
+        ],
+        "subject": 1,
+        "status": "current"
+      }
+    ]
+  },
+  "outcome": {
+    "threw": true,
+    "callback": false,
+    "publish": true,
+    "message": "after real token invalidate",
+    "recovery": null
+  },
+  "status": "pass"
+}

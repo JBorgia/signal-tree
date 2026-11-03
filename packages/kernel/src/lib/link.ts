@@ -1,3 +1,19 @@
+import type { PublicationDeclaration, PublicationReceipt } from './publication-declaration';
+import { scalarPublicationCovers, scalarNotificationContributions } from './internals/scalar-publication-coverage';
+import { createEntityPublicationParticipant } from './experimental-publication/entity';
+import { registerEntityPublicationFactory, entityPublicationOrdinary, entityPublicationUnit, getEntityPublicationBinding, type EntityPublicationEvidence } from './internals/entity-publication';
+import { entityValueTransition } from './internals/entity-value-transition';
+import type { NativeRequirement } from './experimental-publication/lifecycle';
+import { combineTerminalRecords } from './internals/intrinsic-mutation';
+import { getRetainedMembershipPath } from './internals/member-membership';
+import { hasSelectedEntityDisposition } from './internals/selected-entity-disposition';
+import type { WriteMetadata } from './mutation-types';
+import { ordinaryEntityEntries } from './internals/ordinary-entity-entries';
+import * as research from './experimental-publication/private';
+import {
+  applyPlainBranchMembership,
+  plainBranchMembershipChange,
+} from './internals/plain-branch-membership';
 import type { Location } from './internals/cell-runtime';
 import {
   isWritableLocation,
@@ -17,6 +33,7 @@ import {
   getNodeAddress,
 } from './internals/position-registry';
 import { acquireObservation } from './internals/observation-substrate';
+import { registerLinkState } from './internals/link-state-source';
 import { isInspectionWrite } from './write-participation';
 import {
   getEntityProjectionSeed,
@@ -42,6 +59,44 @@ import type { EntityMapBuilder } from './markers/entity-map';
 import type { NodeAccessor } from './node-accessor';
 import type { ConstructionOf } from './internals/construction-accessor';
 import type { ResolveLeafDefinitions } from './types';
+
+// Consume the factory at module initialization, before application writes.
+// Participant state remains lazy and source-owned; Link calls do not register.
+registerEntityPublicationFactory(createEntityPublicationParticipant);
+
+/** Physical topology and eligible semantic facts have distinct existing carriers. */
+function applyCollectionNotification(
+  projection: EntityEgressProjection,
+  subject: number | undefined,
+  row: unknown,
+  effect: Parameters<EntityEgressProjection['apply']>[2],
+  inspection: boolean,
+  fields: readonly string[] | null | undefined,
+  meta: WriteMetadata | undefined
+): boolean {
+  if (!hasSelectedEntityDisposition(meta))
+    return projection.apply(subject, row, effect, inspection, fields);
+  projection.apply(subject, row, effect, true, fields);
+  if (inspection) return false;
+  let advanced = false;
+  for (const entry of ordinaryEntityEntries({
+    path: '',
+    newValue: row,
+    oldValue: undefined,
+    subjectIds: subject === undefined ? undefined : [subject],
+    meta,
+  }))
+    advanced =
+      projection.apply(
+        entry.subjectIds?.[0],
+        entry.newValue,
+        entry.meta?.structuralEffect,
+        false,
+        fields,
+        true
+      ) || advanced;
+  return advanced;
+}
 
 /**
  * `link(x, y)` — synchronize a SignalTree location with an external endpoint.
@@ -85,16 +140,28 @@ export interface LinkEndpoint<T> {
 }
 
 /**
- * The handle. Deliberately three members.
+ * The handle: declaration admission and relationship lifecycle.
  *
  * No `subscribe()`, no `then()`, no retry/backoff/status, no `afterGet`/
  * `afterSet`/`afterChange` — none of those were earned by a demonstrated
  * third-party authoring need, and "might be useful" is UNPROVEN, not PUBLIC.
  */
 export interface Link {
+  /** Declare contributors for synchronous writes to this connection's source.
+   * The callback result is discarded. Writes may remain if validation throws.
+   * PromiseLike returns are rejected by inference; erased types and other
+   * thenables still require runtime validation. No declaration crosses await.
+   */
+  declare<R>(
+    declaration: PublicationDeclaration,
+    work: (() => R) & (Extract<R, PromiseLike<unknown>> extends never ? unknown : never)
+  ): PublicationReceipt;
   /** Pull Y into X once. Rejects if the endpoint supplies no `get()`. */
   retrieve(): Promise<void>;
-  /** Resolves when every outbound write in flight has been acknowledged. */
+  /**
+   * Resolves when every outbound write in flight has been acknowledged,
+   * including one caused by a write still queued for delivery.
+   */
   settled(): Promise<void>;
   /** Stop synchronizing. Idempotent. */
   dispose(): void;
@@ -277,6 +344,11 @@ export function link<S>(
   const releaseObservation = acquireObservation(x);
   const ownerPath = getOwnedOwnerPath(x) ?? '';
   const notifier = getPathNotifier();
+  // Entity projections carry their native collection position independently of
+  // optional capture metadata. Bind admission and incoming evidence to that
+  // same position, with the existing lifetime/field identity kept separate.
+  const publicationPosition =
+    entityLocation?.owner ?? getOwnedPositionIds(x)?.[0] ?? -1;
 
   let knownY: { value: T } | undefined;
   let disposed = false;
@@ -309,6 +381,7 @@ export function link<S>(
    * can never advance the projection (BASE-1 vs BASE-2).
    */
   let eligible: T = read();
+  let researchFact: ReturnType<typeof research.evidence>;
 
   /**
    * A collection source keeps its eligible value as a SUBJECT-KEYED projection
@@ -319,9 +392,18 @@ export function link<S>(
    * Seeded here, at the same RELATIONSHIP-CREATION ADOPTION boundary as
    * `eligible` above and from the same current truth.
    */
+  const seedCollectionProjection=(node:unknown):EntityEgressProjection=>{
+    const source=getEntityPublicationBinding(node)?.source,revision=source?.revision();
+    const seed=getEntityProjectionSeed(node)??[];
+    const facts=research.baselineEntityEvidence(source?.evidence(),registry.id);
+    const result=createEntityEgressProjection(seed,undefined,facts);
+    if(source?.revision()!==revision)throw new Error('Collection seed changed during preparation');
+    return result;
+  };
   const entityProjection: EntityEgressProjection | undefined = collection
-    ? createEntityEgressProjection(getEntityProjectionSeed(x) ?? [])
+    ? seedCollectionProjection(x)
     : undefined;
+  if(entityProjection)eligible=entityProjection.value() as T;
 
   /**
    * Scalar and branch sources advance their eligible value through shared
@@ -356,6 +438,7 @@ export function link<S>(
    * collection's ELIGIBLE value is adopted, never its current one.
    */
   type NestedCollection = {
+    readonly node: unknown;
     readonly projection: EntityEgressProjection;
     readonly relativeAddress: readonly string[];
   };
@@ -375,8 +458,9 @@ export function link<S>(
             ? relativeSourceAddress(sourceAddress, address)
             : undefined;
         if (position === undefined || relative === undefined) return;
-        const projection = createEntityEgressProjection(seed);
+        const projection = seedCollectionProjection(node);
         nestedCollections.set(position, {
+          node,
           projection,
           relativeAddress: relative,
         });
@@ -436,6 +520,25 @@ export function link<S>(
    */
   const retrievals = new Set<{ promise: Promise<void>; resolve: () => void }>();
 
+  // Read-only scheduler facts for `linkStateReader`. No values, no endpoint
+  // results: each publication reports what this relationship is doing now.
+  let queued = 0;
+  let sending = false;
+  const observeLink = registerLinkState(
+    registry,
+    x as object,
+    ownerPath,
+    endpoint,
+    () => [
+      dirty,
+      held.size > 0 || waitingSends.size > 0,
+      queued,
+      sending,
+      retrievals.size,
+      disposed,
+    ]
+  );
+
   /**
    * Inbound Y -> X.
    *
@@ -452,26 +555,179 @@ export function link<S>(
     // the leaf notifications that applying it will generate. External truth is
     // authoritative for this relationship — it is not inspection, and it is not
     // an authored mutation to be reduced.
-    eligible = value;
-    external(() => write(value));
+    if(!entityProjection)eligible = value;
+    research.acquire(consequenceKey, () =>
+      external(() => write(value))
+    );
     // ⚠️ AND THE SUBJECT SHADOW IS RESEEDED, not reduced. Applying inbound truth
     // may emit no notification at all when it coincides with what is already
     // shown (the I4 case), so the shadow is rebuilt from the post-apply
     // topology rather than inferred from events that may never arrive.
-    if (entityProjection) {
-      entityProjection.reseed(getEntityProjectionSeed(x) ?? []);
-    }
+    // Collection acquisition installs its prepared seed in the source unit.
+    // A post-write read could overwrite callback-authored newer truth.
   };
 
-  const offSub = notifier.subscribe(
-    '**',
-    (v, prev, _path, _o, _origin, subjectIds, _pos, meta, _scopes, _owner, fields) => {
+  // Enrollment and source subscription share the same source-issued identity.
+  // Entity row callables are supported even without a scalar carrier marker.
+  const ownEntitySource = getEntityPublicationBinding(x);
+  research.bindSource(
+    consequenceKey,
+    registry.id,
+    publicationPosition,
+    {
+      supported:collection||isWritableLocation(x)||isNodeAccessor(x)||!!getRootTree(x)||!!ownEntitySource,
+      subject: entityLocation?.subjectId,
+      field: entityLocation?.fieldKey,
+    },
+    (error) =>
+      reportTreeError({
+        error,
+        operation: 'link:declare',
+        treeId: registry.id,
+        path: ownerPath || undefined,
+      }),
+    x as object,
+    sourceAddress ? { registry, address: sourceAddress, value: eligible, aggregate: !isWritableLocation(x), presence: getRetainedMembershipPath(x) } : undefined
+  );
+  const releaseEntityPublications: Array<()=>void> = [];
+  const registerEntityRecipient=(node:unknown,projection:EntityEgressProjection|undefined,nested?:NestedCollection):void=>{
+    const binding=getEntityPublicationBinding(node); if(!binding)return;
+    if(projection)research.registerCollectionProjection(consequenceKey,node as object,nested?.relativeAddress,projection.support(),projection.value());
+    releaseEntityPublications.push(binding.source.subscribe({
+      seedRequested:()=>!!projection&&research.acquiringCollection(consequenceKey,node as object),
+      prepare(packet,native){
+        const support=(native as {support?:(subject?:number,field?:string)=>NativeRequirement}|undefined)?.support;
+        const prepared=native as {requirement?:NativeRequirement;facts?:EntityPublicationEvidence}|undefined;
+        const acquired=!!projection&&research.acquiringCollection(consequenceKey,node as object)&&packet.seed!==undefined;
+        const staged=acquired?projection!.prepareSeed(packet.seed!,research.acquiredEntityEvidence()):projection?.prepare(packet,prepared?.facts);
+        let next:unknown=staged?.value;
+        let changed=staged?.changed??false;
+        if(!projection){
+          next=eligible;
+          for(const edit of entityPublicationOrdinary(packet)){
+            if(edit.subject!==binding.subject)continue;
+            if(edit.structural?.kind==='remove'){next=undefined;changed=true;continue;}
+            if(edit.structural?.kind==='rekey')continue;
+            if(binding.field!==undefined){
+              if(edit.fields!==null&&!edit.fields.includes(binding.field))continue;
+              next=edit.after!==null&&typeof edit.after==='object'&&Object.prototype.hasOwnProperty.call(edit.after,binding.field)?(edit.after as Record<string,unknown>)[binding.field]:undefined;
+            }else next=projectEntityFields(next,edit.after,edit.fields);
+            changed=true;
+          }
+        }
+        const before=eligible;
+        const after=nested?applyAtRelativePath(eligible,nested.relativeAddress,{all:next}):next;
+        const affected=acquired||!!staged?.supportEdits.length||!!packet.ordinaryOrder||entityPublicationOrdinary(packet).some(edit=>binding.subject===undefined||edit.subject===binding.subject&&(edit.structural?.kind==='remove'||binding.field===undefined||edit.fields===null||edit.fields.includes(binding.field)));
+        const receipt=affected&&prepared?.requirement?research.prepareSourceProjection(consequenceKey,{intent:'replace',before:nested?nested.projection.value():before,after:nested?next:after,changed},prepared.requirement,undefined,projection?{key:node as object,edits:staged?.supportEdits??[],acquired}:undefined,!projection?support?.(binding.subject,binding.field):undefined):undefined;
+        if(!staged&&!receipt)return;
+        const install={set(_key:unknown,_value:unknown){if(changed){eligible=(nested?applyAtRelativePath(eligible,nested.relativeAddress,{all:next}):next) as T;dirty=true;}}};
+        return {record:combineTerminalRecords(staged?.record,receipt?.record,{writes:[{map:install,key:undefined,value:undefined}],adds:[]})!,completion:{receipt:receipt?.completion},finalize:receipt?.finalize};
+      },
+      complete(value){const receipt=(value as {receipt?:object}).receipt;if(receipt)research.completeSourceProjection(receipt);},
+    }));
+  };
+  if(ownEntitySource)registerEntityRecipient(x,entityProjection);
+  for(const nested of nestedCollections.values())registerEntityRecipient(nested.node,nested.projection,nested);
+  const offSub = research.subscribeProjection(
+    notifier,
+    consequenceKey,
+    (
+      v,
+      prev,
+      _path,
+      _o,
+      _origin,
+      subjectIds,
+      _pos,
+      meta,
+      _scopes,
+      _owner,
+      fields
+    ) => {
       if (disposed || !endpoint.set) return;
+      if (scalarPublicationCovers(meta, consequenceKey)) { dirty = true; observeLink(); return; }
+      if(entityValueTransition(meta)?.publicationUnit || entityPublicationUnit(meta)) return;
       // OWNER-PING-0. Two same-shaped trees give their collections the SAME
       // local position id, so identity is (registry, position) — never the
       // position alone.
       const m = (meta ?? {}) as Record<string, unknown>;
       if (m['ownerId'] !== registry.id) return;
+      const membership = plainBranchMembershipChange(meta);
+      if (membership) {
+        if (entityLocation || isInspectionWrite(meta)) return;
+        if(research.enabled){dirty=true;observeLink();return;}
+        const address = getNodeAddress(membership.branch);
+        const relative =
+          sourceAddress !== undefined && address !== undefined
+            ? relativeSourceAddress(sourceAddress, address)
+            : undefined;
+        if (relative !== undefined) {
+          eligible = applyPlainBranchMembership(eligible, relative, membership);
+        } else {
+          // ⚠️ A MEMBER AT OR ABOVE X CHANGED (v15 c6258aab, v16 8g): X now
+          // reads what that change installed, or nothing while it, or a
+          // member above it, is omitted. The endpoint gets what the tree
+          // exposes, `undefined` (`[]` for a collection), never retained
+          // storage. An omission sent nothing (the endpoint kept the last
+          // value), and the retained value reached it later through a
+          // reversal's announcement. The keys from the changed branch down to
+          // X are where X's address continues the branch's.
+          const below =
+            sourceAddress !== undefined && address !== undefined
+              ? relativeSourceAddress(address, sourceAddress)
+              : undefined;
+          const member =
+            below?.length &&
+            membership.members.find(({ key }) => key === below[0]);
+          if (!member || !below) return;
+          let value = member.after.present ? member.after.value : undefined;
+          for (const key of below.slice(1))
+            value =
+              value !== null &&
+              typeof value === 'object' &&
+              Object.prototype.hasOwnProperty.call(value, key)
+                ? (value as Record<string, unknown>)[key]
+                : undefined;
+          eligible = value as T;
+          entityProjection?.reseed(getEntityProjectionSeed(x) ?? []);
+        }
+        // A nested collection at or below a changed member reads its rows
+        // now (none while omitted): its projection restarts from them, and a
+        // present one gives the value its rows. Others keep their eligible
+        // rows, which an inspection write must not move (R10).
+        for (const nested of nestedCollections.values()) {
+          if (
+            relative !== undefined &&
+            !membership.members.some(
+              ({ key }) =>
+                nested.relativeAddress[relative.length] === key &&
+                relative.every(
+                  (step, at) => nested.relativeAddress[at] === step
+                )
+            )
+          )
+            continue;
+          nested.projection.reseed(getEntityProjectionSeed(nested.node) ?? []);
+          let at: unknown = eligible;
+          for (const key of nested.relativeAddress.slice(0, -1))
+            at =
+              at !== null && typeof at === 'object'
+                ? (at as Record<string, unknown>)[key]
+                : undefined;
+          if (
+            at !== null &&
+            typeof at === 'object' &&
+            Object.prototype.hasOwnProperty.call(
+              at,
+              nested.relativeAddress[nested.relativeAddress.length - 1]
+            )
+          )
+            advanceNested(nested);
+        }
+        dirty = true;
+        observeLink();
+        return;
+      }
       // A value-less ping is a notification, not a state change.
       if (v === undefined && prev === undefined) return;
       if (entityLocation) {
@@ -494,7 +750,8 @@ export function link<S>(
             !removed &&
             footprint !== null &&
             !footprint?.includes(entityLocation.fieldKey)
-          ) return;
+          )
+            return;
           eligible = (
             v != null &&
             Object.prototype.hasOwnProperty.call(v, entityLocation.fieldKey)
@@ -508,7 +765,10 @@ export function link<S>(
           if (next === eligible) return;
           eligible = next as T;
         }
+        researchFact = research.evidence(meta);
+        researchFact = research.project(consequenceKey, meta, eligible);
         dirty = true;
+        observeLink();
         return;
       }
       const position = _pos?.[0];
@@ -533,16 +793,19 @@ export function link<S>(
         const effect = (meta as Record<string, unknown> | undefined)?.[
           'structuralEffect'
         ] as Parameters<EntityEgressProjection['apply']>[2];
-        const advanced = nested.projection.apply(
+        const advanced = applyCollectionNotification(
+          nested.projection,
           subjectIds?.[0],
           v,
           effect,
           inspection,
-          fields
+          fields,
+          meta
         );
         if (advanced) {
           advanceNested(nested);
           dirty = true;
+          observeLink();
         }
         return;
       }
@@ -554,22 +817,46 @@ export function link<S>(
         const effect = (meta as Record<string, unknown> | undefined)?.[
           'structuralEffect'
         ] as Parameters<EntityEgressProjection['apply']>[2];
-        const advanced = entityProjection.apply(
+        const advanced = applyCollectionNotification(
+          entityProjection,
           subjectIds?.[0],
           v,
           effect,
           inspection,
-          fields
+          fields,
+          meta
         );
-        if (advanced) dirty = true;
+        if (advanced) {
+          dirty = true;
+          observeLink();
+        }
         return;
       }
       if (inspection) return;
-      eligible = applyAtRelativePath(eligible, relative, v);
+      const contributions=scalarNotificationContributions(meta);
+      if(contributions){
+        for(const contribution of contributions){
+          if(scalarPublicationCovers(contribution.meta,consequenceKey) ||
+             !research.scalarContributionIsCurrent(consequenceKey,relative,contribution.revision))continue;
+          const receipt=research.projectScalarContribution(consequenceKey,contribution.value,relative,contribution.revision);
+          if(receipt)adoptResearchProjection(receipt);
+        }
+      }else{
+        researchFact = relative.length === 0 ? research.evidence(meta) : undefined;
+        eligible = applyAtRelativePath(eligible, relative, v);
+        researchFact = research.project(consequenceKey, meta, eligible, relative);
+      }
       dirty = true;
+      observeLink();
     }
   );
 
+  const researchHold = (): void => {
+    if (held.size > 0 || disposed) return;
+    let resolve!: () => void;
+    const promise = new Promise<void>((r) => (resolve = r));
+    held.add({ promise, resolve });
+  };
   const sendEligible = (): Promise<boolean> =>
     new Promise((resolve, reject) => {
       const cancel = () => {
@@ -586,37 +873,88 @@ export function link<S>(
         try {
           // No remaining work needs no permission. Read only the eligible
           // projection, once per attempt; deferred admission restarts here.
-          const now = entityProjection
+          const researchTicket = researchFact;
+          const now = entityProjection && !research.enabled
             ? (entityProjection.value() as unknown as T)
             : eligible;
           if (knownY !== undefined && deepEqual(now, knownY.value)) {
             cancel();
             return;
           }
-          scheduleDurableConsequence({
-            claimant: x as object,
-            key: sendConsequenceKey,
-            run: () => {
-              if (!synchronous) {
-                // Settlement can precede delivery of rollback notifications.
-                // Resume after that turn, then ask the authority again: another
-                // scope may have opened before this continuation runs.
-                queueMicrotask(attempt);
-                return;
-              }
-              waitingSends.delete(cancel);
-              try {
-                // Invoke inside the authority's callback. Awaiting permission
-                // first would let a new scope open before the actual send.
-                Promise.resolve(endpoint.set?.(now)).then(() => {
-                  knownY = { value: now };
-                  resolve(true);
-                }, reject);
-              } catch (error) {
-                reject(error);
-              }
-            },
-          });
+          const researchAdmitted = research.admit(
+            scheduleDurableConsequence,
+            researchTicket,
+            registry.id,
+            publicationPosition,
+            consequenceKey,
+            {
+              claimant: x as object,
+              key: sendConsequenceKey,
+              run: () => {
+                if (!synchronous) {
+                  // Settlement can precede delivery of rollback notifications.
+                  // Resume after that turn, then ask the authority again: another
+                  // scope may have opened before this continuation runs.
+                  queueMicrotask(attempt);
+                  return;
+                }
+                waitingSends.delete(cancel);
+                // Entering I/O is observable; a listener may dispose here, and
+                // then no endpoint call may start.
+                sending = true;
+                try {
+                  observeLink();
+                } catch (error) {
+                  sending = false;
+                  throw error;
+                }
+                if (
+                  !disposed &&
+                  !research.allowed(
+                    researchTicket,
+                    registry.id,
+                    publicationPosition,
+                    consequenceKey
+                  )
+                ) {
+                  sending = false;
+                  researchHold();
+                  cancel();
+                  return;
+                }
+                if (disposed) {
+                  sending = false;
+                  resolve(false);
+                  return;
+                }
+                try {
+                  // Invoke inside the authority's callback. Awaiting permission
+                  // first would let a new scope open before the actual send.
+                  research.started(researchTicket, consequenceKey);
+                  Promise.resolve(endpoint.set?.(now)).then(
+                    () => {
+                      sending = false;
+                      knownY = { value: now };
+                      resolve(true);
+                    },
+                    (error) => {
+                      sending = false;
+                      reject(error);
+                    }
+                  );
+                } catch (error) {
+                  sending = false;
+                  reject(error);
+                }
+              },
+            }
+          );
+          if (!researchAdmitted) {
+            researchHold();
+            cancel();
+          }
+          // Held behind an open scope: the send waits for permission.
+          if (waitingSends.has(cancel)) observeLink();
         } catch (error) {
           waitingSends.delete(cancel);
           reject(error);
@@ -651,57 +989,104 @@ export function link<S>(
     }
     const pending = entry;
 
-    scheduleDurableConsequence({
-      claimant: x as object,
-      key: consequenceKey,
-      run: () => {
-        held.delete(pending);
-        pending.resolve();
-        if (disposed) return;
-        chain = chain
-          .then(async () => {
-            // LINK-RACE-1. Reconcile until X equals Y's acknowledged state.
-            // Terminates on EQUALITY, not on a counter — a write that lands
-            // while an earlier one is in flight is picked up by the next lap.
-            for (;;) {
-              if (disposed) return;
-              // Each lap can follow an async acknowledgement or queued turn;
-              // admission of the original flush cannot authorize this send.
-              if (!(await sendEligible())) return;
-            }
-          })
-          .catch((error) => {
-            // LINK-2 case 3. A rejected outbound `set()` reaches the EXISTING
-            // central reporter, so `Link` needs NO error surface of its own:
-            // no `failures`, no error signal, no status. Reusing the reporter
-            // is why the handle stays three members.
-            //
-            // ⚠️ PUBLICLY OBSERVABLE, as of ERROR-SURFACE-2:
-            //
-            //     Rejected outbound Link sends are publicly observable through
-            //     `onTreeError`.
-            //
-            // ERROR-SURFACE-1 had blocked that claim on two counts, both now
-            // measured closed: the event carries a REQUIRED `treeId`, so two
-            // same-shaped trees are distinguishable; and the `source` union is
-            // deleted rather than frozen into public API.
-            //
-            // The queue must SURVIVE the failure too. Otherwise one rejection
-            // wedges the link forever, which is a retry policy's failure mode
-            // arriving without a retry policy.
-            reportTreeError({
-              error,
-              operation: 'link:set',
-              treeId: registry.id,
-              // ⚠️ `ownerPath` was already known here and previously dropped.
-              // Location, never identity — two trees share this string.
-              path: ownerPath === '' ? undefined : ownerPath,
+    research.admit(
+      scheduleDurableConsequence,
+      researchFact,
+      registry.id,
+      publicationPosition,
+      consequenceKey,
+      {
+        claimant: x as object,
+        key: consequenceKey,
+        run: () => {
+          held.delete(pending);
+          pending.resolve();
+          if (disposed) return;
+          queued++;
+          chain = chain
+            .then(async () => {
+              queued--;
+              // Publish after entering I/O or completing reconciliation, never
+              // between removal from the queue and the first endpoint call.
+              try {
+                // LINK-RACE-1. Reconcile until X equals Y's acknowledged state.
+                // Terminates on EQUALITY, not on a counter — a write that lands
+                // while an earlier one is in flight is picked up by the next lap.
+                for (;;) {
+                  if (disposed) return;
+                  // Each lap can follow an async acknowledgement or queued turn;
+                  // admission of the original flush cannot authorize this send.
+                  if (!(await sendEligible())) return;
+                }
+              } finally {
+                observeLink();
+              }
+            })
+            .catch((error) => {
+              observeLink('send-failed');
+              // LINK-2 case 3. A rejected outbound `set()` reaches the EXISTING
+              // central reporter, so `Link` needs NO error surface of its own:
+              // no `failures`, no error signal, no status. Reusing the reporter
+              // is why the handle stays three members.
+              //
+              // ⚠️ PUBLICLY OBSERVABLE, as of ERROR-SURFACE-2:
+              //
+              //     Rejected outbound Link sends are publicly observable through
+              //     `onTreeError`.
+              //
+              // ERROR-SURFACE-1 had blocked that claim on two counts, both now
+              // measured closed: the event carries a REQUIRED `treeId`, so two
+              // same-shaped trees are distinguishable; and the `source` union is
+              // deleted rather than frozen into public API.
+              //
+              // The queue must SURVIVE the failure too. Otherwise one rejection
+              // wedges the link forever, which is a retry policy's failure mode
+              // arriving without a retry policy.
+              reportTreeError({
+                error,
+                operation: 'link:set',
+                treeId: registry.id,
+                // ⚠️ `ownerPath` was already known here and previously dropped.
+                // Location, never identity — two trees share this string.
+                path: ownerPath === '' ? undefined : ownerPath,
+              });
             });
-          });
-      },
-    });
+          observeLink();
+        },
+      }
+    );
+    observeLink();
   };
-  const offFlush = notifier.onFlush?.(flushOutbound);
+  function adoptResearchProjection(receipt:NonNullable<ReturnType<typeof research.refreshSource>>):void {
+    // Callback-free ownership transfer. Support changes never clear Link's work.
+    researchFact=receipt.fact;
+    eligible=receipt.payload as T;
+    if(receipt.changed)dirty=true;
+    research.acknowledgeProjection(consequenceKey,receipt);
+  }
+  const researchRefresh = (): void => {
+    const receipt=research.refreshSource(consequenceKey);
+    if(receipt)adoptResearchProjection(receipt);
+  };
+  const offFlush = notifier.onFlush?.(() => {
+    researchRefresh();
+    flushOutbound();
+  });
+  const offResearchEligibility = research.onEligibility(
+    registry.id,
+    () => {
+      if (!disposed) researchRefresh();
+      if (
+        disposed ||
+        (!dirty && held.size === 0) ||
+        research.pendingDecision(researchFact, consequenceKey)
+      )
+        return;
+      dirty = true;
+      flushOutbound();
+    },
+    consequenceKey
+  );
 
   // Order-only changes need no row notification. Consume their existing capture
   // channel, after earlier queued row notifications, then use the same durable
@@ -712,7 +1097,7 @@ export function link<S>(
     if (!capture?.subscribeCollectionOrder) continue;
     const releaseCapture = capture.activateCapture();
     const offOrder = capture.subscribeCollectionOrder((order) => {
-      if (disposed || order.owner !== getOwnedPositionIds(node)?.[0]) return;
+      if (disposed || order.owner !== getOwnedPositionIds(node)?.[0] || entityPublicationUnit(order.meta)) return;
       const inspection = isInspectionWrite(order.meta);
       let resolve!: () => void;
       const promise = new Promise<void>((r) => (resolve = r));
@@ -720,13 +1105,23 @@ export function link<S>(
       pendingOrders.add(pending);
       queueMicrotask(() => {
         try {
-          if (disposed || !projection.reorder(order.afterSubjects, inspection))
-            return;
+          const selected = hasSelectedEntityDisposition(order.meta);
+          if (selected) projection.reorder(order.afterSubjects, true);
+          const advanced = selected
+            ? order.ordinaryEndpoints !== undefined &&
+              projection.reorder(
+                order.ordinaryEndpoints.after,
+                inspection,
+                true
+              )
+            : projection.reorder(order.afterSubjects, inspection);
+          if (disposed || !advanced) return;
           if (projection !== entityProjection) {
             const nested = nestedCollections.get(order.owner);
             if (nested) advanceNested(nested);
           }
           dirty = true;
+          observeLink();
           flushOutbound();
         } finally {
           pendingOrders.delete(pending);
@@ -744,6 +1139,9 @@ export function link<S>(
   const dispose = (): void => {
     if (disposed) return;
     disposed = true;
+    offResearchEligibility();
+    for(const release of releaseEntityPublications)release();
+    research.dispose(consequenceKey, sendConsequenceKey);
     // Release only this relationship's claim; overlapping links stay armed.
     releaseObservation();
     offSub();
@@ -764,16 +1162,36 @@ export function link<S>(
     pendingOrders.clear();
     for (const r of retrievals) r.resolve();
     retrievals.clear();
+    // Retires the observation record before user cleanup, which may throw.
+    observeLink('disposed');
     offSource?.();
   };
   try {
     offSource = endpoint.subscribe?.((v) => acquire(v, ++inboundSeq));
   } catch (error) {
+    // Construction did not return a handle: not an active relationship, so it
+    // leaves no observation record and publishes nothing.
+    observeLink(null);
     dispose();
     throw error;
   }
+  observeLink('created');
 
-  return {
+  const experimental: Link & {
+    declare(
+      declaration: unknown,
+      work: () => unknown
+    ): ReturnType<typeof research.declare>;
+  } = {
+    declare: (declaration: unknown, work: () => unknown) =>
+      research.declare(
+        consequenceKey,
+        registry.id,
+        publicationPosition,
+        declaration,
+        work,
+        () => disposed
+      ),
     async retrieve() {
       if (!endpoint.get) {
         throw new Error('link: endpoint supplies no get().');
@@ -783,13 +1201,21 @@ export function link<S>(
       const promise = new Promise<void>((r) => (resolve = r));
       const entry = { promise, resolve };
       retrievals.add(entry);
+      observeLink();
       try {
+        // A disposed relationship starts no endpoint call, including one
+        // disposed by a listener of the publication above.
+        if (disposed) return;
         acquire((await endpoint.get()) as T, seq);
+      } catch (error) {
+        observeLink('retrieve-failed');
+        throw error;
       } finally {
         // `finally`, so a rejected get() releases the waiter too - otherwise a
         // failing endpoint would wedge every future `settled()`.
         retrievals.delete(entry);
         entry.resolve();
+        observeLink();
       }
     },
     async settled() {
@@ -798,6 +1224,8 @@ export function link<S>(
       // observations HELD behind settlement and anything a completed send
       // caused the reconciler to enqueue.
       for (;;) {
+        const installedWork = research.pendingWork(consequenceKey);
+        if (installedWork.length) { await Promise.all(installedWork); continue; }
         if (disposed) return;
         // Observe retrievals before yielding to the chain, so a completed
         // acquisition cannot disappear from this wait before its caller's
@@ -829,7 +1257,21 @@ export function link<S>(
         }
         // An order capture can append a send while the previous chain drains.
         if (chain !== awaitedChain) continue;
-        if (held.size === 0) break;
+        if (held.size === 0) {
+          // REACTIVE WRITES. A subscriber handling an earlier write may have
+          // written again; that write is still queued and reaches this
+          // relationship only at a later flush, one per hop. Await that flush
+          // (a microtask, never I/O) and look again. The queue is shared by
+          // every tree, deliberately: a hop can pass through another tree.
+          if (!notifier.hasPending()) break;
+          await new Promise<void>((resolve) => {
+            const off = notifier.onFlush(() => {
+              off();
+              resolve();
+            });
+          });
+          continue;
+        }
         // The RELEASE SIGNAL, not a poll. Every appended send is preceded by a
         // held observation, so this also carries the loop across work enqueued
         // behind a completed send.
@@ -838,4 +1280,5 @@ export function link<S>(
     },
     dispose,
   };
+  return experimental;
 }

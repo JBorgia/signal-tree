@@ -1,0 +1,115 @@
+diff --git a/packages/kernel/src/lib/internals/intrinsic-mutation-pay-for-use.spec.ts b/packages/kernel/src/lib/internals/intrinsic-mutation-pay-for-use.spec.ts
+index cc027d97..832958c5 100644
+--- a/packages/kernel/src/lib/internals/intrinsic-mutation-pay-for-use.spec.ts
++++ b/packages/kernel/src/lib/internals/intrinsic-mutation-pay-for-use.spec.ts
+@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest';
+ import {
+   getIntrinsicMutationObserver,
+   observeIntrinsicMutations,
++  prepareTerminalMutations,
+   registerIntrinsicMutationSource,
+   unobservableMutationSource,
+ } from './intrinsic-mutation';
+@@ -166,3 +167,64 @@ describe('the shared unobservable source cannot carry an observer', () => {
+     expect(seen).toEqual(['B']);
+   });
+ });
++
++
++describe('responsibility sources remain independent', () => {
++  it('observes late capture and terminal attachment and release per source', () => {
++    const a = {};
++    const b = {};
++    const first = registerIntrinsicMutationSource<string>(a);
++    const second = registerIntrinsicMutationSource<string>(b);
++    expect(first.capture).toBeUndefined();
++    expect(first.terminal).toBeUndefined();
++    expect(second.capture).toBeUndefined();
++    for (const key of ['capture', 'terminal', 'prepareTerminal']) {
++      const descriptor = Object.getOwnPropertyDescriptor(first, key);
++      expect(descriptor).toEqual({
++        get: expect.any(Function), set: undefined,
++        enumerable: false, configurable: false,
++      });
++      expect(descriptor?.get).toBe(Object.getOwnPropertyDescriptor(second, key)?.get);
++    }
++    const seen: string[] = [];
++    const releaseCapture = observeIntrinsicMutations<string>(a,
++      (value) => seen.push(`capture:${value.after}`), true);
++    const releaseTerminal = observeIntrinsicMutations<string>(b,
++      (value) => seen.push(`terminal:${value.after}`), 'terminal');
++    const mutation = { before: 'old', after: 'new', intent: 'replace' as const, changed: true };
++    first.capture?.(mutation);
++    second.terminal?.(mutation);
++    expect(seen).toEqual(['capture:new', 'terminal:new']);
++    expect(first.terminal).toBeUndefined();
++    expect(second.capture).toBeUndefined();
++    releaseCapture?.();
++    expect(first.capture).toBeUndefined();
++    second.terminal?.(mutation);
++    expect(seen).toEqual(['capture:new', 'terminal:new', 'terminal:new']);
++    releaseTerminal?.();
++    expect(second.terminal).toBeUndefined();
++  });
++
++  it('keeps preparation ownership and cleanup local to its source', () => {
++    const a = {};
++    const b = {};
++    const first = registerIntrinsicMutationSource(a);
++    const second = registerIntrinsicMutationSource(b);
++    const plan = { writes: [], adds: [] };
++    const prepare = () => plan;
++    const release = prepareTerminalMutations(a, prepare);
++    expect(first.prepareTerminal).toBe(prepare);
++    expect(first.prepareTerminal?.({
++      before: 0, after: 1, intent: 'replace', changed: true,
++    })).toBe(plan);
++    expect(second.prepareTerminal).toBeUndefined();
++    expect(() => prepareTerminalMutations(a, () => undefined)).toThrow('Terminal preparation already owned');
++    const releaseSecond = prepareTerminalMutations(b, prepare);
++    release?.();
++    release?.();
++    expect(first.prepareTerminal).toBeUndefined();
++    expect(second.prepareTerminal).toBe(prepare);
++    releaseSecond?.();
++    expect(second.prepareTerminal).toBeUndefined();
++  });
++});
+diff --git a/packages/kernel/src/lib/internals/intrinsic-mutation.ts b/packages/kernel/src/lib/internals/intrinsic-mutation.ts
+index 0b6b7aa2..679c7153 100644
+--- a/packages/kernel/src/lib/internals/intrinsic-mutation.ts
++++ b/packages/kernel/src/lib/internals/intrinsic-mutation.ts
+@@ -68,6 +68,22 @@ interface SourceRecord {
+  */
+ const SOURCES = new WeakMap<object, SourceRecord>();
+ 
++// Accessor functions are shared; all mutable observer and preparation state
++// stays on the individual source. Per-source closures otherwise retain an
++// unnecessary context and accessor functions even on an unobserved leaf.
++const SOURCE_ACCESSORS: PropertyDescriptorMap = {
++  prepareTerminal: {
++    get(this: SourceRecord) { return this.terminalPreparer; },
++  },
++  terminal: {
++    get(this: SourceRecord) { return this.terminalRecord?.observer; },
++  },
++  capture: {
++    get(this: SourceRecord) { return this.captureRecord?.observer; },
++  },
++};
++
++
+ /**
+  * One observer must not be able to starve another after truth has committed,
+  * so a throwing observer is contained — including when it is the only one.
+@@ -135,9 +151,7 @@ export function registerIntrinsicMutationSource<T = unknown>(
+   node: object
+ ): IntrinsicMutationSource<T> {
+   const record: SourceRecord = { observers: undefined, observer: undefined };
+-  Object.defineProperty(record, 'prepareTerminal', {get: () => record.terminalPreparer});
+-  Object.defineProperty(record, 'terminal', {get: () => record.terminalRecord?.observer});
+-  Object.defineProperty(record, 'capture', {get: () => record.captureRecord?.observer});
++  Object.defineProperties(record, SOURCE_ACCESSORS);
+   SOURCES.set(node, record);
+   return record as IntrinsicMutationSource<T>;
+ }

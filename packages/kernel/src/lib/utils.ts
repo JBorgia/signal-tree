@@ -1,3 +1,4 @@
+import { recordPublicationSnapshot } from './internals/intrinsic-mutation';
 import type { SnapshotValue } from './internals/construction-accessor';
 // TYPE-ONLY: this transitional package still names Angular's types publicly;
 // the split rebinds them per package. No Angular VALUE remains in kernel utils.
@@ -9,6 +10,7 @@ import {
 } from './internals/location-runtime';
 import {
   bindSnapshotParent,
+  readSnapshotTerminal,
   isSnapshotNode,
   materializeSnapshotNode,
 } from './internals/snapshot-authority';
@@ -337,6 +339,17 @@ export function unwrap<T>(node: unknown): T {
 }
 
 /**
+ * Read current plain-branch values before grouped memo invalidation is delivered.
+ * Capture uses the canonical builder without consulting nested branch memos;
+ * ordinary reads keep their memoized structural sharing.
+ */
+export function unwrapBranchForWriteCapture<T>(node: unknown): T {
+  return isNodeAccessor(node)
+    ? buildFromStore<T>(snapshotNodeKey(node), true)
+    : unwrap<T>(node);
+}
+
+/**
  * @internal THE builder. Every snapshot of a tree node is produced here —
  * `tree.$()`, `snapshotState()`, `unwrap()` of an accessor, and every nested
  * child — so there is exactly one place that decides what a property
@@ -347,7 +360,7 @@ export function unwrap<T>(node: unknown): T {
  * only one of them carried the ST2008 diagnostic, and only one of them copied
  * symbol keys. See the comment on the accessor branch of `unwrap()`.
  */
-function buildFromStore<T>(node: object): T {
+function buildFromStore<T>(node: object, uncachedBranches = false): T {
   // A materialised marker snapshots itself — see snapshotMarkerNode().
   const own = snapshotMarkerNode(node);
   if (own) return own.value as T;
@@ -440,9 +453,11 @@ function buildFromStore<T>(node: object): T {
       // destroyed the structural sharing the memo exists to produce: every
       // parent read minted a fresh copy of every child, so NO subtree was ever
       // reference-stable and a one-leaf write still cost O(state) downstream.
-      result[key] = value();
+      result[key] = uncachedBranches
+        ? unwrapBranchForWriteCapture(value)
+        : value();
     } else if (isReactiveStateValue(value)) {
-      result[key] = (value as ReadableCell<unknown>)();
+      result[key] = readSnapshotTerminal(value as ReadableCell<unknown>, node);
     } else if (
       typeof value === 'object' &&
       value !== null &&
@@ -511,16 +526,19 @@ function buildFromStore<T>(node: object): T {
     }
 
     if (isNodeAccessor(value)) {
+      bindSnapshotParent(value as object, node);
       // Take the child's materialisation AS IS. Calling `unwrap()` on it again
       // deep-copied a plain object that was already plain — pure waste, and it
       // destroyed the structural sharing the memo exists to produce: every
       // parent read minted a fresh copy of every child, so NO subtree was ever
       // reference-stable and a one-leaf write still cost O(state) downstream.
-      (result as Record<symbol, unknown>)[sym] = value();
+      (result as Record<symbol, unknown>)[sym] = uncachedBranches
+        ? unwrapBranchForWriteCapture(value)
+        : value();
     } else if (isReactiveStateValue(value)) {
-      (result as Record<symbol, unknown>)[sym] = (
-        value as ReadableCell<unknown>
-      )();
+      (result as Record<symbol, unknown>)[sym] = readSnapshotTerminal(
+        value as ReadableCell<unknown>, node
+      );
     } else if (
       typeof value === 'object' &&
       value !== null &&
@@ -533,6 +551,7 @@ function buildFromStore<T>(node: object): T {
     }
   }
 
+  recordPublicationSnapshot?.(node, result);
   return result as unknown as T;
 }
 

@@ -1,8 +1,13 @@
+import { markSnapshotInstalled } from './snapshot-installation';
+import {openSelected,closeSelected,failSelected,consumeSelected,selectedProceed,type SelectedInvocation,type SelectedOutcome} from './selected-write-operation';
+import type { ClaimedFieldEndpoint } from './native-field-selection';
+import { withEntityBoundPublicationInput } from './entity-publication';
 import { markTreeCell } from './cell-identity';
 import { isLeafDefinition, leafDefinitionValue } from '../leaf';
 import type {
   Location,
   ReadonlyLocation,
+  ReadableCell,
   WritableCell,
 } from './cell-runtime';
 import type {
@@ -17,7 +22,8 @@ import {
   PRODUCTION_SUBSTRATE_STATS_ENABLED,
   recordProductionSubstrateStat,
 } from './production-substrate-stats';
-import { registerIntrinsicMutationSource } from './intrinsic-mutation';
+import { type TerminalRecordPlan, type PreparedPublicationUnit, combineTerminalRecords, registerIntrinsicMutationSource } from './intrinsic-mutation';
+import { reportContainedObserverError } from './error-reporter';
 
 interface DependencyConsumer {
   readonly dependencies: Map<DependencyNode, DependencyEdge>;
@@ -43,8 +49,10 @@ export interface LocationPublisher {
 }
 
 export interface WritableLocationBinding<T> extends LocationPublisher {
+  needsAuthorityAdmission?():boolean;
   readonly location: Location<T>;
   replace(value: T): void;
+  replaceSelected?(invocation: SelectedInvocation): void;
   derive(update: (current: T) => T): void;
 }
 
@@ -67,8 +75,28 @@ export function isWritableLocation(value: unknown): value is Location<unknown> {
   return WRITABLE_LOCATION_BINDINGS.has(value as object);
 }
 
+/**
+ * @internal The publisher a writable location's own writes already publish
+ * through. Exposed so a membership transition can wake a location's observers
+ * without writing it; it creates no reactive state.
+ */
+export function writableLocationPublisher(
+  value: unknown
+): LocationPublisher | undefined {
+  return WRITABLE_LOCATION_BINDINGS.get(value as object);
+}
+
 export function replaceLocation<T>(location: Location<T>, value: T): void {
   writableLocationBinding(location).replace(value);
+}
+
+/** Private inverse dispatch; follows the same installed interceptor chain. */
+export function replaceSelectedLocation<T>(location: Location<T>, value: T, selection: ClaimedFieldEndpoint): void {
+  const binding = writableLocationBinding(location);
+  if (!binding.replaceSelected) throw new Error('Selected replacement has no private projection continuation');
+  const outcome:SelectedOutcome={failed:false};
+  const invocation=openSelected(value,selection,outcome);
+  try{binding.replaceSelected(invocation);if(outcome.failed)throw outcome.error;if(invocation.phase==='open')throw new Error('Selected continuation did not prepare');}finally{closeSelected(invocation);outcome.error=undefined;}
 }
 
 export function deriveLocation<T>(
@@ -113,11 +141,17 @@ export function interceptLocationWrites<T>(
 
   const previousReplace = binding.replace;
   const previousDerive = binding.derive;
+  const previousSelected = binding.replaceSelected;
+  const wrappedSelected = previousSelected ? (invocation: SelectedInvocation): void => {
+    if(invocation.phase!=='open'||!invocation.request)throw new Error('Selected continuation is closed');
+    try{intercept({intent:'replace',value:invocation.request.value as T},selectedProceed(invocation,previousSelected));}catch(error){failSelected(invocation,error);throw error;}
+  } : undefined;
   const wrappedReplace = (value: T): void =>
     intercept({ intent: 'replace', value }, () => previousReplace(value));
   const wrappedDerive = (update: (current: T) => T): void =>
     intercept({ intent: 'derive', update }, () => previousDerive(update));
   binding.replace = wrappedReplace;
+  binding.replaceSelected = wrappedSelected;
   binding.derive = wrappedDerive;
   synchronizeNativeWriters(binding);
 
@@ -126,6 +160,7 @@ export function interceptLocationWrites<T>(
     if (!active) return;
     active = false;
     if (binding.replace === wrappedReplace) binding.replace = previousReplace;
+    if (binding.replaceSelected === wrappedSelected) binding.replaceSelected = previousSelected;
     if (binding.derive === wrappedDerive) binding.derive = previousDerive;
     synchronizeNativeWriters(binding);
   };
@@ -133,7 +168,7 @@ export function interceptLocationWrites<T>(
 
 export function createWritableProjection<T>(
   source: ReadonlyLocation<T>,
-  write: (value: T, intent: 'replace' | 'derive') => void
+  write: (value: T, intent: 'replace' | 'derive', selection?: ClaimedFieldEndpoint) => void
 ): Location<T> {
   const location = markTreeCell(function (value?: unknown) {
     if (arguments.length === 0) return source();
@@ -150,14 +185,11 @@ export function createWritableProjection<T>(
     location as object
   );
 
-  const binding: WritableLocationBinding<T> = {
-    location,
-    notify: () => undefined,
-    replace: (value) => {
+  const replace = (value: T, selection?: ClaimedFieldEndpoint): void => {
       const observer = mutationSource1.observer;
       const before = observer ? source.peek() : undefined;
-      write(value, 'replace');
-      if (observer) {
+      write(value, 'replace', selection);
+      const deliver = () => { if (observer) {
         const after = source.peek();
         observer({
           intent: 'replace',
@@ -165,11 +197,17 @@ export function createWritableProjection<T>(
           after,
           changed: !Object.is(before, after),
         });
-      }
-    },
+      }};
+      if(selection?.preparation)selection.preparation.defer(deliver);else deliver();
+    };
+  const binding: WritableLocationBinding<T> = {
+    location,
+    notify: () => undefined,
+    replace: value => replace(value),
+    replaceSelected: invocation => {const request=consumeSelected(invocation);replace(request.value as T,request.selection);},
     derive: (update) => {
       const before = source.peek();
-      write(update(before), 'derive');
+      withEntityBoundPublicationInput(location as object,()=>write(update(before), 'derive'));
       const observer = mutationSource1.observer;
       if (observer) {
         const after = source.peek();
@@ -281,13 +319,19 @@ export interface LocationRuntime {
     equal?: (left: T, right: T) => boolean
   ): Location<T>;
   createDerived<T>(compute: () => T): ReadonlyLocation<T>;
+  createCurrentReadonly<T>(read: () => T): ReadableCell<T>;
   createWritable<T>(
-    read: () => T,
-    write: (value: T, intent: 'replace' | 'derive') => boolean
+    /**
+     * The location's read. `stored` asks for the stored value whatever the
+     * location's presence: what a write's history records as its before
+     * value, so a reversal restores storage as it was (v16 8e).
+     */
+    read: (stored?: boolean) => T,
+    write: (value: T, intent: 'replace' | 'derive', prepare?: (physicalChanged?:boolean) => TerminalRecordPlan | undefined, prepareUnchanged?: (current: T,physicalChanged?:boolean) => TerminalRecordPlan | undefined) => boolean | {changed:boolean;physicalChanged:boolean}
   ): WritableLocationBinding<T>;
   createWritableProjection?<T>(
     compute: () => T,
-    write: (value: T, intent: 'replace' | 'derive') => void
+    write: (value: T, intent: 'replace' | 'derive', selection?: ClaimedFieldEndpoint) => void
   ): Location<T>;
   /**
    * `SUBJECT-EPOCH-0`. A stable reactive anchor and nothing else: call it to
@@ -391,8 +435,8 @@ export function createLocationRuntime(
   };
 
   const createWritable = <T>(
-    read: () => T,
-    write: (value: T, intent: 'replace' | 'derive') => boolean
+    read: (stored?: boolean) => T,
+    write: (value: T, intent: 'replace' | 'derive', prepare?: (physicalChanged?:boolean) => TerminalRecordPlan | undefined, prepareUnchanged?: (current: T,physicalChanged?:boolean) => TerminalRecordPlan | undefined) => boolean | {changed:boolean;physicalChanged:boolean}
   ): WritableLocationBinding<T> => {
     let observationToken: ObservationToken | undefined;
     const listeners = new Set<() => void>();
@@ -430,37 +474,78 @@ export function createLocationRuntime(
       },
       replace: (next) => {
         const observer = mutationSource2.observer;
-        const before = observer ? read() : undefined;
-        const changed = write(next, 'replace');
-        if (observer) {
-          observer({
-            intent: 'replace',
-            before: before as T,
-            after: changed ? next : (before as T),
-            changed,
-          });
+        const publicationPrepare = mutationSource2.preparePublication;
+        const publicationComplete = mutationSource2.completePublication;
+        const before = observer || publicationPrepare ? read(true) : undefined;
+        let unit: PreparedPublicationUnit | undefined;
+        let terminal: TerminalRecordPlan | undefined;
+        const preparePublication = (changed: boolean, retained: T = before as T,physicalChanged=changed) => {
+          unit = publicationPrepare?.({intent:'replace',before:before as T,after:changed ? next : retained,changed,physicalChanged,preparedTerminal:terminal});
+          return unit?.record;
+        };
+        let failed = false;
+        try {
+          const result = write(next, 'replace', physicalChanged => combineTerminalRecords(
+            terminal = mutationSource2.prepareTerminal?.({intent:'replace',before:before as T,after:next,changed:true}),
+            preparePublication(true,before as T,physicalChanged)
+          ), publicationPrepare ? (current,physicalChanged) => preparePublication(false,current,physicalChanged) : undefined);
+          const changed=typeof result==='boolean'?result:result.changed;
+          const physicalChanged=typeof result==='boolean'?result:result.physicalChanged;
+          if (typeof result === 'boolean' && physicalChanged) markSnapshotInstalled(location);
+          if (observer) observer({intent:'replace',before:before as T,after:changed ? next : before as T,changed,coveredRecipients:unit?.coveredRecipients});
+          if (physicalChanged) publish([binding]);
+        } catch (error) { failed = true; throw error; }
+        finally {
+          if (unit && publicationComplete) {
+            try { publicationComplete(unit.completion); }
+            catch (error) {
+              if (!failed) throw error;
+              reportContainedObserverError({error,operation:'notify:subscriber'});
+            }
+          }
         }
-        if (changed) publish([binding]);
       },
       derive: (update) => {
-        const before = read();
-        const next = update(before);
-        const changed = write(next, 'derive');
-        const observer = mutationSource2.observer;
-        if (observer) {
-          observer({
-            intent: 'derive',
-            before,
-            after: changed ? next : before,
-            changed,
-          });
+        // Native updater input and ordinary recorded truth stay separate.
+        const publicationInput = mutationSource2.capturePublicationInput?.();
+        const current = read();
+        const publicationPrepare = mutationSource2.preparePublication;
+        const publicationComplete = mutationSource2.completePublication;
+        const before = mutationSource2.observer || publicationPrepare ? read(true) : current;
+        const next = update(current);
+        let unit: PreparedPublicationUnit | undefined;
+        let terminal: TerminalRecordPlan | undefined;
+        const preparePublication = (changed: boolean, retained: T = before as T,physicalChanged=changed) => {
+          unit = publicationPrepare?.({intent:'derive',before,after:changed ? next : retained,changed,physicalChanged,preparedTerminal:terminal}, publicationInput);
+          return unit?.record;
+        };
+        let failed = false;
+        try {
+          const result = write(next, 'derive', physicalChanged => combineTerminalRecords(
+            terminal = mutationSource2.prepareTerminal?.({intent:'derive',before,after:next,changed:true}),
+            preparePublication(true,before as T,physicalChanged)
+          ), publicationPrepare ? (current,physicalChanged) => preparePublication(false,current,physicalChanged) : undefined);
+          const changed=typeof result==='boolean'?result:result.changed;
+          const physicalChanged=typeof result==='boolean'?result:result.physicalChanged;
+          if (typeof result === 'boolean' && physicalChanged) markSnapshotInstalled(location);
+          mutationSource2.observer?.({intent:'derive',before,after:changed ? next : before,changed,coveredRecipients:unit?.coveredRecipients});
+          if (physicalChanged) publish([binding]);
+        } catch (error) { failed = true; throw error; }
+        finally {
+          if (unit && publicationComplete) {
+            try { publicationComplete(unit.completion); }
+            catch (error) {
+              if (!failed) throw error;
+              reportContainedObserverError({error,operation:'notify:subscriber'});
+            }
+          }
         }
-        if (changed) publish([binding]);
       },
     };
     registerWritableLocationBinding(binding);
 
-    location.peek = read;
+    // Never the stored read: `peek` is public and takes no argument.
+    location.peek = () => read();
     location.subscribe = (listener) => {
       listeners.add(listener);
       return () => listeners.delete(listener);
@@ -650,6 +735,10 @@ export function createLocationRuntime(
   return {
     createCell,
     createDerived,
+    createCurrentReadonly: <T>(read: () => T): ReadableCell<T> =>
+      realization.createCurrentReadonlyCell
+        ? realization.createCurrentReadonlyCell(read)
+        : read,
     createWritable,
     createEpoch,
     advanceEpoch,
@@ -661,3 +750,5 @@ export function createLocationRuntime(
 export const NEUTRAL_LOCATION_RUNTIME = createLocationRuntime(
   NEUTRAL_OBSERVATION_ADAPTER
 );
+
+export function needsLocationAuthorityAdmission(value:object):boolean {return WRITABLE_LOCATION_BINDINGS.get(value)?.needsAuthorityAdmission?.() ?? false;}

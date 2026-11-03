@@ -1,0 +1,10 @@
+CPRF test-only lint cleanup review, 2026-10-13
+Reviewed current seven-file package diff (63insertions/36deletions) preserved at /private/tmp/CPRF-test-lint-reviewed.patch, SHA25672e51b9196a33ea3a12bd648cb2225fb2c54d3ce440fb506cf36c7cc67fec7c9.
+
+No assertion weakening or changed useful fixture behavior found. All modified files are tests or shared test harness; no runtime/config/ceiling changes.
+- Four framework wrappers and shared expected projection frame replace encode(row)! with identical id:name formatting for rows guaranteed by all/where arrays. Optional find/active encoding remains unchanged. Missing/malformed row cannot newly pass; direct property access would fail rather than encode absent as null.
+- required(value) replaces TypeScript-only nonnull assertions on held references, nested handles, array entries, and adapter methods. It fails explicitly on missing required data instead of erasing the check at compile time. Original equality, field, same-array/memo, observer count, retained-lifetime, confirmation, retry and cleanup assertions remain.
+- Native observer callbacks still read the same values at the same point; reentry expectations not weakened, nested confirm remains after rollback.
+- required(adapter.createReadonlyCell)(...) extracts method receiver, but current Vue producer is explicitly an arrow closure without receiver use; unchanged supported fixture semantics. No runtime helper refactor introduced.
+
+Worker execution pending at review time; source review is not a lint/test success claim. If patch changes, reassess changed hunks and identify new hash. Artifact interpretation remains: unchanged package/demo ceilings block artifact acceptance; these failures neither require scans nor establish architecture redesign is necessary. No broader optimization or ceiling change justified by this cleanup.

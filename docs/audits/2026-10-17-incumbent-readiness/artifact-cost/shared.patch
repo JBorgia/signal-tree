@@ -1,0 +1,88 @@
+--- a/packages/kernel/src/lib/internals/intrinsic-mutation.ts
++++ b/packages/kernel/src/lib/internals/intrinsic-mutation.ts
+@@ -1,6 +1,17 @@
+ export interface TerminalRecordPlan {
+   readonly writes: readonly { readonly map: Map<unknown,unknown>; readonly key: unknown; readonly value: unknown }[];
+   readonly adds: readonly { readonly set: Set<unknown>; readonly value: unknown }[];
++}
++/** Apply only precomputed internal writes; callers own installation ordering. */
++export function installTerminalRecord(plan: TerminalRecordPlan): void {
++  for (let i = 0; i < plan.writes.length; i++) {
++    const write = plan.writes[i];
++    write.map.set(write.key, write.value);
++  }
++  for (let i = 0; i < plan.adds.length; i++) {
++    const add = plan.adds[i];
++    add.set.add(add.value);
++  }
+ }
+ type TerminalPreparer = (mutation: IntrinsicMutation<unknown>) => TerminalRecordPlan | undefined;
+ export interface IntrinsicMutation<T> {
+--- a/packages/kernel/src/lib/internals/tree-scalar-slot-runtime.ts
++++ b/packages/kernel/src/lib/internals/tree-scalar-slot-runtime.ts
+@@ -1,3 +1,4 @@
++import { installTerminalRecord } from './intrinsic-mutation';
+ import type { TerminalRecordPlan } from './intrinsic-mutation';
+ import type { PositionId } from '../mutation-types';
+ import type { PhysicalCommitClock } from './physical-commit-clock';
+@@ -327,8 +328,7 @@
+         recordProductionSubstrateStat('slotWrites');
+       }
+       if(plan){
+-        for(let i=0;i<plan.writes.length;i++){const w=plan.writes[i];w.map.set(w.key,w.value);}
+-        for(let i=0;i<plan.adds.length;i++){const a=plan.adds[i];a.set.add(a.value);}
++        installTerminalRecord(plan);
+       }
+       advanceRevision();
+       if (PRODUCTION_SUBSTRATE_STATS_ENABLED) {
+--- a/packages/kernel/src/lib/internals/materialize-markers.ts
++++ b/packages/kernel/src/lib/internals/materialize-markers.ts
+@@ -1,3 +1,4 @@
++import { installTerminalRecord } from './intrinsic-mutation';
+ import type { TerminalRecordPlan } from './intrinsic-mutation';
+ import { getOwnedPositionIds } from './owned-metadata';
+ import {
+@@ -795,8 +796,7 @@
+   // Internal prepared data only: no observer, equality or user callback may
+   // separate physical membership from its settlement responsibility.
+   if (responsibility) {
+-    for (const write of responsibility.writes) write.map.set(write.key, write.value);
+-    for (const add of responsibility.adds) add.set.add(add.value);
++    installTerminalRecord(responsibility);
+   }
+   // Under a branch that has been omitted before, so an omission above it is
+   // visible to the new member too (`isAbsentMember`).
+--- a/packages/kernel/src/lib/physical/entity-mutation-frame.ts
++++ b/packages/kernel/src/lib/physical/entity-mutation-frame.ts
+@@ -1,3 +1,4 @@
++import { installTerminalRecord } from '../internals/intrinsic-mutation';
+ import type { TerminalRecordPlan } from '../internals/intrinsic-mutation';
+ import type { CommittedEntityMutation } from '../internals/mutation-capture-runtime';
+ import { EntityValueStore } from './entity-value-store';
+@@ -253,8 +254,7 @@
+     }
+
+     if (responsibility) {
+-      for(let i=0;i<responsibility.writes.length;i++){const w=responsibility.writes[i];w.map.set(w.key,w.value);}
+-      for(let i=0;i<responsibility.adds.length;i++){const a=responsibility.adds[i];a.set.add(a.value);}
++      installTerminalRecord(responsibility);
+     }
+     if (before && observeCommitted) {
+       observeCommitted(
+--- a/packages/kernel/src/lib/entity-signal.ts
++++ b/packages/kernel/src/lib/entity-signal.ts
+@@ -1,3 +1,4 @@
++import { installTerminalRecord } from './internals/intrinsic-mutation';
+ import type {
+   Location,
+   ReadableCell,
+@@ -1220,8 +1221,7 @@
+     if (physicalCommitClock?.revision() !== revision) throw new Error('Entity responsibility preparation reentered installation');
+     valueStore.retainSubjectValue(subjectId, nextValue);
+     if (plan) {
+-      for (let i=0;i<plan.writes.length;i++) { const w=plan.writes[i]; w.map.set(w.key,w.value); }
+-      for (let i=0;i<plan.adds.length;i++) { const a=plan.adds[i]; a.set.add(a.value); }
++      installTerminalRecord(plan);
+     }
+     capture?.([
+       { subject: subjectId, before, after: nextValue, structural: false },

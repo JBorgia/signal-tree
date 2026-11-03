@@ -1,0 +1,59 @@
+{
+  "mode": "reentry",
+  "hits": 0,
+  "seen": [
+    [
+      0,
+      0
+    ],
+    [
+      1,
+      1
+    ],
+    [
+      5,
+      1
+    ]
+  ],
+  "mutation": [
+    {
+      "after": 1,
+      "read": 1
+    },
+    {
+      "after": 5,
+      "read": 5
+    }
+  ],
+  "reentry": 1,
+  "callbackReached": true,
+  "beforeDemand": [
+    [
+      0,
+      0
+    ],
+    [
+      1,
+      1
+    ],
+    [
+      5,
+      1
+    ]
+  ],
+  "source": [
+    5,
+    1
+  ],
+  "physical": [
+    5,
+    1
+  ],
+  "pending": 1,
+  "error": {
+    "callback": false,
+    "publisher": false,
+    "code": "SIGNALTREE_ROLLBACK_FAILED"
+  },
+  "status": "pass"
+}

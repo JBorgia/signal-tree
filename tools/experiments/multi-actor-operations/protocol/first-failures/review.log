@@ -1,0 +1,61 @@
+✔ fragmented tool output creates a proposal; finished run does not grant approval (1.500625ms)
+✔ transport metadata and state events cannot approve or mutate canonical data (0.172167ms)
+✔ invalid and oversize arguments leave no operation (0.082125ms)
+✔ duplicate calls, unrelated finishes and incomplete runs are refused (0.075417ms)
+✔ host actor context is declared; tool-provided actor and permission are rejected (0.065125ms)
+✔ review: forged approval fields and tool result never grant consent (0.550375ms)
+✔ review: byte boundary, tool count, tool identity and terminal run checks (0.558792ms)
+✖ review: disposing stream from proposal callback prevents later operation creation (0.4435ms)
+✖ review: recursive tool end is refused before invoking builder twice (0.152292ms)
+ℹ tests 9
+ℹ suites 0
+ℹ pass 7
+ℹ fail 2
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 39.377584
+
+✖ failing tests:
+
+test at tools/experiments/multi-actor-operations/protocol/review.test.mjs:50:1
+✖ review: disposing stream from proposal callback prevents later operation creation (0.4435ms)
+  AssertionError [ERR_ASSERTION]: operation was created after dispose returned inside callback
+  
+  true !== false
+  
+      at TestContext.<anonymous> (file:///Users/jonathanborgia/code/signaltree/tools/experiments/multi-actor-operations/protocol/review.test.mjs:63:10)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1201:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:831:18)
+      at Test.postRun (node:internal/test_runner/test:1330:19)
+      at Test.run (node:internal/test_runner/test:1258:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: true,
+    expected: false,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tools/experiments/multi-actor-operations/protocol/review.test.mjs:67:1
+✖ review: recursive tool end is refused before invoking builder twice (0.152292ms)
+  AssertionError [ERR_ASSERTION]: same tool end entered makeProposal twice
+  
+  2 !== 1
+  
+      at TestContext.<anonymous> (file:///Users/jonathanborgia/code/signaltree/tools/experiments/multi-actor-operations/protocol/review.test.mjs:83:10)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1201:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:831:18)
+      at Test.postRun (node:internal/test_runner/test:1330:19)
+      at Test.run (node:internal/test_runner/test:1258:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 2,
+    expected: 1,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }

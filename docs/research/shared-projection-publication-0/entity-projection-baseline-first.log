@@ -1,0 +1,38 @@
+
+> nx run vue:test --testNamePattern=Vue entity projection publication
+
+> pnpm exec tsc --noEmit -p packages/vue/tsconfig.spec.json && npx vitest run --config packages/vue/vitest.config.ts --testNamePattern="Vue entity projection publication"
+
+(node:63928) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+packages/vue/src/lib/entity-projection-publication.spec.ts(139,16): error TS2349: This expression is not callable.
+  Type 'ComputedRef<boolean>' has no call signatures.
+packages/vue/src/lib/entity-projection-publication.spec.ts(140,18): error TS2349: This expression is not callable.
+  Type 'ComputedRef<Row[]>' has no call signatures.
+packages/vue/src/lib/entity-projection-publication.spec.ts(140,31): error TS7006: Parameter 'row' implicitly has an 'any' type.
+packages/vue/src/lib/entity-projection-publication.spec.ts(141,17): error TS2349: This expression is not callable.
+  Type 'ComputedRef<Row | undefined>' has no call signatures.
+packages/vue/src/lib/entity-projection-publication.spec.ts(141,31): error TS2349: This expression is not callable.
+  Type 'ComputedRef<Row | undefined>' has no call signatures.
+packages/vue/src/lib/entity-projection-publication.spec.ts(203,7): error TS2349: This expression is not callable.
+  Type 'ComputedRef<Row[]>' has no call signatures.
+packages/vue/src/lib/entity-projection-publication.spec.ts(204,7): error TS2349: This expression is not callable.
+  Type 'ComputedRef<Row | undefined>' has no call signatures.
+Warning: command "pnpm exec tsc --noEmit -p packages/vue/tsconfig.spec.json && npx vitest run --config packages/vue/vitest.config.ts --testNamePattern="Vue entity projection publication"" exited with non-zero status code
+
+
+ NX   Running target test for project vue failed
+
+Failed tasks:
+
+- vue:test
+
+Hint: run the command with --verbose for more details.
+
+  Run duration:      11.6s
+  Critical path:     11.6s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Speed up or split the longest tasks on the critical path:
+        vue:test    11.6s

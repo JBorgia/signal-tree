@@ -1,0 +1,12 @@
+CL2 review against CPRE, 2026-10-13
+Reviewed final docs/research/member-point-composition-0/CL2.patch; original /private/tmp/st-cl2/CL2.patch receiver discrepancy superseded.
+
+No supported-path runtime blocker found. Final __preparePointValues call uses .call(collection,...), retaining original receiver. Current producer is closure-backed preparePointValues; receiver retention avoids accidental change for internal wrappers.
+
+The new missing-path guard executes only in sourceCaptureRuntime.prepareEntityResponsibility. Both production callers provide path for every change: commitAndProjectEntityMutationFrame computes path for replace/fresh/remove and explicit fromKey path for rekey before frame.commit; commitExistingSubjectValue computes active-key path before valueStore.retainSubjectValue. Guard therefore cannot be a postinstallation failure for these producers. It strengthens malformed internal preparation failure rather than enlarging supported public refusals.
+
+Captured row epoch, installed result, and Map prior entry preserve semantics: prepared entries are objects (truthy), result is single-assignment, epoch is retained immutable object. Existing boolean failure flags and exact first thrown value unchanged. Conditional installScalars fallback is not called when members exists; installedScalars guard remains before publication and has same condition as old guard.
+
+Extracted terminalRecord/beforePublication no longer receive options as this; actual transaction producers are immutable arrow closures, so no concrete supported regression. Suggested .call(options,...) to retain receiver even for internal method-style options. Capturing identity at registration also differs from dynamic later options mutation, but no production mutation or contract found. Do not claim full JS-behavior equivalence for arbitrary mutated internal options.
+
+Review only; root coordinates execution. No edits to runtime or existing tests.

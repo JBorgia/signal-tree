@@ -1,0 +1,72 @@
+
+> nx run angular:test transaction-realization.spec.ts --testNamePattern=4d owned projection --maxWorkers=1
+
+> NODE_OPTIONS=--expose-gc npx vitest run --root packages/angular transaction-realization.spec.ts --testNamePattern="4d owned projection" --maxWorkers=1
+
+npm warn Unknown env config "verify-deps-before-run". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown project config "auto-install-peers". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown project config "shamefully-hoist". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+(node:2751) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:3010) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /Users/jonathanborgia/.codex/worktrees/atomic-capture-proof/signaltree/packages/angular
+
+(node:3078) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ❯ src/lib/transaction-realization.spec.ts (14 tests | 1 failed | 8 skipped) 77ms
+     × 4d owned projection settlement — remove, primed 21ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/lib/transaction-realization.spec.ts > @signal-tree/angular — pending realization conformance > 4d owned projection settlement — remove, primed
+AssertionError: [{"phase":"setup","scalar":0,"projections":{"all":["A:Original"],"ids":["A"],"count":1,"empty":false,"map":["A:Original"],"hasA":true,"where":["A:Original"],"find":"A:Original","slice":["Original"],"activeId":"A","activeEntity":"A:Original","row":"Original","field":"Original"}},{"phase":"speculative-delivery","scalar":7,"projections":{"all":[],"ids":[],"count":0,"empty":true,"map":[],"hasA":false,"where":[],"find":null,"slice":[],"activeId":"A","activeEntity":null,"row":null,"field":null}},{"phase":"after-rollback","scalar":0,"projections":{"all":["A:Original"],"ids":["A"],"count":1,"empty":false,"map":["A:Original"],"hasA":true,"where":["A:Original"],"find":"A:Original","slice":["Original"],"activeId":"A","activeEntity":null,"row":"Original","field":"Original"}}]: expected { all: [ 'A:Original' ], …(12) } to deeply equal { all: [ 'A:Original' ], …(12) }
+
+- Expected
++ Received
+
+@@ -1,7 +1,7 @@
+  {
+-   "activeEntity": "A:Original",
++   "activeEntity": null,
+    "activeId": "A",
+    "all": [
+      "A:Original",
+    ],
+    "count": 1,
+
+ ❯ ../kernel/src/transaction-realization-contract.ts:371:72
+    369|             for (const frame of delivered) {
+    370|               expect(frame.scalar).toBe(0);
+    371|               expect(frame.projections, JSON.stringify(observed.seen))…
+       |                                                                        ^
+    372|                 snapshot(operation !== 'add', true)
+    373|               );
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 5 passed | 8 skipped (14)
+   Start at  16:29:12
+   Duration  3.56s (transform 1.26s, setup 769ms, import 1.46s, tests 77ms, environment 974ms)
+
+Warning: command "NODE_OPTIONS=--expose-gc npx vitest run --root packages/angular transaction-realization.spec.ts --testNamePattern="4d owned projection" --maxWorkers=1" exited with non-zero status code
+
+
+ NX   Running target test for project angular failed
+
+Failed tasks:
+
+- angular:test
+
+Hint: run the command with --verbose for more details.
+
+  Run duration:      6.1s
+  Critical path:     6.1s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Speed up or split the longest tasks on the critical path:
+        angular:test    6.1s

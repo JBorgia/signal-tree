@@ -1,0 +1,14 @@
+{
+  "command": [
+    "pnpm",
+    "exec",
+    "tsc",
+    "--noEmit",
+    "-p",
+    "packages/vue/tsconfig.spec.json"
+  ],
+  "exit": 0,
+  "stdout": "",
+  "stderr": "",
+  "head": "40866f1292e2f86b86bd98951db6020960fd1163"
+}

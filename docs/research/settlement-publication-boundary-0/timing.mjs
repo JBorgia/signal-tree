@@ -1,0 +1,23 @@
+import assert from 'node:assert/strict';
+import {computed,watchEffect,nextTick} from 'vue';
+import {createSignalTreeFactory} from '@signal-tree/kernel/adapter';
+import {entityMap,transactions} from '@signal-tree/kernel';
+import {createVueObservationAdapter} from '@proof/packages/vue/src/lib/vue-observation.ts';
+const trace={events:[],observations:[]};let phase='setup',seq=0,bodyDepth=0,adapterDepth=0,tree;
+const emit=(kind,extra={})=>trace.events.push({seq:++seq,phase,kind,bodyDepth,adapterDepth,...extra});
+const base=createVueObservationAdapter();const cells=[];
+const adapter={...base,createWritableCell(read){const r=base.createWritableCell(read),id=cells.length;cells.push(r.cell);return{...r,token:{observe:()=>r.token.observe(),invalidate(){emit('writable:invalidate',{id,scalar:r.cell===tree?.$.scalar});r.token.invalidate();}}};},createReadonlyCell(read){return base.createReadonlyCell(()=>{emit('owned-derived:evaluate');return read();});},runInvalidationGroup(run){adapterDepth++;emit('adapter:enter');try{base.runInvalidationGroup(()=>{bodyDepth++;emit('adapter:body-enter');try{run();}finally{emit('adapter:body-exit');bodyDepth--;}});}finally{emit('adapter:return');adapterDepth--;}}};
+globalThis.__publicationTrace=kind=>emit(kind);
+let stopSync,stopDeferred;try{
+ tree=createSignalTreeFactory(adapter)({scalar:0,rows:entityMap({selectId:r=>r.id})},{enhancers:[transactions()]});tree.$.rows.addOne({id:'A',v:0});
+ const nativeScalar=computed(()=>{emit('app-computed:scalar');return tree.$.scalar();});
+ const nativeRows=computed(()=>{emit('app-computed:all');return tree.$.rows.all().map(r=>r.v);});
+ const heldAll=tree.$.rows.all;
+ const read=kind=>{const native={scalar:nativeScalar.value,all:nativeRows.value};const own={scalar:tree.$.scalar(),row:tree.$.rows.byIdOrFail('A')().v,all:tree.$.rows.all().map(r=>r.v),heldAll:heldAll().map(r=>r.v)};const event={seq:++seq,phase,kind,bodyDepth,adapterDepth,own,native};trace.observations.push(event);trace.events.push(event);};
+ stopSync=watchEffect(()=>read('sync-effect'),{flush:'sync'});stopDeferred=watchEffect(()=>read('deferred-effect'));
+ phase='authored';const h=tree.transact(()=>{tree.$.scalar.set(1);tree.$.rows.updateOne('A',{v:1});read('authored-body-read');});phase='authored-delivery';await nextTick();read('after-authored-delivery');
+ phase='rollback-call';emit('rollback:enter');h.rollback();emit('rollback:return');phase='after-rollback-return';read('after-rollback-return');await nextTick();phase='after-rollback-delivery';read('after-rollback-delivery');
+ const sync=trace.observations.filter(x=>x.kind==='sync-effect'&&x.phase==='rollback-call');assert.ok(sync.length);for(const x of sync)assert.deepEqual(x.own,{scalar:0,row:0,all:[0],heldAll:[0]});
+ const deferred=trace.observations.filter(x=>x.kind==='deferred-effect'&&x.phase==='after-rollback-return');assert.ok(deferred.length);for(const x of deferred)assert.deepEqual(x.own,{scalar:0,row:0,all:[0],heldAll:[0]});
+ assert.deepEqual(trace.observations.at(-1).native,{scalar:0,all:[0]});trace.status='pass';
+}catch(e){trace.status='fail';trace.error=e.stack;process.exitCode=1;}finally{stopSync?.();stopDeferred?.();tree?.destroy();delete globalThis.__publicationTrace;}console.log(JSON.stringify(trace,null,2));

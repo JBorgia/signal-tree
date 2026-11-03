@@ -1,0 +1,87 @@
+[
+  {
+    "label": "build-all",
+    "command": [
+      "pnpm",
+      "nx",
+      "run-many",
+      "-t",
+      "build",
+      "--projects=kernel,angular,react,vue,solid",
+      "--skip-nx-cache"
+    ],
+    "exit": 0,
+    "seconds": 8.434
+  },
+  {
+    "label": "api",
+    "command": [
+      "node",
+      "tools/api-inventory.mjs",
+      "--check"
+    ],
+    "exit": 0,
+    "seconds": 1.385
+  },
+  {
+    "label": "api-callable",
+    "command": [
+      "node",
+      "tools/api-callable-inventory.mjs",
+      "--check"
+    ],
+    "exit": 0,
+    "seconds": 0.641
+  },
+  {
+    "label": "bundle-budget",
+    "command": [
+      "node",
+      "tools/check-bundle-budget.mjs"
+    ],
+    "exit": 1,
+    "seconds": 0.135
+  },
+  {
+    "label": "size-report",
+    "command": [
+      "node",
+      "tools/size-report.mjs",
+      "--json"
+    ],
+    "exit": 0,
+    "seconds": 0.242
+  },
+  {
+    "label": "lint-budget",
+    "command": [
+      "node",
+      "tools/check-lint-budget.mjs"
+    ],
+    "exit": 1,
+    "seconds": 15.003
+  },
+  {
+    "label": "doc-links",
+    "command": [
+      "node",
+      "tools/check-doc-links.mjs"
+    ],
+    "exit": 0,
+    "seconds": 0.374
+  },
+  {
+    "label": "demo-production",
+    "command": [
+      "pnpm",
+      "nx",
+      "build",
+      "demo",
+      "--configuration=production",
+      "--base-href=/",
+      "--skip-nx-cache"
+    ],
+    "exit": 1,
+    "seconds": 8.335
+  }
+]

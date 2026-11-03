@@ -1,3 +1,5 @@
+import { attachScalarResponsibility } from './scalar-responsibility-attachment';
+import { withScalarPublicationCoverage } from './scalar-publication-coverage';
 import type { Location } from './cell-runtime';
 
 import type { MutationCaptureRuntime } from './mutation-capture-runtime';
@@ -38,6 +40,7 @@ type OwnedMutationOptions = {
 };
 
 type OwnedWriteHooks<TValue> = {
+  isActive?:()=>boolean;
   afterSet?: (
     value: TValue,
     before: TValue,
@@ -172,7 +175,8 @@ export function emitOwnedMutation(
   options: OwnedMutationOptions,
   before: unknown,
   after: unknown,
-  mutationIntent: OwnedMutationIntent
+  mutationIntent: OwnedMutationIntent,
+  coveredRecipients?: readonly object[]
 ): void {
   markOwnerInvalidated(options.ownerId);
 
@@ -212,10 +216,10 @@ export function emitOwnedMutation(
     // and must not acquire one. Entity/structural notification owns that fact.
     undefined,
     [positionId],
-    {
+    withScalarPublicationCoverage({
       ...(getActiveWriteContext() ?? {}),
       mutationIntent,
-    },
+    }, coveredRecipients),
     options.ownerId
   );
 }
@@ -224,7 +228,7 @@ export function wrapOwnedWritableSignal<TValue>(
   leaf: Location<TValue>,
   options: OwnedMutationOptions,
   hooks: OwnedWriteHooks<TValue> = {}
-): void {
+): () => void {
   const metadataStorage = options.metadataStorage ?? 'property';
 
   defineOwnedPositionIds(leaf as object, options.positionIds, metadataStorage);
@@ -242,12 +246,14 @@ export function wrapOwnedWritableSignal<TValue>(
   const releaseIntrinsicObserver = observeIntrinsicMutations<TValue>(
     leaf as object,
     (mutation) => {
+      if(hooks.isActive && !hooks.isActive())return;
       if (mutation.changed) {
         emitOwnedMutation(
           options,
           mutation.before,
           mutation.after,
-          mutation.intent
+          mutation.intent,
+          mutation.coveredRecipients
         );
       }
       if (mutation.intent === 'replace') {
@@ -269,4 +275,9 @@ export function wrapOwnedWritableSignal<TValue>(
   if (!releaseIntrinsicObserver) {
     throw new Error('SignalTree location has no intrinsic mutation source');
   }
+  let releaseTerminal:(()=>void)|undefined;
+  try { releaseTerminal=attachScalarResponsibility(leaf as object,options.captureRuntime,options.path,hooks.isActive); }
+  catch(error){releaseIntrinsicObserver();throw error;}
+  let active=true;
+  return ()=>{if(!active)return;active=false;try{releaseTerminal?.();}finally{releaseIntrinsicObserver();}};
 }

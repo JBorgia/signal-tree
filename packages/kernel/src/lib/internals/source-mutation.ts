@@ -90,6 +90,8 @@ export type StructuralEffect = {
  * type is a journal, a replay log, or a causal graph.
  */
 export type EntityTopology = {
+  /** Private preparation draft; never used for point-only updates. */
+  fork(): EntityTopology;
   /** Advance to reflect one structural effect, whoever authored it. */
   observe(effect: StructuralEffect): void;
   /** The current address of a subject, which a row payload cannot supply. */
@@ -132,6 +134,7 @@ export function createEntityTopology(
   reload(seed);
 
   return {
+    fork: () => createEntityTopology(order.map(subjectId => ({subjectId, key: keys.get(subjectId)!, row: undefined}))),
     reload,
     reorder: (afterSubjects) => {
       order = [...afterSubjects];

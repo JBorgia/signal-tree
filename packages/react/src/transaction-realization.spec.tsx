@@ -9,8 +9,10 @@ import { entityMap, signalTree, transactions } from '@signal-tree/kernel';
 import {
   transactionRealizationContract,
   type ConformanceRow,
+  type EntityProjectionFrame,
   type MixedFrame,
   type Observation,
+  type ValuePublicationFrame,
 } from '../../kernel/src/transaction-realization-contract';
 import { useSignalTree } from './use-signal-tree';
 
@@ -31,7 +33,9 @@ const build = () =>
   signalTree(
     {
       scalar: 0,
-      rows: entityMap<ConformanceRow, string>({ selectId: (r) => r.id }),
+      rows: entityMap<ConformanceRow, string>({
+        selectId: (r) => r.id,
+      }).computed('names', (rows) => rows.map((row) => row.name)),
     },
     { enhancers: [transactions()] }
   );
@@ -84,6 +88,40 @@ const decodeFrame = (encoded: string): MixedFrame => {
   };
 };
 
+const projectionFrame = (
+  $: Tree['$'],
+  phase: string,
+  enabled: boolean
+): EntityProjectionFrame => {
+  const scalar = $.scalar();
+  if (!enabled) return { phase, scalar, projections: null };
+  const node = $.rows.byId('A');
+  const encode = (row: ConformanceRow | undefined) =>
+    row ? `${row.id}:${row.name}` : null;
+  return {
+    phase,
+    scalar,
+    projections: {
+      all: $.rows.all().map((row) => `${row.id}:${row.name}`),
+      ids: [...$.rows.ids()],
+      count: $.rows.count(),
+      empty: $.rows.empty(),
+      map: [...$.rows.asMap()].map(([key, row]) => `${key}:${row.name}`),
+      hasA: $.rows.has('A')(),
+      where: $.rows
+        .where(matchesA)()
+        .map((row) => `${row.id}:${row.name}`),
+      find: encode($.rows.find(matchesA)()),
+      slice: [...$.rows.names()],
+      activeId: $.rows.activeId() ?? null,
+      activeEntity: encode($.rows.activeEntity()),
+      row: node?.()?.name ?? null,
+      field: node?.name() ?? null,
+    },
+  };
+};
+const matchesA = (row: ConformanceRow) => row.id === 'A';
+
 describe('@signal-tree/react — pending realization conformance', () => {
   transactionRealizationContract<Tree>({
     framework: 'react',
@@ -135,6 +173,52 @@ describe('@signal-tree/react — pending realization conformance', () => {
         current: () => decodeFrame(encoded.current()),
         dispose: encoded.dispose,
       };
+    },
+
+    observeValues: (tree, phase) => {
+      const seen: ValuePublicationFrame[] = [];
+      let latest!: ValuePublicationFrame;
+      // Stable primitive snapshot; record phase at actual render execution.
+      const select = ($: Tree['$']) =>
+        JSON.stringify([
+          $.scalar(),
+          $.rows.byId('A')?.()?.name,
+          $.rows.all().find((row) => row.id === 'A')?.name,
+        ]);
+      function Probe() {
+        const encoded = useSignalTree(tree, select as never) as string;
+        const [scalar, row, all] = JSON.parse(encoded) as [
+          number,
+          string,
+          string
+        ];
+        latest = { phase: phase(), scalar, row, all };
+        seen.push(latest);
+        return null;
+      }
+      const view = render(<Probe />);
+      return [{ seen, current: () => latest, dispose: () => view.unmount() }];
+    },
+
+    selectRow: (tree, id) => tree.$.rows.setActiveId(id),
+    rekeyRow: (tree, from, to) => tree.$.rows.changeId(from, to),
+    observeProjections: (tree, phase, enabled) => {
+      const seen: EntityProjectionFrame[] = [];
+      let latest!: EntityProjectionFrame;
+      // Phase belongs to execution; exclude it from stable external snapshots.
+      const select = ($: Tree['$']) =>
+        JSON.stringify(projectionFrame($, '', enabled()));
+      function ProjectionProbe() {
+        const encoded = useSignalTree(tree, select as never) as string;
+        latest = {
+          ...(JSON.parse(encoded) as EntityProjectionFrame),
+          phase: phase(),
+        };
+        seen.push(latest);
+        return null;
+      }
+      const view = render(<ProjectionProbe />);
+      return [{ seen, current: () => latest, dispose: () => view.unmount() }];
     },
 
     async flush() {

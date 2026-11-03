@@ -1,0 +1,634 @@
+[
+  {
+    "lane": "base",
+    "run": "base-optional-structural-work.mjs-baseline-work-corrected-key",
+    "exit": 1,
+    "stable": true,
+    "runs": [
+      {
+        "N": 128,
+        "kind": "add",
+        "settlement": "confirm",
+        "inventoryCalls": 0,
+        "lengths": []
+      },
+      {
+        "N": 128,
+        "kind": "add",
+        "settlement": "rollback",
+        "inventoryCalls": 0,
+        "lengths": []
+      },
+      {
+        "N": 128,
+        "kind": "remove",
+        "settlement": "confirm",
+        "inventoryCalls": 0,
+        "lengths": []
+      },
+      {
+        "N": 128,
+        "kind": "remove",
+        "settlement": "rollback",
+        "inventoryCalls": 2,
+        "lengths": [
+          127,
+          127
+        ]
+      },
+      {
+        "N": 128,
+        "kind": "rekey",
+        "settlement": "confirm",
+        "inventoryCalls": 0,
+        "lengths": []
+      },
+      {
+        "N": 128,
+        "kind": "rekey",
+        "settlement": "rollback",
+        "inventoryCalls": 0,
+        "lengths": []
+      },
+      {
+        "N": 1024,
+        "kind": "add",
+        "settlement": "confirm",
+        "inventoryCalls": 0,
+        "lengths": []
+      },
+      {
+        "N": 1024,
+        "kind": "add",
+        "settlement": "rollback",
+        "inventoryCalls": 0,
+        "lengths": []
+      },
+      {
+        "N": 1024,
+        "kind": "remove",
+        "settlement": "confirm",
+        "inventoryCalls": 0,
+        "lengths": []
+      },
+      {
+        "N": 1024,
+        "kind": "remove",
+        "settlement": "rollback",
+        "inventoryCalls": 2,
+        "lengths": [
+          1023,
+          1023
+        ]
+      },
+      {
+        "N": 1024,
+        "kind": "rekey",
+        "settlement": "confirm",
+        "inventoryCalls": 0,
+        "lengths": []
+      },
+      {
+        "N": 1024,
+        "kind": "rekey",
+        "settlement": "rollback",
+        "inventoryCalls": 0,
+        "lengths": []
+      },
+      {
+        "N": 8192,
+        "kind": "add",
+        "settlement": "confirm",
+        "inventoryCalls": 0,
+        "lengths": []
+      },
+      {
+        "N": 8192,
+        "kind": "add",
+        "settlement": "rollback",
+        "inventoryCalls": 0,
+        "lengths": []
+      },
+      {
+        "N": 8192,
+        "kind": "remove",
+        "settlement": "confirm",
+        "inventoryCalls": 0,
+        "lengths": []
+      },
+      {
+        "N": 8192,
+        "kind": "remove",
+        "settlement": "rollback",
+        "inventoryCalls": 2,
+        "lengths": [
+          8191,
+          8191
+        ]
+      },
+      {
+        "N": 8192,
+        "kind": "rekey",
+        "settlement": "confirm",
+        "inventoryCalls": 0,
+        "lengths": []
+      },
+      {
+        "N": 8192,
+        "kind": "rekey",
+        "settlement": "rollback",
+        "inventoryCalls": 0,
+        "lengths": []
+      }
+    ]
+  },
+  {
+    "lane": "base",
+    "run": "base-optional-structural-work.mjs-baseline-work-measured-budget",
+    "exit": 0,
+    "stable": true,
+    "runs": [
+      {
+        "N": 128,
+        "kind": "add",
+        "settlement": "confirm",
+        "inventoryCalls": 0,
+        "lengths": []
+      },
+      {
+        "N": 128,
+        "kind": "add",
+        "settlement": "rollback",
+        "inventoryCalls": 0,
+        "lengths": []
+      },
+      {
+        "N": 128,
+        "kind": "remove",
+        "settlement": "confirm",
+        "inventoryCalls": 0,
+        "lengths": []
+      },
+      {
+        "N": 128,
+        "kind": "remove",
+        "settlement": "rollback",
+        "inventoryCalls": 2,
+        "lengths": [
+          127,
+          127
+        ]
+      },
+      {
+        "N": 128,
+        "kind": "rekey",
+        "settlement": "confirm",
+        "inventoryCalls": 0,
+        "lengths": []
+      },
+      {
+        "N": 128,
+        "kind": "rekey",
+        "settlement": "rollback",
+        "inventoryCalls": 0,
+        "lengths": []
+      },
+      {
+        "N": 1024,
+        "kind": "add",
+        "settlement": "confirm",
+        "inventoryCalls": 0,
+        "lengths": []
+      },
+      {
+        "N": 1024,
+        "kind": "add",
+        "settlement": "rollback",
+        "inventoryCalls": 0,
+        "lengths": []
+      },
+      {
+        "N": 1024,
+        "kind": "remove",
+        "settlement": "confirm",
+        "inventoryCalls": 0,
+        "lengths": []
+      },
+      {
+        "N": 1024,
+        "kind": "remove",
+        "settlement": "rollback",
+        "inventoryCalls": 2,
+        "lengths": [
+          1023,
+          1023
+        ]
+      },
+      {
+        "N": 1024,
+        "kind": "rekey",
+        "settlement": "confirm",
+        "inventoryCalls": 0,
+        "lengths": []
+      },
+      {
+        "N": 1024,
+        "kind": "rekey",
+        "settlement": "rollback",
+        "inventoryCalls": 0,
+        "lengths": []
+      },
+      {
+        "N": 8192,
+        "kind": "add",
+        "settlement": "confirm",
+        "inventoryCalls": 0,
+        "lengths": []
+      },
+      {
+        "N": 8192,
+        "kind": "add",
+        "settlement": "rollback",
+        "inventoryCalls": 0,
+        "lengths": []
+      },
+      {
+        "N": 8192,
+        "kind": "remove",
+        "settlement": "confirm",
+        "inventoryCalls": 0,
+        "lengths": []
+      },
+      {
+        "N": 8192,
+        "kind": "remove",
+        "settlement": "rollback",
+        "inventoryCalls": 2,
+        "lengths": [
+          8191,
+          8191
+        ]
+      },
+      {
+        "N": 8192,
+        "kind": "rekey",
+        "settlement": "confirm",
+        "inventoryCalls": 0,
+        "lengths": []
+      },
+      {
+        "N": 8192,
+        "kind": "rekey",
+        "settlement": "rollback",
+        "inventoryCalls": 0,
+        "lengths": []
+      }
+    ]
+  },
+  {
+    "lane": "base",
+    "run": "base-optional-structural-work.mjs-baseline-work-first",
+    "exit": 1,
+    "stable": true
+  },
+  {
+    "lane": "MP1",
+    "run": "CPR10-optional-structural-work.mjs-baseline-work-corrected-key",
+    "exit": 1,
+    "stable": true,
+    "runs": [
+      {
+        "N": 128,
+        "kind": "add",
+        "settlement": "confirm",
+        "inventoryCalls": 0,
+        "lengths": []
+      },
+      {
+        "N": 128,
+        "kind": "add",
+        "settlement": "rollback",
+        "inventoryCalls": 2,
+        "lengths": [
+          129,
+          129
+        ]
+      },
+      {
+        "N": 128,
+        "kind": "remove",
+        "settlement": "confirm",
+        "inventoryCalls": 0,
+        "lengths": []
+      },
+      {
+        "N": 128,
+        "kind": "remove",
+        "settlement": "rollback",
+        "inventoryCalls": 4,
+        "lengths": [
+          127,
+          127,
+          127,
+          127
+        ]
+      },
+      {
+        "N": 128,
+        "kind": "rekey",
+        "settlement": "confirm",
+        "inventoryCalls": 0,
+        "lengths": []
+      },
+      {
+        "N": 128,
+        "kind": "rekey",
+        "settlement": "rollback",
+        "inventoryCalls": 2,
+        "lengths": [
+          128,
+          128
+        ]
+      },
+      {
+        "N": 1024,
+        "kind": "add",
+        "settlement": "confirm",
+        "inventoryCalls": 0,
+        "lengths": []
+      },
+      {
+        "N": 1024,
+        "kind": "add",
+        "settlement": "rollback",
+        "inventoryCalls": 2,
+        "lengths": [
+          1025,
+          1025
+        ]
+      },
+      {
+        "N": 1024,
+        "kind": "remove",
+        "settlement": "confirm",
+        "inventoryCalls": 0,
+        "lengths": []
+      },
+      {
+        "N": 1024,
+        "kind": "remove",
+        "settlement": "rollback",
+        "inventoryCalls": 4,
+        "lengths": [
+          1023,
+          1023,
+          1023,
+          1023
+        ]
+      },
+      {
+        "N": 1024,
+        "kind": "rekey",
+        "settlement": "confirm",
+        "inventoryCalls": 0,
+        "lengths": []
+      },
+      {
+        "N": 1024,
+        "kind": "rekey",
+        "settlement": "rollback",
+        "inventoryCalls": 2,
+        "lengths": [
+          1024,
+          1024
+        ]
+      },
+      {
+        "N": 8192,
+        "kind": "add",
+        "settlement": "confirm",
+        "inventoryCalls": 0,
+        "lengths": []
+      },
+      {
+        "N": 8192,
+        "kind": "add",
+        "settlement": "rollback",
+        "inventoryCalls": 2,
+        "lengths": [
+          8193,
+          8193
+        ]
+      },
+      {
+        "N": 8192,
+        "kind": "remove",
+        "settlement": "confirm",
+        "inventoryCalls": 0,
+        "lengths": []
+      },
+      {
+        "N": 8192,
+        "kind": "remove",
+        "settlement": "rollback",
+        "inventoryCalls": 4,
+        "lengths": [
+          8191,
+          8191,
+          8191,
+          8191
+        ]
+      },
+      {
+        "N": 8192,
+        "kind": "rekey",
+        "settlement": "confirm",
+        "inventoryCalls": 0,
+        "lengths": []
+      },
+      {
+        "N": 8192,
+        "kind": "rekey",
+        "settlement": "rollback",
+        "inventoryCalls": 2,
+        "lengths": [
+          8192,
+          8192
+        ]
+      }
+    ]
+  },
+  {
+    "lane": "MP1",
+    "run": "CPR10-optional-structural-work.mjs-baseline-work-first",
+    "exit": 1,
+    "stable": true
+  },
+  {
+    "lane": "MP1",
+    "run": "CPR10-optional-structural-work.mjs-baseline-work-measured-budget",
+    "exit": 1,
+    "stable": true,
+    "runs": [
+      {
+        "N": 128,
+        "kind": "add",
+        "settlement": "confirm",
+        "inventoryCalls": 0,
+        "lengths": []
+      },
+      {
+        "N": 128,
+        "kind": "add",
+        "settlement": "rollback",
+        "inventoryCalls": 2,
+        "lengths": [
+          129,
+          129
+        ]
+      },
+      {
+        "N": 128,
+        "kind": "remove",
+        "settlement": "confirm",
+        "inventoryCalls": 0,
+        "lengths": []
+      },
+      {
+        "N": 128,
+        "kind": "remove",
+        "settlement": "rollback",
+        "inventoryCalls": 4,
+        "lengths": [
+          127,
+          127,
+          127,
+          127
+        ]
+      },
+      {
+        "N": 128,
+        "kind": "rekey",
+        "settlement": "confirm",
+        "inventoryCalls": 0,
+        "lengths": []
+      },
+      {
+        "N": 128,
+        "kind": "rekey",
+        "settlement": "rollback",
+        "inventoryCalls": 2,
+        "lengths": [
+          128,
+          128
+        ]
+      },
+      {
+        "N": 1024,
+        "kind": "add",
+        "settlement": "confirm",
+        "inventoryCalls": 0,
+        "lengths": []
+      },
+      {
+        "N": 1024,
+        "kind": "add",
+        "settlement": "rollback",
+        "inventoryCalls": 2,
+        "lengths": [
+          1025,
+          1025
+        ]
+      },
+      {
+        "N": 1024,
+        "kind": "remove",
+        "settlement": "confirm",
+        "inventoryCalls": 0,
+        "lengths": []
+      },
+      {
+        "N": 1024,
+        "kind": "remove",
+        "settlement": "rollback",
+        "inventoryCalls": 4,
+        "lengths": [
+          1023,
+          1023,
+          1023,
+          1023
+        ]
+      },
+      {
+        "N": 1024,
+        "kind": "rekey",
+        "settlement": "confirm",
+        "inventoryCalls": 0,
+        "lengths": []
+      },
+      {
+        "N": 1024,
+        "kind": "rekey",
+        "settlement": "rollback",
+        "inventoryCalls": 2,
+        "lengths": [
+          1024,
+          1024
+        ]
+      },
+      {
+        "N": 8192,
+        "kind": "add",
+        "settlement": "confirm",
+        "inventoryCalls": 0,
+        "lengths": []
+      },
+      {
+        "N": 8192,
+        "kind": "add",
+        "settlement": "rollback",
+        "inventoryCalls": 2,
+        "lengths": [
+          8193,
+          8193
+        ]
+      },
+      {
+        "N": 8192,
+        "kind": "remove",
+        "settlement": "confirm",
+        "inventoryCalls": 0,
+        "lengths": []
+      },
+      {
+        "N": 8192,
+        "kind": "remove",
+        "settlement": "rollback",
+        "inventoryCalls": 4,
+        "lengths": [
+          8191,
+          8191,
+          8191,
+          8191
+        ]
+      },
+      {
+        "N": 8192,
+        "kind": "rekey",
+        "settlement": "confirm",
+        "inventoryCalls": 0,
+        "lengths": []
+      },
+      {
+        "N": 8192,
+        "kind": "rekey",
+        "settlement": "rollback",
+        "inventoryCalls": 2,
+        "lengths": [
+          8192,
+          8192
+        ]
+      }
+    ]
+  }
+]

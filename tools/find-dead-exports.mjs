@@ -107,6 +107,7 @@ const parse = (file) => {
 const exportsByFile = new Map();
 const reExports = new Map(); // file -> [{ from, names | '*' }]
 const importedNames = new Set(); // every name imported anywhere
+const namespaceUses = new Map(); // resolved module -> actually accessed members
 const importEdges = new Map(); // file -> [specifiers]
 
 /** Resolve a relative specifier to a real file on disk. */
@@ -141,6 +142,7 @@ for (const file of files) {
   const exported = new Set();
   const res = [];
   const imps = [];
+  const namespaces = new Map();
 
   for (const stmt of sf.statements) {
     const mods = ts.canHaveModifiers(stmt) ? (ts.getModifiers(stmt) ?? []) : [];
@@ -169,7 +171,7 @@ for (const file of files) {
       if (stmt.exportClause && ts.isNamedExports(stmt.exportClause)) {
         const names = stmt.exportClause.elements.map((e) => e.name.text);
         for (const n of names) exported.add(n);
-        if (from) res.push({ from, names });
+        if (from) res.push({ from, names, originals: new Map(stmt.exportClause.elements.map((e) => [e.name.text, (e.propertyName ?? e.name).text])) });
       } else if (from) {
         res.push({ from, names: '*' }); // export * from '...'
       }
@@ -180,7 +182,10 @@ for (const file of files) {
       const clause = stmt.importClause;
       if (clause?.name) importedNames.add(clause.name.text);
       if (clause?.namedBindings) {
-        if (ts.isNamedImports(clause.namedBindings)) {
+        if (ts.isNamespaceImport(clause.namedBindings)) {
+          const target = resolveSpecifier(file, stmt.moduleSpecifier.text);
+          if (target) namespaces.set(clause.namedBindings.name.text, target);
+        } else if (ts.isNamedImports(clause.namedBindings)) {
           for (const el of clause.namedBindings.elements) {
             // `import { a as b }` uses `a` from the source module.
             importedNames.add((el.propertyName ?? el.name).text);
@@ -189,9 +194,48 @@ for (const file of files) {
       }
     }
   }
+  // Namespace imports are uses only of the members actually accessed. Importing
+  // a module must not hide an unused sibling export or a same-named export in
+  // another module. QualifiedName also covers namespace-qualified type uses.
+  function visit(node) {
+    let receiver, member;
+    if (ts.isPropertyAccessExpression(node)) {
+      receiver = node.expression; member = node.name.text;
+    } else if (ts.isElementAccessExpression(node) && node.argumentExpression &&
+               ts.isStringLiteralLike(node.argumentExpression)) {
+      receiver = node.expression; member = node.argumentExpression.text;
+    } else if (ts.isQualifiedName(node)) {
+      receiver = node.left; member = node.right.text;
+    }
+    if (receiver && ts.isIdentifier(receiver) && namespaces.has(receiver.text)) {
+      const target = namespaces.get(receiver.text);
+      if (!namespaceUses.has(target)) namespaceUses.set(target, new Set());
+      namespaceUses.get(target).add(member);
+    }
+    ts.forEachChild(node, visit);
+  }
+  visit(sf);
   exportsByFile.set(file, exported);
   reExports.set(file, res);
   importEdges.set(file, imps);
+}
+
+// Follow only accessed namespace members through re-exports. A re-export alone
+// remains insufficient: the access at the importing site supplies the use.
+function markNamespaceUse(file, name, seen = new Set()) {
+  const key = `${file}:${name}`;
+  if (seen.has(key)) return;
+  seen.add(key);
+  if (!namespaceUses.has(file)) namespaceUses.set(file, new Set());
+  namespaceUses.get(file).add(name);
+  for (const edge of reExports.get(file) ?? []) {
+    if (edge.names !== '*' && !edge.names.includes(name)) continue;
+    const target = resolveSpecifier(file, edge.from);
+    if (target) markNamespaceUse(target, edge.originals?.get(name) ?? name, seen);
+  }
+}
+for (const [file, names] of [...namespaceUses].map(([file, names]) => [file, [...names]])) {
+  for (const name of names) markNamespaceUse(file, name);
 }
 
 // A re-export is NOT a use.
@@ -326,7 +370,7 @@ for (const [file, exported] of exportsByFile) {
   const source = readFileSync(file, 'utf8');
   for (const name of exported) {
     if (api.has(name)) continue;
-    if (importedNames.has(name)) continue;
+    if (importedNames.has(name) || namespaceUses.get(file)?.has(name)) continue;
     if (referencedElsewhereInOwnFile(source, name)) continue;
     dead.push({ file: rel, name });
   }
@@ -391,6 +435,29 @@ if (process.argv.includes('--self-test')) {
     }
   } finally {
     rmSync(probe, { force: true });
+  }
+
+  const namespaceProbe = join(ROOT, 'packages/kernel/src/lib/zz-namespace-probe');
+  const source = `${namespaceProbe}.ts`;
+  const barrel = `${namespaceProbe}-barrel.ts`;
+  const consumer = `${namespaceProbe}-consumer.ts`;
+  const unrelated = `${namespaceProbe}-unrelated.ts`;
+  try {
+    writeFileSync(source, 'export const zzNamespaceLive = 1;\nexport const zzNamespaceElement = 2;\nexport interface ZzNamespaceType { value: number }\nexport const zzNamespaceDead = 3;\n');
+    writeFileSync(barrel, "export { zzNamespaceLive as zzNamespaceAlias, zzNamespaceElement, ZzNamespaceType, zzNamespaceDead } from './zz-namespace-probe';\n");
+    writeFileSync(consumer, "import * as ns from './zz-namespace-probe-barrel';\nconsole.log(ns.zzNamespaceAlias, ns['zzNamespaceElement']);\nconst value: ns.ZzNamespaceType = { value: 1 };\nconsole.log(value);\n");
+    writeFileSync(unrelated, 'export const zzNamespaceLive = 9;\n');
+    const out = JSON.parse(execFileSync(process.execPath, [fileURLToPath(import.meta.url), '--json'], { cwd: ROOT, encoding: 'utf8' }));
+    const sourceDead = out.filter((row) => row.file === relative(ROOT, source)).map((row) => row.name);
+    const unrelatedDead = out.some((row) => row.file === relative(ROOT, unrelated) && row.name === 'zzNamespaceLive');
+    if (sourceDead.length === 1 && sourceDead[0] === 'zzNamespaceDead' && unrelatedDead) {
+      console.log('  ✓ namespace property/element/type and aliased re-export uses retain orphan detection and module identity');
+    } else {
+      failures++;
+      console.error('  ✗ namespace reachability control failed', { sourceDead, unrelatedDead });
+    }
+  } finally {
+    for (const file of [source, barrel, consumer, unrelated]) rmSync(file, { force: true });
   }
 
   console.log(

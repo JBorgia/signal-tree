@@ -1,0 +1,8 @@
+{
+  "status": "not_executed",
+  "action": "OAP full kernel/vue/angular/react/solid Nx suites",
+  "reason": "Automatic approval review rejected the combined command before execution.",
+  "review_reason": "The OAP candidate has a known membership-test failure, so running its full kernel/framework suites violates the explicit requirement to defer broader suites until the candidate survives; focused attribution is sufficient.",
+  "review_instruction": "Do not bypass this rejection through a workaround or indirect execution.",
+  "disposition": "No broad-suite retry or workaround. Only allowed focused baseline/T1 membership attribution executed."
+}

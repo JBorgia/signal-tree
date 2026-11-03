@@ -1,9 +1,9 @@
+import type {ConstructionAllocation} from './construction-allocation';
+import { PublicationPreparation } from './publication-preparation';
 import type { PositionId } from '../types';
 import type { Location } from './cell-runtime';
 import { isTraversableNode } from './node-shape';
-import type {
-  ScalarSlotCommitResult,
-} from './tree-scalar-slot-runtime';
+import type { ScalarSlotCommitResult } from './tree-scalar-slot-runtime';
 
 /**
  * The NODE-ATTACHED SCALAR-SLOT PORT.
@@ -27,17 +27,43 @@ export interface ScalarSlotMutationFrame {
   set(slotIndex: SlotIndex, value: unknown): void;
   update(slotIndex: SlotIndex, updater: (value: unknown) => unknown): void;
   discard(): void;
+  prepareCommit?(options?: {
+    advanceRevision?: boolean; publicationPhase?: PublicationPreparation; admissionParticipation?: 'realized';
+    publish?: boolean;
+  }): () => ScalarSlotCommitResult;
   commit(options?: {
-    advanceRevision?: boolean;
+    advanceRevision?: boolean; publicationPhase?: PublicationPreparation; admissionParticipation?: 'realized';
     publish?: boolean;
   }): ScalarSlotCommitResult;
 }
 
+/**
+ * Member liveness, installed on a tree's leaves by its first omission
+ * (`member-membership.ts`, v16 8e). Until then each leaf read and write sees
+ * one empty slot: a tree that never omits a member runs none of it.
+ */
+export interface MemberAbsence {
+  /** True when the node, or a member above it, is omitted. */
+  isAbsent(node: unknown): boolean;
+  /** Re-add an absent written node's path; whether membership changed. */
+  reAdd(node: unknown): boolean;
+  /** Ordinary existence adoption can be meaningful while physical presence is unchanged. */
+  needsAdmission?(node: unknown): boolean;
+}
+
 export interface TreeScalarLeafRuntime {
+  /** Install member liveness on every leaf of this tree. */
+  enableAbsence?(absence: MemberAbsence): void;
+  /**
+   * Remove it again: no member of this tree is omitted, so no leaf can be
+   * absent or need re-adding (v16 8g).
+   */
+  disableAbsence?(): void;
   createLeaf<T>(
     initialValue: T,
     equal: (current: T, next: T) => boolean,
-    positionId?: PositionId
+    positionId?: PositionId,
+    allocation?: ConstructionAllocation
   ): Location<T>;
   beginFrame(): ScalarSlotMutationFrame;
   runInvalidationGroup(run: () => void): void;

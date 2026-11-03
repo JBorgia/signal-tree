@@ -195,7 +195,7 @@ describe('entity egress preserves authored field footprints', () => {
       }
     }
   );
-  it('identical row replacement and identity updater preserve no-op admission', async () => {
+  it('explicit same-display row replacement adopts before an identity updater', async () => {
     const tree = signalTree({ rows: entityMap<Row, string>() });
     tree.$.rows.addOne({ id: 'r', x: 0, y: 0 });
     await flush();
@@ -213,7 +213,7 @@ describe('entity egress preserves authored field footprints', () => {
       row((current) => current);
       await flush();
       await connection.settled();
-      expect(sent).toEqual([]);
+      expect(sent).toEqual([[{ id: 'r', x: 99, y: 0 }]]);
     } finally {
       connection.dispose();
       tree.destroy();

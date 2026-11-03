@@ -70,6 +70,7 @@ describe.runIf(RUN_TIMING)('Benchmark: neutral kernel vs raw Angular signal()', 
     }
     const tree = signalTree(state, { capabilities: ['causal-runtime'] });
 
+    // All twenty keys are seeded above; the local cast adds no timed operation.
     const ratio = stableRatio(
       () => {
         for (let index = 0; index < ITERATIONS; index++) {
@@ -78,7 +79,7 @@ describe.runIf(RUN_TIMING)('Benchmark: neutral kernel vs raw Angular signal()', 
       },
       () => {
         for (let index = 0; index < ITERATIONS; index++) {
-          tree.$[`key_${index % 20}`]();
+          (tree.$[`key_${index % 20}`] as (() => number))();
         }
       }
     );

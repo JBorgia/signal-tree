@@ -1,0 +1,15 @@
+# Final independent feasibility interpretation review
+
+Read-only review of README.md, traces.json, coverage-checks.json, checker, preserved first results and /private/tmp/semantic-transition-writers.md. No runtime edits or reruns.
+
+The stop is defensible as a scope/authorization boundary. Inventory identifies multiple native installation paths and caller-owned semantic reconstruction; the reproduced setAll mismatch is not solvable merely by declaring the already-correct final state sufficient. The record correctly preserves production rejection,16 checker classifications rather than16 runtime repair passes, inspection-created lifetime uncertainty, ME-B's single publication protocol, and absence of cost/collectibility acceptance.
+
+Two qualifications should be sharpened before finalizing:
+
+1. **Expressibility is design inference, not implemented common-record proof.** The checker normalizes fields already present in captured prepared values. It does not instantiate or exercise a shared record consumed by capture, inspection and publication. Recommend prefixing the opening conclusion with “Source analysis and the captured values support the inference that...” or saying “The tested preparation contains the data a transient shared result would need.” Existing later disclaimers are good but this keeps the lead equally precise.
+
+2. **Six paths require coverage/disposition, not necessarily six redesigned writers.** The inventory proves six relevant routes must be accounted for and shows several independently staged tuples. It does not establish that pure ordering, selection, retirement or already-prepared target realization must all adopt a new row-transition representation. Those routes may remain unchanged if their existing phase separation and semantics are shown compatible. Recommend saying “Complete qualification must account for six paths and eleven families; implementation changes must be derived per path” and distinguish required migration from unchanged-path compatibility controls. This still justifies stopping for explicit cross-cutting scope; it avoids presenting an untested all-path rewrite as logically necessary.
+
+No hidden semantic approval is required by the proposed transient data sharing itself, provided ordinary/physical views, derivation inputs, callback arguments/timing, restoration participation and structural policies remain as explicitly stated. Deferring currently required conditional progress would be an owner decision, correctly identified. A separate notification/chronology bus would contradict ME-B, correctly excluded.
+
+The16 classification results match the stated trace shapes: adopted n is available during preparation and absent from setAll chronology; order is explicit; reentry remains distinct operations; rollback uses realized metadata. The changed checker premise (“rollback never prepares”) is legitimately identified as a harness-oracle mismatch, not retirement of a product assertion. No claim of impossibility is justified or needed.

@@ -1,0 +1,12 @@
+{
+  "compilerOptions": {
+    "target": "ES2022", "module": "ESNext", "moduleResolution": "bundler",
+    "strict": true, "noEmit": true, "skipLibCheck": true, "esModuleInterop": true,
+    "types": ["node"], "typeRoots": ["/Users/jonathanborgia/.codex/worktrees/v16-incumbent-readiness/signaltree/node_modules/@types"],
+    "paths": {
+      "@signal-tree/kernel": ["/Users/jonathanborgia/.codex/worktrees/v16-incumbent-readiness/signaltree/packages/kernel/src/index.ts"],
+      "@signal-tree/kernel/internals": ["/Users/jonathanborgia/.codex/worktrees/v16-incumbent-readiness/signaltree/packages/kernel/src/internals.ts"]
+    }
+  },
+  "files": ["application.ts", "test.ts"]
+}

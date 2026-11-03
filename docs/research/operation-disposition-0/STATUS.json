@@ -1,0 +1,36 @@
+{
+  "baseline": "19a5bd034d5ebef262f637c397bb41fe50a6a1e3",
+  "researchParent": "2c05f289ca1a1bdf315c65d8018b6d1a5fc3e962",
+  "acceptedRuntimeIntegration": false,
+  "latestTestedLane": "CPR10",
+  "outcome": "Reproducible granularity counterexample; prior omitted-member injected atomic-settlement counterexample preserved.",
+  "fullKernelCPR5": {
+    "passed": 5721,
+    "failed": 3,
+    "expectedFailure": 12,
+    "skipped": 12,
+    "completed": true
+  },
+  "focusedCPR5": {
+    "nxPassed": 284,
+    "nxSkipped": 217,
+    "portableProcessesPassed": 52,
+    "D2Controls": "13 mapped subset of prior39"
+  },
+  "focusedCPR9": {
+    "portableProcessesPassed": 54,
+    "noTurnCasesPassed": 12,
+    "structuralWorkCasesPassed": 24,
+    "queuedInspectionAndStatsNxPassed": 11
+  },
+  "typecheckCPR9": "failed TS2345",
+  "specTypesCPR9": "failed TS2345",
+  "lintCPR9": "executed all five frameworks; kernel 2 errors; warning counts in raw logs",
+  "notExecuted": [
+    "Full Angular, React, Vue, Solid suites after CPR5 kernel failure",
+    "Full kernel on CPR9/CPR10",
+    "Fresh package/demo build and size gates",
+    "CLEAN typecheck/spec-types/lint/Nx"
+  ],
+  "evidenceArchiveFiles": 1056
+}

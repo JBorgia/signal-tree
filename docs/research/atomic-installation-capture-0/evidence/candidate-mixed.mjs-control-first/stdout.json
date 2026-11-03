@@ -1,0 +1,81 @@
+{
+  "mode": "control",
+  "hits": 0,
+  "reports": [],
+  "checks": [
+    {
+      "name": "capture injection is reached",
+      "pass": true
+    },
+    {
+      "name": "rollback succeeds completely or honestly retains responsibility",
+      "pass": true
+    },
+    {
+      "name": "retry cannot falsely succeed",
+      "pass": true
+    },
+    {
+      "name": "independent later progress",
+      "pass": true
+    }
+  ],
+  "afterWrite": {
+    "pair": [
+      1,
+      1
+    ],
+    "pending": 1
+  },
+  "inspection": {
+    "threw": false,
+    "value": {
+      "changes": [
+        {
+          "path": "scalar",
+          "address": [
+            "scalar"
+          ],
+          "status": "current"
+        },
+        {
+          "path": "rows.A.v",
+          "address": [
+            "rows",
+            "v"
+          ],
+          "subject": 1,
+          "status": "current"
+        }
+      ]
+    }
+  },
+  "first": {
+    "threw": false,
+    "marker": false,
+    "state": {
+      "pair": [
+        0,
+        0
+      ],
+      "pending": 0
+    }
+  },
+  "retry": {
+    "threw": false,
+    "state": {
+      "pair": [
+        0,
+        0
+      ],
+      "pending": 0
+    }
+  },
+  "next": {
+    "pair": [
+      2,
+      2
+    ],
+    "pending": 0
+  }
+}

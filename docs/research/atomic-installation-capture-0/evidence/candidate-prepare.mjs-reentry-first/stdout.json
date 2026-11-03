@@ -1,0 +1,24 @@
+{
+  "mode": "reentry",
+  "hits": 1,
+  "pubs": 4,
+  "after": 7,
+  "inspection": {
+    "changes": [
+      {
+        "path": "scalar",
+        "address": [
+          "scalar"
+        ],
+        "status": "current"
+      }
+    ]
+  },
+  "final": 0,
+  "pending": 0,
+  "error": {
+    "threw": true,
+    "primary": false
+  },
+  "status": "pass"
+}

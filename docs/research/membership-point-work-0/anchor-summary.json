@@ -1,0 +1,25 @@
+{
+  "cwd": "/Users/jonathanborgia/.codex/worktrees/atomic-capture-proof/signaltree",
+  "runs": [
+    {
+      "command": "ST_PROOF_OUTPUT=/private/tmp/st-membership-anchor-review node docs/research/membership-point-work-0/run.mjs D2 anchor-controls.mjs suite first",
+      "lane": "D2",
+      "exit": 0,
+      "stable": true,
+      "pass": 32,
+      "total": 32,
+      "faultHits": 98,
+      "artifact": "/private/tmp/st-membership-anchor-review/runs/D2-anchor-controls.mjs-suite-first"
+    },
+    {
+      "command": "ST_PROOF_OUTPUT=/private/tmp/st-membership-anchor-review node docs/research/membership-point-work-0/run.mjs D2I anchor-controls.mjs suite first",
+      "lane": "D2I",
+      "exit": 0,
+      "stable": true,
+      "pass": 32,
+      "total": 32,
+      "faultHits": 98,
+      "artifact": "/private/tmp/st-membership-anchor-review/runs/D2I-anchor-controls.mjs-suite-first"
+    }
+  ]
+}

@@ -1,0 +1,314 @@
+[
+  {
+    "command": [
+      "node",
+      "docs/research/selected-key-restoration-0/run.mjs",
+      "base",
+      "selection-trace.mjs",
+      "restore",
+      "write-trace"
+    ],
+    "exit": 0,
+    "stdout": "{\"lane\":\"base\",\"entry\":\"selection-trace.mjs\",\"control\":\"restore\",\"exit\":0,\"stable\":true,\"out\":\"/private/tmp/st-selected-key-replay/runs/base-selection-trace.mjs-restore-write-trace\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/selected-key-restoration-0/run.mjs",
+      "base",
+      "selection-trace.mjs",
+      "new-selection",
+      "write-trace"
+    ],
+    "exit": 0,
+    "stdout": "{\"lane\":\"base\",\"entry\":\"selection-trace.mjs\",\"control\":\"new-selection\",\"exit\":0,\"stable\":true,\"out\":\"/private/tmp/st-selected-key-replay/runs/base-selection-trace.mjs-new-selection-write-trace\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/selected-key-restoration-0/run.mjs",
+      "S1",
+      "selection-trace.mjs",
+      "restore",
+      "write-trace"
+    ],
+    "exit": 0,
+    "stdout": "{\"lane\":\"S1\",\"entry\":\"selection-trace.mjs\",\"control\":\"restore\",\"exit\":0,\"stable\":true,\"out\":\"/private/tmp/st-selected-key-replay/runs/S1-selection-trace.mjs-restore-write-trace\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/selected-key-restoration-0/run.mjs",
+      "S1",
+      "selection-trace.mjs",
+      "new-selection",
+      "write-trace"
+    ],
+    "exit": 0,
+    "stdout": "{\"lane\":\"S1\",\"entry\":\"selection-trace.mjs\",\"control\":\"new-selection\",\"exit\":0,\"stable\":true,\"out\":\"/private/tmp/st-selected-key-replay/runs/S1-selection-trace.mjs-new-selection-write-trace\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/selected-key-restoration-0/run.mjs",
+      "D2",
+      "selection-trace.mjs",
+      "restore",
+      "write-trace"
+    ],
+    "exit": 1,
+    "stdout": "{\"lane\":\"D2\",\"entry\":\"selection-trace.mjs\",\"control\":\"restore\",\"exit\":1,\"stable\":true,\"out\":\"/private/tmp/st-selected-key-replay/runs/D2-selection-trace.mjs-restore-write-trace\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/selected-key-restoration-0/run.mjs",
+      "D2",
+      "selection-trace.mjs",
+      "new-selection",
+      "write-trace"
+    ],
+    "exit": 1,
+    "stdout": "{\"lane\":\"D2\",\"entry\":\"selection-trace.mjs\",\"control\":\"new-selection\",\"exit\":1,\"stable\":true,\"out\":\"/private/tmp/st-selected-key-replay/runs/D2-selection-trace.mjs-new-selection-write-trace\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/selected-key-restoration-0/run.mjs",
+      "DS1",
+      "selection-trace.mjs",
+      "restore",
+      "write-trace"
+    ],
+    "exit": 1,
+    "stdout": "{\"lane\":\"DS1\",\"entry\":\"selection-trace.mjs\",\"control\":\"restore\",\"exit\":1,\"stable\":true,\"out\":\"/private/tmp/st-selected-key-replay/runs/DS1-selection-trace.mjs-restore-write-trace\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/selected-key-restoration-0/run.mjs",
+      "DS1",
+      "selection-trace.mjs",
+      "new-selection",
+      "write-trace"
+    ],
+    "exit": 1,
+    "stdout": "{\"lane\":\"DS1\",\"entry\":\"selection-trace.mjs\",\"control\":\"new-selection\",\"exit\":1,\"stable\":true,\"out\":\"/private/tmp/st-selected-key-replay/runs/DS1-selection-trace.mjs-new-selection-write-trace\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/selected-key-restoration-0/run.mjs",
+      "M1",
+      "selection-trace.mjs",
+      "restore",
+      "write-trace"
+    ],
+    "exit": 0,
+    "stdout": "{\"lane\":\"M1\",\"entry\":\"selection-trace.mjs\",\"control\":\"restore\",\"exit\":0,\"stable\":true,\"out\":\"/private/tmp/st-selected-key-replay/runs/M1-selection-trace.mjs-restore-write-trace\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/selected-key-restoration-0/run.mjs",
+      "M1",
+      "selection-trace.mjs",
+      "new-selection",
+      "write-trace"
+    ],
+    "exit": 0,
+    "stdout": "{\"lane\":\"M1\",\"entry\":\"selection-trace.mjs\",\"control\":\"new-selection\",\"exit\":0,\"stable\":true,\"out\":\"/private/tmp/st-selected-key-replay/runs/M1-selection-trace.mjs-new-selection-write-trace\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/selected-key-restoration-0/run.mjs",
+      "A1",
+      "selection-trace.mjs",
+      "restore",
+      "write-trace"
+    ],
+    "exit": 0,
+    "stdout": "{\"lane\":\"A1\",\"entry\":\"selection-trace.mjs\",\"control\":\"restore\",\"exit\":0,\"stable\":true,\"out\":\"/private/tmp/st-selected-key-replay/runs/A1-selection-trace.mjs-restore-write-trace\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/selected-key-restoration-0/run.mjs",
+      "A1",
+      "selection-trace.mjs",
+      "new-selection",
+      "write-trace"
+    ],
+    "exit": 0,
+    "stdout": "{\"lane\":\"A1\",\"entry\":\"selection-trace.mjs\",\"control\":\"new-selection\",\"exit\":0,\"stable\":true,\"out\":\"/private/tmp/st-selected-key-replay/runs/A1-selection-trace.mjs-new-selection-write-trace\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/selected-key-restoration-0/run.mjs",
+      "DM1",
+      "selection-trace.mjs",
+      "restore",
+      "write-trace"
+    ],
+    "exit": 1,
+    "stdout": "{\"lane\":\"DM1\",\"entry\":\"selection-trace.mjs\",\"control\":\"restore\",\"exit\":1,\"stable\":true,\"out\":\"/private/tmp/st-selected-key-replay/runs/DM1-selection-trace.mjs-restore-write-trace\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/selected-key-restoration-0/run.mjs",
+      "DM1",
+      "selection-trace.mjs",
+      "new-selection",
+      "write-trace"
+    ],
+    "exit": 1,
+    "stdout": "{\"lane\":\"DM1\",\"entry\":\"selection-trace.mjs\",\"control\":\"new-selection\",\"exit\":1,\"stable\":true,\"out\":\"/private/tmp/st-selected-key-replay/runs/DM1-selection-trace.mjs-new-selection-write-trace\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/selected-key-restoration-0/run.mjs",
+      "DA1",
+      "selection-trace.mjs",
+      "restore",
+      "write-trace"
+    ],
+    "exit": 0,
+    "stdout": "{\"lane\":\"DA1\",\"entry\":\"selection-trace.mjs\",\"control\":\"restore\",\"exit\":0,\"stable\":true,\"out\":\"/private/tmp/st-selected-key-replay/runs/DA1-selection-trace.mjs-restore-write-trace\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/selected-key-restoration-0/run.mjs",
+      "DA1",
+      "selection-trace.mjs",
+      "new-selection",
+      "write-trace"
+    ],
+    "exit": 0,
+    "stdout": "{\"lane\":\"DA1\",\"entry\":\"selection-trace.mjs\",\"control\":\"new-selection\",\"exit\":0,\"stable\":true,\"out\":\"/private/tmp/st-selected-key-replay/runs/DA1-selection-trace.mjs-new-selection-write-trace\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/selected-key-restoration-0/run.mjs",
+      "K1",
+      "selection-trace.mjs",
+      "restore",
+      "write-trace"
+    ],
+    "exit": 0,
+    "stdout": "{\"lane\":\"K1\",\"entry\":\"selection-trace.mjs\",\"control\":\"restore\",\"exit\":0,\"stable\":true,\"out\":\"/private/tmp/st-selected-key-replay/runs/K1-selection-trace.mjs-restore-write-trace\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/selected-key-restoration-0/run.mjs",
+      "K1",
+      "selection-trace.mjs",
+      "new-selection",
+      "write-trace"
+    ],
+    "exit": 0,
+    "stdout": "{\"lane\":\"K1\",\"entry\":\"selection-trace.mjs\",\"control\":\"new-selection\",\"exit\":0,\"stable\":true,\"out\":\"/private/tmp/st-selected-key-replay/runs/K1-selection-trace.mjs-new-selection-write-trace\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/selected-key-restoration-0/run.mjs",
+      "SK1",
+      "selection-trace.mjs",
+      "restore",
+      "write-trace"
+    ],
+    "exit": 0,
+    "stdout": "{\"lane\":\"SK1\",\"entry\":\"selection-trace.mjs\",\"control\":\"restore\",\"exit\":0,\"stable\":true,\"out\":\"/private/tmp/st-selected-key-replay/runs/SK1-selection-trace.mjs-restore-write-trace\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/selected-key-restoration-0/run.mjs",
+      "SK1",
+      "selection-trace.mjs",
+      "new-selection",
+      "write-trace"
+    ],
+    "exit": 0,
+    "stdout": "{\"lane\":\"SK1\",\"entry\":\"selection-trace.mjs\",\"control\":\"new-selection\",\"exit\":0,\"stable\":true,\"out\":\"/private/tmp/st-selected-key-replay/runs/SK1-selection-trace.mjs-new-selection-write-trace\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/selected-key-restoration-0/run.mjs",
+      "DK1",
+      "selection-trace.mjs",
+      "restore",
+      "write-trace"
+    ],
+    "exit": 0,
+    "stdout": "{\"lane\":\"DK1\",\"entry\":\"selection-trace.mjs\",\"control\":\"restore\",\"exit\":0,\"stable\":true,\"out\":\"/private/tmp/st-selected-key-replay/runs/DK1-selection-trace.mjs-restore-write-trace\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/selected-key-restoration-0/run.mjs",
+      "DK1",
+      "selection-trace.mjs",
+      "new-selection",
+      "write-trace"
+    ],
+    "exit": 0,
+    "stdout": "{\"lane\":\"DK1\",\"entry\":\"selection-trace.mjs\",\"control\":\"new-selection\",\"exit\":0,\"stable\":true,\"out\":\"/private/tmp/st-selected-key-replay/runs/DK1-selection-trace.mjs-new-selection-write-trace\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/selected-key-restoration-0/run.mjs",
+      "DSK1",
+      "selection-trace.mjs",
+      "restore",
+      "write-trace"
+    ],
+    "exit": 0,
+    "stdout": "{\"lane\":\"DSK1\",\"entry\":\"selection-trace.mjs\",\"control\":\"restore\",\"exit\":0,\"stable\":true,\"out\":\"/private/tmp/st-selected-key-replay/runs/DSK1-selection-trace.mjs-restore-write-trace\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/selected-key-restoration-0/run.mjs",
+      "DSK1",
+      "selection-trace.mjs",
+      "new-selection",
+      "write-trace"
+    ],
+    "exit": 0,
+    "stdout": "{\"lane\":\"DSK1\",\"entry\":\"selection-trace.mjs\",\"control\":\"new-selection\",\"exit\":0,\"stable\":true,\"out\":\"/private/tmp/st-selected-key-replay/runs/DSK1-selection-trace.mjs-new-selection-write-trace\"}\n",
+    "stderr": ""
+  }
+]

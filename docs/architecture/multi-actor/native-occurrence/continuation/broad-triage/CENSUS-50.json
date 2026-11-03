@@ -1,0 +1,1402 @@
+[
+  {
+    "identity": "src/lib/aggregate-independent-input.spec.ts > connection-local branch updater retains useful progress with second enrollment before-pending",
+    "classification": "runtime-or-oracle-requires-disposition",
+    "id": 1,
+    "source": "/private/tmp/st-current-read-integration/candidate/packages/kernel/src/lib/aggregate-independent-input.spec.ts",
+    "line": 32,
+    "sha256": "ac4407a0f0db940377f2334edcade0f1e3ee8e59386c6b8e7453786f72a33f00",
+    "logLine": 1338,
+    "observed": "AssertionError: expected [ { x: 1, y: +0 } ] to deeply equal []",
+    "category": "OPEN enrollment isolation",
+    "obligation": "Declared connection progresses; a second undeclared connection must not borrow its independent grant. Actual otherSent contains payload. Preserve owner inspection and pending owner.",
+    "evidence": "Source assertions 32/35; no reviewed repair closes these ten.",
+    "replay": {
+      "cwd": "<fresh verified disposable copy of selected manifest>",
+      "argv": [
+        "corepack",
+        "pnpm",
+        "nx",
+        "test",
+        "kernel",
+        "--skip-nx-cache",
+        "--testFile=src/lib/aggregate-independent-input.spec.ts",
+        "--testNamePattern=^connection\\-local\\ branch\\ updater\\ retains\\ useful\\ progress\\ with\\ second\\ enrollment\\ before\\-pending$",
+        "--maxWorkers=1"
+      ],
+      "status": "proposed, NOT RUN in this census"
+    }
+  },
+  {
+    "identity": "src/lib/aggregate-independent-input.spec.ts > connection-local branch updater retains useful progress with second enrollment during-pending",
+    "classification": "runtime-or-oracle-requires-disposition",
+    "id": 2,
+    "source": "/private/tmp/st-current-read-integration/candidate/packages/kernel/src/lib/aggregate-independent-input.spec.ts",
+    "line": 32,
+    "sha256": "ac4407a0f0db940377f2334edcade0f1e3ee8e59386c6b8e7453786f72a33f00",
+    "logLine": 1339,
+    "observed": "AssertionError: expected [ { x: 1, y: +0 } ] to deeply equal []",
+    "category": "OPEN enrollment isolation",
+    "obligation": "Declared connection progresses; a second undeclared connection must not borrow its independent grant. Actual otherSent contains payload. Preserve owner inspection and pending owner.",
+    "evidence": "Source assertions 32/35; no reviewed repair closes these ten.",
+    "replay": {
+      "cwd": "<fresh verified disposable copy of selected manifest>",
+      "argv": [
+        "corepack",
+        "pnpm",
+        "nx",
+        "test",
+        "kernel",
+        "--skip-nx-cache",
+        "--testFile=src/lib/aggregate-independent-input.spec.ts",
+        "--testNamePattern=^connection\\-local\\ branch\\ updater\\ retains\\ useful\\ progress\\ with\\ second\\ enrollment\\ during\\-pending$",
+        "--maxWorkers=1"
+      ],
+      "status": "proposed, NOT RUN in this census"
+    }
+  },
+  {
+    "identity": "src/lib/aggregate-independent-input.spec.ts > connection-local root updater retains useful progress with second enrollment before-pending",
+    "classification": "runtime-or-oracle-requires-disposition",
+    "id": 3,
+    "source": "/private/tmp/st-current-read-integration/candidate/packages/kernel/src/lib/aggregate-independent-input.spec.ts",
+    "line": 32,
+    "sha256": "ac4407a0f0db940377f2334edcade0f1e3ee8e59386c6b8e7453786f72a33f00",
+    "logLine": 1363,
+    "observed": "AssertionError: expected [ { pair: { x: +0, y: +0 }, \u2026(2) } ] to deeply equal []",
+    "category": "OPEN enrollment isolation",
+    "obligation": "Declared connection progresses; a second undeclared connection must not borrow its independent grant. Actual otherSent contains payload. Preserve owner inspection and pending owner.",
+    "evidence": "Source assertions 32/35; no reviewed repair closes these ten.",
+    "replay": {
+      "cwd": "<fresh verified disposable copy of selected manifest>",
+      "argv": [
+        "corepack",
+        "pnpm",
+        "nx",
+        "test",
+        "kernel",
+        "--skip-nx-cache",
+        "--testFile=src/lib/aggregate-independent-input.spec.ts",
+        "--testNamePattern=^connection\\-local\\ root\\ updater\\ retains\\ useful\\ progress\\ with\\ second\\ enrollment\\ before\\-pending$",
+        "--maxWorkers=1"
+      ],
+      "status": "proposed, NOT RUN in this census"
+    }
+  },
+  {
+    "identity": "src/lib/aggregate-independent-input.spec.ts > connection-local root updater retains useful progress with second enrollment during-pending",
+    "classification": "runtime-or-oracle-requires-disposition",
+    "id": 4,
+    "source": "/private/tmp/st-current-read-integration/candidate/packages/kernel/src/lib/aggregate-independent-input.spec.ts",
+    "line": 32,
+    "sha256": "ac4407a0f0db940377f2334edcade0f1e3ee8e59386c6b8e7453786f72a33f00",
+    "logLine": 1364,
+    "observed": "AssertionError: expected [ { pair: { x: +0, y: +0 }, \u2026(2) } ] to deeply equal []",
+    "category": "OPEN enrollment isolation",
+    "obligation": "Declared connection progresses; a second undeclared connection must not borrow its independent grant. Actual otherSent contains payload. Preserve owner inspection and pending owner.",
+    "evidence": "Source assertions 32/35; no reviewed repair closes these ten.",
+    "replay": {
+      "cwd": "<fresh verified disposable copy of selected manifest>",
+      "argv": [
+        "corepack",
+        "pnpm",
+        "nx",
+        "test",
+        "kernel",
+        "--skip-nx-cache",
+        "--testFile=src/lib/aggregate-independent-input.spec.ts",
+        "--testNamePattern=^connection\\-local\\ root\\ updater\\ retains\\ useful\\ progress\\ with\\ second\\ enrollment\\ during\\-pending$",
+        "--maxWorkers=1"
+      ],
+      "status": "proposed, NOT RUN in this census"
+    }
+  },
+  {
+    "identity": "src/lib/aggregate-installed-publication.spec.ts > authorized existing-key branch/root installed publication > ancestor updater argument wider than descendant recipient stays unknown rather than borrowing sibling input proof",
+    "classification": "runtime-or-oracle-requires-disposition",
+    "id": 5,
+    "source": "/private/tmp/st-current-read-integration/candidate/packages/kernel/src/lib/aggregate-installed-publication.spec.ts",
+    "line": 131,
+    "sha256": "821b525ff50cb1ce124fc0230cd336f718eec2376a9c3ccd20d10866c6e3aabf",
+    "logLine": 1392,
+    "observed": "AssertionError: expected [ { x: 1, y: +0 } ] to deeply equal []",
+    "category": "OPEN wider-input provenance",
+    "obligation": "Ancestor updater argument wider than descendant recipient stays unknown while foreign owner pending; currently sends x1/y0.",
+    "evidence": "aggregate-installed-publication:127\u2013133; distinct from second-recipient enrollment.",
+    "replay": {
+      "cwd": "<fresh verified disposable copy of selected manifest>",
+      "argv": [
+        "corepack",
+        "pnpm",
+        "nx",
+        "test",
+        "kernel",
+        "--skip-nx-cache",
+        "--testFile=src/lib/aggregate-installed-publication.spec.ts",
+        "--testNamePattern=^authorized\\ existing\\-key\\ branch/root\\ installed\\ publication\\ ancestor\\ updater\\ argument\\ wider\\ than\\ descendant\\ recipient\\ stays\\ unknown\\ rather\\ than\\ borrowing\\ sibling\\ input\\ proof$",
+        "--maxWorkers=1"
+      ],
+      "status": "proposed, NOT RUN in this census"
+    }
+  },
+  {
+    "identity": "src/lib/aggregate-native-input-independent.spec.ts > native ancestor updater cannot publish pending sibling input through a descendant relationship",
+    "classification": "runtime-or-oracle-requires-disposition",
+    "id": 6,
+    "source": "/private/tmp/st-current-read-integration/candidate/packages/kernel/src/lib/aggregate-native-input-independent.spec.ts",
+    "line": 14,
+    "sha256": "0ec2b037b3af6a1271f747487c0f9c14261a879fd98c76147dd3a17b5a4c883d",
+    "logLine": 1416,
+    "observed": "Error: Declaration invalid: contradiction; writes may remain",
+    "category": "OPEN declaration outcome adjudication",
+    "obligation": "Pending sibling read must not escape. Actual declare throws contradiction before no-send/conservative-receipt assertions; not evidence of a leak. Preserve physical and ownership controls while adjudicating throw versus conservative result.",
+    "evidence": "aggregate-native-input-independent:14\u201321; not one of the four approved oracle changes.",
+    "replay": {
+      "cwd": "<fresh verified disposable copy of selected manifest>",
+      "argv": [
+        "corepack",
+        "pnpm",
+        "nx",
+        "test",
+        "kernel",
+        "--skip-nx-cache",
+        "--testFile=src/lib/aggregate-native-input-independent.spec.ts",
+        "--testNamePattern=^native\\ ancestor\\ updater\\ cannot\\ publish\\ pending\\ sibling\\ input\\ through\\ a\\ descendant\\ relationship$",
+        "--maxWorkers=1"
+      ],
+      "status": "proposed, NOT RUN in this census"
+    }
+  },
+  {
+    "identity": "src/lib/audit-entity-projection.spec.ts > entity ownership and order authority controls > bare row and field metadata reuse one lazily allocated collection owner",
+    "classification": "runtime-or-oracle-requires-disposition",
+    "id": 7,
+    "source": "/private/tmp/st-current-read-integration/candidate/packages/kernel/src/lib/audit-entity-projection.spec.ts",
+    "line": 27,
+    "sha256": "d863102c86150b99004dd4171d77081bb20a397c9369b4793ad576bd0ffff653",
+    "logLine": 1431,
+    "observed": "AssertionError: expected \"allocate\" to not be called at all, but actually been called 1 times",
+    "category": "OPEN lazy metadata cost",
+    "obligation": "Bare setAll must not eagerly allocate collection owner; saw one allocation before handle acquisition. Later reuse assertions not reached.",
+    "evidence": "audit-entity-projection:27; anchor identity correction does not prove lazy allocation.",
+    "replay": {
+      "cwd": "<fresh verified disposable copy of selected manifest>",
+      "argv": [
+        "corepack",
+        "pnpm",
+        "nx",
+        "test",
+        "kernel",
+        "--skip-nx-cache",
+        "--testFile=src/lib/audit-entity-projection.spec.ts",
+        "--testNamePattern=^entity\\ ownership\\ and\\ order\\ authority\\ controls\\ bare\\ row\\ and\\ field\\ metadata\\ reuse\\ one\\ lazily\\ allocated\\ collection\\ owner$",
+        "--maxWorkers=1"
+      ],
+      "status": "proposed, NOT RUN in this census"
+    }
+  },
+  {
+    "identity": "src/lib/branch-omission-correctness.spec.ts > whole-value plain-object omission correctness > same-turn removal and reintroduction ends absent at Link",
+    "classification": "runtime-or-oracle-requires-disposition",
+    "id": 8,
+    "source": "/private/tmp/st-current-read-integration/candidate/packages/kernel/src/lib/branch-omission-correctness.spec.ts",
+    "line": 255,
+    "sha256": "01d32e4714e0b68452ab45bcd7d31ff6c89ba5ecd5d4765efd56cc27fe6c4d99",
+    "logLine": 1453,
+    "observed": "AssertionError: expected { name: 'Ada', age: 8 } to strictly equal { name: 'Ada' }",
+    "category": "OPEN branch chronology",
+    "obligation": "Omit/readd age8/omit must end absent; final Link contains age8.",
+    "evidence": "/private/tmp/st-branch-egress-trace/REPORT.md: native masking correct then later fallback overwrites; collection natural-array repair explicitly excludes this.",
+    "replay": {
+      "cwd": "<fresh verified disposable copy of selected manifest>",
+      "argv": [
+        "corepack",
+        "pnpm",
+        "nx",
+        "test",
+        "kernel",
+        "--skip-nx-cache",
+        "--testFile=src/lib/branch-omission-correctness.spec.ts",
+        "--testNamePattern=^whole\\-value\\ plain\\-object\\ omission\\ correctness\\ same\\-turn\\ removal\\ and\\ reintroduction\\ ends\\ absent\\ at\\ Link$",
+        "--maxWorkers=1"
+      ],
+      "status": "proposed, NOT RUN in this census"
+    }
+  },
+  {
+    "identity": "src/lib/branch-omission-correctness.spec.ts > whole-value plain-object omission correctness > an omission does not carry an unchanged inspection-only sibling to Link",
+    "classification": "runtime-or-oracle-requires-disposition",
+    "id": 9,
+    "source": "/private/tmp/st-current-read-integration/candidate/packages/kernel/src/lib/branch-omission-correctness.spec.ts",
+    "line": 309,
+    "sha256": "01d32e4714e0b68452ab45bcd7d31ff6c89ba5ecd5d4765efd56cc27fe6c4d99",
+    "logLine": 1474,
+    "observed": "AssertionError: expected { name: 'Inspected' } to strictly equal { name: 'Ada' }",
+    "category": "SUPERSEDED approved branch oracle",
+    "obligation": "Explicit supplied name Inspected adopts that leaf. Adjacent inspection-only age42 preservation remains required; rejected adoption must not leak.",
+    "evidence": "/private/tmp/st-branch-adoption-oracle-review.md; /private/tmp/st-oracle-alignment/RESULTS.md and oracle-only.patch.",
+    "replay": {
+      "cwd": "<fresh verified disposable copy of selected manifest>",
+      "argv": [
+        "corepack",
+        "pnpm",
+        "nx",
+        "test",
+        "kernel",
+        "--skip-nx-cache",
+        "--testFile=src/lib/branch-omission-correctness.spec.ts",
+        "--testNamePattern=^whole\\-value\\ plain\\-object\\ omission\\ correctness\\ an\\ omission\\ does\\ not\\ carry\\ an\\ unchanged\\ inspection\\-only\\ sibling\\ to\\ Link$",
+        "--maxWorkers=1"
+      ],
+      "status": "proposed, NOT RUN in this census"
+    }
+  },
+  {
+    "identity": "src/lib/entity-egress-footprint.spec.ts > entity egress preserves authored field footprints > identical row replacement and identity updater preserve no-op admission",
+    "classification": "runtime-or-oracle-requires-disposition",
+    "id": 10,
+    "source": "/private/tmp/st-current-read-integration/candidate/packages/kernel/src/lib/entity-egress-footprint.spec.ts",
+    "line": 216,
+    "sha256": "19536a3160a4458b7b3cd85d97fb04c092c63bc64c22d675346788d5dbf84a2a",
+    "logLine": 1495,
+    "observed": "AssertionError: expected [ [ { id: 'r', x: 99, y: +0 } ] ] to deeply equal []",
+    "category": "SUPERSEDED approved row oracle",
+    "obligation": "Explicit row(row()) adopts inspected99; identity updater alone remains no-op. Keep contribution/rollback7 and genuine ordinary-equal controls.",
+    "evidence": "/private/tmp/st-entity-noop-contract-review.md; /private/tmp/st-oracle-alignment/RESULTS.md.",
+    "replay": {
+      "cwd": "<fresh verified disposable copy of selected manifest>",
+      "argv": [
+        "corepack",
+        "pnpm",
+        "nx",
+        "test",
+        "kernel",
+        "--skip-nx-cache",
+        "--testFile=src/lib/entity-egress-footprint.spec.ts",
+        "--testNamePattern=^entity\\ egress\\ preserves\\ authored\\ field\\ footprints\\ identical\\ row\\ replacement\\ and\\ identity\\ updater\\ preserve\\ no\\-op\\ admission$",
+        "--maxWorkers=1"
+      ],
+      "status": "proposed, NOT RUN in this census"
+    }
+  },
+  {
+    "identity": "src/lib/entity-granular-reactivity.spec.ts > entityMap \u2014 collection queries are lazily derived (13.5.0) > a single-entity update does not rebuild the collection",
+    "classification": "runtime-or-oracle-requires-disposition",
+    "id": 11,
+    "source": "/private/tmp/st-current-read-integration/candidate/packages/kernel/src/lib/entity-granular-reactivity.spec.ts",
+    "line": 215,
+    "sha256": "83365544bcb4a572988125141bab0c28786a54b5a2279522f3eed0d9b7d9e872",
+    "logLine": 1522,
+    "observed": "AssertionError: expected 14400 to be less than 2000",
+    "category": "OPEN logical work budget",
+    "obligation": "200 point updates: equal measured work at 2k/20k rows already passes; 14,400 exceeds bound <2,000. This is excessive constant work, not proved linear-in-collection update cost.",
+    "evidence": "entity-granular-reactivity:213\u2013215; retained-production comparison previously passed exact case.",
+    "replay": {
+      "cwd": "<fresh verified disposable copy of selected manifest>",
+      "argv": [
+        "corepack",
+        "pnpm",
+        "nx",
+        "test",
+        "kernel",
+        "--skip-nx-cache",
+        "--testFile=src/lib/entity-granular-reactivity.spec.ts",
+        "--testNamePattern=^entityMap\\ \u2014\\ collection\\ queries\\ are\\ lazily\\ derived\\ \\(13\\.5\\.0\\)\\ a\\ single\\-entity\\ update\\ does\\ not\\ rebuild\\ the\\ collection$",
+        "--maxWorkers=1"
+      ],
+      "status": "proposed, NOT RUN in this census"
+    }
+  },
+  {
+    "identity": "src/lib/entity-granular-reactivity.spec.ts > entityMap \u2014 collection queries are lazily derived (13.5.0) > repeated collection reads between writes are cached",
+    "classification": "runtime-or-oracle-requires-disposition",
+    "id": 12,
+    "source": "/private/tmp/st-current-read-integration/candidate/packages/kernel/src/lib/entity-granular-reactivity.spec.ts",
+    "line": 231,
+    "sha256": "83365544bcb4a572988125141bab0c28786a54b5a2279522f3eed0d9b7d9e872",
+    "logLine": 1534,
+    "observed": "Error: Test timed out in 5000ms.",
+    "category": "OPEN timeout/caching qualification",
+    "obligation": "Repeated reads must return identical cached array and later write must invalidate it. Timeout at 5s does not identify which phase or show cache identity failed.",
+    "evidence": "entity-granular-reactivity:231\u2013249; no timeout/heap waiver.",
+    "replay": {
+      "cwd": "<fresh verified disposable copy of selected manifest>",
+      "argv": [
+        "corepack",
+        "pnpm",
+        "nx",
+        "test",
+        "kernel",
+        "--skip-nx-cache",
+        "--testFile=src/lib/entity-granular-reactivity.spec.ts",
+        "--testNamePattern=^entityMap\\ \u2014\\ collection\\ queries\\ are\\ lazily\\ derived\\ \\(13\\.5\\.0\\)\\ repeated\\ collection\\ reads\\ between\\ writes\\ are\\ cached$",
+        "--maxWorkers=1"
+      ],
+      "status": "proposed, NOT RUN in this census"
+    }
+  },
+  {
+    "identity": "src/lib/entity-membership-view-v16-controls.spec.ts > compound operations publish one unit > prependOne reports the row at the front once, never first at the end",
+    "classification": "runtime-or-oracle-requires-disposition",
+    "id": 13,
+    "source": "/private/tmp/st-current-read-integration/candidate/packages/kernel/src/lib/entity-membership-view-v16-controls.spec.ts",
+    "line": 153,
+    "sha256": "afb9fbb606d3cc025f1d4f3fd497266cca49002554fa94eceaa966b4463753e4",
+    "logLine": 1547,
+    "observed": "AssertionError: expected [ 'add' ] to deeply equal [ 'add', 'reorder' ]",
+    "category": "OPEN internal membership event contract",
+    "obligation": "prependOne emits one coherent event with add and reorder; actual kinds only add. Physical/snapshot final ordering assertion follows failure and is not established by this run.",
+    "evidence": "entity-membership-view-v16-controls:151\u2013157; not the same as structural refusal.",
+    "replay": {
+      "cwd": "<fresh verified disposable copy of selected manifest>",
+      "argv": [
+        "corepack",
+        "pnpm",
+        "nx",
+        "test",
+        "kernel",
+        "--skip-nx-cache",
+        "--testFile=src/lib/entity-membership-view-v16-controls.spec.ts",
+        "--testNamePattern=^compound\\ operations\\ publish\\ one\\ unit\\ prependOne\\ reports\\ the\\ row\\ at\\ the\\ front\\ once,\\ never\\ first\\ at\\ the\\ end$",
+        "--maxWorkers=1"
+      ],
+      "status": "proposed, NOT RUN in this census"
+    }
+  },
+  {
+    "identity": "src/lib/entity-missing-id-guard.spec.ts > entityMap missing-id guard (dev mode) > warns when entities have no id and no selectId",
+    "classification": "runtime-or-oracle-requires-disposition",
+    "id": 14,
+    "source": "/private/tmp/st-current-read-integration/candidate/packages/kernel/src/lib/entity-missing-id-guard.spec.ts",
+    "line": 21,
+    "sha256": "c1268e6dcb11f5b98251d56a749854972ea2c28c5b114b9294151bcb32252827",
+    "logLine": 1568,
+    "observed": "Error: Ordinary entity admission lacks a key",
+    "category": "REPAIR key evidence / combined replay",
+    "obligation": "Warning-only legacy malformed-id input must not become missing-evidence throw; distinguish explicit nullish key from absent key evidence.",
+    "evidence": "Key successor manifest 8d21743c\u2026; /private/tmp/st-native-combined-successor/runs/key-and-sdk:66 pass; original three unchanged.",
+    "replay": {
+      "cwd": "<fresh verified disposable copy of selected manifest>",
+      "argv": [
+        "corepack",
+        "pnpm",
+        "nx",
+        "test",
+        "kernel",
+        "--skip-nx-cache",
+        "--testFile=src/lib/entity-missing-id-guard.spec.ts",
+        "--testNamePattern=^entityMap\\ missing\\-id\\ guard\\ \\(dev\\ mode\\)\\ warns\\ when\\ entities\\ have\\ no\\ id\\ and\\ no\\ selectId$",
+        "--maxWorkers=1"
+      ],
+      "status": "proposed, NOT RUN in this census"
+    }
+  },
+  {
+    "identity": "src/lib/entity-negative-publication-retirement.spec.ts > bare negative membership retains captured foreign obligation until confirm",
+    "classification": "runtime-or-oracle-requires-disposition",
+    "id": 15,
+    "source": "/private/tmp/st-current-read-integration/candidate/packages/kernel/src/lib/entity-negative-publication-retirement.spec.ts",
+    "line": 33,
+    "sha256": "e8edf40cbffd198c09f1f93cc19c8549467efae27c7a0b9609b94fd6aea9f31f",
+    "logLine": 1585,
+    "observed": "AssertionError: expected 1 to be +0 // Object.is equality",
+    "category": "OPEN stronger terminal retention obligation",
+    "obligation": "Pending hold and useful terminal surviving send already pass. Failure is negativePresence=1 versus0 after terminality. Narrow owner-free retirement deliberately retains unknown/possible evidence and has no owner-settlement listener.",
+    "evidence": "entity-negative-publication-retirement:29\u201333; /private/tmp/st-publication-retirement-independent/REVIEW.md. Not waived; broader drain obligation remains unfulfilled/unadjudicated.",
+    "replay": {
+      "cwd": "<fresh verified disposable copy of selected manifest>",
+      "argv": [
+        "corepack",
+        "pnpm",
+        "nx",
+        "test",
+        "kernel",
+        "--skip-nx-cache",
+        "--testFile=src/lib/entity-negative-publication-retirement.spec.ts",
+        "--testNamePattern=^bare\\ negative\\ membership\\ retains\\ captured\\ foreign\\ obligation\\ until\\ confirm$",
+        "--maxWorkers=1"
+      ],
+      "status": "proposed, NOT RUN in this census"
+    }
+  },
+  {
+    "identity": "src/lib/entity-negative-publication-retirement.spec.ts > bare negative membership retains captured foreign obligation until reject",
+    "classification": "runtime-or-oracle-requires-disposition",
+    "id": 16,
+    "source": "/private/tmp/st-current-read-integration/candidate/packages/kernel/src/lib/entity-negative-publication-retirement.spec.ts",
+    "line": 33,
+    "sha256": "e8edf40cbffd198c09f1f93cc19c8549467efae27c7a0b9609b94fd6aea9f31f",
+    "logLine": 1586,
+    "observed": "AssertionError: expected 1 to be +0 // Object.is equality",
+    "category": "OPEN stronger terminal retention obligation",
+    "obligation": "Pending hold and useful terminal surviving send already pass. Failure is negativePresence=1 versus0 after terminality. Narrow owner-free retirement deliberately retains unknown/possible evidence and has no owner-settlement listener.",
+    "evidence": "entity-negative-publication-retirement:29\u201333; /private/tmp/st-publication-retirement-independent/REVIEW.md. Not waived; broader drain obligation remains unfulfilled/unadjudicated.",
+    "replay": {
+      "cwd": "<fresh verified disposable copy of selected manifest>",
+      "argv": [
+        "corepack",
+        "pnpm",
+        "nx",
+        "test",
+        "kernel",
+        "--skip-nx-cache",
+        "--testFile=src/lib/entity-negative-publication-retirement.spec.ts",
+        "--testNamePattern=^bare\\ negative\\ membership\\ retains\\ captured\\ foreign\\ obligation\\ until\\ reject$",
+        "--maxWorkers=1"
+      ],
+      "status": "proposed, NOT RUN in this census"
+    }
+  },
+  {
+    "identity": "src/lib/entity-publication-work-lifetime.spec.ts > ordinary churn retires new metadata while retained receipts and old references stay detached",
+    "classification": "runtime-or-oracle-requires-disposition",
+    "id": 17,
+    "source": "/private/tmp/st-current-read-integration/candidate/packages/kernel/src/lib/entity-publication-work-lifetime.spec.ts",
+    "line": 51,
+    "sha256": "7ca2ca3c60b332b3cf01752618e409d9a8c0b0fc2d52f97865514dd7c26b6a94",
+    "logLine": 1605,
+    "observed": "AssertionError: presence after cycle 0: expected 1 to be +0 // Object.is equality",
+    "category": "REPAIR neutral retirement / combined replay",
+    "obligation": "Ordinary churn drains source maps while retained receipts/handles remain detached and positive sends occur.",
+    "evidence": "Retirement manifest 3be20bcf\u2026; independent22 pass; combined retirement-and-collection158 pass includes original lifetime spec.",
+    "replay": {
+      "cwd": "<fresh verified disposable copy of selected manifest>",
+      "argv": [
+        "corepack",
+        "pnpm",
+        "nx",
+        "test",
+        "kernel",
+        "--skip-nx-cache",
+        "--testFile=src/lib/entity-publication-work-lifetime.spec.ts",
+        "--testNamePattern=^ordinary\\ churn\\ retires\\ new\\ metadata\\ while\\ retained\\ receipts\\ and\\ old\\ references\\ stay\\ detached$",
+        "--maxWorkers=1"
+      ],
+      "status": "proposed, NOT RUN in this census"
+    }
+  },
+  {
+    "identity": "src/lib/link-absent-locations.spec.ts > Link and path observers on 'a collection' > no enhancers > an omission, and re-adds of the location and of a sibling",
+    "classification": "runtime-or-oracle-requires-disposition",
+    "id": 18,
+    "source": "/private/tmp/st-current-read-integration/candidate/packages/kernel/src/lib/link-absent-locations.spec.ts",
+    "line": 144,
+    "sha256": "5ced65b25e334b5142f6d1fe6f7bd6533b698032acac29fd9cf2a70af7a088d9",
+    "logLine": 1656,
+    "observed": "AssertionError: a collection endpoint after a re-add of a.rows: expected { all: [] } to deeply equal [ { id: 's', n: 2 } ]",
+    "category": "REPAIR collection representation / combined replay",
+    "obligation": "Direct collection Link emits natural array after omission/readd, including history traversal; must not receive {all:[]} wrapper.",
+    "evidence": "Collection manifest010d069c\u2026; independent63 pass; combined collection-combined63 and retirement-and-collection158 include unchanged link-absent-locations.",
+    "replay": {
+      "cwd": "<fresh verified disposable copy of selected manifest>",
+      "argv": [
+        "corepack",
+        "pnpm",
+        "nx",
+        "test",
+        "kernel",
+        "--skip-nx-cache",
+        "--testFile=src/lib/link-absent-locations.spec.ts",
+        "--testNamePattern=^Link\\ and\\ path\\ observers\\ on\\ 'a\\ collection'\\ no\\ enhancers\\ an\\ omission,\\ and\\ re\\-adds\\ of\\ the\\ location\\ and\\ of\\ a\\ sibling$",
+        "--maxWorkers=1"
+      ],
+      "status": "proposed, NOT RUN in this census"
+    }
+  },
+  {
+    "identity": "src/lib/link-absent-locations.spec.ts > Link and path observers on 'a collection' > transactions(), restoration() > an omission, and re-adds of the location and of a sibling",
+    "classification": "runtime-or-oracle-requires-disposition",
+    "id": 19,
+    "source": "/private/tmp/st-current-read-integration/candidate/packages/kernel/src/lib/link-absent-locations.spec.ts",
+    "line": 144,
+    "sha256": "5ced65b25e334b5142f6d1fe6f7bd6533b698032acac29fd9cf2a70af7a088d9",
+    "logLine": 1657,
+    "observed": "AssertionError: a collection endpoint after a re-add of a.rows: expected { all: [] } to deeply equal [ { id: 's', n: 2 } ]",
+    "category": "REPAIR collection representation / combined replay",
+    "obligation": "Direct collection Link emits natural array after omission/readd, including history traversal; must not receive {all:[]} wrapper.",
+    "evidence": "Collection manifest010d069c\u2026; independent63 pass; combined collection-combined63 and retirement-and-collection158 include unchanged link-absent-locations.",
+    "replay": {
+      "cwd": "<fresh verified disposable copy of selected manifest>",
+      "argv": [
+        "corepack",
+        "pnpm",
+        "nx",
+        "test",
+        "kernel",
+        "--skip-nx-cache",
+        "--testFile=src/lib/link-absent-locations.spec.ts",
+        "--testNamePattern=^Link\\ and\\ path\\ observers\\ on\\ 'a\\ collection'\\ transactions\\(\\),\\ restoration\\(\\)\\ an\\ omission,\\ and\\ re\\-adds\\ of\\ the\\ location\\ and\\ of\\ a\\ sibling$",
+        "--maxWorkers=1"
+      ],
+      "status": "proposed, NOT RUN in this census"
+    }
+  },
+  {
+    "identity": "src/lib/link-absent-locations.spec.ts > Link and path observers on 'a collection' > restoration(), transactions() > an omission, and re-adds of the location and of a sibling",
+    "classification": "runtime-or-oracle-requires-disposition",
+    "id": 20,
+    "source": "/private/tmp/st-current-read-integration/candidate/packages/kernel/src/lib/link-absent-locations.spec.ts",
+    "line": 144,
+    "sha256": "5ced65b25e334b5142f6d1fe6f7bd6533b698032acac29fd9cf2a70af7a088d9",
+    "logLine": 1658,
+    "observed": "AssertionError: a collection endpoint after a re-add of a.rows: expected { all: [] } to deeply equal [ { id: 's', n: 2 } ]",
+    "category": "REPAIR collection representation / combined replay",
+    "obligation": "Direct collection Link emits natural array after omission/readd, including history traversal; must not receive {all:[]} wrapper.",
+    "evidence": "Collection manifest010d069c\u2026; independent63 pass; combined collection-combined63 and retirement-and-collection158 include unchanged link-absent-locations.",
+    "replay": {
+      "cwd": "<fresh verified disposable copy of selected manifest>",
+      "argv": [
+        "corepack",
+        "pnpm",
+        "nx",
+        "test",
+        "kernel",
+        "--skip-nx-cache",
+        "--testFile=src/lib/link-absent-locations.spec.ts",
+        "--testNamePattern=^Link\\ and\\ path\\ observers\\ on\\ 'a\\ collection'\\ restoration\\(\\),\\ transactions\\(\\)\\ an\\ omission,\\ and\\ re\\-adds\\ of\\ the\\ location\\ and\\ of\\ a\\ sibling$",
+        "--maxWorkers=1"
+      ],
+      "status": "proposed, NOT RUN in this census"
+    }
+  },
+  {
+    "identity": "src/lib/link-absent-locations.spec.ts > Link and path observers on 'a collection' > transactions(), restoration() > undo, redo and jumpTo across the omission and the re-adds",
+    "classification": "runtime-or-oracle-requires-disposition",
+    "id": 21,
+    "source": "/private/tmp/st-current-read-integration/candidate/packages/kernel/src/lib/link-absent-locations.spec.ts",
+    "line": 144,
+    "sha256": "5ced65b25e334b5142f6d1fe6f7bd6533b698032acac29fd9cf2a70af7a088d9",
+    "logLine": 1686,
+    "observed": "AssertionError: a collection endpoint after a re-add of a.rows: expected { all: [] } to deeply equal [ { id: 's', n: 2 } ]",
+    "category": "REPAIR collection representation / combined replay",
+    "obligation": "Direct collection Link emits natural array after omission/readd, including history traversal; must not receive {all:[]} wrapper.",
+    "evidence": "Collection manifest010d069c\u2026; independent63 pass; combined collection-combined63 and retirement-and-collection158 include unchanged link-absent-locations.",
+    "replay": {
+      "cwd": "<fresh verified disposable copy of selected manifest>",
+      "argv": [
+        "corepack",
+        "pnpm",
+        "nx",
+        "test",
+        "kernel",
+        "--skip-nx-cache",
+        "--testFile=src/lib/link-absent-locations.spec.ts",
+        "--testNamePattern=^Link\\ and\\ path\\ observers\\ on\\ 'a\\ collection'\\ transactions\\(\\),\\ restoration\\(\\)\\ undo,\\ redo\\ and\\ jumpTo\\ across\\ the\\ omission\\ and\\ the\\ re\\-adds$",
+        "--maxWorkers=1"
+      ],
+      "status": "proposed, NOT RUN in this census"
+    }
+  },
+  {
+    "identity": "src/lib/link-absent-locations.spec.ts > Link and path observers on 'a collection' > restoration(), transactions() > undo, redo and jumpTo across the omission and the re-adds",
+    "classification": "runtime-or-oracle-requires-disposition",
+    "id": 22,
+    "source": "/private/tmp/st-current-read-integration/candidate/packages/kernel/src/lib/link-absent-locations.spec.ts",
+    "line": 144,
+    "sha256": "5ced65b25e334b5142f6d1fe6f7bd6533b698032acac29fd9cf2a70af7a088d9",
+    "logLine": 1687,
+    "observed": "AssertionError: a collection endpoint after a re-add of a.rows: expected { all: [] } to deeply equal [ { id: 's', n: 2 } ]",
+    "category": "REPAIR collection representation / combined replay",
+    "obligation": "Direct collection Link emits natural array after omission/readd, including history traversal; must not receive {all:[]} wrapper.",
+    "evidence": "Collection manifest010d069c\u2026; independent63 pass; combined collection-combined63 and retirement-and-collection158 include unchanged link-absent-locations.",
+    "replay": {
+      "cwd": "<fresh verified disposable copy of selected manifest>",
+      "argv": [
+        "corepack",
+        "pnpm",
+        "nx",
+        "test",
+        "kernel",
+        "--skip-nx-cache",
+        "--testFile=src/lib/link-absent-locations.spec.ts",
+        "--testNamePattern=^Link\\ and\\ path\\ observers\\ on\\ 'a\\ collection'\\ restoration\\(\\),\\ transactions\\(\\)\\ undo,\\ redo\\ and\\ jumpTo\\ across\\ the\\ omission\\ and\\ the\\ re\\-adds$",
+        "--maxWorkers=1"
+      ],
+      "status": "proposed, NOT RUN in this census"
+    }
+  },
+  {
+    "identity": "src/lib/link-commit-boundary-carrier.spec.ts > the durable commit boundary, carried by public Link > a FOREIGN tree's open transaction neither absorbs nor delays this tree's write",
+    "classification": "runtime-or-oracle-requires-disposition",
+    "id": 23,
+    "source": "/private/tmp/st-current-read-integration/candidate/packages/kernel/src/lib/link-commit-boundary-carrier.spec.ts",
+    "line": 164,
+    "sha256": "c96291c63c49b0ac5cc3c312af6c68d31581573b145595b7307ed239d4748751",
+    "logLine": 1715,
+    "observed": "AssertionError: expected undefined to be 'MINE' // Object.is equality",
+    "category": "SUPERSEDED approved cross-tree oracle",
+    "obligation": "Undeclared origin holds on fixed captured foreign-owner window, then useful fresh publication after confirm/reject without another write; later owner cannot extend window, remaining captured owner still holds.",
+    "evidence": "/private/tmp/st-cross-tree-liveness-oracle-review.md; /private/tmp/st-oracle-alignment/RESULTS.md; authority75c645eb.",
+    "replay": {
+      "cwd": "<fresh verified disposable copy of selected manifest>",
+      "argv": [
+        "corepack",
+        "pnpm",
+        "nx",
+        "test",
+        "kernel",
+        "--skip-nx-cache",
+        "--testFile=src/lib/link-commit-boundary-carrier.spec.ts",
+        "--testNamePattern=^the\\ durable\\ commit\\ boundary,\\ carried\\ by\\ public\\ Link\\ a\\ FOREIGN\\ tree's\\ open\\ transaction\\ neither\\ absorbs\\ nor\\ delays\\ this\\ tree's\\ write$",
+        "--maxWorkers=1"
+      ],
+      "status": "proposed, NOT RUN in this census"
+    }
+  },
+  {
+    "identity": "src/lib/link-commit-ordering.spec.ts > public Link publication respects the commit boundary > one tree open transaction does not block another tree publication",
+    "classification": "runtime-or-oracle-requires-disposition",
+    "id": 24,
+    "source": "/private/tmp/st-current-read-integration/candidate/packages/kernel/src/lib/link-commit-ordering.spec.ts",
+    "line": 167,
+    "sha256": "e6f6742c93fcfcf802e8708e7d1dfb42ff890ee0271deee7f939e8ff6829d0da",
+    "logLine": 1734,
+    "observed": "AssertionError: expected 0 to be greater than 0",
+    "category": "SUPERSEDED approved cross-tree oracle",
+    "obligation": "Undeclared origin holds on fixed captured foreign-owner window, then useful fresh publication after confirm/reject without another write; later owner cannot extend window, remaining captured owner still holds.",
+    "evidence": "/private/tmp/st-cross-tree-liveness-oracle-review.md; /private/tmp/st-oracle-alignment/RESULTS.md; authority75c645eb.",
+    "replay": {
+      "cwd": "<fresh verified disposable copy of selected manifest>",
+      "argv": [
+        "corepack",
+        "pnpm",
+        "nx",
+        "test",
+        "kernel",
+        "--skip-nx-cache",
+        "--testFile=src/lib/link-commit-ordering.spec.ts",
+        "--testNamePattern=^public\\ Link\\ publication\\ respects\\ the\\ commit\\ boundary\\ one\\ tree\\ open\\ transaction\\ does\\ not\\ block\\ another\\ tree\\ publication$",
+        "--maxWorkers=1"
+      ],
+      "status": "proposed, NOT RUN in this census"
+    }
+  },
+  {
+    "identity": "src/lib/native-certificate-successor.spec.ts > omission then restored retained collection selects matching payload and support",
+    "classification": "runtime-or-oracle-requires-disposition",
+    "id": 25,
+    "source": "/private/tmp/st-current-read-integration/candidate/packages/kernel/src/lib/native-certificate-successor.spec.ts",
+    "line": 61,
+    "sha256": "7c53fee09ca49890f9b45c994307fe72dc177ff30ecf6cfe2ac13784d3d9136b",
+    "logLine": 1746,
+    "observed": "AssertionError: expected { other: 1 } to deeply equal { Object (branch, other) }",
+    "category": "OPEN retained root payload/support",
+    "obligation": "Root aggregate must restore retained nested collection with matched payload/support under explicit independent re-exposure; last output remains {other:1}.",
+    "evidence": "native-certificate-successor:50\u201362; direct collection shape correction does not establish this root/provenance case.",
+    "replay": {
+      "cwd": "<fresh verified disposable copy of selected manifest>",
+      "argv": [
+        "corepack",
+        "pnpm",
+        "nx",
+        "test",
+        "kernel",
+        "--skip-nx-cache",
+        "--testFile=src/lib/native-certificate-successor.spec.ts",
+        "--testNamePattern=^omission\\ then\\ restored\\ retained\\ collection\\ selects\\ matching\\ payload\\ and\\ support$",
+        "--maxWorkers=1"
+      ],
+      "status": "proposed, NOT RUN in this census"
+    }
+  },
+  {
+    "identity": "src/lib/opaque-leaf-restoration.spec.ts > opaque leaves retain terminal topology through restoration > still refuses structural drift before reversing an atomic leaf sibling",
+    "classification": "runtime-or-oracle-requires-disposition",
+    "id": 26,
+    "source": "/private/tmp/st-current-read-integration/candidate/packages/kernel/src/lib/opaque-leaf-restoration.spec.ts",
+    "line": 253,
+    "sha256": "d7e4162601fbd6a91feca6742717e01defb36ada539ded0200f541c8ffe705bf",
+    "logLine": 1827,
+    "observed": "AssertionError: expected [Function] to throw an error",
+    "category": "REPAIR structural admission / separate-source evidence",
+    "obligation": "Original semantic structural effects must reject external key drift before any atomic sibling reversal; actual original run did not throw. Preserve inspection-positive undo/redo and complete operations.",
+    "evidence": "Structural admission c5bc23c3\u2026 reviewed bounded; completeness14be1df5\u2026 reports unchanged67 pass including both files. Not demonstrated on current combined by the three recorded combined commands.",
+    "replay": {
+      "cwd": "<fresh verified disposable copy of selected manifest>",
+      "argv": [
+        "corepack",
+        "pnpm",
+        "nx",
+        "test",
+        "kernel",
+        "--skip-nx-cache",
+        "--testFile=src/lib/opaque-leaf-restoration.spec.ts",
+        "--testNamePattern=^opaque\\ leaves\\ retain\\ terminal\\ topology\\ through\\ restoration\\ still\\ refuses\\ structural\\ drift\\ before\\ reversing\\ an\\ atomic\\ leaf\\ sibling$",
+        "--maxWorkers=1"
+      ],
+      "status": "proposed, NOT RUN in this census"
+    }
+  },
+  {
+    "identity": "src/lib/path-notifier-membership.spec.ts > notifier retains plain branch membership frames > delivers values chronologically across membership barriers (priorValue=false)",
+    "classification": "runtime-or-oracle-requires-disposition",
+    "id": 27,
+    "source": "/private/tmp/st-current-read-integration/candidate/packages/kernel/src/lib/path-notifier-membership.spec.ts",
+    "line": 80,
+    "sha256": "d819ff7a943c0a8ead488c43f8948f01768f6885983f0e2b4a2d37540ba289b8",
+    "logLine": 1846,
+    "observed": "AssertionError: expected [ { name: 'Ada', age: 8 } ] to strictly equal [ { name: 'Ada' } ]",
+    "category": "OPEN notifier/Link chronology",
+    "obligation": "Membership event ordering assertion passes, then final Link wrongly retains age8. Keep exact event sequence and final absent payload.",
+    "evidence": "path-notifier-membership:73\u201380; same operation shape as branch trace, shared cause plausible but not independently traced here.",
+    "replay": {
+      "cwd": "<fresh verified disposable copy of selected manifest>",
+      "argv": [
+        "corepack",
+        "pnpm",
+        "nx",
+        "test",
+        "kernel",
+        "--skip-nx-cache",
+        "--testFile=src/lib/path-notifier-membership.spec.ts",
+        "--testNamePattern=^notifier\\ retains\\ plain\\ branch\\ membership\\ frames\\ delivers\\ values\\ chronologically\\ across\\ membership\\ barriers\\ \\(priorValue=false\\)$",
+        "--maxWorkers=1"
+      ],
+      "status": "proposed, NOT RUN in this census"
+    }
+  },
+  {
+    "identity": "src/lib/prepared-placement-index.spec.ts > setAll resolves 32 staged keys with linear map work",
+    "classification": "runtime-or-oracle-requires-disposition",
+    "id": 28,
+    "source": "/private/tmp/st-current-read-integration/candidate/packages/kernel/src/lib/prepared-placement-index.spec.ts",
+    "line": 35,
+    "sha256": "1329b0b8c285bd2cccfd82ccf3f2cbf11def75435640d457429aeecfcee9b681",
+    "logLine": 1869,
+    "observed": "AssertionError: expected 96 to be less than or equal to 64",
+    "category": "OPEN prepared placement work",
+    "obligation": "Preserve exact keys and <=2N prepared patch iteration budget; observed3N at all three sizes. Still linear; do not call quadratic or silently relax ceiling.",
+    "evidence": "prepared-placement-index:32\u201335; key evidence repair is not a measured cost correction.",
+    "replay": {
+      "cwd": "<fresh verified disposable copy of selected manifest>",
+      "argv": [
+        "corepack",
+        "pnpm",
+        "nx",
+        "test",
+        "kernel",
+        "--skip-nx-cache",
+        "--testFile=src/lib/prepared-placement-index.spec.ts",
+        "--testNamePattern=^setAll\\ resolves\\ 32\\ staged\\ keys\\ with\\ linear\\ map\\ work$",
+        "--maxWorkers=1"
+      ],
+      "status": "proposed, NOT RUN in this census"
+    }
+  },
+  {
+    "identity": "src/lib/prepared-placement-index.spec.ts > prependMany resolves 32 staged keys with linear map work",
+    "classification": "runtime-or-oracle-requires-disposition",
+    "id": 29,
+    "source": "/private/tmp/st-current-read-integration/candidate/packages/kernel/src/lib/prepared-placement-index.spec.ts",
+    "line": 35,
+    "sha256": "1329b0b8c285bd2cccfd82ccf3f2cbf11def75435640d457429aeecfcee9b681",
+    "logLine": 1870,
+    "observed": "AssertionError: expected 96 to be less than or equal to 64",
+    "category": "OPEN prepared placement work",
+    "obligation": "Preserve exact keys and <=2N prepared patch iteration budget; observed3N at all three sizes. Still linear; do not call quadratic or silently relax ceiling.",
+    "evidence": "prepared-placement-index:32\u201335; key evidence repair is not a measured cost correction.",
+    "replay": {
+      "cwd": "<fresh verified disposable copy of selected manifest>",
+      "argv": [
+        "corepack",
+        "pnpm",
+        "nx",
+        "test",
+        "kernel",
+        "--skip-nx-cache",
+        "--testFile=src/lib/prepared-placement-index.spec.ts",
+        "--testNamePattern=^prependMany\\ resolves\\ 32\\ staged\\ keys\\ with\\ linear\\ map\\ work$",
+        "--maxWorkers=1"
+      ],
+      "status": "proposed, NOT RUN in this census"
+    }
+  },
+  {
+    "identity": "src/lib/prepared-placement-index.spec.ts > setAll resolves 128 staged keys with linear map work",
+    "classification": "runtime-or-oracle-requires-disposition",
+    "id": 30,
+    "source": "/private/tmp/st-current-read-integration/candidate/packages/kernel/src/lib/prepared-placement-index.spec.ts",
+    "line": 35,
+    "sha256": "1329b0b8c285bd2cccfd82ccf3f2cbf11def75435640d457429aeecfcee9b681",
+    "logLine": 1882,
+    "observed": "AssertionError: expected 384 to be less than or equal to 256",
+    "category": "OPEN prepared placement work",
+    "obligation": "Preserve exact keys and <=2N prepared patch iteration budget; observed3N at all three sizes. Still linear; do not call quadratic or silently relax ceiling.",
+    "evidence": "prepared-placement-index:32\u201335; key evidence repair is not a measured cost correction.",
+    "replay": {
+      "cwd": "<fresh verified disposable copy of selected manifest>",
+      "argv": [
+        "corepack",
+        "pnpm",
+        "nx",
+        "test",
+        "kernel",
+        "--skip-nx-cache",
+        "--testFile=src/lib/prepared-placement-index.spec.ts",
+        "--testNamePattern=^setAll\\ resolves\\ 128\\ staged\\ keys\\ with\\ linear\\ map\\ work$",
+        "--maxWorkers=1"
+      ],
+      "status": "proposed, NOT RUN in this census"
+    }
+  },
+  {
+    "identity": "src/lib/prepared-placement-index.spec.ts > prependMany resolves 128 staged keys with linear map work",
+    "classification": "runtime-or-oracle-requires-disposition",
+    "id": 31,
+    "source": "/private/tmp/st-current-read-integration/candidate/packages/kernel/src/lib/prepared-placement-index.spec.ts",
+    "line": 35,
+    "sha256": "1329b0b8c285bd2cccfd82ccf3f2cbf11def75435640d457429aeecfcee9b681",
+    "logLine": 1883,
+    "observed": "AssertionError: expected 384 to be less than or equal to 256",
+    "category": "OPEN prepared placement work",
+    "obligation": "Preserve exact keys and <=2N prepared patch iteration budget; observed3N at all three sizes. Still linear; do not call quadratic or silently relax ceiling.",
+    "evidence": "prepared-placement-index:32\u201335; key evidence repair is not a measured cost correction.",
+    "replay": {
+      "cwd": "<fresh verified disposable copy of selected manifest>",
+      "argv": [
+        "corepack",
+        "pnpm",
+        "nx",
+        "test",
+        "kernel",
+        "--skip-nx-cache",
+        "--testFile=src/lib/prepared-placement-index.spec.ts",
+        "--testNamePattern=^prependMany\\ resolves\\ 128\\ staged\\ keys\\ with\\ linear\\ map\\ work$",
+        "--maxWorkers=1"
+      ],
+      "status": "proposed, NOT RUN in this census"
+    }
+  },
+  {
+    "identity": "src/lib/prepared-placement-index.spec.ts > setAll resolves 512 staged keys with linear map work",
+    "classification": "runtime-or-oracle-requires-disposition",
+    "id": 32,
+    "source": "/private/tmp/st-current-read-integration/candidate/packages/kernel/src/lib/prepared-placement-index.spec.ts",
+    "line": 35,
+    "sha256": "1329b0b8c285bd2cccfd82ccf3f2cbf11def75435640d457429aeecfcee9b681",
+    "logLine": 1895,
+    "observed": "AssertionError: expected 1536 to be less than or equal to 1024",
+    "category": "OPEN prepared placement work",
+    "obligation": "Preserve exact keys and <=2N prepared patch iteration budget; observed3N at all three sizes. Still linear; do not call quadratic or silently relax ceiling.",
+    "evidence": "prepared-placement-index:32\u201335; key evidence repair is not a measured cost correction.",
+    "replay": {
+      "cwd": "<fresh verified disposable copy of selected manifest>",
+      "argv": [
+        "corepack",
+        "pnpm",
+        "nx",
+        "test",
+        "kernel",
+        "--skip-nx-cache",
+        "--testFile=src/lib/prepared-placement-index.spec.ts",
+        "--testNamePattern=^setAll\\ resolves\\ 512\\ staged\\ keys\\ with\\ linear\\ map\\ work$",
+        "--maxWorkers=1"
+      ],
+      "status": "proposed, NOT RUN in this census"
+    }
+  },
+  {
+    "identity": "src/lib/prepared-placement-index.spec.ts > prependMany resolves 512 staged keys with linear map work",
+    "classification": "runtime-or-oracle-requires-disposition",
+    "id": 33,
+    "source": "/private/tmp/st-current-read-integration/candidate/packages/kernel/src/lib/prepared-placement-index.spec.ts",
+    "line": 35,
+    "sha256": "1329b0b8c285bd2cccfd82ccf3f2cbf11def75435640d457429aeecfcee9b681",
+    "logLine": 1896,
+    "observed": "AssertionError: expected 1536 to be less than or equal to 1024",
+    "category": "OPEN prepared placement work",
+    "obligation": "Preserve exact keys and <=2N prepared patch iteration budget; observed3N at all three sizes. Still linear; do not call quadratic or silently relax ceiling.",
+    "evidence": "prepared-placement-index:32\u201335; key evidence repair is not a measured cost correction.",
+    "replay": {
+      "cwd": "<fresh verified disposable copy of selected manifest>",
+      "argv": [
+        "corepack",
+        "pnpm",
+        "nx",
+        "test",
+        "kernel",
+        "--skip-nx-cache",
+        "--testFile=src/lib/prepared-placement-index.spec.ts",
+        "--testNamePattern=^prependMany\\ resolves\\ 512\\ staged\\ keys\\ with\\ linear\\ map\\ work$",
+        "--maxWorkers=1"
+      ],
+      "status": "proposed, NOT RUN in this census"
+    }
+  },
+  {
+    "identity": "src/lib/production-scalar-substrate.benchmark.spec.ts > Complexity guard: production scalar substrate > proves compiled scalar reads and writes stay constant in logical work",
+    "classification": "runtime-or-oracle-requires-disposition",
+    "id": 34,
+    "source": "/private/tmp/st-current-read-integration/candidate/packages/kernel/src/lib/production-scalar-substrate.benchmark.spec.ts",
+    "line": 1133,
+    "sha256": "f4245476f7cc67ecc2016690d1c2a01383c44af9985c566fa3d60e4f9657acc4",
+    "logLine": 1908,
+    "observed": "AssertionError: expected { slotReads: +0, slotWrites: 1, \u2026(19) } to deeply equal { slotReads: 1, slotWrites: 1, \u2026(19) }",
+    "category": "OPEN scalar counter oracle",
+    "obligation": "Exact write-work vector expected slotReads1, actual0. Requires deliberate accounting/source disposition, not automatic regression or free budget waiver.",
+    "evidence": "production-scalar-substrate.benchmark:1133; broad diff isolates fewer reads, no inferred performance superiority.",
+    "replay": {
+      "cwd": "<fresh verified disposable copy of selected manifest>",
+      "argv": [
+        "corepack",
+        "pnpm",
+        "nx",
+        "test",
+        "kernel",
+        "--skip-nx-cache",
+        "--testFile=src/lib/production-scalar-substrate.benchmark.spec.ts",
+        "--testNamePattern=^Complexity\\ guard:\\ production\\ scalar\\ substrate\\ proves\\ compiled\\ scalar\\ reads\\ and\\ writes\\ stay\\ constant\\ in\\ logical\\ work$",
+        "--maxWorkers=1"
+      ],
+      "status": "proposed, NOT RUN in this census"
+    }
+  },
+  {
+    "identity": "src/lib/publication-enrollment-invariance.spec.ts > enrollment invariance branch: before-pending",
+    "classification": "runtime-or-oracle-requires-disposition",
+    "id": 35,
+    "source": "/private/tmp/st-current-read-integration/candidate/packages/kernel/src/lib/publication-enrollment-invariance.spec.ts",
+    "line": 35,
+    "sha256": "e9bc2895302fd4bccd4e1180232d5accd9616e525d0ebdbadc8b8a2b4aad8316",
+    "logLine": 1957,
+    "observed": "AssertionError: expected [ { x: 1, y: +0 } ] to deeply equal []",
+    "category": "OPEN enrollment isolation",
+    "obligation": "Declared connection progresses; a second undeclared connection must not borrow its independent grant. Actual otherSent contains payload. Preserve owner inspection and pending owner.",
+    "evidence": "Source assertions 32/35; no reviewed repair closes these ten.",
+    "replay": {
+      "cwd": "<fresh verified disposable copy of selected manifest>",
+      "argv": [
+        "corepack",
+        "pnpm",
+        "nx",
+        "test",
+        "kernel",
+        "--skip-nx-cache",
+        "--testFile=src/lib/publication-enrollment-invariance.spec.ts",
+        "--testNamePattern=^enrollment\\ invariance\\ branch:\\ before\\-pending$",
+        "--maxWorkers=1"
+      ],
+      "status": "proposed, NOT RUN in this census"
+    }
+  },
+  {
+    "identity": "src/lib/publication-enrollment-invariance.spec.ts > enrollment invariance branch: during-pending",
+    "classification": "runtime-or-oracle-requires-disposition",
+    "id": 36,
+    "source": "/private/tmp/st-current-read-integration/candidate/packages/kernel/src/lib/publication-enrollment-invariance.spec.ts",
+    "line": 35,
+    "sha256": "e9bc2895302fd4bccd4e1180232d5accd9616e525d0ebdbadc8b8a2b4aad8316",
+    "logLine": 1958,
+    "observed": "AssertionError: expected [ { x: 1, y: +0 } ] to deeply equal []",
+    "category": "OPEN enrollment isolation",
+    "obligation": "Declared connection progresses; a second undeclared connection must not borrow its independent grant. Actual otherSent contains payload. Preserve owner inspection and pending owner.",
+    "evidence": "Source assertions 32/35; no reviewed repair closes these ten.",
+    "replay": {
+      "cwd": "<fresh verified disposable copy of selected manifest>",
+      "argv": [
+        "corepack",
+        "pnpm",
+        "nx",
+        "test",
+        "kernel",
+        "--skip-nx-cache",
+        "--testFile=src/lib/publication-enrollment-invariance.spec.ts",
+        "--testNamePattern=^enrollment\\ invariance\\ branch:\\ during\\-pending$",
+        "--maxWorkers=1"
+      ],
+      "status": "proposed, NOT RUN in this census"
+    }
+  },
+  {
+    "identity": "src/lib/publication-enrollment-invariance.spec.ts > enrollment invariance branch: enroll-in-updater",
+    "classification": "runtime-or-oracle-requires-disposition",
+    "id": 37,
+    "source": "/private/tmp/st-current-read-integration/candidate/packages/kernel/src/lib/publication-enrollment-invariance.spec.ts",
+    "line": 35,
+    "sha256": "e9bc2895302fd4bccd4e1180232d5accd9616e525d0ebdbadc8b8a2b4aad8316",
+    "logLine": 1959,
+    "observed": "AssertionError: expected [ { x: 1, y: +0 } ] to deeply equal []",
+    "category": "OPEN enrollment isolation",
+    "obligation": "Declared connection progresses; a second undeclared connection must not borrow its independent grant. Actual otherSent contains payload. Preserve owner inspection and pending owner.",
+    "evidence": "Source assertions 32/35; no reviewed repair closes these ten.",
+    "replay": {
+      "cwd": "<fresh verified disposable copy of selected manifest>",
+      "argv": [
+        "corepack",
+        "pnpm",
+        "nx",
+        "test",
+        "kernel",
+        "--skip-nx-cache",
+        "--testFile=src/lib/publication-enrollment-invariance.spec.ts",
+        "--testNamePattern=^enrollment\\ invariance\\ branch:\\ enroll\\-in\\-updater$",
+        "--maxWorkers=1"
+      ],
+      "status": "proposed, NOT RUN in this census"
+    }
+  },
+  {
+    "identity": "src/lib/publication-enrollment-invariance.spec.ts > enrollment invariance root: before-pending",
+    "classification": "runtime-or-oracle-requires-disposition",
+    "id": 38,
+    "source": "/private/tmp/st-current-read-integration/candidate/packages/kernel/src/lib/publication-enrollment-invariance.spec.ts",
+    "line": 35,
+    "sha256": "e9bc2895302fd4bccd4e1180232d5accd9616e525d0ebdbadc8b8a2b4aad8316",
+    "logLine": 1983,
+    "observed": "AssertionError: expected [ { pair: { x: +0, y: +0 }, \u2026(2) } ] to deeply equal []",
+    "category": "OPEN enrollment isolation",
+    "obligation": "Declared connection progresses; a second undeclared connection must not borrow its independent grant. Actual otherSent contains payload. Preserve owner inspection and pending owner.",
+    "evidence": "Source assertions 32/35; no reviewed repair closes these ten.",
+    "replay": {
+      "cwd": "<fresh verified disposable copy of selected manifest>",
+      "argv": [
+        "corepack",
+        "pnpm",
+        "nx",
+        "test",
+        "kernel",
+        "--skip-nx-cache",
+        "--testFile=src/lib/publication-enrollment-invariance.spec.ts",
+        "--testNamePattern=^enrollment\\ invariance\\ root:\\ before\\-pending$",
+        "--maxWorkers=1"
+      ],
+      "status": "proposed, NOT RUN in this census"
+    }
+  },
+  {
+    "identity": "src/lib/publication-enrollment-invariance.spec.ts > enrollment invariance root: during-pending",
+    "classification": "runtime-or-oracle-requires-disposition",
+    "id": 39,
+    "source": "/private/tmp/st-current-read-integration/candidate/packages/kernel/src/lib/publication-enrollment-invariance.spec.ts",
+    "line": 35,
+    "sha256": "e9bc2895302fd4bccd4e1180232d5accd9616e525d0ebdbadc8b8a2b4aad8316",
+    "logLine": 1984,
+    "observed": "AssertionError: expected [ { pair: { x: +0, y: +0 }, \u2026(2) } ] to deeply equal []",
+    "category": "OPEN enrollment isolation",
+    "obligation": "Declared connection progresses; a second undeclared connection must not borrow its independent grant. Actual otherSent contains payload. Preserve owner inspection and pending owner.",
+    "evidence": "Source assertions 32/35; no reviewed repair closes these ten.",
+    "replay": {
+      "cwd": "<fresh verified disposable copy of selected manifest>",
+      "argv": [
+        "corepack",
+        "pnpm",
+        "nx",
+        "test",
+        "kernel",
+        "--skip-nx-cache",
+        "--testFile=src/lib/publication-enrollment-invariance.spec.ts",
+        "--testNamePattern=^enrollment\\ invariance\\ root:\\ during\\-pending$",
+        "--maxWorkers=1"
+      ],
+      "status": "proposed, NOT RUN in this census"
+    }
+  },
+  {
+    "identity": "src/lib/publication-enrollment-invariance.spec.ts > enrollment invariance root: enroll-in-updater",
+    "classification": "runtime-or-oracle-requires-disposition",
+    "id": 40,
+    "source": "/private/tmp/st-current-read-integration/candidate/packages/kernel/src/lib/publication-enrollment-invariance.spec.ts",
+    "line": 35,
+    "sha256": "e9bc2895302fd4bccd4e1180232d5accd9616e525d0ebdbadc8b8a2b4aad8316",
+    "logLine": 1985,
+    "observed": "AssertionError: expected [ { pair: { x: +0, y: +0 }, \u2026(2) } ] to deeply equal []",
+    "category": "OPEN enrollment isolation",
+    "obligation": "Declared connection progresses; a second undeclared connection must not borrow its independent grant. Actual otherSent contains payload. Preserve owner inspection and pending owner.",
+    "evidence": "Source assertions 32/35; no reviewed repair closes these ten.",
+    "replay": {
+      "cwd": "<fresh verified disposable copy of selected manifest>",
+      "argv": [
+        "corepack",
+        "pnpm",
+        "nx",
+        "test",
+        "kernel",
+        "--skip-nx-cache",
+        "--testFile=src/lib/publication-enrollment-invariance.spec.ts",
+        "--testNamePattern=^enrollment\\ invariance\\ root:\\ enroll\\-in\\-updater$",
+        "--maxWorkers=1"
+      ],
+      "status": "proposed, NOT RUN in this census"
+    }
+  },
+  {
+    "identity": "src/lib/tree-error-public-contract.spec.ts > PUBLIC: delivery semantics > the Link handle is still exactly three members",
+    "classification": "runtime-or-oracle-requires-disposition",
+    "id": 41,
+    "source": "/private/tmp/st-current-read-integration/candidate/packages/kernel/src/lib/tree-error-public-contract.spec.ts",
+    "line": 238,
+    "sha256": "17c42cdf5bf47162c041b5c3f326540aef20c54605f48d6d5c469ef31a198514",
+    "logLine": 2013,
+    "observed": "AssertionError: expected [ 'declare', 'dispose', \u2026(2) ] to deeply equal [ 'dispose', 'retrieve', 'settled' ]",
+    "category": "OPEN experimental/public surface boundary",
+    "obligation": "Public handle exactly dispose/retrieve/settled versus enumerable declare. Expected scratch experimental surface difference, but no public-release compatibility waiver.",
+    "evidence": "tree-error-public-contract:238; private declaration fixtures do not authorize shipping API.",
+    "replay": {
+      "cwd": "<fresh verified disposable copy of selected manifest>",
+      "argv": [
+        "corepack",
+        "pnpm",
+        "nx",
+        "test",
+        "kernel",
+        "--skip-nx-cache",
+        "--testFile=src/lib/tree-error-public-contract.spec.ts",
+        "--testNamePattern=^PUBLIC:\\ delivery\\ semantics\\ the\\ Link\\ handle\\ is\\ still\\ exactly\\ three\\ members$",
+        "--maxWorkers=1"
+      ],
+      "status": "proposed, NOT RUN in this census"
+    }
+  },
+  {
+    "identity": "src/lib/whole-value-new-keys.spec.ts > owner-authorized whole-value new keys > keeps a pre-existing Link observing newly supplied descendants",
+    "classification": "runtime-or-oracle-requires-disposition",
+    "id": 42,
+    "source": "/private/tmp/st-current-read-integration/candidate/packages/kernel/src/lib/whole-value-new-keys.spec.ts",
+    "line": 88,
+    "sha256": "86cb44e83eb1641b2cb3eb5dd7c12bc524089ccaaf41ada5367fd7cec2bce606",
+    "logLine": 2036,
+    "observed": "Error: Test timed out in 5000ms.",
+    "category": "OPEN public new-member settlement",
+    "obligation": "New descendant updates must continue publishing; completed partial membership after later value throw must publish and settle. Both time out; no established phase/root cause from registration stack.",
+    "evidence": "whole-value-new-keys:88 and446; plain object membership, not EntityMap representation repair.",
+    "replay": {
+      "cwd": "<fresh verified disposable copy of selected manifest>",
+      "argv": [
+        "corepack",
+        "pnpm",
+        "nx",
+        "test",
+        "kernel",
+        "--skip-nx-cache",
+        "--testFile=src/lib/whole-value-new-keys.spec.ts",
+        "--testNamePattern=^owner\\-authorized\\ whole\\-value\\ new\\ keys\\ keeps\\ a\\ pre\\-existing\\ Link\\ observing\\ newly\\ supplied\\ descendants$",
+        "--maxWorkers=1"
+      ],
+      "status": "proposed, NOT RUN in this census"
+    }
+  },
+  {
+    "identity": "src/lib/whole-value-new-keys.spec.ts > owner-authorized whole-value new keys > delivers completed partial membership to Link when a later value throws",
+    "classification": "runtime-or-oracle-requires-disposition",
+    "id": 43,
+    "source": "/private/tmp/st-current-read-integration/candidate/packages/kernel/src/lib/whole-value-new-keys.spec.ts",
+    "line": 446,
+    "sha256": "86cb44e83eb1641b2cb3eb5dd7c12bc524089ccaaf41ada5367fd7cec2bce606",
+    "logLine": 2049,
+    "observed": "Error: Test timed out in 5000ms.",
+    "category": "OPEN public new-member settlement",
+    "obligation": "New descendant updates must continue publishing; completed partial membership after later value throw must publish and settle. Both time out; no established phase/root cause from registration stack.",
+    "evidence": "whole-value-new-keys:88 and446; plain object membership, not EntityMap representation repair.",
+    "replay": {
+      "cwd": "<fresh verified disposable copy of selected manifest>",
+      "argv": [
+        "corepack",
+        "pnpm",
+        "nx",
+        "test",
+        "kernel",
+        "--skip-nx-cache",
+        "--testFile=src/lib/whole-value-new-keys.spec.ts",
+        "--testNamePattern=^owner\\-authorized\\ whole\\-value\\ new\\ keys\\ delivers\\ completed\\ partial\\ membership\\ to\\ Link\\ when\\ a\\ later\\ value\\ throws$",
+        "--maxWorkers=1"
+      ],
+      "status": "proposed, NOT RUN in this census"
+    }
+  },
+  {
+    "identity": "src/enhancers/restoration/designated-collection-omission.spec.ts > rollback of a collection omission > refuses, typed, when the collection changed while omitted (transactions alone)",
+    "classification": "runtime-or-oracle-requires-disposition",
+    "id": 44,
+    "source": "/private/tmp/st-current-read-integration/candidate/packages/kernel/src/enhancers/restoration/designated-collection-omission.spec.ts",
+    "line": 545,
+    "sha256": "e88ef703666602c20ba6874d42c25657b3dda235f0f591753c7e691b09167e9c",
+    "logLine": 2062,
+    "observed": "AssertionError: expected 'SignalTree could not rollback the pen\u2026' to match /later-confirmed-dependency/",
+    "category": "OPEN refusal reason / remaining safety assertions",
+    "obligation": "Typed rollback refusal already passes. effect-validation-failed differs from expected later-confirmed-dependency. Preserve reason authority and downstream state/ownership checks; they were not reached.",
+    "evidence": "designated-collection-omission:526\u2013550; private retained-row mutation. Not absent refusal and not one of four superseded oracles.",
+    "replay": {
+      "cwd": "<fresh verified disposable copy of selected manifest>",
+      "argv": [
+        "corepack",
+        "pnpm",
+        "nx",
+        "test",
+        "kernel",
+        "--skip-nx-cache",
+        "--testFile=src/enhancers/restoration/designated-collection-omission.spec.ts",
+        "--testNamePattern=^rollback\\ of\\ a\\ collection\\ omission\\ refuses,\\ typed,\\ when\\ the\\ collection\\ changed\\ while\\ omitted\\ \\(transactions\\ alone\\)$",
+        "--maxWorkers=1"
+      ],
+      "status": "proposed, NOT RUN in this census"
+    }
+  },
+  {
+    "identity": "src/enhancers/restoration/designated-collection-omission.spec.ts > rollback of a collection omission > refuses, typed, when the collection changed while omitted (transactions first)",
+    "classification": "runtime-or-oracle-requires-disposition",
+    "id": 45,
+    "source": "/private/tmp/st-current-read-integration/candidate/packages/kernel/src/enhancers/restoration/designated-collection-omission.spec.ts",
+    "line": 545,
+    "sha256": "e88ef703666602c20ba6874d42c25657b3dda235f0f591753c7e691b09167e9c",
+    "logLine": 2063,
+    "observed": "AssertionError: expected 'SignalTree could not rollback the pen\u2026' to match /later-confirmed-dependency/",
+    "category": "OPEN refusal reason / remaining safety assertions",
+    "obligation": "Typed rollback refusal already passes. effect-validation-failed differs from expected later-confirmed-dependency. Preserve reason authority and downstream state/ownership checks; they were not reached.",
+    "evidence": "designated-collection-omission:526\u2013550; private retained-row mutation. Not absent refusal and not one of four superseded oracles.",
+    "replay": {
+      "cwd": "<fresh verified disposable copy of selected manifest>",
+      "argv": [
+        "corepack",
+        "pnpm",
+        "nx",
+        "test",
+        "kernel",
+        "--skip-nx-cache",
+        "--testFile=src/enhancers/restoration/designated-collection-omission.spec.ts",
+        "--testNamePattern=^rollback\\ of\\ a\\ collection\\ omission\\ refuses,\\ typed,\\ when\\ the\\ collection\\ changed\\ while\\ omitted\\ \\(transactions\\ first\\)$",
+        "--maxWorkers=1"
+      ],
+      "status": "proposed, NOT RUN in this census"
+    }
+  },
+  {
+    "identity": "src/enhancers/restoration/designated-collection-omission.spec.ts > rollback of a collection omission > refuses, typed, when the collection changed while omitted (restoration first)",
+    "classification": "runtime-or-oracle-requires-disposition",
+    "id": 46,
+    "source": "/private/tmp/st-current-read-integration/candidate/packages/kernel/src/enhancers/restoration/designated-collection-omission.spec.ts",
+    "line": 545,
+    "sha256": "e88ef703666602c20ba6874d42c25657b3dda235f0f591753c7e691b09167e9c",
+    "logLine": 2064,
+    "observed": "AssertionError: expected 'SignalTree could not rollback the pen\u2026' to match /later-confirmed-dependency/",
+    "category": "OPEN refusal reason / remaining safety assertions",
+    "obligation": "Typed rollback refusal already passes. effect-validation-failed differs from expected later-confirmed-dependency. Preserve reason authority and downstream state/ownership checks; they were not reached.",
+    "evidence": "designated-collection-omission:526\u2013550; private retained-row mutation. Not absent refusal and not one of four superseded oracles.",
+    "replay": {
+      "cwd": "<fresh verified disposable copy of selected manifest>",
+      "argv": [
+        "corepack",
+        "pnpm",
+        "nx",
+        "test",
+        "kernel",
+        "--skip-nx-cache",
+        "--testFile=src/enhancers/restoration/designated-collection-omission.spec.ts",
+        "--testNamePattern=^rollback\\ of\\ a\\ collection\\ omission\\ refuses,\\ typed,\\ when\\ the\\ collection\\ changed\\ while\\ omitted\\ \\(restoration\\ first\\)$",
+        "--maxWorkers=1"
+      ],
+      "status": "proposed, NOT RUN in this census"
+    }
+  },
+  {
+    "identity": "src/enhancers/restoration/p0c-divergence.spec.ts > P0-C C2 \u2014 structural collision > a user rekey and a realization rekey of the same subject",
+    "classification": "runtime-or-oracle-requires-disposition",
+    "id": 47,
+    "source": "/private/tmp/st-current-read-integration/candidate/packages/kernel/src/enhancers/restoration/p0c-divergence.spec.ts",
+    "line": 87,
+    "sha256": "3a63515b7db07d9e08b1715e3f2bd705ca3920d39109bcc23bac5314410cdcf2",
+    "logLine": 2083,
+    "observed": "AssertionError: expected [Function] to throw an error",
+    "category": "REPAIR structural admission / separate-source evidence",
+    "obligation": "Original semantic structural effects must reject external key drift before any atomic sibling reversal; actual original run did not throw. Preserve inspection-positive undo/redo and complete operations.",
+    "evidence": "Structural admission c5bc23c3\u2026 reviewed bounded; completeness14be1df5\u2026 reports unchanged67 pass including both files. Not demonstrated on current combined by the three recorded combined commands.",
+    "replay": {
+      "cwd": "<fresh verified disposable copy of selected manifest>",
+      "argv": [
+        "corepack",
+        "pnpm",
+        "nx",
+        "test",
+        "kernel",
+        "--skip-nx-cache",
+        "--testFile=src/enhancers/restoration/p0c-divergence.spec.ts",
+        "--testNamePattern=^P0\\-C\\ C2\\ \u2014\\ structural\\ collision\\ a\\ user\\ rekey\\ and\\ a\\ realization\\ rekey\\ of\\ the\\ same\\ subject$",
+        "--maxWorkers=1"
+      ],
+      "status": "proposed, NOT RUN in this census"
+    }
+  },
+  {
+    "identity": "src/enhancers/transactions/native-compound-ordinary-order-regression.spec.ts > compound ordinary order rejection regression > keeps untouched inspected order out of the ordinary Link payload after structural rejection",
+    "classification": "runtime-or-oracle-requires-disposition",
+    "id": 48,
+    "source": "/private/tmp/st-current-read-integration/candidate/packages/kernel/src/enhancers/transactions/native-compound-ordinary-order-regression.spec.ts",
+    "line": 83,
+    "sha256": "6248370ec0de3fe089a4c4729b02761e162af4d2fd1b7c3ee62f493e4309a0a1",
+    "logLine": 2095,
+    "observed": "AssertionError: expected [ { id: 'b', n: 4 }, \u2026(2) ] to deeply equal [ { id: 'a', n: 1 }, \u2026(2) ]",
+    "category": "OPEN compound ordinary order",
+    "obligation": "After structural rollback physical identity checks pass but ordinary A/B/C ordering differs (B first); keep no inspected x/rejected9 payload and subsequent useful write.",
+    "evidence": "native-compound-ordinary-order-regression:83 and native-structural-composition-gates:79; structural admission success does not prove ordinary egress order.",
+    "replay": {
+      "cwd": "<fresh verified disposable copy of selected manifest>",
+      "argv": [
+        "corepack",
+        "pnpm",
+        "nx",
+        "test",
+        "kernel",
+        "--skip-nx-cache",
+        "--testFile=src/enhancers/transactions/native-compound-ordinary-order-regression.spec.ts",
+        "--testNamePattern=^compound\\ ordinary\\ order\\ rejection\\ regression\\ keeps\\ untouched\\ inspected\\ order\\ out\\ of\\ the\\ ordinary\\ Link\\ payload\\ after\\ structural\\ rejection$",
+        "--maxWorkers=1"
+      ],
+      "status": "proposed, NOT RUN in this census"
+    }
+  },
+  {
+    "identity": "src/enhancers/transactions/native-structural-composition-gates.spec.ts > slice2 structural consumer composition gates > keeps compound inspection membership and order consistent with inspect and ordinary Link rejection",
+    "classification": "runtime-or-oracle-requires-disposition",
+    "id": 49,
+    "source": "/private/tmp/st-current-read-integration/candidate/packages/kernel/src/enhancers/transactions/native-structural-composition-gates.spec.ts",
+    "line": 79,
+    "sha256": "4c00825e75267762487bc920ec053a64d873e60daff0b5ea8b4249a0d42ac38e",
+    "logLine": 2130,
+    "observed": "AssertionError: expected [ { id: 'b', n: 4 }, \u2026(2) ] to deeply equal [ { id: 'a', n: 1 }, \u2026(2) ]",
+    "category": "OPEN compound ordinary order",
+    "obligation": "After structural rollback physical identity checks pass but ordinary A/B/C ordering differs (B first); keep no inspected x/rejected9 payload and subsequent useful write.",
+    "evidence": "native-compound-ordinary-order-regression:83 and native-structural-composition-gates:79; structural admission success does not prove ordinary egress order.",
+    "replay": {
+      "cwd": "<fresh verified disposable copy of selected manifest>",
+      "argv": [
+        "corepack",
+        "pnpm",
+        "nx",
+        "test",
+        "kernel",
+        "--skip-nx-cache",
+        "--testFile=src/enhancers/transactions/native-structural-composition-gates.spec.ts",
+        "--testNamePattern=^slice2\\ structural\\ consumer\\ composition\\ gates\\ keeps\\ compound\\ inspection\\ membership\\ and\\ order\\ consistent\\ with\\ inspect\\ and\\ ordinary\\ Link\\ rejection$",
+        "--maxWorkers=1"
+      ],
+      "status": "proposed, NOT RUN in this census"
+    }
+  },
+  {
+    "identity": "src/lib/internals/causal-runtime/committed-entity-selected-unit.spec.ts > rich committed-entity capture sees the complete selected mixed inverse before authoring newer truth",
+    "classification": "runtime-or-oracle-requires-disposition",
+    "id": 50,
+    "source": "/private/tmp/st-current-read-integration/candidate/packages/kernel/src/lib/internals/causal-runtime/committed-entity-selected-unit.spec.ts",
+    "line": 39,
+    "sha256": "2a6a89b3aff4226bdc2a4070db8db648bd222390a296582e35691b9e9f0ce5f9",
+    "logLine": 2165,
+    "observed": "AssertionError: expected [ { \u2026(2) } ] to deeply equal [ { \u2026(2) } ]",
+    "category": "OPEN authentic rich-callback atomicity",
+    "obligation": "Rich committed-entity callback must see entire mixed inverse before authoring newer777. It sees right50/60 instead of11/12 while left restored; subsequent preservation assertion not reached.",
+    "evidence": "committed-entity-selected-unit:39; authentic capture activation/subscription, not mock or GC harness. No listed repair proves this boundary.",
+    "replay": {
+      "cwd": "<fresh verified disposable copy of selected manifest>",
+      "argv": [
+        "corepack",
+        "pnpm",
+        "nx",
+        "test",
+        "kernel",
+        "--skip-nx-cache",
+        "--testFile=src/lib/internals/causal-runtime/committed-entity-selected-unit.spec.ts",
+        "--testNamePattern=^rich\\ committed\\-entity\\ capture\\ sees\\ the\\ complete\\ selected\\ mixed\\ inverse\\ before\\ authoring\\ newer\\ truth$",
+        "--maxWorkers=1"
+      ],
+      "status": "proposed, NOT RUN in this census"
+    }
+  }
+]

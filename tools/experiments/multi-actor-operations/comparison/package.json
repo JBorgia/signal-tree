@@ -1,0 +1,12 @@
+{
+  "name": "multi-actor-reference-comparison",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --test comparison.test.mjs lifecycle.test.mjs",
+    "typecheck": "tsc -p tsconfig.consumer.json"
+  },
+  "dependencies": {
+    "@tanstack/db": "1.0.0-rc.1"
+  }
+}

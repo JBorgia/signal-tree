@@ -1,0 +1,15 @@
+{
+  "archive": "verification.tar.xz",
+  "sha256": "a6b29c2d940e28c36ad69e148a789c2a88f3f472fe152f85fe5b6f609cc32167",
+  "files": {
+    "ACCEPTANCE.md": "13a6c5a51a73303f8f7dd39157c6e1f59e0d4b47b0c71cb1bb40b54f9e58ccf1",
+    "README.md": "b7956686ff03de767526c686d0633609021b9b8bbc87c2bdcfe61e74f6aff3e3",
+    "acceptance.sha256": "2e739f55e71ec09942642955879c759356313181d374c54141b10d898499936d",
+    "draft-parent-run.log": "08c6e0afe8862c2a931fd9507be078eedbd0ed937884cf4b9ab69bf8c4bde562",
+    "draft-parent-types.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "link-adoption-draft-independent-run.log": "7459d8585e7ffd6957eee9289e31fa6871050f42a41db3eb77eb7a4a74bf0e4d",
+    "link-adoption-outbox-independent-run.log": "48ae5746d195111b0e3d9240ca256716f077cfc4a7b5e8e8a164ed02589ac081",
+    "outbox-parent-run.log": "226c289e7363a9ade17a7bfe685b47c6643c0aa601b2c75c85bd41f21a485162",
+    "outbox-parent-types.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  }
+}

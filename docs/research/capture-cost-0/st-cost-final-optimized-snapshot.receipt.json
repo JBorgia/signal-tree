@@ -1,0 +1,8 @@
+{
+  "source": "/private/tmp/st-cost-performance/g1-comparison/optimized-idle32-leaf128.heapsnapshot",
+  "archive": "/private/tmp/st-cost-final-optimized.heapsnapshot.xz",
+  "sourceBytes": 24391811,
+  "sourceSha256": "b1533fe483d9d94fba1d7d4f1f96ef4ba7e574ad8f153db313cd324bd5ff9f4c",
+  "archiveSha256": "3bc6ce50e71ff90afd823976396237c5c1e6531e234ad6494927128ee900ff49",
+  "limitation": "Optimized snapshot ngDevMode=false; original snapshot flags differ. Do not claim exact-condition snapshot ratios."
+}

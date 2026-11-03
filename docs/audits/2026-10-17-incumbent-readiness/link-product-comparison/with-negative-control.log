@@ -1,0 +1,34 @@
+[
+  {
+    "name": "O1 explicit independent progress, held multi-hop and rejection",
+    "result": "pass"
+  },
+  {
+    "name": "O2 two owner inputs and complete payload confirmation",
+    "result": "pass"
+  },
+  {
+    "name": "O3 overwrite, deferred owner and explicitly unknown input",
+    "result": "pass"
+  },
+  {
+    "name": "O4 explicit retry and destruction disposition",
+    "result": "pass"
+  },
+  {
+    "name": "D1 isolated review allows ordinary live Link progress",
+    "result": "pass"
+  },
+  {
+    "name": "D2 one approved batch gives coherent root payload",
+    "result": "pass"
+  },
+  {
+    "name": "D3 generation guard, and deliberate isolation violation witness",
+    "result": "pass"
+  },
+  {
+    "name": "O5 negative control: omitted owner permits speculative payload",
+    "result": "pass"
+  }
+]

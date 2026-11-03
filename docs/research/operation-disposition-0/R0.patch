@@ -1,0 +1,10 @@
+--- a/packages/kernel/src/enhancers/transactions/transactions.ts
++++ b/packages/kernel/src/enhancers/transactions/transactions.ts
+@@ -2598,7 +2598,6 @@
+           () => {
+             if (
+               orderDeltas.length > 0 ||
+-              (effects.some(e => e.kind === 'set' && e.subject === undefined) && effects.some(e => e.subject !== undefined)) ||
+               requiresDeclarativeStructuralTarget(
+                 effects.map(toRollbackEffect),
+                 (owner) => {

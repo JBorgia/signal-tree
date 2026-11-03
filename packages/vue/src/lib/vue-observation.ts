@@ -3,7 +3,6 @@ import {
   shallowRef,
   triggerRef,
   type ComputedRef,
-  type ShallowRef,
 } from 'vue';
 
 import type {
@@ -33,19 +32,44 @@ interface VueWritableCell<T> extends VueReadonlyCell<T> {
   asReadonly(): VueReadonlyCell<T>;
 }
 
-const wrapReadonlyCell = <T>(source: ComputedRef<T>): VueReadonlyCell<T> => {
-  const cell = (() => source.value) as VueReadonlyCell<T>;
+const wrapReadonlyCell = <T>(
+  source: ComputedRef<T>,
+  read: () => T = () => source.value
+): VueReadonlyCell<T> => {
+  const cell = (() => read()) as VueReadonlyCell<T>;
   Object.defineProperties(cell, {
     __v_isRef: { value: true },
     __v_isReadonly: { value: true },
     effect: { value: source.effect },
-    value: { get: () => source.value },
+    value: { get: read },
   });
   return cell;
 };
 
 const createReadonlyCell = <T>(read: () => T): VueReadonlyCell<T> =>
   wrapReadonlyCell(computed(read));
+
+// The marker avoids double recipe execution on a native cache miss. Each
+// invocation owns its frame so nested reads and exceptions restore the caller.
+const createCurrentReadonlyCell = <T>(readCurrent: () => T): VueReadonlyCell<T> => {
+  let active: { evaluated: boolean } | undefined;
+  const source = computed(() => {
+    if (active) active.evaluated = true;
+    return readCurrent();
+  });
+  const read = (): T => {
+    const previous = active;
+    const frame = { evaluated: false };
+    active = frame;
+    try {
+      // Vue may throw while polling a dependency before this recipe runs.
+      // That is a fresh error, not evidence of a cached own-recipe failure.
+      const value = source.value;
+      return frame.evaluated ? value : readCurrent();
+    } finally { active = previous; }
+  };
+  return wrapReadonlyCell(source, read);
+};
 
 const createWritableCell = <T>(read: () => T): VueWritableCell<T> => {
   const cell = (() => read()) as VueWritableCell<T>;
@@ -65,80 +89,78 @@ const createWritableCell = <T>(read: () => T): VueWritableCell<T> => {
 
 export const createVueObservationAdapter = (): ObservationAdapter => {
   let invalidationGroupDepth = 0;
-  const pendingInvalidations = new Set<() => void>();
+  // One native publication dirties every participating dependency chain before
+  // Vue starts synchronous effects. Per-token computed equality keeps unchanged
+  // branches from recomputing their user-visible projections.
+  const publication = shallowRef(0);
+  let pendingInvalidation = false;
 
-  const scheduleInvalidation = (invalidate: () => void): void => {
+  const scheduleInvalidation = (): void => {
     if (invalidationGroupDepth > 0) {
-      pendingInvalidations.add(invalidate);
+      pendingInvalidation = true;
       return;
     }
-    invalidate();
+    triggerRef(publication);
+  };
+
+  const createRevision = () => {
+    let generation = 0;
+    const revision = computed(() => {
+      void publication.value;
+      return generation;
+    });
+    return {
+      read: () => revision.value,
+      advance: () => {
+        generation += 1;
+        scheduleInvalidation();
+      },
+    };
   };
 
   const createObservationToken = (): ObservationToken => {
-    const revision = shallowRef(0);
-    const invalidate = () => triggerRef(revision);
+    const revision = createRevision();
     return {
-      observe: () => void revision.value,
-      invalidate: () => scheduleInvalidation(invalidate),
+      observe: () => void revision.read(),
+      invalidate: revision.advance,
     };
   };
 
   return {
+    createCurrentReadonlyCell,
     createToken: createObservationToken,
 
     createWritableCell: <T>(read: () => T) => {
       let published = read();
-      const revision = shallowRef(0);
-      const invalidate = () => triggerRef(revision);
+      const revision = createRevision();
       return {
         cell: createWritableCell(() => {
-          void revision.value;
+          void revision.read();
           return published;
         }),
         peek: read,
         token: {
-          observe: () => void revision.value,
+          observe: () => void revision.read(),
           invalidate: () => {
             published = read();
-            scheduleInvalidation(invalidate);
+            revision.advance();
           },
         },
       };
     },
 
-    /**
-     * `VUE-NATIVE-EPOCH-0`. Vue's own realization of a per-subject
-     * invalidation anchor.
-     *
-     * An epoch carries no value anyone reads — it exists to be depended on and
-     * advanced — so this is a `shallowRef` and a reader, with no writable-cell
-     * record and no observation-token wrapper around it.
-     *
-     * Supplied as a PAIR with `advanceEpoch`, which is the load-bearing part.
-     * The kernel never writes this handle: Vue creates it and Vue advances it.
-     * An earlier design had the kernel write the adapter's cell directly, and
-     * because Vue ships `cell.set` as an inert placeholder for the kernel to
-     * replace, Vue's entity invalidation was silently dead. The pair makes that
-     * class of defect unexpressible.
-     *
-     * Advancement goes through `scheduleInvalidation`, so a Vue invalidation
-     * group batches epoch advances exactly like every other publication.
-     */
+    /** Subject identity remains kernel-owned; Vue owns its dependency nonce. */
     createEpoch: () => {
-      const revision = shallowRef(0);
-      const epoch = (() => revision.value) as EpochHandle & {
-        [EPOCH_REF]?: typeof revision;
+      const revision = createRevision();
+      const epoch = revision.read as EpochHandle & {
+        [EPOCH_REF]?: () => void;
       };
-      epoch[EPOCH_REF] = revision;
+      epoch[EPOCH_REF] = revision.advance;
       return epoch;
     },
 
     advanceEpoch: (epoch) => {
-      const revision = (epoch as EpochHandle & {
-        [EPOCH_REF]?: ShallowRef<number>;
-      })[EPOCH_REF];
-      if (revision) scheduleInvalidation(() => triggerRef(revision));
+      (epoch as EpochHandle & { [EPOCH_REF]?: () => void })[EPOCH_REF]?.();
     },
 
     createWritableProjection: <T>(computeValue: () => T) => ({
@@ -162,17 +184,14 @@ export const createVueObservationAdapter = (): ObservationAdapter => {
         hasFailure = true;
       } finally {
         invalidationGroupDepth -= 1;
-        if (invalidationGroupDepth === 0 && pendingInvalidations.size > 0) {
-          const invalidations = [...pendingInvalidations];
-          pendingInvalidations.clear();
-          for (const invalidate of invalidations) {
-            try {
-              invalidate();
-            } catch (error) {
-              if (!hasFailure) {
-                failure = error;
-                hasFailure = true;
-              }
+        if (invalidationGroupDepth === 0 && pendingInvalidation) {
+          pendingInvalidation = false;
+          try {
+            triggerRef(publication);
+          } catch (error) {
+            if (!hasFailure) {
+              failure = error;
+              hasFailure = true;
             }
           }
         }

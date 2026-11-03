@@ -1,0 +1,10 @@
+import assert from 'node:assert/strict';import {watchEffect,computed,isRef,isReadonly,unref,toValue,nextTick} from 'vue';import {createSignalTreeFactory} from '@signal-tree/kernel/adapter';import {entityMap,transactions} from '@signal-tree/kernel';import {createVueObservationAdapter} from '@proof/packages/vue/src/lib/vue-observation.ts';
+const mode=process.argv[2],trace={mode,reads:[],seen:[]};const adapter=createVueObservationAdapter();let tree,stop;
+try{tree=createSignalTreeFactory(adapter)({scalar:0,other:0,left:entityMap({selectId:r=>r.id}),right:entityMap({selectId:r=>r.id})},{enhancers:[transactions()]});tree.$.left.addOne({id:'A',v:0});tree.$.right.addOne({id:'A',v:0});const all=tree.$.left.all;
+assert.ok(isRef(all));assert.ok(isReadonly(all));assert.strictEqual(all,tree.$.left.all);assert.strictEqual(unref(all),all());assert.strictEqual(toValue(all),all());assert.ok(all.effect);
+let phase='setup',reentered=false;const native=computed(()=>all().map(r=>r.v));native.value;
+stop=watchEffect(()=>{const scalar=tree.$.scalar();const row={scalar,left:tree.$.left.all().map(r=>r.v),right:tree.$.right.all().map(r=>r.v),phase};trace.seen.push(row);
+ if(mode==='reentry'&&phase==='rollback'&&!reentered&&scalar===0){reentered=true;const heldBefore=all();const nativeBefore=native.value;const h=tree.transact(()=>{tree.$.left.updateOne('A',{v:9});trace.reads.push({held:all().map(r=>r.v),native:native.value,heldBefore:heldBefore.map(r=>r.v),nativeBefore});assert.strictEqual(all(),heldBefore);assert.strictEqual(native.value,nativeBefore);});h.rollback();}
+},{flush:'sync'});
+const h=tree.transact(()=>{tree.$.scalar.set(1);tree.$.left.updateOne('A',{v:1});tree.$.right.updateOne('A',{v:1});});await nextTick();phase='rollback';h.rollback();phase='after';await nextTick();if(mode==='multi')for(const e of trace.seen.filter(e=>e.phase==='rollback'))assert.deepEqual({scalar:e.scalar,left:e.left,right:e.right},{scalar:0,left:[0],right:[0]});if(mode==='reentry')assert.ok(reentered);trace.status='pass';
+}catch(e){trace.status='fail';trace.error=e.stack;process.exitCode=1;}finally{stop?.();tree?.destroy();}console.log(JSON.stringify(trace,null,2));

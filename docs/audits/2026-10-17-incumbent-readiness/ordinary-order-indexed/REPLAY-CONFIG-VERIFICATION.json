@@ -1,0 +1,77 @@
+[
+  {
+    "path": ".nvmrc",
+    "sha256": "b911698dc3cf3227d34d0ad6727f1c4408791203c9665de99ab959331a1fb07d",
+    "matchesBase": true
+  },
+  {
+    "path": "package.json",
+    "sha256": "7d43fe562e3532b093ffe03a0844b83e071314b949294ce6aa3c2a2e81f48c2b",
+    "matchesBase": true
+  },
+  {
+    "path": "pnpm-lock.yaml",
+    "sha256": "5e1ccb86b533ff4241d8a6ae5ac32ee9a56c6e10a416a8d1be3322d0ba531239",
+    "matchesBase": true
+  },
+  {
+    "path": "pnpm-workspace.yaml",
+    "sha256": "9ca2ec55ee845a8d6014348c7a73f08b781ece8867ef855ef6cb3ddaca6c2f21",
+    "matchesBase": true
+  },
+  {
+    "path": "nx.json",
+    "sha256": "e2048ccf0f8cc92dd42d65e7aa2b8e7f7cf87a504cab666d3020f86b6dc535db",
+    "matchesBase": true
+  },
+  {
+    "path": "tsconfig.base.json",
+    "sha256": "a4e78b268f1c0087f6612b9d5833f6de81670ecb6b52753438b5953aa08fafa1",
+    "matchesBase": true
+  },
+  {
+    "path": "tsconfig.typecheck-all.json",
+    "sha256": "be35b85e82278614afeb70c9a8f99c9b965ef606e879293bbac431b22b9d5ae9",
+    "matchesBase": true
+  },
+  {
+    "path": "tsconfig.typecheck-specs.json",
+    "sha256": "24925071ff6eb7819abfce8de23213f59fa2e5da5b6fd361951208378f040bff",
+    "matchesBase": true
+  },
+  {
+    "path": "eslint.config.mjs",
+    "sha256": "4534828989d31f9d29e3a4e3ec43a52a4d0a2f49a2cedd8b8cfb3a000d1406a2",
+    "matchesBase": true
+  },
+  {
+    "path": "packages/kernel/project.json",
+    "sha256": "f414f578e7f16a5dc7ecb54aeb456ade3ecdd49a9c63fb2340cf9ec85679c336",
+    "matchesBase": true
+  },
+  {
+    "path": "packages/kernel/tsconfig.typecheck.json",
+    "sha256": "4e4ccca4b1742e3a94a0990d21e7062fdb031fbc0d6c1ecb9bdcf9f51fb49095",
+    "matchesBase": true
+  },
+  {
+    "path": "packages/kernel/tsconfig.spec.json",
+    "sha256": "54790f0e55dbcda4c1272885326d1b93ec9e8a0148e4a3a302a94c03274fa1c2",
+    "matchesBase": true
+  },
+  {
+    "path": "packages/kernel/vitest.config.ts",
+    "sha256": "76f5676437b9d8e8236e7b3a48e47c42b326458dcf1f712407a97ceac447b566",
+    "matchesBase": true
+  },
+  {
+    "path": "tools/run-core-vitest.mjs",
+    "sha256": "7f10fcc5361b9f5112bcca63e9b1459b220a806928574dd7d2c9eac6441f5a00",
+    "matchesBase": true
+  },
+  {
+    "path": "tools/check-spec-types.mjs",
+    "sha256": "8342d7ba4c0577a7df4f7c3f652991e8cf3a2a17e47e200b140a5e77e3d6a37a",
+    "matchesBase": true
+  }
+]

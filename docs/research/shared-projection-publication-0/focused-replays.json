@@ -1,0 +1,249 @@
+[
+  {
+    "command": [
+      "node",
+      "docs/research/shared-projection-publication-0/run.mjs",
+      "S1",
+      "timing.mjs",
+      "suite",
+      "first"
+    ],
+    "exit": 0,
+    "stdout": "{\"lane\":\"S1\",\"entry\":\"timing.mjs\",\"control\":\"suite\",\"exit\":0,\"stable\":true,\"out\":\"/private/tmp/st-shared-publication-replay/runs/S1-timing.mjs-suite-first\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/shared-projection-publication-0/run.mjs",
+      "S1",
+      "owned-read-controls.mjs",
+      "reentry",
+      "first"
+    ],
+    "exit": 0,
+    "stdout": "{\"lane\":\"S1\",\"entry\":\"owned-read-controls.mjs\",\"control\":\"reentry\",\"exit\":0,\"stable\":true,\"out\":\"/private/tmp/st-shared-publication-replay/runs/S1-owned-read-controls.mjs-reentry-first\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/shared-projection-publication-0/run.mjs",
+      "S1",
+      "owned-read-controls-v2.mjs",
+      "reentry",
+      "first"
+    ],
+    "exit": 0,
+    "stdout": "{\"lane\":\"S1\",\"entry\":\"owned-read-controls-v2.mjs\",\"control\":\"reentry\",\"exit\":0,\"stable\":true,\"out\":\"/private/tmp/st-shared-publication-replay/runs/S1-owned-read-controls-v2.mjs-reentry-first\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/shared-projection-publication-0/run.mjs",
+      "S1",
+      "review-readonly-memo.mjs",
+      "suite",
+      "first"
+    ],
+    "exit": 0,
+    "stdout": "{\"lane\":\"S1\",\"entry\":\"review-readonly-memo.mjs\",\"control\":\"suite\",\"exit\":0,\"stable\":true,\"out\":\"/private/tmp/st-shared-publication-replay/runs/S1-review-readonly-memo.mjs-suite-first\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/shared-projection-publication-0/run.mjs",
+      "S1",
+      "review-empty.mjs",
+      "suite",
+      "first"
+    ],
+    "exit": 0,
+    "stdout": "{\"lane\":\"S1\",\"entry\":\"review-empty.mjs\",\"control\":\"suite\",\"exit\":0,\"stable\":true,\"out\":\"/private/tmp/st-shared-publication-replay/runs/S1-review-empty.mjs-suite-first\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/shared-projection-publication-0/run.mjs",
+      "S1",
+      "review-active.mjs",
+      "suite",
+      "first"
+    ],
+    "exit": 0,
+    "stdout": "{\"lane\":\"S1\",\"entry\":\"review-active.mjs\",\"control\":\"suite\",\"exit\":0,\"stable\":true,\"out\":\"/private/tmp/st-shared-publication-replay/runs/S1-review-active.mjs-suite-first\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/shared-projection-publication-0/run.mjs",
+      "DS1",
+      "mixed-no-inspect.mjs",
+      "capture-error",
+      "first"
+    ],
+    "exit": 0,
+    "stdout": "{\"lane\":\"DS1\",\"entry\":\"mixed-no-inspect.mjs\",\"control\":\"capture-error\",\"exit\":0,\"stable\":true,\"out\":\"/private/tmp/st-shared-publication-replay/runs/DS1-mixed-no-inspect.mjs-capture-error-first\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/shared-projection-publication-0/run.mjs",
+      "DS1",
+      "mixed-add.mjs",
+      "capture-error",
+      "first"
+    ],
+    "exit": 0,
+    "stdout": "{\"lane\":\"DS1\",\"entry\":\"mixed-add.mjs\",\"control\":\"capture-error\",\"exit\":0,\"stable\":true,\"out\":\"/private/tmp/st-shared-publication-replay/runs/DS1-mixed-add.mjs-capture-error-first\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/shared-projection-publication-0/run.mjs",
+      "DS1",
+      "inspection-v2.mjs",
+      "control",
+      "first"
+    ],
+    "exit": 0,
+    "stdout": "{\"lane\":\"DS1\",\"entry\":\"inspection-v2.mjs\",\"control\":\"control\",\"exit\":0,\"stable\":true,\"out\":\"/private/tmp/st-shared-publication-replay/runs/DS1-inspection-v2.mjs-control-first\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/shared-projection-publication-0/run.mjs",
+      "DS1",
+      "disposition.mjs",
+      "rollback",
+      "first"
+    ],
+    "exit": 0,
+    "stdout": "{\"lane\":\"DS1\",\"entry\":\"disposition.mjs\",\"control\":\"rollback\",\"exit\":0,\"stable\":true,\"out\":\"/private/tmp/st-shared-publication-replay/runs/DS1-disposition.mjs-rollback-first\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/shared-projection-publication-0/run.mjs",
+      "DS1",
+      "disposition.mjs",
+      "confirm",
+      "first"
+    ],
+    "exit": 0,
+    "stdout": "{\"lane\":\"DS1\",\"entry\":\"disposition.mjs\",\"control\":\"confirm\",\"exit\":0,\"stable\":true,\"out\":\"/private/tmp/st-shared-publication-replay/runs/DS1-disposition.mjs-confirm-first\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/shared-projection-publication-0/run.mjs",
+      "DS1",
+      "recovery.mjs",
+      "rollback",
+      "first"
+    ],
+    "exit": 0,
+    "stdout": "{\"lane\":\"DS1\",\"entry\":\"recovery.mjs\",\"control\":\"rollback\",\"exit\":0,\"stable\":true,\"out\":\"/private/tmp/st-shared-publication-replay/runs/DS1-recovery.mjs-rollback-first\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/shared-projection-publication-0/run.mjs",
+      "DS1",
+      "recovery.mjs",
+      "confirm",
+      "first"
+    ],
+    "exit": 0,
+    "stdout": "{\"lane\":\"DS1\",\"entry\":\"recovery.mjs\",\"control\":\"confirm\",\"exit\":0,\"stable\":true,\"out\":\"/private/tmp/st-shared-publication-replay/runs/DS1-recovery.mjs-confirm-first\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/shared-projection-publication-0/run.mjs",
+      "DS1",
+      "controls.mjs",
+      "repeat",
+      "first"
+    ],
+    "exit": 0,
+    "stdout": "{\"lane\":\"DS1\",\"entry\":\"controls.mjs\",\"control\":\"repeat\",\"exit\":0,\"stable\":true,\"out\":\"/private/tmp/st-shared-publication-replay/runs/DS1-controls.mjs-repeat-first\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/shared-projection-publication-0/run.mjs",
+      "DS1",
+      "controls.mjs",
+      "prepare-reentry",
+      "first"
+    ],
+    "exit": 0,
+    "stdout": "{\"lane\":\"DS1\",\"entry\":\"controls.mjs\",\"control\":\"prepare-reentry\",\"exit\":0,\"stable\":true,\"out\":\"/private/tmp/st-shared-publication-replay/runs/DS1-controls.mjs-prepare-reentry-first\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/shared-projection-publication-0/run.mjs",
+      "DS1",
+      "prepare.mjs",
+      "undefined",
+      "first"
+    ],
+    "exit": 0,
+    "stdout": "{\"lane\":\"DS1\",\"entry\":\"prepare.mjs\",\"control\":\"undefined\",\"exit\":0,\"stable\":true,\"out\":\"/private/tmp/st-shared-publication-replay/runs/DS1-prepare.mjs-undefined-first\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/shared-projection-publication-0/run.mjs",
+      "DS1",
+      "prepare.mjs",
+      "reentry",
+      "first"
+    ],
+    "exit": 0,
+    "stdout": "{\"lane\":\"DS1\",\"entry\":\"prepare.mjs\",\"control\":\"reentry\",\"exit\":0,\"stable\":true,\"out\":\"/private/tmp/st-shared-publication-replay/runs/DS1-prepare.mjs-reentry-first\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/shared-projection-publication-0/run.mjs",
+      "DS1",
+      "spec.mjs",
+      "atomic:body",
+      "first"
+    ],
+    "exit": 0,
+    "stdout": "{\"lane\":\"DS1\",\"entry\":\"spec.mjs\",\"control\":\"atomic:body\",\"exit\":0,\"stable\":true,\"out\":\"/private/tmp/st-shared-publication-replay/runs/DS1-spec.mjs-atomic:body-first\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/shared-projection-publication-0/run.mjs",
+      "DS1",
+      "settlement.mjs",
+      "explicit-rollback-fault",
+      "first"
+    ],
+    "exit": 0,
+    "stdout": "{\"lane\":\"DS1\",\"entry\":\"settlement.mjs\",\"control\":\"explicit-rollback-fault\",\"exit\":0,\"stable\":true,\"out\":\"/private/tmp/st-shared-publication-replay/runs/DS1-settlement.mjs-explicit-rollback-fault-first\"}\n",
+    "stderr": ""
+  }
+]

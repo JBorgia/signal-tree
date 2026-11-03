@@ -36,6 +36,28 @@ function captureWrites(): {
   };
 }
 
+// Scalar callbacks carry an uncovered private receipt even without write context.
+// Check every own field and descriptor; do not discard symbols or accept subsets.
+function expectScalarMetadata(
+  actual: WriteMetadata | undefined,
+  fields: WriteMetadata
+): void {
+  if (actual === undefined) throw new Error('Scalar callback metadata missing');
+  expect(Object.getPrototypeOf(actual)).toBe(Object.prototype);
+  expect(Object.getOwnPropertyNames(actual).sort()).toEqual(Object.keys(fields).sort());
+  for (const [key, value] of Object.entries(fields)) {
+    expect(Object.getOwnPropertyDescriptor(actual, key)).toEqual({
+      value, enumerable: true, configurable: true, writable: true,
+    });
+  }
+  const symbols = Object.getOwnPropertySymbols(actual);
+  expect(symbols).toHaveLength(1);
+  expect(symbols[0].description).toBe('ScalarPublicationCoverage');
+  expect(Object.getOwnPropertyDescriptor(actual, symbols[0])).toEqual({
+    value: undefined, enumerable: true, configurable: true, writable: true,
+  });
+}
+
 describe('interceptLeafSignals — WriteMetadata passthrough (PR1)', () => {
   it('passes `meta` from withWriteContext to onWrite on .set()', () => {
     const tree = { count: signal(0) };
@@ -51,7 +73,7 @@ describe('interceptLeafSignals — WriteMetadata passthrough (PR1)', () => {
     expect(list[0].ownerPath).toBe('count');
     expect(list[0].next).toBe(1);
     expect(list[0].prev).toBe(0);
-    expect(list[0].meta).toEqual({
+    expectScalarMetadata(list[0].meta, {
       intent: 'hydrate',
       origin: 'external',
       mutationIntent: 'replace',
@@ -70,7 +92,7 @@ describe('interceptLeafSignals — WriteMetadata passthrough (PR1)', () => {
     });
 
     expect(list).toHaveLength(1);
-    expect(list[0].meta).toEqual({
+    expectScalarMetadata(list[0].meta, {
       intent: 'user',
       mutationIntent: 'derive',
     });
@@ -81,7 +103,7 @@ describe('interceptLeafSignals — WriteMetadata passthrough (PR1)', () => {
     restore();
   });
 
-  it('passes meta=undefined when no withWriteContext frame is active', () => {
+  it('supplies mutation intent and an uncovered receipt when no write context is active', () => {
     const tree = { count: signal(0) };
     const { list, onWrite } = captureWrites();
     const restore = interceptLeafSignals(tree, onWrite);
@@ -89,7 +111,7 @@ describe('interceptLeafSignals — WriteMetadata passthrough (PR1)', () => {
     tree.count(5); // no context
 
     expect(list).toHaveLength(1);
-    expect(list[0].meta).toEqual({ mutationIntent: 'replace' });
+    expectScalarMetadata(list[0].meta, { mutationIntent: 'replace' });
     expect(list[0].ownerPath).toBe('count');
 
     restore();
@@ -131,11 +153,11 @@ describe('interceptLeafSignals — WriteMetadata passthrough (PR1)', () => {
     });
 
     expect(list).toHaveLength(2);
-    expect(list[0].meta).toEqual({
+    expectScalarMetadata(list[0].meta, {
       intent: 'bulk',
       mutationIntent: 'replace',
     });
-    expect(list[1].meta).toEqual({
+    expectScalarMetadata(list[1].meta, {
       intent: 'bulk',
       mutationIntent: 'replace',
     });
@@ -156,11 +178,11 @@ describe('interceptLeafSignals — WriteMetadata passthrough (PR1)', () => {
     });
 
     expect(list).toHaveLength(2);
-    expect(list[0].meta).toEqual({
+    expectScalarMetadata(list[0].meta, {
       intent: 'hydrate',
       mutationIntent: 'replace',
     });
-    expect(list[1].meta).toEqual({
+    expectScalarMetadata(list[1].meta, {
       intent: 'user',
       mutationIntent: 'replace',
     });

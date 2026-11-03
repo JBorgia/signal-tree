@@ -1,6 +1,95 @@
 import { describe, expect, it } from 'vitest';
 
-import { StructuralStore } from './structural-store';
+import { StructuralStore, type ActiveNode } from './structural-store';
+
+// White-box integrity checks belong to the tests, not every consumer bundle.
+// Bracket access keeps the actual private field types without a production hook.
+function assertActiveOrderIntegrity<K extends string | number>(
+  store: StructuralStore<K>
+): void {
+  if (store['activeHead']?.prev !== undefined) {
+    throw new Error('Active head must not have a previous node.');
+  }
+
+  if (store['activeTail']?.next !== undefined) {
+    throw new Error('Active tail must not have a next node.');
+  }
+
+  const reachableKeys = new Set<K>();
+  const reachableSubjects = new Set<number>();
+  let previous: ActiveNode<K> | undefined;
+  let count = 0;
+  let node = store['activeHead'];
+
+  while (node !== undefined) {
+    if (node.prev !== previous) {
+      throw new Error('Broken prev link in active node chain.');
+    }
+
+    if (previous !== undefined && previous.next !== node) {
+      throw new Error('Broken next link in active node chain.');
+    }
+
+    if (reachableKeys.has(node.key)) {
+      throw new Error(`Duplicate reachable key ${String(node.key)}.`);
+    }
+
+    if (reachableSubjects.has(node.subjectId)) {
+      throw new Error(
+        `Duplicate reachable subject ${String(node.subjectId)}.`
+      );
+    }
+
+    if (store['activeNodesByKey'].get(node.key) !== node) {
+      throw new Error(`Key lookup mismatch for ${String(node.key)}.`);
+    }
+
+    if (store['activeNodesBySubject'].get(node.subjectId) !== node) {
+      throw new Error(
+        `Subject lookup mismatch for ${String(node.subjectId)}.`
+      );
+    }
+
+    if (store['subjectIds'].get(node.key) !== node.subjectId) {
+      throw new Error(
+        `Subject id mapping mismatch for key ${String(node.key)}.`
+      );
+    }
+
+    const state = store['subjectStates'].get(node.subjectId);
+    if (!state?.active || state.key !== node.key) {
+      throw new Error(
+        `Active state mismatch for subject ${String(node.subjectId)}.`
+      );
+    }
+
+    reachableKeys.add(node.key);
+    reachableSubjects.add(node.subjectId);
+    count += 1;
+    previous = node;
+    node = node.next;
+  }
+
+  if (previous !== store['activeTail']) {
+    throw new Error('Active tail does not match the reachable chain tail.');
+  }
+
+  if (count !== store['activeCount']) {
+    throw new Error('Active count does not match the reachable chain size.');
+  }
+
+  if (store['activeNodesByKey'].size !== count) {
+    throw new Error(
+      'Active key index size does not match reachable node count.'
+    );
+  }
+
+  if (store['activeNodesBySubject'].size !== count) {
+    throw new Error(
+      'Active subject index size does not match reachable node count.'
+    );
+  }
+}
 
 const seedStore = () => {
   const store = new StructuralStore<string>();
@@ -19,6 +108,28 @@ const acquireExistingHandle = (store: StructuralStore<string>, key: string) => {
 };
 
 describe('StructuralStore', () => {
+  it('integrity witness rejects a corrupted key index', () => {
+    const store = seedStore();
+    store['activeNodesByKey'].delete('B');
+    expect(() => assertActiveOrderIntegrity(store)).toThrow('Key lookup mismatch for B');
+  });
+
+  it('integrity witness rejects a corrupted subject index', () => {
+    const store = seedStore();
+    store['activeNodesBySubject'].delete(2);
+    expect(() => assertActiveOrderIntegrity(store)).toThrow('Subject lookup mismatch for 2');
+  });
+
+  it('moves each key to the front once, however often it is named (v16 8f)', () => {
+    // A node prepended twice linked to itself, and the next walk of the order
+    // never ended (prependMany with a duplicated id).
+    const store = seedStore();
+    store.moveKeysToFront(['C', 'B', 'C', 'B']);
+    // The integrity walk stops at a revisited node; a plain walk would not.
+    assertActiveOrderIntegrity(store);
+    expect(store.activeKeysSnapshot()).toEqual(['C', 'B', 'A']);
+  });
+
   it('tracks canonical active order across create, remove, rekey, and append', () => {
     const store = seedStore();
 
@@ -191,7 +302,7 @@ describe('StructuralStore', () => {
     store.createSubject(4, 'D');
 
     expect(store.activeKeysSnapshot()).toEqual(['A', 'B', 'X', 'D']);
-    expect(() => store.__assertActiveOrderIntegrityForTesting()).not.toThrow();
+    expect(() => assertActiveOrderIntegrity(store)).not.toThrow();
   });
 
   it('treats explicit reorder as wholesale canonical-order replacement', () => {

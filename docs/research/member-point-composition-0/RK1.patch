@@ -1,0 +1,74 @@
+--- a/packages/kernel/src/lib/internals/causal-runtime/pending-rollback.ts
++++ b/packages/kernel/src/lib/internals/causal-runtime/pending-rollback.ts
+@@ -261,6 +261,11 @@
+   if (effect.plainBranchMembership !== undefined) {
+     return `${String(effect.owner)}\u0000membership`;
+   }
++  // Distinct lifetimes may rekey under the same collection owner in one turn.
++  // Owner-only deduplication drops every rekey after the first.
++  if (effect.structural === 'rekey' && effect.subjectId !== undefined) {
++    return JSON.stringify([effect.owner, effect.subjectId, 'rekey']);
++  }
+   if (effect.subjectFieldSegments !== undefined) {
+     return JSON.stringify([
+       effect.owner,
+--- a/packages/kernel/src/lib/internals/causal-runtime/pending-rollback.spec.ts
++++ b/packages/kernel/src/lib/internals/causal-runtime/pending-rollback.spec.ts
+@@ -24,6 +24,57 @@
+ const SUBJECT_DRIVER_TWO = 'driver-2';
+ 
+ describe('rollbackPendingTurnAt', () => {
++  it('restores both rekeyed lifetimes under one collection owner', () => {
++    const tree = signalTree({ rows: entityMap<{ id: string; value: number }>() }, {
++      enhancers: [transactions()],
++    });
++    try {
++      const rows = tree.$.rows;
++      rows.setAll([{ id: 'A', value: 10 }, { id: 'D', value: 20 }]);
++      const first = rows.byIdOrFail('A');
++      const second = rows.byIdOrFail('D');
++      const pending = tree.transact(() => {
++        rows.changeId('A', 'B');
++        rows.changeId('D', 'E');
++      });
++      expect(rows.ids()).toEqual(['B', 'E']);
++      pending.rollback();
++      expect(rows.ids()).toEqual(['A', 'D']);
++      expect(rows.byIdOrFail('A')).toBe(first);
++      expect(rows.byIdOrFail('D')).toBe(second);
++      expect(rows.byId('B')).toBeUndefined();
++      expect(rows.byId('E')).toBeUndefined();
++      expect(rows.all()).toEqual([{ id: 'A', value: 10 }, { id: 'D', value: 20 }]);
++      pending.rollback();
++      expect(rows.ids()).toEqual(['A', 'D']);
++    } finally {
++      tree.destroy();
++    }
++  });
++
++  it('keeps numeric and string subject identities distinct when rolling back rekeys', () => {
++    const { store, appliedTurns, topology } = createPendingRollbackContext();
++    const pending = store.admitPending({
++      id: 1,
++      effects: [
++        { path: 'profile', ownerPath: 'profile', owner: P_DRIVER_KEY, before: 'A', after: 'B', subjectId: 1, structural: 'rekey' },
++        { path: 'profile', ownerPath: 'profile', owner: P_DRIVER_KEY, before: 'D', after: 'E', subjectId: '1', structural: 'rekey' },
++      ],
++    });
++    const applyAtomically = vi.fn<(effects: readonly ReversalEffect[]) => void>();
++    expect(rollbackPendingTurnAt({
++      authority: P_ROOT, turnId: pending.id, store, topology,
++      port: { applyAtomically },
++      realizationContext: createRealizationContextSource({ store, appliedTurns }),
++    })).toEqual({ ok: true, turnId: pending.id });
++    expect(applyAtomically.mock.calls[0][0].map(effect => ({
++      subjectId: effect.subjectId, before: effect.before, after: effect.after,
++    }))).toEqual([
++      { subjectId: 1, before: 'B', after: 'A' },
++      { subjectId: '1', before: 'E', after: 'D' },
++    ]);
++  });
++
+   it('keeps distinct structural subjects in different owners independent', () => {
+     const { store, appliedTurns, topology } = createPendingRollbackContext();
+     const pending = store.admitPending({

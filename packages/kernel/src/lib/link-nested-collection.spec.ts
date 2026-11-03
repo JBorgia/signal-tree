@@ -63,7 +63,10 @@ async function branchLink() {
   // Not a contract contradiction: the runtime supports the source, the type
   // declines to type it, and the documented alternative exists.
   const l = track(
-    link(tree.$.dashboard as never, { set: (v: unknown) => void got.push(v) } as never)
+    link(
+      tree.$.dashboard as never,
+      { set: (v: unknown) => void got.push(v) } as never
+    )
   );
   return { tree, got, l, last: () => got[got.length - 1] };
 }
@@ -114,14 +117,19 @@ describe('a collection nested under a branch Link', () => {
 
   it('R5 a collection at DEEPER ordinary depth', async () => {
     // Guards against a one-level `rows` special case.
-    const tree = signalTree({ dashboard: { panel: { rows: em() }, title: 't' } });
+    const tree = signalTree({
+      dashboard: { panel: { rows: em() }, title: 't' },
+    });
     await flush();
     const got: unknown[] = [];
     const l = track(
       // same documented cast as the helper above
-      link(tree.$.dashboard as never, {
-        set: (v: unknown) => void got.push(v),
-      } as never)
+      link(
+        tree.$.dashboard as never,
+        {
+          set: (v: unknown) => void got.push(v),
+        } as never
+      )
     );
     tree.$.dashboard.panel.rows.addOne({ id: 2, n: 'deep' });
     await flush();
@@ -136,7 +144,9 @@ describe('a collection nested under a branch Link', () => {
     const tree = signalTree({ rows: em() });
     await flush();
     const got: unknown[] = [];
-    const l = track(link(tree.$.rows, { set: (v: unknown) => void got.push(v) } as never));
+    const l = track(
+      link(tree.$.rows, { set: (v: unknown) => void got.push(v) } as never)
+    );
     tree.$.rows.addOne({ id: 1, n: 'a' });
     await flush();
     await l.settled();
@@ -218,6 +228,41 @@ describe('a collection nested under a branch Link', () => {
     expect(last()).toEqual({
       title: 'x',
       rows: { all: [{ id: 3, n: 'realized' }] },
+    });
+  });
+  it('R10 a membership change beside the collection does not carry an earlier scrub (v15 c6258aab, v16 8g)', async () => {
+    // A membership change re-reads the rows of a collection at or below the
+    // changed member (it may have been hidden or re-added); a collection
+    // beside it keeps its eligible rows.
+    const tree = signalTree({
+      dashboard: { title: 'x', k: 1 as number | undefined, rows: em() },
+    });
+    await flush();
+    // Omits k.
+    tree.$.dashboard({ title: 'x', rows: [] } as never);
+    await flush();
+    const got: unknown[] = [];
+    const l = track(
+      link(
+        tree.$.dashboard as never,
+        { set: (v: unknown) => void got.push(v) } as never
+      )
+    );
+    tree.$.dashboard.rows.addOne({ id: 1, n: 'authored' });
+    await flush();
+    await l.settled();
+    withWriteContext(INSPECTION, () =>
+      tree.$.dashboard.rows.updateOne(1, { n: 'SCRUBBED' })
+    );
+    await flush();
+    // Re-adds k beside the collection.
+    tree.$.dashboard.k(5);
+    await flush();
+    await l.settled();
+    expect(got[got.length - 1]).toEqual({
+      title: 'x',
+      k: 5,
+      rows: { all: [{ id: 1, n: 'authored' }] },
     });
   });
 });

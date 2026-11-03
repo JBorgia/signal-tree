@@ -1,0 +1,11 @@
+--- a/packages/kernel/src/enhancers/transactions/transactions.ts
++++ b/packages/kernel/src/enhancers/transactions/transactions.ts
+@@ -2701,7 +2701,7 @@
+                       if (completion) completion.committed = true;
+                       point.publish();
+                     } else {
+-                      rollbackPendingTarget(normalized, orderDeltas, completion);
++                      realizationPort.applyAtomically(normalized);
+                     }
+                   } else {
+                     realizationPort.applyAtomically(normalized);
