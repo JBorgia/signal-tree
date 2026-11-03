@@ -1,5 +1,5 @@
 import type { TerminalRecordPlan } from './intrinsic-mutation';
-import { entityPublicationOrdinary, type EntityPublicationPacket, type EntityPublicationEvidence, type EntityPublicationEdit } from './entity-publication';
+import { entityPublicationOrdinary, type EntityPublicationPacket, type EntityPublicationEvidence } from './entity-publication';
 import type { EntityProjectionSeedEntry } from './entity-projection-seed';
 import {
   createEntityTopology,
@@ -214,7 +214,7 @@ export function createEntityEgressProjection(
           }
         }
         return {
-          record: {writes: [...[...touched].map(([key,value]) => ({map:rows,key,value})),...supportEdits.map(edit=>({map:contributors,key:edit.key,value:edit.after!}))], adds: []},
+          record: {writes: [...[...touched].map(([key,value]) => ({map:rows,key,value})),...supportEdits.map(edit=>({map:contributors,key:edit.key,value:edit.after}))], adds: []},
           value: order.map(subject => touched.has(subject) ? touched.get(subject) : rows.get(subject)),
           changed,supportEdits,
         };
@@ -222,9 +222,7 @@ export function createEntityEgressProjection(
       // Structural operations already request placement interpretation. Its
       // private draft retains the relationship's latent inspection topology,
       // rather than reseeding authority from the source's physical rows.
-      const draft = createEntityEgressProjection(order.map(subjectId => ({
-        subjectId, key: keyOf.get(subjectId)!, row: rows.get(subjectId),
-      })), topology.fork(),undefined,contributors);
+      const draft = createEntityEgressProjection(order.map(subjectId => {const key=keyOf.get(subjectId);if(key===undefined)throw new Error('Topology key missing');return {subjectId,key,row:rows.get(subjectId)};}), topology.fork(),undefined,contributors);
       for (const edit of packet.physical)
         if (edit.structural) draft.apply(edit.subject,edit.after,edit.structural,true,edit.fields);
       if (packet.physicalOrder) draft.reorder(packet.physicalOrder,true);

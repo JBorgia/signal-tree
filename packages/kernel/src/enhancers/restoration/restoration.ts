@@ -4798,13 +4798,13 @@ export function restoration(
           isInspectionWrite(capture.meta)
         )
           return;
+        const physical = capture.topologyUnit?.physical ?? capture.structuralFrontier;
+        if (!physical) throw new Error('Admitted structural witness has no physical frontier');
         const evidence: OrderBoundaryEvidence = {
           before:
-            capture.topologyUnit?.physical.before ??
-            capture.structuralFrontier!.before,
+            physical.before,
           after:
-            capture.topologyUnit?.physical.after ??
-            capture.structuralFrontier!.after,
+            physical.after,
           records: capture.structuralRecords ?? [],
           physical: capture.topologyUnit?.physical,
           ordinary: capture.topologyUnit?.ordinary,

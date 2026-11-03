@@ -1,7 +1,7 @@
 import { leaf, signalTree, type LeafDefinition } from '../index';
 
 class TerminalConstructor {
-  constructor(readonly label: string) {}
+  constructor(readonly label: string) { /* Intentionally inert fixture hook; the surrounding protocol is asserted. */ }
 }
 const values = {
   weakMap: new WeakMap<object, string>(),

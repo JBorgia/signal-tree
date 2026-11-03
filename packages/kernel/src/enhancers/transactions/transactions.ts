@@ -3442,7 +3442,8 @@ export function getOrCreateInternalTransactionRuntime<T>(
           getPhysicalCommitClock(tree.$) ?? getPhysicalCommitClock(tree)
         )?.advance();
       if (completion) completion.committed = true;
-      if(point?.complete&&completion?.deliveries)completion.deliveries.push(()=>point.complete!());
+      const completePoint=point?.complete;
+        if(completePoint&&completion?.deliveries)completion.deliveries.push(()=>completePoint.call(point));
       point?.publish({deferCompletion:!!completion?.deliveries});
     } finally {
       releaseMembership();
@@ -4375,7 +4376,7 @@ export function getOrCreateInternalTransactionRuntime<T>(
                   value: windowWriteSeq,
                 });
             return {
-              scalarAdmission:{effect:combined,operationEffect:operation.effects[0]!},
+              scalarAdmission:{effect:combined,operationEffect:operation.effects[0]},
               writes,
               adds: [
                 { set: operation.owners, value: position },

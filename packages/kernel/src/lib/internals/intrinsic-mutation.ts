@@ -17,6 +17,9 @@ export function installTerminalRecord(plan: TerminalRecordPlan): void {
   }
 }
 /** Combine only this installation's prepared primitive edits, never history prefixes. */
+export function combineTerminalRecords(first: TerminalRecordPlan, ...rest: readonly (TerminalRecordPlan | undefined)[]): TerminalRecordPlan;
+export function combineTerminalRecords(...plans: readonly [...(TerminalRecordPlan | undefined)[], TerminalRecordPlan]): TerminalRecordPlan;
+export function combineTerminalRecords(...plans: readonly (TerminalRecordPlan | undefined)[]): TerminalRecordPlan | undefined;
 export function combineTerminalRecords(...plans: readonly (TerminalRecordPlan | undefined)[]): TerminalRecordPlan | undefined {
   const present = plans.filter((plan): plan is TerminalRecordPlan => plan !== undefined);
   if (present.length < 2) return present[0];
@@ -39,7 +42,7 @@ export interface PreparedPublicationUnit {
 }
 type PublicationPreparer = (mutation: IntrinsicMutation<unknown>, input?: object, native?: object) => PreparedPublicationUnit | undefined;
 type PublicationInputCapture = () => object | undefined;
-type PublicationInput = { readonly inputs: ReadonlyMap<PublicationPreparer, object | undefined>; readonly native?: object };
+type PublicationInput = { readonly inputs?: ReadonlyMap<PublicationPreparer, object | undefined>; readonly native?: object };
 /** Optional experiment participant owned by the native source, not its recipients. */
 export interface NativePublicationParticipant {
   prepare: PublicationPreparer;
@@ -322,6 +325,37 @@ function composePublication(source: SourceRecord): void {
     source.publicationPreparers = undefined;
     return;
   }
+  if (native && snapshot.length === 0) {
+    source.publicationInputCapture = () => ({ native: native.captureInput() });
+    const publicationPreparer: PublicationPreparer = (mutation, input) => {
+      const unit = native.prepare(mutation, (input as PublicationInput | undefined)?.native);
+      let sealed = false;
+      const validate = () => {
+        unit?.validate?.();
+        if (source.publicationPreparer !== publicationPreparer)
+          throw new Error('Scalar publication enrollment changed before installation');
+      };
+      const seal = unit?.finalize;
+      const finalize = () => {
+        if (sealed) return;
+        sealed = true;
+        validate();
+        seal?.();
+        validate();
+      };
+      if (!mutation.deferPublicationFinalization) finalize();
+      if (!unit) return;
+      const completion = { parts: [{ complete: native.complete, value: unit.completion }] };
+      return {
+        record: combineTerminalRecords(unit.record, {
+          writes: [], adds: [{ set: installedPublications, value: completion }],
+        }),
+        completion, coveredRecipients: [], finalize, validate,
+      };
+    };
+    source.publicationPreparer = publicationPreparer;
+    return;
+  }
   source.publicationInputCapture = () => ({
     native: native?.captureInput(),
     inputs: new Map(snapshot.map(([prepare, entry]) => [prepare, entry.captureInput?.()])),
@@ -335,7 +369,7 @@ function composePublication(source: SourceRecord): void {
     const parts: Array<{ complete: PublicationCompleter; value: object }> = nativeUnit && native
       ? [{ complete: native.complete, value: nativeUnit.completion }] : [];
     for (const [prepare, entry] of snapshot) {
-      const unit = prepare(mutation, captured?.inputs.get(prepare), nativeUnit?.completion);
+      const unit = prepare(mutation, captured?.inputs?.get(prepare), nativeUnit?.completion);
       if (unit) { plans.push(unit.record); parts.push({ complete: entry.complete, value: unit.completion }); if (unit.finalize) finalizers.push(unit.finalize); coveredRecipients.push(...unit.coveredRecipients??[]); }
     }
     // Every private unit finalizes after all callback-capable preparation.
@@ -346,7 +380,7 @@ function composePublication(source: SourceRecord): void {
     const record = combineTerminalRecords(...plans);
     if (!record) return undefined;
     const completion = { parts };
-    return { record: combineTerminalRecords(record, { writes: [], adds: [{ set: installedPublications, value: completion }] })!, completion,coveredRecipients,finalize,validate };
+    return { record: combineTerminalRecords(record, { writes: [], adds: [{ set: installedPublications, value: completion }] }), completion,coveredRecipients,finalize,validate };
   };
   source.publicationPreparer = publicationPreparer;
 }
@@ -391,7 +425,7 @@ export function registerMembershipPublication(
       if (!units.length) return;
       const completion = { parts };
       return { record: combineTerminalRecords(...units.map(unit => unit.record),
-        { writes: [], adds: [{ set: installedPublications, value: completion }] })!, completion };
+        { writes: [], adds: [{ set: installedPublications, value: completion }] }), completion };
     } : undefined;
   };
   compose();

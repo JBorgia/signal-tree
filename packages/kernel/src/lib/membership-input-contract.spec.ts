@@ -45,7 +45,7 @@ it(`supplied absence ${writer}/${observation}/${claim} retains source omission a
   const enrollment = observation === 'direct' || observation === 'keys' ? 'none'
     : observation === 'hasOwn' || observation === 'entries' ? 'live' : 'disposed';
   const p = source.transact(() => source.$.pair({ y: 0 }));
-  const passive = enrollment === 'none' ? undefined : link(source.$, { set: () => {} });
+  const passive = enrollment === 'none' ? undefined : link(source.$, { set: () => { /* Destination values are intentionally discarded in this protocol fixture. */ } });
   try {
     source.$.pair.y(1);
     if (enrollment === 'disposed') passive?.dispose();
@@ -85,7 +85,7 @@ it(`primed ${writer} input refreshes equal-value support while retaining absence
   const c = link(target.$.value, { set: value => { sent.push(value); } }) as Experimental;
   const p = source.transact(() => source.$.pair({ y: 0 }));
   source.$.pair.y(1);
-  const sourceConnection = link(source.$.pair, { set: () => {} }) as Experimental;
+  const sourceConnection = link(source.$.pair, { set: () => { /* Destination values are intentionally discarded in this protocol fixture. */ } }) as Experimental;
   let release: () => void = () => undefined;
   try {
     await flush();
@@ -145,7 +145,7 @@ it(`${writer} excludes an independently masked dormant pending payload`, async (
   const target = signalTree({ value: -1 });
   const sent: number[] = [];
   const c = link(target.$.value, { set: value => { sent.push(value); } }) as Experimental;
-  const sourceConnection = link(source.$.pair, { set: () => {} }) as Experimental;
+  const sourceConnection = link(source.$.pair, { set: () => { /* Destination values are intentionally discarded in this protocol fixture. */ } }) as Experimental;
   const x = source.$.pair.x;
   if (!x) throw new Error('Seeded child unavailable');
   const p = source.transact(() => x(77));
@@ -169,7 +169,7 @@ it(`${writer} observes independently reactivated same retained member`, async ()
   const target = signalTree({ value: -1 });
   const sent: number[] = [];
   const c = link(target.$.value, { set: value => { sent.push(value); } }) as Experimental;
-  const sourceConnection = link(source.$.pair, { set: () => {} }) as Experimental;
+  const sourceConnection = link(source.$.pair, { set: () => { /* Destination values are intentionally discarded in this protocol fixture. */ } }) as Experimental;
   const p = source.transact(() => source.$.pair({ y: 0 }));
   try {
     sourceConnection.declare({ kind: 'independent' }, () => { held(7); source.$.pair.y(1); });

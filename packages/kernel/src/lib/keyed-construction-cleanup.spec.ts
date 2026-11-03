@@ -15,7 +15,7 @@ const flush=async()=>{for(let i=0;i<120;i++)await Promise.resolve();};
 
 for(const sameKey of [false,true])it(`keyed constructor refusal protects ${sameKey?'same':'other'}-key nested installed identity and releases recursive cells`,async()=>{
  const {t,rows,l,sent,rt}=setup();const before=rt.slotCount();const fail=Error('keyed refused');let nested:Child|undefined;let escaped:Child|undefined;let busy=false;let ids:readonly number[]=[];const registry=getPositionRegistry(rows)!;
- const off=registerMembershipPublication(edit=>{if(edit.key!=='a'||busy)return;busy=true;escaped=edit.child as Child;ids=getOwnedPositionIds(escaped.n)??[];nested=materializeMember(rows,sameKey?'a':'kept',{n:7,more:8}) as Child;throw fail;},()=>{});
+ const off=registerMembershipPublication(edit=>{if(edit.key!=='a'||busy)return;busy=true;escaped=edit.child as Child;ids=getOwnedPositionIds(escaped.n)??[];nested=materializeMember(rows,sameKey?'a':'kept',{n:7,more:8}) as Child;throw fail;},()=>{ /* Intentionally inert fixture hook; the surrounding protocol is asserted. */ });
  try{expect(()=>materializeMember(rows,'a',{n:1,more:2})).toThrow(fail);off();const key=sameKey?'a':'kept';expect(rows[key]).toBe(nested);expect(rows()).toEqual({[key]:{n:7,more:8}});nested!.n(9);await flush();const count=sent.length;escaped!.n(99);(escaped as unknown as (v:unknown)=>void)({n:99,more:100,newChild:{x:12}});await flush();expect(sent.length).toBe(count);expect(rows()).toEqual({[key]:{n:9,more:8}});expect(rt.slotCount()).toBe(before+2);for(const id of ids){expect(registry.addressFor(id)).toBeUndefined();expect(rt.resolveScalarSlot(id)).toBeUndefined();expect(rt.resolveScalarLeaf(id)).toBeUndefined();}}
  finally{off();l.dispose();t.destroy();}
 });

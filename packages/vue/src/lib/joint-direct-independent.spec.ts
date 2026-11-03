@@ -1,5 +1,6 @@
 import {expect,it} from 'vitest';
 import {signalTree,entityMap} from '../index';
+// eslint-disable-next-line @nx/enforce-module-boundaries -- White-box regression exercises private kernel/realization coordination.
 import {getEntityPublicationBinding} from '../../../kernel/src/lib/internals/entity-publication';
 for(const writer of ['update','replace'] as const)for(const throws of [false,true])it(`direct ${writer} completion coherent; throws=${throws}`,()=>{
  const t=signalTree({rows:entityMap<{id:number;n:number},number>()});
@@ -7,7 +8,7 @@ for(const writer of ['update','replace'] as const)for(const throws of [false,tru
  const read=()=>[leaf.value,t.$.rows.byIdOrFail(1).n.value,t.$.rows.all.value.map(x=>({...x}))];
  expect(read()).toEqual([0,0,[{id:1,n:0}]]);
  const seen:unknown[]=[];const sentinel=new Error('completion sentinel');let caught:unknown;
- const stop=getEntityPublicationBinding(t.$.rows)!.source.subscribe({prepare(){return {record:{writes:[],adds:[]},completion:{}};},complete(){seen.push(read());if(throws)throw sentinel;}});
+ const stop=required(getEntityPublicationBinding(t.$.rows)).source.subscribe({prepare(){return {record:{writes:[],adds:[]},completion:{}};},complete(){seen.push(read());if(throws)throw sentinel;}});
  try{
   try{if(writer==='update')t.$.rows.updateOne(1,{n:2});else t.$.rows.replaceOne(1,{id:1,n:2});}catch(e){caught=e;}
   console.log(JSON.stringify({writer,throws,seen,after:read(),caught:caught===sentinel}));
@@ -20,6 +21,11 @@ for(const writer of ['update','replace'] as const)for(const throws of [false,tru
 it('direct completion nested write remains final truth',()=>{
  const t=signalTree({rows:entityMap<{id:number;n:number},number>()});t.$.rows.addOne({id:1,n:0});
  let nested=false;let calls=0;
- const stop=getEntityPublicationBinding(t.$.rows)!.source.subscribe({prepare(){return {record:{writes:[],adds:[]},completion:{}};},complete(){calls++;if(!nested){nested=true;t.$.rows.updateOne(1,{n:777});}}});
+ const stop=required(getEntityPublicationBinding(t.$.rows)).source.subscribe({prepare(){return {record:{writes:[],adds:[]},completion:{}};},complete(){calls++;if(!nested){nested=true;t.$.rows.updateOne(1,{n:777});}}});
  try{t.$.rows.updateOne(1,{n:2});expect(calls).toBe(2);expect(t.$.rows.byIdOrFail(1).n.value).toBe(777);expect(t.$.rows.all.value).toEqual([{id:1,n:777}]);}finally{stop();t.destroy();}
 });
+
+function required<T>(value: T): NonNullable<T> {
+  if (value === null || value === undefined) throw new Error("Fixture expected a present value");
+  return value;
+}

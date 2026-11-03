@@ -1,5 +1,6 @@
 import { expect, it } from 'vitest';
 import { entityMap, signalTree, transactions } from '../index';
+// eslint-disable-next-line @nx/enforce-module-boundaries -- White-box regression exercises private kernel/realization coordination.
 import { getLocationRuntime } from '../../../kernel/src/lib/internals/location-runtime';
 
 type Row = { id: string; n: number };
@@ -7,7 +8,7 @@ for (const query of ['where', 'find', 'sorted-all'] as const) for (const throws 
   it(`install revision is captured before callback reentry: ${query}, throws=${throws}`, () => {
     let calls = 0; let armed = false;
     const sentinel = new Error('installed revision original sentinel');
-    let reenter = () => {};
+    let reenter = () => { /* Intentionally inert fixture hook; the surrounding protocol is asserted. */ };
     const callback = () => {
       calls++;
       if (!armed) return;
@@ -28,7 +29,7 @@ for (const query of ['where', 'find', 'sorted-all'] as const) for (const throws 
       read(); // A warm projection exercises the current fallback on native runtimes.
       const start = calls;
       reenter = () => rows.updateOne('z', { n: 11 });
-      getLocationRuntime(tree.$)!.runInvalidationGroup(() => {
+      required(getLocationRuntime(tree.$)).runInvalidationGroup(() => {
         rows.updateOne('z', { n: 10 });
         armed = true;
         let first: unknown; let caught: unknown;
@@ -48,4 +49,9 @@ for (const query of ['where', 'find', 'sorted-all'] as const) for (const throws 
       expect(rows.all().find(row => row.id === 'z')?.n).toBe(11);
     } finally { tree.destroy(); }
   });
+}
+
+function required<T>(value: T): NonNullable<T> {
+  if (value === null || value === undefined) throw new Error("Fixture expected a present value");
+  return value;
 }

@@ -4,6 +4,7 @@ import {entityMap,signalTree,transactions} from '../index';
 import {getEntityPublicationBinding} from './internals/entity-publication';
 import {interceptLocationWrites,type LocationWriteOperation} from './internals/location-runtime';
 import {getPathNotifier} from './path-notifier';
+// eslint-disable-next-line @nx/enforce-module-boundaries -- White-box regression exercises private kernel/realization coordination.
 import {collect} from '../../../../tools/lib/heap-quiescence.mjs';
 type Holder={outer?:()=>void;inner?:()=>void;value?:object;valueRef?:WeakRef<object>;positive?:object};
 const innerCapture=(box:Holder,scenario:string,error:Error,holdValue:boolean)=>(operation:LocationWriteOperation<{n:number}[]>,proceed:()=>void)=>{

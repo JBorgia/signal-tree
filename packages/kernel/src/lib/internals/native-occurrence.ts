@@ -40,9 +40,9 @@ export function captureNativeOccurrence(source: object): NativeOccurrence {
     parent = child;
   }
   if (occurrenceIdentity(parent) !== occurrenceIdentity(anchor)) throw new Error('Native occurrence address names another lifetime');
-  if (anchor !== source) {
+  if (anchor !== source && entity) {
     // Entity bindings are source-issued and lifetime-specific; do not resolve a reused public key.
-    edges.push(Object.freeze({ parent: anchor, key: `${entity!.subject}:${entity!.field ?? ''}`, child: source, address, present: true, entity: true }));
+    edges.push(Object.freeze({ parent: anchor, key: `${entity.subject}:${entity.field ?? ''}`, child: source, address, present: true, entity: true }));
   }
   const result = Object.freeze({ root, source, edges: Object.freeze(edges) });
   issued.add(result);return result;
@@ -68,9 +68,11 @@ export function prepareNativeMemberOccurrences(parent: object, key: string, chil
     const storage = occurrenceIdentity(node);
     for (const name of Object.getOwnPropertyNames(storage)) {
       const descriptor = Object.getOwnPropertyDescriptor(storage, name);
-      if (!descriptor || !('value' in descriptor) || !isTraversableNode(descriptor.value) || !getNodeAddress(descriptor.value)) continue;
+      if (!descriptor || !('value' in descriptor) || !isTraversableNode(descriptor.value)) continue;
+      const childAddress=getNodeAddress(descriptor.value);
+      if(!childAddress)continue;
       visit(descriptor.value, [...edges, Object.freeze({parent: node, key:name, child:descriptor.value,
-        address: Object.freeze([...address,key,...getNodeAddress(descriptor.value)!.slice(address.length+1)]), present:descriptor.enumerable===true})]);
+        address: Object.freeze([...address,key,...childAddress.slice(address.length+1)]), present:descriptor.enumerable===true})]);
     }
   };
   visit(child,[...ancestry.edges,Object.freeze({parent,key,child,address:Object.freeze([...address,key]),present:true})]);

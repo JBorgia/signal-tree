@@ -94,7 +94,7 @@ describe('authorized existing-key branch/root installed publication',()=>{
   }finally{c.dispose();t.destroy();}
  });
  it('disposing the last connection during a native branch updater closes its captured input scope',async()=>{
-  const t=make();const c=experimental(link(t.$.pair,{set:()=>{}}));
+  const t=make();const c=experimental(link(t.$.pair,{set:()=>{ /* Destination values are intentionally discarded in this protocol fixture. */ }}));
   try{
    t.$.pair(input=>{c.dispose();return input;});
    const sent:unknown[]=[];const next=experimental(link(t.$.pair,{set:v=>{sent.push(v);}}));

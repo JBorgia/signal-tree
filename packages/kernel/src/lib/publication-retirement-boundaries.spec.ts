@@ -14,7 +14,7 @@ it('retirement releases both key requirements, not just their reported counts',a
  try{rows.removeOne('a');await flush();expect(s.inspect().mappings).toBe(0);expect(s.inspect().mappingViews).toBe(0);expect(s.evidence()!.keyMapping(b.subject!,'ordinary')).not.toBe(ordinary);expect(s.evidence()!.keyMapping(b.subject!,'physical')).not.toBe(physical);}finally{tree.destroy();}
 });
 it('closed clean horizon drains only after completion, preserving a caught completion error',async()=>{
- const tree=make(),rows=tree.$.rows;rows.addOne({id:'a',n:1});await flush();const s=sourceOf(rows);const c=link(rows,{set:()=>{}}) as Declared;const primary=new Error('completion');let calls=0;
+ const tree=make(),rows=tree.$.rows;rows.addOne({id:'a',n:1});await flush();const s=sourceOf(rows);const c=link(rows,{set:()=>{ /* Destination values are intentionally discarded in this protocol fixture. */ }}) as Declared;const primary=new Error('completion');let calls=0;
  const off=s.subscribe({prepare:p=>p.physical.some(e=>e.structural?.kind==='remove')?{record:{writes:[],adds:[]},completion:{}}:undefined,complete(){calls++;throw primary;}});
  try{c.declare({kind:'independent'},()=>{let caught:unknown;try{rows.removeOne('a');}catch(e){caught=e;}expect(caught).toBe(primary);expect(calls).toBe(1);expect(s.inspect().presence).toBe(1);expect(s.inspect().retireCalls).toBe(0);});await flush();expect(s.inspect().presence).toBe(0);expect(s.inspect().retirementRequests).toBe(0);}finally{off();c.dispose();tree.destroy();}
 });
@@ -53,6 +53,6 @@ for(const disposition of ['ready','dispose','replace'] as const)it(`exact readin
 });
 it('callback-capable finalization reentry invalidates the outer prepared source unit',async()=>{
  const tree=make(),rows=tree.$.rows;rows.addOne({id:'a',n:1});await flush();const s=sourceOf(rows),id={};let calls=0;
- const off=s.subscribe({prepare:p=>p.id===id?{record:{writes:[],adds:[]},completion:{},finalize(){calls++;rows.updateOne('a',{n:2});}}:undefined,complete(){}});
+ const off=s.subscribe({prepare:p=>p.id===id?{record:{writes:[],adds:[]},completion:{},finalize(){calls++;rows.updateOne('a',{n:2});}}:undefined,complete(){ /* This participant has no completion side effect. */ }});
  try{const unit=s.prepare({owner:0,id,meta:undefined,physical:[],ordinary:[]})!;expect(()=>unit.finalize?.()).toThrow('changed before installation');expect(calls).toBe(1);expect(rows.byIdOrFail('a').n()).toBe(2);}finally{off();tree.destroy();}
 });

@@ -1,5 +1,5 @@
 import { computed, nextTick, watchEffect } from 'vue';
-import { describe, expect, it } from 'vitest';
+import {  expect, it } from 'vitest';
 
 import { signalTree, transactions } from '../index';
 

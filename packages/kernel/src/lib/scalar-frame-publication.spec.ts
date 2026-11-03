@@ -22,7 +22,7 @@ function fixture(native: boolean) {
   const token = () => {
     const n = id++;
     return {
-      observe() {},
+      observe() { /* This adapter fixture does not schedule reactive work. */ },
       invalidate() {
         invalidations.push(n);
         if (throwInvalidation) throw error;
@@ -34,8 +34,8 @@ function fixture(native: boolean) {
     runInvalidationGroup: (run) => run(),
     createWritableCell: <T>(read: () => T) => {
       const cell = Object.assign(() => read(), {
-        set: (_v: T) => {},
-        update: (_f: (v: T) => T) => {},
+        set: (_v: T) => { /* Destination values are intentionally discarded in this protocol fixture. */ },
+        update: (_f: (v: T) => T) => { /* Intentionally inert fixture hook; the surrounding protocol is asserted. */ },
         asReadonly: () => cell,
       });
       return { cell, peek: read, token: token() };
@@ -112,7 +112,7 @@ for (const native of [false, true]) {
           completion: {},
         };
       },
-      () => {}
+      () => { /* Intentionally inert fixture hook; the surrounding protocol is asserted. */ }
     )!;
     try {
       const f = runtime.beginFrame();
@@ -212,7 +212,7 @@ for (const native of [false, true]) {
         record: { writes: [{ map: records, key: 0, value: 1 }], adds: [] },
         completion: {},
       }),
-      () => {}
+      () => { /* Intentionally inert fixture hook; the surrounding protocol is asserted. */ }
     )!;
     try {
       const f = runtime.beginFrame();
@@ -585,7 +585,7 @@ it('declarative restoration scalar preparation fails before collection or scalar
         record: { writes: [{ map: records, key: 'a', value: 1 }], adds: [] },
         completion: {},
       }),
-      () => {}
+      () => { /* Intentionally inert fixture hook; the surrounding protocol is asserted. */ }
     )!;
     const offB = preparePublicationMutations(
       t.$.b,
@@ -593,7 +593,7 @@ it('declarative restoration scalar preparation fails before collection or scalar
         calls++;
         throw error;
       },
-      () => {}
+      () => { /* Intentionally inert fixture hook; the surrounding protocol is asserted. */ }
     )!;
     try {
       let caught: unknown;

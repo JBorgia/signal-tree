@@ -13,9 +13,16 @@ existing boundaries.
 
 Owner authorized completing integration, qualification, documentation and workflow
 cleanup. Existing semantic/API approvals remain valid. No new permission is needed
-for routine corrections within them. Budget increases, new semantic changes,
+for routine corrections within them. New semantic changes,
 activation, push, merge and publication are not authorized by this controller.
 Stable v15 remains untouched; rejected B remains closed.
+
+Owner subsequently accepted production/package size as a tradeoff and authorized
+the recommended finite path: lint and benchmark hygiene; three bounded transient
+work optimizations (preliminary proof, native-only composition, unique-subject row
+snapshots); matched measurements; a representative application exercise; final
+qualification. Numerical size gates remain reported failures, with owner disposition;
+no ceilings are raised. Runtime cost and point-work obligations remain open.
 
 ## One candidate, one heavy-job owner
 
@@ -49,12 +56,12 @@ Stable v15 remains untouched; rejected B remains closed.
 | --- | --- | --- | --- |
 | I1 | Select and seal one integration source | Durable runtime/tool checkpoint `95bae1fa`; source `ccf592c805de`; final documentation/evidence reconciliation is local only | Closed for review: five-package artifact seal and archive identities in final disposition; no release acceptance |
 | I2 | Permanent regression quality | Successor11/11; cold dispatch-revert kills both cold cases; assertion/sink controls retained | Closed within documented scope and predecessor identity/equivalence bindings; no weakened assertions |
-| I3 | Types, lint and installed consumers | Current source/spec types, approved API baselines, source controls, installed AOT, strict consumers, SSR and checker lint pass. Configured full lint fails246 errors / 173 warnings vs19 (seven projects) | HOLD: preserve first247/177 result; close lint with error-precedence validation and complete scope; no warning-budget increase |
+| I3 | Types, lint and installed consumers | Current source/spec types, approved API baselines, source controls, installed AOT, strict consumers, SSR and checker lint pass. Expanded lint passes0 errors / 11 warnings (nine projects), with the ratchet tightened from19; source/spec types pass | Lint closed: preserve initial247/177 and earlier246/173 results; scoped intentional finally exceptions retain error precedence. Fresh consumer qualification follows the runtime trials |
 | I4 | Large replacement/restoration | All 13 original cases pass in disjoint partitions, including all four 130,000-row cases; four smaller screens are separate | Closed functionally on selected source. Preserve original 2 GiB operational stop and later 4 GiB/25% host-metric protocol; no memory-efficiency claim. Reuse unchanged partition in I7 |
-| I5 | Point-work requirement | Tested size independence passes;13,000 counted iterations fail `<2000` | HOLD: meaningful reduction or explicit owner disposition required; no new threshold/SLO adopted |
-| I6 | Artifact and populated costs | Fresh bare 17.84/20.16 KB and entities 43.04/46.64 KB fail all four ceilings; fresh demo805.15 kB exceeds570 kB. Representative cost 84 assertions pass, costs remain materially higher in tested ordinary-store workloads | HOLD: current measurements and old artifact identities/limits in final disposition; no ceiling changes or cost waiver |
-| I7 | Full integration qualification | Kernel 7,177 ordinary / 5 expected / 12 skipped plus absolute-work failure; frameworks pass as preserved. Demo 173 pass / 2 timing failures / 4 skipped. Development browser 27 pass. All 16missing baselines receipted.84 selected gates proved;0 unproven/vacuous/blind/errors after scoped repair | HOLD: three failed baselines excluded from mutation proof. Fresh 193-file artifacts reproduce seal; final tarball/types/AOT pass. Historical stops/setup failures retained; no full-release pass |
-| I8 | Consumer readiness and release disposition | Declaration/error API, native-reader migration, source/document dependency closure and developer workflow are durable; current installed consumers and development browser pass | Release HOLD. Production demo/browser acceptance, lint, timing, costs/budgets and point work remain unresolved. No activation/push/merge/tag/publication |
+| I5 | Point-work requirement | Tested size independence passes;13,000 counted iterations still fail `<2000` after the bounded trials | HOLD: meaningful reduction or explicit owner disposition required; no new threshold/SLO adopted |
+| I6 | Artifact and populated costs | Fresh bare 17.84/20.16 KB and entities 43.04/46.64 KB fail all four ceilings; fresh demo805.15 kB exceeds570 kB. Representative cost 84 assertions pass, costs remain materially higher in tested ordinary-store workloads | Size has explicit owner disposition; unchanged numerical ceilings remain reported failures. Runtime-cost HOLD: fresh matched before/after measurements pending; no runtime-cost waiver |
+| I7 | Full integration qualification | Current kernel7,184 ordinary / 5 expected / 12 skipped plus the same absolute-work failure; all four framework suites pass freshly. Demo175 pass / 4 skipped; construction-only timing hygiene7/7 pass with unchanged limits. Development browser 27 pass. All 16missing baselines receipted.84 selected gates proved;0 unproven/vacuous/blind/errors after scoped repair | HOLD: three failed baselines excluded from mutation proof. Fresh 193-file artifacts reproduce seal; final tarball/types/AOT pass. Historical stops/setup failures retained; no full-release pass |
+| I8 | Consumer readiness and release disposition | Declaration/error API, native-reader migration, source/document dependency closure and developer workflow are durable; current installed consumers and development browser pass | Release HOLD. Production demo/browser and fresh artifact qualification are in progress; runtime costs and point work remain unresolved. Lint/timing are closed within their tested scope; size has owner disposition. No activation/push/merge/tag/publication |
 
 All rows must close or receive an explicit authorized disposition. Unreachable
 hypothetical paths are not extra gates without a supported-path counterexample.

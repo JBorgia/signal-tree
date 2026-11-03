@@ -54,7 +54,7 @@ it('payload getter reentry before proposal returns cannot install stale outer pa
 });
 
 it('recipient prepares fail atomically after responsibility, preserving previous source facts',()=>{
- const s=new EntityPublicationSource();const installed=new Map<unknown,unknown>();let calls=0;let off=()=>{};
+ const s=new EntityPublicationSource();const installed=new Map<unknown,unknown>();let calls=0;let off=()=>{ /* Intentionally inert fixture hook; the surrounding protocol is asserted. */ };
  try{install(s,packet([edit(1,2)]));const prior=s.evidence()!.field(1,'x','ordinary');off=s.subscribe({prepare(){throw Error('recipient failed');},complete(){throw Error('not completed');}});
  expect(()=>s.prepare(packet([edit(1,7)],{prepareResponsibility:selection=>{calls++;expect(selection!.proposed(1,'x').value).toBe(7);return {writes:[{map:installed,key:1,value:7}],adds:[]};}}))).toThrow('recipient failed');expect(calls).toBe(1);expect(installed.size).toBe(0);expect(s.evidence()!.field(1,'x','ordinary')).toBe(prior);
  }finally{off();s.dispose();}
@@ -76,7 +76,7 @@ it('rekey-last remains the last proposal instead of the last field-bearing edit'
 
 it('forEdit retains original identities and distinct restored support for duplicate-subject steps',()=>{
  const s=new EntityPublicationSource();const first=initialRequirement(),last=initialRequirement();const a:Edit={...edit(1,7),restoredFields:new Map([['x',{present:true,value:7,requirement:first}]])};const b:Edit={...edit(1,11),restoredFields:new Map([['x',{present:true,value:11,requirement:last}]])};let calls=0;
- const off=s.subscribe({prepare(p,native){calls++;expect(p.steps![0].ordinary[0]).toBe(a);const facts=(native as {facts:import('./internals/entity-publication').EntityPublicationEvidence}).facts;expect(facts.forEdit!(a).field(1,'x','ordinary')).toBe(first);expect(facts.forEdit!(b).field(1,'x','ordinary')).toBe(last);return undefined;},complete(){}});
+ const off=s.subscribe({prepare(p,native){calls++;expect(p.steps![0].ordinary[0]).toBe(a);const facts=(native as {facts:import('./internals/entity-publication').EntityPublicationEvidence}).facts;expect(facts.forEdit!(a).field(1,'x','ordinary')).toBe(first);expect(facts.forEdit!(b).field(1,'x','ordinary')).toBe(last);return undefined;},complete(){ /* This participant has no completion side effect. */ }});
  try{install(s,packet([a,b],{steps:[{ordinal:0,ordinary:[a],physical:[a]},{ordinal:1,ordinary:[b],physical:[b]}]}));expect(calls).toBe(1);}finally{off();s.dispose();}
 });
 
@@ -121,7 +121,7 @@ for(const fields of [null,[]] as const)it(`present undefined remains distinct fr
 it('held support retains admitted subjects after retirement and denied private array mutation',()=>{
  const s=new EntityPublicationSource();const requirement=initialRequirement();requirement.proof={owners:[],unknown:true,invalid:false};
  const a:Edit={...edit(1,7),restoredFields:new Map([['x',{present:true,value:7,requirement}]])};const edits=[a];let support:(()=>object)|undefined;
- const off=s.subscribe({prepare(_p,native){support=(native as {support:()=>object}).support;return undefined;},complete(){}});
+ const off=s.subscribe({prepare(_p,native){support=(native as {support:()=>object}).support;return undefined;},complete(){ /* This participant has no completion side effect. */ }});
  try{install(s,{owner:1,id:{},meta:undefined,ordinary:edits,physical:[a]});expect(typeof support).toBe('function');expect(nativeProof(support!() as NativeRequirement).unknown).toBe(true);s.retire(1);expect(s.inspect().rows).toBe(0);expect(Object.isFrozen(edits)).toBe(true);expect(Reflect.set(edits,'length',0)).toBe(false);expect(edits).toEqual([a]);expect(nativeProof(support!() as NativeRequirement).unknown).toBe(true);}finally{off();s.dispose();}
 });
 

@@ -6,7 +6,7 @@ export class ConstructionAllocation {
  private cancels: Array<()=>void> = [];
  private checks: Array<()=>void> = [];
  get installed():boolean{return this.state==='installed';}
- add(attach:()=>void, cancel:()=>void = ()=>{}, validate:()=>void = ()=>{}):void {
+ add(attach:()=>void, cancel:()=>void = ()=>{ /* Optional phase has no work for this allocation. */ }, validate:()=>void = ()=>{ /* Optional phase has no work for this allocation. */ }):void {
   if(this.state!=='preparing')throw new Error('Closed member construction');
   this.attaches.push(attach);this.cancels.push(cancel);this.checks.push(validate);
  }

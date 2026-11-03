@@ -24,7 +24,7 @@ describe('dynamic member enrollment',()=>{
  it('failed preparation leaves no child and retry enrolls once',async()=>{
   const t=make();const sent:unknown[]=[];const l=link(t.$.rows,{set:v=>{sent.push(v);}});const failure=new Error('recipient abort');
   let escaped:object|undefined;
-  let off=registerMembershipPublication(edit=>{if(edit.key==='a'){escaped=edit.child;throw failure;}return undefined;},()=>{});
+  const off=registerMembershipPublication(edit=>{if(edit.key==='a'){escaped=edit.child;throw failure;}return undefined;},()=>{ /* Intentionally inert fixture hook; the surrounding protocol is asserted. */ });
   try{expect(()=>t.$.rows({a:{n:1}})).toThrow(failure);expect(t.$.rows()).toEqual({});await tick();expect(sent).toEqual([]);off();
    t.$.rows({a:{n:2}});await tick();expect(sent).toEqual([{a:{n:2}}]);(t.$.rows.a as InstalledRow).n(3);await tick();expect(sent).toEqual([{a:{n:2}},{a:{n:3}}]);
    (escaped as {n:(value:number)=>void}).n(999);await tick();expect(sent).toEqual([{a:{n:2}},{a:{n:3}}]);
@@ -42,14 +42,14 @@ describe('dynamic member enrollment',()=>{
  });
  it('reentrant preparation preserves the installed newer identity and rejects stale outer member',async()=>{
   const t=make();const sent:unknown[]=[];const l=link(t.$.rows,{set:v=>{sent.push(v);}});let entered=false;
-  const off=registerMembershipPublication(edit=>{if(edit.key==='a'&&!entered){entered=true;t.$.rows({a:{n:7}});}return undefined;},()=>{});
+  const off=registerMembershipPublication(edit=>{if(edit.key==='a'&&!entered){entered=true;t.$.rows({a:{n:7}});}return undefined;},()=>{ /* Intentionally inert fixture hook; the surrounding protocol is asserted. */ });
   try{expect(()=>t.$.rows({a:{n:1}})).toThrow();await tick();expect(t.$.rows()).toEqual({a:{n:7}});expect(sent.at(-1)).toEqual({a:{n:7}});
    (t.$.rows.a as InstalledRow).n(8);await tick();expect(sent.at(-1)).toEqual({a:{n:8}});
   }finally{off();l.dispose();t.destroy();}
  });
  it('disposal during preparation prevents recipient resurrection and leaves retry useful',async()=>{
   const t=make();const sent:unknown[]=[];const l=link(t.$.rows,{set:v=>{sent.push(v);}});
-  const off=registerMembershipPublication(edit=>{if(edit.key==='a')l.dispose();return undefined;},()=>{});
+  const off=registerMembershipPublication(edit=>{if(edit.key==='a')l.dispose();return undefined;},()=>{ /* Intentionally inert fixture hook; the surrounding protocol is asserted. */ });
   try{expect(()=>t.$.rows({a:{n:1}})).toThrow();expect(t.$.rows()).toEqual({});off();t.$.rows({a:{n:2}});await tick();expect(sent).toEqual([]);expect(t.$.rows()).toEqual({a:{n:2}});
   }finally{off();l.dispose();t.destroy();}
  });

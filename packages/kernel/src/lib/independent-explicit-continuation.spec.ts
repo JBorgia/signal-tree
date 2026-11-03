@@ -29,7 +29,7 @@ it('double proceed cannot reuse the same selected endpoint within one intercepto
  const rows=tree.$.rows;rows.addOne({id:'a',x:0});await flush();const leaf=rows.byIdOrFail('a').x;
  const b=getEntityPublicationBinding(leaf)!,baseline=b.source.evidence()!.field(b.subject!,'x','ordinary');
  const q=tree.transact(()=>rows.updateOne('a',{x:7}));await flush();let secondValue:unknown,secondBaseline=false;
- const off=interceptLocationWrites(leaf,(_op,proceed)=>{proceed();rows.updateOne('a',{x:19});try{proceed();}catch{}secondValue=leaf();secondBaseline=b.source.evidence()!.field(b.subject!,'x','ordinary')===baseline;});
- try{try{q.rollback();}catch{}console.log('DOUBLE-PROCEED',{secondValue,secondBaseline});expect(secondValue).toBe(19);expect(secondBaseline).toBe(false);}
+ const off=interceptLocationWrites(leaf,(_op,proceed)=>{proceed();rows.updateOne('a',{x:19});try{proceed();}catch{ /* Expected refusal is checked by the following state assertions. */ }secondValue=leaf();secondBaseline=b.source.evidence()!.field(b.subject!,'x','ordinary')===baseline;});
+ try{try{q.rollback();}catch{ /* Expected refusal is checked by the following state assertions. */ }console.log('DOUBLE-PROCEED',{secondValue,secondBaseline});expect(secondValue).toBe(19);expect(secondBaseline).toBe(false);}
  finally{off();tree.destroy();}
 });

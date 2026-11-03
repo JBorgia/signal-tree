@@ -11,14 +11,14 @@ it('failed scalar preparation installs neither value nor publication obligation;
   const source = make(); const late = make(); const target = make();
   const sent: number[] = []; const c = link(target.$.x, { set: value => { sent.push(value); } });
   const failure = new Error('controlled publication preparation'); let calls = 0;
-  let release = preparePublicationMutations(target.$.x, () => { calls++; throw failure; }, () => {})!;
+  let release = preparePublicationMutations(target.$.x, () => { calls++; throw failure; }, () => { /* Intentionally inert fixture hook; the surrounding protocol is asserted. */ })!;
   try {
     const p = source.transact(() => source.$.x(1));
     const before = diagnostics();
     for (let i = 0; i < 5; i++) expect(() => target.$.x(7)).toThrow(failure);
     await flush(); expect(target.$.x()).toBe(0); expect(sent).toEqual([]);
     expect(calls).toBe(5); expect(diagnostics().operations).toBe(before.operations);
-    release(); release = () => {};
+    release(); release = () => { /* Intentionally inert fixture hook; the surrounding protocol is asserted. */ };
     const q = late.transact(() => late.$.x(2));
     target.$.x(7); await flush(); expect(sent).toEqual([]);
     p.confirm(); await flush(); expect(sent).toEqual([]);
@@ -32,7 +32,7 @@ it('scalar preparation reentry captures the install-time window without replayin
   let q: { confirm(): void } | undefined; let preparationCalls = 0; let updaterCalls = 0;
   const release = preparePublicationMutations(target.$.x, () => {
     preparationCalls++; q = reentrant.transact(() => reentrant.$.x(2)); return undefined;
-  }, () => {})!;
+  }, () => { /* Intentionally inert fixture hook; the surrounding protocol is asserted. */ })!;
   try {
     const p = source.transact(() => source.$.x(1));
     target.$.x(value => { updaterCalls++; expect(value).toBe(0); return 7; });
@@ -49,7 +49,7 @@ it('owner settled by scalar preparation does not remain a pending installation o
   const source = make(); const later = make(); const target = make();
   const sent: number[] = []; const c = link(target.$.x, { set: value => { sent.push(value); } });
   const p = source.transact(() => source.$.x(1)); let calls = 0;
-  const release = preparePublicationMutations(target.$.x, () => { calls++; p.confirm(); return undefined; }, () => {})!;
+  const release = preparePublicationMutations(target.$.x, () => { calls++; p.confirm(); return undefined; }, () => { /* Intentionally inert fixture hook; the surrounding protocol is asserted. */ })!;
   try {
     target.$.x(7);
     const q = later.transact(() => later.$.x(2)); const pendingQ = q.inspect();

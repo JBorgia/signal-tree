@@ -9,7 +9,7 @@ it('duplicate-key updateMany selects each prepared ordinary step once',async()=>
  const notifier=getPathNotifier();
  const runtime=(tree as unknown as Record<symbol,MutationCaptureRuntime>)[MUTATION_CAPTURE_RUNTIME];
  const paired: CommittedEntityMutation[]=[];const rich:CommittedEntityMutation[]=[];
- let off=()=>{};let offCapture=()=>{};
+ let off=()=>{ /* Intentionally inert fixture hook; the surrounding protocol is asserted. */ };let offCapture=()=>{ /* Intentionally inert fixture hook; the surrounding protocol is asserted. */ };
  try{
   tree.$.rows.setAll([{id:'a',n:1},{id:'b',n:2}]);notifier.flushSync();
   offCapture=runtime.subscribeCommittedEntity!(capture=>paired.push(...capture.changes));

@@ -499,6 +499,7 @@ export function createLocationRuntime(
           if (unit && publicationComplete) {
             try { publicationComplete(unit.completion); }
             catch (error) {
+              // eslint-disable-next-line no-unsafe-finally -- Completion failure propagates only after primary success; preserve primary throws, including undefined.
               if (!failed) throw error;
               reportContainedObserverError({error,operation:'notify:subscriber'});
             }
@@ -535,6 +536,7 @@ export function createLocationRuntime(
           if (unit && publicationComplete) {
             try { publicationComplete(unit.completion); }
             catch (error) {
+              // eslint-disable-next-line no-unsafe-finally -- Completion failure propagates only after primary success; preserve primary throws, including undefined.
               if (!failed) throw error;
               reportContainedObserverError({error,operation:'notify:subscriber'});
             }

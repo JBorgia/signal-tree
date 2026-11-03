@@ -241,3 +241,9 @@ export type _ReadonlySliceChecks = [
   Expect<NotOffered<ROStock, 'setAll'>>,
   Expect<NotOffered<ROStock, 'clear'>>
 ];
+
+void ro;
+void realAccessor;
+void emptyAccessor;
+void roMinimal;
+void roSlice;

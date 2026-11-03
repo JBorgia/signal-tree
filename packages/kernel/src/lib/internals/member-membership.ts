@@ -1036,7 +1036,8 @@ export function setMemberPresence(
       try {
         completePreparedPublication(unit.completion);
       } catch (error) {
-        if (!failed) throw error;
+        // eslint-disable-next-line no-unsafe-finally -- Completion failure propagates only after primary success; preserve primary throws, including undefined.
+              if (!failed) throw error;
         reportContainedObserverError({ error, operation: 'notify:subscriber' });
       }
   }

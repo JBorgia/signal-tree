@@ -15,11 +15,11 @@ for(const openerFirst of [false,true]) it(`final scalar frame window includes ca
  let pending:ReturnType<typeof foreign.transact>|undefined;
  const offA=preparePublicationMutations(tree.$.a,(_m,_input,native)=>{
   requirements.push((native as {requirement:NativeRequirement}).requirement);return undefined;
- },()=>{});
+ },()=>{ /* Intentionally inert fixture hook; the surrounding protocol is asserted. */ });
  const offB=preparePublicationMutations(tree.$.b,(_m,_input,native)=>{
   requirements.push((native as {requirement:NativeRequirement}).requirement);
   pending=foreign.transact(()=>foreign.$.x(7));return undefined;
- },()=>{});
+ },()=>{ /* Intentionally inert fixture hook; the surrounding protocol is asserted. */ });
  try {
   const runtime=getTreeScalarSlotRuntime(tree.$)!;
   const frame=runtime.beginFrame();
@@ -44,8 +44,8 @@ import type { ObservationAdapter } from './internals/observation-adapter';
 it('invalidation sentinel stays primary, both completions drain and secondary sentinel is reported exactly',()=>{
  const primary={tag:'invalidation'},secondary={tag:'completion'};
  const events:string[]=[];const reports:unknown[]=[];
- const token=()=>({observe(){},invalidate(){throw primary;}});
- const adapter:ObservationAdapter={createToken:token,runInvalidationGroup:run=>run(),createWritableCell:<T>(read:()=>T)=>({cell:Object.assign(read,{set(_v:T){},update(_f:(v:T)=>T){},asReadonly:()=>read}),peek:read,token:token()})};
+ const token=()=>({observe(){ /* This adapter fixture does not schedule reactive work. */ },invalidate(){throw primary;}});
+ const adapter:ObservationAdapter={createToken:token,runInvalidationGroup:run=>run(),createWritableCell:<T>(read:()=>T)=>({cell:Object.assign(read,{set(_v:T){ /* Destination values are intentionally discarded in this protocol fixture. */ },update(_f:(v:T)=>T){ /* Intentionally inert fixture hook; the surrounding protocol is asserted. */ },asReadonly:()=>read}),peek:read,token:token()})};
  const runtime=createNativeTreeScalarLeafRuntime(undefined,adapter),a=runtime.createLeaf(0,Object.is),b=runtime.createLeaf(0,Object.is);
  const unit=()=>({record:{writes:[],adds:[]},completion:{}});
  const offA=preparePublicationMutations(a,unit,()=>{events.push('a');throw secondary;})!;

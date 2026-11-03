@@ -7,7 +7,7 @@ for (const query of ['where', 'find', 'sorted-all'] as const) for (const throws 
   it(`install revision is captured before callback reentry: ${query}, throws=${throws}`, () => {
     let calls = 0; let armed = false;
     const sentinel = new Error('installed revision original sentinel');
-    let reenter = () => {};
+    let reenter = () => { /* Intentionally inert fixture hook; the surrounding protocol is asserted. */ };
     const callback = () => {
       calls++;
       if (!armed) return;

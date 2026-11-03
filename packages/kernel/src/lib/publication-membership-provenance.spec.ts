@@ -11,7 +11,7 @@ for (const projection of ['branch', 'root'] as const)
 it(`native ordinary membership survives ${initialConnection}/${projection}`, async () => {
   const owner = signalTree({ z: 0 }, { enhancers: [transactions()] });
   const t = signalTree({ a: { x: 7, y: 0 } as { x?: number; y: number } });
-  const old = link(t.$.a, { set: () => {} }) as Experimental;
+  const old = link(t.$.a, { set: () => { /* Destination values are intentionally discarded in this protocol fixture. */ } }) as Experimental;
   const p = owner.transact(() => owner.$.z(7));
   const sent: unknown[] = [];
   let current: Experimental | undefined;

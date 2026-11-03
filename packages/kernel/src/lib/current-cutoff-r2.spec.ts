@@ -5,7 +5,7 @@ import {installTerminalRecord} from './internals/intrinsic-mutation';
 const drain=async()=>{for(let i=0;i<120;i++)await Promise.resolve();};
 for(const activationFirst of [true,false])it(`source and recipient projection wait for both barriers: activationFirst=${activationFirst}`,()=>{
  const tree=signalTree({x:0},{enhancers:[transactions()]});const a=tree.transact(()=>tree.$.x(1));a.confirm();
- const channel={};l.registerConnection(channel,{supported:true,report:()=>{},wake:()=>{}});
+ const channel={};l.registerConnection(channel,{supported:true,report:()=>{ /* Intentionally inert fixture hook; the surrounding protocol is asserted. */ },wake:()=>{ /* Intentionally inert fixture hook; the surrounding protocol is asserted. */ }});
  let raw!:l.NativeRequirement,source!:l.NativeRequirement,cell!:l.OwnerCell;const revision={};
  try{
   l.runDeclaration(channel,{kind:'dependent',owners:[a]},()=>{
@@ -36,7 +36,7 @@ for(const activationFirst of [true,false])it(`source and recipient projection wa
 });
 it('projected source preserves invalidity and exact readiness sentinel after cleanup',()=>{
  const tree=signalTree({x:0},{enhancers:[transactions()]});const a=tree.transact(()=>tree.$.x(1));a.confirm();
- const channel={};l.registerConnection(channel,{supported:true,report:()=>{},wake:()=>{}});const sentinel=new Error('R2 readiness sentinel');
+ const channel={};l.registerConnection(channel,{supported:true,report:()=>{ /* Intentionally inert fixture hook; the surrounding protocol is asserted. */ },wake:()=>{ /* Intentionally inert fixture hook; the surrounding protocol is asserted. */ }});const sentinel=new Error('R2 readiness sentinel');
  let source!:l.NativeRequirement,raw!:l.NativeRequirement;let later=0,caught:unknown;
  try{
   l.runDeclaration(channel,{kind:'dependent',owners:[a]},()=>{

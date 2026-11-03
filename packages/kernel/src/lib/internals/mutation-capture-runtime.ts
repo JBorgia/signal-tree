@@ -248,12 +248,13 @@ export function getMutationCaptureRuntime(
     return undefined;
   }
 
+  const registry=getPositionRegistry(node);
   return (
     (node as Record<symbol, MutationCaptureRuntime | undefined>)[
       MUTATION_CAPTURE_RUNTIME
     ] ??
-    (getPositionRegistry(node)
-      ? runtimesByRegistry.get(getPositionRegistry(node)!)
+    (registry
+      ? runtimesByRegistry.get(registry)
       : undefined)
   );
 }

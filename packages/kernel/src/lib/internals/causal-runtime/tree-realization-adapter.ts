@@ -838,17 +838,18 @@ function prepareSelectedOperation(tree:ISignalTree<object>,effects:readonly Reve
      if(edits.length!==count+1)throw new Error('Selected continuation did not prepare exactly one operation');
    }
    const groups=new Map<object,SelectedRowIntent[]>();for(const edit of edits){let group=groups.get(edit.source);if(!group)groups.set(edit.source,group=[]);group.push(edit);}
-   const plans=[...groups.values()].map(group=>group[0]!.prepare(group,publicationPhase));
-   if(!frame.prepareCommit)throw new Error('Selected scalar preparation unavailable');
-   const installScalars=prepareWithScalarSelections(slots,scalarEffects,()=>frame.prepareCommit!({advanceRevision:false,publish:false,publicationPhase,admissionParticipation:'realized'}));
+   const plans=[...groups.values()].map(group=>group[0].prepare(group,publicationPhase));
+   const prepareCommit=frame.prepareCommit;
+   if(!prepareCommit)throw new Error('Selected scalar preparation unavailable');
+   const installScalars=prepareWithScalarSelections(slots,scalarEffects,()=>prepareCommit.call(frame,{advanceRevision:false,publish:false,publicationPhase,admissionParticipation:'realized'}));
    publicationPhase.seal();
    if(clock.revision()!==revision)throw new Error('Selected operation preparation reentered installation');
    active=false;edits.length=0;groups.clear();let installed=false;let scalarResult:ReturnType<typeof installScalars>|undefined;
    return {
      install(){if(installed||clock.revision()!==revision)throw new Error('Selected operation revision changed');publicationPhase.validate();scalarResult=installScalars();for(const plan of plans)plan.install();clock.advance();installed=true;},
      complete(){let failed=false,first:unknown;for(const work of [()=>{if(scalarResult)completeScalarFrame(scalarResult);},...plans.map(plan=>()=>plan.complete())])try{work();}catch(error){if(!failed){failed=true;first=error;}}plans.length=0;if(failed)throw first;},
-     publish(options){if(!installed||!scalarResult)throw new Error('Selected operation not installed');let failed=false;let first:unknown;const run=(body:()=>void)=>{try{body();}catch(error){if(!failed){failed=true;first=error;}}};
-       try{for(const plan of plans)run(()=>plan.invalidate());run(()=>slots.publishPrepared({...scalarResult!,publication:undefined}));for(const plan of plans)run(()=>plan.publish());for(const delivery of deliveries)run(delivery);
+     publish(options){if(!installed||!scalarResult)throw new Error('Selected operation not installed');const installedScalars=scalarResult;let failed=false;let first:unknown;const run=(body:()=>void)=>{try{body();}catch(error){if(!failed){failed=true;first=error;}}};
+       try{for(const plan of plans)run(()=>plan.invalidate());run(()=>slots.publishPrepared({...installedScalars,publication:undefined}));for(const plan of plans)run(()=>plan.publish());for(const delivery of deliveries)run(delivery);
          for(const effect of scalarEffects)run(()=>{const descriptor=descriptors.get(effect.owner);const path=resolveNotifyPath(tree,descriptor,owners,effect);if(path)getPathNotifier().notify(path,effect.after,effect.before,descriptor?.ownerPath??path,undefined,[effect.owner],scalarFrameMetadata(scalarResult,slots.resolveScalarSlot(effect.owner),{...getActiveWriteContext(),intent:'system',participation:'realized'}));});
        }finally{deliveries.length=0;scalarEffects.length=0;}
        if(!options?.deferCompletion)run(()=>this.complete());
@@ -1027,7 +1028,7 @@ export function preparePointRealization(
     const present = effect.fieldPresence?.after !== false;
     if (path.length === 0) row.edits.push({ kind: 'row', value: after });
     else
-      row.edits.push({ kind: 'field', field: path[0]!, present, value: after, selection:fieldEndpoints(effect)?.after });
+      row.edits.push({ kind: 'field', field: path[0], present, value: after, selection:fieldEndpoints(effect)?.after });
     if (path.length === 0) row.value = deepClone(after);
     else if (!present) row.value = withoutFieldAtSegments(row.value, path);
     else assignPreparedSubjectValue(row.value, path, deepClone(after));
@@ -1283,7 +1284,7 @@ function planHeterogeneousFrame(
       row.edits.push({ kind: 'row', value });
     } else {
       const present = effect.fieldPresence?.after !== false;
-      row.edits.push({ kind: 'field', field: path[0]!, present, value, selection:fieldEndpoints(effect)?.after });
+      row.edits.push({ kind: 'field', field: path[0], present, value, selection:fieldEndpoints(effect)?.after });
       if (present) assignPreparedSubjectValue(row.value, path, value);
       else row.value = withoutFieldAtSegments(row.value, path);
     }
@@ -1292,7 +1293,7 @@ function planHeterogeneousFrame(
   // One independently contained delivery per lifetime: a callback from one
   // row cannot starve a later row after the complete frame is installed.
   const livePointPlans = withEntityPointPublicationPreparation(()=>[...liveRows].flatMap(([collection, rows]) =>
-    [...rows.values()].map(row=>collection.__preparePointValues!([row],undefined,publicationPhase))
+    [...rows.values()].map(row=>{if(!collection.__preparePointValues)throw new Error('Point preparation unavailable');return collection.__preparePointValues([row],undefined,publicationPhase);})
   ));
   const preparedSubjectScalarEffects = scalarEffects.filter((effect) =>
     isPreparedSubjectScalarEffect(effect, preparedContext)
@@ -1615,7 +1616,8 @@ function planHeterogeneousFrame(
     };
     const plan = ordinaryPlans.get(effect.owner);
     if (!plan) return meta;
-    const subjects = dispositionByOwner.get(effect.owner)!;
+    const subjects = dispositionByOwner.get(effect.owner);
+    if(!subjects)throw new Error('Prepared entity disposition missing');
     // Preserve the old per-call array identity; metadata consumers never share
     // a mutable grouping array, and same-lifetime edit order stays unchanged.
     return withSelectedEntityDisposition(meta,
@@ -1634,7 +1636,7 @@ function planHeterogeneousFrame(
     const node=resolveCollectionNode(tree,descriptors.get(effect.owner),structuralOwnerPaths,effect);
     if(!node?.__prepareStructuralUnit || typeof effect.subjectId!=='number')throw new Error('Structural source preparation unavailable');
     let group=structuralGroups.get(node);if(!group)structuralGroups.set(node,group=[]);
-    if(effect.structural==='remove')group.push({kind:'remove',subject:effect.subjectId,key:removeKeysByEffect.get(effect as ReversalEffect & {structural:'remove';subjectId:number})!});
+    if(effect.structural==='remove'){const key=removeKeysByEffect.get(effect as ReversalEffect & {structural:'remove';subjectId:number});if(key===undefined)throw new Error('Prepared removal key missing');group.push({kind:'remove',subject:effect.subjectId,key});}
     else {
       if(effect.structural==='rekey'){const recipe=plannedRekeys.find(entry=>entry.effect===effect)?.plan.recipe;if(!recipe)throw new Error('Prepared rekey recipe missing');group.push(recipe);}
       else {
@@ -1646,7 +1648,7 @@ function planHeterogeneousFrame(
       }
     }
   }
-  const structuralUnits=[...structuralGroups].map(([node,operations])=>node.__prepareStructuralUnit!(operations,publicationPhase));
+  const structuralUnits=[...structuralGroups].map(([node,operations])=>{if(!node.__prepareStructuralUnit)throw new Error('Structural preparation unavailable');return node.__prepareStructuralUnit(operations,publicationPhase);});
 
   if(!outerPhase)publicationPhase.seal();
   if(physicalCommitClock&&physicalCommitClock.revision()!==basePhysicalRevision)throw new Error('Joint preparation reentered installation');
@@ -1688,7 +1690,8 @@ function planHeterogeneousFrame(
     for (const unit of structuralUnits) run(() => unit.invalidate());
     for (const plan of livePointPlans) run(() => plan.invalidate());
     if (scalarCommitResult && scalarSlotRuntime) {
-      run(() => scalarSlotRuntime.publishPrepared({...scalarCommitResult!,publication:undefined}));
+      const result=scalarCommitResult;
+      run(() => scalarSlotRuntime.publishPrepared({...result,publication:undefined}));
     }
     if (failed) throw firstError;
   };
@@ -2026,7 +2029,7 @@ function applyEffect(
     const binding=getEntityPublicationBinding(target),path=effect.subjectFieldSegments;
     if(!binding||binding.subject!==effect.subjectId||path?.length!==1||binding.field!==undefined&&binding.field!==path[0])
       throw new Error('Inverse endpoint does not match resolved source field');
-    const selection = Object.freeze({source:binding.source,subject:binding.subject!,field:path[0]!,endpoint,preparation});
+    const selection = Object.freeze({source:binding.source,subject:binding.subject,field:path[0],endpoint,preparation});
     if (binding.field !== undefined) replaceSelectedLocation(target as import('../cell-runtime').Location<unknown>, value, selection);
     else {
       if (!binding.replaceSelected) throw new Error('Selected row replacement has no private continuation');

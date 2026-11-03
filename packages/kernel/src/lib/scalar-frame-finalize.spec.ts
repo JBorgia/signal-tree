@@ -27,15 +27,15 @@ registerNativePublicationFactory((node) => ({
   },
 }));
 const adapter: ObservationAdapter = {
-  createToken: () => ({ observe() {}, invalidate() {} }),
+  createToken: () => ({ observe() { /* This adapter fixture does not schedule reactive work. */ }, invalidate() { /* This adapter fixture does not schedule reactive work. */ } }),
   runInvalidationGroup: (run) => run(),
   createWritableCell: <T>(read: () => T) => {
     const cell = Object.assign(read, {
-      set: (_value: T) => {},
-      update: (_f: (value: T) => T) => {},
+      set: (_value: T) => { /* Destination values are intentionally discarded in this protocol fixture. */ },
+      update: (_f: (value: T) => T) => { /* Intentionally inert fixture hook; the surrounding protocol is asserted. */ },
       asReadonly: () => cell,
     });
-    return { cell, peek: read, token: { observe() {}, invalidate() {} } };
+    return { cell, peek: read, token: { observe() { /* This adapter fixture does not schedule reactive work. */ }, invalidate() { /* This adapter fixture does not schedule reactive work. */ } } };
   },
 };
 for (const native of [false, true])

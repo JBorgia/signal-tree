@@ -14,7 +14,8 @@ const observe = (read: (cleanup: (fn: () => void) => void) => void) => {
 };
 
 const current = <T>(read: () => T) => {
-  const cell = adapter.createCurrentReadonlyCell!(read);
+  if (!adapter.createCurrentReadonlyCell) throw new Error('Missing fixture current-read factory');
+  const cell = adapter.createCurrentReadonlyCell(read);
   return {call: cell, read: () => nativeRead(cell), metadata: () => metadata(cell), cell};
 };
 it('current-read source-linked producer preserves held/ABA, counts, identity, cleanup and errors', () => {

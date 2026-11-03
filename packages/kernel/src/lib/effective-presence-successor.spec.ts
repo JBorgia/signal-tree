@@ -18,7 +18,7 @@ for (const direct of [false, true]) for (const warmWrapper of [false, true]) {
     const rows = tree.$.a.rows;
     const all = rows.all, ids = rows.ids, count = rows.count, map = rows.asMap;
     const has = rows.has('z'), where = rows.where(row => row.n === 9), find = rows.find(row => row.n === 9);
-    let off = () => {};
+    let off = () => { /* Intentionally inert fixture hook; the surrounding protocol is asserted. */ };
     try {
       rows.addOne({ id: 'old', n: 1 });
       if (direct) tree.$.a({ n: 1 } as { rows: { all: Row[] }; n: number });
@@ -55,7 +55,7 @@ for (const direct of [false, true]) for (const warmWrapper of [false, true]) {
 
 it('independently omitted edge keeps held projection and wrapper identity before delivery', () => {
   const tree = signalTree({ a: { rows: entityMap<Row, string>(), n: 1 }, other: 0 }, { enhancers: [transactions()] });
-  const rows = tree.$.a.rows; let off = () => {};
+  const rows = tree.$.a.rows; let off = () => { /* Intentionally inert fixture hook; the surrounding protocol is asserted. */ };
   try {
     rows.addOne(Z);
     tree.$.a({ n: 1 } as { rows: { all: Row[] }; n: number });

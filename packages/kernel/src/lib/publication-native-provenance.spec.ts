@@ -22,7 +22,7 @@ it(`native provenance ${writer}/${enrollment}/${claim}`, async () => {
   const p = source.transact(() => x(7));
   const sent: number[] = [];
   const c = link(target.$.y, { set: value => { sent.push(value); } }) as Experimental;
-  const passive = enrollment === 'none' ? undefined : link(source.$, { set: () => {} });
+  const passive = enrollment === 'none' ? undefined : link(source.$, { set: () => { /* Destination values are intentionally discarded in this protocol fixture. */ } });
   let receipt: Receipt | undefined;
   let error: unknown;
   try {

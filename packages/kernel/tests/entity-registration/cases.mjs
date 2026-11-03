@@ -48,6 +48,6 @@ export async function runCase(api, test) {
   check(row.x()===9,'terminal physical state changed');
   observation.settled=true;observation.phase='complete';observation.pass=true;
  } catch(error) {observation.pass=false;observation.error={name:error?.name,message:error?.message,code:error?.code,stage:error?.stage,reason:error?.reason};}
- finally {connection?.dispose();if(owner&&!confirmed){try{owner.confirm();}catch{}}tree?.destroy();q?.destroy();}
+ finally {connection?.dispose();if(owner&&!confirmed){try{owner.confirm();}catch{ /* Best-effort settlement during teardown; retain the original recorded failure. */ }}tree?.destroy();q?.destroy();}
  return observation;
 }

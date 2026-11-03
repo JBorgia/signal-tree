@@ -1,5 +1,5 @@
 import { createComputed, createMemo, createRoot } from 'solid-js';
-import { describe, expect, it } from 'vitest';
+import {  expect, it } from 'vitest';
 
 import { signalTree, transactions } from '../index';
 

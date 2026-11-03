@@ -870,7 +870,11 @@ export function installPreparedMember(
   } catch(error){failed=true;throw error;}
   finally {
     if(unit)try {completePreparedPublication(unit.completion);}
-    catch(error){if(!failed)throw error;reportContainedObserverError({error,operation:'notify:subscriber'});}
+    catch(error){
+      // eslint-disable-next-line no-unsafe-finally -- Completion failure propagates only after primary success; retain the original primary thrown value.
+      if(!failed)throw error;
+      reportContainedObserverError({error,operation:'notify:subscriber'});
+    }
   }
 }
 

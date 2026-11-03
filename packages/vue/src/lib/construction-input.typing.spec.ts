@@ -83,7 +83,7 @@ export function genericDerivedEntityMarker<E extends { id: string }>() {
 }
 
 class TerminalConstructor {
-  constructor(readonly label: string) {}
+  constructor(readonly label: string) { /* Intentionally inert fixture hook; the surrounding protocol is asserted. */ }
 }
 const terminalValues = {
   weakMap: new WeakMap<object, string>(),

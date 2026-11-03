@@ -34,6 +34,6 @@ export async function runLifecycle(api,test){
   for(const link of links){let done=false;const promise=link.settled().then(()=>{done=true;});await flush();check(done,'settled resolves');await promise;}
   await flush();check(r.sent.length===1&&(!test.late||r.second.length===1&&r.third.length===1),'no duplicate terminal output');r.pass=true;r.phase='complete';
  }catch(error){r.pass=false;r.error={name:error?.name,message:error?.message};}
- finally{for(const link of links)link.dispose();if(pending&&!settled){try{pending.confirm();}catch{}}tree?.destroy();}
+ finally{for(const link of links)link.dispose();if(pending&&!settled){try{pending.confirm();}catch{ /* Best-effort settlement during teardown; retain the original recorded failure. */ }}tree?.destroy();}
  return r;
 }

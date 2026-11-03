@@ -8,7 +8,7 @@ type Experimental=ReturnType<typeof link>&{declare(input:{kind:'independent'},wo
 const flush=async()=>{getPathNotifier().flushSync();for(let i=0;i<120;i++)await Promise.resolve();};
 
 it('composite readiness follows parent finalization without a recipient operation',()=>{
- const channel={};lifecycle.registerConnection(channel,{supported:true,report:()=>{},wake:()=>{}});
+ const channel={};lifecycle.registerConnection(channel,{supported:true,report:()=>{ /* Intentionally inert fixture hook; the surrounding protocol is asserted. */ },wake:()=>{ /* Intentionally inert fixture hook; the surrounding protocol is asserted. */ }});
  let requirement!:lifecycle.NativeRequirement, composite!:lifecycle.NativeRequirement;
  const seen:boolean[]=[];const sentinel=new Error('parent');
  try{
@@ -25,7 +25,7 @@ it('composite readiness follows parent finalization without a recipient operatio
 });
 
 it('released readiness listener does not run at close',()=>{
- const channel={};lifecycle.registerConnection(channel,{supported:true,report:()=>{},wake:()=>{}});let calls=0;
+ const channel={};lifecycle.registerConnection(channel,{supported:true,report:()=>{ /* Intentionally inert fixture hook; the surrounding protocol is asserted. */ },wake:()=>{ /* Intentionally inert fixture hook; the surrounding protocol is asserted. */ }});let calls=0;
  try{lifecycle.runDeclaration(channel,{kind:'independent'},()=>{
   const p=lifecycle.prepareNativeRequirement([],false,[]);installTerminalRecord(p.record);lifecycle.finalizeNativeRequirement(p.requirement);
   lifecycle.onNativeRequirementReady(p.requirement,()=>calls++)();
@@ -36,7 +36,7 @@ it('released readiness listener does not run at close',()=>{
 
 for(const membership of [false,true])it(`enrollment retains parent invalidation for ${membership?'membership':'scalar'} support`,async()=>{
  const tree=signalTree({pair:{x:0,y:0}},{enhancers:[transactions()]});
- const foreign=signalTree({z:0},{enhancers:[transactions()]});const parent=link(tree.$.pair,{set:()=>{}}) as Experimental;
+ const foreign=signalTree({z:0},{enhancers:[transactions()]});const parent=link(tree.$.pair,{set:()=>{ /* Destination values are intentionally discarded in this protocol fixture. */ }}) as Experimental;
  const sent:unknown[]=[];let child:Experimental|undefined;const q=foreign.transact(()=>foreign.$.z(7));
  try{
   expect(()=>parent.declare({kind:'independent'},()=>{

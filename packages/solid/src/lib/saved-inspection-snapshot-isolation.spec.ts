@@ -1,5 +1,6 @@
 import { expect, it } from 'vitest';
 import { leaf, link, signalTree, transactions } from '../index';
+// eslint-disable-next-line @nx/enforce-module-boundaries -- White-box regression exercises private kernel/realization coordination.
 import { realizeAs as withWriteContext } from '../../../kernel/src/transaction-realization-contract';
 
 type Receipt = {

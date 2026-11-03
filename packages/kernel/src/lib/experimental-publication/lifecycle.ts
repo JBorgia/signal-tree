@@ -53,8 +53,8 @@ export function ownerCellCanTransition(cell: OwnerCell): boolean {
  return cell.outcome === 'pending' && sources.get(cell.owner)?.cells.get(cell.id) === cell;
 }
 export function onOwnerCellTransition(cell: OwnerCell, callback: () => void): () => void {
- let observers = ownerTransitionObservers.get(cell);
- if (!observers) ownerTransitionObservers.set(cell, observers = new Set());
+ const observers = ownerTransitionObservers.get(cell) ?? new Set<OwnerTransitionObserver>();
+ if (!ownerTransitionObservers.has(cell)) ownerTransitionObservers.set(cell, observers);
  const observer: OwnerTransitionObserver = { callback, queued: false };
  observers.add(observer);
  // Covers a terminal/disappearance race between assessment and subscription.
@@ -64,10 +64,10 @@ export function onOwnerCellTransition(cell: OwnerCell, callback: () => void): ()
   if (!active) return;
   active = false;
   observer.callback = undefined;
-  observers!.delete(observer);
+  observers.delete(observer);
   // This handle owns only its original observer set. A later registration may
   // have replaced the cell's index after this set became empty.
-  if (!observers!.size && ownerTransitionObservers.get(cell) === observers)
+  if (!observers.size && ownerTransitionObservers.get(cell) === observers)
    ownerTransitionObservers.delete(cell);
  };
 }
@@ -210,7 +210,8 @@ function reconcileCurrentDependencies(op:Operation,proof:Readonly<Proof>,relevan
 export function combineScalarNativeRequirements(parts:readonly NativeRequirement[],relevance?:CurrentRelevance):NativeRequirement {
  const requirement=combineNativeRequirements(parts);
  if(relevance?.size){
-  const sources=requirement.components!; // Frozen construction snapshot, released on normalization.
+  const sources=requirement.components; // Frozen construction snapshot, released on normalization.
+  if(!sources)throw new Error('Scalar composite has no construction snapshot');
   Object.defineProperty(requirement,'proof',{get:()=>currentObligations(combineProofs(sources.map(nativeProof)),sources.every(nativeRequirementReady)?relevance:undefined),configurable:true,enumerable:true});
  }
  scalarComposites.add(requirement);
@@ -240,8 +241,8 @@ export function onNativeRequirementReady(requirement:NativeRequirement,callback:
  const check=()=>{if(active&&nativeRequirementReady(requirement)&&!unactivatedRequirements.has(requirement)){release();callback();}};
  const visit=(part:NativeRequirement)=>{
   if(unfinishedRequirements.has(part)||unactivatedRequirements.has(part)){
-   let listeners=requirementListeners.get(part);if(!listeners)requirementListeners.set(part,listeners=new Set());
-   listeners.add(check);releases.push(()=>{listeners!.delete(check);if(!listeners!.size)requirementListeners.delete(part);});
+   const listeners=requirementListeners.get(part)??new Set<()=>void>();if(!requirementListeners.has(part))requirementListeners.set(part,listeners);
+   listeners.add(check);releases.push(()=>{listeners.delete(check);if(!listeners.size)requirementListeners.delete(part);});
   }
   for(const child of part.components??[])visit(child);
  };
@@ -293,13 +294,17 @@ export function prepareNativeRequirement(known:readonly OwnerCell[], unknown:boo
   ||inputs.some(input=>nativeProof(input.requirement).unavailableInput===true);
  const requirement:NativeRequirement={retirementOwnWindowOnly:!unknown&&known.length===0&&inputs.length===0&&active.length===0,known:Object.freeze([...known]),unknown,inputs:Object.freeze([...inputs]),frames:active,possible:[],captureWindow};
  unfinishedRequirements.add(requirement);unactivatedRequirements.add(requirement);
- const evidence=nativeProof(requirement);
+ // No frame consumes preliminary evidence; finalization still samples foreign owners.
  const adds:TerminalRecordPlan['adds'][number][]=[];
+ if(active.length){
+ const evidence=nativeProof(requirement);
  for(const frame of active){
   for(const owner of inputs.flatMap(input=>input.owners))adds.push({set:frame.protectedOwners,value:owner});
   for(const owner of [...(evidence.input??[]),...(evidence.validation??[])])adds.push({set:frame.installedOwners,value:owner});
-  if(frame.declaredOwners!==undefined&&((evidence.terminalRejectedRoles??0)!==0||[...(evidence.input??[]),...(evidence.validation??[])].some(owner=>!frame.declaredOwners!.includes(owner))))adds.push({set:invalidFrames,value:frame});
+  const declaredOwners=frame.declaredOwners;
+  if(declaredOwners!==undefined&&((evidence.terminalRejectedRoles??0)!==0||[...(evidence.input??[]),...(evidence.validation??[])].some(owner=>!declaredOwners.includes(owner))))adds.push({set:invalidFrames,value:frame});
   if(evidence.unknown)adds.push({set:unknownFrames,value:frame});
+ }
  }
  const h=active.at(-1)?.horizon;
  if(h)adds.push({set:h.requirements,value:requirement});
@@ -433,20 +438,20 @@ export function comparisonRevisionReady(channel:object,revision:object):boolean 
   (!op.native||nativeRequirementReady(op.native));
 }
 export function noWrite(channel:object,revision:object):void {
- const c=connections.get(channel),op=c?.ops.get(revision);if(!op)return;
+ const c=connections.get(channel),op=c?.ops.get(revision);if(!c||!op)return;
  for(const view of op.views){
   let fallback=op.noopFallbacks.get(view);
-  while(fallback&&!c!.ops.has(fallback.revision))fallback=fallback.noopFallbacks.get(view);
+  while(fallback&&!c.ops.has(fallback.revision))fallback=fallback.noopFallbacks.get(view);
   if(fallback){fallback.views.add(view);refresh(fallback);}else state(view,{state:'no-write'});
  }
- op.views.clear();retire(op);c!.ops.delete(revision);
+ op.views.clear();retire(op);c.ops.delete(revision);
 }
 /** A meaningful revision no longer needs tentative receipt predecessors. */
 export function keepRevision(channel:object,revision:object):void{connections.get(channel)?.ops.get(revision)?.noopFallbacks.clear();}
 export function decision(channel:object,revision:object):{early:boolean;pending:boolean}{
  const op=connections.get(channel)?.ops.get(revision);if(!op)return {early:false,pending:false};
  if(op.frames.size||op.projectionPending||!projectionReady(op))return {early:false,pending:true};
- const p=op.proof!;return {early:!p.invalid&&!p.unknown&&!(p.terminalRejectedRoles??0)&&p.owners.every(x=>x.outcome==='confirmed'),pending:[...p.owners,...(p.possible??[])].some(x=>x.outcome==='pending'||x.outcome==='abandoned')};
+ const p=op.proof;if(!p)throw new Error('Ready publication has no proof');return {early:!p.invalid&&!p.unknown&&!(p.terminalRejectedRoles??0)&&p.owners.every(x=>x.outcome==='confirmed'),pending:[...p.owners,...(p.possible??[])].some(x=>x.outcome==='pending'||x.outcome==='abandoned')};
 }
 function retire(op:Operation):void{for(const cell of op.dependencies)cell.dependents.delete(op);}
 export function started(channel:object,revision:object,basis:'declared'|'surviving'='declared'):void{
@@ -455,9 +460,9 @@ export function started(channel:object,revision:object,basis:'declared'|'survivi
  retire(op);op.noopFallbacks.clear();op.proof=undefined;op.frames.clear();op.views.clear();connections.get(channel)?.ops.delete(revision);
 }
 export function supersede(channel:object,revision:object):void{
- const c=connections.get(channel),op=c?.ops.get(revision);if(!op)return;
+ const c=connections.get(channel),op=c?.ops.get(revision);if(!c||!op)return;
  if(!op.started)setOperationState(op,{state:'superseded'});
- retire(op);c!.ops.delete(revision);
+ retire(op);c.ops.delete(revision);
 }
 export function disposeConnection(channel:object):void{
  const c=connections.get(channel);if(!c)return;c.disposed=true;

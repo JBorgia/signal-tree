@@ -17,7 +17,7 @@ const make=()=>{
  return {t,binding,subject,owner,p,remove,present};
 };
 for(const scalarFirst of [false,true])it(`incomplete ordinary removal refuses whole unit scalarFirst=${scalarFirst}`,()=>{
- const c=make();let stop=()=>{};try{
+ const c=make();let stop=()=>{ /* Intentionally inert fixture hook; the surrounding protocol is asserted. */ };try{
  inspect(()=>c.t.$.rows.removeOne(1));expect(c.present()).toBe(true);
  const revision=getPhysicalCommitClock(c.t.$)!.revision();
  const support=c.binding.source.evidence()!.member(c.subject,'ordinary');let deliveries=0;

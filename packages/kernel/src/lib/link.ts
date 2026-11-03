@@ -599,7 +599,7 @@ export function link<S>(
         const support=(native as {support?:(subject?:number,field?:string)=>NativeRequirement}|undefined)?.support;
         const prepared=native as {requirement?:NativeRequirement;facts?:EntityPublicationEvidence}|undefined;
         const acquired=!!projection&&research.acquiringCollection(consequenceKey,node as object)&&packet.seed!==undefined;
-        const staged=acquired?projection!.prepareSeed(packet.seed!,research.acquiredEntityEvidence()):projection?.prepare(packet,prepared?.facts);
+        const staged=acquired?projection.prepareSeed(packet.seed,research.acquiredEntityEvidence()):projection?.prepare(packet,prepared?.facts);
         let next:unknown=staged?.value;
         let changed=staged?.changed??false;
         if(!projection){
@@ -621,7 +621,7 @@ export function link<S>(
         const receipt=affected&&prepared?.requirement?research.prepareSourceProjection(consequenceKey,{intent:'replace',before:nested?nested.projection.value():before,after:nested?next:after,changed},prepared.requirement,undefined,projection?{key:node as object,edits:staged?.supportEdits??[],acquired}:undefined,!projection?support?.(binding.subject,binding.field):undefined):undefined;
         if(!staged&&!receipt)return;
         const install={set(_key:unknown,_value:unknown){if(changed){eligible=(nested?applyAtRelativePath(eligible,nested.relativeAddress,{all:next}):next) as T;dirty=true;}}};
-        return {record:combineTerminalRecords(staged?.record,receipt?.record,{writes:[{map:install,key:undefined,value:undefined}],adds:[]})!,completion:{receipt:receipt?.completion},finalize:receipt?.finalize};
+        return {record:combineTerminalRecords(staged?.record,receipt?.record,{writes:[{map:install,key:undefined,value:undefined}],adds:[]}),completion:{receipt:receipt?.completion},finalize:receipt?.finalize};
       },
       complete(value){const receipt=(value as {receipt?:object}).receipt;if(receipt)research.completeSourceProjection(receipt);},
     }));

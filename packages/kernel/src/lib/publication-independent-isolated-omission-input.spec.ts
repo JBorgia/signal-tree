@@ -11,7 +11,7 @@ it(`native omitted-member input after independent sibling overwrite: ${claim}`,a
  const owner=signalTree({z:0},{enhancers:[transactions()]});
  const source=signalTree({pair:{x:7,y:0} as {x?:number;y:number}});
  const target=signalTree({value:-1});
- const old=link(source.$.pair,{set:()=>{}}) as Experimental;
+ const old=link(source.$.pair,{set:()=>{ /* Destination values are intentionally discarded in this protocol fixture. */ }}) as Experimental;
  const sent:unknown[]=[];
  const c=link(target.$.value,{set:value=>{sent.push(value);}}) as Experimental;
  const p=owner.transact(()=>owner.$.z(7));
