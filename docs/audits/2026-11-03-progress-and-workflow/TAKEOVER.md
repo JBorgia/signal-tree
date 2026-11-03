@@ -59,10 +59,10 @@ serially; this record is not release acceptance.
 
 ## Current checkpoint
 
-The complete demo run has173 passes,2 retained50ms timing failures and4 skips.
+The complete demo run has173 passes,2 retained50 ms timing failures and4 skips.
 The development browser has27 passes. Current source/spec types, installed AOT,
 packed framework consumers, SSR and repaired documentation links pass. Full lint
-still fails at246 errors/173 warnings against19 (seven configured projects).
+still fails at246 errors/173 warnings against 19 (seven configured projects).
 Its first247/177 result is preserved. Four deliberate runtime finally paths need
 error-precedence validation before an equivalent rewrite; no lint budget changed.
 
@@ -72,7 +72,7 @@ The earlier193-file identity statement above describes the initial cleanup build
 not the later binding/documentation snapshot. The equivalence bridge preserves
 original measurement identities rather than inventing current-source timings.
 
-All16 formerly missing canonical baselines have complete passing receipts. The
+All 16 formerly missing canonical baselines have complete passing receipts. The
 first bounded-history attempt lost its exit receipt after a5-second ps timeout;
 its passing final log receives no qualification credit. The receipted retry passes.
 A900-second combined precheck interruption is also retained; completed rows remain
@@ -88,3 +88,13 @@ The historical browser reference additionally has a verified three-file input
 archive (original identity receipt and two pinned tarballs). It supplies required
 inputs without copying dependency caches or installed consumers. Its walkthrough
 separates historical replay from current v16 qualification.
+
+## Final disposition
+
+The [completion record](completion/DISPOSITION.md) supersedes pending-phase text
+above. Release remains HOLD. All 84 selected mutation gates are proved after the
+folding-anchor repair; three failing baselines were excluded. Fresh 193-file
+artifacts reproduce their seal; final tarball, strict consumer types and AOT pass.
+The current production demo fails805.15 kB/570 kB. Changed checker lint is clean;
+full configured lint remains246 errors / 173 warnings. All first failures remain
+archived. No active verification job remains.
