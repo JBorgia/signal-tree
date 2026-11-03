@@ -1,0 +1,32 @@
+{
+  "runtimeCheckpointCommit": "95bae1fada088ef16212a0eebbae5df6a42a7532",
+  "branch": "codex/v16-integration-qualification",
+  "qualifiedSourceManifestSha256": "ccf592c805de1b22dae1c1dbc7639331a718a2e361d0d5b8263205533c88c6d1",
+  "artifactSeal": "sha256-21af60880b3e0168baad05c20aacca761bb5f4d28153c277bfded6db5f7ea8e5",
+  "artifactFiles": 193,
+  "archives": {
+    "qualification-evidence.tar.gz": {
+      "sha256": "49cd94d3cd132624a9a50b84f8954765c815065e31fa4df9631a45179c2e4c5a",
+      "bytes": 71249606
+    },
+    "source-restoration-overrides.tar.gz": {
+      "sha256": "07e737470edb087d00487bf7ec4464b2b58ed7836a44215e1155cdd192fd3185",
+      "bytes": 960952
+    }
+  },
+  "runtimeSeal": {
+    "at": "2026-11-03T22:57:43.305085+00:00",
+    "runtimeCommit": "95bae1fada088ef16212a0eebbae5df6a42a7532",
+    "sourceManifestSha256": "ccf592c805de1b22dae1c1dbc7639331a718a2e361d0d5b8263205533c88c6d1",
+    "sourceFiles": 3514,
+    "sourceMismatches": [],
+    "matchingOwnedProcessIdentities": 1431,
+    "remainingOwned": [],
+    "gitStatus": "",
+    "leftoverOwnedProbeFiles": "",
+    "changedCheckerErrors": 0,
+    "changedCheckerWarnings": 0,
+    "finalArtifactSeal": "sha256-21af60880b3e0168baad05c20aacca761bb5f4d28153c277bfded6db5f7ea8e5"
+  },
+  "finalDocs": "Subsequent reconciliation changes only coordination/evidence documents; final Git HEAD is recorded separately in root FINAL-SEAL.json after commit. Source input manifest excludes itself and pure evidence archives to avoid self-reference."
+}

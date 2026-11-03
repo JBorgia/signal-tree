@@ -1,4 +1,4 @@
-# Current work — v16 integration qualification
+# Current work — v16 integration qualification (HOLD)
 
 Updated November 3, 2026. This controller is the single active acceptance ledger.
 It supersedes historical next-step lists, not frozen semantics or first failures.
@@ -47,14 +47,14 @@ Stable v15 remains untouched; rejected B remains closed.
 
 | ID | Obligation | Current status | Next action / closure evidence |
 | --- | --- | --- | --- |
-| I1 | Select and seal one integration source | Durable successor selected from verified `13d970ef`; build output unchanged after scoped cleanup | Verify final source and preserve dependent qualification identities |
-| I2 | Permanent regression quality | Successor 11/11 passes; cold-only dispatch-revert mutation fails both cold cases as intended | Preserve first outcomes and verify final mutation classification; no weakened assertions |
-| I3 | Types, lint and installed consumers | Current source/spec types, exact approved API baselines, installed AOT, framework consumer closure, SSR and source controls pass. Full configured lint gate fails: 246 errors/173 warnings vs19, across seven projects | Keep first 247/177 result. Close lint with behavior-preserving cleanup and error-precedence validation; no warning-baseline increase. Final post-mutation consumers remain required |
+| I1 | Select and seal one integration source | Durable runtime/tool checkpoint `95bae1fa`; source `ccf592c805de`; final documentation/evidence reconciliation is local only | Closed for review: five-package artifact seal and archive identities in final disposition; no release acceptance |
+| I2 | Permanent regression quality | Successor11/11; cold dispatch-revert kills both cold cases; assertion/sink controls retained | Closed within documented scope and predecessor identity/equivalence bindings; no weakened assertions |
+| I3 | Types, lint and installed consumers | Current source/spec types, approved API baselines, source controls, installed AOT, strict consumers, SSR and checker lint pass. Configured full lint fails246 errors / 173 warnings vs19 (seven projects) | HOLD: preserve first247/177 result; close lint with error-precedence validation and complete scope; no warning-budget increase |
 | I4 | Large replacement/restoration | All 13 original cases pass in disjoint partitions, including all four 130,000-row cases; four smaller screens are separate | Closed functionally on selected source. Preserve original 2 GiB operational stop and later 4 GiB/25% host-metric protocol; no memory-efficiency claim. Reuse unchanged partition in I7 |
-| I5 | Point-work requirement | Sampled size independence passes; `<2000` absolute proxy fails at 13,000 | Keep scaling/mutation controls; finite representative characterization completed, without a new numeric SLO. Absolute proxy rationale remains unresolved; no silent threshold change |
-| I6 | Artifact and populated costs | Four package ceilings still fail. Matched pre-page/overlay demo builds are 683.40/805.14 kB against570 kB. Representative cost84 assertions pass but ordinary-store CPU/heap increases remain undisposed | Prior cost figures retain original artifact identity; constant-binding bridge is not new measurement. Final current demo build follows mutations. No ceilings changed |
-| I7 | Full integration qualification | Kernel partition: 7,177 ordinary passes,5 expected failures,12 skips; absolute-work failure remains. Frameworks pass as preserved. Complete demo:173 pass/2 timing failures/4 skips. Development browser:27 pass. All16 missing canonical baselines now have receipted passes | First bounded-history watchdog census failure and first900s precheck-batch interruption remain preserved without full-pass credit. Finish outer mutation proofs on clean baselines, forced fresh artifacts and installed consumers; no full-release pass claim |
-| I8 | Consumer readiness and release disposition | Approved declaration/error API, current-reader migration and demo guidance are composed; prior strict Bundler/Node16 guidance plus current installed AOT and development workflow pass | Final disposition is HOLD while costs, ceilings, absolute work, full-demo timing and lint remain unresolved. Mutation/artifact closure pending; no release authority granted |
+| I5 | Point-work requirement | Tested size independence passes;13,000 counted iterations fail `<2000` | HOLD: meaningful reduction or explicit owner disposition required; no new threshold/SLO adopted |
+| I6 | Artifact and populated costs | Fresh bare 17.84/20.16 KB and entities 43.04/46.64 KB fail all four ceilings; fresh demo805.15 kB exceeds570 kB. Representative cost 84 assertions pass, costs remain materially higher in tested ordinary-store workloads | HOLD: current measurements and old artifact identities/limits in final disposition; no ceiling changes or cost waiver |
+| I7 | Full integration qualification | Kernel 7,177 ordinary / 5 expected / 12 skipped plus absolute-work failure; frameworks pass as preserved. Demo 173 pass / 2 timing failures / 4 skipped. Development browser 27 pass. All 16missing baselines receipted.84 selected gates proved;0 unproven/vacuous/blind/errors after scoped repair | HOLD: three failed baselines excluded from mutation proof. Fresh 193-file artifacts reproduce seal; final tarball/types/AOT pass. Historical stops/setup failures retained; no full-release pass |
+| I8 | Consumer readiness and release disposition | Declaration/error API, native-reader migration, source/document dependency closure and developer workflow are durable; current installed consumers and development browser pass | Release HOLD. Production demo/browser acceptance, lint, timing, costs/budgets and point work remain unresolved. No activation/push/merge/tag/publication |
 
 All rows must close or receive an explicit authorized disposition. Unreachable
 hypothetical paths are not extra gates without a supported-path counterexample.
@@ -76,6 +76,7 @@ Known policy failures remain failures until resolved; this is not a waiver.
 
 ## Evidence and preserved history
 
+- [Final disposition](docs/audits/2026-11-03-progress-and-workflow/completion/DISPOSITION.md)
 - [Current takeover and scoped corrections](docs/audits/2026-11-03-progress-and-workflow/TAKEOVER.md)
 - [Audit and finite-path rationale](docs/audits/2026-11-03-progress-and-workflow/README.md)
 - [C28 evidence index](docs/architecture/multi-actor/native-occurrence/continuation/C28-STATUS.md)

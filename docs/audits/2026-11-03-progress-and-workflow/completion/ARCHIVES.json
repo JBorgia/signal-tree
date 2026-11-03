@@ -1,0 +1,28 @@
+{
+  "archives": {
+    "qualification-evidence.tar.gz": {
+      "sha256": "49cd94d3cd132624a9a50b84f8954765c815065e31fa4df9631a45179c2e4c5a",
+      "bytes": 71249606
+    },
+    "source-restoration-overrides.tar.gz": {
+      "sha256": "07e737470edb087d00487bf7ec4464b2b58ed7836a44215e1155cdd192fd3185",
+      "bytes": 960952
+    }
+  },
+  "qualificationMembers": 7258,
+  "sourceVariants": [
+    {
+      "variant": "13d",
+      "sourceFiles": 3139,
+      "overrideFiles": 14,
+      "reconstruction": "Start with final Git checkout; retain exactly manifest paths, apply overrides, validate every SHA256. These original source manifests did not bind modes."
+    },
+    {
+      "variant": "8fb",
+      "sourceFiles": 3135,
+      "overrideFiles": 15,
+      "reconstruction": "Start with final Git checkout; retain exactly manifest paths, apply overrides, validate every SHA256. These original source manifests did not bind modes."
+    }
+  ],
+  "exclusions": "No dependency/cache trees, generated installed consumers or entire experimental directory copied."
+}
