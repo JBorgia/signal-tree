@@ -1,0 +1,18 @@
+{
+  "buildArgv": [
+    "corepack",
+    "pnpm",
+    "nx",
+    "run-many",
+    "-t",
+    "build",
+    "--projects=kernel,angular,react,vue,solid",
+    "--skip-nx-cache",
+    "--parallel=1"
+  ],
+  "buildExit": 0,
+  "sameFileSet": true,
+  "verifiedFiles": 193,
+  "mismatches": [],
+  "meaning": "Fresh build after test-only diagnostic corrections reproduces every measured package byte and executable mode. No cost cohort repeated."
+}
