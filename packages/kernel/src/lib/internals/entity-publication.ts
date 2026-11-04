@@ -48,6 +48,24 @@ export interface EntityPublicationPacket {
   readonly physicalOrder?: readonly number[];
   readonly ordinaryOrder?: readonly number[];
 }
+/** Construction-bound producer capability. Fields must be a fresh source-owned
+ * string list; this capability takes its ownership. It is never stored on the
+ * source or exported through a package barrel. */
+export interface SourcePointPublication {
+  readonly owner: number;
+  readonly id: object;
+  readonly meta: WriteMetadata | undefined;
+  readonly subject: number;
+  readonly fields: readonly string[];
+  readonly physicalBefore: unknown;
+  readonly physicalAfter: unknown;
+  readonly ordinaryBefore: unknown;
+  readonly ordinaryAfter: unknown;
+  readonly prepareResponsibility?: EntityPublicationPacket['prepareResponsibility'];
+  readonly inputs?: readonly object[];
+}
+export type SourcePointPreparer = (point: SourcePointPublication) => PreparedPublicationUnit | undefined;
+
 /** Private ownership boundary: metadata is source-owned, row payloads and proof
  * objects are not. Weak marks avoid reprocessing queued point fragments; they
  * contain no values, certificates or revision authority and do not retain keys.
@@ -56,6 +74,19 @@ class AdmissionMetadata {
   private readonly edits = new WeakSet<EntityPublicationEdit>();
   private readonly arrays = new WeakSet<readonly EntityPublicationEdit[]>();
   private readonly packets = new WeakSet<EntityPublicationPacket>();
+  private readonly points = new WeakSet<EntityPublicationPacket>();
+  ownsPoint(packet: EntityPublicationPacket): boolean { return this.points.has(packet); }
+  point(input: SourcePointPublication): EntityPublicationPacket {
+    const fields = Object.freeze(input.fields);
+    const physical = Object.freeze({subject:input.subject,before:input.physicalBefore,after:input.physicalAfter,fields});
+    const ordinary = Object.freeze({subject:input.subject,before:input.ordinaryBefore,after:input.ordinaryAfter,fields});
+    const ordinaryList = Object.freeze([ordinary]), physicalList = Object.freeze([physical]);
+    const step = Object.freeze({ordinal:0,authoredFootprint:Object.freeze({kind:'fields' as const,fields}),ordinary:ordinaryList,physical:physicalList});
+    const packet = Object.freeze({owner:input.owner,id:input.id,meta:input.meta,ordinary:ordinaryList,physical:physicalList,
+      steps:Object.freeze([step]),prepareResponsibility:input.prepareResponsibility,inputs:input.inputs});
+    this.packets.add(packet);this.points.add(packet);
+    return packet;
+  }
   private edit(edit: EntityPublicationEdit): void {
     if (this.edits.has(edit)) return;
     // Native producers supply mutable shells. Copy shared metadata before locking
@@ -120,6 +151,10 @@ type RetirementRequest = { eligible: () => boolean; release?: () => void; queued
 export interface EntityPublicationParticipant {
   seedRequested?():boolean;
   prepare(packet: EntityPublicationPacket, native?: object): PreparedPublicationUnit | undefined;
+  /** Source-issued single-field preparation; never selected for generic/foreign packets. */
+  preparePoint?(packet: EntityPublicationPacket): PreparedPublicationUnit | undefined;
+  /** Seal native row snapshots before handing this completion to any recipient. */
+  expose?(completion: object): void;
   complete(completion: object): void;
   captureInput?(subject?: number, field?: string): object | undefined;
   retire?(subject: number): void;
@@ -145,6 +180,11 @@ export class EntityPublicationSource {
   private retirementRevision: object = {};
   private readonly retirements = new Map<number, RetirementRequest>();
   private disposed = false;
+  constructor(receivePointPreparer?: (prepare: SourcePointPreparer) => void) {
+    // Only the constructing owner receives this closure. A recipient with a
+    // source reference cannot mint fast-admission packets for that source.
+    receivePointPreparer?.(input => this.prepare(this.admission.point(input)));
+  }
   /** Called only for a successfully installed kernel forget-lifetime mutation. */
   requestRetirement(subject: number, eligible: () => boolean): void {
     if (this.disposed) return;
@@ -230,10 +270,13 @@ export class EntityPublicationSource {
     const parts: { participant: EntityPublicationParticipant; unit: PreparedPublicationUnit }[] = [];
     packet=this.admission.prepare(packet);
     const native = this.nativeParticipant();
-    const nativeUnit = native?.prepare(packet);
+    const nativeUnit = native && this.admission.ownsPoint(packet) && this.recipients.size === 0 && !packet.prepareResponsibility
+      ? native.preparePoint?.(packet) ?? native.prepare(packet)
+      : native?.prepare(packet);
     const fallbackRecord = native ? undefined : packet.prepareResponsibility?.();
     if (native && nativeUnit) parts.push({ participant: native, unit: nativeUnit });
     for (const participant of [...this.recipients]) {
+      if (nativeUnit) native?.expose?.(nativeUnit.completion);
       const unit = participant.prepare(packet, nativeUnit?.completion);
       if (unit) parts.push({ participant, unit });
     }
@@ -244,6 +287,26 @@ export class EntityPublicationSource {
       if (this.disposed || retirementRevision !== this.retirementRevision || recipientRevision !== this.recipientRevision || sourceRevision !== this.revisionToken)
         throw new Error('Entity publication source changed before installation');
     };
+    if (native && nativeUnit && parts.length === 1 && !fallbackRecord) {
+      const record = nativeUnit.record, revision = {};
+      const completion = {};
+      // Lookup, not deletion: ordinary source completion remains repeatable.
+      pointCompletions.set(completion, () => native.complete(nativeUnit.completion));
+      return { validate, completion,
+        record: { deletes: record.deletes, adds: record.adds, writes: [{
+          map: { set: () => {
+            // Only writes are specialized. Deletes and adds remain in their
+            // composition-wide phases when another terminal plan wraps this.
+            for (let i = 0; i < record.writes.length; i++) {
+              const write = record.writes[i];write.map.set(write.key, write.value);
+            }
+            this.revisionToken = revision;
+          } }, key: undefined, value: undefined,
+        }] },
+        finalize: () => { validate();const before = this.revisionToken;nativeUnit.finalize?.();validate();
+          if (before !== this.revisionToken) throw new Error('Entity publication source changed during finalization'); },
+      };
+    }
     return {
       validate,
       record: combineTerminalRecords(fallbackRecord,...parts.map(part => part.unit.record),{writes:[{map:{set:(_key:unknown,value:unknown)=>{this.revisionToken=value as object;}},key:undefined,value:{}}],adds:[]}),

@@ -1,0 +1,9 @@
+{
+  "measuredManifestSha256": "6a0a70ecea51e90a0b0bd8f5783f462e8c0ea0fd1258d220983fee724dc0f67c",
+  "changedMeasuredPaths": [
+    "RELEASE-CURRENT.md"
+  ],
+  "newPathsScope": "docs/audits/2026-11-03-integrated-point-runtime only",
+  "runtimeAndBuildInputsUnchanged": true,
+  "note": "Measured source6a0a70... is preserved; closure audit/controller additions are separate. Final doc-check receipt and independent closure review are post-seal records."
+}

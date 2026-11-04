@@ -38,6 +38,18 @@ export class EntityOrdinaryTopology<K extends string | number> {
       this.tailOverride ? this.tailOverride.value : physical.tail
     );
   }
+  /** Positive eligibility for the point-only shortcut; do not depend on a
+   * later generic install normalizing redundant placement exceptions. */
+  isAligned(): boolean {
+    return this.divergent.size === 0 && this.displaced.size === 0 &&
+      this.headOverride === undefined && this.tailOverride === undefined;
+  }
+  /** A value-only write on an already ordinary-present lifetime changes no
+   * placement. Retain the exact source continuity without constructing stages. */
+  prepareUnchanged(): (() => void) & { readonly interval: TopologyViewInterval } {
+    const interval = Object.freeze({before:this.continuity,after:this.continuity,pairs:Object.freeze([])});
+    return Object.assign(() => { /* No placement mutation was prepared. */ }, {interval});
+  }
   prepareInstall(
     ordinary: EntityPlacementStage<K>,
     physical: EntityPlacementStage<K>

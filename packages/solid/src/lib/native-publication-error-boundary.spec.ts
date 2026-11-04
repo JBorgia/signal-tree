@@ -109,7 +109,7 @@ function instrumentedAdapter() {
   };
 }
 
-function fixture() {
+function fixture(observeCollection = false) {
   const instrument = instrumentedAdapter();
   const tree = createSignalTreeFactory(instrument.adapter)({
     rows: entityMap<Row, number>(),
@@ -124,6 +124,7 @@ function fixture() {
   const one = required(tree.$.rows.byId(1));
   const two = required(tree.$.rows.byId(2));
   const seen: number[][] = [];
+  const collectionSeen: number[][] = [];
   const subscribers = createRoot((dispose) => {
     const a = createMemo(() => one()?.v ?? -1);
     const b = createMemo(() => two()?.v ?? -1);
@@ -131,12 +132,19 @@ function fixture() {
     createComputed(() => {
       seen.push([...pair()]);
     });
+    // Fault injection must target an actually realized writable collection
+    // token. Held row memos alone only exercise the separate epoch path.
+    if (observeCollection) {
+      const collection = createMemo(() => tree.$.rows.all().map(row => row.v));
+      createComputed(() => { collectionSeen.push([...collection()]); });
+    }
     return { dispose, a, b, pair };
   });
   return {
     instrument,
     tree,
     seen,
+    collectionSeen,
     replaceBoth,
     subscribers,
     direct: () => [one()?.v, two()?.v],
@@ -161,9 +169,10 @@ describe('Solid public EntityMap publication error timing', () => {
   it.each(['writable-token', 'last-epoch'] as const)(
     'completes native bookkeeping before reporting a post-%s invalidation fault',
     (fault) => {
-      const f = fixture();
+      const f = fixture(fault === 'writable-token');
       try {
         expect(f.seen.at(-1)).toEqual([0, 0]); // Reject SSR/no-op observer fixture.
+        if (fault === 'writable-token') expect(f.collectionSeen.at(-1)).toEqual([0, 0]);
         f.instrument.start('none');
         f.replaceBoth(1);
         const control = f.instrument.snapshot();
@@ -172,8 +181,10 @@ describe('Solid public EntityMap publication error timing', () => {
         expect(controlSeen.length).toBeGreaterThan(1);
         expect(control.advances.length).toBeGreaterThanOrEqual(2);
         expect(new Set(control.advances).size).toBeGreaterThanOrEqual(2);
-        if (fault === 'writable-token')
+        if (fault === 'writable-token') {
           expect(control.tokenCalls).toBeGreaterThan(0);
+          expect(f.collectionSeen.at(-1)).toEqual([1, 1]);
+        }
         expect(control.frames.every((frame) => frame.returnedNormally)).toBe(
           true
         );
@@ -184,6 +195,7 @@ describe('Solid public EntityMap publication error timing', () => {
         const outcome = attempt(() => f.replaceBoth(2));
         // Freeze history BEFORE any ST direct read or memo demand can repair it.
         const afterFault = f.seen.map((pair) => [...pair]);
+        const collectionAfterFault = f.collectionSeen.map(pair => [...pair]);
         const publication = f.instrument.snapshot();
         expect(publication.hits).toBe(1);
         expect(outcome.threw).toBe(true);
@@ -198,6 +210,10 @@ describe('Solid public EntityMap publication error timing', () => {
           publication.frames.every((frame) => frame.returnedNormally)
         ).toBe(true);
         expect(afterFault.at(-1)).toEqual([2, 2]);
+        if (fault === 'writable-token') {
+          expect(collectionAfterFault.at(-1)).toEqual([2, 2]);
+          expect(collectionAfterFault.every(([a, b]) => a === b)).toBe(true);
+        }
         expect(afterFault.every(([a, b]) => a === b)).toBe(true);
         expect([f.subscribers.a(), f.subscribers.b()]).toEqual([2, 2]);
 
@@ -206,6 +222,7 @@ describe('Solid public EntityMap publication error timing', () => {
         f.replaceBoth(3);
         const next = f.seen.map((pair) => [...pair]);
         expect(next.at(-1)).toEqual([3, 3]);
+        if (fault === 'writable-token') expect(f.collectionSeen.at(-1)).toEqual([3, 3]);
         expect(next.every(([a, b]) => a === b)).toBe(true);
       } finally {
         f.dispose();

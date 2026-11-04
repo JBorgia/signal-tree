@@ -1,0 +1,71 @@
+{
+  "sources": {
+    "retained": {
+      "root": "/Users/jonathanborgia/code/signaltree/.worktrees/v16-integration-candidate",
+      "manifest": "/private/tmp/st-v16-integrated-point-0/cost/RETAINED-MANIFEST.json",
+      "manifestSha256": "1633b76bb7244fd952b288511fb5c6950db2fb3389efe23431fc160e8adae9c7"
+    },
+    "selected": {
+      "root": "/Users/jonathanborgia/code/signaltree/.worktrees/v16-sparse-responsibility-0",
+      "manifest": "/private/tmp/st-v16-integrated-point-0/cost/SELECTED-MANIFEST.json",
+      "manifestSha256": "6a0a70ecea51e90a0b0bd8f5783f462e8c0ea0fd1258d220983fee724dc0f67c"
+    }
+  },
+  "artifacts": {
+    "retained": {
+      "root": "/Users/jonathanborgia/code/signaltree/.worktrees/v16-integration-candidate",
+      "manifest": "/private/tmp/st-v16-integrated-point-0/cost/RETAINED-ARTIFACTS.json",
+      "manifestSha256": "2e51f09fcc2d96f8a0a8221f11b85ace04927daaa85b3978df4385f2151f9a24",
+      "files": 193
+    },
+    "selected": {
+      "root": "/Users/jonathanborgia/code/signaltree/.worktrees/v16-sparse-responsibility-0",
+      "manifest": "/private/tmp/st-v16-integrated-point-0/cost/SELECTED-ARTIFACTS.json",
+      "manifestSha256": "80c2a3e1a9868f838080040f0c2af05038e70f5d74f8ccfa4b1478c81edab24c",
+      "files": 193
+    }
+  },
+  "dependencies": {
+    "realNodeModules": "/Users/jonathanborgia/code/signaltree/node_modules",
+    "sameInstalledTree": true,
+    "versions": {
+      "node": "v24.15.0",
+      "pnpm": "10.17.0",
+      "typescript": "6.0.3",
+      "esbuild": "0.25.12",
+      "rollup": "4.62.2",
+      "nx": "23.1.0",
+      "@nx/rollup": "23.1.0",
+      "tslib": "2.8.1"
+    },
+    "hashes": {
+      "/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/lock.yaml": "bfb59363fcda0de5508bdb837555dd1729455a5e7a216fb8e39c411d5986284b",
+      "/Users/jonathanborgia/code/signaltree/node_modules/.modules.yaml": "fb7f00ead6f79b3f168b05223aa6157c2e50098179b9161b824288301e973e21",
+      "/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/typescript@6.0.3/node_modules/typescript/package.json": "9332e97c30d3e53ed54910b89207ed657fb444066484df6e5b6965bf130865e9",
+      "/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/esbuild@0.25.12/node_modules/esbuild/package.json": "cb7d5b1fe478f8cbaae566a86031b6fdf5f7d444354f35d1cb3cba9adf6d2935",
+      "/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/rollup@4.62.2/node_modules/rollup/package.json": "f4c43bde641711b4e7cda761bf681dd6b694e58e10cb02bc8a4f691f39f2a8a4",
+      "/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/nx@23.1.0_@swc-node+register@1.12.1_@swc+core@1.15.17_@swc+helpers@0.5.23__@swc+types@0_82d5463b3335b686c663679688918a9b/node_modules/nx/package.json": "1ece57bedcaaa587f62e81194878fa9859e69af0ab830a68769a8b316785afed",
+      "/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@nx+rollup@23.1.0_@babel+core@7.29.7_@babel+traverse@7.29.7_@swc-node+register@1.12.1_@_e1553ea56b8ca650a7dfbd2ea0a0262c/node_modules/@nx/rollup/package.json": "e1e6b2bfc64eea04c11e3a911847f11813b2c33b117b39973675d6dcca39ca1d",
+      "/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/tslib@2.8.1/node_modules/tslib/package.json": "f02b4851df316f29bdfcd404aa1eb41e4e216b5859015f81fcd3e91caf8be931"
+    }
+  },
+  "buildReceipts": {
+    "retained": {
+      "command": "/private/tmp/st-v16-improvement/runs/corrected-five-build/COMMAND.json",
+      "result": "/private/tmp/st-v16-improvement/runs/corrected-five-build/RESULT.json",
+      "commandSha256": "39ab7296f0367c11d36689020a608b404a50b61c74411ae6025dc4b2eaafd48a",
+      "resultSha256": "803fee71682352cbe2e837d3106f47972a53a955bc129f80aaca4a0a1ff27fd0"
+    },
+    "selected": {
+      "command": "/private/tmp/st-v16-integrated-point-0/runs/prototype-five-build/COMMAND.json",
+      "result": "/private/tmp/st-v16-integrated-point-0/runs/prototype-five-build/RESULT.json",
+      "commandSha256": "80de15b439cde60331098346f358fc86748dba5fa3da0ceda32de9a25ef1f97e",
+      "resultSha256": "7a26044b01e78e55fbdac380733a475844824cedcb1238cc451481e26a08296e"
+    }
+  },
+  "armLabels": {
+    "retained": "frozenfe18runtime,3eabcsource",
+    "selected": "INTEGRATED-POINT-0 uncommittedsourceoverf165;fullmanifestbound"
+  },
+  "meaning": "v16before/prototypecomparisononly;notv15. Completecostdimensionsseparate;noadoptionfromcounterpass"
+}

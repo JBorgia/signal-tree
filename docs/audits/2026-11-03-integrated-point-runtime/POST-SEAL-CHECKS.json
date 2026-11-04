@@ -1,0 +1,97 @@
+{
+  "scope": "Post-seal closure checks, separate from immutable evidence archive",
+  "command": {
+    "cwd": "/Users/jonathanborgia/code/signaltree/.worktrees/v16-sparse-responsibility-0",
+    "argv": [
+      "python3",
+      "/private/tmp/st-v16-integrated-point-0/doc-checks.py"
+    ],
+    "env": {
+      "PATH": "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin:/Library/Frameworks/Python.framework/Versions/3.14/bin:/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin:/opt/homebrew/bin:/opt/homebrew/sbin:/usr/local/bin:/System/Cryptexes/App/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin:/opt/pmk/env/global/bin:/Library/Apple/usr/bin:/usr/local/share/dotnet:~/.dotnet/tools:/opt/homebrew/bin:/Applications/ChatGPT.app/Contents/Resources/codex-cli/codex-path:/Users/jonathanborgia/.codex/tmp/arg0-macos/codex-arg0iM3W5v:/Users/jonathanborgia/.cache/codex-runtimes/codex-primary-runtime/dependencies/bin/override:/Users/jonathanborgia/.local/bin:/Users/jonathanborgia/.agentic/server:/Users/jonathanborgia/.opencode/bin:/Users/jonathanborgia/bin:/Users/jonathanborgia/.rd/bin:/Users/jonathanborgia/.codeium/windsurf/bin:/Users/jonathanborgia/Library/pnpm:/Users/jonathanborgia/Library/Android/sdk/platform-tools:/opt/homebrew/opt/openjdk@17/bin:/Users/jonathanborgia/.pyenv/shims:/Library/Frameworks/Python.framework/Versions/3.14/bin:/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin:/opt/homebrew/sbin:/Users/jonathanborgia/.foundry/bin:/Users/jonathanborgia/.cache/codex-runtimes/codex-primary-runtime/dependencies/bin/fallback:/Applications/ChatGPT.app/Contents/Resources:/Applications/ChatGPT.app/Contents/Resources/codex-cli/CodexCLI.app/Contents/MacOS",
+      "NX_DAEMON": "false",
+      "NX_ISOLATE_PLUGINS": "false",
+      "NX_NO_CLOUD": "true",
+      "NX_TUI": "false",
+      "NX_CACHE_DIRECTORY": "/private/tmp/st-v16-integrated-point-0/nx-cache",
+      "NX_WORKSPACE_DATA_DIRECTORY": "/private/tmp/st-v16-integrated-point-0/nx-data",
+      "TMPDIR": "/private/tmp/st-v16-integrated-point-0/runs/closure-doc-and-integrity/tmp",
+      "npm_config_cache": "/private/tmp/st-v16-integrated-point-0/npm-cache"
+    },
+    "sourceManifestSha256": "952c4734b9f407717ebfd09e4de6f0d3abdfe6c629fd9578316d3ca91bd2eae5",
+    "sourceManifestFile": "/private/tmp/st-v16-integrated-point-0/manifests/952c4734b9f407717ebfd09e4de6f0d3abdfe6c629fd9578316d3ca91bd2eae5.json",
+    "absoluteTimeoutSeconds": 600,
+    "noLogProgressTimeoutSeconds": 900,
+    "processCensusTimeoutSeconds": 30,
+    "startedAt": "2026-11-04T05:16:58.134289+00:00"
+  },
+  "guardResult": {
+    "sourceManifestSha256": "952c4734b9f407717ebfd09e4de6f0d3abdfe6c629fd9578316d3ca91bd2eae5",
+    "exit": 0,
+    "timeout": false,
+    "guardReason": null,
+    "maxObservedOwnedRssBytes": 25051136,
+    "minObservedHostFreePercentage": 41.0,
+    "sourceMismatches": [],
+    "remainingOwned": [],
+    "completedAt": "2026-11-04T05:17:00.740395+00:00"
+  },
+  "checks": [
+    {
+      "name": "archive-integrity",
+      "argv": [
+        "python3",
+        "docs/audits/2026-11-03-integrated-point-runtime/verify-evidence.py"
+      ],
+      "exit": 0
+    },
+    {
+      "name": "doc-links",
+      "argv": [
+        "node",
+        "tools/check-doc-links.mjs"
+      ],
+      "exit": 0
+    },
+    {
+      "name": "numeric-claims",
+      "argv": [
+        "node",
+        "tools/check-numeric-claims.mjs"
+      ],
+      "exit": 0
+    },
+    {
+      "name": "documented-imports",
+      "argv": [
+        "node",
+        "tools/check-documented-imports.mjs"
+      ],
+      "exit": 0
+    },
+    {
+      "name": "semantic-discoverability",
+      "argv": [
+        "node",
+        "tools/check-semantic-discoverability.mjs"
+      ],
+      "exit": 0
+    },
+    {
+      "name": "diff-whitespace",
+      "argv": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "exit": 0
+    }
+  ],
+  "logs": {
+    "archive-integrity.log": "Verified archive SHA256 and 988 file payloads; no extraction or execution.\n",
+    "doc-links.log": "1099 relative link(s) across 226 live surface(s); 1099 resolve.\n\u2705 every relative link resolves and every install instruction names a publishable, current package. (docs/archive/** and CHANGELOG.md are point-in-time and excluded.)\n",
+    "diff-whitespace.log": "",
+    "semantic-discoverability.log": "\u2705 semantic discoverability: canonical guidance and package reachability are complete.\n",
+    "numeric-claims.log": "\n161 measured figure(s) across 36 live surface(s); 161 backed by a named generator or exempt.\n\u2705 no new ungenerated figures. Backlog: 0 across 0 file(s), held flat by the ratchet.\n\n",
+    "documented-imports.log": "Checked 12 @signaltree import specifier(s) across 26 live document(s) against the packages' export maps.\n\u2713 every documented import specifier resolves against a published export map.\n"
+  }
+}
