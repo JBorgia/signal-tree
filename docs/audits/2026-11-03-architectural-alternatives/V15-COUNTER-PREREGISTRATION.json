@@ -1,0 +1,25 @@
+{
+  "registeredAt": "2026-11-04T02:35:05.995608+00:00",
+  "profile": "commonordinarypointcounteronly",
+  "armOrder": [
+    "released-v15",
+    "frozen-v16"
+  ],
+  "freshProcesses": 2,
+  "sourceCounterSha256": "22605a56a96fca87dacff833b908f720c6abccb897f8cde57e25af1dcfe50b6f",
+  "compiledCounterSha256": "0ab86b313d984ada5480848253436bb5c4c75b1652b3b7169c4b98a1efebf2db",
+  "harnessSha256": "0e8dcceb68f8a3e7d84df709b4450a10e227450d63a5456bb9e6b453f599956a",
+  "v15": "npm@signal-tree/kernel15.4.4;109files;registrySHA512andSHA1verified",
+  "v16": "frozen3eabc01dd/runtimefe18;193-filebuildbindings inpriorattributioncost",
+  "expectedV16": 13000,
+  "v15Outcome": "unknown;reportwithoutthresholdadjustment",
+  "originalBound": "<2000 unchanged;v15comparisoncontextnotreleasequalification",
+  "limits": "NoCPU/wall/heapmeasurementsornewsemanticparityclaim;productiondefinefalsemeansngDevModefalse;priorVitestsourcecountskeptseparate",
+  "controls": [
+    "all200endpointsanduntouchedrow",
+    "sizeequality",
+    "width-scaledknowncopy",
+    "known7charges",
+    "throwundefinedandpatchrestoration"
+  ]
+}

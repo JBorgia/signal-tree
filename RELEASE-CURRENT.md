@@ -16,8 +16,10 @@ lint/benchmark hygiene, three bounded transient-work trials, matched measurement
 a representative application exercise and final qualification. That path is now
 complete. Size has explicit owner disposition; numerical ceilings remain unchanged
 and failed results remain reported. Runtime-cost acceptance and the absolute
-point-work bound have no owner disposition. New semantics, activation, push,
-merge, tag and publication remain unauthorized.
+point-work bound have no owner disposition. New semantics, activation, merge, tag and publication remain unauthorized.
+The owner subsequently authorized pushing the work to a review branch:
+`codex/v16-runtime-attribution` at9a9770a63 is now on origin. Sharing reviewed
+work does not grant merge,activation or package-publication authority.
 
 ## Authorized attribution follow-up — complete
 
@@ -36,6 +38,30 @@ remains; no activation, push, merge or publication. No next execution queue open
 preserve raw counts, first failures, exact artifacts, independent review and
 separate cost dimensions. The earlier controlled-pilot assessment grants no
 activation authority. Current outer mutation proof remains pending.
+
+## Architectural alternatives — first admission screen
+
+The owner supplied the architectural-alternatives review. A separate
+`codex/v16-sparse-responsibility-0` worktree investigated the proposed first
+contract-preserving family without selecting or implementing a replacement.
+A new counter discriminator observes5000 of13000visits before native preparation.
+A native-only field/window replacement with that prefix unchanged cannot clear
+the existing `<2000` gate. An integrated producer/value/topology/admission
+mechanism remains unspecified and is not admitted to runtime experimentation.
+
+Fresh integrity-verified npm15.4.4 measures800visits versus frozenv16's13000
+on the shared originalcounter. A separate24-child ordinary baseline comparison
+classifies v16 construction/point wall+CPU and populated live heap higher under
+its registered descriptive rule. It does not establish capability parity or
+unavoidable semantic cost. One copied build-receipt metadata defect is preserved
+and corrected by a separate provenance sidecar; raw registrations/data are intact.
+
+[Architectural admission evidence and limitations](docs/audits/2026-11-03-architectural-alternatives/README.md)
+record the5000prefix,semantic baseline oracles,actual released artifacts,rawcosts
+and independent reviews. Candidatefe18 stays frozen; no thresholds/semantics
+changed and no architecture is promoted. Further code requires a concrete
+integrated mechanism against the listed counterexamples,not another native-only
+optimization or automatic84-child campaign. General release remains HOLD.
 
 ## Candidate and execution identity
 

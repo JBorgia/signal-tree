@@ -1,0 +1,7 @@
+{
+  "run": "architecture-admission-screen",
+  "observed": 9,
+  "expected": 7,
+  "cause": "new Map([[...],[...]]) was constructed inside counted interval and charges2 array iterator elements",
+  "correction": "Preconstruct map/list outside measured interval, matching intended original7chargecontrol. Counterandoriginalboundunchanged."
+}
