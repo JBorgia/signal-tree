@@ -1,0 +1,9 @@
+{
+  "file": "/private/tmp/st-v16-runtime-attribution/SignalTree-v16-review-bundle.tar",
+  "bytes": 64931840,
+  "sha256": "305f96526582e1db936740fa4a0faa79bbca59b63406406771ec467185ec9108",
+  "payloadFilesVerified": 38,
+  "sourceCommitAndTreeVerified": true,
+  "notPublished": true,
+  "externalReviewerAction": "Download and attach this local archive; it has not been uploaded to GitHub"
+}
