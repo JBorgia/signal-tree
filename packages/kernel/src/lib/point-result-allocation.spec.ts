@@ -11,16 +11,39 @@ function countContainers(run:()=>void){
   return Reflect.construct(target,[wrapped],newTarget);
  }});
  globalThis.Map=Counted;
- try{run();return {containers,entries,mapArrays,mapEntries};}finally{globalThis.Map=Original;Array.prototype.map=originalMap;}
+ try{
+  run();
+  const measured={containers,entries,mapArrays,mapEntries};
+  // Probe interception after the workload while the same patches remain active.
+  // Seed via Original; synthetic probe counts are separate and never reported.
+  const seed=new Original([[1,2],[3,4]]);
+  const empty=new Map(),copied=new Map(seed);
+  const mapped=[1,2,3].map(value=>value+1);
+  if(containers-measured.containers!==2||entries-measured.entries!==2
+   ||empty.size!==0||copied.size!==2||copied.get(1)!==2||copied.get(3)!==4||mapArrays-measured.mapArrays!==1||mapEntries-measured.mapEntries!==3
+   ||mapped.length!==3||mapped[0]!==2||mapped[1]!==3||mapped[2]!==4)
+   throw new Error('Allocation interception failed its in-window positive probe');
+  return measured;
+ }finally{globalThis.Map=Original;Array.prototype.map=originalMap;}
 }
 it('constructor counter independently calibrates empty and copied containers',()=>{
  const source=new Map([[1,2],[3,4]]);let copied=0,empty=-1;expect(countContainers(()=>{copied=new Map(source).size;empty=new Map().size;[1,2,3].map(x=>x+1);})).toEqual({containers:2,entries:2,mapArrays:1,mapEntries:3});expect([copied,empty]).toEqual([2,0]);
+});
+it('detects workload removal of Map interception and restores the original global',()=>{
+ const Original=globalThis.Map;
+ expect(()=>countContainers(()=>{globalThis.Map=Original;})).toThrow('Allocation interception failed its in-window positive probe');
+ expect(globalThis.Map).toBe(Original);
+});
+it('detects workload removal of array interception and restores both originals',()=>{
+ const Original=globalThis.Map,originalMap=Array.prototype.map;
+ expect(()=>countContainers(()=>{Array.prototype.map=originalMap;})).toThrow('Allocation interception failed its in-window positive probe');
+ expect(globalThis.Map).toBe(Original);expect(Array.prototype.map).toBe(originalMap);
 });
 for(const width of [2,32])for(const size of [2000,20000])it(`populated point Map allocations width=${width} rows=${size}`,()=>{
  const t=signalTree({rows:entityMap<{id:number;v:number;[key:string]:number},number>({selectId:r=>r.id})});
  try{t.$.rows.setAll(Array.from({length:size},(_,id)=>{const r:{id:number;v:number;[key:string]:number}={id,v:0};for(let k=2;k<width;k++)r['f'+k]=k;return r;}));
  const measured=countContainers(()=>{for(let i=0;i<200;i++)t.$.rows.updateOne(i,{v:1});});
- for(let i=0;i<200;i++)expect(t.$.rows.byId(i)?.().v).toBe(1);expect(t.$.rows.byId(201)?.().v).toBe(0);expect(measured.containers).toBeGreaterThan(0);expect(measured.entries).toBeGreaterThan(0);
+ for(let i=0;i<200;i++)expect(t.$.rows.byId(i)?.().v).toBe(1);expect(t.$.rows.byId(201)?.().v).toBe(0);for(const count of Object.values(measured)){expect(Number.isSafeInteger(count)).toBe(true);expect(count).toBeGreaterThanOrEqual(0);}
  const output=process.env.ST_POINT_ALLOCATION_OUTPUT;
  if(output)appendFileSync(output,JSON.stringify({width,size,writes:200,...measured})+'\n');
  }finally{t.destroy();}

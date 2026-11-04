@@ -1,0 +1,15 @@
+{
+  "measuredManifestSha256": "c5aacadcc182dc445876304320137622073c94e2743c03a502e400158f7c999d",
+  "qualifiedManifestSha256": "51b1a4a83c9030c1f260586558452f52dc4bc2926b755cf0cef37d350e1c10fd",
+  "changedMeasuredPaths": [
+    "RELEASE-CURRENT.md",
+    "packages/kernel/src/lib/point-result-allocation.spec.ts",
+    "packages/kernel/src/lib/singleton-row-allocation.spec.ts"
+  ],
+  "changedQualifiedPaths": [
+    "RELEASE-CURRENT.md"
+  ],
+  "runtimeAndBuildInputsUnchanged": true,
+  "artifactEquivalence": "ARTIFACT-EQUIVALENCE.json:193 exact bytes and modes reproduced after diagnostic-only corrections",
+  "closureScope": "Controller and newaudit records only after qualified source; postsealcheck/review records separate. No cost retry."
+}

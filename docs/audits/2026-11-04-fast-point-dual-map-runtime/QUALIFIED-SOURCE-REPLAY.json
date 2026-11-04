@@ -1,0 +1,12 @@
+{
+  "baseCommit": "eef7dfc0b95c16658b825d7b1466c95b1cf43c20",
+  "verifiedFiles": 4,
+  "mismatches": [],
+  "payloadHashes": {
+    "packages/kernel/src/lib/fast-point-dual-map.spec.ts": "dbbebddd00c6dca3154878d13b5a12c38706888bec656e6eecf3e847086fde2e",
+    "packages/kernel/src/lib/singleton-row-allocation.spec.ts": "b9505c0c7d9c57d893d28aae569dcd77736d4dc7ffede5352f5c80d0c7e39e25",
+    "packages/kernel/src/lib/point-result-allocation.spec.ts": "83a7a55c64e442f7d4abe2530ea4762b3b38ee1f3c95566df5e3541bf0c2e0ec",
+    "packages/kernel/src/lib/experimental-publication/entity.ts": "377be337bb777aa464e3f2e34d0f0d325f1cdc5391278b4372d816f1bb9a1137"
+  },
+  "scope": "One runtime module, one new retirement spec, two corrected diagnostic specs; original point-work spec unchanged."
+}

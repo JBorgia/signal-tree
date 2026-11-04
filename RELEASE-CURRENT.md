@@ -89,6 +89,34 @@ and fourteen replay-verified changed/new package files; final closure edits are
 audit/controller-only. General production/release HOLD remains. No merge,
 activation, tag or package publication. No second execution queue is opened.
 
+## FAST-POINT-DUAL-MAP-0 — complete; necessary endpoints pass, cost HOLD
+
+The owner supplied the eef7dfc0b review and selected the bounded dual-Map
+experiment. [Candidate C and exact evidence](docs/audits/2026-11-04-fast-point-dual-map-runtime/README.md)
+retain the point pipeline while restoring separate field Maps. The unchanged
+point bound passes at 1,800 visits. A new 48-child matched screen classifies
+point synchronous CPU lower (69.354→31.470 ms) and populated live-minus-baseline
+heap lower by 32,144 bytes (17,757,224→17,725,080; −0.181%). Both pinned endpoints
+clear their registered variability rule. The saving is small, not object attribution.
+
+Overall runtime-cost HOLD remains: pending live-minus-idle heap rises 6.12%,
+point drain time rises, and total point CPU/construction are unresolved. No gain
+compensates for those results. The fused cohort was neither rerun nor pooled.
+C is retained for further qualification, without promotion into frozen fe18,
+merge, activation, tag or package publication. No new optimization queue is opened.
+
+Final kernel: 7,205 ordinary passes, five expected failures, twelve skips across
+658 files. Types/spec types, zero-warning focused lint, all four facades and
+public API/callable/barrel/import checks pass. Two known-bad runtime controls
+were killed and exact source restored before measurement. Initial missing-factory
+fixture failures and eight obsolete positive-allocation diagnostic floors are
+preserved. Stronger in-window calibration and patch-removal controls pass both
+candidate and original runtime; no behavioral assertion or point ceiling is removed.
+A fresh post-diagnostic build reproduces all 193 measured package bytes. Original
+cost source c5aacad and qualified test source 51b1a4a remain separately bound.
+Unchanged size failures retain the owner's disposition; outer mutation, installed
+consumers and production-browser qualification are not newly claimed.
+
 ## Candidate and execution identity
 
 - Selected durable worktree: `/Users/jonathanborgia/code/signaltree/.worktrees/v16-integration-candidate`,
