@@ -1,0 +1,94 @@
+{
+  "sources": {
+    "retained": {
+      "root": "/private/tmp/st-v16-improvement/before",
+      "manifest": "/private/tmp/st-v16-improvement/cost-final/RETAINED-MANIFEST.json",
+      "manifestSha256": "392323236b8a63882cd91030e12b40037bde292e4dc15eb1d4fd279c1385db3f"
+    },
+    "selected": {
+      "root": "/Users/jonathanborgia/code/signaltree/.worktrees/v16-integration-candidate",
+      "manifest": "/private/tmp/st-v16-improvement/cost-final/SELECTED-MANIFEST.json",
+      "manifestSha256": "ab8cb3731fe647d220d03e988793889dbbaac9b2faefeba10ef13e4ded36333d"
+    }
+  },
+  "artifacts": {
+    "retained": {
+      "root": "/private/tmp/st-v16-improvement/before",
+      "manifest": "/private/tmp/st-v16-improvement/cost-final/RETAINED-ARTIFACTS.json",
+      "manifestSha256": "2e20c267d9ae9f42017b8f599fa5e0d026d434c137e52695252a35804c730640",
+      "files": 193
+    },
+    "selected": {
+      "root": "/Users/jonathanborgia/code/signaltree/.worktrees/v16-integration-candidate",
+      "manifest": "/private/tmp/st-v16-improvement/cost-final/SELECTED-ARTIFACTS.json",
+      "manifestSha256": "2e51f09fcc2d96f8a0a8221f11b85ace04927daaa85b3978df4385f2151f9a24",
+      "files": 193
+    }
+  },
+  "dependencies": {
+    "realNodeModules": "/Users/jonathanborgia/code/signaltree/node_modules",
+    "sameInstalledTree": true,
+    "versions": {
+      "node": "v24.15.0",
+      "pnpm": "10.17.0",
+      "typescript": "6.0.3",
+      "esbuild": "0.25.12",
+      "rollup": "4.62.2",
+      "nx": "23.1.0",
+      "@nx/rollup": "23.1.0",
+      "tslib": "2.8.1"
+    },
+    "hashes": {
+      "/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/lock.yaml": "bfb59363fcda0de5508bdb837555dd1729455a5e7a216fb8e39c411d5986284b",
+      "/Users/jonathanborgia/code/signaltree/node_modules/.modules.yaml": "fb7f00ead6f79b3f168b05223aa6157c2e50098179b9161b824288301e973e21",
+      "/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/typescript@6.0.3/node_modules/typescript/package.json": "9332e97c30d3e53ed54910b89207ed657fb444066484df6e5b6965bf130865e9",
+      "/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/esbuild@0.25.12/node_modules/esbuild/package.json": "cb7d5b1fe478f8cbaae566a86031b6fdf5f7d444354f35d1cb3cba9adf6d2935",
+      "/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/rollup@4.62.2/node_modules/rollup/package.json": "f4c43bde641711b4e7cda761bf681dd6b694e58e10cb02bc8a4f691f39f2a8a4",
+      "/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/nx@23.1.0_@swc-node+register@1.12.1_@swc+core@1.15.17_@swc+helpers@0.5.23__@swc+types@0_82d5463b3335b686c663679688918a9b/node_modules/nx/package.json": "1ece57bedcaaa587f62e81194878fa9859e69af0ab830a68769a8b316785afed",
+      "/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@nx+rollup@23.1.0_@babel+core@7.29.7_@babel+traverse@7.29.7_@swc-node+register@1.12.1_@_e1553ea56b8ca650a7dfbd2ea0a0262c/node_modules/@nx/rollup/package.json": "e1e6b2bfc64eea04c11e3a911847f11813b2c33b117b39973675d6dcca39ca1d",
+      "/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/tslib@2.8.1/node_modules/tslib/package.json": "f02b4851df316f29bdfcd404aa1eb41e4e216b5859015f81fcd3e91caf8be931"
+    }
+  },
+  "buildReceipts": {
+    "retained": {
+      "command": "/private/tmp/st-v16-takeover-evidence/runs/post-mutation-build/COMMAND.json",
+      "result": "/private/tmp/st-v16-takeover-evidence/runs/post-mutation-build/RESULT.json",
+      "commandSha256": "a7b6b5919bc811a0baf13f03bbb9bbe2af0fe18838d836331452075f86388e8e",
+      "resultSha256": "b4b980f09ab53c74069cebd13351c244c090a22abee1a3fb4a7c954b6c001b01"
+    },
+    "selected": {
+      "command": "/private/tmp/st-v16-improvement/runs/corrected-five-build/COMMAND.json",
+      "result": "/private/tmp/st-v16-improvement/runs/corrected-five-build/RESULT.json",
+      "commandSha256": "39ab7296f0367c11d36689020a608b404a50b61c74411ae6025dc4b2eaafd48a",
+      "resultSha256": "803fee71682352cbe2e837d3106f47972a53a955bc129f80aaca4a0a1ff27fd0"
+    }
+  },
+  "beforeCommit": "c2127a34b2fdd162ea1bd7bb2000f4815a2d8461",
+  "afterCommit": "fe18a8e1c1f3da42727341d6c6fa30a407c1461e",
+  "armLabels": {
+    "retained": "sealed pre-trial v16 candidate, NOT v15 production",
+    "selected": "three-trial batch and lint hygiene"
+  },
+  "baselineEquivalence": "BEFORE-ARTIFACTS.json matches prior final 193-file build; c212 documentation seal did not alter runtime artifacts",
+  "intent": {
+    "scope": "One final matched comparison of the finite three-trial batch plus lint hygiene against sealed pre-trial c2127a34 candidate; no per-trial quantitative attribution and no new performance SLO",
+    "beforeCommit": "c2127a34b2fdd162ea1bd7bb2000f4815a2d8461",
+    "beforeArtifacts": "BEFORE-ARTIFACTS.json, byte-identical to previous final five-package artifact receipt",
+    "afterArtifacts": "Fresh canonical five-package build after source settles; bound before campaign",
+    "profiles": [
+      "bare:0",
+      "point:1000",
+      "projection:1000",
+      "confirm:1000",
+      "rollback:1000",
+      "heap-populated:1000",
+      "heap-pending:1000"
+    ],
+    "schedule": "84 serial fresh processes: per cell two before-arm A/A controls, then five alternating before/after pairs",
+    "harness": "Unchanged child.mjs and child-heap-v2.mjs from /private/tmp/st-v16-representative-cost/harness; original intermediate and endpoint assertions remain",
+    "guards": "4 GiB aggregate owned RSS; host memory_pressure free percentage >=25; each child <=180s; sampled PID/birth cleanup and before/after source/artifact/dependency hashes",
+    "failures": "Preserve first assertion and stop that profile. Setup, integrity, resource, malformed output, quiescence or cleanup error stops packet; no favorable retries",
+    "interpretation": "Report every sample, five-sample medians/ranges, and separate two-sample A/A controls. Overlap or differences within observed same-arm variability remain unresolved. Busy development host, not production SLO. Heap is whole-process post-quiescence delta, not dominator attribution. Keep persistent heap separate from temporary-work savings",
+    "priorProductionComparison": "Prior 87f6831f comparison remains historical evidence only; this matched campaign compares the before/after candidate, not newly measured v15 production"
+  }
+}

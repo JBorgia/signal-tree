@@ -1,0 +1,16 @@
+{
+  "qualifiedCodeCommit": "fe18a8e1c1f3da42727341d6c6fa30a407c1461e",
+  "qualifiedSourceManifestSha256": "ab8cb3731fe647d220d03e988793889dbbaac9b2faefeba10ef13e4ded36333d",
+  "qualifiedFilesChecked": 3533,
+  "changedQualifiedFiles": [
+    "RELEASE-CURRENT.md",
+    "docs/audits/2026-11-03-progress-and-workflow/HANDOFF.md",
+    "docs/audits/2026-11-03-progress-and-workflow/improvement/README.md"
+  ],
+  "allChangesAreInternalEvidenceOrController": true,
+  "runtimeBuildPackageAndConsumerSourceUnchanged": true,
+  "qualifiedSourceModesMatch": true,
+  "artifactSeal": "sha256-7892fe8daaff3c11fce09d3d5f2a4614ad5cadb45bdb0b8369ab94450a7940d9",
+  "archiveSha256": "f0dcad898f0f4dd75cd558aaff186fba7da4e265f19de8b14697fbcdf0bb343a",
+  "archiveMemberHashesVerified": 4219
+}

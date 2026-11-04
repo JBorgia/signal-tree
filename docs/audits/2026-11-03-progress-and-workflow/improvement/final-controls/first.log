@@ -1,0 +1,15 @@
+
+Running 9 gates
+
+  · version-claims       pass ✓  (every documented Angular-version claim matches peerDependencies)
+  · source-controls      pass ✓  (no raw NUL or unexpected C0 control character in any tracked source)
+  · readme-apis          pass ✓  (every @signaltree symbol named in a shipped README or live doc exists, and no live doc EXAMPLE teaches a retired API)
+  · numeric-claims       pass ✓  (every measured figure on a live surface names a tool that produces it — ratcheted, so new ungenerated numbers cannot land)
+  · release-claims       pass ✓  (every symbol/code ADDED since the last release tag reaches every surface that claims to describe the library)
+  · documented-imports   pass ✓  (every import specifier a LIVE document teaches resolves against the published export map — the documented -> publishable edge no other gate checks)
+  · semantic-discoverability pass ✓  (the canonical manifest states the v15 model, facade rule, link/persistence, external-authority, and causal-projection boundaries, and each primary package README reaches its co-packed manifest)
+  · documented-symbols   pass ✓  (a package barrel's own API-SUMMARY list does not advertise a symbol the barrel fails to export — the symbol-level complement to documented-imports' specifier-level check)
+  · doc-links            pass ✓  (every relative link resolves AND every install instruction selects a publishable current package (archive/CHANGELOG excluded as point-in-time))
+
+──────────────────────────────────────────────────────────────────────────────
+9/9 passed, 0 failed, 0 known-red.
