@@ -1,3 +1,15 @@
+# Current handoff — bounded improvement complete
+
+Use [the improvement report](improvement/README.md) and the root release controller.
+Current runtime/tool checkpoint is fe18a8e1c; lint, benchmark hygiene, three bounded
+trials, two separately identified matched cohorts and production-built application
+qualification are complete. General production/release remains HOLD for the
+point-work and runtime-cost decision. No activation or publication is authorized.
+
+The prior sealed handoff below is preserved as c212 history.
+
+---
+
 # v16 final navigation — November 3, 2026
 
 Release HOLD. Read [the controller](../../../RELEASE-CURRENT.md) and
