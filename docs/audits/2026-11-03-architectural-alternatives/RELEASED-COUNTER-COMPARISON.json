@@ -1,0 +1,56 @@
+{
+  "released-v15-counter": {
+    "arm": "released-v15",
+    "entry": "/private/tmp/st-v16-sparse-responsibility-0/released-v15/package/dist/index.js",
+    "node": "v24.15.0",
+    "pid": 15422,
+    "productionDefine": false,
+    "ngDevMode": false,
+    "workload": "original200distinctupdates;2-field rows;originalcounterunchanged;all200endpoints+untouchedrowchecked",
+    "rows": [
+      {
+        "size": 2000,
+        "total": 800,
+        "originalBound": 2000,
+        "passesOriginalBound": true,
+        "widthControl": 4000
+      },
+      {
+        "size": 20000,
+        "total": 800,
+        "originalBound": 2000,
+        "passesOriginalBound": true,
+        "widthControl": 40000
+      }
+    ],
+    "plantedCharge": 7,
+    "throwUndefinedPreserved": true
+  },
+  "frozen-v16-counter": {
+    "arm": "frozen-v16",
+    "entry": "/Users/jonathanborgia/code/signaltree/.worktrees/v16-integration-candidate/dist/packages/kernel/dist/index.js",
+    "node": "v24.15.0",
+    "pid": 16637,
+    "productionDefine": false,
+    "ngDevMode": false,
+    "workload": "original200distinctupdates;2-field rows;originalcounterunchanged;all200endpoints+untouchedrowchecked",
+    "rows": [
+      {
+        "size": 2000,
+        "total": 13000,
+        "originalBound": 2000,
+        "passesOriginalBound": false,
+        "widthControl": 4000
+      },
+      {
+        "size": 20000,
+        "total": 13000,
+        "originalBound": 2000,
+        "passesOriginalBound": false,
+        "widthControl": 40000
+      }
+    ],
+    "plantedCharge": 7,
+    "throwUndefinedPreserved": true
+  }
+}

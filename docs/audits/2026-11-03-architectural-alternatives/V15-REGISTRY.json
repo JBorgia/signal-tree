@@ -1,0 +1,99 @@
+{
+  "metadataURL": "https://registry.npmjs.org/@signal-tree%2fkernel",
+  "metadataSha256": "78addf87f0324ff540e8cdce990fa9534daeeed27010c57c39abded447877739",
+  "distTags": {
+    "rc": "15.0.0-rc.16",
+    "latest": "15.4.4"
+  },
+  "selectedReleasedV15": "15.4.4",
+  "publishedAt": "2026-10-07T21:05:15.435Z",
+  "package": {
+    "_id": "@signal-tree/kernel@15.4.4",
+    "bugs": {
+      "url": "https://github.com/JBorgia/signal-tree/issues"
+    },
+    "dist": {
+      "shasum": "6d730fbb680752305092cd32d5204878d5da584f",
+      "tarball": "https://registry.npmjs.org/@signal-tree/kernel/-/kernel-15.4.4.tgz",
+      "fileCount": 109,
+      "integrity": "sha512-IfD1tc3KsbnWTIB6eUGt/KYlTJSRUUtWKqnqrzeaQuMisxJ/D4EXkSUz25Ll8XHdA+5Mp9P2JOWoiOgL9cge3A==",
+      "signatures": [
+        {
+          "sig": "MEUCICo5Mm9xFga4pgzkknj2iCMnn1XG9rbbm6RlrtCV8NFlAiEAq0FkyK9KWYuVLHUcfeD9OEhV+jQ1dUjNzu/t5Heeylw=",
+          "keyid": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U"
+        },
+        {
+          "keyid": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U",
+          "sig": "MEUCIF4eukM1QmEZN83fG712vocFL2UICgwflV4R7lV/aXz5AiEAnjdDRN7eDJ1SRVvcE8bSr/bv07tlolO2bquKRM9dgFw="
+        }
+      ],
+      "attestations": {
+        "url": "https://registry.npmjs.org/-/npm/v1/attestations/@signal-tree%2fkernel@15.4.4",
+        "provenance": {
+          "predicateType": "https://slsa.dev/provenance/v1"
+        }
+      },
+      "unpackedSize": 781911
+    },
+    "main": "./dist/index.js",
+    "name": "@signal-tree/kernel",
+    "type": "module",
+    "_from": "file:/home/runner/work/signal-tree/signal-tree/.release/candidates/15.4.4/tarballs/signal-tree-kernel-15.4.4.tgz",
+    "types": "./dist/index.d.ts",
+    "module": "./dist/index.js",
+    "exports": {
+      ".": {
+        "types": "./dist/index.d.ts",
+        "import": "./dist/index.js",
+        "default": "./dist/index.js"
+      },
+      "./adapter": {
+        "types": "./dist/adapter.d.ts",
+        "import": "./dist/adapter.js",
+        "default": "./dist/adapter.js"
+      },
+      "./internals": {
+        "types": "./dist/internals.d.ts",
+        "import": "./dist/internals.js",
+        "default": "./dist/internals.js"
+      },
+      "./package.json": "./package.json"
+    },
+    "license": "Apache-2.0",
+    "version": "15.4.4",
+    "_npmUser": {
+      "name": "counterreset",
+      "email": "jonathanborgia@gmail.com"
+    },
+    "homepage": "https://github.com/JBorgia/signal-tree/tree/main/packages/kernel#readme",
+    "_resolved": "/home/runner/work/signal-tree/signal-tree/.release/candidates/15.4.4/tarballs/signal-tree-kernel-15.4.4.tgz",
+    "_integrity": "sha512-IfD1tc3KsbnWTIB6eUGt/KYlTJSRUUtWKqnqrzeaQuMisxJ/D4EXkSUz25Ll8XHdA+5Mp9P2JOWoiOgL9cge3A==",
+    "repository": {
+      "url": "git+https://github.com/JBorgia/signal-tree.git",
+      "type": "git",
+      "directory": "packages/kernel"
+    },
+    "_npmVersion": "11.21.0",
+    "description": "SignalTree: framework-neutral reactive application state with causal semantics.",
+    "directories": {},
+    "maintainers": [
+      {
+        "name": "counterreset",
+        "email": "jonathanborgia@gmail.com"
+      }
+    ],
+    "sideEffects": false,
+    "_nodeVersion": "24.15.0",
+    "publishConfig": {
+      "access": "public"
+    },
+    "_hasShrinkwrap": false,
+    "peerDependencies": {
+      "tslib": "^2.0.0"
+    },
+    "_npmOperationalInternal": {
+      "host": "s3://npm-registry-packages-npm-production",
+      "tmp": "tmp/kernel_15.4.4_1791407115334_0.2248748119306705"
+    }
+  }
+}

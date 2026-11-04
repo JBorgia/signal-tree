@@ -1,0 +1,137 @@
+import { expect, it } from 'vitest';
+import { writeFileSync } from 'node:fs';
+import { signalTree, entityMap } from '../index';
+import { getEntityPublicationBinding } from './internals/entity-publication';
+import type { EntityPublicationParticipant } from './internals/entity-publication';
+
+function countIteratedElements(run: () => void, expose?: (read: () => number) => void): number {
+  let visited = 0;
+  expose?.(() => visited);
+  const restore: Array<() => void> = [];
+  const patch = (
+    target: object,
+    key: PropertyKey,
+    wrap: (original: (...args: unknown[]) => unknown) => unknown
+  ): void => {
+    const descriptor = Object.getOwnPropertyDescriptor(target, key);
+    if (!descriptor) throw new Error(`nothing to count at ${String(key)}`);
+    restore.push(() => Object.defineProperty(target, key, descriptor));
+    Object.defineProperty(target, key, {
+      ...descriptor,
+      value: wrap(descriptor.value),
+    });
+  };
+  const counting = (iterator: Iterator<unknown>): IterableIterator<unknown> => ({
+    next() {
+      const step = iterator.next();
+      if (!step.done) visited++;
+      return step;
+    },
+    [Symbol.iterator]() {
+      return this;
+    },
+  });
+  for (const proto of [Map.prototype, Set.prototype, Array.prototype])
+    for (const key of ['keys', 'values', 'entries', Symbol.iterator])
+      patch(proto, key, (original) =>
+        function (this: unknown, ...args: unknown[]) {
+          return counting(original.apply(this, args) as Iterator<unknown>);
+        }
+      );
+  for (const proto of [Map.prototype, Set.prototype])
+    patch(proto, 'forEach', (original) =>
+      function (this: { size: number }, ...args: unknown[]) {
+        visited += this.size;
+        return original.apply(this, args);
+      }
+    );
+  // Whole-array walks, counted at their full length: a search that stops
+  // early still scales with the array it searches.
+  for (const key of [
+    'map',
+    'filter',
+    'forEach',
+    'slice',
+    'concat',
+    'reduce',
+    'indexOf',
+    'lastIndexOf',
+    'includes',
+    'find',
+    'findIndex',
+    'some',
+    'every',
+    'splice',
+    'sort',
+    'join',
+  ])
+    patch(Array.prototype, key, (original) =>
+      function (this: unknown[], ...args: unknown[]) {
+        visited += this.length;
+        return original.apply(this, args);
+      }
+    );
+  for (const key of ['keys', 'values', 'entries'])
+    patch(Object, key, (original) =>
+      function (this: unknown, ...args: unknown[]) {
+        const result = original.apply(this, args) as unknown[];
+        visited += result.length;
+        return result;
+      }
+    );
+  patch(Array.prototype, 'push', (original) =>
+    function (this: unknown[], ...args: unknown[]) {
+      visited += args.length;
+      return original.apply(this, args);
+    }
+  );
+  patch(Array, 'from', (original) =>
+    function (this: unknown, ...args: unknown[]) {
+      const result = original.apply(this, args) as unknown[];
+      visited += result.length;
+      return result;
+    }
+  );
+  let counted: number;
+  try {
+    visited = 0;
+    run();
+    counted = visited;
+  } finally {
+    for (let i = restore.length - 1; i >= 0; i--) restore[i]();
+  }
+  return counted;
+}
+
+it('measures incumbent charges before native field/window preparation without changing the original counter', () => {
+  const results: unknown[]=[];
+  for(const size of [2000,20000]) {
+    const tree=signalTree({rows:entityMap<{id:number;v:number},number>({selectId:r=>r.id})});
+    try {
+      tree.$.rows.setAll(Array.from({length:size},(_,id)=>({id,v:0})));
+      const source=getEntityPublicationBinding(tree.$.rows)?.source;
+      const native=(source as unknown as {native?:EntityPublicationParticipant})?.native;
+      if(!native)throw Error('Expected native participant after source population');
+      const original=native.prepare, starts=new Uint32Array(200), prefixes=new Uint32Array(200);
+      let index=0,calls=0,readCounter=()=>0;
+      native.prepare=function(packet,facts){prefixes[index]=readCounter()-starts[index];calls++;return original.call(this,packet,facts);};
+      let total:number;
+      try {total=countIteratedElements(()=>{for(let i=0;i<200;i++){index=i;starts[i]=readCounter();tree.$.rows.updateOne(i,{v:1});}},read=>{readCounter=read;});}
+      finally {native.prepare=original;}
+      expect(calls).toBe(200);expect(total).toBe(13000);
+      for(const prefix of prefixes)expect(prefix).toBe(25);
+      for(let i=0;i<200;i++)expect(tree.$.rows.byIdOrFail(i)().v).toBe(1);
+      expect(tree.$.rows.byIdOrFail(201)().v).toBe(0);
+      results.push({size,total,nativeCalls:calls,prefixes:[...prefixes],prefixSum:prefixes.reduce((a,b)=>a+b,0)});
+    } finally {tree.destroy();}
+  }
+  const out=process.env['SPARSE_SCREEN_OUTPUT'];if(!out)throw Error('SPARSE_SCREEN_OUTPUT required');
+  writeFileSync(out,JSON.stringify({scope:'Counter charges before native.prepare entry on incumbent; not unavoidable semantic cost or a prototype result',results},null,2));
+});
+it('planted charge and throw controls run independently of the failing original bound', () => {
+  const push=Array.prototype.push;
+  const map=new Map([[1,1],[2,2]]), list=[1,2,3];
+  expect(countIteratedElements(()=>{Array.from(map.values());list.map(x=>x);})).toBe(7);
+  let caught=false;try{countIteratedElements(()=>{throw undefined;});}catch(e){caught=true;expect(e).toBeUndefined();}
+  expect(caught).toBe(true);expect(Array.prototype.push).toBe(push);
+});

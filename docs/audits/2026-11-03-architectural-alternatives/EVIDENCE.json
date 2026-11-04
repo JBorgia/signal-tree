@@ -1,0 +1,9 @@
+{
+  "file": "architectural-admission-evidence.tar.gz",
+  "bytes": 1458055,
+  "sha256": "9fd99308a5f0146865bb4f352ba59e92d3cfaee47d278826fc803ba53634c890",
+  "members": 309,
+  "everyMemberVerified": true,
+  "contains": "Original/corrected bindings and registrations,24baselinechildren,2counterchildren,Nxsemantic/prefixruns,source/artifact/dependency maps,exactpublishedv15tarball,correctfrozenbuildreceipt,oracles/scripts/reviews",
+  "candidateRuntimeChanged": false
+}
