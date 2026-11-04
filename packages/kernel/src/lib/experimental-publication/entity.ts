@@ -113,8 +113,8 @@ export const createEntityPublicationParticipant: () => EntityPublicationParticip
       const ordinaryEdits=entityPublicationOrdinary(packet);
       const singleton=ordinaryEdits.length===1?ordinaryEdits[0]:undefined;
       const lastOrdinaryBySubject=singleton?undefined:new Map<number,EntityPublicationEdit>();
-      const repeatedSubjects=new Set<number>();
-      if(lastOrdinaryBySubject)for(const edit of ordinaryEdits){
+      const repeatedSubjects=singleton?undefined:new Set<number>();
+      if(lastOrdinaryBySubject&&repeatedSubjects)for(const edit of ordinaryEdits){
         if(lastOrdinaryBySubject.has(edit.subject))repeatedSubjects.add(edit.subject);
         lastOrdinaryBySubject.set(edit.subject,edit);
       }
@@ -197,7 +197,7 @@ export const createEntityPublicationParticipant: () => EntityPublicationParticip
         }
         // A unique subject's prepared row is final within this admitted sequence.
         // Later units clone installed rows; repeated subjects retain per-edit images.
-        const ordinaryRow=!repeatedSubjects.has(edit.subject)?row:new Map(row),physicalRow=new Map(physical&&physicalAt.get(physical)||view);
+        const ordinaryRow=!repeatedSubjects?.has(edit.subject)?row:new Map(row),physicalRow=new Map(physical&&physicalAt.get(physical)||view);
         for(const key of keys){const endpoint=row.get(key);if(!endpoint)throw new Error('Missing prepared field endpoint');physicalRow.set(key,{requirement:endpoint.requirement as Requirement,present:own(physical?.after??edit.after,key)});}
         const member=nextMembers.get(edit.subject)??members.get(edit.subject),placement=nextPlacements.get(edit.subject)??placements.get(edit.subject);
         const ordinaryKey=nextMappings.get(edit.subject)??mappings.get(edit.subject)??missing,physicalKey=nextMappingViews.get(edit.subject)?.requirement??mappingViews.get(edit.subject)?.requirement??missing;
