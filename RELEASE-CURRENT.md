@@ -19,6 +19,24 @@ and failed results remain reported. Runtime-cost acceptance and the absolute
 point-work bound have no owner disposition. New semantics, activation, push,
 merge, tag and publication remain unauthorized.
 
+## Authorized attribution follow-up — complete
+
+The owner subsequently supplied the qualification review and authorized its finite
+runtime-responsibility attribution experiment. The measured candidate3eabc01dd
+(runtimefe18) stayed frozen. A separate `codex/v16-runtime-attribution` worktree
+reconciled all55paths/13,000visits and tested one detached-image reuse prototype.
+It removed400visits but still failed the unchanged `<2000` bound at12,600. A late
+consumer counterexample proves earlier history cannot simply be omitted; it does
+not prove the remaining representation mandatory. Fresh84-child uninstrumented
+measurements establish no wall/CPU/persistent-heap recovery under the registered
+rule. The prototype is unadopted and runtime restored. General release HOLD
+remains; no activation, push, merge or publication. No next execution queue opened.
+
+[Attribution report, source review bundle and replay evidence](docs/audits/2026-11-03-runtime-responsibility-attribution/README.md)
+preserve raw counts, first failures, exact artifacts, independent review and
+separate cost dimensions. The earlier controlled-pilot assessment grants no
+activation authority. Current outer mutation proof remains pending.
+
 ## Candidate and execution identity
 
 - Selected durable worktree: `/Users/jonathanborgia/code/signaltree/.worktrees/v16-integration-candidate`,

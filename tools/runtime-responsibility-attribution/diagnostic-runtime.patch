@@ -1,0 +1,188 @@
+diff --git a/packages/kernel/src/lib/experimental-publication/entity.ts b/packages/kernel/src/lib/experimental-publication/entity.ts
+index 6868b078a..51889eaf0 100644
+--- a/packages/kernel/src/lib/experimental-publication/entity.ts
++++ b/packages/kernel/src/lib/experimental-publication/entity.ts
+@@ -1,3 +1,4 @@
++import {runtimeAttribution,copyAttributionMap,enterAttribution,leaveAttribution} from '../internals/runtime-attribution-probe';
+ import type {NativeFieldEndpoint,NativeFieldSelections} from '../internals/native-field-selection';
+ import { getActiveWriteContext } from '../write-context';
+ import { combineTerminalRecords, type TerminalRecordPlan } from '../internals/intrinsic-mutation';
+@@ -96,7 +97,8 @@ export const createEntityPublicationParticipant: () => EntityPublicationParticip
+     }}),
+     captureInput(subject,field){return {native:Object.freeze([...new Set(physicalViews(subject,field).map(view=>view.requirement))].map(lifecycle.captureNativeInput))};},
+     inspect(){return {rows:fields.size,fields:[...fields.values()].reduce((n,row)=>n+row.size,0),presence:members.size,negativePresence:[...members.values()].filter(member=>!member.present).length,placements:placements.size,viewRows:views.size,viewFields:[...views.values()].reduce((n,row)=>n+row.size,0),negativeViewFields:[...views.values()].reduce((n,row)=>n+[...row.values()].filter(view=>view.present===false).length,0),visible:visible.size,negativeVisible:[...visible.values()].filter(view=>view.present===false).length,placementViews:placementViews.size,mappings:mappings.size,mappingViews:mappingViews.size,preparedFieldEdits:acquisitions,retireCalls:retirements,inputFactVisits:inputVisits};},
+-    prepare(packet){
++    prepare(packet){const __entered=enterAttribution(1,0);try{
++      if(runtimeAttribution.omitNative)return undefined;
+       const inspection=packet.meta?.participation==='inspection';
+       const meta=getActiveWriteContext()??packet.meta,id=meta?.transactionId;
+       const owner=typeof id==='number'?lifecycle.ownerCell(packet.owner,id):undefined;
+@@ -149,8 +151,8 @@ export const createEntityPublicationParticipant: () => EntityPublicationParticip
+       }
+       const physicalAt=new Map<EntityPublicationEdit,Map<string,View>>();
+       const selectedAt=new Map<EntityPublicationEdit,EntityPublicationEvidence>();
+-      const rowFields=(id:number):Map<string,NativeFieldEndpoint>=>{let row=nextFields.get(id);if(!row)nextFields.set(id,row=new Map(fields.get(id)));return row;};
+-      const rowViews=(id:number):Map<string,View>=>{let row=nextViews.get(id);if(!row)nextViews.set(id,row=new Map(views.get(id)));return row;};
++      const rowFields=(id:number):Map<string,NativeFieldEndpoint>=>{let row=nextFields.get(id);if(!row)nextFields.set(id,row=copyAttributionMap(fields.get(id),0));return row;};
++      const rowViews=(id:number):Map<string,View>=>{let row=nextViews.get(id);if(!row)nextViews.set(id,row=copyAttributionMap(views.get(id),1));return row;};
+       // Physical support is distinct from ordinary eligibility. Inspection
+       // changes only the physical certificate, including negative membership.
+       for(const edit of packet.physical){
+@@ -163,7 +165,7 @@ export const createEntityPublicationParticipant: () => EntityPublicationParticip
+         const row=rowViews(edit.subject);
+         const keys=edit.fields===null?[...new Set([...row.keys(),...Object.keys(edit.after??{})])]:edit.fields;
+         for(const key of keys)row.set(key,{requirement,present:own(edit.after,key)});
+-        physicalAt.set(edit,new Map(row));
++        physicalAt.set(edit,copyAttributionMap(row,2));
+         if(edit.structural?.kind==='add'){nextMappingViews.set(edit.subject,{requirement});physicalMembers.set(edit.subject,{requirement,present:true});physicalPlacements.set(edit.subject,{requirement});}
+         if(edit.structural?.kind==='add')writes.push({map:visible,key:edit.subject,value:{requirement,present:true}},{map:placementViews,key:edit.subject,value:{requirement}});
+       }
+@@ -197,7 +199,9 @@ export const createEntityPublicationParticipant: () => EntityPublicationParticip
+         }
+         // A unique subject's prepared row is final within this admitted sequence.
+         // Later units clone installed rows; repeated subjects retain per-edit images.
+-        const ordinaryRow=!repeatedSubjects?.has(edit.subject)?row:new Map(row),physicalRow=new Map(physical&&physicalAt.get(physical)||view);
++        const ordinaryRow=!repeatedSubjects?.has(edit.subject)?row:new Map(row);
++        const physicalImage=physical&&physicalAt.get(physical);
++        const physicalRow=runtimeAttribution.reusePhysical&&singleton&&physicalImage?physicalImage:copyAttributionMap(physicalImage||view,3);
+         for(const key of keys){const endpoint=row.get(key);if(!endpoint)throw new Error('Missing prepared field endpoint');physicalRow.set(key,{requirement:endpoint.requirement as Requirement,present:own(physical?.after??edit.after,key)});}
+         const member=nextMembers.get(edit.subject)??members.get(edit.subject),placement=nextPlacements.get(edit.subject)??placements.get(edit.subject);
+         const ordinaryKey=nextMappings.get(edit.subject)??mappings.get(edit.subject)??missing,physicalKey=nextMappingViews.get(edit.subject)?.requirement??mappingViews.get(edit.subject)?.requirement??missing;
+@@ -234,8 +238,8 @@ export const createEntityPublicationParticipant: () => EntityPublicationParticip
+       return {record:combineTerminalRecords(responsibility,prepared?.record,{writes,deletes,adds:[]}),completion:inspection?{}:{requirement,support,facts:selected},finalize:()=>{
+         if(prepared)lifecycle.finalizeNativeRequirement(requirement);
+       }};
+-    },
+-    complete(completion){lifecycle.deliverNativeRequirementReady((completion as {requirement?:Requirement}).requirement);},
++    }finally{leaveAttribution(__entered);}},
++    complete(completion){const __entered=enterAttribution(5,5);try{lifecycle.deliverNativeRequirementReady((completion as {requirement?:Requirement}).requirement);}finally{leaveAttribution(__entered);}},
+     prepareRetirement(subject){
+       // Snapshot only this exact subject. Missing entries contribute no evidence.
+       const snapshots = [fields.get(subject), members.get(subject), placements.get(subject), views.get(subject), visible.get(subject), placementViews.get(subject), mappings.get(subject), mappingViews.get(subject)] as const;
+diff --git a/packages/kernel/src/lib/experimental-publication/lifecycle.ts b/packages/kernel/src/lib/experimental-publication/lifecycle.ts
+index 7a1a9e955..218aa7b49 100644
+--- a/packages/kernel/src/lib/experimental-publication/lifecycle.ts
++++ b/packages/kernel/src/lib/experimental-publication/lifecycle.ts
+@@ -1,3 +1,4 @@
++import {runtimeAttribution,enterAttribution,leaveAttribution} from '../internals/runtime-attribution-probe';
+ import type { PublicationState } from '../publication-declaration';
+ import { isTraversableNode } from '../internals/node-shape';
+ import type { TerminalRecordPlan } from '../internals/intrinsic-mutation';
+@@ -261,8 +262,8 @@ export function captureNativeInput(requirement:NativeRequirement):NativeInput {
+  const proof=nativeProof(requirement);
+  return Object.freeze({requirement,owners:Object.freeze(proof.owners.filter(owner=>owner.outcome!=='confirmed')),terminalRejectedRoles:proof.terminalRejectedRoles??0});
+ }
+-export function nativeProof(requirement: NativeRequirement): Proof {
+- const p=requirement.proof;if(p)return p;
++export function nativeProof(requirement: NativeRequirement): Proof {const __entered=enterAttribution(3,3);try{
++ const p=requirement.proof;if(runtimeAttribution.active){if(p)runtimeAttribution.proofCached++;else runtimeAttribution.proofMaterialized++;}if(p)return p;
+  const inputs=requirement.inputs.map(input=>nativeProof(input.requirement));
+  const validation=requirement.frames.map(effective);
+  // Every actual source obligation, including its destination authorship,
+@@ -281,14 +282,15 @@ export function nativeProof(requirement: NativeRequirement): Proof {
+   historicalWindow:requirement.captureWindow||inputs.some(p=>p.historicalWindow===true),
+   unknown:requirement.unknown||ownWindow.length>0||inputs.some(p=>p.unknown)||validation.some(p=>p.unknown),
+   invalid:inputs.some(p=>p.invalid)||validation.some(p=>p.invalid)};
+-}
++}finally{leaveAttribution(__entered);}}
+ export function initialRequirement():NativeRequirement{return {proof:{owners:[],unknown:false,invalid:false},inputs:[],frames:[],known:[],unknown:false,possible:[],captureWindow:false};}
+ /** An exact physical input whose ordinary authorship cannot be certified. */
+ export function unavailableRequirement():NativeRequirement {
+  return {proof:{owners:[],unknown:true,invalid:false,unavailableInput:true},inputs:[],frames:[],known:[],unknown:true,possible:[],captureWindow:false};
+ }
+-export function prepareNativeRequirement(known:readonly OwnerCell[], unknown:boolean, inputs:readonly NativeInput[]):{requirement:NativeRequirement;record:TerminalRecordPlan}{
++export function prepareNativeRequirement(known:readonly OwnerCell[], unknown:boolean, inputs:readonly NativeInput[]):{requirement:NativeRequirement;record:TerminalRecordPlan}{const __entered=enterAttribution(1,1);try{
+  const active=[...stack];
++ if(runtimeAttribution.active){runtimeAttribution.known+=known.length;runtimeAttribution.inputs+=inputs.length;runtimeAttribution.frames+=active.length;}
+  // Input completeness, not destination ownership, decides whether W applies.
+  const captureWindow=active.length===0||active.some(f=>f.declaredOwners===undefined)
+   ||inputs.some(input=>nativeProof(input.requirement).unavailableInput===true);
+@@ -310,21 +312,22 @@ export function prepareNativeRequirement(known:readonly OwnerCell[], unknown:boo
+  if(h)adds.push({set:h.requirements,value:requirement});
+  // Pure window finalization occurs after all callback-capable preparers, before installation.
+  return {requirement,record:{writes:[],adds}};
+-}
+-export function finalizeNativeRequirement(requirement:NativeRequirement):void {
++}finally{leaveAttribution(__entered);}}
++export function finalizeNativeRequirement(requirement:NativeRequirement):void {const __entered=enterAttribution(2,2);try{
+  // Normalize ONLY this installation's newly acquired candidate window. An
+  // inherited W with the same identity as D/I/V remains in the input proof.
++ if(runtimeAttribution.active)runtimeAttribution.pending+=pending.size;
+  const actualInputs=new Set(requirement.inputs.flatMap(input=>input.owners));
+  const destination=new Set(requirement.known);
+  requirement.possible=Object.freeze([...pending].filter(owner=>!destination.has(owner)&&!actualInputs.has(owner)));
+  // Source inputs are immutable snapshots; only the not-yet-installed unit's own window is refreshed.
+  if(requirement.frames.length===0){requirement.proof=nativeProof(requirement);requirement.inputs=[];requirement.known=[];unfinishedRequirements.delete(requirement);}
+-}
++}finally{leaveAttribution(__entered);}}
+ /** Installed completion delivers readiness; sealing itself never calls subscribers. */
+-export function deliverNativeRequirementReady(requirement:NativeRequirement|undefined):void {
++export function deliverNativeRequirementReady(requirement:NativeRequirement|undefined):void {const __entered=enterAttribution(5,6);try{
+  if(!requirement||!unactivatedRequirements.delete(requirement))return;
+  if(nativeRequirementReady(requirement))notifyRequirement(requirement);
+-}
++}finally{leaveAttribution(__entered);}}
+ type Operation={relevance?:CurrentRelevance;invocation?:NativeRequirement;declared:boolean;recipientWindow:readonly OwnerCell[];incomplete:boolean;projectionPending:boolean;native?:NativeRequirement;coverageUnknown:boolean;channel:object;dependencies:Set<OwnerCell>;revision:object;frames:Set<Frame>;proof?:Proof;views:Set<View>;started:boolean;surviving:boolean;noopFallbacks:Map<View,Operation>};
+ const connections=new Map<object,Connection>();
+ const stack:Frame[]=[];
+diff --git a/packages/kernel/src/lib/internals/entity-publication.ts b/packages/kernel/src/lib/internals/entity-publication.ts
+index c8105ce67..25e9a9a14 100644
+--- a/packages/kernel/src/lib/internals/entity-publication.ts
++++ b/packages/kernel/src/lib/internals/entity-publication.ts
+@@ -1,3 +1,4 @@
++import {enterAttribution,leaveAttribution} from './runtime-attribution-probe';
+ import { isTraversableNode } from './node-shape';
+ import type { EntityProjectionSeedEntry } from './entity-projection-seed';
+ import type { WriteMetadata } from '../mutation-types';
+@@ -81,7 +82,7 @@ class AdmissionMetadata {
+     this.arrays.add(result);
+     return result;
+   }
+-  prepare(packet:EntityPublicationPacket):EntityPublicationPacket {
++  prepare(packet:EntityPublicationPacket):EntityPublicationPacket {const __entered=enterAttribution(6,7);try{
+     if(this.packets.has(packet))return packet;
+     const steps=packet.steps?.map(step=>{
+       if(step.authoredRemoval)this.edit(step.authoredRemoval);
+@@ -96,7 +97,7 @@ class AdmissionMetadata {
+       physicalOrder:packet.physicalOrder?Object.freeze([...packet.physicalOrder]):undefined});
+     this.packets.add(result);
+     return result;
+-  }
++  }finally{leaveAttribution(__entered);}}
+ }
+ /** Opaque source-issued support; the reducer transports, never interprets, it. */
+ export interface EntityPublicationEvidence {
+@@ -224,7 +225,7 @@ export class EntityPublicationSource {
+     }
+     group.state.packets.push(packet);return group.publication;
+   }
+-  prepare(packet: EntityPublicationPacket): PreparedPublicationUnit | undefined {
++  prepare(packet: EntityPublicationPacket): PreparedPublicationUnit | undefined {const __entered=enterAttribution(6,7);try{
+     const recipientRevision = this.recipientRevision,sourceRevision=this.revisionToken;
+     const retirementRevision = this.retirementRevision;
+     const parts: { participant: EntityPublicationParticipant; unit: PreparedPublicationUnit }[] = [];
+@@ -257,13 +258,13 @@ export class EntityPublicationSource {
+           throw new Error('Entity publication source changed during finalization');
+       },
+     };
+-  }
++  }finally{leaveAttribution(__entered);}}
+   requestsSeed():boolean { return [...this.recipients].some(participant=>participant.seedRequested?.()); }
+   evidence():EntityPublicationEvidence|undefined { return this.nativeParticipant()?.evidence?.(); }
+   captureViews(subject?:number,field?:string): readonly object[] { return this.nativeParticipant()?.captureViews?.(subject,field)??[]; }
+   inspect(): Readonly<Record<string,number>> { return {...(this.native?.inspect?.()??{}),recipients:this.recipients.size,native:this.native?1:0,retirementRequests:this.retirements.size}; }
+   retire(subject: number): void { this.cancelRetirement(subject); this.native?.retire?.(subject); this.revisionToken = {}; this.retirementRevision = {}; }
+-  complete(completion: object): void {
++  complete(completion: object): void {const __entered=enterAttribution(5,8);try{
+     const point=pointCompletions.get(completion);if(point){point();return;}
+     const { parts } = completion as { parts: readonly {participant: EntityPublicationParticipant; unit: PreparedPublicationUnit}[] };
+     let failed = false;
+@@ -273,7 +274,7 @@ export class EntityPublicationSource {
+       catch (error) { if (!failed) { failed = true; first = error; } }
+     }
+     if (failed) throw first;
+-  }
++  }finally{leaveAttribution(__entered);}}
+ }
+ const ENTITY_PUBLICATION = Symbol('signaltree.entityPublication');
+ const anchors = new WeakMap<EntityPublicationSource, object>();

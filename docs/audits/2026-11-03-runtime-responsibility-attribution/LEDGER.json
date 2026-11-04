@@ -1,0 +1,1016 @@
+{
+  "baselineCommit": "3eabc01ddab71f16b8def0172c43c344bfd08731",
+  "runtimeCommit": "fe18a8e1c1f3da42727341d6c6fa30a407c1461e",
+  "workload": "original counter interval;200 distinct updateOne writes;2-field rows;size2000/20000",
+  "summary": {
+    "write key enumeration": 400,
+    "physical value transition": 200,
+    "value equality": 800,
+    "ordinary topology": 1000,
+    "source footprint and packet construction": 1000,
+    "admission normalization": 1800,
+    "native preparation excluding row copies": 3600,
+    "row map copies": 1600,
+    "source composition": 1200,
+    "source finalization dispatch": 200,
+    "publication input capture": 200,
+    "location delivery": 600,
+    "completion dispatch": 200,
+    "source completion": 200
+  },
+  "count": 13000,
+  "countPerUpdate": 65,
+  "unclassified": 0,
+  "nestedCharges": "Preserved original counter: iterator yield and Array.from output may both charge. Not CPU instructions. Empty iterations contribute zero.",
+  "ledger": [
+    {
+      "id": 0,
+      "count": 200,
+      "perUpdate": 1.0,
+      "operation": "Object.keys",
+      "responsibility": "write key enumeration",
+      "site": "at updateOnePrivate (packages/kernel/src/lib/entity-signal.ts:2374:16)",
+      "callPath": [
+        "at updateOnePrivate (packages/kernel/src/lib/entity-signal.ts:2374:16)",
+        "at Proxy.updateOne (packages/kernel/src/lib/entity-signal.ts:4192:51)"
+      ],
+      "necessity": "Observed incumbent operation; required responsibility does not prove this traversal representation necessary",
+      "removableWitness": false
+    },
+    {
+      "id": 1,
+      "count": 200,
+      "perUpdate": 1.0,
+      "operation": "Array.Symbol(Symbol.iterator)",
+      "responsibility": "physical value transition",
+      "site": "at EntityValueStore.prepareValueTransition (packages/kernel/src/lib/physical/entity-value-store.ts:70:18)",
+      "callPath": [
+        "at EntityValueStore.prepareValueTransition (packages/kernel/src/lib/physical/entity-value-store.ts:70:18)",
+        "at commitExistingSubjectValue (packages/kernel/src/lib/entity-signal.ts:2538:35)",
+        "at updateOnePrivate (packages/kernel/src/lib/entity-signal.ts:2371:26)",
+        "at Proxy.updateOne (packages/kernel/src/lib/entity-signal.ts:4192:51)"
+      ],
+      "necessity": "Observed incumbent operation; required responsibility does not prove this traversal representation necessary",
+      "removableWitness": false
+    },
+    {
+      "id": 2,
+      "count": 400,
+      "perUpdate": 2.0,
+      "operation": "Object.keys",
+      "responsibility": "value equality",
+      "site": "at equalsInner (packages/kernel/src/lib/internals/utilities/deep-equal.ts:228:24)",
+      "callPath": [
+        "at equalsInner (packages/kernel/src/lib/internals/utilities/deep-equal.ts:228:24)",
+        "at deepEqual (packages/kernel/src/lib/internals/utilities/deep-equal.ts:17:10)",
+        "at EntityValueStore.prepareValueTransition (packages/kernel/src/lib/physical/entity-value-store.ts:90:10)",
+        "at commitExistingSubjectValue (packages/kernel/src/lib/entity-signal.ts:2538:35)",
+        "at updateOnePrivate (packages/kernel/src/lib/entity-signal.ts:2371:26)",
+        "at Proxy.updateOne (packages/kernel/src/lib/entity-signal.ts:4192:51)"
+      ],
+      "necessity": "Observed incumbent operation; required responsibility does not prove this traversal representation necessary",
+      "removableWitness": false
+    },
+    {
+      "id": 3,
+      "count": 400,
+      "perUpdate": 2.0,
+      "operation": "Object.keys",
+      "responsibility": "value equality",
+      "site": "at equalsInner (packages/kernel/src/lib/internals/utilities/deep-equal.ts:229:24)",
+      "callPath": [
+        "at equalsInner (packages/kernel/src/lib/internals/utilities/deep-equal.ts:229:24)",
+        "at deepEqual (packages/kernel/src/lib/internals/utilities/deep-equal.ts:17:10)",
+        "at EntityValueStore.prepareValueTransition (packages/kernel/src/lib/physical/entity-value-store.ts:90:10)",
+        "at commitExistingSubjectValue (packages/kernel/src/lib/entity-signal.ts:2538:35)",
+        "at updateOnePrivate (packages/kernel/src/lib/entity-signal.ts:2371:26)",
+        "at Proxy.updateOne (packages/kernel/src/lib/entity-signal.ts:4192:51)"
+      ],
+      "necessity": "Observed incumbent operation; required responsibility does not prove this traversal representation necessary",
+      "removableWitness": false
+    },
+    {
+      "id": 4,
+      "count": 200,
+      "perUpdate": 1.0,
+      "operation": "Array.Symbol(Symbol.iterator)",
+      "responsibility": "ordinary topology",
+      "site": "at prepareOrdinaryTopology (packages/kernel/src/lib/entity-signal.ts:1193:16)",
+      "callPath": [
+        "at prepareOrdinaryTopology (packages/kernel/src/lib/entity-signal.ts:1193:16)",
+        "at commitExistingSubjectValue (packages/kernel/src/lib/entity-signal.ts:2543:26)",
+        "at updateOnePrivate (packages/kernel/src/lib/entity-signal.ts:2371:26)",
+        "at Proxy.updateOne (packages/kernel/src/lib/entity-signal.ts:4192:51)"
+      ],
+      "necessity": "Observed incumbent operation; required responsibility does not prove this traversal representation necessary",
+      "removableWitness": false
+    },
+    {
+      "id": 5,
+      "count": 200,
+      "perUpdate": 1.0,
+      "operation": "Array.push",
+      "responsibility": "ordinary topology",
+      "site": "at prepareOrdinaryTopology (packages/kernel/src/lib/entity-signal.ts:1291:17)",
+      "callPath": [
+        "at prepareOrdinaryTopology (packages/kernel/src/lib/entity-signal.ts:1291:17)",
+        "at commitExistingSubjectValue (packages/kernel/src/lib/entity-signal.ts:2543:26)",
+        "at updateOnePrivate (packages/kernel/src/lib/entity-signal.ts:2371:26)",
+        "at Proxy.updateOne (packages/kernel/src/lib/entity-signal.ts:4192:51)"
+      ],
+      "necessity": "Observed incumbent operation; required responsibility does not prove this traversal representation necessary",
+      "removableWitness": false
+    },
+    {
+      "id": 6,
+      "count": 200,
+      "perUpdate": 1.0,
+      "operation": "Array.Symbol(Symbol.iterator)",
+      "responsibility": "ordinary topology",
+      "site": "at prepareOrdinaryTopology (packages/kernel/src/lib/entity-signal.ts:1303:16)",
+      "callPath": [
+        "at prepareOrdinaryTopology (packages/kernel/src/lib/entity-signal.ts:1303:16)",
+        "at commitExistingSubjectValue (packages/kernel/src/lib/entity-signal.ts:2543:26)",
+        "at updateOnePrivate (packages/kernel/src/lib/entity-signal.ts:2371:26)",
+        "at Proxy.updateOne (packages/kernel/src/lib/entity-signal.ts:4192:51)"
+      ],
+      "necessity": "Observed incumbent operation; required responsibility does not prove this traversal representation necessary",
+      "removableWitness": false
+    },
+    {
+      "id": 7,
+      "count": 200,
+      "perUpdate": 1.0,
+      "operation": "Array.push",
+      "responsibility": "ordinary topology",
+      "site": "at prepareOrdinaryTopology (packages/kernel/src/lib/entity-signal.ts:1303:16)",
+      "callPath": [
+        "at prepareOrdinaryTopology (packages/kernel/src/lib/entity-signal.ts:1303:16)",
+        "at commitExistingSubjectValue (packages/kernel/src/lib/entity-signal.ts:2543:26)",
+        "at updateOnePrivate (packages/kernel/src/lib/entity-signal.ts:2371:26)",
+        "at Proxy.updateOne (packages/kernel/src/lib/entity-signal.ts:4192:51)"
+      ],
+      "necessity": "Observed incumbent operation; required responsibility does not prove this traversal representation necessary",
+      "removableWitness": false
+    },
+    {
+      "id": 8,
+      "count": 200,
+      "perUpdate": 1.0,
+      "operation": "Array.map",
+      "responsibility": "ordinary topology",
+      "site": "at prepareOrdinaryTopology (packages/kernel/src/lib/entity-signal.ts:1365:32)",
+      "callPath": [
+        "at prepareOrdinaryTopology (packages/kernel/src/lib/entity-signal.ts:1365:32)",
+        "at commitExistingSubjectValue (packages/kernel/src/lib/entity-signal.ts:2543:26)",
+        "at updateOnePrivate (packages/kernel/src/lib/entity-signal.ts:2371:26)",
+        "at Proxy.updateOne (packages/kernel/src/lib/entity-signal.ts:4192:51)"
+      ],
+      "necessity": "Observed incumbent operation; required responsibility does not prove this traversal representation necessary",
+      "removableWitness": false
+    },
+    {
+      "id": 9,
+      "count": 200,
+      "perUpdate": 1.0,
+      "operation": "Array.map",
+      "responsibility": "source footprint and packet construction",
+      "site": "at commitExistingSubjectValue (packages/kernel/src/lib/entity-signal.ts:2566:28)",
+      "callPath": [
+        "at commitExistingSubjectValue (packages/kernel/src/lib/entity-signal.ts:2566:28)",
+        "at updateOnePrivate (packages/kernel/src/lib/entity-signal.ts:2371:26)",
+        "at Proxy.updateOne (packages/kernel/src/lib/entity-signal.ts:4192:51)"
+      ],
+      "necessity": "Observed incumbent operation; required responsibility does not prove this traversal representation necessary",
+      "removableWitness": false
+    },
+    {
+      "id": 10,
+      "count": 200,
+      "perUpdate": 1.0,
+      "operation": "Array.Symbol(Symbol.iterator)",
+      "responsibility": "source footprint and packet construction",
+      "site": "at authoredFootprint (packages/kernel/src/lib/entity-signal.ts:2504:66)",
+      "callPath": [
+        "at authoredFootprint (packages/kernel/src/lib/entity-signal.ts:2504:66)",
+        "at commitExistingSubjectValue (packages/kernel/src/lib/entity-signal.ts:2567:63)",
+        "at updateOnePrivate (packages/kernel/src/lib/entity-signal.ts:2371:26)",
+        "at Proxy.updateOne (packages/kernel/src/lib/entity-signal.ts:4192:51)"
+      ],
+      "necessity": "Observed incumbent operation; required responsibility does not prove this traversal representation necessary",
+      "removableWitness": false
+    },
+    {
+      "id": 11,
+      "count": 200,
+      "perUpdate": 1.0,
+      "operation": "Array.map",
+      "responsibility": "source footprint and packet construction",
+      "site": "at commitExistingSubjectValue (packages/kernel/src/lib/entity-signal.ts:2567:119)",
+      "callPath": [
+        "at commitExistingSubjectValue (packages/kernel/src/lib/entity-signal.ts:2567:119)",
+        "at updateOnePrivate (packages/kernel/src/lib/entity-signal.ts:2371:26)",
+        "at Proxy.updateOne (packages/kernel/src/lib/entity-signal.ts:4192:51)"
+      ],
+      "necessity": "Observed incumbent operation; required responsibility does not prove this traversal representation necessary",
+      "removableWitness": false
+    },
+    {
+      "id": 12,
+      "count": 200,
+      "perUpdate": 1.0,
+      "operation": "Array.map",
+      "responsibility": "source footprint and packet construction",
+      "site": "at prepareEntityPublication (packages/kernel/src/lib/entity-signal.ts:2528:411)",
+      "callPath": [
+        "at prepareEntityPublication (packages/kernel/src/lib/entity-signal.ts:2528:411)",
+        "at commitExistingSubjectValue (packages/kernel/src/lib/entity-signal.ts:2564:25)",
+        "at updateOnePrivate (packages/kernel/src/lib/entity-signal.ts:2371:26)",
+        "at Proxy.updateOne (packages/kernel/src/lib/entity-signal.ts:4192:51)"
+      ],
+      "necessity": "Observed incumbent operation; required responsibility does not prove this traversal representation necessary",
+      "removableWitness": false
+    },
+    {
+      "id": 13,
+      "count": 200,
+      "perUpdate": 1.0,
+      "operation": "Array.slice",
+      "responsibility": "source footprint and packet construction",
+      "site": "at packages/kernel/src/lib/entity-signal.ts:2528:464",
+      "callPath": [
+        "at packages/kernel/src/lib/entity-signal.ts:2528:464",
+        "at prepareEntityPublication (packages/kernel/src/lib/entity-signal.ts:2528:411)",
+        "at commitExistingSubjectValue (packages/kernel/src/lib/entity-signal.ts:2564:25)",
+        "at updateOnePrivate (packages/kernel/src/lib/entity-signal.ts:2371:26)",
+        "at Proxy.updateOne (packages/kernel/src/lib/entity-signal.ts:4192:51)"
+      ],
+      "necessity": "Observed incumbent operation; required responsibility does not prove this traversal representation necessary",
+      "removableWitness": false
+    },
+    {
+      "id": 14,
+      "count": 200,
+      "perUpdate": 1.0,
+      "operation": "Array.map",
+      "responsibility": "admission normalization",
+      "site": "at AdmissionMetadata.prepare (packages/kernel/src/lib/internals/entity-publication.ts:86:31)",
+      "callPath": [
+        "at AdmissionMetadata.prepare (packages/kernel/src/lib/internals/entity-publication.ts:86:31)",
+        "at EntityPublicationSource.prepare (packages/kernel/src/lib/internals/entity-publication.ts:231:27)",
+        "at prepareEntityPublication (packages/kernel/src/lib/entity-signal.ts:2528:126)",
+        "at commitExistingSubjectValue (packages/kernel/src/lib/entity-signal.ts:2564:25)",
+        "at updateOnePrivate (packages/kernel/src/lib/entity-signal.ts:2371:26)",
+        "at Proxy.updateOne (packages/kernel/src/lib/entity-signal.ts:4192:51)"
+      ],
+      "necessity": "Observed incumbent operation; required responsibility does not prove this traversal representation necessary",
+      "removableWitness": false
+    },
+    {
+      "id": 15,
+      "count": 200,
+      "perUpdate": 1.0,
+      "operation": "Array.Symbol(Symbol.iterator)",
+      "responsibility": "admission normalization",
+      "site": "at packages/kernel/src/lib/internals/entity-publication.ts:90:126",
+      "callPath": [
+        "at packages/kernel/src/lib/internals/entity-publication.ts:90:126",
+        "at AdmissionMetadata.prepare (packages/kernel/src/lib/internals/entity-publication.ts:86:31)",
+        "at EntityPublicationSource.prepare (packages/kernel/src/lib/internals/entity-publication.ts:231:27)",
+        "at prepareEntityPublication (packages/kernel/src/lib/entity-signal.ts:2528:126)",
+        "at commitExistingSubjectValue (packages/kernel/src/lib/entity-signal.ts:2564:25)",
+        "at updateOnePrivate (packages/kernel/src/lib/entity-signal.ts:2371:26)",
+        "at Proxy.updateOne (packages/kernel/src/lib/entity-signal.ts:4192:51)"
+      ],
+      "necessity": "Observed incumbent operation; required responsibility does not prove this traversal representation necessary",
+      "removableWitness": false
+    },
+    {
+      "id": 16,
+      "count": 200,
+      "perUpdate": 1.0,
+      "operation": "Array.Symbol(Symbol.iterator)",
+      "responsibility": "admission normalization",
+      "site": "at AdmissionMetadata.array (packages/kernel/src/lib/internals/entity-publication.ts:77:16)",
+      "callPath": [
+        "at AdmissionMetadata.array (packages/kernel/src/lib/internals/entity-publication.ts:77:16)",
+        "at packages/kernel/src/lib/internals/entity-publication.ts:91:23",
+        "at AdmissionMetadata.prepare (packages/kernel/src/lib/internals/entity-publication.ts:86:31)",
+        "at EntityPublicationSource.prepare (packages/kernel/src/lib/internals/entity-publication.ts:231:27)",
+        "at prepareEntityPublication (packages/kernel/src/lib/entity-signal.ts:2528:126)",
+        "at commitExistingSubjectValue (packages/kernel/src/lib/entity-signal.ts:2564:25)",
+        "at updateOnePrivate (packages/kernel/src/lib/entity-signal.ts:2371:26)",
+        "at Proxy.updateOne (packages/kernel/src/lib/entity-signal.ts:4192:51)"
+      ],
+      "necessity": "Observed incumbent operation; required responsibility does not prove this traversal representation necessary",
+      "removableWitness": false
+    },
+    {
+      "id": 17,
+      "count": 200,
+      "perUpdate": 1.0,
+      "operation": "Array.Symbol(Symbol.iterator)",
+      "responsibility": "admission normalization",
+      "site": "at AdmissionMetadata.edit (packages/kernel/src/lib/internals/entity-publication.ts:65:123)",
+      "callPath": [
+        "at AdmissionMetadata.edit (packages/kernel/src/lib/internals/entity-publication.ts:65:123)",
+        "at AdmissionMetadata.array (packages/kernel/src/lib/internals/entity-publication.ts:77:36)",
+        "at packages/kernel/src/lib/internals/entity-publication.ts:91:23",
+        "at AdmissionMetadata.prepare (packages/kernel/src/lib/internals/entity-publication.ts:86:31)",
+        "at EntityPublicationSource.prepare (packages/kernel/src/lib/internals/entity-publication.ts:231:27)",
+        "at prepareEntityPublication (packages/kernel/src/lib/entity-signal.ts:2528:126)",
+        "at commitExistingSubjectValue (packages/kernel/src/lib/entity-signal.ts:2564:25)",
+        "at updateOnePrivate (packages/kernel/src/lib/entity-signal.ts:2371:26)",
+        "at Proxy.updateOne (packages/kernel/src/lib/entity-signal.ts:4192:51)"
+      ],
+      "necessity": "Observed incumbent operation; required responsibility does not prove this traversal representation necessary",
+      "removableWitness": false
+    },
+    {
+      "id": 18,
+      "count": 200,
+      "perUpdate": 1.0,
+      "operation": "Array.Symbol(Symbol.iterator)",
+      "responsibility": "admission normalization",
+      "site": "at AdmissionMetadata.array (packages/kernel/src/lib/internals/entity-publication.ts:77:16)",
+      "callPath": [
+        "at AdmissionMetadata.array (packages/kernel/src/lib/internals/entity-publication.ts:77:16)",
+        "at packages/kernel/src/lib/internals/entity-publication.ts:91:72",
+        "at AdmissionMetadata.prepare (packages/kernel/src/lib/internals/entity-publication.ts:86:31)",
+        "at EntityPublicationSource.prepare (packages/kernel/src/lib/internals/entity-publication.ts:231:27)",
+        "at prepareEntityPublication (packages/kernel/src/lib/entity-signal.ts:2528:126)",
+        "at commitExistingSubjectValue (packages/kernel/src/lib/entity-signal.ts:2564:25)",
+        "at updateOnePrivate (packages/kernel/src/lib/entity-signal.ts:2371:26)",
+        "at Proxy.updateOne (packages/kernel/src/lib/entity-signal.ts:4192:51)"
+      ],
+      "necessity": "Observed incumbent operation; required responsibility does not prove this traversal representation necessary",
+      "removableWitness": false
+    },
+    {
+      "id": 19,
+      "count": 200,
+      "perUpdate": 1.0,
+      "operation": "Array.Symbol(Symbol.iterator)",
+      "responsibility": "admission normalization",
+      "site": "at AdmissionMetadata.edit (packages/kernel/src/lib/internals/entity-publication.ts:65:123)",
+      "callPath": [
+        "at AdmissionMetadata.edit (packages/kernel/src/lib/internals/entity-publication.ts:65:123)",
+        "at AdmissionMetadata.array (packages/kernel/src/lib/internals/entity-publication.ts:77:36)",
+        "at packages/kernel/src/lib/internals/entity-publication.ts:91:72",
+        "at AdmissionMetadata.prepare (packages/kernel/src/lib/internals/entity-publication.ts:86:31)",
+        "at EntityPublicationSource.prepare (packages/kernel/src/lib/internals/entity-publication.ts:231:27)",
+        "at prepareEntityPublication (packages/kernel/src/lib/entity-signal.ts:2528:126)",
+        "at commitExistingSubjectValue (packages/kernel/src/lib/entity-signal.ts:2564:25)",
+        "at updateOnePrivate (packages/kernel/src/lib/entity-signal.ts:2371:26)",
+        "at Proxy.updateOne (packages/kernel/src/lib/entity-signal.ts:4192:51)"
+      ],
+      "necessity": "Observed incumbent operation; required responsibility does not prove this traversal representation necessary",
+      "removableWitness": false
+    },
+    {
+      "id": 20,
+      "count": 200,
+      "perUpdate": 1.0,
+      "operation": "Array.Symbol(Symbol.iterator)",
+      "responsibility": "admission normalization",
+      "site": "at AdmissionMetadata.array (packages/kernel/src/lib/internals/entity-publication.ts:77:16)",
+      "callPath": [
+        "at AdmissionMetadata.array (packages/kernel/src/lib/internals/entity-publication.ts:77:16)",
+        "at AdmissionMetadata.prepare (packages/kernel/src/lib/internals/entity-publication.ts:93:57)",
+        "at EntityPublicationSource.prepare (packages/kernel/src/lib/internals/entity-publication.ts:231:27)",
+        "at prepareEntityPublication (packages/kernel/src/lib/entity-signal.ts:2528:126)",
+        "at commitExistingSubjectValue (packages/kernel/src/lib/entity-signal.ts:2564:25)",
+        "at updateOnePrivate (packages/kernel/src/lib/entity-signal.ts:2371:26)",
+        "at Proxy.updateOne (packages/kernel/src/lib/entity-signal.ts:4192:51)"
+      ],
+      "necessity": "Observed incumbent operation; required responsibility does not prove this traversal representation necessary",
+      "removableWitness": false
+    },
+    {
+      "id": 21,
+      "count": 200,
+      "perUpdate": 1.0,
+      "operation": "Array.Symbol(Symbol.iterator)",
+      "responsibility": "admission normalization",
+      "site": "at AdmissionMetadata.edit (packages/kernel/src/lib/internals/entity-publication.ts:65:123)",
+      "callPath": [
+        "at AdmissionMetadata.edit (packages/kernel/src/lib/internals/entity-publication.ts:65:123)",
+        "at AdmissionMetadata.array (packages/kernel/src/lib/internals/entity-publication.ts:77:36)",
+        "at AdmissionMetadata.prepare (packages/kernel/src/lib/internals/entity-publication.ts:93:57)",
+        "at EntityPublicationSource.prepare (packages/kernel/src/lib/internals/entity-publication.ts:231:27)",
+        "at prepareEntityPublication (packages/kernel/src/lib/entity-signal.ts:2528:126)",
+        "at commitExistingSubjectValue (packages/kernel/src/lib/entity-signal.ts:2564:25)",
+        "at updateOnePrivate (packages/kernel/src/lib/entity-signal.ts:2371:26)",
+        "at Proxy.updateOne (packages/kernel/src/lib/entity-signal.ts:4192:51)"
+      ],
+      "necessity": "Observed incumbent operation; required responsibility does not prove this traversal representation necessary",
+      "removableWitness": false
+    },
+    {
+      "id": 22,
+      "count": 200,
+      "perUpdate": 1.0,
+      "operation": "Array.Symbol(Symbol.iterator)",
+      "responsibility": "admission normalization",
+      "site": "at AdmissionMetadata.array (packages/kernel/src/lib/internals/entity-publication.ts:77:16)",
+      "callPath": [
+        "at AdmissionMetadata.array (packages/kernel/src/lib/internals/entity-publication.ts:77:16)",
+        "at AdmissionMetadata.prepare (packages/kernel/src/lib/internals/entity-publication.ts:93:94)",
+        "at EntityPublicationSource.prepare (packages/kernel/src/lib/internals/entity-publication.ts:231:27)",
+        "at prepareEntityPublication (packages/kernel/src/lib/entity-signal.ts:2528:126)",
+        "at commitExistingSubjectValue (packages/kernel/src/lib/entity-signal.ts:2564:25)",
+        "at updateOnePrivate (packages/kernel/src/lib/entity-signal.ts:2371:26)",
+        "at Proxy.updateOne (packages/kernel/src/lib/entity-signal.ts:4192:51)"
+      ],
+      "necessity": "Observed incumbent operation; required responsibility does not prove this traversal representation necessary",
+      "removableWitness": false
+    },
+    {
+      "id": 23,
+      "count": 200,
+      "perUpdate": 1.0,
+      "operation": "Array.Symbol(Symbol.iterator)",
+      "responsibility": "native preparation excluding row copies",
+      "site": "at Object.prepare (packages/kernel/src/lib/experimental-publication/entity.ts:144:20)",
+      "callPath": [
+        "at Object.prepare (packages/kernel/src/lib/experimental-publication/entity.ts:144:20)",
+        "at EntityPublicationSource.prepare (packages/kernel/src/lib/internals/entity-publication.ts:233:32)",
+        "at prepareEntityPublication (packages/kernel/src/lib/entity-signal.ts:2528:126)",
+        "at commitExistingSubjectValue (packages/kernel/src/lib/entity-signal.ts:2564:25)",
+        "at updateOnePrivate (packages/kernel/src/lib/entity-signal.ts:2371:26)",
+        "at Proxy.updateOne (packages/kernel/src/lib/entity-signal.ts:4192:51)"
+      ],
+      "necessity": "Observed incumbent operation; required responsibility does not prove this traversal representation necessary",
+      "removableWitness": false
+    },
+    {
+      "id": 24,
+      "count": 200,
+      "perUpdate": 1.0,
+      "operation": "Array.Symbol(Symbol.iterator)",
+      "responsibility": "native preparation excluding row copies",
+      "site": "at pairPhysicalUnit (packages/kernel/src/lib/experimental-publication/entity.ts:30:16)",
+      "callPath": [
+        "at pairPhysicalUnit (packages/kernel/src/lib/experimental-publication/entity.ts:30:16)",
+        "at Object.prepare (packages/kernel/src/lib/experimental-publication/entity.ts:145:11)",
+        "at EntityPublicationSource.prepare (packages/kernel/src/lib/internals/entity-publication.ts:233:32)",
+        "at prepareEntityPublication (packages/kernel/src/lib/entity-signal.ts:2528:126)",
+        "at commitExistingSubjectValue (packages/kernel/src/lib/entity-signal.ts:2564:25)",
+        "at updateOnePrivate (packages/kernel/src/lib/entity-signal.ts:2371:26)",
+        "at Proxy.updateOne (packages/kernel/src/lib/entity-signal.ts:4192:51)"
+      ],
+      "necessity": "Observed incumbent operation; required responsibility does not prove this traversal representation necessary",
+      "removableWitness": false
+    },
+    {
+      "id": 25,
+      "count": 200,
+      "perUpdate": 1.0,
+      "operation": "Array.Symbol(Symbol.iterator)",
+      "responsibility": "native preparation excluding row copies",
+      "site": "at Object.prepare (packages/kernel/src/lib/experimental-publication/entity.ts:156:17)",
+      "callPath": [
+        "at Object.prepare (packages/kernel/src/lib/experimental-publication/entity.ts:156:17)",
+        "at EntityPublicationSource.prepare (packages/kernel/src/lib/internals/entity-publication.ts:233:32)",
+        "at prepareEntityPublication (packages/kernel/src/lib/entity-signal.ts:2528:126)",
+        "at commitExistingSubjectValue (packages/kernel/src/lib/entity-signal.ts:2564:25)",
+        "at updateOnePrivate (packages/kernel/src/lib/entity-signal.ts:2371:26)",
+        "at Proxy.updateOne (packages/kernel/src/lib/entity-signal.ts:4192:51)"
+      ],
+      "necessity": "Observed incumbent operation; required responsibility does not prove this traversal representation necessary",
+      "removableWitness": false
+    },
+    {
+      "id": 26,
+      "count": 400,
+      "perUpdate": 2.0,
+      "operation": "Map.Symbol(Symbol.iterator)",
+      "responsibility": "row map copies",
+      "site": "at rowViews (packages/kernel/src/lib/experimental-publication/entity.ts:153:108)",
+      "callPath": [
+        "at rowViews (packages/kernel/src/lib/experimental-publication/entity.ts:153:108)",
+        "at Object.prepare (packages/kernel/src/lib/experimental-publication/entity.ts:163:19)",
+        "at EntityPublicationSource.prepare (packages/kernel/src/lib/internals/entity-publication.ts:233:32)",
+        "at prepareEntityPublication (packages/kernel/src/lib/entity-signal.ts:2528:126)",
+        "at commitExistingSubjectValue (packages/kernel/src/lib/entity-signal.ts:2564:25)",
+        "at updateOnePrivate (packages/kernel/src/lib/entity-signal.ts:2371:26)",
+        "at Proxy.updateOne (packages/kernel/src/lib/entity-signal.ts:4192:51)"
+      ],
+      "necessity": "Observed incumbent operation; required responsibility does not prove this traversal representation necessary",
+      "removableWitness": false
+    },
+    {
+      "id": 27,
+      "count": 200,
+      "perUpdate": 1.0,
+      "operation": "Array.Symbol(Symbol.iterator)",
+      "responsibility": "native preparation excluding row copies",
+      "site": "at Object.prepare (packages/kernel/src/lib/experimental-publication/entity.ts:165:19)",
+      "callPath": [
+        "at Object.prepare (packages/kernel/src/lib/experimental-publication/entity.ts:165:19)",
+        "at EntityPublicationSource.prepare (packages/kernel/src/lib/internals/entity-publication.ts:233:32)",
+        "at prepareEntityPublication (packages/kernel/src/lib/entity-signal.ts:2528:126)",
+        "at commitExistingSubjectValue (packages/kernel/src/lib/entity-signal.ts:2564:25)",
+        "at updateOnePrivate (packages/kernel/src/lib/entity-signal.ts:2371:26)",
+        "at Proxy.updateOne (packages/kernel/src/lib/entity-signal.ts:4192:51)"
+      ],
+      "necessity": "Observed incumbent operation; required responsibility does not prove this traversal representation necessary",
+      "removableWitness": false
+    },
+    {
+      "id": 28,
+      "count": 400,
+      "perUpdate": 2.0,
+      "operation": "Map.Symbol(Symbol.iterator)",
+      "responsibility": "row map copies",
+      "site": "at Object.prepare (packages/kernel/src/lib/experimental-publication/entity.ts:166:29)",
+      "callPath": [
+        "at Object.prepare (packages/kernel/src/lib/experimental-publication/entity.ts:166:29)",
+        "at EntityPublicationSource.prepare (packages/kernel/src/lib/internals/entity-publication.ts:233:32)",
+        "at prepareEntityPublication (packages/kernel/src/lib/entity-signal.ts:2528:126)",
+        "at commitExistingSubjectValue (packages/kernel/src/lib/entity-signal.ts:2564:25)",
+        "at updateOnePrivate (packages/kernel/src/lib/entity-signal.ts:2371:26)",
+        "at Proxy.updateOne (packages/kernel/src/lib/entity-signal.ts:4192:51)"
+      ],
+      "necessity": "Observed incumbent operation; required responsibility does not prove this traversal representation necessary",
+      "removableWitness": false
+    },
+    {
+      "id": 29,
+      "count": 200,
+      "perUpdate": 1.0,
+      "operation": "Array.Symbol(Symbol.iterator)",
+      "responsibility": "native preparation excluding row copies",
+      "site": "at Object.prepare (packages/kernel/src/lib/experimental-publication/entity.ts:171:17)",
+      "callPath": [
+        "at Object.prepare (packages/kernel/src/lib/experimental-publication/entity.ts:171:17)",
+        "at EntityPublicationSource.prepare (packages/kernel/src/lib/internals/entity-publication.ts:233:32)",
+        "at prepareEntityPublication (packages/kernel/src/lib/entity-signal.ts:2528:126)",
+        "at commitExistingSubjectValue (packages/kernel/src/lib/entity-signal.ts:2564:25)",
+        "at updateOnePrivate (packages/kernel/src/lib/entity-signal.ts:2371:26)",
+        "at Proxy.updateOne (packages/kernel/src/lib/entity-signal.ts:4192:51)"
+      ],
+      "necessity": "Observed incumbent operation; required responsibility does not prove this traversal representation necessary",
+      "removableWitness": false
+    },
+    {
+      "id": 30,
+      "count": 400,
+      "perUpdate": 2.0,
+      "operation": "Map.Symbol(Symbol.iterator)",
+      "responsibility": "row map copies",
+      "site": "at rowFields (packages/kernel/src/lib/experimental-publication/entity.ts:152:126)",
+      "callPath": [
+        "at rowFields (packages/kernel/src/lib/experimental-publication/entity.ts:152:126)",
+        "at Object.prepare (packages/kernel/src/lib/experimental-publication/entity.ts:180:19)",
+        "at EntityPublicationSource.prepare (packages/kernel/src/lib/internals/entity-publication.ts:233:32)",
+        "at prepareEntityPublication (packages/kernel/src/lib/entity-signal.ts:2528:126)",
+        "at commitExistingSubjectValue (packages/kernel/src/lib/entity-signal.ts:2564:25)",
+        "at updateOnePrivate (packages/kernel/src/lib/entity-signal.ts:2371:26)",
+        "at Proxy.updateOne (packages/kernel/src/lib/entity-signal.ts:4192:51)"
+      ],
+      "necessity": "Observed incumbent operation; required responsibility does not prove this traversal representation necessary",
+      "removableWitness": false
+    },
+    {
+      "id": 31,
+      "count": 200,
+      "perUpdate": 1.0,
+      "operation": "Array.Symbol(Symbol.iterator)",
+      "responsibility": "native preparation excluding row copies",
+      "site": "at Object.prepare (packages/kernel/src/lib/experimental-publication/entity.ts:187:19)",
+      "callPath": [
+        "at Object.prepare (packages/kernel/src/lib/experimental-publication/entity.ts:187:19)",
+        "at EntityPublicationSource.prepare (packages/kernel/src/lib/internals/entity-publication.ts:233:32)",
+        "at prepareEntityPublication (packages/kernel/src/lib/entity-signal.ts:2528:126)",
+        "at commitExistingSubjectValue (packages/kernel/src/lib/entity-signal.ts:2564:25)",
+        "at updateOnePrivate (packages/kernel/src/lib/entity-signal.ts:2371:26)",
+        "at Proxy.updateOne (packages/kernel/src/lib/entity-signal.ts:4192:51)"
+      ],
+      "necessity": "Observed incumbent operation; required responsibility does not prove this traversal representation necessary",
+      "removableWitness": false
+    },
+    {
+      "id": 32,
+      "count": 400,
+      "perUpdate": 2.0,
+      "operation": "Map.Symbol(Symbol.iterator)",
+      "responsibility": "row map copies",
+      "site": "at Object.prepare (packages/kernel/src/lib/experimental-publication/entity.ts:200:93)",
+      "callPath": [
+        "at Object.prepare (packages/kernel/src/lib/experimental-publication/entity.ts:200:93)",
+        "at EntityPublicationSource.prepare (packages/kernel/src/lib/internals/entity-publication.ts:233:32)",
+        "at prepareEntityPublication (packages/kernel/src/lib/entity-signal.ts:2528:126)",
+        "at commitExistingSubjectValue (packages/kernel/src/lib/entity-signal.ts:2564:25)",
+        "at updateOnePrivate (packages/kernel/src/lib/entity-signal.ts:2371:26)",
+        "at Proxy.updateOne (packages/kernel/src/lib/entity-signal.ts:4192:51)"
+      ],
+      "necessity": "Observed incumbent operation; required responsibility does not prove this traversal representation necessary",
+      "removableWitness": true
+    },
+    {
+      "id": 33,
+      "count": 200,
+      "perUpdate": 1.0,
+      "operation": "Array.Symbol(Symbol.iterator)",
+      "responsibility": "native preparation excluding row copies",
+      "site": "at Object.prepare (packages/kernel/src/lib/experimental-publication/entity.ts:201:19)",
+      "callPath": [
+        "at Object.prepare (packages/kernel/src/lib/experimental-publication/entity.ts:201:19)",
+        "at EntityPublicationSource.prepare (packages/kernel/src/lib/internals/entity-publication.ts:233:32)",
+        "at prepareEntityPublication (packages/kernel/src/lib/entity-signal.ts:2528:126)",
+        "at commitExistingSubjectValue (packages/kernel/src/lib/entity-signal.ts:2564:25)",
+        "at updateOnePrivate (packages/kernel/src/lib/entity-signal.ts:2371:26)",
+        "at Proxy.updateOne (packages/kernel/src/lib/entity-signal.ts:4192:51)"
+      ],
+      "necessity": "Observed incumbent operation; required responsibility does not prove this traversal representation necessary",
+      "removableWitness": false
+    },
+    {
+      "id": 34,
+      "count": 200,
+      "perUpdate": 1.0,
+      "operation": "Map.Symbol(Symbol.iterator)",
+      "responsibility": "native preparation excluding row copies",
+      "site": "at Object.prepare (packages/kernel/src/lib/experimental-publication/entity.ts:212:27)",
+      "callPath": [
+        "at Object.prepare (packages/kernel/src/lib/experimental-publication/entity.ts:212:27)",
+        "at EntityPublicationSource.prepare (packages/kernel/src/lib/internals/entity-publication.ts:233:32)",
+        "at prepareEntityPublication (packages/kernel/src/lib/entity-signal.ts:2528:126)",
+        "at commitExistingSubjectValue (packages/kernel/src/lib/entity-signal.ts:2564:25)",
+        "at updateOnePrivate (packages/kernel/src/lib/entity-signal.ts:2371:26)",
+        "at Proxy.updateOne (packages/kernel/src/lib/entity-signal.ts:4192:51)"
+      ],
+      "necessity": "Observed incumbent operation; required responsibility does not prove this traversal representation necessary",
+      "removableWitness": false
+    },
+    {
+      "id": 35,
+      "count": 200,
+      "perUpdate": 1.0,
+      "operation": "Array.Symbol(Symbol.iterator)",
+      "responsibility": "native preparation excluding row copies",
+      "site": "at Object.prepare (packages/kernel/src/lib/experimental-publication/entity.ts:212:18)",
+      "callPath": [
+        "at Object.prepare (packages/kernel/src/lib/experimental-publication/entity.ts:212:18)",
+        "at EntityPublicationSource.prepare (packages/kernel/src/lib/internals/entity-publication.ts:233:32)",
+        "at prepareEntityPublication (packages/kernel/src/lib/entity-signal.ts:2528:126)",
+        "at commitExistingSubjectValue (packages/kernel/src/lib/entity-signal.ts:2564:25)",
+        "at updateOnePrivate (packages/kernel/src/lib/entity-signal.ts:2371:26)",
+        "at Proxy.updateOne (packages/kernel/src/lib/entity-signal.ts:4192:51)"
+      ],
+      "necessity": "Observed incumbent operation; required responsibility does not prove this traversal representation necessary",
+      "removableWitness": false
+    },
+    {
+      "id": 36,
+      "count": 200,
+      "perUpdate": 1.0,
+      "operation": "Array.Symbol(Symbol.iterator)",
+      "responsibility": "native preparation excluding row copies",
+      "site": "at Object.prepare (packages/kernel/src/lib/experimental-publication/entity.ts:212:22)",
+      "callPath": [
+        "at Object.prepare (packages/kernel/src/lib/experimental-publication/entity.ts:212:22)",
+        "at EntityPublicationSource.prepare (packages/kernel/src/lib/internals/entity-publication.ts:233:32)",
+        "at prepareEntityPublication (packages/kernel/src/lib/entity-signal.ts:2528:126)",
+        "at commitExistingSubjectValue (packages/kernel/src/lib/entity-signal.ts:2564:25)",
+        "at updateOnePrivate (packages/kernel/src/lib/entity-signal.ts:2371:26)",
+        "at Proxy.updateOne (packages/kernel/src/lib/entity-signal.ts:4192:51)"
+      ],
+      "necessity": "Observed incumbent operation; required responsibility does not prove this traversal representation necessary",
+      "removableWitness": false
+    },
+    {
+      "id": 37,
+      "count": 200,
+      "perUpdate": 1.0,
+      "operation": "Array.push",
+      "responsibility": "native preparation excluding row copies",
+      "site": "at Object.prepare (packages/kernel/src/lib/experimental-publication/entity.ts:212:70)",
+      "callPath": [
+        "at Object.prepare (packages/kernel/src/lib/experimental-publication/entity.ts:212:70)",
+        "at EntityPublicationSource.prepare (packages/kernel/src/lib/internals/entity-publication.ts:233:32)",
+        "at prepareEntityPublication (packages/kernel/src/lib/entity-signal.ts:2528:126)",
+        "at commitExistingSubjectValue (packages/kernel/src/lib/entity-signal.ts:2564:25)",
+        "at updateOnePrivate (packages/kernel/src/lib/entity-signal.ts:2371:26)",
+        "at Proxy.updateOne (packages/kernel/src/lib/entity-signal.ts:4192:51)"
+      ],
+      "necessity": "Observed incumbent operation; required responsibility does not prove this traversal representation necessary",
+      "removableWitness": false
+    },
+    {
+      "id": 38,
+      "count": 200,
+      "perUpdate": 1.0,
+      "operation": "Map.Symbol(Symbol.iterator)",
+      "responsibility": "native preparation excluding row copies",
+      "site": "at Object.prepare (packages/kernel/src/lib/experimental-publication/entity.ts:213:27)",
+      "callPath": [
+        "at Object.prepare (packages/kernel/src/lib/experimental-publication/entity.ts:213:27)",
+        "at EntityPublicationSource.prepare (packages/kernel/src/lib/internals/entity-publication.ts:233:32)",
+        "at prepareEntityPublication (packages/kernel/src/lib/entity-signal.ts:2528:126)",
+        "at commitExistingSubjectValue (packages/kernel/src/lib/entity-signal.ts:2564:25)",
+        "at updateOnePrivate (packages/kernel/src/lib/entity-signal.ts:2371:26)",
+        "at Proxy.updateOne (packages/kernel/src/lib/entity-signal.ts:4192:51)"
+      ],
+      "necessity": "Observed incumbent operation; required responsibility does not prove this traversal representation necessary",
+      "removableWitness": false
+    },
+    {
+      "id": 39,
+      "count": 200,
+      "perUpdate": 1.0,
+      "operation": "Array.Symbol(Symbol.iterator)",
+      "responsibility": "native preparation excluding row copies",
+      "site": "at Object.prepare (packages/kernel/src/lib/experimental-publication/entity.ts:213:18)",
+      "callPath": [
+        "at Object.prepare (packages/kernel/src/lib/experimental-publication/entity.ts:213:18)",
+        "at EntityPublicationSource.prepare (packages/kernel/src/lib/internals/entity-publication.ts:233:32)",
+        "at prepareEntityPublication (packages/kernel/src/lib/entity-signal.ts:2528:126)",
+        "at commitExistingSubjectValue (packages/kernel/src/lib/entity-signal.ts:2564:25)",
+        "at updateOnePrivate (packages/kernel/src/lib/entity-signal.ts:2371:26)",
+        "at Proxy.updateOne (packages/kernel/src/lib/entity-signal.ts:4192:51)"
+      ],
+      "necessity": "Observed incumbent operation; required responsibility does not prove this traversal representation necessary",
+      "removableWitness": false
+    },
+    {
+      "id": 40,
+      "count": 200,
+      "perUpdate": 1.0,
+      "operation": "Array.Symbol(Symbol.iterator)",
+      "responsibility": "native preparation excluding row copies",
+      "site": "at Object.prepare (packages/kernel/src/lib/experimental-publication/entity.ts:213:22)",
+      "callPath": [
+        "at Object.prepare (packages/kernel/src/lib/experimental-publication/entity.ts:213:22)",
+        "at EntityPublicationSource.prepare (packages/kernel/src/lib/internals/entity-publication.ts:233:32)",
+        "at prepareEntityPublication (packages/kernel/src/lib/entity-signal.ts:2528:126)",
+        "at commitExistingSubjectValue (packages/kernel/src/lib/entity-signal.ts:2564:25)",
+        "at updateOnePrivate (packages/kernel/src/lib/entity-signal.ts:2371:26)",
+        "at Proxy.updateOne (packages/kernel/src/lib/entity-signal.ts:4192:51)"
+      ],
+      "necessity": "Observed incumbent operation; required responsibility does not prove this traversal representation necessary",
+      "removableWitness": false
+    },
+    {
+      "id": 41,
+      "count": 200,
+      "perUpdate": 1.0,
+      "operation": "Array.push",
+      "responsibility": "native preparation excluding row copies",
+      "site": "at Object.prepare (packages/kernel/src/lib/experimental-publication/entity.ts:213:69)",
+      "callPath": [
+        "at Object.prepare (packages/kernel/src/lib/experimental-publication/entity.ts:213:69)",
+        "at EntityPublicationSource.prepare (packages/kernel/src/lib/internals/entity-publication.ts:233:32)",
+        "at prepareEntityPublication (packages/kernel/src/lib/entity-signal.ts:2528:126)",
+        "at commitExistingSubjectValue (packages/kernel/src/lib/entity-signal.ts:2564:25)",
+        "at updateOnePrivate (packages/kernel/src/lib/entity-signal.ts:2371:26)",
+        "at Proxy.updateOne (packages/kernel/src/lib/entity-signal.ts:4192:51)"
+      ],
+      "necessity": "Observed incumbent operation; required responsibility does not prove this traversal representation necessary",
+      "removableWitness": false
+    },
+    {
+      "id": 42,
+      "count": 600,
+      "perUpdate": 3.0,
+      "operation": "Array.filter",
+      "responsibility": "native preparation excluding row copies",
+      "site": "at combineTerminalRecords (packages/kernel/src/lib/internals/intrinsic-mutation.ts:24:25)",
+      "callPath": [
+        "at combineTerminalRecords (packages/kernel/src/lib/internals/intrinsic-mutation.ts:24:25)",
+        "at Object.prepare (packages/kernel/src/lib/experimental-publication/entity.ts:234:22)",
+        "at EntityPublicationSource.prepare (packages/kernel/src/lib/internals/entity-publication.ts:233:32)",
+        "at prepareEntityPublication (packages/kernel/src/lib/entity-signal.ts:2528:126)",
+        "at commitExistingSubjectValue (packages/kernel/src/lib/entity-signal.ts:2564:25)",
+        "at updateOnePrivate (packages/kernel/src/lib/entity-signal.ts:2371:26)",
+        "at Proxy.updateOne (packages/kernel/src/lib/entity-signal.ts:4192:51)"
+      ],
+      "necessity": "Observed incumbent operation; required responsibility does not prove this traversal representation necessary",
+      "removableWitness": false
+    },
+    {
+      "id": 43,
+      "count": 200,
+      "perUpdate": 1.0,
+      "operation": "Array.push",
+      "responsibility": "source composition",
+      "site": "at EntityPublicationSource.prepare (packages/kernel/src/lib/internals/entity-publication.ts:235:37)",
+      "callPath": [
+        "at EntityPublicationSource.prepare (packages/kernel/src/lib/internals/entity-publication.ts:235:37)",
+        "at prepareEntityPublication (packages/kernel/src/lib/entity-signal.ts:2528:126)",
+        "at commitExistingSubjectValue (packages/kernel/src/lib/entity-signal.ts:2564:25)",
+        "at updateOnePrivate (packages/kernel/src/lib/entity-signal.ts:2371:26)",
+        "at Proxy.updateOne (packages/kernel/src/lib/entity-signal.ts:4192:51)"
+      ],
+      "necessity": "Observed incumbent operation; required responsibility does not prove this traversal representation necessary",
+      "removableWitness": false
+    },
+    {
+      "id": 44,
+      "count": 200,
+      "perUpdate": 1.0,
+      "operation": "Array.map",
+      "responsibility": "source composition",
+      "site": "at EntityPublicationSource.prepare (packages/kernel/src/lib/internals/entity-publication.ts:249:62)",
+      "callPath": [
+        "at EntityPublicationSource.prepare (packages/kernel/src/lib/internals/entity-publication.ts:249:62)",
+        "at prepareEntityPublication (packages/kernel/src/lib/entity-signal.ts:2528:126)",
+        "at commitExistingSubjectValue (packages/kernel/src/lib/entity-signal.ts:2564:25)",
+        "at updateOnePrivate (packages/kernel/src/lib/entity-signal.ts:2371:26)",
+        "at Proxy.updateOne (packages/kernel/src/lib/entity-signal.ts:4192:51)"
+      ],
+      "necessity": "Observed incumbent operation; required responsibility does not prove this traversal representation necessary",
+      "removableWitness": false
+    },
+    {
+      "id": 45,
+      "count": 200,
+      "perUpdate": 1.0,
+      "operation": "Array.Symbol(Symbol.iterator)",
+      "responsibility": "source composition",
+      "site": "at EntityPublicationSource.prepare (packages/kernel/src/lib/internals/entity-publication.ts:249:62)",
+      "callPath": [
+        "at EntityPublicationSource.prepare (packages/kernel/src/lib/internals/entity-publication.ts:249:62)",
+        "at prepareEntityPublication (packages/kernel/src/lib/entity-signal.ts:2528:126)",
+        "at commitExistingSubjectValue (packages/kernel/src/lib/entity-signal.ts:2564:25)",
+        "at updateOnePrivate (packages/kernel/src/lib/entity-signal.ts:2371:26)",
+        "at Proxy.updateOne (packages/kernel/src/lib/entity-signal.ts:4192:51)"
+      ],
+      "necessity": "Observed incumbent operation; required responsibility does not prove this traversal representation necessary",
+      "removableWitness": false
+    },
+    {
+      "id": 46,
+      "count": 600,
+      "perUpdate": 3.0,
+      "operation": "Array.filter",
+      "responsibility": "source composition",
+      "site": "at combineTerminalRecords (packages/kernel/src/lib/internals/intrinsic-mutation.ts:24:25)",
+      "callPath": [
+        "at combineTerminalRecords (packages/kernel/src/lib/internals/intrinsic-mutation.ts:24:25)",
+        "at EntityPublicationSource.prepare (packages/kernel/src/lib/internals/entity-publication.ts:249:15)",
+        "at prepareEntityPublication (packages/kernel/src/lib/entity-signal.ts:2528:126)",
+        "at commitExistingSubjectValue (packages/kernel/src/lib/entity-signal.ts:2564:25)",
+        "at updateOnePrivate (packages/kernel/src/lib/entity-signal.ts:2371:26)",
+        "at Proxy.updateOne (packages/kernel/src/lib/entity-signal.ts:4192:51)"
+      ],
+      "necessity": "Observed incumbent operation; required responsibility does not prove this traversal representation necessary",
+      "removableWitness": false
+    },
+    {
+      "id": 47,
+      "count": 200,
+      "perUpdate": 1.0,
+      "operation": "Array.Symbol(Symbol.iterator)",
+      "responsibility": "source finalization dispatch",
+      "site": "at Object.finalize (packages/kernel/src/lib/internals/entity-publication.ts:254:20)",
+      "callPath": [
+        "at Object.finalize (packages/kernel/src/lib/internals/entity-publication.ts:254:20)",
+        "at commitExistingSubjectValue (packages/kernel/src/lib/entity-signal.ts:2579:23)",
+        "at updateOnePrivate (packages/kernel/src/lib/entity-signal.ts:2371:26)",
+        "at Proxy.updateOne (packages/kernel/src/lib/entity-signal.ts:4192:51)"
+      ],
+      "necessity": "Observed incumbent operation; required responsibility does not prove this traversal representation necessary",
+      "removableWitness": false
+    },
+    {
+      "id": 48,
+      "count": 200,
+      "perUpdate": 1.0,
+      "operation": "Array.push",
+      "responsibility": "publication input capture",
+      "site": "at suppliedViews (packages/kernel/src/lib/experimental-publication/private.ts:127:48)",
+      "callPath": [
+        "at suppliedViews (packages/kernel/src/lib/experimental-publication/private.ts:127:48)",
+        "at nativeInputs (packages/kernel/src/lib/experimental-publication/private.ts:144:14)",
+        "at Object.captureInput (packages/kernel/src/lib/experimental-publication/private.ts:158:43)",
+        "at Object.source.publicationInputCapture (packages/kernel/src/lib/internals/intrinsic-mutation.ts:329:62)",
+        "at Object.derive (packages/kernel/src/lib/internals/location-runtime.ts:511:50)",
+        "at deriveLocation (packages/kernel/src/lib/internals/location-runtime.ts:106:37)",
+        "at packages/kernel/src/lib/entity-signal.ts:3470:19",
+        "at deliver (packages/kernel/src/lib/entity-signal.ts:3467:40)",
+        "at packages/kernel/src/lib/entity-signal.ts:3470:7",
+        "at Object.runInvalidationGroup (packages/kernel/src/lib/internals/location-runtime.ts:415:7)",
+        "at packages/kernel/src/lib/entity-signal.ts:3468:41",
+        "at deliver (packages/kernel/src/lib/entity-signal.ts:3467:40)",
+        "at updateSignals (packages/kernel/src/lib/entity-signal.ts:3468:5)",
+        "at updateOnePrivate (packages/kernel/src/lib/entity-signal.ts:2378:7)",
+        "at Proxy.updateOne (packages/kernel/src/lib/entity-signal.ts:4192:51)"
+      ],
+      "necessity": "Observed incumbent operation; required responsibility does not prove this traversal representation necessary",
+      "removableWitness": false
+    },
+    {
+      "id": 49,
+      "count": 200,
+      "perUpdate": 1.0,
+      "operation": "Array.Symbol(Symbol.iterator)",
+      "responsibility": "location delivery",
+      "site": "at publish (packages/kernel/src/lib/internals/location-runtime.ts:404:18)",
+      "callPath": [
+        "at publish (packages/kernel/src/lib/internals/location-runtime.ts:404:18)",
+        "at Object.derive (packages/kernel/src/lib/internals/location-runtime.ts:533:32)",
+        "at deriveLocation (packages/kernel/src/lib/internals/location-runtime.ts:106:37)",
+        "at packages/kernel/src/lib/entity-signal.ts:3470:19",
+        "at deliver (packages/kernel/src/lib/entity-signal.ts:3467:40)",
+        "at packages/kernel/src/lib/entity-signal.ts:3470:7",
+        "at Object.runInvalidationGroup (packages/kernel/src/lib/internals/location-runtime.ts:415:7)",
+        "at packages/kernel/src/lib/entity-signal.ts:3468:41",
+        "at deliver (packages/kernel/src/lib/entity-signal.ts:3467:40)",
+        "at updateSignals (packages/kernel/src/lib/entity-signal.ts:3468:5)",
+        "at updateOnePrivate (packages/kernel/src/lib/entity-signal.ts:2378:7)",
+        "at Proxy.updateOne (packages/kernel/src/lib/entity-signal.ts:4192:51)"
+      ],
+      "necessity": "Observed incumbent operation; required responsibility does not prove this traversal representation necessary",
+      "removableWitness": false
+    },
+    {
+      "id": 50,
+      "count": 200,
+      "perUpdate": 1.0,
+      "operation": "Set.Symbol(Symbol.iterator)",
+      "responsibility": "location delivery",
+      "site": "at Object.runInvalidationGroup (packages/kernel/src/lib/internals/location-runtime.ts:422:32)",
+      "callPath": [
+        "at Object.runInvalidationGroup (packages/kernel/src/lib/internals/location-runtime.ts:422:32)",
+        "at packages/kernel/src/lib/entity-signal.ts:3468:41",
+        "at deliver (packages/kernel/src/lib/entity-signal.ts:3467:40)",
+        "at updateSignals (packages/kernel/src/lib/entity-signal.ts:3468:5)",
+        "at updateOnePrivate (packages/kernel/src/lib/entity-signal.ts:2378:7)",
+        "at Proxy.updateOne (packages/kernel/src/lib/entity-signal.ts:4192:51)"
+      ],
+      "necessity": "Observed incumbent operation; required responsibility does not prove this traversal representation necessary",
+      "removableWitness": false
+    },
+    {
+      "id": 51,
+      "count": 200,
+      "perUpdate": 1.0,
+      "operation": "Array.Symbol(Symbol.iterator)",
+      "responsibility": "location delivery",
+      "site": "at packages/kernel/src/lib/internals/location-runtime.ts:386:20",
+      "callPath": [
+        "at packages/kernel/src/lib/internals/location-runtime.ts:386:20",
+        "at Object.runInvalidationGroup (packages/kernel/src/lib/internals/observation-adapter.ts:82:34)",
+        "at deliver (packages/kernel/src/lib/internals/location-runtime.ts:383:17)",
+        "at Object.runInvalidationGroup (packages/kernel/src/lib/internals/location-runtime.ts:425:11)",
+        "at packages/kernel/src/lib/entity-signal.ts:3468:41",
+        "at deliver (packages/kernel/src/lib/entity-signal.ts:3467:40)",
+        "at updateSignals (packages/kernel/src/lib/entity-signal.ts:3468:5)",
+        "at updateOnePrivate (packages/kernel/src/lib/entity-signal.ts:2378:7)",
+        "at Proxy.updateOne (packages/kernel/src/lib/entity-signal.ts:4192:51)"
+      ],
+      "necessity": "Observed incumbent operation; required responsibility does not prove this traversal representation necessary",
+      "removableWitness": false
+    },
+    {
+      "id": 52,
+      "count": 200,
+      "perUpdate": 1.0,
+      "operation": "Array.Symbol(Symbol.iterator)",
+      "responsibility": "completion dispatch",
+      "site": "at complete (packages/kernel/src/lib/entity-signal.ts:2591:17)",
+      "callPath": [
+        "at complete (packages/kernel/src/lib/entity-signal.ts:2591:17)",
+        "at updateSignals (packages/kernel/src/lib/entity-signal.ts:3473:9)",
+        "at updateOnePrivate (packages/kernel/src/lib/entity-signal.ts:2378:7)",
+        "at Proxy.updateOne (packages/kernel/src/lib/entity-signal.ts:4192:51)"
+      ],
+      "necessity": "Observed incumbent operation; required responsibility does not prove this traversal representation necessary",
+      "removableWitness": false
+    },
+    {
+      "id": 53,
+      "count": 200,
+      "perUpdate": 1.0,
+      "operation": "Array.Symbol(Symbol.iterator)",
+      "responsibility": "source completion",
+      "site": "at EntityPublicationSource.complete (packages/kernel/src/lib/internals/entity-publication.ts:271:16)",
+      "callPath": [
+        "at EntityPublicationSource.complete (packages/kernel/src/lib/internals/entity-publication.ts:271:16)",
+        "at packages/kernel/src/lib/entity-signal.ts:2591:88",
+        "at complete (packages/kernel/src/lib/entity-signal.ts:2591:133)",
+        "at updateSignals (packages/kernel/src/lib/entity-signal.ts:3473:9)",
+        "at updateOnePrivate (packages/kernel/src/lib/entity-signal.ts:2378:7)",
+        "at Proxy.updateOne (packages/kernel/src/lib/entity-signal.ts:4192:51)"
+      ],
+      "necessity": "Observed incumbent operation; required responsibility does not prove this traversal representation necessary",
+      "removableWitness": false
+    },
+    {
+      "id": 54,
+      "count": 200,
+      "perUpdate": 1.0,
+      "operation": "Object.keys",
+      "responsibility": "write key enumeration",
+      "site": "at updateOnePrivate (packages/kernel/src/lib/entity-signal.ts:2392:20)",
+      "callPath": [
+        "at updateOnePrivate (packages/kernel/src/lib/entity-signal.ts:2392:20)",
+        "at Proxy.updateOne (packages/kernel/src/lib/entity-signal.ts:4192:51)"
+      ],
+      "necessity": "Observed incumbent operation; required responsibility does not prove this traversal representation necessary",
+      "removableWitness": false
+    }
+  ]
+}

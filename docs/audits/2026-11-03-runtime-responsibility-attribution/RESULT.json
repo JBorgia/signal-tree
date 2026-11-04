@@ -1,0 +1,208 @@
+{
+  "disposition": "HOLD; finite experiment complete; no runtime adoption",
+  "frozenCandidate": "3eabc01ddab71f16b8def0172c43c344bfd08731",
+  "runtime": "fe18a8e1c1f3da42727341d6c6fa30a407c1461e",
+  "originalCounter": {
+    "baseline": 13000,
+    "prototype": 12600,
+    "updates": 200,
+    "sizes": [
+      2000,
+      20000
+    ],
+    "bound": "<2000",
+    "passed": false,
+    "unchanged": true,
+    "unclassified": 0,
+    "originalSourceSha256": "83365544bcb4a572988125141bab0c28786a54b5a2279522f3eed0d9b7d9e872"
+  },
+  "cost": {
+    "completed": 84,
+    "valid": 84,
+    "sourceDrift": [],
+    "inputDrift": [],
+    "dimensions": [
+      {
+        "profile": "bare",
+        "metric": "sync_ms",
+        "beforeMedian": 49.48925,
+        "prototypeMedian": 47.152125,
+        "delta": -2.3371250000000003,
+        "direction": "unresolved"
+      },
+      {
+        "profile": "bare",
+        "metric": "sync_cpu_ms",
+        "beforeMedian": 109.742,
+        "prototypeMedian": 108.228,
+        "delta": -1.51400000000001,
+        "direction": "unresolved"
+      },
+      {
+        "profile": "bare",
+        "metric": "total_cpu_ms",
+        "beforeMedian": 109.911,
+        "prototypeMedian": 108.377,
+        "delta": -1.534000000000006,
+        "direction": "unresolved"
+      },
+      {
+        "profile": "point",
+        "metric": "sync_ms",
+        "beforeMedian": 33.271333,
+        "prototypeMedian": 29.761750000000006,
+        "delta": -3.509582999999992,
+        "direction": "unresolved"
+      },
+      {
+        "profile": "point",
+        "metric": "sync_cpu_ms",
+        "beforeMedian": 69.963,
+        "prototypeMedian": 62.414,
+        "delta": -7.548999999999992,
+        "direction": "unresolved"
+      },
+      {
+        "profile": "point",
+        "metric": "total_cpu_ms",
+        "beforeMedian": 70.411,
+        "prototypeMedian": 63.964,
+        "delta": -6.447000000000003,
+        "direction": "unresolved"
+      },
+      {
+        "profile": "projection",
+        "metric": "sync_ms",
+        "beforeMedian": 26.16616599999999,
+        "prototypeMedian": 13.003917000000001,
+        "delta": -13.162248999999989,
+        "direction": "unresolved"
+      },
+      {
+        "profile": "projection",
+        "metric": "sync_cpu_ms",
+        "beforeMedian": 35.787,
+        "prototypeMedian": 17.808,
+        "delta": -17.979,
+        "direction": "unresolved"
+      },
+      {
+        "profile": "projection",
+        "metric": "total_cpu_ms",
+        "beforeMedian": 47.853,
+        "prototypeMedian": 17.878,
+        "delta": -29.975,
+        "direction": "unresolved"
+      },
+      {
+        "profile": "confirm",
+        "metric": "sync_ms",
+        "beforeMedian": 22.928832999999997,
+        "prototypeMedian": 22.38275,
+        "delta": -0.5460829999999959,
+        "direction": "unresolved"
+      },
+      {
+        "profile": "confirm",
+        "metric": "sync_cpu_ms",
+        "beforeMedian": 35.932,
+        "prototypeMedian": 35.665,
+        "delta": -0.267000000000003,
+        "direction": "unresolved"
+      },
+      {
+        "profile": "confirm",
+        "metric": "total_cpu_ms",
+        "beforeMedian": 36.051,
+        "prototypeMedian": 35.772,
+        "delta": -0.27900000000000347,
+        "direction": "unresolved"
+      },
+      {
+        "profile": "rollback",
+        "metric": "sync_ms",
+        "beforeMedian": 39.518874999999994,
+        "prototypeMedian": 42.010999999999996,
+        "delta": 2.4921250000000015,
+        "direction": "unresolved"
+      },
+      {
+        "profile": "rollback",
+        "metric": "sync_cpu_ms",
+        "beforeMedian": 65.006,
+        "prototypeMedian": 69.617,
+        "delta": 4.611000000000004,
+        "direction": "unresolved"
+      },
+      {
+        "profile": "rollback",
+        "metric": "total_cpu_ms",
+        "beforeMedian": 65.328,
+        "prototypeMedian": 70.074,
+        "delta": 4.745999999999995,
+        "direction": "unresolved"
+      },
+      {
+        "profile": "heap-populated",
+        "metric": "live_minus_baseline_bytes",
+        "beforeMedian": 17756264,
+        "prototypeMedian": 17757656,
+        "delta": 1392,
+        "direction": "unresolved"
+      },
+      {
+        "profile": "heap-populated",
+        "metric": "settled_minus_baseline_bytes",
+        "beforeMedian": 17784040,
+        "prototypeMedian": 17785432,
+        "delta": 1392,
+        "direction": "unresolved"
+      },
+      {
+        "profile": "heap-pending",
+        "metric": "live_minus_baseline_bytes",
+        "beforeMedian": 20480224,
+        "prototypeMedian": 20484248,
+        "delta": 4024,
+        "direction": "unresolved"
+      },
+      {
+        "profile": "heap-pending",
+        "metric": "settled_minus_baseline_bytes",
+        "beforeMedian": 20396000,
+        "prototypeMedian": 20396400,
+        "delta": 400,
+        "direction": "unresolved"
+      },
+      {
+        "profile": "heap-pending",
+        "metric": "pending_live_minus_idle_bytes",
+        "beforeMedian": 1033336,
+        "prototypeMedian": 1031960,
+        "delta": -1376,
+        "direction": "unresolved"
+      }
+    ],
+    "weakRefScope": "All24 heap children reported weakAlive0 for their10 sampled trees; finite scoped check, not universal leak proof"
+  },
+  "semanticScope": "35 diagnostic+focused passes;6 independent reader cells pass;uninstrumented71tests:70pass andunchangedpointboundfailure; nofullcurrentoutermutationproof",
+  "necessity": "400 visits removable in testedsingletoncase; earlier history responsibility required by concretecounterexample; remaining12600 not provedmandatory",
+  "notAuthorized": [
+    "activation",
+    "push",
+    "merge",
+    "publication",
+    "runtime-cost waiver",
+    "bound change"
+  ],
+  "restoredRuntime": {
+    "packagesDiffEmpty": true,
+    "lateHistoryReceipt": "runs/restored-runtime-late-history/RESULT.json",
+    "lateHistoryExit": 0
+  },
+  "productionDemo": {
+    "commandReceipt": "runs/prototype-production-demo/COMMAND.json",
+    "exit": 1,
+    "reason": "unchanged570kB numerical ceiling;generated initial807.46kB;owner already acceptedsize;not relabeledpass"
+  }
+}

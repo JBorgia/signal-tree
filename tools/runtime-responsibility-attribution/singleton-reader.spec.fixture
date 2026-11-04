@@ -1,0 +1,91 @@
+// Experiment-only fixture. Copy to packages/kernel/src/lib/ before focused Nx
+// execution; relative imports intentionally target that location. Not executed
+// by its author. Both intervention settings must satisfy identical assertions.
+import { expect, it } from 'vitest';
+import '../index';
+import {
+  EntityPublicationSource,
+  type EntityPublicationEdit as Edit,
+  type EntityPublicationPacket as Packet,
+  type EntityPublicationEvidence as Evidence,
+} from './internals/entity-publication';
+import { installTerminalRecord } from './internals/intrinsic-mutation';
+import { initialRequirement } from './experimental-publication/lifecycle';
+import { runtimeAttribution } from './internals/runtime-attribution-probe';
+
+const edit = (fields: string[], after: unknown): Edit => ({
+  subject: 1, before: { x: 0, y: 0 }, after, fields,
+});
+const packet = (ordinary: Edit[], physical: Edit[], extra: Partial<Packet> = {}): Packet => ({
+  owner: 1, id: {}, meta: undefined, ordinary, physical, ...extra,
+});
+function install(source: EntityPublicationSource, value: Packet): void {
+  const unit = source.prepare(value);
+  if (!unit) throw Error('Missing native unit');
+  unit.finalize?.();
+  installTerminalRecord(unit.record);
+  source.complete(unit.completion);
+}
+
+for (const reuse of [false, true])
+for (const mode of ['paired-singleton', 'missing-pair', 'repeated-edit'] as const)
+it(`detached per-edit physical reader survives later activity: ${mode}, reuse=${reuse}`, () => {
+  const previousReuse = runtimeAttribution.reusePhysical;
+  runtimeAttribution.reusePhysical = reuse;
+  const source = new EntityPublicationSource();
+  let release = () => { /* No capture participant until after seeding. */ };
+  try {
+    const seed = edit(['x', 'y'], { x: 0, y: 0 });
+    install(source, packet([seed], [seed]));
+    const priorY = source.evidence()?.field(1, 'y', 'physical');
+    expect(priorY).toBeDefined();
+    const first = initialRequirement(), last = initialRequirement(), later = initialRequirement();
+    const a: Edit = { ...edit(['x'], { x: 1, y: 0 }),
+      restoredFields: new Map([['x', { present: true, value: 1, requirement: first }]]) };
+    const b: Edit = { ...edit(['x'], { x: 2, y: 0 }),
+      restoredFields: new Map([['x', { present: true, value: 2, requirement: last }]]) };
+    const p1 = edit(['x'], { x: 1, y: 0 });
+    const p2 = edit(['y'], { x: 1, y: 42 });
+    let saved: Evidence | undefined;
+    release = source.subscribe({
+      prepare(_packet, native) { saved ??= (native as { facts: Evidence }).facts; return undefined; },
+      complete() { /* Capture-only recipient. */ },
+    });
+    const input = packet(mode === 'repeated-edit' ? [a, b] : [a], [p1, p2],
+      mode === 'missing-pair' ? { steps: [{ ordinal: 0, ordinary: [a] }] } : {});
+    const unit = source.prepare(input);
+    if (!unit || !saved?.forEdit) throw Error('Missing prepared evidence');
+    const firstReader = saved.forEdit(a);
+    const lastReader = mode === 'repeated-edit' ? saved.forEdit(b) : undefined;
+    const savedY = firstReader.field(1, 'y', 'physical');
+    const check = () => {
+      expect(firstReader.field(1, 'x', 'ordinary')).toBe(first);
+      expect(firstReader.field(1, 'x', 'physical')).toBe(first);
+      expect(firstReader.field(1, 'y', 'physical')).toBe(savedY);
+      if (mode === 'missing-pair') expect(savedY).not.toBe(priorY);
+      else expect(savedY).toBe(priorY);
+      if (lastReader) {
+        expect(lastReader.field(1, 'x', 'ordinary')).toBe(last);
+        expect(lastReader.field(1, 'x', 'physical')).toBe(last);
+        expect(lastReader.field(1, 'y', 'physical')).toBe(priorY);
+      }
+    };
+    check();
+    unit.finalize?.(); installTerminalRecord(unit.record); source.complete(unit.completion);
+    check();
+    expect(source.evidence()?.field(1, 'y', 'physical')).not.toBe(priorY);
+    const next: Edit = { ...edit(['x', 'y'], { x: 9, y: 10 }),
+      restoredFields: new Map([
+        ['x', { present: true, value: 9, requirement: later }],
+        ['y', { present: true, value: 10, requirement: later }],
+      ]) };
+    const refuse = source.subscribe({ prepare() { throw Error('Refused later preparation'); },
+      complete() { throw Error('Refused unit must not complete'); } });
+    try { expect(() => source.prepare(packet([next], [next]))).toThrow('Refused later preparation'); }
+    finally { refuse(); }
+    check();
+    install(source, packet([next], [next]));
+    expect(source.evidence()?.field(1, 'y', 'physical')).toBe(later);
+    check();
+  } finally { release(); source.dispose(); runtimeAttribution.reusePhysical = previousReuse; }
+});

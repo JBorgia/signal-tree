@@ -1,0 +1,18 @@
+{
+  "frozenHead": "3eabc01ddab71f16b8def0172c43c344bfd08731",
+  "frozenClean": true,
+  "frozenArtifacts": 193,
+  "frozenArtifactMapSha256": "2e51f09fcc2d96f8a0a8221f11b85ace04927daaa85b3978df4385f2151f9a24",
+  "frozenArtifactsMatch": true,
+  "experimentalPackagesDiffEmpty": true,
+  "publicLateHistoryRestoredRuntimePass": true,
+  "documentationGates": "4/4 pass; receipt runs/final-documentation-gates",
+  "noAdoption": true,
+  "noPushMergeActivationPublication": true,
+  "restoredBuild": {
+    "exit": 0,
+    "files": 193,
+    "matchesFrozenArtifactMap": true,
+    "receipt": "final-receipts/restored-five-build/RESULT.json"
+  }
+}

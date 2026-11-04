@@ -1,0 +1,3964 @@
+[
+  {
+    "profile": "bare",
+    "size": 0,
+    "complete": true,
+    "children": 12,
+    "metrics": {
+      "drain_ms": {
+        "retained": {
+          "n": 5,
+          "median": 0.15887499999999477,
+          "min": 0.12920900000000302,
+          "max": 0.17766699999999958,
+          "range": 0.04845799999999656,
+          "values": [
+            0.1529170000000022,
+            0.17766699999999958,
+            0.12920900000000302,
+            0.16791599999999107,
+            0.15887499999999477
+          ]
+        },
+        "selected": {
+          "n": 5,
+          "median": 0.15362500000000523,
+          "min": 0.1333750000000009,
+          "max": 0.19104200000001015,
+          "range": 0.05766700000000924,
+          "values": [
+            0.14749999999999375,
+            0.15895899999999585,
+            0.15362500000000523,
+            0.19104200000001015,
+            0.1333750000000009
+          ]
+        },
+        "aa": {
+          "n": 2,
+          "median": 0.13300000000000267,
+          "min": 0.12383300000000474,
+          "max": 0.1421670000000006,
+          "range": 0.018333999999995854,
+          "values": [
+            0.1421670000000006,
+            0.12383300000000474
+          ]
+        },
+        "completeCell": true,
+        "absoluteMedianDelta": -0.005249999999989541,
+        "relativeMedianDeltaPercent": -3.3044846577433287,
+        "rangesOverlap": true,
+        "observedSameArmVariability": 0.05766700000000924,
+        "direction": "unresolved",
+        "pairedDeltas": {
+          "n": 5,
+          "median": -0.005417000000008443,
+          "min": -0.02549999999999386,
+          "max": 0.024416000000002214,
+          "range": 0.049915999999996075,
+          "values": [
+            -0.005417000000008443,
+            -0.01870800000000372,
+            0.024416000000002214,
+            0.023126000000019076,
+            -0.02549999999999386
+          ]
+        },
+        "relativeDeltaLimitation": "undefined for nonpositive retained median; signed process heap changes are not owner storage"
+      },
+      "sync_cpu_ms": {
+        "retained": {
+          "n": 5,
+          "median": 109.742,
+          "min": 107.772,
+          "max": 133.008,
+          "range": 25.236000000000004,
+          "values": [
+            107.772,
+            109.742,
+            109.698,
+            133.008,
+            113.489
+          ]
+        },
+        "selected": {
+          "n": 5,
+          "median": 108.228,
+          "min": 101.402,
+          "max": 132.624,
+          "range": 31.221999999999994,
+          "values": [
+            101.402,
+            108.228,
+            112.21,
+            105.33,
+            132.624
+          ]
+        },
+        "aa": {
+          "n": 2,
+          "median": 103.6185,
+          "min": 102.074,
+          "max": 105.163,
+          "range": 3.0889999999999986,
+          "values": [
+            105.163,
+            102.074
+          ]
+        },
+        "completeCell": true,
+        "absoluteMedianDelta": -1.51400000000001,
+        "relativeMedianDeltaPercent": -1.379599424103816,
+        "rangesOverlap": true,
+        "observedSameArmVariability": 31.221999999999994,
+        "direction": "unresolved",
+        "pairedDeltas": {
+          "n": 5,
+          "median": -1.51400000000001,
+          "min": -27.67800000000001,
+          "max": 19.13499999999999,
+          "range": 46.813,
+          "values": [
+            -6.3700000000000045,
+            -1.51400000000001,
+            2.5120000000000005,
+            -27.67800000000001,
+            19.13499999999999
+          ]
+        },
+        "relativeDeltaLimitation": "undefined for nonpositive retained median; signed process heap changes are not owner storage"
+      },
+      "sync_ms": {
+        "retained": {
+          "n": 5,
+          "median": 49.48925,
+          "min": 47.63125,
+          "max": 62.48725,
+          "range": 14.856000000000002,
+          "values": [
+            47.63125,
+            49.48925,
+            47.865291,
+            62.48725,
+            50.542125000000006
+          ]
+        },
+        "selected": {
+          "n": 5,
+          "median": 47.152125,
+          "min": 45.092542,
+          "max": 59.437375,
+          "range": 14.344833000000001,
+          "values": [
+            45.092542,
+            47.152125,
+            48.478042,
+            46.05366599999999,
+            59.437375
+          ]
+        },
+        "aa": {
+          "n": 2,
+          "median": 47.077186999999995,
+          "min": 45.615708,
+          "max": 48.53866599999999,
+          "range": 2.922957999999994,
+          "values": [
+            48.53866599999999,
+            45.615708
+          ]
+        },
+        "completeCell": true,
+        "absoluteMedianDelta": -2.3371250000000003,
+        "relativeMedianDeltaPercent": -4.722490237778913,
+        "rangesOverlap": true,
+        "observedSameArmVariability": 14.856000000000002,
+        "direction": "unresolved",
+        "pairedDeltas": {
+          "n": 5,
+          "median": -2.3371250000000003,
+          "min": -16.43358400000001,
+          "max": 8.895249999999997,
+          "range": 25.328834000000008,
+          "values": [
+            -2.5387079999999997,
+            -2.3371250000000003,
+            0.6127510000000029,
+            -16.43358400000001,
+            8.895249999999997
+          ]
+        },
+        "relativeDeltaLimitation": "undefined for nonpositive retained median; signed process heap changes are not owner storage"
+      },
+      "sync_system_ms": {
+        "retained": {
+          "n": 5,
+          "median": 2.563,
+          "min": 2.231,
+          "max": 4.336,
+          "range": 2.1050000000000004,
+          "values": [
+            2.231,
+            3.405,
+            2.563,
+            4.336,
+            2.433
+          ]
+        },
+        "selected": {
+          "n": 5,
+          "median": 2.627,
+          "min": 1.397,
+          "max": 3.581,
+          "range": 2.184,
+          "values": [
+            1.397,
+            2.627,
+            2.971,
+            2.093,
+            3.581
+          ]
+        },
+        "aa": {
+          "n": 2,
+          "median": 1.8279999999999998,
+          "min": 1.795,
+          "max": 1.861,
+          "range": 0.06600000000000006,
+          "values": [
+            1.861,
+            1.795
+          ]
+        },
+        "completeCell": true,
+        "absoluteMedianDelta": 0.06399999999999961,
+        "relativeMedianDeltaPercent": 2.4970737417089195,
+        "rangesOverlap": true,
+        "observedSameArmVariability": 2.184,
+        "direction": "unresolved",
+        "pairedDeltas": {
+          "n": 5,
+          "median": -0.778,
+          "min": -2.2430000000000003,
+          "max": 1.1480000000000001,
+          "range": 3.3910000000000005,
+          "values": [
+            -0.8339999999999999,
+            -0.778,
+            0.4079999999999999,
+            -2.2430000000000003,
+            1.1480000000000001
+          ]
+        },
+        "relativeDeltaLimitation": "undefined for nonpositive retained median; signed process heap changes are not owner storage"
+      },
+      "sync_user_ms": {
+        "retained": {
+          "n": 5,
+          "median": 107.135,
+          "min": 105.541,
+          "max": 128.672,
+          "range": 23.131,
+          "values": [
+            105.541,
+            106.337,
+            107.135,
+            128.672,
+            111.056
+          ]
+        },
+        "selected": {
+          "n": 5,
+          "median": 105.601,
+          "min": 100.005,
+          "max": 129.043,
+          "range": 29.03800000000001,
+          "values": [
+            100.005,
+            105.601,
+            109.239,
+            103.237,
+            129.043
+          ]
+        },
+        "aa": {
+          "n": 2,
+          "median": 101.79050000000001,
+          "min": 100.279,
+          "max": 103.302,
+          "range": 3.0230000000000103,
+          "values": [
+            103.302,
+            100.279
+          ]
+        },
+        "completeCell": true,
+        "absoluteMedianDelta": -1.534000000000006,
+        "relativeMedianDeltaPercent": -1.4318383348112251,
+        "rangesOverlap": true,
+        "observedSameArmVariability": 29.03800000000001,
+        "direction": "unresolved",
+        "pairedDeltas": {
+          "n": 5,
+          "median": -0.7360000000000042,
+          "min": -25.435000000000002,
+          "max": 17.98700000000001,
+          "range": 43.42200000000001,
+          "values": [
+            -5.536000000000001,
+            -0.7360000000000042,
+            2.103999999999999,
+            -25.435000000000002,
+            17.98700000000001
+          ]
+        },
+        "relativeDeltaLimitation": "undefined for nonpositive retained median; signed process heap changes are not owner storage"
+      },
+      "total_cpu_ms": {
+        "retained": {
+          "n": 5,
+          "median": 109.911,
+          "min": 107.915,
+          "max": 133.168,
+          "range": 25.253,
+          "values": [
+            107.915,
+            109.911,
+            109.81,
+            133.168,
+            113.649
+          ]
+        },
+        "selected": {
+          "n": 5,
+          "median": 108.377,
+          "min": 101.541,
+          "max": 132.736,
+          "range": 31.194999999999993,
+          "values": [
+            101.541,
+            108.377,
+            112.34,
+            105.547,
+            132.736
+          ]
+        },
+        "aa": {
+          "n": 2,
+          "median": 103.733,
+          "min": 102.179,
+          "max": 105.287,
+          "range": 3.108000000000004,
+          "values": [
+            105.287,
+            102.179
+          ]
+        },
+        "completeCell": true,
+        "absoluteMedianDelta": -1.534000000000006,
+        "relativeMedianDeltaPercent": -1.3956746822429111,
+        "rangesOverlap": true,
+        "observedSameArmVariability": 31.194999999999993,
+        "direction": "unresolved",
+        "pairedDeltas": {
+          "n": 5,
+          "median": -1.534000000000006,
+          "min": -27.62100000000001,
+          "max": 19.08699999999999,
+          "range": 46.708,
+          "values": [
+            -6.374000000000009,
+            -1.534000000000006,
+            2.530000000000001,
+            -27.62100000000001,
+            19.08699999999999
+          ]
+        },
+        "relativeDeltaLimitation": "undefined for nonpositive retained median; signed process heap changes are not owner storage"
+      }
+    }
+  },
+  {
+    "profile": "point",
+    "size": 1000,
+    "complete": true,
+    "children": 12,
+    "metrics": {
+      "drain_ms": {
+        "retained": {
+          "n": 5,
+          "median": 0.23633399999999938,
+          "min": 0.08929200000000037,
+          "max": 0.4152080000000069,
+          "range": 0.32591600000000653,
+          "values": [
+            0.2627080000000035,
+            0.23633399999999938,
+            0.4152080000000069,
+            0.08929200000000037,
+            0.18949999999999534
+          ]
+        },
+        "selected": {
+          "n": 5,
+          "median": 0.11745799999999917,
+          "min": 0.09954199999999958,
+          "max": 3.1683749999999975,
+          "range": 3.068832999999998,
+          "values": [
+            3.1683749999999975,
+            2.5039579999999972,
+            0.09954199999999958,
+            0.11745799999999917,
+            0.10395799999999156
+          ]
+        },
+        "aa": {
+          "n": 2,
+          "median": 0.26706250000000153,
+          "min": 0.1950829999999968,
+          "max": 0.3390420000000063,
+          "range": 0.1439590000000095,
+          "values": [
+            0.3390420000000063,
+            0.1950829999999968
+          ]
+        },
+        "completeCell": true,
+        "absoluteMedianDelta": -0.1188760000000002,
+        "relativeMedianDeltaPercent": -50.299999153740266,
+        "rangesOverlap": true,
+        "observedSameArmVariability": 3.068832999999998,
+        "direction": "unresolved",
+        "pairedDeltas": {
+          "n": 5,
+          "median": 0.028165999999998803,
+          "min": -0.31566600000000733,
+          "max": 2.905666999999994,
+          "range": 3.2213330000000013,
+          "values": [
+            2.905666999999994,
+            2.267623999999998,
+            -0.31566600000000733,
+            0.028165999999998803,
+            -0.08554200000000378
+          ]
+        },
+        "relativeDeltaLimitation": "undefined for nonpositive retained median; signed process heap changes are not owner storage"
+      },
+      "sync_cpu_ms": {
+        "retained": {
+          "n": 5,
+          "median": 69.963,
+          "min": 62.466,
+          "max": 71.707,
+          "range": 9.240999999999993,
+          "values": [
+            71.389,
+            69.963,
+            71.707,
+            63.189,
+            62.466
+          ]
+        },
+        "selected": {
+          "n": 5,
+          "median": 62.414,
+          "min": 57.581,
+          "max": 83.511,
+          "range": 25.929999999999993,
+          "values": [
+            57.885,
+            57.581,
+            62.414,
+            83.511,
+            64.342
+          ]
+        },
+        "aa": {
+          "n": 2,
+          "median": 79.7995,
+          "min": 67.94,
+          "max": 91.659,
+          "range": 23.71900000000001,
+          "values": [
+            91.659,
+            67.94
+          ]
+        },
+        "completeCell": true,
+        "absoluteMedianDelta": -7.548999999999992,
+        "relativeMedianDeltaPercent": -10.789988994182629,
+        "rangesOverlap": true,
+        "observedSameArmVariability": 25.929999999999993,
+        "direction": "unresolved",
+        "pairedDeltas": {
+          "n": 5,
+          "median": -9.292999999999992,
+          "min": -13.503999999999998,
+          "max": 20.321999999999996,
+          "range": 33.82599999999999,
+          "values": [
+            -13.503999999999998,
+            -12.38199999999999,
+            -9.292999999999992,
+            20.321999999999996,
+            1.8759999999999977
+          ]
+        },
+        "relativeDeltaLimitation": "undefined for nonpositive retained median; signed process heap changes are not owner storage"
+      },
+      "sync_ms": {
+        "retained": {
+          "n": 5,
+          "median": 33.271333,
+          "min": 29.079375,
+          "max": 37.076834000000005,
+          "range": 7.997459000000006,
+          "values": [
+            35.19200000000001,
+            33.271333,
+            37.076834000000005,
+            29.079375,
+            29.561542000000003
+          ]
+        },
+        "selected": {
+          "n": 5,
+          "median": 29.761750000000006,
+          "min": 27.645458000000005,
+          "max": 40.57462500000001,
+          "range": 12.929167000000007,
+          "values": [
+            27.76424999999999,
+            27.645458000000005,
+            29.761750000000006,
+            40.57462500000001,
+            31.221625000000003
+          ]
+        },
+        "aa": {
+          "n": 2,
+          "median": 40.021083,
+          "min": 32.145375,
+          "max": 47.89679099999999,
+          "range": 15.751415999999992,
+          "values": [
+            47.89679099999999,
+            32.145375
+          ]
+        },
+        "completeCell": true,
+        "absoluteMedianDelta": -3.509582999999992,
+        "relativeMedianDeltaPercent": -10.54836907195751,
+        "rangesOverlap": true,
+        "observedSameArmVariability": 15.751415999999992,
+        "direction": "unresolved",
+        "pairedDeltas": {
+          "n": 5,
+          "median": -5.6258749999999935,
+          "min": -7.427750000000017,
+          "max": 11.495250000000013,
+          "range": 18.92300000000003,
+          "values": [
+            -7.427750000000017,
+            -5.6258749999999935,
+            -7.315083999999999,
+            11.495250000000013,
+            1.6600830000000002
+          ]
+        },
+        "relativeDeltaLimitation": "undefined for nonpositive retained median; signed process heap changes are not owner storage"
+      },
+      "sync_system_ms": {
+        "retained": {
+          "n": 5,
+          "median": 9.098,
+          "min": 6.06,
+          "max": 10.282,
+          "range": 4.222,
+          "values": [
+            9.357,
+            10.282,
+            9.098,
+            7.823,
+            6.06
+          ]
+        },
+        "selected": {
+          "n": 5,
+          "median": 6.246,
+          "min": 4.724,
+          "max": 7.04,
+          "range": 2.316,
+          "values": [
+            4.724,
+            4.966,
+            6.246,
+            7.04,
+            6.314
+          ]
+        },
+        "aa": {
+          "n": 2,
+          "median": 9.885,
+          "min": 8.626,
+          "max": 11.144,
+          "range": 2.5180000000000007,
+          "values": [
+            11.144,
+            8.626
+          ]
+        },
+        "completeCell": true,
+        "absoluteMedianDelta": -2.8520000000000003,
+        "relativeMedianDeltaPercent": -31.34754891184876,
+        "rangesOverlap": true,
+        "observedSameArmVariability": 4.222,
+        "direction": "unresolved",
+        "pairedDeltas": {
+          "n": 5,
+          "median": -2.8520000000000003,
+          "min": -5.316,
+          "max": 0.25400000000000045,
+          "range": 5.57,
+          "values": [
+            -4.632999999999999,
+            -5.316,
+            -2.8520000000000003,
+            -0.7830000000000004,
+            0.25400000000000045
+          ]
+        },
+        "relativeDeltaLimitation": "undefined for nonpositive retained median; signed process heap changes are not owner storage"
+      },
+      "sync_user_ms": {
+        "retained": {
+          "n": 5,
+          "median": 59.681,
+          "min": 55.366,
+          "max": 62.609,
+          "range": 7.243000000000002,
+          "values": [
+            62.032,
+            59.681,
+            62.609,
+            55.366,
+            56.406
+          ]
+        },
+        "selected": {
+          "n": 5,
+          "median": 56.168,
+          "min": 52.615,
+          "max": 76.471,
+          "range": 23.856,
+          "values": [
+            53.161,
+            52.615,
+            56.168,
+            76.471,
+            58.028
+          ]
+        },
+        "aa": {
+          "n": 2,
+          "median": 69.9145,
+          "min": 59.314,
+          "max": 80.515,
+          "range": 21.201,
+          "values": [
+            80.515,
+            59.314
+          ]
+        },
+        "completeCell": true,
+        "absoluteMedianDelta": -3.512999999999998,
+        "relativeMedianDeltaPercent": -5.886295470920391,
+        "rangesOverlap": true,
+        "observedSameArmVariability": 23.856,
+        "direction": "unresolved",
+        "pairedDeltas": {
+          "n": 5,
+          "median": -6.4410000000000025,
+          "min": -8.870999999999995,
+          "max": 21.105000000000004,
+          "range": 29.976,
+          "values": [
+            -8.870999999999995,
+            -7.065999999999995,
+            -6.4410000000000025,
+            21.105000000000004,
+            1.6219999999999999
+          ]
+        },
+        "relativeDeltaLimitation": "undefined for nonpositive retained median; signed process heap changes are not owner storage"
+      },
+      "total_cpu_ms": {
+        "retained": {
+          "n": 5,
+          "median": 70.411,
+          "min": 62.684,
+          "max": 72.378,
+          "range": 9.694000000000003,
+          "values": [
+            71.657,
+            70.411,
+            72.378,
+            63.26,
+            62.684
+          ]
+        },
+        "selected": {
+          "n": 5,
+          "median": 63.964,
+          "min": 62.494,
+          "max": 83.607,
+          "range": 21.113,
+          "values": [
+            63.964,
+            62.765,
+            62.494,
+            83.607,
+            64.426
+          ]
+        },
+        "aa": {
+          "n": 2,
+          "median": 80.211,
+          "min": 68.286,
+          "max": 92.136,
+          "range": 23.849999999999994,
+          "values": [
+            92.136,
+            68.286
+          ]
+        },
+        "completeCell": true,
+        "absoluteMedianDelta": -6.447000000000003,
+        "relativeMedianDeltaPercent": -9.156239792077946,
+        "rangesOverlap": true,
+        "observedSameArmVariability": 23.849999999999994,
+        "direction": "unresolved",
+        "pairedDeltas": {
+          "n": 5,
+          "median": -7.646000000000001,
+          "min": -9.884,
+          "max": 20.347,
+          "range": 30.231,
+          "values": [
+            -7.692999999999998,
+            -7.646000000000001,
+            -9.884,
+            20.347,
+            1.7420000000000044
+          ]
+        },
+        "relativeDeltaLimitation": "undefined for nonpositive retained median; signed process heap changes are not owner storage"
+      }
+    }
+  },
+  {
+    "profile": "projection",
+    "size": 1000,
+    "complete": true,
+    "children": 12,
+    "metrics": {
+      "drain_ms": {
+        "retained": {
+          "n": 5,
+          "median": 4.596083000000007,
+          "min": 0.08799999999999386,
+          "max": 41.336291999999986,
+          "range": 41.24829199999999,
+          "values": [
+            4.596083000000007,
+            41.336291999999986,
+            0.27145799999999554,
+            4.667375000000007,
+            0.08799999999999386
+          ]
+        },
+        "selected": {
+          "n": 5,
+          "median": 0.08625000000000682,
+          "min": 0.08404199999999662,
+          "max": 4.684375000000003,
+          "range": 4.600333000000006,
+          "values": [
+            0.08625000000000682,
+            4.684375000000003,
+            0.10829100000000835,
+            0.08587500000000148,
+            0.08404199999999662
+          ]
+        },
+        "aa": {
+          "n": 2,
+          "median": 0.07843700000000098,
+          "min": 0.07620800000000827,
+          "max": 0.08066599999999369,
+          "range": 0.004457999999985418,
+          "values": [
+            0.07620800000000827,
+            0.08066599999999369
+          ]
+        },
+        "completeCell": true,
+        "absoluteMedianDelta": -4.509833,
+        "relativeMedianDeltaPercent": -98.12340203603793,
+        "rangesOverlap": true,
+        "observedSameArmVariability": 41.24829199999999,
+        "direction": "unresolved",
+        "pairedDeltas": {
+          "n": 5,
+          "median": -4.509833,
+          "min": -36.65191699999998,
+          "max": -0.0039579999999972415,
+          "range": 36.647958999999986,
+          "values": [
+            -4.509833,
+            -36.65191699999998,
+            -0.16316699999998718,
+            -4.5815000000000055,
+            -0.0039579999999972415
+          ]
+        },
+        "relativeDeltaLimitation": "undefined for nonpositive retained median; signed process heap changes are not owner storage"
+      },
+      "sync_cpu_ms": {
+        "retained": {
+          "n": 5,
+          "median": 35.787,
+          "min": 15.726,
+          "max": 43.369,
+          "range": 27.643,
+          "values": [
+            36.513,
+            43.369,
+            20.44,
+            35.787,
+            15.726
+          ]
+        },
+        "selected": {
+          "n": 5,
+          "median": 17.808,
+          "min": 17.164,
+          "max": 36.945,
+          "range": 19.781,
+          "values": [
+            17.808,
+            36.945,
+            22.444,
+            17.738,
+            17.164
+          ]
+        },
+        "aa": {
+          "n": 2,
+          "median": 17.494500000000002,
+          "min": 17.04,
+          "max": 17.949,
+          "range": 0.9090000000000025,
+          "values": [
+            17.949,
+            17.04
+          ]
+        },
+        "completeCell": true,
+        "absoluteMedianDelta": -17.979,
+        "relativeMedianDeltaPercent": -50.23891357196747,
+        "rangesOverlap": true,
+        "observedSameArmVariability": 27.643,
+        "direction": "unresolved",
+        "pairedDeltas": {
+          "n": 5,
+          "median": -6.4239999999999995,
+          "min": -18.705,
+          "max": 2.003999999999998,
+          "range": 20.708999999999996,
+          "values": [
+            -18.705,
+            -6.4239999999999995,
+            2.003999999999998,
+            -18.049,
+            1.4380000000000006
+          ]
+        },
+        "relativeDeltaLimitation": "undefined for nonpositive retained median; signed process heap changes are not owner storage"
+      },
+      "sync_ms": {
+        "retained": {
+          "n": 5,
+          "median": 26.16616599999999,
+          "min": 11.654042000000004,
+          "max": 30.86250000000001,
+          "range": 19.208458000000007,
+          "values": [
+            26.352499999999992,
+            30.86250000000001,
+            14.48491700000001,
+            26.16616599999999,
+            11.654042000000004
+          ]
+        },
+        "selected": {
+          "n": 5,
+          "median": 13.003917000000001,
+          "min": 12.582624999999993,
+          "max": 29.787374999999997,
+          "range": 17.204750000000004,
+          "values": [
+            13.003917000000001,
+            29.787374999999997,
+            16.066209,
+            12.834084000000004,
+            12.582624999999993
+          ]
+        },
+        "aa": {
+          "n": 2,
+          "median": 12.6908125,
+          "min": 12.42387500000001,
+          "max": 12.95774999999999,
+          "range": 0.5338749999999806,
+          "values": [
+            12.95774999999999,
+            12.42387500000001
+          ]
+        },
+        "completeCell": true,
+        "absoluteMedianDelta": -13.162248999999989,
+        "relativeMedianDeltaPercent": -50.30255101186774,
+        "rangesOverlap": true,
+        "observedSameArmVariability": 19.208458000000007,
+        "direction": "unresolved",
+        "pairedDeltas": {
+          "n": 5,
+          "median": -1.075125000000014,
+          "min": -13.34858299999999,
+          "max": 1.5812919999999906,
+          "range": 14.929874999999981,
+          "values": [
+            -13.34858299999999,
+            -1.075125000000014,
+            1.5812919999999906,
+            -13.332081999999986,
+            0.9285829999999891
+          ]
+        },
+        "relativeDeltaLimitation": "undefined for nonpositive retained median; signed process heap changes are not owner storage"
+      },
+      "sync_system_ms": {
+        "retained": {
+          "n": 5,
+          "median": 2.605,
+          "min": 1.089,
+          "max": 3.642,
+          "range": 2.553,
+          "values": [
+            2.605,
+            3.642,
+            1.726,
+            2.645,
+            1.089
+          ]
+        },
+        "selected": {
+          "n": 5,
+          "median": 1.802,
+          "min": 1.237,
+          "max": 2.906,
+          "range": 1.669,
+          "values": [
+            1.802,
+            2.906,
+            2.405,
+            1.237,
+            1.261
+          ]
+        },
+        "aa": {
+          "n": 2,
+          "median": 1.294,
+          "min": 1.096,
+          "max": 1.492,
+          "range": 0.3959999999999999,
+          "values": [
+            1.492,
+            1.096
+          ]
+        },
+        "completeCell": true,
+        "absoluteMedianDelta": -0.8029999999999999,
+        "relativeMedianDeltaPercent": -30.825335892514396,
+        "rangesOverlap": true,
+        "observedSameArmVariability": 2.553,
+        "direction": "unresolved",
+        "pairedDeltas": {
+          "n": 5,
+          "median": -0.7359999999999998,
+          "min": -1.408,
+          "max": 0.6789999999999998,
+          "range": 2.0869999999999997,
+          "values": [
+            -0.8029999999999999,
+            -0.7359999999999998,
+            0.6789999999999998,
+            -1.408,
+            0.17199999999999993
+          ]
+        },
+        "relativeDeltaLimitation": "undefined for nonpositive retained median; signed process heap changes are not owner storage"
+      },
+      "sync_user_ms": {
+        "retained": {
+          "n": 5,
+          "median": 33.142,
+          "min": 14.637,
+          "max": 39.727,
+          "range": 25.089999999999996,
+          "values": [
+            33.908,
+            39.727,
+            18.714,
+            33.142,
+            14.637
+          ]
+        },
+        "selected": {
+          "n": 5,
+          "median": 16.501,
+          "min": 15.903,
+          "max": 34.039,
+          "range": 18.136000000000003,
+          "values": [
+            16.006,
+            34.039,
+            20.039,
+            16.501,
+            15.903
+          ]
+        },
+        "aa": {
+          "n": 2,
+          "median": 16.2005,
+          "min": 15.944,
+          "max": 16.457,
+          "range": 0.5129999999999999,
+          "values": [
+            16.457,
+            15.944
+          ]
+        },
+        "completeCell": true,
+        "absoluteMedianDelta": -16.641000000000002,
+        "relativeMedianDeltaPercent": -50.211212358940315,
+        "rangesOverlap": true,
+        "observedSameArmVariability": 25.089999999999996,
+        "direction": "unresolved",
+        "pairedDeltas": {
+          "n": 5,
+          "median": -5.687999999999995,
+          "min": -17.902,
+          "max": 1.3250000000000028,
+          "range": 19.227000000000004,
+          "values": [
+            -17.902,
+            -5.687999999999995,
+            1.3250000000000028,
+            -16.641000000000002,
+            1.266
+          ]
+        },
+        "relativeDeltaLimitation": "undefined for nonpositive retained median; signed process heap changes are not owner storage"
+      },
+      "total_cpu_ms": {
+        "retained": {
+          "n": 5,
+          "median": 47.853,
+          "min": 15.799,
+          "max": 59.641,
+          "range": 43.842,
+          "values": [
+            48.964,
+            59.641,
+            20.624,
+            47.853,
+            15.799
+          ]
+        },
+        "selected": {
+          "n": 5,
+          "median": 17.878,
+          "min": 17.232,
+          "max": 50.667,
+          "range": 33.435,
+          "values": [
+            17.878,
+            50.667,
+            22.532,
+            17.809,
+            17.232
+          ]
+        },
+        "aa": {
+          "n": 2,
+          "median": 17.558,
+          "min": 17.106,
+          "max": 18.01,
+          "range": 0.9039999999999999,
+          "values": [
+            18.01,
+            17.106
+          ]
+        },
+        "completeCell": true,
+        "absoluteMedianDelta": -29.975,
+        "relativeMedianDeltaPercent": -62.639750903809585,
+        "rangesOverlap": true,
+        "observedSameArmVariability": 43.842,
+        "direction": "unresolved",
+        "pairedDeltas": {
+          "n": 5,
+          "median": -8.973999999999997,
+          "min": -31.086,
+          "max": 1.9080000000000013,
+          "range": 32.994,
+          "values": [
+            -31.086,
+            -8.973999999999997,
+            1.9080000000000013,
+            -30.044,
+            1.4329999999999998
+          ]
+        },
+        "relativeDeltaLimitation": "undefined for nonpositive retained median; signed process heap changes are not owner storage"
+      }
+    }
+  },
+  {
+    "profile": "confirm",
+    "size": 1000,
+    "complete": true,
+    "children": 12,
+    "metrics": {
+      "drain_ms": {
+        "retained": {
+          "n": 5,
+          "median": 0.1430830000000043,
+          "min": 0.12779199999999946,
+          "max": 0.1526670000000081,
+          "range": 0.02487500000000864,
+          "values": [
+            0.1526670000000081,
+            0.1430830000000043,
+            0.12779199999999946,
+            0.14929199999998843,
+            0.1353330000000028
+          ]
+        },
+        "selected": {
+          "n": 5,
+          "median": 0.14058400000000404,
+          "min": 0.12245900000000631,
+          "max": 0.1893749999999983,
+          "range": 0.06691599999999198,
+          "values": [
+            0.14058400000000404,
+            0.12245900000000631,
+            0.1893749999999983,
+            0.15458300000000236,
+            0.13187499999999375
+          ]
+        },
+        "aa": {
+          "n": 2,
+          "median": 0.1449789999999993,
+          "min": 0.14033299999999826,
+          "max": 0.14962500000000034,
+          "range": 0.009292000000002076,
+          "values": [
+            0.14033299999999826,
+            0.14962500000000034
+          ]
+        },
+        "completeCell": true,
+        "absoluteMedianDelta": -0.002499000000000251,
+        "relativeMedianDeltaPercent": -1.7465387222801982,
+        "rangesOverlap": true,
+        "observedSameArmVariability": 0.06691599999999198,
+        "direction": "unresolved",
+        "pairedDeltas": {
+          "n": 5,
+          "median": -0.003458000000009065,
+          "min": -0.020623999999997977,
+          "max": 0.06158299999999883,
+          "range": 0.08220699999999681,
+          "values": [
+            -0.012083000000004063,
+            -0.020623999999997977,
+            0.06158299999999883,
+            0.0052910000000139235,
+            -0.003458000000009065
+          ]
+        },
+        "relativeDeltaLimitation": "undefined for nonpositive retained median; signed process heap changes are not owner storage"
+      },
+      "sync_cpu_ms": {
+        "retained": {
+          "n": 5,
+          "median": 35.932,
+          "min": 31.827,
+          "max": 39.977,
+          "range": 8.149999999999995,
+          "values": [
+            38.225,
+            35.245,
+            39.977,
+            31.827,
+            35.932
+          ]
+        },
+        "selected": {
+          "n": 5,
+          "median": 35.665,
+          "min": 34.609,
+          "max": 38.002,
+          "range": 3.3930000000000007,
+          "values": [
+            34.609,
+            35.665,
+            38.002,
+            35.045,
+            36.491
+          ]
+        },
+        "aa": {
+          "n": 2,
+          "median": 37.879,
+          "min": 36.431,
+          "max": 39.327,
+          "range": 2.896000000000001,
+          "values": [
+            36.431,
+            39.327
+          ]
+        },
+        "completeCell": true,
+        "absoluteMedianDelta": -0.267000000000003,
+        "relativeMedianDeltaPercent": -0.7430702437938411,
+        "rangesOverlap": true,
+        "observedSameArmVariability": 8.149999999999995,
+        "direction": "unresolved",
+        "pairedDeltas": {
+          "n": 5,
+          "median": 0.4200000000000017,
+          "min": -3.6159999999999997,
+          "max": 3.218,
+          "range": 6.834,
+          "values": [
+            -3.6159999999999997,
+            0.4200000000000017,
+            -1.9749999999999943,
+            3.218,
+            0.5589999999999975
+          ]
+        },
+        "relativeDeltaLimitation": "undefined for nonpositive retained median; signed process heap changes are not owner storage"
+      },
+      "sync_ms": {
+        "retained": {
+          "n": 5,
+          "median": 22.928832999999997,
+          "min": 20.74454200000001,
+          "max": 24.365374999999986,
+          "range": 3.620832999999976,
+          "values": [
+            24.365374999999986,
+            22.437832999999998,
+            23.735332999999997,
+            20.74454200000001,
+            22.928832999999997
+          ]
+        },
+        "selected": {
+          "n": 5,
+          "median": 22.38275,
+          "min": 22.117458999999997,
+          "max": 24.149500000000003,
+          "range": 2.0320410000000066,
+          "values": [
+            22.38275,
+            22.607833,
+            24.149500000000003,
+            22.117458999999997,
+            22.247833
+          ]
+        },
+        "aa": {
+          "n": 2,
+          "median": 24.164375,
+          "min": 23.276916999999997,
+          "max": 25.051833000000002,
+          "range": 1.7749160000000046,
+          "values": [
+            23.276916999999997,
+            25.051833000000002
+          ]
+        },
+        "completeCell": true,
+        "absoluteMedianDelta": -0.5460829999999959,
+        "relativeMedianDeltaPercent": -2.381643234960959,
+        "rangesOverlap": true,
+        "observedSameArmVariability": 3.620832999999976,
+        "direction": "unresolved",
+        "pairedDeltas": {
+          "n": 5,
+          "median": 0.1700000000000017,
+          "min": -1.9826249999999845,
+          "max": 1.3729169999999868,
+          "range": 3.3555419999999714,
+          "values": [
+            -1.9826249999999845,
+            0.1700000000000017,
+            0.41416700000000617,
+            1.3729169999999868,
+            -0.6809999999999974
+          ]
+        },
+        "relativeDeltaLimitation": "undefined for nonpositive retained median; signed process heap changes are not owner storage"
+      },
+      "sync_system_ms": {
+        "retained": {
+          "n": 5,
+          "median": 2.552,
+          "min": 1.65,
+          "max": 3.554,
+          "range": 1.904,
+          "values": [
+            2.926,
+            2.149,
+            3.554,
+            1.65,
+            2.552
+          ]
+        },
+        "selected": {
+          "n": 5,
+          "median": 2.63,
+          "min": 2.405,
+          "max": 2.948,
+          "range": 0.5430000000000001,
+          "values": [
+            2.843,
+            2.406,
+            2.948,
+            2.63,
+            2.405
+          ]
+        },
+        "aa": {
+          "n": 2,
+          "median": 2.5735,
+          "min": 2.386,
+          "max": 2.761,
+          "range": 0.375,
+          "values": [
+            2.386,
+            2.761
+          ]
+        },
+        "completeCell": true,
+        "absoluteMedianDelta": 0.07799999999999985,
+        "relativeMedianDeltaPercent": 3.056426332288395,
+        "rangesOverlap": true,
+        "observedSameArmVariability": 1.904,
+        "direction": "unresolved",
+        "pairedDeltas": {
+          "n": 5,
+          "median": -0.08300000000000018,
+          "min": -0.6059999999999999,
+          "max": 0.98,
+          "range": 1.5859999999999999,
+          "values": [
+            -0.08300000000000018,
+            0.2570000000000001,
+            -0.6059999999999999,
+            0.98,
+            -0.14700000000000024
+          ]
+        },
+        "relativeDeltaLimitation": "undefined for nonpositive retained median; signed process heap changes are not owner storage"
+      },
+      "sync_user_ms": {
+        "retained": {
+          "n": 5,
+          "median": 33.38,
+          "min": 30.177,
+          "max": 36.423,
+          "range": 6.246000000000002,
+          "values": [
+            35.299,
+            33.096,
+            36.423,
+            30.177,
+            33.38
+          ]
+        },
+        "selected": {
+          "n": 5,
+          "median": 33.259,
+          "min": 31.766,
+          "max": 35.054,
+          "range": 3.288000000000004,
+          "values": [
+            31.766,
+            33.259,
+            35.054,
+            32.415,
+            34.086
+          ]
+        },
+        "aa": {
+          "n": 2,
+          "median": 35.3055,
+          "min": 34.045,
+          "max": 36.566,
+          "range": 2.521000000000001,
+          "values": [
+            34.045,
+            36.566
+          ]
+        },
+        "completeCell": true,
+        "absoluteMedianDelta": -0.12100000000000222,
+        "relativeMedianDeltaPercent": -0.36249251048532716,
+        "rangesOverlap": true,
+        "observedSameArmVariability": 6.246000000000002,
+        "direction": "unresolved",
+        "pairedDeltas": {
+          "n": 5,
+          "median": 0.1630000000000038,
+          "min": -3.5330000000000013,
+          "max": 2.2379999999999995,
+          "range": 5.771000000000001,
+          "values": [
+            -3.5330000000000013,
+            0.1630000000000038,
+            -1.3689999999999998,
+            2.2379999999999995,
+            0.705999999999996
+          ]
+        },
+        "relativeDeltaLimitation": "undefined for nonpositive retained median; signed process heap changes are not owner storage"
+      },
+      "total_cpu_ms": {
+        "retained": {
+          "n": 5,
+          "median": 36.051,
+          "min": 31.957,
+          "max": 40.092,
+          "range": 8.134999999999998,
+          "values": [
+            38.359,
+            35.373,
+            40.092,
+            31.957,
+            36.051
+          ]
+        },
+        "selected": {
+          "n": 5,
+          "median": 35.772,
+          "min": 34.733,
+          "max": 38.163,
+          "range": 3.4299999999999997,
+          "values": [
+            34.733,
+            35.772,
+            38.163,
+            35.184,
+            36.607
+          ]
+        },
+        "aa": {
+          "n": 2,
+          "median": 38.007999999999996,
+          "min": 36.556,
+          "max": 39.46,
+          "range": 2.9040000000000035,
+          "values": [
+            36.556,
+            39.46
+          ]
+        },
+        "completeCell": true,
+        "absoluteMedianDelta": -0.27900000000000347,
+        "relativeMedianDeltaPercent": -0.7739036365149468,
+        "rangesOverlap": true,
+        "observedSameArmVariability": 8.134999999999998,
+        "direction": "unresolved",
+        "pairedDeltas": {
+          "n": 5,
+          "median": 0.3990000000000009,
+          "min": -3.6260000000000048,
+          "max": 3.2269999999999968,
+          "range": 6.8530000000000015,
+          "values": [
+            -3.6260000000000048,
+            0.3990000000000009,
+            -1.929000000000002,
+            3.2269999999999968,
+            0.5559999999999974
+          ]
+        },
+        "relativeDeltaLimitation": "undefined for nonpositive retained median; signed process heap changes are not owner storage"
+      }
+    }
+  },
+  {
+    "profile": "rollback",
+    "size": 1000,
+    "complete": true,
+    "children": 12,
+    "metrics": {
+      "drain_ms": {
+        "retained": {
+          "n": 5,
+          "median": 0.20462499999999295,
+          "min": 0.15891600000000494,
+          "max": 0.25225000000000364,
+          "range": 0.0933339999999987,
+          "values": [
+            0.15891600000000494,
+            0.25225000000000364,
+            0.18691599999999653,
+            0.20966700000002447,
+            0.20462499999999295
+          ]
+        },
+        "selected": {
+          "n": 5,
+          "median": 0.18850000000000477,
+          "min": 0.17287500000000477,
+          "max": 0.26466700000000287,
+          "range": 0.0917919999999981,
+          "values": [
+            0.17525000000000546,
+            0.26466700000000287,
+            0.18850000000000477,
+            0.21104199999999196,
+            0.17287500000000477
+          ]
+        },
+        "aa": {
+          "n": 2,
+          "median": 0.21047950000000526,
+          "min": 0.1911670000000072,
+          "max": 0.22979200000000333,
+          "range": 0.038624999999996135,
+          "values": [
+            0.1911670000000072,
+            0.22979200000000333
+          ]
+        },
+        "completeCell": true,
+        "absoluteMedianDelta": -0.016124999999988177,
+        "relativeMedianDeltaPercent": -7.88026878435613,
+        "rangesOverlap": true,
+        "observedSameArmVariability": 0.0933339999999987,
+        "direction": "unresolved",
+        "pairedDeltas": {
+          "n": 5,
+          "median": 0.0015840000000082455,
+          "min": -0.03174999999998818,
+          "max": 0.016334000000000515,
+          "range": 0.04808399999998869,
+          "values": [
+            0.016334000000000515,
+            0.012416999999999234,
+            0.0015840000000082455,
+            0.0013749999999674856,
+            -0.03174999999998818
+          ]
+        },
+        "relativeDeltaLimitation": "undefined for nonpositive retained median; signed process heap changes are not owner storage"
+      },
+      "sync_cpu_ms": {
+        "retained": {
+          "n": 5,
+          "median": 65.006,
+          "min": 59.103,
+          "max": 66.638,
+          "range": 7.535000000000004,
+          "values": [
+            59.103,
+            66.561,
+            66.638,
+            63.312,
+            65.006
+          ]
+        },
+        "selected": {
+          "n": 5,
+          "median": 69.617,
+          "min": 59.967,
+          "max": 75.632,
+          "range": 15.665000000000006,
+          "values": [
+            69.784,
+            75.632,
+            61.04,
+            69.617,
+            59.967
+          ]
+        },
+        "aa": {
+          "n": 2,
+          "median": 66.059,
+          "min": 61.108,
+          "max": 71.01,
+          "range": 9.902000000000008,
+          "values": [
+            61.108,
+            71.01
+          ]
+        },
+        "completeCell": true,
+        "absoluteMedianDelta": 4.611000000000004,
+        "relativeMedianDeltaPercent": 7.09319139771714,
+        "rangesOverlap": true,
+        "observedSameArmVariability": 15.665000000000006,
+        "direction": "unresolved",
+        "pairedDeltas": {
+          "n": 5,
+          "median": 6.305000000000007,
+          "min": -5.598000000000006,
+          "max": 10.681000000000004,
+          "range": 16.27900000000001,
+          "values": [
+            10.681000000000004,
+            9.070999999999998,
+            -5.598000000000006,
+            6.305000000000007,
+            -5.0390000000000015
+          ]
+        },
+        "relativeDeltaLimitation": "undefined for nonpositive retained median; signed process heap changes are not owner storage"
+      },
+      "sync_ms": {
+        "retained": {
+          "n": 5,
+          "median": 39.518874999999994,
+          "min": 37.159334,
+          "max": 40.807666,
+          "range": 3.6483319999999964,
+          "values": [
+            37.159334,
+            40.807666,
+            40.51466700000002,
+            37.80945799999999,
+            39.518874999999994
+          ]
+        },
+        "selected": {
+          "n": 5,
+          "median": 42.010999999999996,
+          "min": 37.276583,
+          "max": 46.679249999999996,
+          "range": 9.402666999999994,
+          "values": [
+            42.010999999999996,
+            46.679249999999996,
+            37.476333,
+            42.95516599999999,
+            37.276583
+          ]
+        },
+        "aa": {
+          "n": 2,
+          "median": 40.084166499999995,
+          "min": 37.17320799999999,
+          "max": 42.995125,
+          "range": 5.821917000000013,
+          "values": [
+            37.17320799999999,
+            42.995125
+          ]
+        },
+        "completeCell": true,
+        "absoluteMedianDelta": 2.4921250000000015,
+        "relativeMedianDeltaPercent": 6.30616382677898,
+        "rangesOverlap": true,
+        "observedSameArmVariability": 9.402666999999994,
+        "direction": "unresolved",
+        "pairedDeltas": {
+          "n": 5,
+          "median": 4.8516659999999945,
+          "min": -3.0383340000000203,
+          "max": 5.871583999999999,
+          "range": 8.909918000000019,
+          "values": [
+            4.8516659999999945,
+            5.871583999999999,
+            -3.0383340000000203,
+            5.145707999999999,
+            -2.242291999999992
+          ]
+        },
+        "relativeDeltaLimitation": "undefined for nonpositive retained median; signed process heap changes are not owner storage"
+      },
+      "sync_system_ms": {
+        "retained": {
+          "n": 5,
+          "median": 4.274,
+          "min": 2.946,
+          "max": 4.683,
+          "range": 1.7369999999999997,
+          "values": [
+            2.946,
+            4.188,
+            4.683,
+            4.326,
+            4.274
+          ]
+        },
+        "selected": {
+          "n": 5,
+          "median": 4.29,
+          "min": 3.102,
+          "max": 5.638,
+          "range": 2.536,
+          "values": [
+            4.29,
+            5.638,
+            3.398,
+            5.618,
+            3.102
+          ]
+        },
+        "aa": {
+          "n": 2,
+          "median": 4.3950000000000005,
+          "min": 3.494,
+          "max": 5.296,
+          "range": 1.802,
+          "values": [
+            3.494,
+            5.296
+          ]
+        },
+        "completeCell": true,
+        "absoluteMedianDelta": 0.016000000000000014,
+        "relativeMedianDeltaPercent": 0.3743565746373424,
+        "rangesOverlap": true,
+        "observedSameArmVariability": 2.536,
+        "direction": "unresolved",
+        "pairedDeltas": {
+          "n": 5,
+          "median": 1.2920000000000007,
+          "min": -1.2849999999999997,
+          "max": 1.4500000000000002,
+          "range": 2.735,
+          "values": [
+            1.3439999999999999,
+            1.4500000000000002,
+            -1.2849999999999997,
+            1.2920000000000007,
+            -1.1720000000000002
+          ]
+        },
+        "relativeDeltaLimitation": "undefined for nonpositive retained median; signed process heap changes are not owner storage"
+      },
+      "sync_user_ms": {
+        "retained": {
+          "n": 5,
+          "median": 60.732,
+          "min": 56.157,
+          "max": 62.373,
+          "range": 6.216000000000001,
+          "values": [
+            56.157,
+            62.373,
+            61.955,
+            58.986,
+            60.732
+          ]
+        },
+        "selected": {
+          "n": 5,
+          "median": 63.999,
+          "min": 56.865,
+          "max": 69.994,
+          "range": 13.128999999999998,
+          "values": [
+            65.494,
+            69.994,
+            57.642,
+            63.999,
+            56.865
+          ]
+        },
+        "aa": {
+          "n": 2,
+          "median": 61.664,
+          "min": 57.614,
+          "max": 65.714,
+          "range": 8.100000000000001,
+          "values": [
+            57.614,
+            65.714
+          ]
+        },
+        "completeCell": true,
+        "absoluteMedianDelta": 3.267000000000003,
+        "relativeMedianDeltaPercent": 5.3793716656787245,
+        "rangesOverlap": true,
+        "observedSameArmVariability": 13.128999999999998,
+        "direction": "unresolved",
+        "pairedDeltas": {
+          "n": 5,
+          "median": 5.013000000000005,
+          "min": -4.312999999999995,
+          "max": 9.337000000000003,
+          "range": 13.649999999999999,
+          "values": [
+            9.337000000000003,
+            7.621000000000002,
+            -4.312999999999995,
+            5.013000000000005,
+            -3.8669999999999973
+          ]
+        },
+        "relativeDeltaLimitation": "undefined for nonpositive retained median; signed process heap changes are not owner storage"
+      },
+      "total_cpu_ms": {
+        "retained": {
+          "n": 5,
+          "median": 65.328,
+          "min": 59.523,
+          "max": 67.107,
+          "range": 7.583999999999996,
+          "values": [
+            59.523,
+            67.107,
+            67.096,
+            63.82,
+            65.328
+          ]
+        },
+        "selected": {
+          "n": 5,
+          "median": 70.074,
+          "min": 60.561,
+          "max": 76.162,
+          "range": 15.601000000000006,
+          "values": [
+            70.214,
+            76.162,
+            61.462,
+            70.074,
+            60.561
+          ]
+        },
+        "aa": {
+          "n": 2,
+          "median": 66.524,
+          "min": 61.557,
+          "max": 71.491,
+          "range": 9.933999999999997,
+          "values": [
+            61.557,
+            71.491
+          ]
+        },
+        "completeCell": true,
+        "absoluteMedianDelta": 4.745999999999995,
+        "relativeMedianDeltaPercent": 7.264878765613512,
+        "rangesOverlap": true,
+        "observedSameArmVariability": 15.601000000000006,
+        "direction": "unresolved",
+        "pairedDeltas": {
+          "n": 5,
+          "median": 6.253999999999998,
+          "min": -5.634,
+          "max": 10.690999999999995,
+          "range": 16.324999999999996,
+          "values": [
+            10.690999999999995,
+            9.055000000000007,
+            -5.634,
+            6.253999999999998,
+            -4.767000000000003
+          ]
+        },
+        "relativeDeltaLimitation": "undefined for nonpositive retained median; signed process heap changes are not owner storage"
+      }
+    }
+  },
+  {
+    "profile": "heap-populated",
+    "size": 1000,
+    "complete": true,
+    "children": 12,
+    "metrics": {
+      "baseline_heap_bytes": {
+        "retained": {
+          "n": 5,
+          "median": 6206224,
+          "min": 6206192,
+          "max": 6206912,
+          "range": 720,
+          "values": [
+            6206912,
+            6206880,
+            6206224,
+            6206224,
+            6206192
+          ]
+        },
+        "selected": {
+          "n": 5,
+          "median": 6205872,
+          "min": 6205232,
+          "max": 6205904,
+          "range": 672,
+          "values": [
+            6205872,
+            6205904,
+            6205232,
+            6205232,
+            6205904
+          ]
+        },
+        "aa": {
+          "n": 2,
+          "median": 6206224.0,
+          "min": 6206224,
+          "max": 6206224,
+          "range": 0,
+          "values": [
+            6206224,
+            6206224
+          ]
+        },
+        "completeCell": true,
+        "absoluteMedianDelta": -352,
+        "relativeMedianDeltaPercent": -0.005671725674097487,
+        "rangesOverlap": false,
+        "observedSameArmVariability": 720,
+        "direction": "unresolved",
+        "pairedDeltas": {
+          "n": 5,
+          "median": -992,
+          "min": -1040,
+          "max": -288,
+          "range": 752,
+          "values": [
+            -1040,
+            -976,
+            -992,
+            -992,
+            -288
+          ]
+        },
+        "relativeDeltaLimitation": "undefined for nonpositive retained median; signed process heap changes are not owner storage"
+      },
+      "baseline_rounds": {
+        "retained": {
+          "n": 5,
+          "median": 3,
+          "min": 3,
+          "max": 3,
+          "range": 0,
+          "values": [
+            3,
+            3,
+            3,
+            3,
+            3
+          ]
+        },
+        "selected": {
+          "n": 5,
+          "median": 3,
+          "min": 3,
+          "max": 3,
+          "range": 0,
+          "values": [
+            3,
+            3,
+            3,
+            3,
+            3
+          ]
+        },
+        "aa": {
+          "n": 2,
+          "median": 3.0,
+          "min": 3,
+          "max": 3,
+          "range": 0,
+          "values": [
+            3,
+            3
+          ]
+        },
+        "completeCell": true,
+        "absoluteMedianDelta": 0,
+        "relativeMedianDeltaPercent": 0.0,
+        "rangesOverlap": true,
+        "observedSameArmVariability": 0,
+        "direction": "unresolved",
+        "pairedDeltas": {
+          "n": 5,
+          "median": 0,
+          "min": 0,
+          "max": 0,
+          "range": 0,
+          "values": [
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "relativeDeltaLimitation": "undefined for nonpositive retained median; signed process heap changes are not owner storage"
+      },
+      "destroyed_heap_bytes": {
+        "retained": {
+          "n": 5,
+          "median": 7674696,
+          "min": 7674312,
+          "max": 7675392,
+          "range": 1080,
+          "values": [
+            7675392,
+            7674328,
+            7675216,
+            7674696,
+            7674312
+          ]
+        },
+        "selected": {
+          "n": 5,
+          "median": 7675096,
+          "min": 7669528,
+          "max": 7676112,
+          "range": 6584,
+          "values": [
+            7676112,
+            7669528,
+            7675936,
+            7675096,
+            7674176
+          ]
+        },
+        "aa": {
+          "n": 2,
+          "median": 7675340.0,
+          "min": 7674696,
+          "max": 7675984,
+          "range": 1288,
+          "values": [
+            7675984,
+            7674696
+          ]
+        },
+        "completeCell": true,
+        "absoluteMedianDelta": 400,
+        "relativeMedianDeltaPercent": 0.005211932824440212,
+        "rangesOverlap": true,
+        "observedSameArmVariability": 6584,
+        "direction": "unresolved",
+        "pairedDeltas": {
+          "n": 5,
+          "median": 400,
+          "min": -4800,
+          "max": 720,
+          "range": 5520,
+          "values": [
+            720,
+            -4800,
+            720,
+            400,
+            -136
+          ]
+        },
+        "relativeDeltaLimitation": "undefined for nonpositive retained median; signed process heap changes are not owner storage"
+      },
+      "destroyed_minus_baseline_bytes": {
+        "retained": {
+          "n": 5,
+          "median": 1468472,
+          "min": 1467448,
+          "max": 1468992,
+          "range": 1544,
+          "values": [
+            1468480,
+            1467448,
+            1468992,
+            1468472,
+            1468120
+          ]
+        },
+        "selected": {
+          "n": 5,
+          "median": 1469864,
+          "min": 1463624,
+          "max": 1470704,
+          "range": 7080,
+          "values": [
+            1470240,
+            1463624,
+            1470704,
+            1469864,
+            1468272
+          ]
+        },
+        "aa": {
+          "n": 2,
+          "median": 1469116.0,
+          "min": 1468472,
+          "max": 1469760,
+          "range": 1288,
+          "values": [
+            1469760,
+            1468472
+          ]
+        },
+        "completeCell": true,
+        "absoluteMedianDelta": 1392,
+        "relativeMedianDeltaPercent": 0.09479241006978682,
+        "rangesOverlap": true,
+        "observedSameArmVariability": 7080,
+        "direction": "unresolved",
+        "pairedDeltas": {
+          "n": 5,
+          "median": 1392,
+          "min": -3824,
+          "max": 1760,
+          "range": 5584,
+          "values": [
+            1760,
+            -3824,
+            1712,
+            1392,
+            152
+          ]
+        },
+        "relativeDeltaLimitation": "undefined for nonpositive retained median; signed process heap changes are not owner storage"
+      },
+      "destroyed_rounds": {
+        "retained": {
+          "n": 5,
+          "median": 3,
+          "min": 3,
+          "max": 3,
+          "range": 0,
+          "values": [
+            3,
+            3,
+            3,
+            3,
+            3
+          ]
+        },
+        "selected": {
+          "n": 5,
+          "median": 3,
+          "min": 3,
+          "max": 3,
+          "range": 0,
+          "values": [
+            3,
+            3,
+            3,
+            3,
+            3
+          ]
+        },
+        "aa": {
+          "n": 2,
+          "median": 3.0,
+          "min": 3,
+          "max": 3,
+          "range": 0,
+          "values": [
+            3,
+            3
+          ]
+        },
+        "completeCell": true,
+        "absoluteMedianDelta": 0,
+        "relativeMedianDeltaPercent": 0.0,
+        "rangesOverlap": true,
+        "observedSameArmVariability": 0,
+        "direction": "unresolved",
+        "pairedDeltas": {
+          "n": 5,
+          "median": 0,
+          "min": 0,
+          "max": 0,
+          "range": 0,
+          "values": [
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "relativeDeltaLimitation": "undefined for nonpositive retained median; signed process heap changes are not owner storage"
+      },
+      "live_before_drain_minus_baseline_bytes": {
+        "retained": {
+          "n": 5,
+          "median": 56327296,
+          "min": 55569200,
+          "max": 57993136,
+          "range": 2423936,
+          "values": [
+            55716776,
+            57993136,
+            55569200,
+            56327296,
+            56653264
+          ]
+        },
+        "selected": {
+          "n": 5,
+          "median": 56852136,
+          "min": 55667160,
+          "max": 57392592,
+          "range": 1725432,
+          "values": [
+            57390712,
+            55911104,
+            56852136,
+            57392592,
+            55667160
+          ]
+        },
+        "aa": {
+          "n": 2,
+          "median": 57771292.0,
+          "min": 57360360,
+          "max": 58182224,
+          "range": 821864,
+          "values": [
+            57360360,
+            58182224
+          ]
+        },
+        "completeCell": true,
+        "absoluteMedianDelta": 524840,
+        "relativeMedianDeltaPercent": 0.9317684981718277,
+        "rangesOverlap": true,
+        "observedSameArmVariability": 2423936,
+        "direction": "unresolved",
+        "pairedDeltas": {
+          "n": 5,
+          "median": 1065296,
+          "min": -2082032,
+          "max": 1673936,
+          "range": 3755968,
+          "values": [
+            1673936,
+            -2082032,
+            1282936,
+            1065296,
+            -986104
+          ]
+        },
+        "relativeDeltaLimitation": "undefined for nonpositive retained median; signed process heap changes are not owner storage"
+      },
+      "live_heap_bytes": {
+        "retained": {
+          "n": 5,
+          "median": 23962488,
+          "min": 23962104,
+          "max": 23963184,
+          "range": 1080,
+          "values": [
+            23963184,
+            23962120,
+            23963008,
+            23962488,
+            23962104
+          ]
+        },
+        "selected": {
+          "n": 5,
+          "median": 23962888,
+          "min": 23957320,
+          "max": 23963904,
+          "range": 6584,
+          "values": [
+            23963904,
+            23957320,
+            23963728,
+            23962888,
+            23961968
+          ]
+        },
+        "aa": {
+          "n": 2,
+          "median": 23963132.0,
+          "min": 23962488,
+          "max": 23963776,
+          "range": 1288,
+          "values": [
+            23963776,
+            23962488
+          ]
+        },
+        "completeCell": true,
+        "absoluteMedianDelta": 400,
+        "relativeMedianDeltaPercent": 0.0016692757446555634,
+        "rangesOverlap": true,
+        "observedSameArmVariability": 6584,
+        "direction": "unresolved",
+        "pairedDeltas": {
+          "n": 5,
+          "median": 400,
+          "min": -4800,
+          "max": 720,
+          "range": 5520,
+          "values": [
+            720,
+            -4800,
+            720,
+            400,
+            -136
+          ]
+        },
+        "relativeDeltaLimitation": "undefined for nonpositive retained median; signed process heap changes are not owner storage"
+      },
+      "live_minus_baseline_bytes": {
+        "retained": {
+          "n": 5,
+          "median": 17756264,
+          "min": 17755240,
+          "max": 17756784,
+          "range": 1544,
+          "values": [
+            17756272,
+            17755240,
+            17756784,
+            17756264,
+            17755912
+          ]
+        },
+        "selected": {
+          "n": 5,
+          "median": 17757656,
+          "min": 17751416,
+          "max": 17758496,
+          "range": 7080,
+          "values": [
+            17758032,
+            17751416,
+            17758496,
+            17757656,
+            17756064
+          ]
+        },
+        "aa": {
+          "n": 2,
+          "median": 17756908.0,
+          "min": 17756264,
+          "max": 17757552,
+          "range": 1288,
+          "values": [
+            17757552,
+            17756264
+          ]
+        },
+        "completeCell": true,
+        "absoluteMedianDelta": 1392,
+        "relativeMedianDeltaPercent": 0.007839486955138761,
+        "rangesOverlap": true,
+        "observedSameArmVariability": 7080,
+        "direction": "unresolved",
+        "pairedDeltas": {
+          "n": 5,
+          "median": 1392,
+          "min": -3824,
+          "max": 1760,
+          "range": 5584,
+          "values": [
+            1760,
+            -3824,
+            1712,
+            1392,
+            152
+          ]
+        },
+        "relativeDeltaLimitation": "undefined for nonpositive retained median; signed process heap changes are not owner storage"
+      },
+      "live_rounds": {
+        "retained": {
+          "n": 5,
+          "median": 3,
+          "min": 3,
+          "max": 3,
+          "range": 0,
+          "values": [
+            3,
+            3,
+            3,
+            3,
+            3
+          ]
+        },
+        "selected": {
+          "n": 5,
+          "median": 3,
+          "min": 3,
+          "max": 3,
+          "range": 0,
+          "values": [
+            3,
+            3,
+            3,
+            3,
+            3
+          ]
+        },
+        "aa": {
+          "n": 2,
+          "median": 3.0,
+          "min": 3,
+          "max": 3,
+          "range": 0,
+          "values": [
+            3,
+            3
+          ]
+        },
+        "completeCell": true,
+        "absoluteMedianDelta": 0,
+        "relativeMedianDeltaPercent": 0.0,
+        "rangesOverlap": true,
+        "observedSameArmVariability": 0,
+        "direction": "unresolved",
+        "pairedDeltas": {
+          "n": 5,
+          "median": 0,
+          "min": 0,
+          "max": 0,
+          "range": 0,
+          "values": [
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "relativeDeltaLimitation": "undefined for nonpositive retained median; signed process heap changes are not owner storage"
+      },
+      "settled_before_drain_minus_baseline_bytes": {
+        "retained": {
+          "n": 5,
+          "median": 17763528,
+          "min": 17762504,
+          "max": 17764048,
+          "range": 1544,
+          "values": [
+            17763536,
+            17762504,
+            17764048,
+            17763528,
+            17763176
+          ]
+        },
+        "selected": {
+          "n": 5,
+          "median": 17764920,
+          "min": 17758680,
+          "max": 17765760,
+          "range": 7080,
+          "values": [
+            17765296,
+            17758680,
+            17765760,
+            17764920,
+            17763328
+          ]
+        },
+        "aa": {
+          "n": 2,
+          "median": 17764172.0,
+          "min": 17763528,
+          "max": 17764816,
+          "range": 1288,
+          "values": [
+            17764816,
+            17763528
+          ]
+        },
+        "completeCell": true,
+        "absoluteMedianDelta": 1392,
+        "relativeMedianDeltaPercent": 0.007836281171172754,
+        "rangesOverlap": true,
+        "observedSameArmVariability": 7080,
+        "direction": "unresolved",
+        "pairedDeltas": {
+          "n": 5,
+          "median": 1392,
+          "min": -3824,
+          "max": 1760,
+          "range": 5584,
+          "values": [
+            1760,
+            -3824,
+            1712,
+            1392,
+            152
+          ]
+        },
+        "relativeDeltaLimitation": "undefined for nonpositive retained median; signed process heap changes are not owner storage"
+      },
+      "settled_heap_bytes": {
+        "retained": {
+          "n": 5,
+          "median": 23990264,
+          "min": 23989880,
+          "max": 23990960,
+          "range": 1080,
+          "values": [
+            23990960,
+            23989896,
+            23990784,
+            23990264,
+            23989880
+          ]
+        },
+        "selected": {
+          "n": 5,
+          "median": 23990664,
+          "min": 23985096,
+          "max": 23991680,
+          "range": 6584,
+          "values": [
+            23991680,
+            23985096,
+            23991504,
+            23990664,
+            23989744
+          ]
+        },
+        "aa": {
+          "n": 2,
+          "median": 23990908.0,
+          "min": 23990264,
+          "max": 23991552,
+          "range": 1288,
+          "values": [
+            23991552,
+            23990264
+          ]
+        },
+        "completeCell": true,
+        "absoluteMedianDelta": 400,
+        "relativeMedianDeltaPercent": 0.0016673430521648282,
+        "rangesOverlap": true,
+        "observedSameArmVariability": 6584,
+        "direction": "unresolved",
+        "pairedDeltas": {
+          "n": 5,
+          "median": 400,
+          "min": -4800,
+          "max": 720,
+          "range": 5520,
+          "values": [
+            720,
+            -4800,
+            720,
+            400,
+            -136
+          ]
+        },
+        "relativeDeltaLimitation": "undefined for nonpositive retained median; signed process heap changes are not owner storage"
+      },
+      "settled_minus_baseline_bytes": {
+        "retained": {
+          "n": 5,
+          "median": 17784040,
+          "min": 17783016,
+          "max": 17784560,
+          "range": 1544,
+          "values": [
+            17784048,
+            17783016,
+            17784560,
+            17784040,
+            17783688
+          ]
+        },
+        "selected": {
+          "n": 5,
+          "median": 17785432,
+          "min": 17779192,
+          "max": 17786272,
+          "range": 7080,
+          "values": [
+            17785808,
+            17779192,
+            17786272,
+            17785432,
+            17783840
+          ]
+        },
+        "aa": {
+          "n": 2,
+          "median": 17784684.0,
+          "min": 17784040,
+          "max": 17785328,
+          "range": 1288,
+          "values": [
+            17785328,
+            17784040
+          ]
+        },
+        "completeCell": true,
+        "absoluteMedianDelta": 1392,
+        "relativeMedianDeltaPercent": 0.007827242853704782,
+        "rangesOverlap": true,
+        "observedSameArmVariability": 7080,
+        "direction": "unresolved",
+        "pairedDeltas": {
+          "n": 5,
+          "median": 1392,
+          "min": -3824,
+          "max": 1760,
+          "range": 5584,
+          "values": [
+            1760,
+            -3824,
+            1712,
+            1392,
+            152
+          ]
+        },
+        "relativeDeltaLimitation": "undefined for nonpositive retained median; signed process heap changes are not owner storage"
+      },
+      "settled_rounds": {
+        "retained": {
+          "n": 5,
+          "median": 3,
+          "min": 3,
+          "max": 3,
+          "range": 0,
+          "values": [
+            3,
+            3,
+            3,
+            3,
+            3
+          ]
+        },
+        "selected": {
+          "n": 5,
+          "median": 3,
+          "min": 3,
+          "max": 3,
+          "range": 0,
+          "values": [
+            3,
+            3,
+            3,
+            3,
+            3
+          ]
+        },
+        "aa": {
+          "n": 2,
+          "median": 3.0,
+          "min": 3,
+          "max": 3,
+          "range": 0,
+          "values": [
+            3,
+            3
+          ]
+        },
+        "completeCell": true,
+        "absoluteMedianDelta": 0,
+        "relativeMedianDeltaPercent": 0.0,
+        "rangesOverlap": true,
+        "observedSameArmVariability": 0,
+        "direction": "unresolved",
+        "pairedDeltas": {
+          "n": 5,
+          "median": 0,
+          "min": 0,
+          "max": 0,
+          "range": 0,
+          "values": [
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "relativeDeltaLimitation": "undefined for nonpositive retained median; signed process heap changes are not owner storage"
+      },
+      "weak_alive_count": {
+        "retained": {
+          "n": 5,
+          "median": 0,
+          "min": 0,
+          "max": 0,
+          "range": 0,
+          "values": [
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "selected": {
+          "n": 5,
+          "median": 0,
+          "min": 0,
+          "max": 0,
+          "range": 0,
+          "values": [
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "aa": {
+          "n": 2,
+          "median": 0.0,
+          "min": 0,
+          "max": 0,
+          "range": 0,
+          "values": [
+            0,
+            0
+          ]
+        },
+        "completeCell": true,
+        "absoluteMedianDelta": 0,
+        "relativeMedianDeltaPercent": null,
+        "rangesOverlap": true,
+        "observedSameArmVariability": 0,
+        "direction": "unresolved",
+        "pairedDeltas": {
+          "n": 5,
+          "median": 0,
+          "min": 0,
+          "max": 0,
+          "range": 0,
+          "values": [
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "relativeDeltaLimitation": "undefined for nonpositive retained median; signed process heap changes are not owner storage"
+      }
+    }
+  },
+  {
+    "profile": "heap-pending",
+    "size": 1000,
+    "complete": true,
+    "children": 12,
+    "metrics": {
+      "baseline_heap_bytes": {
+        "retained": {
+          "n": 5,
+          "median": 6206864,
+          "min": 6206224,
+          "max": 6206888,
+          "range": 664,
+          "values": [
+            6206864,
+            6206888,
+            6206880,
+            6206224,
+            6206864
+          ]
+        },
+        "selected": {
+          "n": 5,
+          "median": 6205872,
+          "min": 6205232,
+          "max": 6205952,
+          "range": 720,
+          "values": [
+            6205952,
+            6205232,
+            6205232,
+            6205872,
+            6205944
+          ]
+        },
+        "aa": {
+          "n": 2,
+          "median": 6206552.0,
+          "min": 6206224,
+          "max": 6206880,
+          "range": 656,
+          "values": [
+            6206224,
+            6206880
+          ]
+        },
+        "completeCell": true,
+        "absoluteMedianDelta": -992,
+        "relativeMedianDeltaPercent": -0.015982306040538345,
+        "rangesOverlap": false,
+        "observedSameArmVariability": 720,
+        "direction": "selected-lower",
+        "pairedDeltas": {
+          "n": 5,
+          "median": -920,
+          "min": -1656,
+          "max": -352,
+          "range": 1304,
+          "values": [
+            -912,
+            -1656,
+            -1648,
+            -352,
+            -920
+          ]
+        },
+        "relativeDeltaLimitation": "undefined for nonpositive retained median; signed process heap changes are not owner storage"
+      },
+      "baseline_rounds": {
+        "retained": {
+          "n": 5,
+          "median": 3,
+          "min": 3,
+          "max": 3,
+          "range": 0,
+          "values": [
+            3,
+            3,
+            3,
+            3,
+            3
+          ]
+        },
+        "selected": {
+          "n": 5,
+          "median": 3,
+          "min": 3,
+          "max": 3,
+          "range": 0,
+          "values": [
+            3,
+            3,
+            3,
+            3,
+            3
+          ]
+        },
+        "aa": {
+          "n": 2,
+          "median": 3.0,
+          "min": 3,
+          "max": 3,
+          "range": 0,
+          "values": [
+            3,
+            3
+          ]
+        },
+        "completeCell": true,
+        "absoluteMedianDelta": 0,
+        "relativeMedianDeltaPercent": 0.0,
+        "rangesOverlap": true,
+        "observedSameArmVariability": 0,
+        "direction": "unresolved",
+        "pairedDeltas": {
+          "n": 5,
+          "median": 0,
+          "min": 0,
+          "max": 0,
+          "range": 0,
+          "values": [
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "relativeDeltaLimitation": "undefined for nonpositive retained median; signed process heap changes are not owner storage"
+      },
+      "destroyed_heap_bytes": {
+        "retained": {
+          "n": 5,
+          "median": 9527928,
+          "min": 9526904,
+          "max": 9527992,
+          "range": 1088,
+          "values": [
+            9527240,
+            9527928,
+            9527928,
+            9526904,
+            9527992
+          ]
+        },
+        "selected": {
+          "n": 5,
+          "median": 9527384,
+          "min": 9526512,
+          "max": 9532416,
+          "range": 5904,
+          "values": [
+            9526984,
+            9526512,
+            9532416,
+            9531448,
+            9527384
+          ]
+        },
+        "aa": {
+          "n": 2,
+          "median": 9527948.0,
+          "min": 9527936,
+          "max": 9527960,
+          "range": 24,
+          "values": [
+            9527936,
+            9527960
+          ]
+        },
+        "completeCell": true,
+        "absoluteMedianDelta": -544,
+        "relativeMedianDeltaPercent": -0.005709530970427148,
+        "rangesOverlap": true,
+        "observedSameArmVariability": 5904,
+        "direction": "unresolved",
+        "pairedDeltas": {
+          "n": 5,
+          "median": -256,
+          "min": -1416,
+          "max": 4544,
+          "range": 5960,
+          "values": [
+            -256,
+            -1416,
+            4488,
+            4544,
+            -608
+          ]
+        },
+        "relativeDeltaLimitation": "undefined for nonpositive retained median; signed process heap changes are not owner storage"
+      },
+      "destroyed_minus_baseline_bytes": {
+        "retained": {
+          "n": 5,
+          "median": 3321040,
+          "min": 3320376,
+          "max": 3321128,
+          "range": 752,
+          "values": [
+            3320376,
+            3321040,
+            3321048,
+            3320680,
+            3321128
+          ]
+        },
+        "selected": {
+          "n": 5,
+          "median": 3321440,
+          "min": 3321032,
+          "max": 3327184,
+          "range": 6152,
+          "values": [
+            3321032,
+            3321280,
+            3327184,
+            3325576,
+            3321440
+          ]
+        },
+        "aa": {
+          "n": 2,
+          "median": 3321396.0,
+          "min": 3321080,
+          "max": 3321712,
+          "range": 632,
+          "values": [
+            3321712,
+            3321080
+          ]
+        },
+        "completeCell": true,
+        "absoluteMedianDelta": 400,
+        "relativeMedianDeltaPercent": 0.012044419820297256,
+        "rangesOverlap": true,
+        "observedSameArmVariability": 6152,
+        "direction": "unresolved",
+        "pairedDeltas": {
+          "n": 5,
+          "median": 656,
+          "min": 240,
+          "max": 6136,
+          "range": 5896,
+          "values": [
+            656,
+            240,
+            6136,
+            4896,
+            312
+          ]
+        },
+        "relativeDeltaLimitation": "undefined for nonpositive retained median; signed process heap changes are not owner storage"
+      },
+      "destroyed_rounds": {
+        "retained": {
+          "n": 5,
+          "median": 3,
+          "min": 3,
+          "max": 3,
+          "range": 0,
+          "values": [
+            3,
+            3,
+            3,
+            3,
+            3
+          ]
+        },
+        "selected": {
+          "n": 5,
+          "median": 3,
+          "min": 3,
+          "max": 3,
+          "range": 0,
+          "values": [
+            3,
+            3,
+            3,
+            3,
+            3
+          ]
+        },
+        "aa": {
+          "n": 2,
+          "median": 3.0,
+          "min": 3,
+          "max": 3,
+          "range": 0,
+          "values": [
+            3,
+            3
+          ]
+        },
+        "completeCell": true,
+        "absoluteMedianDelta": 0,
+        "relativeMedianDeltaPercent": 0.0,
+        "rangesOverlap": true,
+        "observedSameArmVariability": 0,
+        "direction": "unresolved",
+        "pairedDeltas": {
+          "n": 5,
+          "median": 0,
+          "min": 0,
+          "max": 0,
+          "range": 0,
+          "values": [
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "relativeDeltaLimitation": "undefined for nonpositive retained median; signed process heap changes are not owner storage"
+      },
+      "enhanced_idle_heap_bytes": {
+        "retained": {
+          "n": 5,
+          "median": 25652856,
+          "min": 25652616,
+          "max": 25654128,
+          "range": 1512,
+          "values": [
+            25652856,
+            25652688,
+            25653776,
+            25652616,
+            25654128
+          ]
+        },
+        "selected": {
+          "n": 5,
+          "median": 25657600,
+          "min": 25652704,
+          "max": 25683864,
+          "range": 31160,
+          "values": [
+            25654280,
+            25674136,
+            25657600,
+            25683864,
+            25652704
+          ]
+        },
+        "aa": {
+          "n": 2,
+          "median": 25654760.0,
+          "min": 25654408,
+          "max": 25655112,
+          "range": 704,
+          "values": [
+            25654408,
+            25655112
+          ]
+        },
+        "completeCell": true,
+        "absoluteMedianDelta": 4744,
+        "relativeMedianDeltaPercent": 0.018493067594500978,
+        "rangesOverlap": true,
+        "observedSameArmVariability": 31160,
+        "direction": "unresolved",
+        "pairedDeltas": {
+          "n": 5,
+          "median": 3824,
+          "min": -1424,
+          "max": 31248,
+          "range": 32672,
+          "values": [
+            1424,
+            21448,
+            3824,
+            31248,
+            -1424
+          ]
+        },
+        "relativeDeltaLimitation": "undefined for nonpositive retained median; signed process heap changes are not owner storage"
+      },
+      "enhanced_idle_minus_baseline_bytes": {
+        "retained": {
+          "n": 5,
+          "median": 19446392,
+          "min": 19445800,
+          "max": 19447264,
+          "range": 1464,
+          "values": [
+            19445992,
+            19445800,
+            19446896,
+            19446392,
+            19447264
+          ]
+        },
+        "selected": {
+          "n": 5,
+          "median": 19452368,
+          "min": 19446760,
+          "max": 19477992,
+          "range": 31232,
+          "values": [
+            19448328,
+            19468904,
+            19452368,
+            19477992,
+            19446760
+          ]
+        },
+        "aa": {
+          "n": 2,
+          "median": 19448208.0,
+          "min": 19448184,
+          "max": 19448232,
+          "range": 48,
+          "values": [
+            19448184,
+            19448232
+          ]
+        },
+        "completeCell": true,
+        "absoluteMedianDelta": 5976,
+        "relativeMedianDeltaPercent": 0.030730636305181958,
+        "rangesOverlap": true,
+        "observedSameArmVariability": 31232,
+        "direction": "unresolved",
+        "pairedDeltas": {
+          "n": 5,
+          "median": 5472,
+          "min": -504,
+          "max": 31600,
+          "range": 32104,
+          "values": [
+            2336,
+            23104,
+            5472,
+            31600,
+            -504
+          ]
+        },
+        "relativeDeltaLimitation": "undefined for nonpositive retained median; signed process heap changes are not owner storage"
+      },
+      "enhanced_idle_rounds": {
+        "retained": {
+          "n": 5,
+          "median": 5,
+          "min": 5,
+          "max": 5,
+          "range": 0,
+          "values": [
+            5,
+            5,
+            5,
+            5,
+            5
+          ]
+        },
+        "selected": {
+          "n": 5,
+          "median": 5,
+          "min": 5,
+          "max": 6,
+          "range": 1,
+          "values": [
+            5,
+            6,
+            5,
+            5,
+            5
+          ]
+        },
+        "aa": {
+          "n": 2,
+          "median": 5.0,
+          "min": 5,
+          "max": 5,
+          "range": 0,
+          "values": [
+            5,
+            5
+          ]
+        },
+        "completeCell": true,
+        "absoluteMedianDelta": 0,
+        "relativeMedianDeltaPercent": 0.0,
+        "rangesOverlap": true,
+        "observedSameArmVariability": 1,
+        "direction": "unresolved",
+        "pairedDeltas": {
+          "n": 5,
+          "median": 0,
+          "min": 0,
+          "max": 1,
+          "range": 1,
+          "values": [
+            0,
+            1,
+            0,
+            0,
+            0
+          ]
+        },
+        "relativeDeltaLimitation": "undefined for nonpositive retained median; signed process heap changes are not owner storage"
+      },
+      "live_before_drain_minus_baseline_bytes": {
+        "retained": {
+          "n": 5,
+          "median": 34303464,
+          "min": 34298376,
+          "max": 34312600,
+          "range": 14224,
+          "values": [
+            34312600,
+            34298376,
+            34302808,
+            34303464,
+            34303728
+          ]
+        },
+        "selected": {
+          "n": 5,
+          "median": 34252568,
+          "min": 34242992,
+          "max": 34274296,
+          "range": 31304,
+          "values": [
+            34242992,
+            34273216,
+            34248736,
+            34274296,
+            34252568
+          ]
+        },
+        "aa": {
+          "n": 2,
+          "median": 34305980.0,
+          "min": 34300328,
+          "max": 34311632,
+          "range": 11304,
+          "values": [
+            34311632,
+            34300328
+          ]
+        },
+        "completeCell": true,
+        "absoluteMedianDelta": -50896,
+        "relativeMedianDeltaPercent": -0.14836985559242646,
+        "rangesOverlap": false,
+        "observedSameArmVariability": 31304,
+        "direction": "selected-lower",
+        "pairedDeltas": {
+          "n": 5,
+          "median": -51160,
+          "min": -69608,
+          "max": -25160,
+          "range": 44448,
+          "values": [
+            -69608,
+            -25160,
+            -54072,
+            -29168,
+            -51160
+          ]
+        },
+        "relativeDeltaLimitation": "undefined for nonpositive retained median; signed process heap changes are not owner storage"
+      },
+      "live_heap_bytes": {
+        "retained": {
+          "n": 5,
+          "median": 26687112,
+          "min": 26684280,
+          "max": 26687176,
+          "range": 2896,
+          "values": [
+            26686496,
+            26687112,
+            26687112,
+            26684280,
+            26687176
+          ]
+        },
+        "selected": {
+          "n": 5,
+          "median": 26689480,
+          "min": 26686240,
+          "max": 26715536,
+          "range": 29296,
+          "values": [
+            26686240,
+            26689480,
+            26690984,
+            26715536,
+            26686592
+          ]
+        },
+        "aa": {
+          "n": 2,
+          "median": 26685452.0,
+          "min": 26685440,
+          "max": 26685464,
+          "range": 24,
+          "values": [
+            26685440,
+            26685464
+          ]
+        },
+        "completeCell": true,
+        "absoluteMedianDelta": 2368,
+        "relativeMedianDeltaPercent": 0.008873196919921496,
+        "rangesOverlap": true,
+        "observedSameArmVariability": 29296,
+        "direction": "unresolved",
+        "pairedDeltas": {
+          "n": 5,
+          "median": 2368,
+          "min": -584,
+          "max": 31256,
+          "range": 31840,
+          "values": [
+            -256,
+            2368,
+            3872,
+            31256,
+            -584
+          ]
+        },
+        "relativeDeltaLimitation": "undefined for nonpositive retained median; signed process heap changes are not owner storage"
+      },
+      "live_minus_baseline_bytes": {
+        "retained": {
+          "n": 5,
+          "median": 20480224,
+          "min": 20478056,
+          "max": 20480312,
+          "range": 2256,
+          "values": [
+            20479632,
+            20480224,
+            20480232,
+            20478056,
+            20480312
+          ]
+        },
+        "selected": {
+          "n": 5,
+          "median": 20484248,
+          "min": 20480288,
+          "max": 20509664,
+          "range": 29376,
+          "values": [
+            20480288,
+            20484248,
+            20485752,
+            20509664,
+            20480648
+          ]
+        },
+        "aa": {
+          "n": 2,
+          "median": 20478900.0,
+          "min": 20478584,
+          "max": 20479216,
+          "range": 632,
+          "values": [
+            20479216,
+            20478584
+          ]
+        },
+        "completeCell": true,
+        "absoluteMedianDelta": 4024,
+        "relativeMedianDeltaPercent": 0.019648222597565337,
+        "rangesOverlap": true,
+        "observedSameArmVariability": 29376,
+        "direction": "unresolved",
+        "pairedDeltas": {
+          "n": 5,
+          "median": 4024,
+          "min": 336,
+          "max": 31608,
+          "range": 31272,
+          "values": [
+            656,
+            4024,
+            5520,
+            31608,
+            336
+          ]
+        },
+        "relativeDeltaLimitation": "undefined for nonpositive retained median; signed process heap changes are not owner storage"
+      },
+      "live_rounds": {
+        "retained": {
+          "n": 5,
+          "median": 5,
+          "min": 5,
+          "max": 5,
+          "range": 0,
+          "values": [
+            5,
+            5,
+            5,
+            5,
+            5
+          ]
+        },
+        "selected": {
+          "n": 5,
+          "median": 5,
+          "min": 5,
+          "max": 5,
+          "range": 0,
+          "values": [
+            5,
+            5,
+            5,
+            5,
+            5
+          ]
+        },
+        "aa": {
+          "n": 2,
+          "median": 5.0,
+          "min": 5,
+          "max": 5,
+          "range": 0,
+          "values": [
+            5,
+            5
+          ]
+        },
+        "completeCell": true,
+        "absoluteMedianDelta": 0,
+        "relativeMedianDeltaPercent": 0.0,
+        "rangesOverlap": true,
+        "observedSameArmVariability": 0,
+        "direction": "unresolved",
+        "pairedDeltas": {
+          "n": 5,
+          "median": 0,
+          "min": 0,
+          "max": 0,
+          "range": 0,
+          "values": [
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "relativeDeltaLimitation": "undefined for nonpositive retained median; signed process heap changes are not owner storage"
+      },
+      "pending_live_minus_idle_bytes": {
+        "retained": {
+          "n": 5,
+          "median": 1033336,
+          "min": 1031664,
+          "max": 1034424,
+          "range": 2760,
+          "values": [
+            1033640,
+            1034424,
+            1033336,
+            1031664,
+            1033048
+          ]
+        },
+        "selected": {
+          "n": 5,
+          "median": 1031960,
+          "min": 1015344,
+          "max": 1033888,
+          "range": 18544,
+          "values": [
+            1031960,
+            1015344,
+            1033384,
+            1031672,
+            1033888
+          ]
+        },
+        "aa": {
+          "n": 2,
+          "median": 1030692.0,
+          "min": 1030352,
+          "max": 1031032,
+          "range": 680,
+          "values": [
+            1031032,
+            1030352
+          ]
+        },
+        "completeCell": true,
+        "absoluteMedianDelta": -1376,
+        "relativeMedianDeltaPercent": -0.13316094668142792,
+        "rangesOverlap": true,
+        "observedSameArmVariability": 18544,
+        "direction": "unresolved",
+        "pairedDeltas": {
+          "n": 5,
+          "median": 8,
+          "min": -19080,
+          "max": 840,
+          "range": 19920,
+          "values": [
+            -1680,
+            -19080,
+            48,
+            8,
+            840
+          ]
+        },
+        "relativeDeltaLimitation": "undefined for nonpositive retained median; signed process heap changes are not owner storage"
+      },
+      "settled_before_drain_minus_baseline_bytes": {
+        "retained": {
+          "n": 5,
+          "median": 34694392,
+          "min": 34674408,
+          "max": 34695632,
+          "range": 21224,
+          "values": [
+            34674408,
+            34694024,
+            34694392,
+            34695416,
+            34695632
+          ]
+        },
+        "selected": {
+          "n": 5,
+          "median": 34695968,
+          "min": 34693112,
+          "max": 34706272,
+          "range": 13160,
+          "values": [
+            34693112,
+            34693856,
+            34706272,
+            34704256,
+            34695968
+          ]
+        },
+        "aa": {
+          "n": 2,
+          "median": 34697212.0,
+          "min": 34695744,
+          "max": 34698680,
+          "range": 2936,
+          "values": [
+            34695744,
+            34698680
+          ]
+        },
+        "completeCell": true,
+        "absoluteMedianDelta": 1576,
+        "relativeMedianDeltaPercent": 0.004542520877725715,
+        "rangesOverlap": true,
+        "observedSameArmVariability": 21224,
+        "direction": "unresolved",
+        "pairedDeltas": {
+          "n": 5,
+          "median": 8840,
+          "min": -168,
+          "max": 18704,
+          "range": 18872,
+          "values": [
+            18704,
+            -168,
+            11880,
+            8840,
+            336
+          ]
+        },
+        "relativeDeltaLimitation": "undefined for nonpositive retained median; signed process heap changes are not owner storage"
+      },
+      "settled_heap_bytes": {
+        "retained": {
+          "n": 5,
+          "median": 26602888,
+          "min": 26601864,
+          "max": 26602952,
+          "range": 1088,
+          "values": [
+            26602200,
+            26602888,
+            26602888,
+            26601864,
+            26602952
+          ]
+        },
+        "selected": {
+          "n": 5,
+          "median": 26602344,
+          "min": 26601472,
+          "max": 26631000,
+          "range": 29528,
+          "values": [
+            26601944,
+            26601472,
+            26607544,
+            26631000,
+            26602344
+          ]
+        },
+        "aa": {
+          "n": 2,
+          "median": 26602908.0,
+          "min": 26602896,
+          "max": 26602920,
+          "range": 24,
+          "values": [
+            26602896,
+            26602920
+          ]
+        },
+        "completeCell": true,
+        "absoluteMedianDelta": -544,
+        "relativeMedianDeltaPercent": -0.0020448907652432322,
+        "rangesOverlap": true,
+        "observedSameArmVariability": 29528,
+        "direction": "unresolved",
+        "pairedDeltas": {
+          "n": 5,
+          "median": -256,
+          "min": -1416,
+          "max": 29136,
+          "range": 30552,
+          "values": [
+            -256,
+            -1416,
+            4656,
+            29136,
+            -608
+          ]
+        },
+        "relativeDeltaLimitation": "undefined for nonpositive retained median; signed process heap changes are not owner storage"
+      },
+      "settled_minus_baseline_bytes": {
+        "retained": {
+          "n": 5,
+          "median": 20396000,
+          "min": 20395336,
+          "max": 20396088,
+          "range": 752,
+          "values": [
+            20395336,
+            20396000,
+            20396008,
+            20395640,
+            20396088
+          ]
+        },
+        "selected": {
+          "n": 5,
+          "median": 20396400,
+          "min": 20395992,
+          "max": 20425128,
+          "range": 29136,
+          "values": [
+            20395992,
+            20396240,
+            20402312,
+            20425128,
+            20396400
+          ]
+        },
+        "aa": {
+          "n": 2,
+          "median": 20396356.0,
+          "min": 20396040,
+          "max": 20396672,
+          "range": 632,
+          "values": [
+            20396672,
+            20396040
+          ]
+        },
+        "completeCell": true,
+        "absoluteMedianDelta": 400,
+        "relativeMedianDeltaPercent": 0.0019611688566385566,
+        "rangesOverlap": true,
+        "observedSameArmVariability": 29136,
+        "direction": "unresolved",
+        "pairedDeltas": {
+          "n": 5,
+          "median": 656,
+          "min": 240,
+          "max": 29488,
+          "range": 29248,
+          "values": [
+            656,
+            240,
+            6304,
+            29488,
+            312
+          ]
+        },
+        "relativeDeltaLimitation": "undefined for nonpositive retained median; signed process heap changes are not owner storage"
+      },
+      "settled_minus_idle_bytes": {
+        "retained": {
+          "n": 5,
+          "median": 949248,
+          "min": 948824,
+          "max": 950200,
+          "range": 1376,
+          "values": [
+            949344,
+            950200,
+            949112,
+            949248,
+            948824
+          ]
+        },
+        "selected": {
+          "n": 5,
+          "median": 947664,
+          "min": 927336,
+          "max": 949944,
+          "range": 22608,
+          "values": [
+            947664,
+            927336,
+            949944,
+            947136,
+            949640
+          ]
+        },
+        "aa": {
+          "n": 2,
+          "median": 948148.0,
+          "min": 947808,
+          "max": 948488,
+          "range": 680,
+          "values": [
+            948488,
+            947808
+          ]
+        },
+        "completeCell": true,
+        "absoluteMedianDelta": -1584,
+        "relativeMedianDeltaPercent": -0.16686893203883496,
+        "rangesOverlap": true,
+        "observedSameArmVariability": 22608,
+        "direction": "unresolved",
+        "pairedDeltas": {
+          "n": 5,
+          "median": -1680,
+          "min": -22864,
+          "max": 832,
+          "range": 23696,
+          "values": [
+            -1680,
+            -22864,
+            832,
+            -2112,
+            816
+          ]
+        },
+        "relativeDeltaLimitation": "undefined for nonpositive retained median; signed process heap changes are not owner storage"
+      },
+      "settled_rounds": {
+        "retained": {
+          "n": 5,
+          "median": 5,
+          "min": 5,
+          "max": 5,
+          "range": 0,
+          "values": [
+            5,
+            5,
+            5,
+            5,
+            5
+          ]
+        },
+        "selected": {
+          "n": 5,
+          "median": 5,
+          "min": 5,
+          "max": 5,
+          "range": 0,
+          "values": [
+            5,
+            5,
+            5,
+            5,
+            5
+          ]
+        },
+        "aa": {
+          "n": 2,
+          "median": 5.0,
+          "min": 5,
+          "max": 5,
+          "range": 0,
+          "values": [
+            5,
+            5
+          ]
+        },
+        "completeCell": true,
+        "absoluteMedianDelta": 0,
+        "relativeMedianDeltaPercent": 0.0,
+        "rangesOverlap": true,
+        "observedSameArmVariability": 0,
+        "direction": "unresolved",
+        "pairedDeltas": {
+          "n": 5,
+          "median": 0,
+          "min": 0,
+          "max": 0,
+          "range": 0,
+          "values": [
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "relativeDeltaLimitation": "undefined for nonpositive retained median; signed process heap changes are not owner storage"
+      },
+      "weak_alive_count": {
+        "retained": {
+          "n": 5,
+          "median": 0,
+          "min": 0,
+          "max": 0,
+          "range": 0,
+          "values": [
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "selected": {
+          "n": 5,
+          "median": 0,
+          "min": 0,
+          "max": 0,
+          "range": 0,
+          "values": [
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "aa": {
+          "n": 2,
+          "median": 0.0,
+          "min": 0,
+          "max": 0,
+          "range": 0,
+          "values": [
+            0,
+            0
+          ]
+        },
+        "completeCell": true,
+        "absoluteMedianDelta": 0,
+        "relativeMedianDeltaPercent": null,
+        "rangesOverlap": true,
+        "observedSameArmVariability": 0,
+        "direction": "unresolved",
+        "pairedDeltas": {
+          "n": 5,
+          "median": 0,
+          "min": 0,
+          "max": 0,
+          "range": 0,
+          "values": [
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "relativeDeltaLimitation": "undefined for nonpositive retained median; signed process heap changes are not owner storage"
+      }
+    }
+  }
+]

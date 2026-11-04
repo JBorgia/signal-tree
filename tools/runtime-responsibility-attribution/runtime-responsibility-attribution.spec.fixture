@@ -1,0 +1,229 @@
+import { expect, it } from 'vitest';
+import { writeFileSync } from 'node:fs';
+import { entityMap, link, transactions } from '../index';
+import { signalTree } from './signal-tree';
+import {getEntityPublicationBinding} from './internals/entity-publication';
+import {runtimeAttribution,beginAttribution} from './internals/runtime-attribution-probe';
+type Event = { count: number; operation: string; phase: number; stack: string };
+function countIteratedElements(run: () => void, observe = false): { total: number; events: Event[] } {
+  const events: Event[] = [];
+  const append = Array.prototype.push;
+  let observing = false;
+  let inInterval = false;
+  const charge = (count: number, operation: string): void => {
+    if (observing || !inInterval) return;
+    visited += count;
+    if (!observe || count === 0) return;
+    observing = true;
+    try { append.call(events, { count, operation, phase: runtimeAttribution.phase, stack: new Error().stack ?? "missing stack" }); }
+    finally { observing = false; }
+  };
+  let visited = 0;
+  const restore: Array<() => void> = [];
+  const patch = (
+    target: object,
+    key: PropertyKey,
+    wrap: (original: (...args: unknown[]) => unknown) => unknown
+  ): void => {
+    const descriptor = Object.getOwnPropertyDescriptor(target, key);
+    if (!descriptor) throw new Error(`nothing to count at ${String(key)}`);
+    restore.push(() => Object.defineProperty(target, key, descriptor));
+    Object.defineProperty(target, key, {
+      ...descriptor,
+      value: wrap(descriptor.value),
+    });
+  };
+  const counting = (iterator: Iterator<unknown>, operation: string): IterableIterator<unknown> => ({
+    next() {
+      const step = iterator.next();
+      if (!step.done) charge(1, operation);
+      return step;
+    },
+    [Symbol.iterator]() {
+      return this;
+    },
+  });
+  for (const proto of [Map.prototype, Set.prototype, Array.prototype])
+    for (const key of ['keys', 'values', 'entries', Symbol.iterator])
+      patch(proto, key, (original) =>
+        function (this: unknown, ...args: unknown[]) {
+          return counting(original.apply(this, args) as Iterator<unknown>, `${proto === Map.prototype ? 'Map' : proto === Set.prototype ? 'Set' : 'Array'}.${String(key)}`);
+        }
+      );
+  for (const proto of [Map.prototype, Set.prototype])
+    patch(proto, 'forEach', (original) =>
+      function (this: { size: number }, ...args: unknown[]) {
+        charge(this.size, `${proto === Map.prototype ? 'Map' : 'Set'}.forEach`);
+        return original.apply(this, args);
+      }
+    );
+  // Whole-array walks, counted at their full length: a search that stops
+  // early still scales with the array it searches.
+  for (const key of [
+    'map',
+    'filter',
+    'forEach',
+    'slice',
+    'concat',
+    'reduce',
+    'indexOf',
+    'lastIndexOf',
+    'includes',
+    'find',
+    'findIndex',
+    'some',
+    'every',
+    'splice',
+    'sort',
+    'join',
+  ])
+    patch(Array.prototype, key, (original) =>
+      function (this: unknown[], ...args: unknown[]) {
+        charge(this.length, `Array.${key}`);
+        return original.apply(this, args);
+      }
+    );
+  for (const key of ['keys', 'values', 'entries'])
+    patch(Object, key, (original) =>
+      function (this: unknown, ...args: unknown[]) {
+        const result = original.apply(this, args) as unknown[];
+        charge(result.length, `Object.${key}`);
+        return result;
+      }
+    );
+  patch(Array.prototype, 'push', (original) =>
+    function (this: unknown[], ...args: unknown[]) {
+      charge(args.length, 'Array.push');
+      return original.apply(this, args);
+    }
+  );
+  patch(Array, 'from', (original) =>
+    function (this: unknown, ...args: unknown[]) {
+      const result = original.apply(this, args) as unknown[];
+      charge(result.length, 'Array.from');
+      return result;
+    }
+  );
+  let counted: number;
+  try {
+    visited = 0;
+    beginAttribution();
+    inInterval = true;
+    run();
+    counted = visited;
+  } finally {
+    inInterval = false;
+    runtimeAttribution.active = false;
+    for (let i = restore.length - 1; i >= 0; i--) restore[i]();
+  }
+  return { total: counted, events };
+}
+
+it('attributes every original point-work charge with observer off/on reconciliation', () => {
+  const results: unknown[] = [];
+  const originalLimit = Error.stackTraceLimit;
+  Error.stackTraceLimit = 40;
+  try {
+    for (const reuse of [false,true]) for (const size of [2000, 20000]) for (const observe of [false, true]) {
+      runtimeAttribution.reusePhysical=reuse;
+      const tree = signalTree({ rows: entityMap<{ id: number; v: number }, number>({ selectId: r => r.id }) });
+      try {
+        tree.$.rows.setAll(Array.from({ length: size }, (_, i) => ({ id: i, v: 0 })));
+        const counted = countIteratedElements(() => {
+          for (let i = 0; i < 200; i++) tree.$.rows.updateOne(i, { v: 1 });
+        }, observe);
+        expect(counted.total).toBe(reuse ? 12600 : 13000);
+        for (let i = 0; i < 200; i++) expect(tree.$.rows.byIdOrFail(i)().v).toBe(1);
+        expect(tree.$.rows.byIdOrFail(201)().v).toBe(0);
+        const buckets = new Map<string, number>();
+        let reconciled = 0;
+        for (const event of counted.events) {
+          const key = event.phase + ':' + event.operation + '\n' + event.stack;
+          buckets.set(key, (buckets.get(key) ?? 0) + event.count); reconciled += event.count;
+        }
+        expect(reconciled).toBe(observe ? counted.total : 0);
+        results.push({ reuse, size, observe, total: counted.total, events: counted.events.length, phases: {calls:[...runtimeAttribution.calls],known:runtimeAttribution.known,inputs:runtimeAttribution.inputs,frames:runtimeAttribution.frames,pending:runtimeAttribution.pending,proofCached:runtimeAttribution.proofCached,proofMaterialized:runtimeAttribution.proofMaterialized,copies:[...runtimeAttribution.copies],copiedEntries:[...runtimeAttribution.copiedEntries]},
+          buckets: [...buckets].map(([stack, count]) => ({ count, stack })) });
+      } finally { tree.destroy(); }
+    }
+  } finally { Error.stackTraceLimit = originalLimit; }
+  const output = process.env['ATTRIBUTION_OUTPUT'];
+  if (!output) throw new Error('ATTRIBUTION_OUTPUT required');
+  writeFileSync(output, JSON.stringify({ question: 'counter charges, not CPU instructions or timing', results }, null, 2));
+}, 30000);
+it('independent planted charge and throw controls restore all patches', () => {
+  const original = Array.prototype.push;
+  for (const observe of [false, true]) {
+    const map = new Map([[1, 1], [2, 2]]), list = [1, 2, 3];
+    expect(countIteratedElements(() => { Array.from(map.values()); list.map(n => n); }, observe).total).toBe(7);
+    let failed = false;
+    try { countIteratedElements(() => { throw undefined; }, observe); }
+    catch (error) { failed = true; expect(error).toBeUndefined(); }
+    expect(failed).toBe(true); expect(Array.prototype.push).toBe(original);
+  }
+});
+
+it('late consumer exposes omitted earlier history with foreign confirmation and rollback separately', async () => {
+  const output = process.env['ATTRIBUTION_OUTPUT'];
+  if (!output) throw new Error('ATTRIBUTION_OUTPUT required');
+  const observations: unknown[] = [];
+  const flush = async () => { for (let i=0;i<160;i++) await Promise.resolve(); };
+  async function scenario(settlement: 'confirm'|'rollback', omit: boolean) {
+    const tree=signalTree({rows:entityMap<{id:string;x:number;y:number},string>()});
+    const foreign=signalTree({z:0},{enhancers:[transactions()]});
+    tree.$.rows.setAll([{id:'a',x:0,y:0}]);
+    const q=foreign.transact(()=>foreign.$.z(7));
+    const beforeOwner=q.inspect();const sent: unknown[]=[];
+    let consumer: ReturnType<typeof link>|undefined;
+    try {
+      runtimeAttribution.omitNative=omit;
+      try {tree.$.rows.updateOne('a',{x:7});}finally{runtimeAttribution.omitNative=false;}
+      expect(tree.$.rows.byIdOrFail('a')().x).toBe(7);
+      consumer=link(tree.$.rows,{set:value=>{sent.push(value);}});
+      consumer.declare({kind:'independent'},()=>tree.$.rows.updateOne('a',{y:8}));
+      await flush();const before=sent.slice();
+      expect(q.inspect()).toEqual(beforeOwner);
+      q[settlement]();await flush();const settled=sent.slice();
+      expect(tree.$.rows.byIdOrFail('a')()).toEqual({id:'a',x:7,y:8});
+      consumer.declare({kind:'independent'},()=>tree.$.rows.updateOne('a',{x:9,y:10}));
+      await flush();await consumer.settled();
+      expect(sent.at(-1)).toEqual([{id:'a',x:9,y:10}]);
+      const final=sent.slice();await flush();expect(sent).toEqual(final);
+      consumer.dispose();let called=false;
+      expect(()=>consumer?.declare({kind:'independent'},()=>{called=true;})).toThrow();expect(called).toBe(false);
+      return {settlement,omit,before,settled,final};
+    } finally {runtimeAttribution.omitNative=false;consumer?.dispose();tree.destroy();foreign.destroy();}
+  }
+  for(const settlement of ['confirm','rollback'] as const){
+    const baseline=await scenario(settlement,false),ablated=await scenario(settlement,true);
+    observations.push({baseline,ablated});
+    writeFileSync(output+'.late.json',JSON.stringify(observations,null,2));
+    expect(baseline.before).toEqual([]);
+    expect(baseline.settled).toEqual([[{id:"a",x:7,y:8}]]);
+    // A positive counterexample, not a semantically acceptable optimization.
+    expect(ablated.before).not.toEqual(baseline.before);
+  }
+});
+
+it('observes persistent row-map populations separately from transient copy counts', () => {
+  const results: unknown[]=[];
+  for(const reuse of [false,true])for(const size of [2000,20000]){
+    runtimeAttribution.reusePhysical=reuse;
+    const tree=signalTree({rows:entityMap<{id:number;v:number},number>()});
+    const source=getEntityPublicationBinding(tree.$.rows)?.source;
+    if(!source)throw new Error('Missing collection publication source');
+    try{
+      tree.$.rows.setAll(Array.from({length:size},(_,id)=>({id,v:0})));
+      const before=source.inspect();expect(before.rows).toBe(size);expect(before.fields).toBe(2*size);
+      for(let i=0;i<200;i++)tree.$.rows.updateOne(i,{v:1});
+      const after=source.inspect();expect(after.rows).toBe(size);expect(after.fields).toBe(2*size);
+      results.push({reuse,size,before,after});
+    }finally{tree.destroy();}
+    const destroyed=source.inspect();
+    // This deliberately retained internal source is not a tree collection oracle.
+    expect(destroyed.rows).toBe(size);expect(destroyed.fields).toBe(2*size);
+    results.push({reuse,size,heldSourceAfterDestroy:destroyed});
+  }
+  const out=process.env['ATTRIBUTION_OUTPUT'];if(!out)throw Error('ATTRIBUTION_OUTPUT required');
+  writeFileSync(out+'.storage.json',JSON.stringify(results,null,2));
+});

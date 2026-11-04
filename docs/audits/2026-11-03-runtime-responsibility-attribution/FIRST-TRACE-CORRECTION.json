@@ -1,0 +1,6 @@
+{
+  "firstRun": "initial-charge-attribution",
+  "observation": "Original total remained13000, but event sum included22 wrapper-setup charges before the original counter reset; observer window corrected to run() only",
+  "thresholdUnchanged": true,
+  "runtimeCandidateUntouched": true
+}

@@ -1,0 +1,142 @@
+[
+  {
+    "baseline": {
+      "settlement": "confirm",
+      "omit": false,
+      "before": [],
+      "settled": [
+        [
+          {
+            "id": "a",
+            "x": 7,
+            "y": 8
+          }
+        ]
+      ],
+      "final": [
+        [
+          {
+            "id": "a",
+            "x": 7,
+            "y": 8
+          }
+        ],
+        [
+          {
+            "id": "a",
+            "x": 9,
+            "y": 10
+          }
+        ]
+      ]
+    },
+    "ablated": {
+      "settlement": "confirm",
+      "omit": true,
+      "before": [
+        [
+          {
+            "id": "a",
+            "x": 7,
+            "y": 8
+          }
+        ]
+      ],
+      "settled": [
+        [
+          {
+            "id": "a",
+            "x": 7,
+            "y": 8
+          }
+        ]
+      ],
+      "final": [
+        [
+          {
+            "id": "a",
+            "x": 7,
+            "y": 8
+          }
+        ],
+        [
+          {
+            "id": "a",
+            "x": 9,
+            "y": 10
+          }
+        ]
+      ]
+    }
+  },
+  {
+    "baseline": {
+      "settlement": "rollback",
+      "omit": false,
+      "before": [],
+      "settled": [
+        [
+          {
+            "id": "a",
+            "x": 7,
+            "y": 8
+          }
+        ]
+      ],
+      "final": [
+        [
+          {
+            "id": "a",
+            "x": 7,
+            "y": 8
+          }
+        ],
+        [
+          {
+            "id": "a",
+            "x": 9,
+            "y": 10
+          }
+        ]
+      ]
+    },
+    "ablated": {
+      "settlement": "rollback",
+      "omit": true,
+      "before": [
+        [
+          {
+            "id": "a",
+            "x": 7,
+            "y": 8
+          }
+        ]
+      ],
+      "settled": [
+        [
+          {
+            "id": "a",
+            "x": 7,
+            "y": 8
+          }
+        ]
+      ],
+      "final": [
+        [
+          {
+            "id": "a",
+            "x": 7,
+            "y": 8
+          }
+        ],
+        [
+          {
+            "id": "a",
+            "x": 9,
+            "y": 10
+          }
+        ]
+      ]
+    }
+  }
+]

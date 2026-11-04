@@ -1,0 +1,24 @@
+/** Experiment-only observation. Never use these instrumented modules for timing/heap comparisons. */
+export const runtimeAttribution = {
+  active: false, omitNative: false, reusePhysical: true, phase: 0, depth: 0,
+  stack: new Uint8Array(128), calls: new Uint32Array(10),
+  known: 0, inputs: 0, frames: 0, pending: 0, proofCached:0, proofMaterialized:0,
+  copies: new Uint32Array(4), copiedEntries: new Uint32Array(4),
+};
+export function beginAttribution(): void {
+  const p=runtimeAttribution;p.phase=0;p.depth=0;p.calls.fill(0);p.copies.fill(0);p.copiedEntries.fill(0);
+  p.known=0;p.inputs=0;p.frames=0;p.pending=0;p.proofCached=0;p.proofMaterialized=0;p.active=true;
+}
+export function enterAttribution(phase:number,call:number): boolean {
+  const p=runtimeAttribution;if(!p.active)return false;
+  if(p.depth===p.stack.length)throw new Error('Attribution phase stack overflow');
+  p.stack[p.depth++]=p.phase;p.phase=phase;p.calls[call]++;return true;
+}
+export function leaveAttribution(entered:boolean): void {
+  if(entered){const p=runtimeAttribution;p.phase=p.stack[--p.depth];}
+}
+export function copyAttributionMap<K,V>(value:ReadonlyMap<K,V>|undefined,kind:number):Map<K,V>{
+  const entered=enterAttribution(4,4);
+  try {if(runtimeAttribution.active){runtimeAttribution.copies[kind]++;runtimeAttribution.copiedEntries[kind]+=value?.size??0;}return new Map(value);}
+  finally{leaveAttribution(entered);}
+}
