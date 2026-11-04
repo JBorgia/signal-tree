@@ -10,7 +10,7 @@ import { ordinaryAdmissionKey } from './physical/ordinary-key-evidence';
 import type {SelectedRowIntent,SelectedRowEdit} from './internals/selected-write-operation';
 import {type ClaimedFieldEndpoint,type NativeFieldEndpoint} from './internals/native-field-selection';
 import type { EntityProjectionSeedEntry } from './internals/entity-projection-seed';
-import { EntityPublicationSource, markEntityPublicationFacts, entityPublicationFactsUnit, defineEntityPublicationBinding, currentEntityPublicationInputs, withEntityPublicationInput, withEntityPublicationUnit, type EntityPublicationEdit, type EntityPublicationStep } from './internals/entity-publication';
+import { EntityPublicationSource, markEntityPublicationFacts, entityPublicationFactsUnit, defineEntityPublicationBinding, currentEntityPublicationInputs, withEntityPublicationInput, withEntityPublicationUnit, type EntityPublicationEdit, type EntityPublicationStep, type SourcePointPreparer } from './internals/entity-publication';
 import { createPreparedPlacementVisibility } from './physical/prepared-placement-visibility';
 import { withSelectedEntityDisposition } from './internals/selected-entity-disposition';
 import { realizationPlacement } from './internals/causal-runtime/ordinary-realization';
@@ -418,7 +418,15 @@ export function createEntitySignal<
    * computed caches them until the next mutation — so a grid that reads `all()`
    * once per frame pays once per frame instead of once per write.
    */
-  const version = locations.createCell(0);
+  // Observation/cache metadata is realized only when first read. Native entity
+  // history is installed independently on every write, including cold writes.
+  let coldVersion = 0;
+  let versionCell: Location<number> | undefined;
+  const version = (): number => (versionCell ??= locations.createCell(coldVersion))();
+  const advanceCollectionVersion = (): void => {
+    if (versionCell) deriveLocation(versionCell, value => value + 1);
+    else coldVersion++;
+  };
   /**
    * `SUBJECT-EPOCH-0`. Epochs to advance when the batch flushes.
    *
@@ -1869,7 +1877,8 @@ export function createEntitySignal<
   const positionMetadataEnabled = options?.positionMetadataEnabled ?? true;
   const hasRestorationAuthority = options?.hasRestorationAuthority ?? true;
   const ownerId = options?.ownerId;
-  const entityPublication = new EntityPublicationSource();
+  let prepareSourcePoint!: SourcePointPreparer;
+  const entityPublication = new EntityPublicationSource(prepare => { prepareSourcePoint = prepare; });
   options?.onDispose?.(() => entityPublication.dispose());
   const physicalCommitClock = options?.physicalCommitClock;
   const mutationCaptureRuntime = options?.mutationCaptureRuntime;
@@ -2540,17 +2549,22 @@ export function createEntitySignal<
       nextValue,
       fields
     );
-    const ordinaryPlan = prepareOrdinaryTopology('point', [
-      {
-        subject: subjectId,
-        before: transition.ordinaryBefore,
-        after: transition.ordinaryAfter,
-        structural: false,
-        path: `${basePath}.${String(
-          structuralStore.activeKeyForSubject(subjectId)
-        )}`,
-      },
-    ]);
+    // Only this private producer supplies the fresh Object.keys list. Transfer
+    // that metadata once; arbitrary public packets still use generic admission.
+    if (fields) Object.freeze(fields);
+    const physicalPlacement = structuralStore.placementForSubject(subjectId);
+    const ordinaryPlacement = ordinaryTopology.read(subjectId) ?? physicalPlacement;
+    const sourcePoint = getActiveWriteContext() === undefined && fields !== null && !restoredFields && ordinaryTopology.isAligned() &&
+      ordinaryPlacement.present && physicalPlacement.present && ordinaryPlacement.key === physicalPlacement.key;
+    const change: CommittedEntityMutation = {
+      subject:subjectId,before:transition.ordinaryBefore,after:transition.ordinaryAfter,structural:false,
+      path:`${basePath}.${String(structuralStore.activeKeyForSubject(subjectId))}`,
+    };
+    let ordinaryPlan: OrdinaryPointPreparation;
+    if (sourcePoint) {
+      const install = ordinaryTopology.prepareUnchanged();
+      ordinaryPlan = {changes:[{...change,before:valueStore.ordinaryForSubject(subjectId)}],install,interval:install.interval,ordinaryEndpoints:undefined};
+    } else ordinaryPlan = prepareOrdinaryTopology('point', [change]);
     const currentPhysicalToken = structuralStore.activeOrderFrontier();
     const topologyUnit = Object.freeze({
       id: Object.freeze({}),
@@ -2561,10 +2575,18 @@ export function createEntitySignal<
       }),
       ordinary: ordinaryPlan.interval,
     });
-    const publication = prepareEntityPublication(
+    const responsibilityCapture = prepareResponsibilityCapture(ordinaryPlan.changes, topologyUnit);
+    const id = Object.freeze({});
+    const publication = sourcePoint ? {id,unit:prepareSourcePoint({
+      id,owner:ownerId??-1,meta:ambientMeta(),subject:subjectId,fields,
+      physicalBefore:transition.physicalBefore,physicalAfter:transition.physicalAfter,
+      ordinaryBefore:ordinaryPlan.changes[0].before,ordinaryAfter:transition.ordinaryAfter,
+      inputs:currentEntityPublicationInputs(),
+      prepareResponsibility:responsibilityCapture?fieldSelections=>mutationCaptureRuntime?.prepareEntityResponsibility?.({...responsibilityCapture,fieldSelections}):undefined,
+    })} : prepareEntityPublication(
       [{subject:subjectId,before:transition.physicalBefore,after:transition.physicalAfter,fields:publicationFields(transition.physicalBefore,transition.physicalAfter,fields)}],
       ordinaryPlan.changes.map(change=>({...change,restoredFields,fields:publicationFields(transition.physicalBefore,transition.physicalAfter,fields),structural:change.structuralRecord})),
-      undefined,undefined,false,[{ordinal:0,authoredFootprint:authoredFootprint(fields),ordinary:ordinaryPlan.changes.map(change=>({...change,restoredFields,fields:publicationFields(transition.physicalBefore,transition.physicalAfter,fields),structural:change.structuralRecord}))}],undefined,prepareResponsibilityCapture(ordinaryPlan.changes, topologyUnit)
+      undefined,undefined,false,[{ordinal:0,authoredFootprint:authoredFootprint(fields),ordinary:ordinaryPlan.changes.map(change=>({...change,restoredFields,fields:publicationFields(transition.physicalBefore,transition.physicalAfter,fields),structural:change.structuralRecord}))}],undefined,responsibilityCapture
     );
     const capture = committedEntityObserver(
       undefined,
@@ -3467,7 +3489,7 @@ export function createEntitySignal<
     const deliver=(run:()=>void)=>{try{run();}catch(error){if(!failed){failed=true;first=error;}}};
     deliver(()=>{if(!absent())locations.runInvalidationGroup(() => {
       for (const epoch of pending) deliver(()=>advanceEpochHandle(epoch));
-      deliver(()=>deriveLocation(version, (value) => value + 1));
+      deliver(()=>advanceCollectionVersion());
       deliver(()=>markOwnerInvalidated(ownerId));
     });});
     try{complete?.();}catch(error){if(!failed){failed=true;first=error;}else reportContainedObserverError({error,operation:'notify:subscriber'});}
@@ -5363,7 +5385,7 @@ export function createEntitySignal<
   const wake = () =>
     locations.runInvalidationGroup(() => {
       for (const epoch of subjectEpochs.values()) advanceEpochHandle(epoch);
-      deriveLocation(version, (value) => value + 1);
+      advanceCollectionVersion();
       markOwnerInvalidated(ownerId);
     });
   // Inside a structural write it wakes them once, after the write has closed

@@ -39,15 +39,15 @@ preserve raw counts, first failures, exact artifacts, independent review and
 separate cost dimensions. The earlier controlled-pilot assessment grants no
 activation authority. Current outer mutation proof remains pending.
 
-## Architectural alternatives — first admission screen
+## Architectural alternatives — completed first admission screen
 
 The owner supplied the architectural-alternatives review. A separate
 `codex/v16-sparse-responsibility-0` worktree investigated the proposed first
 contract-preserving family without selecting or implementing a replacement.
 A new counter discriminator observes5000 of13000visits before native preparation.
 A native-only field/window replacement with that prefix unchanged cannot clear
-the existing `<2000` gate. An integrated producer/value/topology/admission
-mechanism remains unspecified and is not admitted to runtime experimentation.
+the existing `<2000` gate. At that checkpoint an integrated producer/value/topology/admission
+mechanism remained unspecified; the subsequent bounded implementation is below.
 
 Fresh integrity-verified npm15.4.4 measures800visits versus frozenv16's13000
 on the shared originalcounter. A separate24-child ordinary baseline comparison
@@ -62,6 +62,32 @@ and independent reviews. Candidatefe18 stays frozen; no thresholds/semantics
 changed and no architecture is promoted. Further code requires a concrete
 integrated mechanism against the listed counterexamples,not another native-only
 optimization or automatic84-child campaign. General release remains HOLD.
+
+## INTEGRATED-POINT-0 — complete; rejected for advancement
+
+The owner then said “proceed”. The [isolated integrated experiment](docs/audits/2026-11-03-integrated-point-runtime/README.md)
+was specified, independently reviewed, implemented and measured. It passes the
+unchanged original point-work bound at 1,800 visits for both 2,000/20,000 rows,
+versus frozen fe18's 13,000. Fresh 48-child matched measurements classify point
+synchronous CPU lower (180.387→55.417 ms), but populated live-minus-baseline heap
+higher (17,757,072→19,956,008 bytes) and pending live-minus-idle heap higher
+(1,032,976→1,086,040 bytes). Construction timing is unresolved. The registered
+conjunctive advancement rule fails: CPU cannot compensate for heap regression.
+No favorable retry or second representation experiment was run.
+
+Final types/spec types, focused lint, scoped kernel witnesses and all four
+framework suites pass. Five known-bad controls were killed at their recorded
+source state. Original lint and Solid fault-calibration failures, corrected
+fixture proof on original runtime, unchanged size failures and all raw receipts
+are preserved. Public API/callable/barrel/import checks pass; full outer mutation
+and full release qualification are not newly claimed.
+
+The review branch `codex/v16-sparse-responsibility-0` retains the **unadopted
+experimental runtime** for inspection. It is not restored runtime fe18 and is not
+promoted into the frozen candidate. Measured source `6a0a70ecea51` binds the runtime
+and fourteen replay-verified changed/new package files; final closure edits are
+audit/controller-only. General production/release HOLD remains. No merge,
+activation, tag or package publication. No second execution queue is opened.
 
 ## Candidate and execution identity
 
@@ -84,6 +110,9 @@ optimization or automatic84-child campaign. General release remains HOLD.
 
 ## Finite acceptance table
 
+This table describes the frozenfe18 candidate. The rejected isolated prototype
+above does not replace its runtime or acceptance status.
+
 | ID | Obligation | Current status | Disposition / closure evidence |
 | --- | --- | --- | --- |
 | I1 | Select and seal one integration source | Current code fe18, source ab8c, 193-file seal7892; final docs separately bound | Closed for review; no release acceptance |
@@ -93,7 +122,7 @@ optimization or automatic84-child campaign. General release remains HOLD.
 | I5 | Point-work requirement | Current13,000 counted visits across200 updates at both2000/20000 rows; `<2000` still fails | HOLD: tested size independence passes. Reduce fixed work or obtain explicit owner disposition; no threshold changed |
 | I6 | Artifact and populated costs | Fresh bare17.95/20.28KiB, entities43.22/46.83KiB and demo807.45kB retain numerical overages. Size is owner accepted. Final84-child before/after comparison supports lower bare wall time only; CPU/other timing mostly unresolved; persistent populated heap not recovered | Size disposition closed. Runtime-cost HOLD. Both cohorts/raw samples remain separate; no new SLO, per-trial attribution, fresh v15 comparison or runtime-cost waiver |
 | I7 | Integration qualification | Current kernel7184 ordinary/5 expected/12 skipped plus point failure; all four frameworks, reference app and demo175/4skip pass. Fresh24 companion controls and62 normal baselines:85 pass, one accepted size failure. Production browser28 pass | Current scoped qualification complete. Full outer mutation proof is not claimed fresh; predecessor proof stays bound to its source. No full release-green or coverage-percentage claim |
-| I8 | Consumer readiness and release disposition | Current packed consumers and production-built inventory/publication workflows pass; source/document/evidence closure is durable | Controlled-pilot candidate. General production/release HOLD for I5/I6 and final release proof. No activation/push/merge/tag/publication |
+| I8 | Consumer readiness and release disposition | Current packed consumers and production-built inventory/publication workflows pass; source/document/evidence closure is durable | Controlled-pilot candidate. General production/release HOLD for I5/I6 and final release proof. No activation/merge/tag/package publication; review-branch push authorized |
 
 All obligations must close or receive an explicit authorized disposition before
 release. Completing this finite phase does not silently accept runtime costs or

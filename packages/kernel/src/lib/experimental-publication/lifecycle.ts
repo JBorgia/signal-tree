@@ -8,6 +8,12 @@ type Source = {token:object; cells:Map<number,OwnerCell>};
 const sources=new Map<number,Source>();
 const authentic=new WeakMap<object,OwnerCell>();
 const pending=new Set<OwnerCell>();
+// Exact global membership is shared until that membership changes. Captures keep
+// the immutable array; later owner outcomes evolve on their original cells.
+let pendingSnapshot: readonly OwnerCell[] | undefined;
+function currentPendingSnapshot(): readonly OwnerCell[] {
+ return pendingSnapshot ??= Object.freeze([...pending]);
+}
 // Comparison-only chronology. Weak exact-cell keys never retain owner history.
 let confirmationSerial=BigInt(0);
 const firstConfirmation=new WeakMap<OwnerCell,bigint>();
@@ -76,12 +82,12 @@ export function ownerTransition(owner:number,event:{kind:string;transactionId:nu
  const source=sources.get(owner);if(!source)return;
  let cell=source.cells.get(event.transactionId);
  if(!cell){if(event.kind!=='opened'&&event.kind!=='staged')return;cell={owner,id:event.transactionId,outcome:'pending',dependents:new Set()};source.cells.set(cell.id,cell);}
- if(event.kind==='opened'||event.kind==='staged'){if(cell.outcome==='pending')pending.add(cell);return;}
+ if(event.kind==='opened'||event.kind==='staged'){if(cell.outcome==='pending'&&!pending.has(cell)){pending.add(cell);pendingSnapshot=undefined;}return;}
  if(!['confirmed','rolled-back','abandoned'].includes(event.kind))return;
  const outcome=event.kind as Exclude<Outcome,'pending'>;
  if(cell.outcome!=='pending'&&cell.outcome!==outcome)throw Error('Terminal publication dependency outcome reversed');
  if(cell.outcome==='pending'&&outcome==='confirmed')firstConfirmation.set(cell,++confirmationSerial);
- cell.outcome=outcome;pending.delete(cell);
+ cell.outcome=outcome;if(pending.delete(cell))pendingSnapshot=undefined;
  // Synchronous normal/recovery handle enrollment can still obtain this cell.
  const retired=cell;queueMicrotask(()=>{if(source.cells.get(retired.id)===retired&&retired.outcome!=='pending')source.cells.delete(retired.id);});
  ownerWake(cell);notifyOwnerTransition(cell);
@@ -89,7 +95,7 @@ export function ownerTransition(owner:number,event:{kind:string;transactionId:nu
 export function abandonOwnerSource(owner:number):void{
  const source=sources.get(owner);if(!source)return;
  // Unregister storage only. Native lifecycle alone determines terminal outcome.
- for(const cell of source.cells.values()){pending.delete(cell);ownerWake(cell);notifyOwnerTransition(cell);}
+ for(const cell of source.cells.values()){if(pending.delete(cell))pendingSnapshot=undefined;ownerWake(cell);notifyOwnerTransition(cell);}
  source.cells.clear();sources.delete(owner);
 }
 export function enroll<T extends object>(handle:T,owner:number|undefined,id:number):T{
@@ -314,9 +320,12 @@ export function prepareNativeRequirement(known:readonly OwnerCell[], unknown:boo
 export function finalizeNativeRequirement(requirement:NativeRequirement):void {
  // Normalize ONLY this installation's newly acquired candidate window. An
  // inherited W with the same identity as D/I/V remains in the input proof.
- const actualInputs=new Set(requirement.inputs.flatMap(input=>input.owners));
- const destination=new Set(requirement.known);
- requirement.possible=Object.freeze([...pending].filter(owner=>!destination.has(owner)&&!actualInputs.has(owner)));
+ if(requirement.inputs.length===0&&requirement.known.length===0)requirement.possible=currentPendingSnapshot();
+ else {
+  const actualInputs=new Set(requirement.inputs.flatMap(input=>input.owners));
+  const destination=new Set(requirement.known);
+  requirement.possible=Object.freeze([...pending].filter(owner=>!destination.has(owner)&&!actualInputs.has(owner)));
+ }
  // Source inputs are immutable snapshots; only the not-yet-installed unit's own window is refreshed.
  if(requirement.frames.length===0){requirement.proof=nativeProof(requirement);requirement.inputs=[];requirement.known=[];unfinishedRequirements.delete(requirement);}
 }

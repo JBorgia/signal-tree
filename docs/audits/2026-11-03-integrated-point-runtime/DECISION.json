@@ -1,0 +1,30 @@
+{
+  "scope": "INTEGRATED-POINT-0 bounded experiment",
+  "outcome": "REJECT_ADVANCEMENT_RETAIN_EVIDENCE",
+  "originalPointBound": 2000,
+  "originalPointResult": 1800,
+  "required": {
+    "point": {
+      "metric": "sync_cpu_ms",
+      "direction": "selected-lower",
+      "beforeMedian": 180.387,
+      "afterMedian": 55.417
+    },
+    "heap-populated": {
+      "metric": "live_minus_baseline_bytes",
+      "direction": "selected-higher",
+      "beforeMedian": 17757072,
+      "afterMedian": 19956008
+    }
+  },
+  "costIntegrity": {
+    "sourceMismatches": [],
+    "inputMismatches": [],
+    "completedChildren": 48,
+    "validChildren": 48,
+    "failedProfiles": [],
+    "globalStop": null,
+    "finishedAt": "2026-11-04T05:07:04.612545+00:00"
+  },
+  "rule": "Both required dimensions must classify selected-lower; no compensation. No favorable retries. No adoption."
+}

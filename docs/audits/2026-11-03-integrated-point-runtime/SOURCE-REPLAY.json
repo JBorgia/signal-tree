@@ -1,0 +1,21 @@
+{
+  "baseCommit": "f165d28e55dce241ff6466a58c9b850f1bbc20f3",
+  "verifiedFiles": 14,
+  "mismatches": [],
+  "payloadHashes": {
+    "packages/kernel/src/lib/integrated-collection-version.spec.ts": "7905a822aa5ef68cd9438d544978557b9a98a9742b48ad4ddaa89085e5e42eb3",
+    "packages/kernel/src/lib/integrated-late-history.spec.ts": "adf64ad44eba491811b2e49a2f2f7f845759fa3303cc4be88dd5284394b4a0b2",
+    "packages/kernel/src/lib/integrated-field-facts.spec.ts": "f0a50d65f94d8abc58fe03f86f2ddb6cec09128ab9288030ceb8c8c957704730",
+    "packages/kernel/src/lib/integrated-point-source.spec.ts": "7c3c995311ec927222cfbf1252f8eebd3af64bfd433843364abf6b5419a17dfe",
+    "packages/kernel/src/lib/entity-signal.ts": "a8d4e6f119fb429ce3a3a455959ede58a3f6547b843c726af9105acbc792e799",
+    "packages/kernel/src/lib/experimental-publication/entity.ts": "6ec2b3732967dfb3ba0b720292597e288578cc26b1c67304a45f6c528a167714",
+    "packages/kernel/src/lib/experimental-publication/lifecycle.ts": "10696583f7b382a3cdcea26c7bf0228e2e7aa5de1f6668225529dba2cfbafce3",
+    "packages/kernel/src/lib/physical/entity-ordinary-topology.ts": "63972d6220bb231272e3555a78db81400e6972eaf69d38d04e93e69761c52755",
+    "packages/kernel/src/lib/internals/entity-publication.ts": "b950cd8f5604701476018a331e5404cb161cfa42201522aace3d20c41533ad89",
+    "packages/react/src/lib/integrated-cold-collection.spec.tsx": "c3ab718e4c65db3ddf668f336758a9c229fdcaf2257343818c9fec725f9f3745",
+    "packages/solid/src/lib/native-publication-error-boundary.spec.ts": "ca1a7980d307fb457b1b985ebe0fad75e83d9bb0179da2ad78bf4fb7559b21fb",
+    "packages/solid/src/lib/integrated-cold-collection.spec.ts": "2aea81748ed7efa65938c3bf37e751c72cffbe35939bba356e43622a5df627ae",
+    "packages/angular/src/lib/integrated-cold-collection.spec.ts": "4603889517944ccbc5041bdb49ddc0ea43cdb1d0b8e3a9b012b4ad9966c2fede",
+    "packages/vue/src/lib/integrated-cold-collection.spec.ts": "d007f3a0e68f8ba8c0bc10978882b263db76a5dad9123d8cc27f10da97b9600f"
+  }
+}
