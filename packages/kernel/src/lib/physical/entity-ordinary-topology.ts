@@ -56,8 +56,7 @@ export class EntityOrdinaryTopology<K extends string | number> {
   ): (() => void) & { readonly interval: TopologyViewInterval } {
     const interval = this.prepareInterval(ordinary);
     const updates = new Map<number, PlacementPresence<K> | undefined>();
-    const ids = new Set([...ordinary.patch.keys(), ...physical.patch.keys()]);
-    for (const subject of ids) {
+    const prepareSubject = (subject: number): void => {
       const o = ordinary.read(subject),
         p = physical.read(subject);
       const same =
@@ -71,7 +70,10 @@ export class EntityOrdinaryTopology<K extends string | number> {
         subject,
         same ? undefined : o.present ? o : { present: false }
       );
-    }
+    };
+    for (const subject of ordinary.patch.keys()) prepareSubject(subject);
+    for (const subject of physical.patch.keys())
+      if (!updates.has(subject)) prepareSubject(subject);
     const head =
       ordinary.head === physical.head ? undefined : { value: ordinary.head };
     const tail =
@@ -90,7 +92,8 @@ export class EntityOrdinaryTopology<K extends string | number> {
     stage: EntityPlacementStage<K>,
     entries?: PreparedPlacementEntries<K>
   ): TopologyViewInterval {
-    const pairs = (entries ?? [...stage.patch]).flatMap(([subject, after]) => {
+    const pairs: TopologyViewInterval['pairs'][number][] = [];
+    for (const [subject, after] of entries ?? stage.patch) {
       const before = stage.base(subject);
       const equal =
         before.present === after.present &&
@@ -99,19 +102,15 @@ export class EntityOrdinaryTopology<K extends string | number> {
             before.key === after.key &&
             before.beforeSubject === after.beforeSubject &&
             before.afterSubject === after.afterSubject));
-      return equal
-        ? []
-        : [
-            Object.freeze({
-              subject,
-              before: Object.freeze({ ...before }),
-              after:
-                entries && Object.isFrozen(after)
-                  ? after
-                  : Object.freeze({ ...after }),
-            }),
-          ];
-    });
+      if (equal) continue;
+      pairs.push(Object.freeze({
+        subject,
+        before: Object.freeze({ ...before }),
+        after: entries && Object.isFrozen(after)
+          ? after
+          : Object.freeze({ ...after }),
+      }));
+    }
     return Object.freeze({
       before: this.continuity,
       after: pairs.length ? {} : this.continuity,

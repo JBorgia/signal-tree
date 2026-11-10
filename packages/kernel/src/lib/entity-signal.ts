@@ -1601,10 +1601,9 @@ export function createEntitySignal<
       structuralFrontier.after = topologyUnit.physical.after;
     // Whole replacement offers equal supplied fields to native endpoint selection.
     // This publication domain does not change native value effects or physical diffs.
-    const ordinaryPublicationByChange = new Map<
-      import('./internals/mutation-capture-runtime').CommittedEntityMutation,
-      EntityPublicationEdit
-    >();
+    // Rich replay emits the ordered changes by appending each completed
+    // step. Emit publication's aggregate and step indexes in that same pass.
+    const ordinaryPublication: EntityPublicationEdit[] = [];
     const publicationSteps = changes.map((change, ordinal) => {
       const footprint = authoredByStep.get(ordinal);
       return {
@@ -1618,14 +1617,14 @@ export function createEntitySignal<
             ? Object.freeze([...new Set([...(changedFields ?? []), ...Object.keys(effect.after ?? {})])])
             : changedFields;
           const edit = {...effect, restoredFields:restoredByStep.get(ordinal), fields, structural:effect.structuralRecord};
-          ordinaryPublicationByChange.set(effect, edit);
+          ordinaryPublication.push(edit);
           return edit;
         }),
       };
     });
     const publication=prepareEntityPublication(
       changes.map((change,ordinal)=>{const physical=physicalValuesByStep.get(ordinal);return {...change,before:physical?physical.physicalBefore:change.before,after:physical?physical.physicalAfter:change.after,fields:change.structural?null:publicationFields(physical?physical.physicalBefore:change.before,physical?physical.physicalAfter:change.after),structural:change.structuralRecord};}),
-      ordinaryPlan.changes.map(change=>ordinaryPublicationByChange.get(change)??({...change,fields:change.structural?null:publicationFields(change.before,change.after),structural:change.structuralRecord})),
+      ordinaryPublication,
       frame.orderEndpoints?.after,ordinaryPlan.ordinaryEndpoints?.after,false,
       publicationSteps,
       entityPublication.requestsSeed()?(()=>{
