@@ -5,7 +5,7 @@ import {performance} from 'node:perf_hooks';
 import {quiesce} from '../lib/heap-quiescence.mjs';
 import * as c from './coordinated.mjs';
 
-const [_root,packet,arm,mode]=process.argv.slice(2);
+const [,packet,arm,mode]=process.argv.slice(2);
 const policy=JSON.parse(readFileSync(new URL('./policy.json',import.meta.url)));
 const factory=await c.loadArm(arm,resolve(packet,'packed-kernel'));
 const input=c.makeRows(policy.coordination.rows);

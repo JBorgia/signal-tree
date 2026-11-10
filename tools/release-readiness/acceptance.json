@@ -1,0 +1,13 @@
+{
+  "baseline": "667e4c0923ba379116bdd724dbe80fe541dad14d",
+  "authority": "Owner explicitly requested repairs until v16 is ready, budgets weighed against cost and feasibility, and continued release qualification without check-ins.",
+  "binding": ["Supported semantic conformance", "Destroyed derived resources collect", "Late-reader, independent publication, refusal, reentry and entity-lifetime behavior", "Original strict point-work bound below 2000", "Exact-artifact release qualification and mutation proof"],
+  "economicDispositionRegisteredBeforeRepairResults": {
+    "targetsRetained": {"stateStartupMs":25,"localInteractionMs":4,"eightSessionHeapMiB":32},
+    "startup": "Retain every original state-only result. Evaluate modest residual state allocation overages against the existing100ms loaded-application first-use readiness envelope, actual framework view realization and feasible implementation changes; do not invent a ceiling immediately above a measured result.",
+    "coordinatedSetup": "Original start sums connection setup, three optimistic owners, late full-collection enrollment and two edits. Preserve its total, separately identify first enrollment versus recurring operation boundaries. Evaluate setup against readiness and recurring actions against interaction allocation; do not claim timer splitting is a speed improvement.",
+    "heap": "Repair avoidable per-slot bookkeeping. Compare exact packed baseline and repair at1/2/4/8sessions, with matched pending and settled endpoints, repeated cycles and actual resource collection. Retain32MiB target and assess residual working set against the chosen128MiB application envelope and concurrent capacity, never waive lifecycle retention.",
+    "relativeCosts": "No v15 parity or Map-coordinator speed requirement. Preserve same-task traces and independently measured variability.",
+    "decision": "Continue repairs and qualification. Economic feasibility is evaluated from application impact and concrete alternatives, not an automatic stop at a provisional allocation crossing. Do not conceal failures or label old strict checks passing."
+  }
+}

@@ -525,8 +525,7 @@ export async function verifyReentry(factory) {
   await flush();
   const sent = [];
   const receipts = [];
-  let connection;
-  connection = session.connect({ kind: 'field', id: 'J-0', field: 'status' }, value => {
+  const connection = session.connect({ kind: 'field', id: 'J-0', field: 'status' }, value => {
     sent.push(value);
     if (value === 'active') receipts.push(connection.declare({ kind: 'independent' }, () => session.update('J-0', { status: 'done' })));
   });

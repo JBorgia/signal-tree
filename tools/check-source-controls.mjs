@@ -51,7 +51,10 @@ function trackedTextFiles() {
   const out = execFileSync('git', ['ls-files', '-z'], { encoding: 'buffer' });
   const files = out.toString('utf8').split('\0').filter(Boolean);
   // Binary formats legitimately contain C0 bytes; they are not "sources".
-  const BINARY = /\.(png|jpe?g|gif|webp|ico|pdf|woff2?|ttf|eot|zip|gz|xz|docx?|xlsx?|pptx?|mp4|webm|wasm)$/i;
+  // Evidence archives may be split for repository storage. Only numbered
+  // parts of a known compressed archive qualify; .part alone and source files
+  // beneath/after such names remain text and must still reject control bytes.
+  const BINARY = /\.(png|jpe?g|gif|webp|ico|pdf|woff2?|ttf|eot|zip|gz|xz|docx?|xlsx?|pptx?|mp4|webm|wasm)$|\.(?:tar\.)?(?:gz|xz|zip)\.part\d+$/i;
   return files.filter((f) => !BINARY.test(f));
 }
 
