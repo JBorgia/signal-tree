@@ -92,8 +92,13 @@ export function createPreparedPlacementVisibility<K>(
       direction: Direction,
       excluded?: number
     ): number | undefined {
+      // Keep the original snapshot boundary even for a trivial query.
       build();
-      let subject = start;
+      if (start === undefined || start === excluded) return undefined;
+      const first = positions.get(start);
+      if (first && first.run.counts[first.run.size + first.at] === 1)
+        return start;
+      let subject: number | undefined = start;
       const seen = new Set<number>();
       while (
         subject !== undefined &&

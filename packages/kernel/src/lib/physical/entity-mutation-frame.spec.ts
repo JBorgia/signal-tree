@@ -4,6 +4,7 @@ import {
   EntityMutationFrame,
   type PreparedFreshSubject,
 } from './entity-mutation-frame';
+import { EntityPlacementStage } from './entity-placement-stage';
 import { EntityValueStore } from './entity-value-store';
 import { StructuralStore } from './structural-store';
 
@@ -25,6 +26,33 @@ function createFrameHarness() {
 }
 
 describe('EntityMutationFrame', () => {
+  it.each([
+    { keys: [1, 2], rewrites: 0 },
+    { keys: [2, 1], rewrites: 1 },
+  ])('prepares final key order $keys with $rewrites placement rewrites', ({ keys, rewrites }) => {
+    const { frame, structuralStore } = createFrameHarness();
+    const subjects = structuralStore.planFreshSubjectIds(2);
+    subjects.forEach((subjectId, index) => {
+      const key = index + 1;
+      frame.stageFreshSubject({
+        kind: 'create-fresh-subject', key, subjectId,
+        nextValue: { id: key, name: String(key) },
+      });
+    });
+    frame.stageFinalOrder(keys);
+    const order = vi.spyOn(EntityPlacementStage.prototype, 'order');
+    try {
+      const prepared = frame.preparePlacement();
+      expect(prepared.snapshot()).toEqual(keys.map(key => subjects[key - 1]));
+      expect(prepared.patch.size).toBe(2);
+      expect(order).toHaveBeenCalledTimes(rewrites);
+      frame.commit();
+      expect(structuralStore.activeKeysSnapshot()).toEqual(keys);
+    } finally {
+      order.mockRestore();
+    }
+  });
+
   it('commits prepared fresh subjects without allocating ids during commit', () => {
     const { frame, structuralStore, valueStore } = createFrameHarness();
     const plannedSubjectId = structuralStore.planFreshSubjectIds(1)[0];

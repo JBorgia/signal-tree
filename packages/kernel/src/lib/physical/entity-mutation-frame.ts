@@ -177,8 +177,24 @@ export class EntityMutationFrame<
     // Final key order resolves against this complete private placement stage.
     // Build its lookup once; searching the patch for every key makes a full
     // setAll/prepend batch quadratic. No index is installed in live storage.
-    const stagedSubjects =
-      this.finalFront || this.finalOrder ? new Map<K, number>() : undefined;
+    const finalOrder = this.finalOrder;
+    // Every fresh insertion is already in the placement patch. In this case
+    // resolving its final key order would recreate the same adjacency records.
+    // Commit still applies the requested order to the then-installed state.
+    let freshKeys: Set<K> | undefined;
+    const alreadyOrdered = finalOrder !== undefined && !this.finalFront &&
+      base.head === undefined && instructions.length === finalOrder.length &&
+      stage.patch.size === instructions.length &&
+      instructions.every((mutation, index) => {
+        if (mutation.kind !== 'create-fresh-subject' ||
+            mutation.key !== finalOrder[index] || freshKeys?.has(mutation.key))
+          return false;
+        (freshKeys ??= new Set()).add(mutation.key);
+        return true;
+      });
+    const stagedSubjects = this.finalFront || finalOrder && !alreadyOrdered
+      ? new Map<K, number>()
+      : undefined;
     if (stagedSubjects) {
       for (const [id, row] of stage.patch) {
         // Preserve the prior strict-equality lookup (including NaN) and first
@@ -219,9 +235,9 @@ export class EntityMutationFrame<
       }
       if (moved) this.ordinaryOrder = prefixOrder = stage.snapshot();
     }
-    if (this.finalOrder)
+    if (finalOrder && !alreadyOrdered)
       stage.order(
-        this.finalOrder
+        finalOrder
           .map(subjectFor)
           .filter((id): id is number => id !== undefined)
       );
