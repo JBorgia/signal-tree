@@ -1,0 +1,8 @@
+{
+  "packages": 193,
+  "demoFiles": 84,
+  "packageBytesAndExecutableBitsMatchOriginalC": true,
+  "demoUnchangedDuringBrowserRun": true,
+  "packageManifestSha256": "bdb083a7ba599a2c5d8e4336a155591d21140148d15975b9093b79181f60619f",
+  "demoManifestSha256": "8218d23730ecd3c3e56cba53d4069129ebe610640264a11e6d2e52c922935e84"
+}

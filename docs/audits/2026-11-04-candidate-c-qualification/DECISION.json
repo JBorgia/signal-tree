@@ -1,0 +1,41 @@
+{
+  "status": "qualification complete within recorded scope; production/runtime-cost HOLD",
+  "runtimeBase": "9aa20563b72ad73bc4a1ae736181ffebd73dc418",
+  "runtimeChanged": false,
+  "originalCArtifactFiles": 193,
+  "exactPostMutationArtifactEquivalence": true,
+  "normalGateCoverage": {
+    "passed": 86,
+    "failed": 1,
+    "failedName": "bundle-budget",
+    "sizeDisposition": "owner accepted; numerical result remains failed",
+    "partitioned": true
+  },
+  "outerMutationRunner": {
+    "proven": 87,
+    "indirect": 13,
+    "blind": 0,
+    "vacuous": 0,
+    "unproven": 0,
+    "errored": 0,
+    "limitation": "baseline-red bundle-budget mutation cannot independently establish new rejection by nonzero exit"
+  },
+  "browser": {
+    "files": 9,
+    "passed": 137,
+    "failed": 1,
+    "skipped": 0,
+    "flaky": 0,
+    "failure": "size assertion <=570000 receives787720; owner size disposition applies, test remains failed"
+  },
+  "freshReleasedV15": {
+    "version": "15.4.4",
+    "validChildren": 24,
+    "constructionSyncCPURatio": 7.548436240687229,
+    "pointTotalCPURatio": 4.163344242784885,
+    "populatedHeapRatio": 3.7510704326935285,
+    "ordinaryDirections": "C higher under registered descriptive rule; drain unresolved",
+    "capabilityParityClaim": false
+  },
+  "disposition": "Keep C as leading experimental runtime, unadopted. No safe pending/journal repair demonstrated. Full functional evidence does not close ordinary runtime-cost gap or grant adoption/release authority. No new execution queue opened."
+}

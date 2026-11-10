@@ -1,0 +1,2272 @@
+{
+  "scaling": {
+    "anchor/10/before": {
+      "pendingMinusPrimed": {
+        "min": 1032408,
+        "median": 1034936,
+        "max": 1042200,
+        "samples": [
+          1034936,
+          1032408,
+          1042200
+        ]
+      },
+      "settledMinusPrimed": {
+        "min": 948032,
+        "median": 958752,
+        "max": 965104,
+        "samples": [
+          948032,
+          958752,
+          965104
+        ]
+      },
+      "destroyedMinusBaseline": {
+        "min": 3327912,
+        "median": 3328336,
+        "max": 3342280,
+        "samples": [
+          3328336,
+          3327912,
+          3342280
+        ]
+      }
+    },
+    "anchor/10/candidate": {
+      "pendingMinusPrimed": {
+        "min": 1078712,
+        "median": 1096576,
+        "max": 1097504,
+        "samples": [
+          1097504,
+          1078712,
+          1096576
+        ]
+      },
+      "settledMinusPrimed": {
+        "min": 1001424,
+        "median": 1022808,
+        "max": 1024896,
+        "samples": [
+          1022808,
+          1001424,
+          1024896
+        ]
+      },
+      "destroyedMinusBaseline": {
+        "min": 3352616,
+        "median": 3352904,
+        "max": 3364480,
+        "samples": [
+          3352904,
+          3352616,
+          3364480
+        ]
+      }
+    },
+    "fixed-distinct/0/before": {
+      "pendingMinusPrimed": {
+        "min": 75160,
+        "median": 75160.0,
+        "max": 75160,
+        "samples": [
+          75160,
+          75160
+        ]
+      },
+      "settledMinusPrimed": {
+        "min": 89600,
+        "median": 89600.0,
+        "max": 89600,
+        "samples": [
+          89600,
+          89600
+        ]
+      },
+      "destroyedMinusBaseline": {
+        "min": 2589280,
+        "median": 2592284.0,
+        "max": 2595288,
+        "samples": [
+          2595288,
+          2589280
+        ]
+      }
+    },
+    "fixed-distinct/0/candidate": {
+      "pendingMinusPrimed": {
+        "min": 75160,
+        "median": 75160.0,
+        "max": 75160,
+        "samples": [
+          75160,
+          75160
+        ]
+      },
+      "settledMinusPrimed": {
+        "min": 89600,
+        "median": 89600.0,
+        "max": 89600,
+        "samples": [
+          89600,
+          89600
+        ]
+      },
+      "destroyedMinusBaseline": {
+        "min": 2575216,
+        "median": 2575940.0,
+        "max": 2576664,
+        "samples": [
+          2576664,
+          2575216
+        ]
+      }
+    },
+    "fixed-distinct/1/before": {
+      "pendingMinusPrimed": {
+        "min": 402656,
+        "median": 402832.0,
+        "max": 403008,
+        "samples": [
+          403008,
+          402656
+        ]
+      },
+      "settledMinusPrimed": {
+        "min": 812304,
+        "median": 813412.0,
+        "max": 814520,
+        "samples": [
+          814520,
+          812304
+        ]
+      },
+      "destroyedMinusBaseline": {
+        "min": 3428808,
+        "median": 3434720.0,
+        "max": 3440632,
+        "samples": [
+          3440632,
+          3428808
+        ]
+      }
+    },
+    "fixed-distinct/1/candidate": {
+      "pendingMinusPrimed": {
+        "min": 447648,
+        "median": 448780.0,
+        "max": 449912,
+        "samples": [
+          447648,
+          449912
+        ]
+      },
+      "settledMinusPrimed": {
+        "min": 874960,
+        "median": 876092.0,
+        "max": 877224,
+        "samples": [
+          874960,
+          877224
+        ]
+      },
+      "destroyedMinusBaseline": {
+        "min": 3445368,
+        "median": 3445504.0,
+        "max": 3445640,
+        "samples": [
+          3445640,
+          3445368
+        ]
+      }
+    },
+    "fixed-distinct/10/before": {
+      "pendingMinusPrimed": {
+        "min": 1037600,
+        "median": 1039604.0,
+        "max": 1041608,
+        "samples": [
+          1037600,
+          1041608
+        ]
+      },
+      "settledMinusPrimed": {
+        "min": 949248,
+        "median": 951324.0,
+        "max": 953400,
+        "samples": [
+          949248,
+          953400
+        ]
+      },
+      "destroyedMinusBaseline": {
+        "min": 3525024,
+        "median": 3528088.0,
+        "max": 3531152,
+        "samples": [
+          3525024,
+          3531152
+        ]
+      }
+    },
+    "fixed-distinct/10/candidate": {
+      "pendingMinusPrimed": {
+        "min": 1099232,
+        "median": 1104036.0,
+        "max": 1108840,
+        "samples": [
+          1108840,
+          1099232
+        ]
+      },
+      "settledMinusPrimed": {
+        "min": 1019000,
+        "median": 1023228.0,
+        "max": 1027456,
+        "samples": [
+          1027456,
+          1019000
+        ]
+      },
+      "destroyedMinusBaseline": {
+        "min": 3550048,
+        "median": 3558592.0,
+        "max": 3567136,
+        "samples": [
+          3567136,
+          3550048
+        ]
+      }
+    },
+    "fixed-distinct/32/before": {
+      "pendingMinusPrimed": {
+        "min": 3208584,
+        "median": 3208808.0,
+        "max": 3209032,
+        "samples": [
+          3209032,
+          3208584
+        ]
+      },
+      "settledMinusPrimed": {
+        "min": 1264544,
+        "median": 1264576.0,
+        "max": 1264608,
+        "samples": [
+          1264608,
+          1264544
+        ]
+      },
+      "destroyedMinusBaseline": {
+        "min": 3641016,
+        "median": 3641680.0,
+        "max": 3642344,
+        "samples": [
+          3642344,
+          3641016
+        ]
+      }
+    },
+    "fixed-distinct/32/candidate": {
+      "pendingMinusPrimed": {
+        "min": 3287640,
+        "median": 3288988.0,
+        "max": 3290336,
+        "samples": [
+          3290336,
+          3287640
+        ]
+      },
+      "settledMinusPrimed": {
+        "min": 1327144,
+        "median": 1328992.0,
+        "max": 1330840,
+        "samples": [
+          1327144,
+          1330840
+        ]
+      },
+      "destroyedMinusBaseline": {
+        "min": 3658752,
+        "median": 3662376.0,
+        "max": 3666000,
+        "samples": [
+          3666000,
+          3658752
+        ]
+      }
+    },
+    "fixed-same/0/before": {
+      "pendingMinusPrimed": {
+        "min": 75160,
+        "median": 75244.0,
+        "max": 75328,
+        "samples": [
+          75328,
+          75160
+        ]
+      },
+      "settledMinusPrimed": {
+        "min": 89600,
+        "median": 89684.0,
+        "max": 89768,
+        "samples": [
+          89768,
+          89600
+        ]
+      },
+      "destroyedMinusBaseline": {
+        "min": 2588816,
+        "median": 2592844.0,
+        "max": 2596872,
+        "samples": [
+          2596872,
+          2588816
+        ]
+      }
+    },
+    "fixed-same/0/candidate": {
+      "pendingMinusPrimed": {
+        "min": 75160,
+        "median": 75160.0,
+        "max": 75160,
+        "samples": [
+          75160,
+          75160
+        ]
+      },
+      "settledMinusPrimed": {
+        "min": 89600,
+        "median": 89600.0,
+        "max": 89600,
+        "samples": [
+          89600,
+          89600
+        ]
+      },
+      "destroyedMinusBaseline": {
+        "min": 2564728,
+        "median": 2565908.0,
+        "max": 2567088,
+        "samples": [
+          2567088,
+          2564728
+        ]
+      }
+    },
+    "fixed-same/1/before": {
+      "pendingMinusPrimed": {
+        "min": 402136,
+        "median": 402136.0,
+        "max": 402136,
+        "samples": [
+          402136,
+          402136
+        ]
+      },
+      "settledMinusPrimed": {
+        "min": 813472,
+        "median": 813472.0,
+        "max": 813472,
+        "samples": [
+          813472,
+          813472
+        ]
+      },
+      "destroyedMinusBaseline": {
+        "min": 3423640,
+        "median": 3425016.0,
+        "max": 3426392,
+        "samples": [
+          3426392,
+          3423640
+        ]
+      }
+    },
+    "fixed-same/1/candidate": {
+      "pendingMinusPrimed": {
+        "min": 449104,
+        "median": 449156.0,
+        "max": 449208,
+        "samples": [
+          449104,
+          449208
+        ]
+      },
+      "settledMinusPrimed": {
+        "min": 876352,
+        "median": 876404.0,
+        "max": 876456,
+        "samples": [
+          876352,
+          876456
+        ]
+      },
+      "destroyedMinusBaseline": {
+        "min": 3452824,
+        "median": 3453052.0,
+        "max": 3453280,
+        "samples": [
+          3453280,
+          3452824
+        ]
+      }
+    },
+    "fixed-same/10/before": {
+      "pendingMinusPrimed": {
+        "min": 1003704,
+        "median": 1004628.0,
+        "max": 1005552,
+        "samples": [
+          1005552,
+          1003704
+        ]
+      },
+      "settledMinusPrimed": {
+        "min": 938864,
+        "median": 940472.0,
+        "max": 942080,
+        "samples": [
+          938864,
+          942080
+        ]
+      },
+      "destroyedMinusBaseline": {
+        "min": 3527008,
+        "median": 3528756.0,
+        "max": 3530504,
+        "samples": [
+          3527008,
+          3530504
+        ]
+      }
+    },
+    "fixed-same/10/candidate": {
+      "pendingMinusPrimed": {
+        "min": 1065464,
+        "median": 1065732.0,
+        "max": 1066000,
+        "samples": [
+          1066000,
+          1065464
+        ]
+      },
+      "settledMinusPrimed": {
+        "min": 1011152,
+        "median": 1011860.0,
+        "max": 1012568,
+        "samples": [
+          1011152,
+          1012568
+        ]
+      },
+      "destroyedMinusBaseline": {
+        "min": 3543592,
+        "median": 3547800.0,
+        "max": 3552008,
+        "samples": [
+          3543592,
+          3552008
+        ]
+      }
+    },
+    "fixed-same/32/before": {
+      "pendingMinusPrimed": {
+        "min": 3082456,
+        "median": 3085092.0,
+        "max": 3087728,
+        "samples": [
+          3082456,
+          3087728
+        ]
+      },
+      "settledMinusPrimed": {
+        "min": 1269712,
+        "median": 1272792.0,
+        "max": 1275872,
+        "samples": [
+          1269712,
+          1275872
+        ]
+      },
+      "destroyedMinusBaseline": {
+        "min": 3632824,
+        "median": 3637740.0,
+        "max": 3642656,
+        "samples": [
+          3632824,
+          3642656
+        ]
+      }
+    },
+    "fixed-same/32/candidate": {
+      "pendingMinusPrimed": {
+        "min": 3166264,
+        "median": 3169496.0,
+        "max": 3172728,
+        "samples": [
+          3166264,
+          3172728
+        ]
+      },
+      "settledMinusPrimed": {
+        "min": 1340344,
+        "median": 1341788.0,
+        "max": 1343232,
+        "samples": [
+          1343232,
+          1340344
+        ]
+      },
+      "destroyedMinusBaseline": {
+        "min": 3650680,
+        "median": 3651196.0,
+        "max": 3651712,
+        "samples": [
+          3651712,
+          3650680
+        ]
+      }
+    }
+  },
+  "economics": {
+    "before": {
+      "sync/wallMs": {
+        "min": 58.87591699999999,
+        "median": 65.90895799999998,
+        "max": 127.76108399999998,
+        "samples": [
+          64.84345800000003,
+          58.87591699999999,
+          127.76108399999998,
+          108.91383300000001,
+          65.90895799999998
+        ]
+      },
+      "sync/cpuMs": {
+        "min": 103.786,
+        "median": 115.878,
+        "max": 163.53,
+        "samples": [
+          115.878,
+          103.786,
+          149.22,
+          163.53,
+          111.744
+        ]
+      },
+      "twoImmediateDrain/wallMs": {
+        "min": 59.27716699999999,
+        "median": 66.03495800000002,
+        "max": 128.316917,
+        "samples": [
+          65.08025,
+          59.27716699999999,
+          128.316917,
+          109.11066699999998,
+          66.03495800000002
+        ]
+      },
+      "twoImmediateDrain/cpuMs": {
+        "min": 104.309,
+        "median": 116.078,
+        "max": 163.695,
+        "samples": [
+          116.078,
+          104.309,
+          149.991,
+          163.695,
+          111.843
+        ]
+      },
+      "turn22/wallMs": {
+        "min": 60.12804199999999,
+        "median": 66.74116700000002,
+        "max": 129.19399999999996,
+        "samples": [
+          65.584416,
+          60.12804199999999,
+          129.19399999999996,
+          110.534875,
+          66.74116700000002
+        ]
+      },
+      "turn22/cpuMs": {
+        "min": 108.181,
+        "median": 116.631,
+        "max": 164.693,
+        "samples": [
+          116.631,
+          108.181,
+          153.679,
+          164.693,
+          112.557
+        ]
+      },
+      "drainOnly/wallMs": {
+        "min": 0.1260000000000332,
+        "median": 0.2367919999999799,
+        "max": 0.5558330000000069,
+        "samples": [
+          0.2367919999999799,
+          0.40125000000000455,
+          0.5558330000000069,
+          0.1968339999999671,
+          0.1260000000000332
+        ]
+      },
+      "drainOnly/cpuMs": {
+        "min": 0.09900000000000375,
+        "median": 0.20000000000000284,
+        "max": 0.771000000000015,
+        "samples": [
+          0.20000000000000284,
+          0.5229999999999961,
+          0.771000000000015,
+          0.16499999999999204,
+          0.09900000000000375
+        ]
+      },
+      "postTurn2/wallMs": {
+        "min": 0.5041659999999979,
+        "median": 0.850875000000002,
+        "max": 1.4242080000000215,
+        "samples": [
+          0.5041659999999979,
+          0.850875000000002,
+          0.8770829999999705,
+          1.4242080000000215,
+          0.7062090000000012
+        ]
+      },
+      "postTurn2/cpuMs": {
+        "min": 0.5529999999999973,
+        "median": 0.9980000000000189,
+        "max": 3.872,
+        "samples": [
+          0.5529999999999973,
+          3.872,
+          3.687999999999988,
+          0.9980000000000189,
+          0.7139999999999986
+        ]
+      }
+    },
+    "candidate": {
+      "sync/wallMs": {
+        "min": 44.40270799999996,
+        "median": 60.46625,
+        "max": 74.28633299999998,
+        "samples": [
+          44.40270799999996,
+          60.46625,
+          63.191959,
+          48.902375000000006,
+          74.28633299999998
+        ]
+      },
+      "sync/cpuMs": {
+        "min": 67.234,
+        "median": 92.237,
+        "max": 102.92,
+        "samples": [
+          68.949,
+          93.808,
+          92.237,
+          67.234,
+          102.92
+        ]
+      },
+      "twoImmediateDrain/wallMs": {
+        "min": 49.156791999999996,
+        "median": 60.633084000000025,
+        "max": 74.47833299999999,
+        "samples": [
+          52.548707999999976,
+          60.633084000000025,
+          63.391999999999996,
+          49.156791999999996,
+          74.47833299999999
+        ]
+      },
+      "twoImmediateDrain/cpuMs": {
+        "min": 67.422,
+        "median": 93.942,
+        "max": 103.075,
+        "samples": [
+          94.165,
+          93.942,
+          92.397,
+          67.422,
+          103.075
+        ]
+      },
+      "turn22/wallMs": {
+        "min": 49.93399999999997,
+        "median": 61.531667,
+        "max": 75.02766699999998,
+        "samples": [
+          53.374540999999965,
+          61.531667,
+          64.56766700000003,
+          49.93399999999997,
+          75.02766699999998
+        ]
+      },
+      "turn22/cpuMs": {
+        "min": 68.324,
+        "median": 94.716,
+        "max": 103.651,
+        "samples": [
+          95.044,
+          94.716,
+          93.294,
+          68.324,
+          103.651
+        ]
+      },
+      "drainOnly/wallMs": {
+        "min": 0.1668340000000228,
+        "median": 0.2000409999999988,
+        "max": 8.146000000000015,
+        "samples": [
+          8.146000000000015,
+          0.1668340000000228,
+          0.2000409999999988,
+          0.25441699999998946,
+          0.19200000000000728
+        ]
+      },
+      "drainOnly/cpuMs": {
+        "min": 0.13399999999998613,
+        "median": 0.1600000000000108,
+        "max": 25.216000000000008,
+        "samples": [
+          25.216000000000008,
+          0.13399999999998613,
+          0.1600000000000108,
+          0.1880000000000024,
+          0.15500000000000114
+        ]
+      },
+      "postTurn2/wallMs": {
+        "min": 0.5493339999999876,
+        "median": 0.8258329999999887,
+        "max": 1.1756670000000327,
+        "samples": [
+          0.8258329999999887,
+          0.8985829999999737,
+          1.1756670000000327,
+          0.7772079999999733,
+          0.5493339999999876
+        ]
+      },
+      "postTurn2/cpuMs": {
+        "min": 0.5759999999999934,
+        "median": 0.8789999999999907,
+        "max": 0.902000000000001,
+        "samples": [
+          0.8789999999999907,
+          0.7740000000000009,
+          0.8969999999999914,
+          0.902000000000001,
+          0.5759999999999934
+        ]
+      }
+    }
+  },
+  "traces": {
+    "trace-pending-author-before": {
+      "syncSchedulers": {
+        "scheduled": 100,
+        "executed": 0,
+        "cancelled": 0,
+        "failedScheduling": 0,
+        "current": 100,
+        "maxQueue": 100
+      },
+      "lastSchedulers": {
+        "scheduled": 100,
+        "executed": 100,
+        "cancelled": 0,
+        "failedScheduling": 0,
+        "current": 0,
+        "maxQueue": 100
+      },
+      "syncCounters": {
+        "Lifecycle.ownerTransition": 200,
+        "Source.prepare": 100,
+        "Source.prepare.metadata": 100,
+        "Source.prepare.metadata.sum0": 0,
+        "Source.prepare.metadata.sum1": 100,
+        "Source.prepare.metadata.sum2": 100,
+        "Source.prepare.metadata.sum3": 100,
+        "Native.prepare": 100,
+        "Lifecycle.prepareNativeRequirement": 100,
+        "Lifecycle.finalizeNativeRequirement": 100,
+        "Source.complete": 100,
+        "Native.complete": 100,
+        "Lifecycle.deliverNativeRequirementReady": 100,
+        "Lifecycle.notifyRequirement": 100,
+        "scheduler.scheduled:queueMicrotask:/kernel/dist/lib/path-notifier.js:1:5358": 100
+      },
+      "laterCounterChanges": {
+        "scheduler.executed:queueMicrotask:/kernel/dist/lib/path-notifier.js:1:5358": 100
+      },
+      "gc": [
+        {
+          "startTime": 856.495959,
+          "duration": 6.571000099182129,
+          "kind": 4,
+          "flags": 4,
+          "deliveryPhase": "turn-2"
+        },
+        {
+          "startTime": 863.073167,
+          "duration": 6.166458010673523,
+          "kind": 4,
+          "flags": 4,
+          "deliveryPhase": "turn-2"
+        },
+        {
+          "startTime": 869.248584,
+          "duration": 8.699416041374207,
+          "kind": 4,
+          "flags": 4,
+          "deliveryPhase": "turn-2"
+        },
+        {
+          "startTime": 877.952542,
+          "duration": 6.489750027656555,
+          "kind": 4,
+          "flags": 4,
+          "deliveryPhase": "turn-2"
+        }
+      ],
+      "syncTime": 940.547959,
+      "gcTimingLimit": "GC delivery phase is not occurrence phase; compare startTime with syncTime; priming forced GCs may precede measured scope."
+    },
+    "trace-pending-author-candidate": {
+      "syncSchedulers": {
+        "scheduled": 100,
+        "executed": 0,
+        "cancelled": 0,
+        "failedScheduling": 0,
+        "current": 100,
+        "maxQueue": 100
+      },
+      "lastSchedulers": {
+        "scheduled": 100,
+        "executed": 100,
+        "cancelled": 0,
+        "failedScheduling": 0,
+        "current": 0,
+        "maxQueue": 100
+      },
+      "syncCounters": {
+        "Lifecycle.ownerTransition": 200,
+        "Source.prepare": 100,
+        "Source.prepare.metadata": 100,
+        "Source.prepare.metadata.sum0": 0,
+        "Source.prepare.metadata.sum1": 100,
+        "Source.prepare.metadata.sum2": 100,
+        "Source.prepare.metadata.sum3": 100,
+        "Native.prepare": 100,
+        "Lifecycle.prepareNativeRequirement": 100,
+        "Lifecycle.finalizeNativeRequirement": 100,
+        "Source.complete": 100,
+        "Native.complete": 100,
+        "Lifecycle.deliverNativeRequirementReady": 100,
+        "Lifecycle.notifyRequirement": 100,
+        "scheduler.scheduled:queueMicrotask:/kernel/dist/lib/path-notifier.js:1:5358": 100
+      },
+      "laterCounterChanges": {
+        "scheduler.executed:queueMicrotask:/kernel/dist/lib/path-notifier.js:1:5358": 100
+      },
+      "gc": [
+        {
+          "startTime": 934.212042,
+          "duration": 7.419000029563904,
+          "kind": 4,
+          "flags": 4,
+          "deliveryPhase": "turn-2"
+        },
+        {
+          "startTime": 941.63925,
+          "duration": 10.831666946411133,
+          "kind": 4,
+          "flags": 4,
+          "deliveryPhase": "turn-2"
+        },
+        {
+          "startTime": 952.487167,
+          "duration": 9.907917022705078,
+          "kind": 4,
+          "flags": 4,
+          "deliveryPhase": "turn-2"
+        },
+        {
+          "startTime": 962.405959,
+          "duration": 8.036374926567078,
+          "kind": 4,
+          "flags": 4,
+          "deliveryPhase": "turn-2"
+        }
+      ],
+      "syncTime": 1020.094875,
+      "gcTimingLimit": "GC delivery phase is not occurrence phase; compare startTime with syncTime; priming forced GCs may precede measured scope."
+    },
+    "trace-pending-settle-before": {
+      "syncSchedulers": {
+        "scheduled": 111,
+        "executed": 0,
+        "cancelled": 0,
+        "failedScheduling": 0,
+        "current": 111,
+        "maxQueue": 111
+      },
+      "lastSchedulers": {
+        "scheduled": 111,
+        "executed": 111,
+        "cancelled": 0,
+        "failedScheduling": 0,
+        "current": 0,
+        "maxQueue": 111
+      },
+      "syncCounters": {
+        "Source.prepare": 100,
+        "Source.prepare.metadata": 100,
+        "Source.prepare.metadata.sum0": 0,
+        "Source.prepare.metadata.sum1": 0,
+        "Source.prepare.metadata.sum2": 100,
+        "Source.prepare.metadata.sum3": 100,
+        "Native.prepare": 100,
+        "Lifecycle.prepareNativeRequirement": 100,
+        "Lifecycle.finalizeNativeRequirement": 100,
+        "scheduler.scheduled:queueMicrotask:/kernel/dist/lib/path-notifier.js:1:5358": 1,
+        "Source.complete": 100,
+        "Native.complete": 100,
+        "Lifecycle.deliverNativeRequirementReady": 100,
+        "Lifecycle.notifyRequirement": 100,
+        "Lifecycle.ownerTransition": 100,
+        "scheduler.scheduled:queueMicrotask:/kernel/dist/lib/experimental-publication/lifecycle.js:1:3372": 100,
+        "Lifecycle.ownerWake": 100,
+        "Lifecycle.notifyOwnerTransition": 100,
+        "scheduler.scheduled:queueMicrotask:/kernel/dist/enhancers/transactions/transactions.js:1:22699": 10
+      },
+      "laterCounterChanges": {
+        "scheduler.executed:queueMicrotask:/kernel/dist/lib/path-notifier.js:1:5358": 1,
+        "scheduler.executed:queueMicrotask:/kernel/dist/lib/experimental-publication/lifecycle.js:1:3372": 100,
+        "scheduler.executed:queueMicrotask:/kernel/dist/enhancers/transactions/transactions.js:1:22699": 10
+      },
+      "gc": [
+        {
+          "startTime": 1131.466458,
+          "duration": 7.518082976341248,
+          "kind": 4,
+          "flags": 4,
+          "deliveryPhase": "turn-2"
+        },
+        {
+          "startTime": 1138.991041,
+          "duration": 6.504834055900574,
+          "kind": 4,
+          "flags": 4,
+          "deliveryPhase": "turn-2"
+        },
+        {
+          "startTime": 1145.501291,
+          "duration": 6.04620897769928,
+          "kind": 4,
+          "flags": 4,
+          "deliveryPhase": "turn-2"
+        },
+        {
+          "startTime": 1151.551,
+          "duration": 10.066499948501587,
+          "kind": 4,
+          "flags": 4,
+          "deliveryPhase": "turn-2"
+        }
+      ],
+      "syncTime": 1192.691833,
+      "gcTimingLimit": "GC delivery phase is not occurrence phase; compare startTime with syncTime; priming forced GCs may precede measured scope."
+    },
+    "trace-pending-settle-candidate": {
+      "syncSchedulers": {
+        "scheduled": 111,
+        "executed": 0,
+        "cancelled": 0,
+        "failedScheduling": 0,
+        "current": 111,
+        "maxQueue": 111
+      },
+      "lastSchedulers": {
+        "scheduled": 111,
+        "executed": 111,
+        "cancelled": 0,
+        "failedScheduling": 0,
+        "current": 0,
+        "maxQueue": 111
+      },
+      "syncCounters": {
+        "Source.prepare": 100,
+        "Source.prepare.metadata": 100,
+        "Source.prepare.metadata.sum0": 0,
+        "Source.prepare.metadata.sum1": 0,
+        "Source.prepare.metadata.sum2": 100,
+        "Source.prepare.metadata.sum3": 100,
+        "Native.prepare": 100,
+        "Lifecycle.prepareNativeRequirement": 100,
+        "Lifecycle.finalizeNativeRequirement": 100,
+        "scheduler.scheduled:queueMicrotask:/kernel/dist/lib/path-notifier.js:1:5358": 1,
+        "Source.complete": 100,
+        "Native.complete": 100,
+        "Lifecycle.deliverNativeRequirementReady": 100,
+        "Lifecycle.notifyRequirement": 100,
+        "Lifecycle.ownerTransition": 100,
+        "scheduler.scheduled:queueMicrotask:/kernel/dist/lib/experimental-publication/lifecycle.js:1:3549": 100,
+        "Lifecycle.ownerWake": 100,
+        "Lifecycle.notifyOwnerTransition": 100,
+        "scheduler.scheduled:queueMicrotask:/kernel/dist/enhancers/transactions/transactions.js:1:22699": 10
+      },
+      "laterCounterChanges": {
+        "scheduler.executed:queueMicrotask:/kernel/dist/lib/path-notifier.js:1:5358": 1,
+        "scheduler.executed:queueMicrotask:/kernel/dist/lib/experimental-publication/lifecycle.js:1:3549": 100,
+        "scheduler.executed:queueMicrotask:/kernel/dist/enhancers/transactions/transactions.js:1:22699": 10
+      },
+      "gc": [
+        {
+          "startTime": 930.295292,
+          "duration": 6.674791932106018,
+          "kind": 4,
+          "flags": 4,
+          "deliveryPhase": "turn-2"
+        },
+        {
+          "startTime": 936.973709,
+          "duration": 7.283125042915344,
+          "kind": 4,
+          "flags": 4,
+          "deliveryPhase": "turn-2"
+        },
+        {
+          "startTime": 944.261125,
+          "duration": 9.01199996471405,
+          "kind": 4,
+          "flags": 4,
+          "deliveryPhase": "turn-2"
+        },
+        {
+          "startTime": 953.28025,
+          "duration": 6.753250002861023,
+          "kind": 4,
+          "flags": 4,
+          "deliveryPhase": "turn-2"
+        }
+      ],
+      "syncTime": 984.646,
+      "gcTimingLimit": "GC delivery phase is not occurrence phase; compare startTime with syncTime; priming forced GCs may precede measured scope."
+    },
+    "trace-point-before": {
+      "syncSchedulers": {
+        "scheduled": 0,
+        "executed": 0,
+        "cancelled": 0,
+        "failedScheduling": 0,
+        "current": 0,
+        "maxQueue": 0
+      },
+      "lastSchedulers": {
+        "scheduled": 0,
+        "executed": 0,
+        "cancelled": 0,
+        "failedScheduling": 0,
+        "current": 0,
+        "maxQueue": 0
+      },
+      "syncCounters": {
+        "Source.prepare": 2000,
+        "Source.prepare.metadata": 2000,
+        "Source.prepare.metadata.sum0": 0,
+        "Source.prepare.metadata.sum1": 0,
+        "Source.prepare.metadata.sum2": 2000,
+        "Source.prepare.metadata.sum3": 2000,
+        "Native.prepare": 2000,
+        "Lifecycle.prepareNativeRequirement": 2000,
+        "Lifecycle.finalizeNativeRequirement": 2000,
+        "Source.complete": 2000,
+        "Native.complete": 2000,
+        "Lifecycle.deliverNativeRequirementReady": 2000,
+        "Lifecycle.notifyRequirement": 2000
+      },
+      "laterCounterChanges": {},
+      "gc": [
+        {
+          "startTime": 182.310834,
+          "duration": 1.9331248998641968,
+          "kind": 1,
+          "flags": 0,
+          "deliveryPhase": "turn-2"
+        },
+        {
+          "startTime": 199.66775,
+          "duration": 2.2517499923706055,
+          "kind": 1,
+          "flags": 0,
+          "deliveryPhase": "turn-2"
+        },
+        {
+          "startTime": 213.338959,
+          "duration": 2.1822500228881836,
+          "kind": 1,
+          "flags": 0,
+          "deliveryPhase": "turn-2"
+        },
+        {
+          "startTime": 224.944334,
+          "duration": 7.142750024795532,
+          "kind": 1,
+          "flags": 0,
+          "deliveryPhase": "turn-2"
+        }
+      ],
+      "syncTime": 237.600209,
+      "gcTimingLimit": "GC delivery phase is not occurrence phase; compare startTime with syncTime; priming forced GCs may precede measured scope."
+    },
+    "trace-point-candidate": {
+      "syncSchedulers": {
+        "scheduled": 0,
+        "executed": 0,
+        "cancelled": 0,
+        "failedScheduling": 0,
+        "current": 0,
+        "maxQueue": 0
+      },
+      "lastSchedulers": {
+        "scheduled": 0,
+        "executed": 0,
+        "cancelled": 0,
+        "failedScheduling": 0,
+        "current": 0,
+        "maxQueue": 0
+      },
+      "syncCounters": {
+        "Source.prepare": 2000,
+        "Source.prepare.metadata": 2000,
+        "Source.prepare.metadata.sum0": 0,
+        "Source.prepare.metadata.sum1": 0,
+        "Source.prepare.metadata.sum2": 2000,
+        "Source.prepare.metadata.sum3": 2000,
+        "Native.preparePoint": 2000,
+        "Lifecycle.prepareNativeRequirement": 2000,
+        "Lifecycle.finalizeNativeRequirement": 2000,
+        "Source.complete": 2000,
+        "Native.complete": 2000,
+        "Lifecycle.deliverNativeRequirementReady": 2000,
+        "Lifecycle.notifyRequirement": 2000
+      },
+      "laterCounterChanges": {},
+      "gc": [
+        {
+          "startTime": 181.931833,
+          "duration": 1.924375057220459,
+          "kind": 1,
+          "flags": 0,
+          "deliveryPhase": "turn-2"
+        },
+        {
+          "startTime": 192.2115,
+          "duration": 1.7869579792022705,
+          "kind": 1,
+          "flags": 0,
+          "deliveryPhase": "turn-2"
+        }
+      ],
+      "syncTime": 191.978208,
+      "gcTimingLimit": "GC delivery phase is not occurrence phase; compare startTime with syncTime; priming forced GCs may precede measured scope."
+    }
+  },
+  "allocation": {
+    "allocation-pending-author-before": {
+      "totalSampledBytes": 14888048,
+      "topSelfStacks": [
+        {
+          "bytes": 619272,
+          "function": "",
+          "url": "file:///Users/jonathanborgia/code/signaltree/.worktrees/v16-integration-candidate/dist/packages/kernel/dist/lib/internals/ordinary-entity-entries.js",
+          "line": 0,
+          "column": 332
+        },
+        {
+          "bytes": 594848,
+          "function": "withoutEntityOrdinaryChanges",
+          "url": "file:///Users/jonathanborgia/code/signaltree/.worktrees/v16-integration-candidate/dist/packages/kernel/dist/lib/internals/entity-value-transition.js",
+          "line": 0,
+          "column": 1505
+        },
+        {
+          "bytes": 545696,
+          "function": "createEntityNode",
+          "url": "file:///Users/jonathanborgia/code/signaltree/.worktrees/v16-integration-candidate/dist/packages/kernel/dist/lib/entity-signal.js",
+          "line": 0,
+          "column": 70923
+        },
+        {
+          "bytes": 427960,
+          "function": "sourceCaptureRuntime.prepareEntityResponsibility",
+          "url": "file:///Users/jonathanborgia/code/signaltree/.worktrees/v16-integration-candidate/dist/packages/kernel/dist/enhancers/transactions/transactions.js",
+          "line": 0,
+          "column": 38451
+        },
+        {
+          "bytes": 346632,
+          "function": "_runNotify",
+          "url": "file:///Users/jonathanborgia/code/signaltree/.worktrees/v16-integration-candidate/dist/packages/kernel/dist/lib/path-notifier.js",
+          "line": 0,
+          "column": 5407
+        },
+        {
+          "bytes": 277120,
+          "function": "add",
+          "url": "",
+          "line": -1,
+          "column": -1
+        },
+        {
+          "bytes": 263800,
+          "function": "Map",
+          "url": "",
+          "line": -1,
+          "column": -1
+        },
+        {
+          "bytes": 246544,
+          "function": "createDerived",
+          "url": "file:///Users/jonathanborgia/code/signaltree/.worktrees/v16-integration-candidate/dist/packages/kernel/dist/lib/internals/location-runtime.js",
+          "line": 0,
+          "column": 11200
+        },
+        {
+          "bytes": 221440,
+          "function": "prepare",
+          "url": "file:///Users/jonathanborgia/code/signaltree/.worktrees/v16-integration-candidate/dist/packages/kernel/dist/lib/experimental-publication/entity.js",
+          "line": 0,
+          "column": 4686
+        },
+        {
+          "bytes": 217416,
+          "function": "next",
+          "url": "",
+          "line": -1,
+          "column": -1
+        },
+        {
+          "bytes": 216040,
+          "function": "createWritableProjection",
+          "url": "file:///Users/jonathanborgia/code/signaltree/.worktrees/v16-integration-candidate/dist/packages/kernel/dist/lib/internals/location-runtime.js",
+          "line": 0,
+          "column": 3177
+        },
+        {
+          "bytes": 205456,
+          "function": "sort",
+          "url": "",
+          "line": -1,
+          "column": -1
+        },
+        {
+          "bytes": 171192,
+          "function": "drainCaptureBucket",
+          "url": "file:///Users/jonathanborgia/code/signaltree/.worktrees/v16-integration-candidate/dist/packages/kernel/dist/enhancers/transactions/transactions.js",
+          "line": 0,
+          "column": 27969
+        },
+        {
+          "bytes": 164736,
+          "function": "drainCaptureBucket",
+          "url": "file:///Users/jonathanborgia/code/signaltree/.worktrees/v16-integration-candidate/dist/packages/kernel/dist/enhancers/transactions/transactions.js",
+          "line": 0,
+          "column": 27969
+        },
+        {
+          "bytes": 148944,
+          "function": "drainCaptureBucket",
+          "url": "file:///Users/jonathanborgia/code/signaltree/.worktrees/v16-integration-candidate/dist/packages/kernel/dist/enhancers/transactions/transactions.js",
+          "line": 0,
+          "column": 27969
+        },
+        {
+          "bytes": 147944,
+          "function": "commitExistingSubjectValue",
+          "url": "file:///Users/jonathanborgia/code/signaltree/.worktrees/v16-integration-candidate/dist/packages/kernel/dist/lib/entity-signal.js",
+          "line": 0,
+          "column": 54616
+        },
+        {
+          "bytes": 133832,
+          "function": "receiveOrdinaryNotification",
+          "url": "file:///Users/jonathanborgia/code/signaltree/.worktrees/v16-integration-candidate/dist/packages/kernel/dist/enhancers/transactions/transactions.js",
+          "line": 0,
+          "column": 75413
+        },
+        {
+          "bytes": 131280,
+          "function": "overlay",
+          "url": "file:///Users/jonathanborgia/code/signaltree/.worktrees/v16-integration-candidate/dist/packages/kernel/dist/lib/experimental-publication/entity.js",
+          "line": 0,
+          "column": 644
+        },
+        {
+          "bytes": 128712,
+          "function": "Map",
+          "url": "",
+          "line": -1,
+          "column": -1
+        },
+        {
+          "bytes": 128064,
+          "function": "",
+          "url": "file:///Users/jonathanborgia/code/signaltree/.worktrees/v16-integration-candidate/dist/packages/kernel/dist/lib/experimental-publication/private.js",
+          "line": 0,
+          "column": 9955
+        },
+        {
+          "bytes": 127400,
+          "function": "Map",
+          "url": "",
+          "line": -1,
+          "column": -1
+        },
+        {
+          "bytes": 126592,
+          "function": "Map",
+          "url": "",
+          "line": -1,
+          "column": -1
+        },
+        {
+          "bytes": 124504,
+          "function": "Map",
+          "url": "",
+          "line": -1,
+          "column": -1
+        },
+        {
+          "bytes": 122896,
+          "function": "prepare",
+          "url": "file:///Users/jonathanborgia/code/signaltree/.worktrees/v16-integration-candidate/dist/packages/kernel/dist/lib/internals/entity-publication.js",
+          "line": 0,
+          "column": 5096
+        },
+        {
+          "bytes": 120064,
+          "function": "nativeProof",
+          "url": "file:///Users/jonathanborgia/code/signaltree/.worktrees/v16-integration-candidate/dist/packages/kernel/dist/lib/experimental-publication/lifecycle.js",
+          "line": 0,
+          "column": 10538
+        }
+      ]
+    },
+    "allocation-pending-author-candidate": {
+      "totalSampledBytes": 14835760,
+      "topSelfStacks": [
+        {
+          "bytes": 657920,
+          "function": "",
+          "url": "file:///Users/jonathanborgia/code/signaltree/.worktrees/v16-fast-point-dual-map-0/dist/packages/kernel/dist/lib/internals/ordinary-entity-entries.js",
+          "line": 0,
+          "column": 332
+        },
+        {
+          "bytes": 564480,
+          "function": "createEntityNode",
+          "url": "file:///Users/jonathanborgia/code/signaltree/.worktrees/v16-fast-point-dual-map-0/dist/packages/kernel/dist/lib/entity-signal.js",
+          "line": 0,
+          "column": 72355
+        },
+        {
+          "bytes": 539192,
+          "function": "withoutEntityOrdinaryChanges",
+          "url": "file:///Users/jonathanborgia/code/signaltree/.worktrees/v16-fast-point-dual-map-0/dist/packages/kernel/dist/lib/internals/entity-value-transition.js",
+          "line": 0,
+          "column": 1505
+        },
+        {
+          "bytes": 428192,
+          "function": "sourceCaptureRuntime.prepareEntityResponsibility",
+          "url": "file:///Users/jonathanborgia/code/signaltree/.worktrees/v16-fast-point-dual-map-0/dist/packages/kernel/dist/enhancers/transactions/transactions.js",
+          "line": 0,
+          "column": 38451
+        },
+        {
+          "bytes": 339120,
+          "function": "_runNotify",
+          "url": "file:///Users/jonathanborgia/code/signaltree/.worktrees/v16-fast-point-dual-map-0/dist/packages/kernel/dist/lib/path-notifier.js",
+          "line": 0,
+          "column": 5407
+        },
+        {
+          "bytes": 286704,
+          "function": "Map",
+          "url": "",
+          "line": -1,
+          "column": -1
+        },
+        {
+          "bytes": 270120,
+          "function": "add",
+          "url": "",
+          "line": -1,
+          "column": -1
+        },
+        {
+          "bytes": 249712,
+          "function": "next",
+          "url": "",
+          "line": -1,
+          "column": -1
+        },
+        {
+          "bytes": 243464,
+          "function": "createDerived",
+          "url": "file:///Users/jonathanborgia/code/signaltree/.worktrees/v16-fast-point-dual-map-0/dist/packages/kernel/dist/lib/internals/location-runtime.js",
+          "line": 0,
+          "column": 11200
+        },
+        {
+          "bytes": 219392,
+          "function": "prepare",
+          "url": "file:///Users/jonathanborgia/code/signaltree/.worktrees/v16-fast-point-dual-map-0/dist/packages/kernel/dist/lib/experimental-publication/entity.js",
+          "line": 0,
+          "column": 10708
+        },
+        {
+          "bytes": 219000,
+          "function": "sort",
+          "url": "",
+          "line": -1,
+          "column": -1
+        },
+        {
+          "bytes": 217960,
+          "function": "createWritableProjection",
+          "url": "file:///Users/jonathanborgia/code/signaltree/.worktrees/v16-fast-point-dual-map-0/dist/packages/kernel/dist/lib/internals/location-runtime.js",
+          "line": 0,
+          "column": 3177
+        },
+        {
+          "bytes": 206592,
+          "function": "drainCaptureBucket",
+          "url": "file:///Users/jonathanborgia/code/signaltree/.worktrees/v16-fast-point-dual-map-0/dist/packages/kernel/dist/enhancers/transactions/transactions.js",
+          "line": 0,
+          "column": 27969
+        },
+        {
+          "bytes": 183984,
+          "function": "drainCaptureBucket",
+          "url": "file:///Users/jonathanborgia/code/signaltree/.worktrees/v16-fast-point-dual-map-0/dist/packages/kernel/dist/enhancers/transactions/transactions.js",
+          "line": 0,
+          "column": 27969
+        },
+        {
+          "bytes": 162648,
+          "function": "drainCaptureBucket",
+          "url": "file:///Users/jonathanborgia/code/signaltree/.worktrees/v16-fast-point-dual-map-0/dist/packages/kernel/dist/enhancers/transactions/transactions.js",
+          "line": 0,
+          "column": 27969
+        },
+        {
+          "bytes": 149928,
+          "function": "",
+          "url": "file:///Users/jonathanborgia/code/signaltree/.worktrees/v16-fast-point-dual-map-0/dist/packages/kernel/dist/lib/experimental-publication/private.js",
+          "line": 0,
+          "column": 9955
+        },
+        {
+          "bytes": 144616,
+          "function": "commitExistingSubjectValue",
+          "url": "file:///Users/jonathanborgia/code/signaltree/.worktrees/v16-fast-point-dual-map-0/dist/packages/kernel/dist/lib/entity-signal.js",
+          "line": 0,
+          "column": 54858
+        },
+        {
+          "bytes": 133080,
+          "function": "Map",
+          "url": "",
+          "line": -1,
+          "column": -1
+        },
+        {
+          "bytes": 129984,
+          "function": "Map",
+          "url": "",
+          "line": -1,
+          "column": -1
+        },
+        {
+          "bytes": 127400,
+          "function": "Map",
+          "url": "",
+          "line": -1,
+          "column": -1
+        },
+        {
+          "bytes": 123200,
+          "function": "next",
+          "url": "",
+          "line": -1,
+          "column": -1
+        },
+        {
+          "bytes": 122840,
+          "function": "ordinaryEntityEntries",
+          "url": "file:///Users/jonathanborgia/code/signaltree/.worktrees/v16-fast-point-dual-map-0/dist/packages/kernel/dist/lib/internals/ordinary-entity-entries.js",
+          "line": 0,
+          "column": 146
+        },
+        {
+          "bytes": 120864,
+          "function": "bindLocation",
+          "url": "file:///Users/jonathanborgia/code/signaltree/.worktrees/v16-fast-point-dual-map-0/dist/packages/kernel/dist/lib/entity-signal.js",
+          "line": 0,
+          "column": 73762
+        },
+        {
+          "bytes": 119872,
+          "function": "overlay",
+          "url": "file:///Users/jonathanborgia/code/signaltree/.worktrees/v16-fast-point-dual-map-0/dist/packages/kernel/dist/lib/experimental-publication/entity.js",
+          "line": 0,
+          "column": 644
+        },
+        {
+          "bytes": 119648,
+          "function": "Map",
+          "url": "",
+          "line": -1,
+          "column": -1
+        }
+      ]
+    },
+    "allocation-pending-settle-before": {
+      "totalSampledBytes": 14125128,
+      "topSelfStacks": [
+        {
+          "bytes": 1197344,
+          "function": "",
+          "url": "file:///Users/jonathanborgia/code/signaltree/.worktrees/v16-integration-candidate/dist/packages/kernel/dist/enhancers/transactions/transactions.js",
+          "line": 0,
+          "column": 81331
+        },
+        {
+          "bytes": 1030416,
+          "function": "",
+          "url": "file:///Users/jonathanborgia/code/signaltree/.worktrees/v16-integration-candidate/dist/packages/kernel/dist/lib/path-notifier.js",
+          "line": 0,
+          "column": 7439
+        },
+        {
+          "bytes": 644400,
+          "function": "ordinaryEntityEntry",
+          "url": "file:///Users/jonathanborgia/code/signaltree/.worktrees/v16-integration-candidate/dist/packages/kernel/dist/lib/internals/entity-value-transition.js",
+          "line": 0,
+          "column": 905
+        },
+        {
+          "bytes": 546800,
+          "function": "createEntityNode",
+          "url": "file:///Users/jonathanborgia/code/signaltree/.worktrees/v16-integration-candidate/dist/packages/kernel/dist/lib/entity-signal.js",
+          "line": 0,
+          "column": 70923
+        },
+        {
+          "bytes": 440304,
+          "function": "",
+          "url": "file:///Users/jonathanborgia/code/signaltree/.worktrees/v16-integration-candidate/dist/packages/kernel/dist/enhancers/transactions/transactions.js",
+          "line": 0,
+          "column": 81421
+        },
+        {
+          "bytes": 313464,
+          "function": "createWritableProjection",
+          "url": "file:///Users/jonathanborgia/code/signaltree/.worktrees/v16-integration-candidate/dist/packages/kernel/dist/lib/internals/location-runtime.js",
+          "line": 0,
+          "column": 3177
+        },
+        {
+          "bytes": 287760,
+          "function": "add",
+          "url": "",
+          "line": -1,
+          "column": -1
+        },
+        {
+          "bytes": 276808,
+          "function": "createDerived",
+          "url": "file:///Users/jonathanborgia/code/signaltree/.worktrees/v16-integration-candidate/dist/packages/kernel/dist/lib/internals/location-runtime.js",
+          "line": 0,
+          "column": 11200
+        },
+        {
+          "bytes": 250704,
+          "function": "Map",
+          "url": "",
+          "line": -1,
+          "column": -1
+        },
+        {
+          "bytes": 203392,
+          "function": "prepare",
+          "url": "file:///Users/jonathanborgia/code/signaltree/.worktrees/v16-integration-candidate/dist/packages/kernel/dist/lib/experimental-publication/entity.js",
+          "line": 0,
+          "column": 4686
+        },
+        {
+          "bytes": 188880,
+          "function": "",
+          "url": "file:///Users/jonathanborgia/code/signaltree/.worktrees/v16-integration-candidate/dist/packages/kernel/dist/lib/experimental-publication/private.js",
+          "line": 0,
+          "column": 9955
+        },
+        {
+          "bytes": 169784,
+          "function": "_runNotify",
+          "url": "file:///Users/jonathanborgia/code/signaltree/.worktrees/v16-integration-candidate/dist/packages/kernel/dist/lib/path-notifier.js",
+          "line": 0,
+          "column": 5407
+        },
+        {
+          "bytes": 139304,
+          "function": "next",
+          "url": "",
+          "line": -1,
+          "column": -1
+        },
+        {
+          "bytes": 130304,
+          "function": "overlay",
+          "url": "file:///Users/jonathanborgia/code/signaltree/.worktrees/v16-integration-candidate/dist/packages/kernel/dist/lib/experimental-publication/entity.js",
+          "line": 0,
+          "column": 644
+        },
+        {
+          "bytes": 126976,
+          "function": "prepareSelectedOperation",
+          "url": "file:///Users/jonathanborgia/code/signaltree/.worktrees/v16-integration-candidate/dist/packages/kernel/dist/lib/internals/causal-runtime/tree-realization-adapter.js",
+          "line": 0,
+          "column": 14291
+        },
+        {
+          "bytes": 124856,
+          "function": "getPendingRollbackPlan",
+          "url": "file:///Users/jonathanborgia/code/signaltree/.worktrees/v16-integration-candidate/dist/packages/kernel/dist/enhancers/transactions/transactions.js",
+          "line": 0,
+          "column": 14819
+        },
+        {
+          "bytes": 123592,
+          "function": "filter",
+          "url": "",
+          "line": -1,
+          "column": -1
+        },
+        {
+          "bytes": 122496,
+          "function": "Set",
+          "url": "",
+          "line": -1,
+          "column": -1
+        },
+        {
+          "bytes": 117664,
+          "function": "prepare",
+          "url": "file:///Users/jonathanborgia/code/signaltree/.worktrees/v16-integration-candidate/dist/packages/kernel/dist/lib/internals/entity-publication.js",
+          "line": 0,
+          "column": 5096
+        },
+        {
+          "bytes": 102504,
+          "function": "flatMap",
+          "url": "",
+          "line": -1,
+          "column": -1
+        },
+        {
+          "bytes": 99440,
+          "function": "nativeProof",
+          "url": "file:///Users/jonathanborgia/code/signaltree/.worktrees/v16-integration-candidate/dist/packages/kernel/dist/lib/experimental-publication/lifecycle.js",
+          "line": 0,
+          "column": 10538
+        },
+        {
+          "bytes": 97680,
+          "function": "flatMap",
+          "url": "",
+          "line": -1,
+          "column": -1
+        },
+        {
+          "bytes": 95920,
+          "function": "Set",
+          "url": "",
+          "line": -1,
+          "column": -1
+        },
+        {
+          "bytes": 95480,
+          "function": "next",
+          "url": "",
+          "line": -1,
+          "column": -1
+        },
+        {
+          "bytes": 94528,
+          "function": "composePublication",
+          "url": "file:///Users/jonathanborgia/code/signaltree/.worktrees/v16-integration-candidate/dist/packages/kernel/dist/lib/internals/intrinsic-mutation.js",
+          "line": 0,
+          "column": 3799
+        }
+      ]
+    },
+    "allocation-pending-settle-candidate": {
+      "totalSampledBytes": 13939984,
+      "topSelfStacks": [
+        {
+          "bytes": 1255896,
+          "function": "",
+          "url": "file:///Users/jonathanborgia/code/signaltree/.worktrees/v16-fast-point-dual-map-0/dist/packages/kernel/dist/enhancers/transactions/transactions.js",
+          "line": 0,
+          "column": 81331
+        },
+        {
+          "bytes": 970984,
+          "function": "",
+          "url": "file:///Users/jonathanborgia/code/signaltree/.worktrees/v16-fast-point-dual-map-0/dist/packages/kernel/dist/lib/path-notifier.js",
+          "line": 0,
+          "column": 7439
+        },
+        {
+          "bytes": 712368,
+          "function": "ordinaryEntityEntry",
+          "url": "file:///Users/jonathanborgia/code/signaltree/.worktrees/v16-fast-point-dual-map-0/dist/packages/kernel/dist/lib/internals/entity-value-transition.js",
+          "line": 0,
+          "column": 905
+        },
+        {
+          "bytes": 548912,
+          "function": "createEntityNode",
+          "url": "file:///Users/jonathanborgia/code/signaltree/.worktrees/v16-fast-point-dual-map-0/dist/packages/kernel/dist/lib/entity-signal.js",
+          "line": 0,
+          "column": 72355
+        },
+        {
+          "bytes": 413296,
+          "function": "",
+          "url": "file:///Users/jonathanborgia/code/signaltree/.worktrees/v16-fast-point-dual-map-0/dist/packages/kernel/dist/enhancers/transactions/transactions.js",
+          "line": 0,
+          "column": 81421
+        },
+        {
+          "bytes": 319416,
+          "function": "createWritableProjection",
+          "url": "file:///Users/jonathanborgia/code/signaltree/.worktrees/v16-fast-point-dual-map-0/dist/packages/kernel/dist/lib/internals/location-runtime.js",
+          "line": 0,
+          "column": 3177
+        },
+        {
+          "bytes": 277320,
+          "function": "add",
+          "url": "",
+          "line": -1,
+          "column": -1
+        },
+        {
+          "bytes": 274856,
+          "function": "createDerived",
+          "url": "file:///Users/jonathanborgia/code/signaltree/.worktrees/v16-fast-point-dual-map-0/dist/packages/kernel/dist/lib/internals/location-runtime.js",
+          "line": 0,
+          "column": 11200
+        },
+        {
+          "bytes": 254904,
+          "function": "Map",
+          "url": "",
+          "line": -1,
+          "column": -1
+        },
+        {
+          "bytes": 187024,
+          "function": "prepare",
+          "url": "file:///Users/jonathanborgia/code/signaltree/.worktrees/v16-fast-point-dual-map-0/dist/packages/kernel/dist/lib/experimental-publication/entity.js",
+          "line": 0,
+          "column": 10708
+        },
+        {
+          "bytes": 179360,
+          "function": "",
+          "url": "file:///Users/jonathanborgia/code/signaltree/.worktrees/v16-fast-point-dual-map-0/dist/packages/kernel/dist/lib/experimental-publication/private.js",
+          "line": 0,
+          "column": 9955
+        },
+        {
+          "bytes": 152976,
+          "function": "_runNotify",
+          "url": "file:///Users/jonathanborgia/code/signaltree/.worktrees/v16-fast-point-dual-map-0/dist/packages/kernel/dist/lib/path-notifier.js",
+          "line": 0,
+          "column": 5407
+        },
+        {
+          "bytes": 144608,
+          "function": "next",
+          "url": "",
+          "line": -1,
+          "column": -1
+        },
+        {
+          "bytes": 123616,
+          "function": "getPendingRollbackPlan",
+          "url": "file:///Users/jonathanborgia/code/signaltree/.worktrees/v16-fast-point-dual-map-0/dist/packages/kernel/dist/enhancers/transactions/transactions.js",
+          "line": 0,
+          "column": 14819
+        },
+        {
+          "bytes": 119960,
+          "function": "next",
+          "url": "",
+          "line": -1,
+          "column": -1
+        },
+        {
+          "bytes": 113760,
+          "function": "filter",
+          "url": "",
+          "line": -1,
+          "column": -1
+        },
+        {
+          "bytes": 113688,
+          "function": "prepareSelectedOperation",
+          "url": "file:///Users/jonathanborgia/code/signaltree/.worktrees/v16-fast-point-dual-map-0/dist/packages/kernel/dist/lib/internals/causal-runtime/tree-realization-adapter.js",
+          "line": 0,
+          "column": 14291
+        },
+        {
+          "bytes": 111504,
+          "function": "flatMap",
+          "url": "",
+          "line": -1,
+          "column": -1
+        },
+        {
+          "bytes": 110408,
+          "function": "nativeProof",
+          "url": "file:///Users/jonathanborgia/code/signaltree/.worktrees/v16-fast-point-dual-map-0/dist/packages/kernel/dist/lib/experimental-publication/lifecycle.js",
+          "line": 0,
+          "column": 10741
+        },
+        {
+          "bytes": 94240,
+          "function": "Set",
+          "url": "",
+          "line": -1,
+          "column": -1
+        },
+        {
+          "bytes": 93424,
+          "function": "overlay",
+          "url": "file:///Users/jonathanborgia/code/signaltree/.worktrees/v16-fast-point-dual-map-0/dist/packages/kernel/dist/lib/experimental-publication/entity.js",
+          "line": 0,
+          "column": 644
+        },
+        {
+          "bytes": 92968,
+          "function": "flatMap",
+          "url": "",
+          "line": -1,
+          "column": -1
+        },
+        {
+          "bytes": 91304,
+          "function": "composePublication",
+          "url": "file:///Users/jonathanborgia/code/signaltree/.worktrees/v16-fast-point-dual-map-0/dist/packages/kernel/dist/lib/internals/intrinsic-mutation.js",
+          "line": 0,
+          "column": 3799
+        },
+        {
+          "bytes": 89528,
+          "function": "prepare",
+          "url": "file:///Users/jonathanborgia/code/signaltree/.worktrees/v16-fast-point-dual-map-0/dist/packages/kernel/dist/lib/internals/entity-publication.js",
+          "line": 0,
+          "column": 6058
+        },
+        {
+          "bytes": 87256,
+          "function": "Set",
+          "url": "",
+          "line": -1,
+          "column": -1
+        }
+      ]
+    },
+    "allocation-point-before": {
+      "totalSampledBytes": 62672728,
+      "topSelfStacks": [
+        {
+          "bytes": 7393552,
+          "function": "prepare",
+          "url": "file:///Users/jonathanborgia/code/signaltree/.worktrees/v16-integration-candidate/dist/packages/kernel/dist/lib/experimental-publication/entity.js",
+          "line": 0,
+          "column": 4686
+        },
+        {
+          "bytes": 5997368,
+          "function": "Map",
+          "url": "",
+          "line": -1,
+          "column": -1
+        },
+        {
+          "bytes": 2735960,
+          "function": "next",
+          "url": "",
+          "line": -1,
+          "column": -1
+        },
+        {
+          "bytes": 2663944,
+          "function": "prepareOrdinaryTopology",
+          "url": "file:///Users/jonathanborgia/code/signaltree/.worktrees/v16-integration-candidate/dist/packages/kernel/dist/lib/entity-signal.js",
+          "line": 0,
+          "column": 24372
+        },
+        {
+          "bytes": 2630576,
+          "function": "prepare",
+          "url": "file:///Users/jonathanborgia/code/signaltree/.worktrees/v16-integration-candidate/dist/packages/kernel/dist/lib/internals/entity-publication.js",
+          "line": 0,
+          "column": 5096
+        },
+        {
+          "bytes": 2141232,
+          "function": "commitExistingSubjectValue",
+          "url": "file:///Users/jonathanborgia/code/signaltree/.worktrees/v16-integration-candidate/dist/packages/kernel/dist/lib/entity-signal.js",
+          "line": 0,
+          "column": 54616
+        },
+        {
+          "bytes": 1903568,
+          "function": "next",
+          "url": "",
+          "line": -1,
+          "column": -1
+        },
+        {
+          "bytes": 1853592,
+          "function": "Set",
+          "url": "",
+          "line": -1,
+          "column": -1
+        },
+        {
+          "bytes": 1664904,
+          "function": "nativeProof",
+          "url": "file:///Users/jonathanborgia/code/signaltree/.worktrees/v16-integration-candidate/dist/packages/kernel/dist/lib/experimental-publication/lifecycle.js",
+          "line": 0,
+          "column": 10538
+        },
+        {
+          "bytes": 1379440,
+          "function": "prepareEntityPublication",
+          "url": "file:///Users/jonathanborgia/code/signaltree/.worktrees/v16-integration-candidate/dist/packages/kernel/dist/lib/entity-signal.js",
+          "line": 0,
+          "column": 53749
+        },
+        {
+          "bytes": 1146768,
+          "function": "Map",
+          "url": "",
+          "line": -1,
+          "column": -1
+        },
+        {
+          "bytes": 980904,
+          "function": "Map",
+          "url": "",
+          "line": -1,
+          "column": -1
+        },
+        {
+          "bytes": 923016,
+          "function": "updateOnePrivate",
+          "url": "file:///Users/jonathanborgia/code/signaltree/.worktrees/v16-integration-candidate/dist/packages/kernel/dist/lib/entity-signal.js",
+          "line": 0,
+          "column": 48766
+        },
+        {
+          "bytes": 803056,
+          "function": "Set",
+          "url": "",
+          "line": -1,
+          "column": -1
+        },
+        {
+          "bytes": 772840,
+          "function": "prepareNativeRequirement",
+          "url": "file:///Users/jonathanborgia/code/signaltree/.worktrees/v16-integration-candidate/dist/packages/kernel/dist/lib/experimental-publication/lifecycle.js",
+          "line": 0,
+          "column": 11932
+        },
+        {
+          "bytes": 754800,
+          "function": "updateSignals",
+          "url": "file:///Users/jonathanborgia/code/signaltree/.worktrees/v16-integration-candidate/dist/packages/kernel/dist/lib/entity-signal.js",
+          "line": 0,
+          "column": 70325
+        },
+        {
+          "bytes": 744800,
+          "function": "evidence",
+          "url": "file:///Users/jonathanborgia/code/signaltree/.worktrees/v16-integration-candidate/dist/packages/kernel/dist/lib/experimental-publication/entity.js",
+          "line": 0,
+          "column": 2194
+        },
+        {
+          "bytes": 695712,
+          "function": "combineTerminalRecords",
+          "url": "file:///Users/jonathanborgia/code/signaltree/.worktrees/v16-integration-candidate/dist/packages/kernel/dist/lib/internals/intrinsic-mutation.js",
+          "line": 0,
+          "column": 314
+        },
+        {
+          "bytes": 686664,
+          "function": "complete",
+          "url": "file:///Users/jonathanborgia/code/signaltree/.worktrees/v16-integration-candidate/dist/packages/kernel/dist/lib/entity-signal.js",
+          "line": 0,
+          "column": 56593
+        },
+        {
+          "bytes": 670720,
+          "function": "combineTerminalRecords",
+          "url": "file:///Users/jonathanborgia/code/signaltree/.worktrees/v16-integration-candidate/dist/packages/kernel/dist/lib/internals/intrinsic-mutation.js",
+          "line": 0,
+          "column": 314
+        },
+        {
+          "bytes": 647168,
+          "function": "finalizeNativeRequirement",
+          "url": "file:///Users/jonathanborgia/code/signaltree/.worktrees/v16-integration-candidate/dist/packages/kernel/dist/lib/experimental-publication/lifecycle.js",
+          "line": 0,
+          "column": 13245
+        },
+        {
+          "bytes": 634344,
+          "function": "prepareValueTransition",
+          "url": "file:///Users/jonathanborgia/code/signaltree/.worktrees/v16-integration-candidate/dist/packages/kernel/dist/lib/physical/entity-value-store.js",
+          "line": 0,
+          "column": 273
+        },
+        {
+          "bytes": 576560,
+          "function": "derive",
+          "url": "file:///Users/jonathanborgia/code/signaltree/.worktrees/v16-integration-candidate/dist/packages/kernel/dist/lib/internals/location-runtime.js",
+          "line": 0,
+          "column": 9234
+        },
+        {
+          "bytes": 574104,
+          "function": "push",
+          "url": "",
+          "line": -1,
+          "column": -1
+        },
+        {
+          "bytes": 542096,
+          "function": "runInvalidationGroup",
+          "url": "file:///Users/jonathanborgia/code/signaltree/.worktrees/v16-integration-candidate/dist/packages/kernel/dist/lib/internals/location-runtime.js",
+          "line": 0,
+          "column": 6721
+        }
+      ]
+    },
+    "allocation-point-candidate": {
+      "totalSampledBytes": 23499016,
+      "topSelfStacks": [
+        {
+          "bytes": 2492960,
+          "function": "commitExistingSubjectValue",
+          "url": "file:///Users/jonathanborgia/code/signaltree/.worktrees/v16-fast-point-dual-map-0/dist/packages/kernel/dist/lib/entity-signal.js",
+          "line": 0,
+          "column": 54858
+        },
+        {
+          "bytes": 2028544,
+          "function": "preparePoint",
+          "url": "file:///Users/jonathanborgia/code/signaltree/.worktrees/v16-fast-point-dual-map-0/dist/packages/kernel/dist/lib/experimental-publication/entity.js",
+          "line": 0,
+          "column": 5632
+        },
+        {
+          "bytes": 1918136,
+          "function": "nativeProof",
+          "url": "file:///Users/jonathanborgia/code/signaltree/.worktrees/v16-fast-point-dual-map-0/dist/packages/kernel/dist/lib/experimental-publication/lifecycle.js",
+          "line": 0,
+          "column": 10741
+        },
+        {
+          "bytes": 1796320,
+          "function": "prepare",
+          "url": "file:///Users/jonathanborgia/code/signaltree/.worktrees/v16-fast-point-dual-map-0/dist/packages/kernel/dist/lib/internals/entity-publication.js",
+          "line": 0,
+          "column": 6058
+        },
+        {
+          "bytes": 1461328,
+          "function": "Set",
+          "url": "",
+          "line": -1,
+          "column": -1
+        },
+        {
+          "bytes": 895064,
+          "function": "updateOnePrivate",
+          "url": "file:///Users/jonathanborgia/code/signaltree/.worktrees/v16-fast-point-dual-map-0/dist/packages/kernel/dist/lib/entity-signal.js",
+          "line": 0,
+          "column": 49008
+        },
+        {
+          "bytes": 762360,
+          "function": "updateSignals",
+          "url": "file:///Users/jonathanborgia/code/signaltree/.worktrees/v16-fast-point-dual-map-0/dist/packages/kernel/dist/lib/entity-signal.js",
+          "line": 0,
+          "column": 71769
+        },
+        {
+          "bytes": 705288,
+          "function": "point",
+          "url": "file:///Users/jonathanborgia/code/signaltree/.worktrees/v16-fast-point-dual-map-0/dist/packages/kernel/dist/lib/internals/entity-publication.js",
+          "line": 0,
+          "column": 587
+        },
+        {
+          "bytes": 649944,
+          "function": "complete",
+          "url": "file:///Users/jonathanborgia/code/signaltree/.worktrees/v16-fast-point-dual-map-0/dist/packages/kernel/dist/lib/entity-signal.js",
+          "line": 0,
+          "column": 58037
+        },
+        {
+          "bytes": 579640,
+          "function": "prepareNativeRequirement",
+          "url": "file:///Users/jonathanborgia/code/signaltree/.worktrees/v16-fast-point-dual-map-0/dist/packages/kernel/dist/lib/experimental-publication/lifecycle.js",
+          "line": 0,
+          "column": 12135
+        },
+        {
+          "bytes": 557448,
+          "function": "prepareValueTransition",
+          "url": "file:///Users/jonathanborgia/code/signaltree/.worktrees/v16-fast-point-dual-map-0/dist/packages/kernel/dist/lib/physical/entity-value-store.js",
+          "line": 0,
+          "column": 273
+        },
+        {
+          "bytes": 537584,
+          "function": "runInvalidationGroup",
+          "url": "file:///Users/jonathanborgia/code/signaltree/.worktrees/v16-fast-point-dual-map-0/dist/packages/kernel/dist/lib/internals/location-runtime.js",
+          "line": 0,
+          "column": 6721
+        },
+        {
+          "bytes": 513464,
+          "function": "preparePoint",
+          "url": "file:///Users/jonathanborgia/code/signaltree/.worktrees/v16-fast-point-dual-map-0/dist/packages/kernel/dist/lib/experimental-publication/entity.js",
+          "line": 0,
+          "column": 5632
+        },
+        {
+          "bytes": 505816,
+          "function": "",
+          "url": "file:///Users/jonathanborgia/code/signaltree/.worktrees/v16-fast-point-dual-map-0/dist/packages/kernel/dist/lib/entity-signal.js",
+          "line": 0,
+          "column": 72011
+        },
+        {
+          "bytes": 503104,
+          "function": "nativeRequirement",
+          "url": "file:///Users/jonathanborgia/code/signaltree/.worktrees/v16-fast-point-dual-map-0/dist/packages/kernel/dist/lib/experimental-publication/entity.js",
+          "line": 0,
+          "column": 3867
+        },
+        {
+          "bytes": 357280,
+          "function": "Set",
+          "url": "",
+          "line": -1,
+          "column": -1
+        },
+        {
+          "bytes": 324336,
+          "function": "prepare",
+          "url": "file:///Users/jonathanborgia/code/signaltree/.worktrees/v16-fast-point-dual-map-0/dist/packages/kernel/dist/lib/internals/entity-publication.js",
+          "line": 0,
+          "column": 6058
+        },
+        {
+          "bytes": 320536,
+          "function": "",
+          "url": "file:///Users/jonathanborgia/code/signaltree/.worktrees/v16-fast-point-dual-map-0/dist/packages/kernel/dist/lib/internals/location-runtime.js",
+          "line": 0,
+          "column": 6250
+        },
+        {
+          "bytes": 287752,
+          "function": "notifyRequirement",
+          "url": "file:///Users/jonathanborgia/code/signaltree/.worktrees/v16-fast-point-dual-map-0/dist/packages/kernel/dist/lib/experimental-publication/lifecycle.js",
+          "line": 0,
+          "column": 10214
+        },
+        {
+          "bytes": 247240,
+          "function": "installTerminalRecord",
+          "url": "file:///Users/jonathanborgia/code/signaltree/.worktrees/v16-fast-point-dual-map-0/dist/packages/kernel/dist/lib/internals/intrinsic-mutation.js",
+          "line": 0,
+          "column": 30
+        },
+        {
+          "bytes": 237848,
+          "function": "notifyObservers",
+          "url": "file:///Users/jonathanborgia/code/signaltree/.worktrees/v16-fast-point-dual-map-0/dist/packages/kernel/dist/lib/internals/location-runtime.js",
+          "line": 0,
+          "column": 5024
+        },
+        {
+          "bytes": 234360,
+          "function": "keys",
+          "url": "",
+          "line": -1,
+          "column": -1
+        },
+        {
+          "bytes": 225272,
+          "function": "finalizeNativeRequirement",
+          "url": "file:///Users/jonathanborgia/code/signaltree/.worktrees/v16-fast-point-dual-map-0/dist/packages/kernel/dist/lib/experimental-publication/lifecycle.js",
+          "line": 0,
+          "column": 13448
+        },
+        {
+          "bytes": 214648,
+          "function": "keys",
+          "url": "",
+          "line": -1,
+          "column": -1
+        },
+        {
+          "bytes": 200736,
+          "function": "flatMap",
+          "url": "",
+          "line": -1,
+          "column": -1
+        }
+      ]
+    }
+  }
+}

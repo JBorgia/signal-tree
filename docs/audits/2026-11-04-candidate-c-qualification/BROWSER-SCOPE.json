@@ -1,0 +1,15 @@
+{
+  "canonicalConfig": "scripts/playwright/route-smoke.config.ts",
+  "testMatch": [
+    "route-smoke.spec.ts",
+    "v16-candidate-workflow.spec.ts",
+    "architecture-connectors.spec.ts",
+    "benchmarks.spec.ts",
+    "demo-production-bundle.spec.ts",
+    "hover-language.spec.ts",
+    "mobile-layout.spec.ts",
+    "layout-system.spec.ts",
+    "visual-language.spec.ts"
+  ],
+  "differences": "fresh own port43218, no existing server, one worker, zero retries, output in packet; all nine canonical files included"
+}

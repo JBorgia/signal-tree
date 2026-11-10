@@ -1,6 +1,6 @@
 # Current work — v16 runtime-cost disposition (HOLD)
 
-Updated November 3, 2026. This is the single active acceptance ledger. Historical
+Updated November 4, 2026. This is the single active acceptance ledger. Historical
 first failures and sealed predecessors remain evidence, not competing queues.
 
 ## Goal and authority
@@ -117,7 +117,44 @@ cost source c5aacad and qualified test source 51b1a4a remain separately bound.
 Unchanged size failures retain the owner's disposition; outer mutation, installed
 consumers and production-browser qualification are not newly claimed.
 
-## Candidate and execution identity
+## V16-PENDING-DRAIN-ATTRIBUTION-0 — diagnostic complete; no repair selected
+
+The owner supplied the Candidate C review and selected attribution before any
+optimization, then complete qualification. [Registered diagnostics and results](docs/audits/2026-11-04-pending-drain-attribution/README.md)
+complete82/82 scheduled children with no source/input drift or resource failure.
+Covered point completions are synchronous, with no added direct scheduler queue;
+pending callback counts match. The snapshot pending-increment difference is
+chiefly code/VM metadata, with no growing preparation-context population. These
+are bounded observations, not a historical drain-CPU explanation or exact owner
+storage partition. Fresh diagnostic economics remain unresolved; prior cost
+cohorts are neither replaced nor pooled. No safe runtime repair is demonstrated,
+so C9aa and frozen fe18 remain unchanged. No owner-journal redesign is opened.
+
+[C qualification record](docs/audits/2026-11-04-candidate-c-qualification/README.md)
+is now recorded on `codex/v16-pending-drain-attribution-0`:86 normal passes plus
+the owner-dispositioned numerical size failure; full kernel7205ordinary passes,
+all four frameworks and both apps; outer runner87/87 proven with the baseline-red
+size-control caveat. Restored-source clean build reproduces all193 original C
+package bytes/modes. Final installed consumers/AOT pass. All9 production-browser
+files execute:137passes, one accepted-size failure, no skips/flaky results.
+
+Fresh24-child released npm15.4.4 versus C measurements all validate without drift.
+Common ordinary construction sync CPU is101.742→767.993ms (7.55×); point total CPU
+13.444→55.972ms (4.16×); populated live-minus-baseline heap4,725,192→17,724,528B
+(3.75×). These classify C higher under the registered descriptive rule; drain is
+unresolved. They compare shared outcomes, not capability parity or unavoidable
+semantic cost. Earlier frozen/C cohorts remain separate. Passing the point-work
+bound does not close the cheap-ordinary-state goal. Runtime-cost acceptance and
+adoption remain ungranted. This finite qualification is complete; no further
+execution queue, merge, activation, tag or publication is opened. Review-branch
+push remains authorized. The default-worker resource stop and setup failures are
+recorded. One-worker orchestration changes no runtime or test assertions.
+The diagnostic archive is sealed. The temporary qualification payloads were
+unavailable at closure, so qualification is backed by the surviving summaries,
+manifests, distributions, and reviews. The audit proposes separate ordinary
+and coordinated performance criteria. No new thresholds have been adopted.
+
+## Frozen candidate and execution identity
 
 - Selected durable worktree: `/Users/jonathanborgia/code/signaltree/.worktrees/v16-integration-candidate`,
   branch `codex/v16-integration-qualification`.

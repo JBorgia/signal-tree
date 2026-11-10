@@ -1,0 +1,40 @@
+{
+  "experiment": "V16-PENDING-DRAIN-ATTRIBUTION-0",
+  "registeredAt": "2026-11-04T20:11:53.578767+00:00",
+  "baseCommit": "9aa20563b72ad73bc4a1ae736181ffebd73dc418",
+  "runtimeChanged": false,
+  "workloadChildren": 72,
+  "offlineAnalyses": 10,
+  "scheduleSha256": "b74d6f6220c7932719881c709c4e1a06e8817d867a17f94ce634dbe557ee5c39",
+  "bindingsSha256": "7c789a76f9d8048ea7205d09a600f490db8a05c44b6d7a0be4265566c7797155",
+  "runnerSha256": "ce79f938517b30f9362cd187c56aad0c1c36a5bee4e96e54d1a0a8e8e0366bbb",
+  "environmentKeys": [
+    "PATH",
+    "TZ",
+    "LANG"
+  ],
+  "scope": "Diagnostic attribution only. No SLO, adoption, prior-cohort replacement or favorable retry. All82scheduledresults retained; firstfailure stops.",
+  "controls": {
+    "HEAP-CALIBRATION.json": "52ab80a2b17d5012e571de0c9df2bfe503a162a99ec3a2f1bcf000e99d38c808",
+    "ALLOCATION-CALIBRATION.json": "7c3a31c6d99da5576f185ad2cfc159a0421895c04a7b8a0513d62c7e382123f1",
+    "TRACE-CALIBRATION.json": "7bc00b72c70cb8e01ecf6694c530fe623c021f5798f2e33d676768fa13d80519",
+    "WORKLOAD-CALIBRATION.json": "45b1467f8d7928a4202bdc371a1623aa5727320d9c23bf5aef41d42e5a7b9394"
+  },
+  "analysisRules": {
+    "scaling": "3anchor/2controlledsamples perarm; descriptive ranges only; per-treeN0/1/10/32 (global0/10/100/320), fixed33heldrows controlled, anchornotpooled.",
+    "snapshots": "Oneperfreshchildprefixcheckpoint; engine-calibratedretainedsizesnonadditive/conditional; signaturesnotowneridentification; no cross-childIDidentity.",
+    "sampling": "PoissonJSallocations inclcollected, interval1024; no nativebacking/exactbytes/timingacceptance.",
+    "trace": "CopiedAST instruments143of193originalfiles; sourcehits/schedulerwrappers/async_hooks/GCobserverperturbwork. Counts boundedtosites; no historicalwall\u2192CPUattribution.",
+    "economics": "2beforeAA+5alternatingpairs; sync/two/22turncumulativeCPUandwall separately. Directiondescriptiveonly: nonoverlapANDabsolutemediandelta>max(samearmranges,AArange). No confidenceinterval/equivalence oracceptance."
+  },
+  "resourcePolicy": {
+    "oneHeavySlot": true,
+    "ownedRssBytes": 4294967296,
+    "minimumHostFreePercentage": 25,
+    "workloadTimeoutSeconds": 240,
+    "analysisTimeoutSeconds": 600,
+    "snapshotBytesCap": 1073741824,
+    "pidBirthCleanup": true
+  },
+  "limits": "SnapshotsmayGC/allocate; extra rootsaliasexistingheldfixture only. Quiescence/22turnsnotproofallscheduledconsequencescomplete. Zero/changedownerCountchangeshandles/facts/windows, notpureownerbytes. Runtimeproposalonlyafterconcrete removable-lifetime evidence+semanticfalsifier."
+}

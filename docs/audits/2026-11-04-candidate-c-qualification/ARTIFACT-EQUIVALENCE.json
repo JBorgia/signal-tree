@@ -1,0 +1,10 @@
+{
+  "candidateCBase": "9aa20563b72ad73bc4a1ae736181ffebd73dc418",
+  "freshFiles": 193,
+  "missing": [],
+  "extra": [],
+  "contentOrExecutableChanges": [],
+  "freshManifestSha256": "bdb083a7ba599a2c5d8e4336a155591d21140148d15975b9093b79181f60619f",
+  "originalCandidateManifestSha256": "bdb083a7ba599a2c5d8e4336a155591d21140148d15975b9093b79181f60619f",
+  "meaning": "Post-mutation clean build reproduces original C193 payload bytes and executable bits; this does not qualify temporary trace copies."
+}

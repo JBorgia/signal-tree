@@ -1,0 +1,27 @@
+{
+  "arm": "released-v15",
+  "entry": "/private/tmp/st-v16-sparse-responsibility-0/released-v15/package/dist/index.js",
+  "node": "v24.15.0",
+  "pid": 74396,
+  "productionDefine": false,
+  "ngDevMode": false,
+  "workload": "original200distinctupdates;2-field rows;originalcounterunchanged;all200endpoints+untouchedrowchecked",
+  "rows": [
+    {
+      "size": 2000,
+      "total": 800,
+      "originalBound": 2000,
+      "passesOriginalBound": true,
+      "widthControl": 4000
+    },
+    {
+      "size": 20000,
+      "total": 800,
+      "originalBound": 2000,
+      "passesOriginalBound": true,
+      "widthControl": 40000
+    }
+  ],
+  "plantedCharge": 7,
+  "throwUndefinedPreserved": true
+}

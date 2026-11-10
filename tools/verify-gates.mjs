@@ -127,6 +127,9 @@ const GATES = [
       // undermine that gate too.
       `--projects=${BUILD_PROJECTS},demo,react-reference`,
       '--parallel=1',
+      // Project serialization does not bound Vitest/Jest workers. Keep the
+      // complete suite within the qualification process-tree memory guard.
+      '--maxWorkers=1',
       '--skip-nx-cache',
     ],
     slow: true,
