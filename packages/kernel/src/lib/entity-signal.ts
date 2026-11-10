@@ -1148,9 +1148,6 @@ export function createEntitySignal<
     // Point writes still prepare the same completed ordinary changes and install.
     const byStep: Array<readonly CommittedEntityMutation[]> | undefined =
       demand === 'rich' ? [] : undefined;
-    const byPhysicalSubject = demand === 'rich'
-      ? new Map<number, readonly CommittedEntityMutation[]>()
-      : undefined;
     const read = (subject: number): Presence => {
       const row = placement.read(subject);
       if (!row.present) return { present: false };
@@ -1300,15 +1297,8 @@ export function createEntitySignal<
           write(change.subject, { ...ordinary, value: change.after as E });
         }
       }
-      if (byPhysicalSubject) {
-        const previous = byPhysicalSubject.get(change.subject);
-        byPhysicalSubject.set(
-          change.subject,
-          previous === undefined ? group : [...previous, ...group]
-        );
-      }
-      byStep?.push(group);
-      selected.push(...group);
+      if (byStep) byStep.push(group);
+      else selected.push(...group);
     }
     let ordinaryEndpoints:
       | {
@@ -1367,20 +1357,33 @@ export function createEntitySignal<
       completedChanges.set(change, completed);
       return completed;
     };
-    if (byPhysicalSubject)
-      for (const [subject, group] of byPhysicalSubject)
-        byPhysicalSubject.set(subject, group.map(completeChange));
-    const completed = selected.map(completeChange);
-    if (byPhysicalSubject && byStep) return {
-      changes: completed,
-      byPhysicalSubject,
-      byStep: byStep.map((group) => group.map(completeChange)),
-      install: installPlacement,
-      interval: installPlacement.interval,
-      ordinaryEndpoints,
-    };
+    if (byStep) {
+      const byPhysicalSubject = new Map<number, CommittedEntityMutation[]>();
+      const completed: CommittedEntityMutation[] = [];
+      // Resolve final adjacency once per step. The three indexes keep their
+      // own arrays while pointing to the same completed mutation objects.
+      for (let index = 0; index < byStep.length; index++) {
+        const subject = changes[index].subject;
+        let bySubject = byPhysicalSubject.get(subject);
+        if (!bySubject) {
+          bySubject = [];
+          byPhysicalSubject.set(subject, bySubject);
+        }
+        const group = byStep[index].map(completeChange);
+        byStep[index] = group;
+        for (const change of group) {
+          bySubject.push(change);
+          completed.push(change);
+        }
+      }
+      return {
+        changes: completed, byPhysicalSubject, byStep,
+        install: installPlacement, interval: installPlacement.interval,
+        ordinaryEndpoints,
+      };
+    }
     return {
-      changes: completed,
+      changes: selected.map(completeChange),
       install: installPlacement,
       interval: installPlacement.interval,
       ordinaryEndpoints,

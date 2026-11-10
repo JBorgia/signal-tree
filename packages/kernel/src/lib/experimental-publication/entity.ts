@@ -276,7 +276,11 @@ export const createEntityPublicationParticipant: () => EntityPublicationParticip
         }
         if(edit.structural?.kind==='rekey'){nextMappingViews.set(edit.subject,{requirement});continue;}
         const row=rowViews(edit.subject);
-        const keys=edit.fields===null?[...new Set([...row.keys(),...Object.keys(edit.after??{})])]:edit.fields;
+        const keys = edit.fields === null
+          ? row.size === 0
+            ? Object.keys(edit.after ?? {})
+            : [...new Set([...row.keys(), ...Object.keys(edit.after ?? {})])]
+          : edit.fields;
         for(const key of keys)row.set(key,{requirement,present:own(edit.after,key)});
         physicalAt.set(edit,new Map(row));
         if(edit.structural?.kind==='add'){nextMappingViews.set(edit.subject,{requirement});physicalMembers.set(edit.subject,{requirement,present:true});physicalPlacements.set(edit.subject,{requirement});}
@@ -297,7 +301,11 @@ export const createEntityPublicationParticipant: () => EntityPublicationParticip
           nextMembers.set(edit.subject,{present:true,requirement});nextPlacements.set(edit.subject,requirement);nextMappings.set(edit.subject,requirement);
           writes.push({map:visible,key:edit.subject,value:{requirement,present:true}},{map:placementViews,key:edit.subject,value:{requirement}});
         }
-        const keys=edit.fields===null?[...new Set([...row.keys(),...Object.keys(edit.after??{})])]:edit.fields;
+        const keys = edit.fields === null
+          ? row.size === 0
+            ? Object.keys(edit.after ?? {})
+            : [...new Set([...row.keys(), ...Object.keys(edit.after ?? {})])]
+          : edit.fields;
         const physical=paired.get(edit);
         for(const key of keys){
           const endpoint=chosen(edit,key),fieldRequirement=endpoint.requirement as Requirement;
