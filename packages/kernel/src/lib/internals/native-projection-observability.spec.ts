@@ -9,8 +9,8 @@ import type { ObservationAdapter } from './observation-adapter';
  * if it stopped.
  *
  * Entity field carriers are `createWritableProjection` locations, and each one
- * registers a mutation source at creation: eagerly, for every field of every
- * row `byId` touches, read or not. Measured at ~35 B per field, which is
+ * registers a mutation source at creation. At the original measurement,
+ * `byId` created every field eagerly, read or not. Measured at ~35 B per field, which is
  * ~420 B/entity on a twelve-field row, so it looked like the same pay-for-use
  * cut `createCell` locations took in `SUBJECT-STATE-MINIMAL-0`.
  *
@@ -20,6 +20,8 @@ import type { ObservationAdapter } from './observation-adapter';
  * `NEUTRAL_LOCATION_RUNTIME`, so no test in this package executed
  * `native-location-realization.ts` at all; before this file, nothing did. The
  * capability was live and simply unguarded, and deleting it was silent.
+ * Deferring carrier creation until field acquisition does not remove this
+ * registration: the first exposed carrier still supports the same observer.
  *
  * Driving the runtime with a stub adapter is what makes the test possible here
  * rather than in a framework package: the realization seam is kernel-internal,
