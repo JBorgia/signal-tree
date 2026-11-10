@@ -1,9 +1,27 @@
-# Current work — v16 repairs and release qualification
+# Current release — v16 candidate qualified
 
 Updated November 10, 2026. This is the single active acceptance ledger. Historical
 first failures and sealed predecessors remain evidence, not competing queues.
 
 ## Active owner instruction
+
+**GO: v16 candidate release-qualified.** The
+[completed readiness audit](docs/audits/2026-11-10-release-readiness/README.md)
+supersedes the rejected packed artifact below. Runtime `5dca0e457` fixes derived
+graph retention and removes the dominant per-slot publication bookkeeping.
+Final qualification uses checkpoint `cd9bf4fd8` and the audit's exact five-package
+seal. All required non-size checks pass, including corrected normal gates, full
+mutation/restoration, clean installed consumers, lifecycle/reentry witnesses and
+the original 1,800-visit point result. Production browser scope is 137 passes and
+one owner-accepted size assertion. Numerical size ceilings remain unchanged.
+
+Economic acceptance follows the owner's instruction to weigh budgets against
+application impact and feasible implementation. The audit retains every missed
+provisional target: actual React readiness fits its 100 ms envelope, coordinated
+work is substantially cheaper, pending state falls 74.25%, and destroyed resources
+collect. This is an evidenced disposition, not a rewritten numerical pass.
+Qualification is complete. The candidate remains unreleased at `16.0.0-dev`;
+merge, final version/tag preparation and publication require their own authority.
 
 The owner corrected the preceding disposition: continue until v16 is ready,
 fix retention, pending memory and startup, weigh engineering budgets against
@@ -12,12 +30,12 @@ qualification without routine check-ins. That instruction supersedes the former
 stop and its requirement to hold every provisional economic allocation fixed.
 The prior measured failures and rejected exact artifact remain evidence below.
 
-The active repair branch is `codex/v16-release-readiness`, starting at
+The qualified review branch is `codex/v16-release-readiness`, starting at
 `667e4c0923ba379116bdd724dbe80fe541dad14d`. Preserve semantics, actual lifecycle
 cleanup and the original point-work bound. Attribute and repair avoidable costs;
 document any residual budget disposition using application evidence and feasible
-alternatives. Then run the required complete exact-artifact release checks,
-mutation proofs, installed consumers and production browser qualification.
+alternatives. The required complete exact-artifact release checks, mutation
+proofs, installed consumers and production browser qualification are complete.
 Routine corrective work is authorized. Branch sharing remains authorized;
 merge, tag and package publication are separate actions.
 

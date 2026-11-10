@@ -5,6 +5,13 @@ repairs the packed candidate evaluated at `667e4c0923ba379116bdd724dbe80fe541dad
 The exact before artifact remains packed runtime
 `b6acda57552affb0fdcbc0b40f1996c4345ed5d8`. Stable v15 is unchanged.
 
+**Release decision: GO — this v16 candidate is release-qualified.** The actual
+retention defect and dominant avoidable publication costs are repaired. Remaining
+economic and size costs have explicit, evidenced disposition. The complete
+functional, artifact and production-browser scope below is satisfied apart from
+the recorded size assertions. The candidate remains `16.0.0-dev` and unreleased;
+merge, final release metadata/tagging and package publication are separate actions.
+
 The owner explicitly requested repairs through readiness and instructed that
 budgets be weighed against application impact and implementation feasibility.
 The [policy registered before repair results](../../../tools/release-readiness/acceptance.json)
@@ -111,11 +118,37 @@ comparison, not proof of an unavoidable semantic lower bound.
 
 ## Qualification and evidence
 
-Full exact-artifact qualification is in progress. The final receipt will record
-the complete registry, mutation restoration, clean rebuild, installed consumers,
-production browser scope and unchanged point-work bound before a release-ready
-decision is recorded. Package/demo size retains prior explicit owner disposition;
-the numerical ceilings remain unchanged.
+Qualification ran on runtime `5dca0e457`, with the corrected harness/gate checkpoint
+`cd9bf4fd8`. Later closure edits affect only the controller, TODO and this audit.
+All five packages contain 194 files; the publication integrity seal is
+`sha256-d490182b76f94539ac78d7e37ba1dea05dee93a1d2c98ce5089a1ff01e6ccda2`.
+Deleting generated output after mutation tests and rebuilding without the cache
+reproduces all 141 measured kernel files byte-for-byte. Node 24.15.0 and pnpm
+10.17.0 are used throughout.
+
+| Required check | Result |
+| --- | --- |
+| Complete `node tools/verify-gates.mjs --release` | 84/87 pass initially; lint and source-control failures repaired and both canonical rechecks pass; only owner-accepted numerical package size remains failed |
+| Complete `--self-test --release` | Runner reports 87/87 proven, 13 indirectly; zero unproven, vacuous, blind or errored; all 3,747 tracked files restored by hash |
+| Clean uncached five-package rebuild | Pass; measured kernel byte identity verified |
+| Final tarball, strict bundler/Node16 consumers and installed Angular AOT | Pass |
+| Final coordinated common oracle | 22 result records pass; all four deliberately broken controls rejected |
+| Final isolated actual-resource retention | All nine repaired scenarios collect; v15 failures preserved as controls |
+| Exact-built late reader, retirement, public/clone reentry and frame witnesses | Pass |
+| Original unchanged point counter | 1,800 visits at both 2,000 and 20,000 rows, below strict 2,000; width and thrown-value controls pass |
+| Strict production demo build | Size-only failure: 815.40 kB versus unchanged 570 kB |
+| Production review build | Pass with only budget diagnostics temporarily overridden; source configuration restored by hash |
+| All nine canonical production browser files | 137 pass, one accepted size failure; one worker, zero retries, fresh server; no skipped/flaky cases |
+
+The size mutation reports failure against a baseline that already fails size, so
+it does not independently prove sensitivity to its planted size defect. This
+caveat is retained rather than calling all numerical checks green. The browser
+failure reaches its final size assertion: main JS is 789,705 bytes versus 570,000.
+Its prior checks for single main output, absent polyfills and retired/development
+runtimes pass. Production configuration and all committed ceilings are unchanged.
+
+Qualification does not claim the historical coverage percentages (they are not
+enforced by this registry), universal device performance, or npm publication.
 
 First failures remain in the packet. The browser measurement's initial filter
 assertion exposed its missing external-store notification task drain; the final
@@ -131,3 +164,15 @@ source review found no demonstrated blocker in weak cleanup edges or compact
 contributions. Economic review checked the raw cohorts and supported the scoped
 disposition while retaining the missed targets, memory increases and timing
 limits above. These reviews are source/evidence inspection, not substitute runs.
+The [final independent closure review](independent-review.md) recomputed the
+artifact seal and checked qualification receipts; no additional release blocker
+was demonstrated.
+
+The [validation receipt](validation.json) records commands, exact identities,
+dispositions and limits. The [evidence archive](evidence.tar.gz),
+[SHA-256](evidence.sha256) and [payload verifier](verify-evidence.py) preserve raw measurements,
+registrations, original failures, final build/test receipts, source restoration,
+artifact manifests and reproduction inputs. Measurement helpers before the three
+lint-only edits are retained separately; their workload/timer/assertions are
+unchanged. The browser input bindings include app CSS, imported dependency
+closure, output files, Chromium/host metadata and per-child drift checks.
