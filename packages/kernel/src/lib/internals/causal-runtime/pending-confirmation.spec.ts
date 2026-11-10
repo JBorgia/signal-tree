@@ -413,7 +413,7 @@ describe('pending confirmation', () => {
       entitySignal: false,
       activationToken: true,
       nodeFacadeMaterialized: true,
-      fieldFacadesMaterialized: ['active', 'id', 'name'],
+      fieldFacadesMaterialized: ['name'],
       positionIds: heldName.__positionIds,
       retainedValueBacking: undefined,
     });
@@ -522,7 +522,7 @@ describe('pending confirmation', () => {
       entitySignal: false,
       activationToken: true,
       nodeFacadeMaterialized: true,
-      fieldFacadesMaterialized: ['active', 'id', 'name'],
+      fieldFacadesMaterialized: ['name'],
       positionIds: heldName.__positionIds,
       retainedValueBacking: undefined,
     });
@@ -749,7 +749,7 @@ describe('pending confirmation', () => {
       entitySignal: false,
       activationToken: true,
       nodeFacadeMaterialized: true,
-      fieldFacadesMaterialized: ['active', 'id', 'name'],
+      fieldFacadesMaterialized: ['name'],
       positionIds: heldName.__positionIds,
       retainedValueBacking: undefined,
     });

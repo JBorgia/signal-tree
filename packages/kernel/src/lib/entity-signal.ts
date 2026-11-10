@@ -3368,6 +3368,9 @@ export function createEntitySignal<
    * behaviour is unchanged for every reference anyone can actually observe.
    */
   const nodeCache = new Map<number, WeakRef<EntityNode<E>>>();
+  // Physical inventory may observe allocation, but must never cause it. Weak
+  // getter identities also avoid retaining a deleted/redefined field carrier.
+  const materializedFieldGetters = new WeakSet<() => unknown>();
   const nodeFinalizer =
     typeof FinalizationRegistry === 'function'
       ? new FinalizationRegistry<number>((subjectId) => {
@@ -3603,66 +3606,86 @@ export function createEntitySignal<
     };
     bindLocation(node);
 
-    // Field projections derive their read from the subject-owned entity location.
-    // Public and selected writes share updateOnePrivate, including interceptors and taps.
+    // Keep the creation-time field surface, but realize a carrier only when
+    // its getter is used. Whole-row readers need none of the field machinery.
+    // Each carrier still derives from the captured subject lifetime and uses
+    // the complete public/selected write path, including interceptors and taps.
     for (const key of Object.keys(entity)) {
       const fieldKey = key as keyof E;
-      const computeField = () => {
-        const current = entitySig();
-        return current &&
-          Object.prototype.hasOwnProperty.call(current, fieldKey)
-          ? current[fieldKey]
-          : undefined;
-      };
-      const writeField = (
-        value: E[typeof fieldKey] | undefined,
-        intent: 'replace' | 'derive',
-        selection?: ClaimedFieldEndpoint
-      ) => {
-        validateSelectedEntry(selection, subjectId, String(fieldKey));
-        const key = currentKey();
-        if (key === undefined) {
-          throw new Error(`Entity with subject ${String(subjectId)} not found`);
+      let fieldSignal: Location<E[typeof fieldKey] | undefined> | undefined;
+      let initializing = false;
+      const getField = (): Location<E[typeof fieldKey] | undefined> => {
+        if (fieldSignal !== undefined) return fieldSignal;
+        if (initializing) {
+          throw new Error(`Recursive initialization of entity field ${key}`);
         }
-        withCallableWriteIntent(intent, () =>
-          updateOnePrivate(key, { [fieldKey]: value } as Partial<E>, selection)
-        );
-      };
-      const fieldSignal = locations.createWritableProjection
-        ? locations.createWritableProjection(computeField, writeField)
-        : createWritableProjection(
-            locations.createDerived(computeField),
-            writeField
-          );
-      bindLocation(fieldSignal, key);
-
-      if (ownerMetadataEnabled) {
-        Object.defineProperty(fieldSignal, '__ownerPath', {
-          get: () => {
+        initializing = true;
+        try {
+          const computeField = () => {
+            const current = entitySig();
+            return current &&
+              Object.prototype.hasOwnProperty.call(current, fieldKey)
+              ? current[fieldKey]
+              : undefined;
+          };
+          const writeField = (
+            value: E[typeof fieldKey] | undefined,
+            intent: 'replace' | 'derive',
+            selection?: ClaimedFieldEndpoint
+          ) => {
+            validateSelectedEntry(selection, subjectId, String(fieldKey));
             const key = currentKey();
-            return key === undefined ? undefined : `${basePath}.${String(key)}`;
-          },
-          enumerable: false,
-          configurable: true,
-        });
-      }
-      if (subjectMetadataEnabled) {
-        Object.defineProperty(fieldSignal, '__subjectIds', {
-          get: () => [subjectId],
-          enumerable: false,
-          configurable: true,
-        });
-      }
-      if (positionMetadataEnabled) {
-        Object.defineProperty(fieldSignal, '__positionIds', {
-          get: getPositionIds,
-          enumerable: false,
-          configurable: true,
-        });
-      }
+            if (key === undefined) {
+              throw new Error(`Entity with subject ${String(subjectId)} not found`);
+            }
+            withCallableWriteIntent(intent, () =>
+              updateOnePrivate(key, { [fieldKey]: value } as Partial<E>, selection)
+            );
+          };
+          const created = locations.createWritableProjection
+            ? locations.createWritableProjection(computeField, writeField)
+            : createWritableProjection(
+                locations.createDerived(computeField),
+                writeField
+              );
+          bindLocation(created, key);
+
+          if (ownerMetadataEnabled) {
+            Object.defineProperty(created, '__ownerPath', {
+              get: () => {
+                const key = currentKey();
+                return key === undefined ? undefined : `${basePath}.${String(key)}`;
+              },
+              enumerable: false,
+              configurable: true,
+            });
+          }
+          if (subjectMetadataEnabled) {
+            Object.defineProperty(created, '__subjectIds', {
+              get: () => [subjectId],
+              enumerable: false,
+              configurable: true,
+            });
+          }
+          if (positionMetadataEnabled) {
+            Object.defineProperty(created, '__positionIds', {
+              get: getPositionIds,
+              enumerable: false,
+              configurable: true,
+            });
+          }
+          // Publish the cache only after the complete carrier is bound. A
+          // throwing adapter may retry; no caller receives a partial carrier.
+          fieldSignal = created;
+          materializedFieldGetters.add(getField);
+          return created;
+        } finally {
+          initializing = false;
+        }
+      };
 
       Object.defineProperty(node, key, {
-        get: () => fieldSignal,
+        get: getField,
         enumerable: true,
         configurable: true,
       });
@@ -3699,10 +3722,10 @@ export function createEntitySignal<
       node === undefined
         ? []
         : Object.keys(node as Record<string, unknown>)
-            .filter(
-              (key) =>
-                typeof (node as Record<string, unknown>)[key] === 'function'
-            )
+            .filter((key) => {
+              const getter = Object.getOwnPropertyDescriptor(node, key)?.get;
+              return getter !== undefined && materializedFieldGetters.has(getter);
+            })
             .sort((left, right) => left.localeCompare(right));
 
     return {

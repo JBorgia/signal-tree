@@ -185,7 +185,7 @@ describe('entity subject physical inventory', () => {
       entitySignal: true,
       activationToken: false,
       nodeFacadeMaterialized: true,
-      fieldFacadesMaterialized: ['active', 'id', 'name'],
+      fieldFacadesMaterialized: ['name'],
       positionIds,
       retainedValueBacking: {
         kind: 'retained-entity-signal',
@@ -204,7 +204,7 @@ describe('entity subject physical inventory', () => {
       entitySignal: true,
       activationToken: false,
       nodeFacadeMaterialized: true,
-      fieldFacadesMaterialized: ['active', 'id', 'name'],
+      fieldFacadesMaterialized: ['name'],
       positionIds,
       retainedValueBacking: {
         kind: 'retained-entity-signal',
@@ -225,7 +225,7 @@ describe('entity subject physical inventory', () => {
       entitySignal: true,
       activationToken: false,
       nodeFacadeMaterialized: true,
-      fieldFacadesMaterialized: ['active', 'id', 'name'],
+      fieldFacadesMaterialized: ['name'],
       positionIds,
       retainedValueBacking: {
         kind: 'retained-entity-signal',
@@ -241,7 +241,7 @@ describe('entity subject physical inventory', () => {
       entitySignal: true,
       activationToken: false,
       nodeFacadeMaterialized: true,
-      fieldFacadesMaterialized: ['active', 'id', 'name'],
+      fieldFacadesMaterialized: ['name'],
       positionIds,
       retainedValueBacking: {
         kind: 'retained-entity-signal',
@@ -265,7 +265,7 @@ describe('entity subject physical inventory', () => {
       entitySignal: true,
       activationToken: false,
       nodeFacadeMaterialized: true,
-      fieldFacadesMaterialized: ['active', 'id', 'name'],
+      fieldFacadesMaterialized: ['name'],
       positionIds,
       retainedValueBacking: {
         kind: 'retained-entity-signal',
@@ -307,7 +307,7 @@ describe('entity subject physical inventory', () => {
       entitySignal: false,
       activationToken: false,
       nodeFacadeMaterialized: true,
-      fieldFacadesMaterialized: ['active', 'id', 'name'],
+      fieldFacadesMaterialized: ['name'],
       positionIds: getOwnedPositionIds(heldOne),
       retainedValueBacking: undefined,
     });
@@ -439,7 +439,7 @@ describe('entity subject physical inventory', () => {
       entitySignal: false,
       activationToken: true,
       nodeFacadeMaterialized: true,
-      fieldFacadesMaterialized: ['active', 'id', 'name'],
+      fieldFacadesMaterialized: ['name'],
       positionIds: getOwnedPositionIds(heldName),
       retainedValueBacking: undefined,
     });
@@ -507,7 +507,7 @@ describe('entity subject physical inventory', () => {
       entitySignal: false,
       activationToken: true,
       nodeFacadeMaterialized: true,
-      fieldFacadesMaterialized: ['active', 'id', 'name'],
+      fieldFacadesMaterialized: ['name'],
       positionIds: getOwnedPositionIds(heldName),
       retainedValueBacking: undefined,
     });
@@ -552,7 +552,7 @@ describe('entity subject physical inventory', () => {
       entitySignal: true,
       activationToken: false,
       nodeFacadeMaterialized: true,
-      fieldFacadesMaterialized: ['active', 'id', 'name'],
+      fieldFacadesMaterialized: ['name'],
       positionIds: getOwnedPositionIds(api.byIdOrFail(1).name),
       retainedValueBacking: {
         kind: 'retained-entity-signal',
@@ -582,7 +582,7 @@ describe('entity subject physical inventory', () => {
       entitySignal: true,
       activationToken: false,
       nodeFacadeMaterialized: true,
-      fieldFacadesMaterialized: ['active', 'id', 'name'],
+      fieldFacadesMaterialized: ['name'],
       positionIds: getOwnedPositionIds(originalField),
       retainedValueBacking: {
         kind: 'retained-entity-signal',
@@ -602,7 +602,7 @@ describe('entity subject physical inventory', () => {
       entitySignal: true,
       activationToken: false,
       nodeFacadeMaterialized: true,
-      fieldFacadesMaterialized: ['active', 'id', 'name'],
+      fieldFacadesMaterialized: ['name'],
       positionIds: getOwnedPositionIds(originalField),
       retainedValueBacking: {
         kind: 'retained-entity-signal',
@@ -620,7 +620,7 @@ describe('entity subject physical inventory', () => {
       entitySignal: true,
       activationToken: false,
       nodeFacadeMaterialized: true,
-      fieldFacadesMaterialized: ['active', 'id', 'name'],
+      fieldFacadesMaterialized: ['name'],
       positionIds: getOwnedPositionIds(originalField),
       retainedValueBacking: {
         kind: 'retained-entity-signal',
@@ -638,7 +638,7 @@ describe('entity subject physical inventory', () => {
       entitySignal: true,
       activationToken: false,
       nodeFacadeMaterialized: true,
-      fieldFacadesMaterialized: ['active', 'id', 'name'],
+      fieldFacadesMaterialized: ['name'],
       positionIds: getOwnedPositionIds(originalField),
       retainedValueBacking: {
         kind: 'retained-entity-signal',
@@ -664,7 +664,7 @@ describe('entity subject physical inventory', () => {
       entitySignal: true,
       activationToken: false,
       nodeFacadeMaterialized: true,
-      fieldFacadesMaterialized: ['active', 'id', 'name'],
+      fieldFacadesMaterialized: ['name'],
       positionIds: getOwnedPositionIds(originalField),
       retainedValueBacking: {
         kind: 'retained-entity-signal',
@@ -682,7 +682,7 @@ describe('entity subject physical inventory', () => {
       entitySignal: true,
       activationToken: false,
       nodeFacadeMaterialized: true,
-      fieldFacadesMaterialized: ['active', 'id', 'name'],
+      fieldFacadesMaterialized: ['name'],
       positionIds: getOwnedPositionIds(originalField),
       retainedValueBacking: {
         kind: 'retained-entity-signal',
@@ -703,7 +703,7 @@ describe('entity subject physical inventory', () => {
       entitySignal: true,
       activationToken: true,
       nodeFacadeMaterialized: true,
-      fieldFacadesMaterialized: ['active', 'id', 'name'],
+      fieldFacadesMaterialized: ['name'],
       positionIds: getOwnedPositionIds(originalField),
       retainedValueBacking: {
         kind: 'retained-entity-signal',
@@ -721,7 +721,7 @@ describe('entity subject physical inventory', () => {
       entitySignal: true,
       activationToken: true,
       nodeFacadeMaterialized: true,
-      fieldFacadesMaterialized: ['active', 'id', 'name'],
+      fieldFacadesMaterialized: ['name'],
       positionIds: getOwnedPositionIds(originalField),
       retainedValueBacking: {
         kind: 'retained-entity-signal',
@@ -742,7 +742,7 @@ describe('entity subject physical inventory', () => {
       entitySignal: false,
       activationToken: true,
       nodeFacadeMaterialized: true,
-      fieldFacadesMaterialized: ['active', 'id', 'name'],
+      fieldFacadesMaterialized: ['name'],
       positionIds: getOwnedPositionIds(originalField),
       retainedValueBacking: undefined,
     });
@@ -769,7 +769,7 @@ describe('entity subject physical inventory', () => {
       entitySignal: true,
       activationToken: false,
       nodeFacadeMaterialized: true,
-      fieldFacadesMaterialized: ['active', 'id', 'name'],
+      fieldFacadesMaterialized: ['name'],
       positionIds: getOwnedPositionIds(heldField),
       retainedValueBacking: {
         kind: 'retained-entity-signal',
@@ -793,7 +793,7 @@ describe('entity subject physical inventory', () => {
       entitySignal: true,
       activationToken: true,
       nodeFacadeMaterialized: true,
-      fieldFacadesMaterialized: ['active', 'id', 'name'],
+      fieldFacadesMaterialized: ['name'],
       positionIds: getOwnedPositionIds(heldField),
       retainedValueBacking: {
         kind: 'retained-entity-signal',
@@ -827,7 +827,7 @@ describe('entity subject physical inventory', () => {
       entitySignal: true,
       activationToken: true,
       nodeFacadeMaterialized: true,
-      fieldFacadesMaterialized: ['active', 'id', 'name'],
+      fieldFacadesMaterialized: ['name'],
       positionIds: getOwnedPositionIds(heldField),
       retainedValueBacking: {
         kind: 'retained-entity-signal',
@@ -876,7 +876,7 @@ describe('entity subject physical inventory', () => {
       entitySignal: true,
       activationToken: true,
       nodeFacadeMaterialized: true,
-      fieldFacadesMaterialized: ['active', 'id', 'name'],
+      fieldFacadesMaterialized: ['name'],
       positionIds: getOwnedPositionIds(originalField),
       retainedValueBacking: {
         kind: 'retained-entity-signal',
@@ -891,7 +891,7 @@ describe('entity subject physical inventory', () => {
       entitySignal: true,
       activationToken: false,
       nodeFacadeMaterialized: true,
-      fieldFacadesMaterialized: ['active', 'id', 'name'],
+      fieldFacadesMaterialized: ['name'],
       positionIds: getOwnedPositionIds(originalField),
       retainedValueBacking: {
         kind: 'retained-entity-signal',
@@ -930,7 +930,7 @@ describe('entity subject physical inventory', () => {
       entitySignal: true,
       activationToken: false,
       nodeFacadeMaterialized: true,
-      fieldFacadesMaterialized: ['active', 'id', 'name'],
+      fieldFacadesMaterialized: ['name'],
       positionIds: getOwnedPositionIds(heldField),
       retainedValueBacking: {
         kind: 'retained-entity-signal',
@@ -955,7 +955,7 @@ describe('entity subject physical inventory', () => {
       entitySignal: true,
       activationToken: true,
       nodeFacadeMaterialized: true,
-      fieldFacadesMaterialized: ['active', 'id', 'name'],
+      fieldFacadesMaterialized: ['active', 'name'],
       positionIds: getOwnedPositionIds(heldField),
       retainedValueBacking: {
         kind: 'retained-entity-signal',
@@ -1037,7 +1037,7 @@ describe('entity subject physical inventory', () => {
       entitySignal: true,
       activationToken: false,
       nodeFacadeMaterialized: true,
-      fieldFacadesMaterialized: ['active', 'id', 'name'],
+      fieldFacadesMaterialized: ['name'],
       positionIds: getOwnedPositionIds(api.byIdOrFail(1).name),
       retainedValueBacking: {
         kind: 'retained-entity-signal',
@@ -1085,7 +1085,7 @@ describe('entity subject physical inventory', () => {
       entitySignal: true,
       activationToken: false,
       nodeFacadeMaterialized: true,
-      fieldFacadesMaterialized: ['active', 'id', 'name'],
+      fieldFacadesMaterialized: ['name'],
       positionIds: getOwnedPositionIds(originalField),
       retainedValueBacking: {
         kind: 'retained-entity-signal',
@@ -1110,7 +1110,7 @@ describe('entity subject physical inventory', () => {
       entitySignal: true,
       activationToken: false,
       nodeFacadeMaterialized: true,
-      fieldFacadesMaterialized: ['active', 'id', 'name'],
+      fieldFacadesMaterialized: ['name'],
       positionIds: getOwnedPositionIds(originalField),
       retainedValueBacking: {
         kind: 'retained-entity-signal',
@@ -1125,7 +1125,7 @@ describe('entity subject physical inventory', () => {
       entitySignal: true,
       activationToken: true,
       nodeFacadeMaterialized: true,
-      fieldFacadesMaterialized: ['active', 'id', 'name'],
+      fieldFacadesMaterialized: ['name'],
       positionIds: getOwnedPositionIds(originalField),
       retainedValueBacking: {
         kind: 'retained-entity-signal',
@@ -1148,7 +1148,7 @@ describe('entity subject physical inventory', () => {
       entitySignal: true,
       activationToken: true,
       nodeFacadeMaterialized: true,
-      fieldFacadesMaterialized: ['active', 'id', 'name'],
+      fieldFacadesMaterialized: ['name'],
       positionIds: getOwnedPositionIds(originalField),
       retainedValueBacking: {
         kind: 'retained-entity-signal',
@@ -1170,7 +1170,7 @@ describe('entity subject physical inventory', () => {
       entitySignal: false,
       activationToken: true,
       nodeFacadeMaterialized: true,
-      fieldFacadesMaterialized: ['active', 'id', 'name'],
+      fieldFacadesMaterialized: ['name'],
       positionIds: getOwnedPositionIds(originalField),
       retainedValueBacking: undefined,
     });
@@ -1209,7 +1209,7 @@ describe('entity subject physical inventory', () => {
       entitySignal: false,
       activationToken: true,
       nodeFacadeMaterialized: true,
-      fieldFacadesMaterialized: ['active', 'id', 'name'],
+      fieldFacadesMaterialized: ['name'],
       positionIds: getOwnedPositionIds(heldField),
       retainedValueBacking: undefined,
     });
@@ -1222,7 +1222,7 @@ describe('entity subject physical inventory', () => {
       entitySignal: true,
       activationToken: false,
       nodeFacadeMaterialized: true,
-      fieldFacadesMaterialized: ['active', 'id', 'name'],
+      fieldFacadesMaterialized: ['name'],
       positionIds: getOwnedPositionIds(heldField),
       retainedValueBacking: {
         kind: 'retained-entity-signal',
@@ -1265,7 +1265,7 @@ describe('entity subject physical inventory', () => {
       entitySignal: true,
       activationToken: false,
       nodeFacadeMaterialized: true,
-      fieldFacadesMaterialized: ['active', 'id', 'name'],
+      fieldFacadesMaterialized: ['name'],
       positionIds: getOwnedPositionIds(api.byIdOrFail(1).name),
       retainedValueBacking: {
         kind: 'retained-entity-signal',
@@ -1328,7 +1328,7 @@ describe('entity subject physical inventory', () => {
       entitySignal: true,
       activationToken: true,
       nodeFacadeMaterialized: true,
-      fieldFacadesMaterialized: ['active', 'id', 'name'],
+      fieldFacadesMaterialized: ['name'],
       positionIds: getOwnedPositionIds(heldFieldA),
       retainedValueBacking: {
         kind: 'retained-entity-signal',
@@ -1404,7 +1404,7 @@ describe('entity subject physical inventory', () => {
       entitySignal: true,
       activationToken: false,
       nodeFacadeMaterialized: true,
-      fieldFacadesMaterialized: ['active', 'id', 'name'],
+      fieldFacadesMaterialized: ['name'],
       positionIds: getOwnedPositionIds(heldFieldB),
       retainedValueBacking: {
         kind: 'retained-entity-signal',
@@ -1419,7 +1419,7 @@ describe('entity subject physical inventory', () => {
       entitySignal: true,
       activationToken: false,
       nodeFacadeMaterialized: true,
-      fieldFacadesMaterialized: ['active', 'id', 'name'],
+      fieldFacadesMaterialized: ['name'],
       positionIds: getOwnedPositionIds(heldFieldE),
       retainedValueBacking: {
         kind: 'retained-entity-signal',
@@ -1434,7 +1434,7 @@ describe('entity subject physical inventory', () => {
       entitySignal: true,
       activationToken: false,
       nodeFacadeMaterialized: true,
-      fieldFacadesMaterialized: ['active', 'id', 'name'],
+      fieldFacadesMaterialized: ['name'],
       positionIds: getOwnedPositionIds(historicalDField),
       retainedValueBacking: {
         kind: 'retained-entity-signal',
@@ -1795,7 +1795,7 @@ describe('addMany() mode option (F-011)', () => {
       entitySignal: true,
       activationToken: true,
       nodeFacadeMaterialized: true,
-      fieldFacadesMaterialized: ['active', 'id', 'name'],
+      fieldFacadesMaterialized: ['name'],
       positionIds: getOwnedPositionIds(heldFieldTwo),
       retainedValueBacking: {
         kind: 'retained-entity-signal',
@@ -1810,7 +1810,7 @@ describe('addMany() mode option (F-011)', () => {
       entitySignal: true,
       activationToken: true,
       nodeFacadeMaterialized: true,
-      fieldFacadesMaterialized: ['active', 'id', 'name'],
+      fieldFacadesMaterialized: ['name'],
       positionIds: getOwnedPositionIds(heldFieldFour),
       retainedValueBacking: {
         kind: 'retained-entity-signal',
@@ -1873,7 +1873,7 @@ describe('addMany() mode option (F-011)', () => {
         entitySignal: true,
         activationToken: true,
         nodeFacadeMaterialized: true,
-        fieldFacadesMaterialized: ['active', 'id', 'name'],
+        fieldFacadesMaterialized: ['name'],
         positionIds: getOwnedPositionIds(heldFields[i]),
         retainedValueBacking: {
           kind: 'retained-entity-signal',
