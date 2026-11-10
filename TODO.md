@@ -1,23 +1,22 @@
 # TODO
 
-The active v16 repair and qualification work is in
+The completed v16 repair and qualification decision is in
 [RELEASE-CURRENT.md](RELEASE-CURRENT.md#active-owner-instruction).
-The [application economics audit](docs/audits/2026-11-10-release-economics/README.md)
-closes the requested ordinary-budget and equivalent-workflow comparison.
+The [readiness audit](docs/audits/2026-11-10-release-readiness/README.md)
+records **GO: release-qualified candidate**, exact artifacts and accepted costs.
 
-Required work: fix finalizer-held derived dependency retention; attribute and
-reduce coordinated pending-state and start preparation costs; improve first-use
-construction. Evaluate residual costs against application needs and feasible
-alternatives, retaining all original measured budgets and failures as evidence.
-Preserve late readers, independent publication, reentry, entity lifetime and the
-original point-work bound. Repeat exact-artifact qualification only after the
-acceptance failures are corrected or receive justified engineering disposition.
-Continue through the complete release qualification rather than stopping at a
-candidate-status decision. Semantic and lifecycle failures are not cost waivers.
+Completed: repair finalizer-held derived graphs; reduce pending publication
+bookkeeping and coordinated start CPU; measure actual application startup and
+1/2/4/8-session capacity; disposition residual costs without hiding numerical
+misses. Late readers, independent publication, reentry, entity lifetime, actual
+resource collection and the original point-work bound pass. Full release gates,
+mutation restoration, clean installed consumers and production browser checks
+are complete, with only the previously accepted numerical size failures.
 
-Cleanup is part of that work: consolidate repeated setup and active instructions,
-preserve meaningful tests and first failures, and serialize heavy jobs. Do not
-start another architecture competition or reopen B.
+Remaining release actions are final version/tag preparation, merge and package
+publication when authorized. They are not unresolved runtime qualification work.
+Keep first failures and exact artifact bindings; do not reopen B or start another
+architecture competition as a prerequisite to this qualified candidate.
 
 Historical entries and prior decisions are preserved byte-for-byte in the
 [November 3 queue archive](docs/archive/2026-11-03-active-queues/TODO.md.before.txt),

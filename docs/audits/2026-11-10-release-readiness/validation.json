@@ -1,0 +1,341 @@
+{
+  "decision": "release-qualified; unreleased",
+  "runtimeCommit": "5dca0e457a1a348190275c560fc6d93aec88e5e4",
+  "qualificationCheckpoint": "cd9bf4fd81bdea8debb2b2d38761002a95db3b85",
+  "finalClosureScope": [
+    "RELEASE-CURRENT.md",
+    "TODO.md",
+    "docs/audits/2026-11-10-release-readiness"
+  ],
+  "version": "16.0.0-dev",
+  "node": "24.15.0",
+  "pnpm": "10.17.0",
+  "sourceRestoration": {
+    "filesVerified": 3747,
+    "unchanged": true
+  },
+  "kernelEquivalence": {
+    "filesVerified": 141,
+    "byteIdenticalToMeasuredCandidate": true
+  },
+  "packages": {
+    "packages": [
+      "kernel",
+      "angular",
+      "react",
+      "vue",
+      "solid"
+    ],
+    "seal": "sha256-d490182b76f94539ac78d7e37ba1dea05dee93a1d2c98ce5089a1ff01e6ccda2"
+  },
+  "normalRegistry": {
+    "command": "NX_DAEMON=false NX_ISOLATE_PLUGINS=false NG_BUILD_MAX_WORKERS=1 node tools/verify-gates.mjs --release",
+    "exit": 1,
+    "passed": 84,
+    "failed": [
+      "lint:budget",
+      "source-controls",
+      "bundle-budget"
+    ],
+    "correctionCommand": "node tools/verify-gates.mjs --only=lint:budget,source-controls",
+    "correctionExit": 0,
+    "correctedPasses": 2,
+    "onlyResidualFailure": "bundle-budget; prior explicit owner size disposition"
+  },
+  "mutation": {
+    "command": "node tools/verify-gates.mjs --self-test --release",
+    "exit": 0,
+    "reportedProven": 87,
+    "indirect": 13,
+    "unproven": 0,
+    "vacuous": 0,
+    "blind": 0,
+    "errored": 0,
+    "caveat": "Size baseline is already red; its failed mutation is not independent detection proof."
+  },
+  "sequence": [
+    {
+      "name": "qualification-mutation",
+      "command": [
+        "node",
+        "tools/verify-gates.mjs",
+        "--self-test",
+        "--release"
+      ],
+      "exit": 0,
+      "startedUTC": "2026-11-10T21:34:26Z",
+      "seconds": 633.3872728347778
+    },
+    {
+      "name": "post-mutation-build",
+      "command": [
+        "pnpm",
+        "run",
+        "build:all",
+        "--skip-nx-cache",
+        "--parallel=1"
+      ],
+      "exit": 0,
+      "startedUTC": "2026-11-10T21:45:01Z",
+      "seconds": 10.152858018875122
+    },
+    {
+      "name": "final-tarball-consumer",
+      "command": [
+        "node",
+        "tools/verify-tarball-consumer.mjs"
+      ],
+      "exit": 0,
+      "startedUTC": "2026-11-10T21:45:11Z",
+      "seconds": 1.8406920433044434
+    },
+    {
+      "name": "final-consumer-typecheck",
+      "command": [
+        "node",
+        "tools/verify-consumer-typecheck.mjs"
+      ],
+      "exit": 0,
+      "startedUTC": "2026-11-10T21:45:13Z",
+      "seconds": 6.48992395401001
+    },
+    {
+      "name": "final-angular-aot-consumer",
+      "command": [
+        "node",
+        "tools/verify-angular-aot-consumer.mjs"
+      ],
+      "exit": 0,
+      "startedUTC": "2026-11-10T21:45:19Z",
+      "seconds": 15.882946968078613
+    },
+    {
+      "name": "final-coordinated-selftest",
+      "command": [
+        "node",
+        "tools/release-economics/coordinated.mjs",
+        "selftest",
+        "/Users/jonathanborgia/code/signaltree/.worktrees/v16-release-readiness/dist/packages/kernel",
+        "1000"
+      ],
+      "exit": 0,
+      "startedUTC": "2026-11-10T21:45:35Z",
+      "seconds": 1.139746904373169
+    },
+    {
+      "name": "final-retention-diagnostic",
+      "command": [
+        "node",
+        "--expose-gc",
+        "tools/release-economics/retention-diagnostic.mjs",
+        "suite",
+        "/Users/jonathanborgia/code/signaltree/.worktrees/v16-release-readiness",
+        "/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-v16-readiness.nkyh1v3r"
+      ],
+      "exit": 0,
+      "startedUTC": "2026-11-10T21:45:36Z",
+      "seconds": 2.8227577209472656
+    },
+    {
+      "name": "final-built-witnesses",
+      "command": [
+        "node",
+        "/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-v16-readiness.nkyh1v3r/witnesses/built-witnesses.mjs",
+        "/Users/jonathanborgia/code/signaltree/.worktrees/v16-release-readiness/dist/packages/kernel/dist"
+      ],
+      "exit": 0,
+      "startedUTC": "2026-11-10T21:45:39Z",
+      "seconds": 0.09378290176391602
+    },
+    {
+      "name": "final-public-reentry",
+      "command": [
+        "node",
+        "/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-v16-readiness.nkyh1v3r/witnesses/public-reentry.mjs",
+        "/Users/jonathanborgia/code/signaltree/.worktrees/v16-release-readiness/dist/packages/kernel/dist"
+      ],
+      "exit": 0,
+      "startedUTC": "2026-11-10T21:45:39Z",
+      "seconds": 0.0523991584777832
+    },
+    {
+      "name": "final-clone-reentry-review",
+      "command": [
+        "node",
+        "/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-v16-readiness.nkyh1v3r/witnesses/clone-reentry-review.mjs",
+        "/Users/jonathanborgia/code/signaltree/.worktrees/v16-release-readiness/dist/packages/kernel/dist"
+      ],
+      "exit": 0,
+      "startedUTC": "2026-11-10T21:45:39Z",
+      "seconds": 0.05421900749206543
+    },
+    {
+      "name": "final-frame-packet-witness",
+      "command": [
+        "node",
+        "/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-v16-readiness.nkyh1v3r/witnesses/frame-packet-witness.mjs",
+        "/Users/jonathanborgia/code/signaltree/.worktrees/v16-release-readiness/dist/packages/kernel/dist"
+      ],
+      "exit": 0,
+      "startedUTC": "2026-11-10T21:45:39Z",
+      "seconds": 0.05189990997314453
+    },
+    {
+      "name": "final-counter",
+      "command": [
+        "node",
+        "/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-v16-readiness.nkyh1v3r/witnesses/replay/counter-child.mjs",
+        "repaired",
+        "/Users/jonathanborgia/code/signaltree/.worktrees/v16-release-readiness/dist/packages/kernel/dist/index.js"
+      ],
+      "exit": 0,
+      "startedUTC": "2026-11-10T21:45:39Z",
+      "seconds": 0.3742861747741699
+    },
+    {
+      "name": "demo-production-strict",
+      "command": [
+        "pnpm",
+        "nx",
+        "build",
+        "demo",
+        "--configuration=production",
+        "--skip-nx-cache"
+      ],
+      "exit": 1,
+      "startedUTC": "2026-11-10T21:45:40Z",
+      "seconds": 10.232053756713867
+    },
+    {
+      "name": "demo-production-size-disposition",
+      "command": [
+        "pnpm",
+        "nx",
+        "build",
+        "demo",
+        "--configuration=production",
+        "--skip-nx-cache"
+      ],
+      "exit": 0,
+      "startedUTC": "2026-11-10T21:45:50Z",
+      "seconds": 7.473308086395264
+    },
+    {
+      "name": "production-browser",
+      "command": [
+        "pnpm",
+        "exec",
+        "playwright",
+        "test",
+        "--config",
+        "scripts/playwright/route-smoke.config.ts",
+        "--workers=1",
+        "--retries=0"
+      ],
+      "exit": 1,
+      "startedUTC": "2026-11-10T21:45:58Z",
+      "seconds": 71.53356003761292
+    }
+  ],
+  "productionBrowser": {
+    "files": 9,
+    "cases": 138,
+    "passed": 137,
+    "failed": 1,
+    "skipped": 0,
+    "flaky": 0,
+    "retries": 0,
+    "workers": 1,
+    "freshServer": true,
+    "onlyFailure": "demo-production-bundle.spec.ts:61 main JS789705B >570000B; prior size disposition"
+  },
+  "productionBuild": {
+    "strictExit": 1,
+    "initialKilobytes": 815.4,
+    "ceilingKilobytes": 570,
+    "reviewBuildExit": 0,
+    "override": "temporary production budgets=[]; all tracked source restored by hash"
+  },
+  "pointCounter": {
+    "arm": "repaired",
+    "entry": "/Users/jonathanborgia/code/signaltree/.worktrees/v16-release-readiness/dist/packages/kernel/dist/index.js",
+    "node": "v24.15.0",
+    "pid": 57951,
+    "productionDefine": false,
+    "ngDevMode": false,
+    "workload": "original200distinctupdates;2-field rows;originalcounterunchanged;all200endpoints+untouchedrowchecked",
+    "rows": [
+      {
+        "size": 2000,
+        "total": 1800,
+        "originalBound": 2000,
+        "passesOriginalBound": true,
+        "widthControl": 4000
+      },
+      {
+        "size": 20000,
+        "total": 1800,
+        "originalBound": 2000,
+        "passesOriginalBound": true,
+        "widthControl": 40000
+      }
+    ],
+    "plantedCharge": 7,
+    "throwUndefinedPreserved": true
+  },
+  "economicCohort": {
+    "children": 96,
+    "baselineFailures": 7,
+    "inputsUnchanged": true
+  },
+  "retention": {
+    "candidateCases": 9,
+    "candidateActualResourcesCollected": true,
+    "v15ControlFailuresRetained": true
+  },
+  "dispositions": {
+    "size": "Owner previously accepted production/package size; ceilings and failed assertions retained.",
+    "economics": "Owner authorized budgets weighed against cost and feasibility; preregistered policy and actual app evidence support scoped acceptance.",
+    "semantics": "No waiver; exercised semantic/lifecycle/point-work requirements pass."
+  },
+  "limits": [
+    "One host and specified workloads; no universal production-device latency claim.",
+    "100ms loaded-app readiness excludes network/module loading; no first-paint or INP claim.",
+    "35.40MiB pending is above imported idle, whole pending heap about43.8MiB; not guaranteed128MiB browser headroom.",
+    "Actual lifecycle collection and ten aging workflows are bounded tests, not universal leak freedom.",
+    "Coverage percentages not enforced or newly claimed.",
+    "No merge, tag or package publication."
+  ],
+  "finalDocumentationGates": {
+    "command": "node tools/verify-gates.mjs --only=version-claims,readme-apis,documented-imports,doc-links,numeric-claims,source-controls --artifact-integrity=sha256-d490182b76f94539ac78d7e37ba1dea05dee93a1d2c98ce5089a1ff01e6ccda2",
+    "exit": 0,
+    "passed": 6
+  },
+  "finalMetadataChecks": [
+    {
+      "name": "version-claims",
+      "command": [
+        "node",
+        "scripts/verify-version-claims.js"
+      ],
+      "exit": 0
+    },
+    {
+      "name": "release-state",
+      "command": [
+        "node",
+        "scripts/verify-release-state.js"
+      ],
+      "exit": 0
+    },
+    {
+      "name": "changelog-entry",
+      "command": [
+        "bash",
+        "scripts/verify-changelog-entry.sh",
+        "16.0.0-dev"
+      ],
+      "exit": 0
+    }
+  ]
+}
