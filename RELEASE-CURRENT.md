@@ -154,6 +154,18 @@ unavailable at closure, so qualification is backed by the surviving summaries,
 manifests, distributions, and reviews. The audit proposes separate ordinary
 and coordinated performance criteria. No new thresholds have been adopted.
 
+## Candidate C construction and heap attribution
+
+The [construction and heap audit](docs/audits/2026-11-10-candidate-c-construction-attribution/README.md)
+locates the ordinary construction gap in EntityMap population, especially
+general frame, topology, and publication preparation. The populated snapshot
+identifies the ordinary and physical publication indexes as the largest storage
+cost. The two hypotheses for a follow-up are less per-edit preparation for
+unique fresh subjects and a compact representation of aligned current evidence.
+Preserve late acquisition, independent publication, snapshot isolation,
+bounded point work, and reclamation when testing either. Runtime source
+remains at C and production remains HOLD.
+
 ## Frozen candidate and execution identity
 
 - Selected durable worktree: `/Users/jonathanborgia/code/signaltree/.worktrees/v16-integration-candidate`,
