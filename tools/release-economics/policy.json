@@ -1,0 +1,60 @@
+{
+  "id": "V16-APP-ECONOMICS-0",
+  "sourceRevision": "1a6225a386825c12f60d799a59db34c6341cc1e2",
+  "packedRuntime": "b6acda57552affb0fdcbc0b40f1996c4345ed5d8",
+  "authority": "Owner requested setting ordinary-state budgets from representative apps and an equivalent coordinated-workflow comparison, then a clear release decision.",
+  "ordinaryProfiles": [
+    { "kind": "jobs", "rows": 5, "basis": "Exact React reference seed, seven fields; actual store/derived/action bodies." },
+    { "kind": "products", "rows": 4, "basis": "Exact Angular inventory seed, five fields; actual factory/action/hooks with explicit neutral projection reads." },
+    { "kind": "jobs", "rows": 1000, "basis": "Declared scaled app-shaped capacity, anchored to demo benchmark QUICK_CONFIG collectionSize=1000; not a deployed 1000-job application." },
+    { "kind": "products", "rows": 1000, "basis": "Same declared capacity, actual inventory shape and methods." }
+  ],
+  "budgets": {
+    "initializationWallMs": 25,
+    "interactionWallMs": 4,
+    "coordinatedWorkflowWallMs": 25,
+    "liveStateBytes": 33554432,
+    "justification": "Chosen state-layer allocations: 25ms of a 100ms local readiness target, leaving 75ms for other work; 4ms of a 16.67ms 60Hz frame, leaving 12.67ms; 32MiB of a chosen 128MiB JS working-set envelope, leaving 96MiB. These are newly authorized engineering policy, not existing product SLOs or measured device limits. Node state-layer failures can reject; passes do not qualify browser readiness. CPU is reported separately and has no numeric gate."
+  },
+  "ordinaryCpu": {
+    "coldSamplesPerChild": 1,
+    "warmupRoutes": 20,
+    "measuredRoutes": 100,
+    "warmupInteractions": 20,
+    "measuredInteractions": 400,
+    "initIncludes": "Loaded-module create/populate, active selection, all application projections. Payload generation and module loading excluded; destruction outside timer. Cold first invocation also gated at25ms.",
+    "interactionIncludes": "Actual app action and every selected projection/held-entity read; checked against independent model outside timer. Synchronous wall and CPU recorded; full CPU through two task turns separately recorded.",
+    "excludes": "Framework scheduling, DOM rendering, network, bundling, module load and oracle validation. Neutral inventory computed reads do not claim Angular scheduling equivalence."
+  },
+  "ordinaryHeap": {
+    "stores": [{ "kind": "jobs", "count": 4, "rows": 1000 }, { "kind": "products", "count": 4, "rows": 1000 }],
+    "editsPerStore": 1200,
+    "endpoints": ["populated", "afterEdits"],
+    "basis": "Chosen eight coexisting views; not an existing app route-cache requirement. Keep app readers, selected and held entities. Live heap above imported idle with input payloads resident. Same shared quiescence protocol both arms. Destroy all stores and check actual tree/held-node WeakRefs after release; no universal leak claim."
+  },
+  "coordination": {
+    "rows": 1000,
+    "shape": "Seven-field Job records",
+    "contract": "Overlapping independent-field optimistic transactions on accepted row, independent progress, late collection consumer, exact pending publication and final trace, confirm/rollback in both orders, foreign pending owner and same-key lifetime retirement. Reference is an application coordinator with its own ledger, not full SignalTree API equivalence.",
+    "warmupWorkflows": 10,
+    "measuredWorkflows": 100,
+    "heapSessions": 8,
+    "heapCycles": 10,
+    "budgets": "25ms initialization;4ms each synchronous start or settlement stage including required state reads and library scheduling drains;25ms full local workflow, excluding external wait and oracle assertion overhead;32MiB for eight live sessions. Relative comparison descriptive only. Same observable oracle must pass both arms before economics."
+  },
+  "sampling": {
+    "observedLifecycleFailure": "After the first production cohort stopped at its first heap child, diagnostic scoping removed inventory fixture retention but four job trees remained retained on BOTH v15 and packed. Fresh final cohorts preserve the same collection assertion and exit1, now writing numeric heap endpoints before asserting. The runner continues only this explicitly recorded lifecycle failure to finish the comparison; all such results count against release and are never called passing checks. Complete first cohorts and source preserved. No threshold, operation count or success assertion changed.",
+    "runtimeMode": "Both installed kernels execute with globalThis.ngDevMode=false and NODE_ENV=production. First incomplete ordinary cohort omitted these flags; it is preserved as invalid development-mode data, never pooled or selected by outcomes.",
+    "perProfile": "Two packed A/A fresh-process controls, then five alternating reference/packed pairs. Every child serial; no other benchmark/test/build running. All results retained, no favorable retries.",
+    "percentile": "nearest-rank p95: sorted[ceil(0.95*N)-1] within each child; no pooling. Cold first invocation is one value per independent child.",
+    "pass": "All five comparative packed children meet each required budget; A/A controls reported, not counted as extra favorable samples.",
+    "fail": "At least four of five comparative packed children exceed any mandatory endpoint budget: repeatable failure and NO-GO. Any isolated or mixed violation still prevents GO; diagnose identified external/harness fault without deleting the first cohort. No averaging or cross-profile compensation.",
+    "relativeDirection": "Descriptive lower/higher only when comparison arm ranges are disjoint and median gap exceeds largest A/A or within-arm range; otherwise unresolved. This observed variability rule is not a confidence interval.",
+    "limits": "One named host and Node version; independent processes, not independent machines. Warmup fixed, no device throttle. Host load recorded. No inferential production-device percentile claim."
+  },
+  "decision": {
+    "go": "Common semantic oracles, all absolute economic budgets, lifecycle/point-work witnesses and full exact-artifact release, facade, installed-consumer and production-browser qualification pass; owner-dispositioned package size remains separately reported.",
+    "noGo": "A repeatable mandatory budget or semantic-contract failure rejects this packed candidate for general production. Do not run an expensive full release campaign to re-prove a candidate already rejected by a noncompensatory acceptance gate. Does not reject every possible v16 implementation.",
+    "unchanged": "No threshold tuned after observing data. No semantic change, production merge, activation, tag or publication."
+  }
+}

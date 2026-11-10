@@ -1,9 +1,45 @@
-# Current work — v16 runtime-cost disposition (HOLD)
+# Current release decision — packed v16 NO-GO
 
-Updated November 4, 2026. This is the single active acceptance ledger. Historical
+Updated November 10, 2026. This is the single active acceptance ledger. Historical
 first failures and sealed predecessors remain evidence, not competing queues.
 
-## Goal and authority
+## Current disposition — reject the packed candidate
+
+The owner authorized application-based ordinary budgets, an equivalent
+coordinated-workflow comparison, and a clear release decision. The
+[completed acceptance audit](docs/audits/2026-11-10-release-economics/README.md)
+rejects packed runtime `b6acda57552affb0fdcbc0b40f1996c4345ed5d8`, evaluated from
+source checkpoint `1a6225a386825c12f60d799a59db34c6341cc1e2`, for general v16
+production. This is a **NO-GO**, closing the current candidate decision rather
+than maintaining an undecided HOLD.
+
+The final 60 ordinary and 24 coordinated children preserve exact artifact
+identity and all first failures. Warm ordinary operations and the specified
+ordinary live-state heap fit the new budgets. Job-store first initialization
+exceeds 25 ms in five of five comparison children. Equivalent coordinated
+work passes its observable contract but the start stage exceeds 4 ms in five
+of five children; eight pending sessions exceed the 32 MiB allocation in five
+of five. Destroyed derived-state roots also remain retained, with an isolated
+actual-app snapshot proving a strong finalizer path. Related retention exists
+in v15; this is not attributed to packed field storage.
+
+No budget or semantic requirement was weakened. The candidate is not approved
+for activation, merge, tagging or publication. The previous size disposition
+remains valid and is not a reason for this rejection. Full release promotion
+gates are unnecessary to reject a candidate already failing mandatory
+acceptance; focused witness, documentation and production-demo checks are
+recorded separately, without claiming release-green.
+
+A future candidate must address coordinated pending-state representation,
+coordinated start preparation, destroyed derived-dependency retention, and
+first-use construction under these same workloads and budgets, then complete
+exact-artifact qualification. The bounded alternative demonstrates that the
+measured costs are not an established unavoidable price of the exercised
+guarantees. It does not implement every v16 contract or authorize an API/semantic
+redesign. Stable release-line source is unchanged. No further micro-optimization
+queue is opened by this disposition.
+
+## Historical goal and authority
 
 Implement the approved [multi-actor product plan](docs/architecture/multi-actor/PLAN.md)
 through supported framework-native APIs and one kernel authority. Backend
