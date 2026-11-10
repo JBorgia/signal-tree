@@ -12,14 +12,33 @@ function add(target:Counts,source:Counts,direction:number):void {
  for(const [key,n]of source.rejected)count(target.rejected,key,n*direction);
  target.unresolved+=source.unresolved*direction;if(target.unresolved<0)throw Error('Negative occurrence readiness');
 }
-function contribution(proof:Proof,unresolved:boolean):Counts {
- const result=empty();result.unresolved=Number(unresolved);
- for(const role of roles)for(const owner of proof[role]??[])count(result[role],owner,1);
- for(const key of ['unknown','invalid','unavailableInput','historicalWindow'] as const)if(proof[key])count(result.flags,key,1);
- for(const bit of [1,2,4,8])if((proof.terminalRejectedRoles??0)&bit)count(result.rejected,bit,1);
+const flagKeys=['unknown','invalid','unavailableInput','historicalWindow'] as const;
+type Contribution=Readonly<Partial<Record<typeof roles[number],readonly lifecycle.OwnerCell[]>>&{flags:number;rejected:number;unresolved:number}>;
+const noContribution:Contribution=Object.freeze({flags:0,rejected:0,unresolved:0});
+// A fixed 9-bit domain: roleless terminal/window flags need no per-slot object.
+const rolelessContributions:(Contribution|undefined)[]=new Array(512);
+rolelessContributions[0]=noContribution;
+/** Slots need a removable snapshot, not seven independently counted Maps.
+ * Only group summaries combine multiplicities. Copy nonempty role arrays so a
+ * later requirement transition cannot rewrite the contribution being removed. */
+function contribution(proof:Proof,unresolved:boolean):Contribution {
+ let flags=0;for(let i=0;i<flagKeys.length;i++)if(proof[flagKeys[i]])flags|=1<<i;
+ const rejected=(proof.terminalRejectedRoles??0)&15;
+ if(roles.every(role=>!proof[role]?.length)){
+  const key=flags|(rejected<<4)|(Number(unresolved)<<8);
+  return rolelessContributions[key]??=(Object.freeze({flags,rejected,unresolved:Number(unresolved)}));
+ }
+ const result:Partial<Record<typeof roles[number],readonly lifecycle.OwnerCell[]>>&{flags:number;rejected:number;unresolved:number}={flags,rejected,unresolved:Number(unresolved)};
+ for(const role of roles)if(proof[role]?.length)result[role]=[...proof[role]];
  return result;
 }
-type Entry={requirement:Requirement;proof:Proof;counts:Counts;release?:()=>void;onProof?:(proof:Proof)=>void};
+function addContribution(target:Counts,source:Contribution,direction:number):void {
+ for(const role of roles)for(const owner of source[role]??[])count(target[role],owner,direction);
+ for(let i=0;i<flagKeys.length;i++)if(source.flags&(1<<i))count(target.flags,flagKeys[i],direction);
+ for(const bit of [1,2,4,8])if(source.rejected&bit)count(target.rejected,bit,direction);
+ target.unresolved+=source.unresolved*direction;if(target.unresolved<0)throw Error('Negative occurrence readiness');
+}
+type Entry={counts:Contribution;release?:()=>void;onProof?:(proof:Proof)=>void};
 export interface OccurrenceHandle { readonly identity:object }
 type Group=OccurrenceHandle & {parent?:Group;edge?:NativeOccurrenceEdge;guard:object;present:boolean;entries:Map<unknown,Entry>;children:Set<Group>;summary:Counts};
 
@@ -55,19 +74,24 @@ export class RecipientOccurrences {
   while(current){this.counters.propagated++;add(current.summary,counts,direction);if(!current.parent)return true;if(!current.present)return false;current=current.parent;}
   return false;
  }
+ private propagateContribution(group:Group,counts:Contribution,direction:number):boolean {
+  let current:Group|undefined=group;
+  while(current){this.counters.propagated++;addContribution(current.summary,counts,direction);if(!current.parent)return true;if(!current.present)return false;current=current.parent;}
+  return false;
+ }
  private cancel(entry:Entry):void {if(entry.release){entry.release();entry.release=undefined;this.counters.subscriptions--;}}
  private replaceEntry(group:Group,key:unknown,requirement?:Requirement,onProof?:(proof:Proof)=>void):void {
-  const old=group.entries.get(key);if(old){this.cancel(old);this.propagate(group,old.counts,-1);group.entries.delete(key);}
+  const old=group.entries.get(key);if(old){this.cancel(old);this.propagateContribution(group,old.counts,-1);group.entries.delete(key);}
   if(!requirement)return;
   const proof=lifecycle.nativeProof(requirement),unresolved=!lifecycle.nativeRequirementReady(requirement);
-  const entry:Entry={requirement,proof,counts:contribution(proof,unresolved),onProof};group.entries.set(key,entry);this.propagate(group,entry.counts,1);onProof?.(proof);
+  const entry:Entry={counts:contribution(proof,unresolved),onProof};group.entries.set(key,entry);this.propagateContribution(group,entry.counts,1);onProof?.(proof);
   if(unresolved){
    this.counters.subscriptions++;
    entry.release=lifecycle.onNativeRequirementReady(requirement,()=>{
     if(this.disposed||group.entries.get(key)!==entry)return;
     this.cancel(entry);this.counters.finalized++;
-    this.propagate(group,entry.counts,-1);entry.proof=lifecycle.nativeProof(requirement);entry.counts=contribution(entry.proof,false);
-    const selected=this.propagate(group,entry.counts,1);entry.onProof?.(entry.proof);if(selected)this.wake();
+    this.propagateContribution(group,entry.counts,-1);const settledProof=lifecycle.nativeProof(requirement);entry.counts=contribution(settledProof,false);
+    const selected=this.propagateContribution(group,entry.counts,1);entry.onProof?.(settledProof);if(selected)this.wake();
    });
   }
  }

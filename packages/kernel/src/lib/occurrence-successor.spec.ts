@@ -9,6 +9,34 @@ type Experimental=ReturnType<typeof link>&{declare(input:{kind:'independent'}|{k
 const flush=async()=>{getPathNotifier().flushSync();for(let i=0;i<120;i++)await Promise.resolve();};
 const asLink=(source:object,sent:unknown[])=>link(source as never,{set:(v:unknown)=>{sent.push(v);}} as never) as Experimental;
 
+it('removes exact role multiplicities from captured slots across hidden replacement',()=>{
+ const tree=signalTree({branch:{x:0},y:0});
+ const index=new RecipientOccurrences(()=>{throw Error('Ready evidence must not subscribe');},()=>life.initialRequirement());
+ const cell=(id:number):life.OwnerCell=>({owner:1,id,outcome:'pending',dependents:new Set()});
+ const a=cell(1),b=cell(2),c=cell(3),d=cell(4),e=cell(5);
+ const proof={owners:[a,a,b],destination:[b],input:[c],validation:[d],possible:[e],unknown:true,invalid:true,unavailableInput:true,historicalWindow:true,terminalRejectedRoles:15};
+ const sibling={owners:[a],destination:[b],input:[c],validation:[d],possible:[e],unknown:true,invalid:false,historicalWindow:true,terminalRejectedRoles:5};
+ const requirement=(value:life.Proof):life.NativeRequirement=>({...life.initialRequirement(),proof:value});
+ try{
+  const branch=index.enroll(tree.$.branch),x=index.enroll(tree.$.branch.x),y=index.enroll(tree.$.y);
+  index.replace(x,'value',requirement(proof));index.replace(y,'value',requirement(sibling));
+  expect(index.proof()).toEqual({...proof,owners:[a,b]});
+  // A requirement can acquire a later proof; deletion must remove what this
+  // exact slot contributed when enrolled, including duplicate owner counts.
+  proof.owners.length=0;proof.destination.length=0;proof.input.length=0;
+  proof.validation.length=0;proof.possible.length=0;proof.unknown=false;
+  proof.invalid=false;proof.unavailableInput=false;proof.historicalWindow=false;proof.terminalRejectedRoles=0;
+  index.setPresence(branch,false,life.initialRequirement());
+  expect(index.proof()).toEqual({...sibling,unavailableInput:false});
+  index.replace(x,'value',life.initialRequirement());
+  index.setPresence(branch,true,life.initialRequirement());
+  expect(index.proof()).toEqual({...sibling,unavailableInput:false});
+  index.replace(y,'value');
+  expect(index.proof()).toEqual({owners:[],destination:[],input:[],validation:[],possible:[],terminalRejectedRoles:0,unknown:false,invalid:false,unavailableInput:false,historicalWindow:false});
+  expect(index.inspect().subscriptions).toBe(0);
+ }finally{index.dispose();tree.destroy();}
+});
+
 it('omission prunes selected nested support but not q consumed into surviving y',async()=>{
  const tree=signalTree({branch:{x:0},y:0},{enhancers:[transactions()]});
  const owner=signalTree({z:0},{enhancers:[transactions()]});const sent:unknown[]=[];const c=asLink(tree.$,sent);

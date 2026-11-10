@@ -25,7 +25,7 @@ type Unit={comparison?:lifecycle.ComparisonAdmission;relevance?:lifecycle.Curren
 type SlotTrie={children:Map<string,SlotTrie>;slots:Map<object,Slot>};
 type FieldInfo={relative:readonly string[];address:readonly string[]};
 type FieldTrie={children:Map<string,FieldTrie>;field?:object};
-type CollectionSupport={occurrence:OccurrenceHandle;payload:unknown;relative:readonly string[]|undefined;entries:Map<string,{requirement:lifecycle.NativeRequirement;proof:Proof}>};
+type CollectionSupport={occurrence:OccurrenceHandle;payload:unknown;relative:readonly string[]|undefined};
 type LegacyScalar={value:unknown;relative:readonly string[];revision:number};
 type SelectedProjection=Readonly<{fact:Fact;payload:unknown;workEpoch:number}>;
 type ProjectionReceipt=SelectedProjection & Readonly<{changed:boolean}>;
@@ -224,7 +224,6 @@ function collectionSelected(b:Binding,collection:CollectionSupport):boolean {
 }
 function setCollectionEntry(_channel:object,b:Binding,collection:CollectionSupport,key:string,requirement?:lifecycle.NativeRequirement):void {
  b.index.replace(collection.occurrence,key,requirement);
- if(requirement)collection.entries.set(key,{requirement,proof:lifecycle.nativeProof(requirement)});else collection.entries.delete(key);
 }
 function projectionSupport(b:Binding):{proof:Proof;present:boolean}{
  const source=b.source&&b.occurrences.get(b.source);
@@ -441,7 +440,7 @@ export function baselineEntityEvidence(source:EntityPublicationEvidence|undefine
 export function registerCollectionProjection(channel:object,key:object,relative:readonly string[]|undefined,initial:ReadonlyMap<string,object>,payload?:unknown):void {
  const b=bindings.get(channel);if(!b)return;
  const occurrence=b.index.enroll(key);b.occurrences.set(key,occurrence);
- const support:CollectionSupport={occurrence,payload:payload??pathValue(b.valuePayload,relative??[]).value,relative,entries:new Map()};
+ const support:CollectionSupport={occurrence,payload:payload??pathValue(b.valuePayload,relative??[]).value,relative};
  for(const [slot,reference]of initial)setCollectionEntry(channel,b,support,slot,reference as lifecycle.NativeRequirement);
  b.collections.set(key,support);
 }
