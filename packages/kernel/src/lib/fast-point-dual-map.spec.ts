@@ -3,6 +3,7 @@ import '../index';
 import {
   EntityPublicationSource,
   type EntityPublicationParticipant,
+  type EntityPublicationEdit,
   type SourcePointPreparer,
 } from './internals/entity-publication';
 import { installTerminalRecord, type PreparedPublicationUnit } from './internals/intrinsic-mutation';
@@ -15,11 +16,18 @@ function install(source: EntityPublicationSource, unit: PreparedPublicationUnit 
   source.complete(unit.completion);
 }
 
-it.each([0, 7])('invalidates a retirement plan captured after point preparation when x becomes %s', value => {
+it.each([
+  { storage: 'map', value: 0 },
+  { storage: 'map', value: 7 },
+  { storage: 'packed', value: 0 },
+  { storage: 'packed', value: 7 },
+])('invalidates a retirement plan captured after $storage point preparation when x becomes $value', ({ storage, value }) => {
   let preparePoint: SourcePointPreparer | undefined;
   const source = new EntityPublicationSource(prepare => { preparePoint = prepare; });
   try {
-    const edit = { subject: 1, before: undefined, after: { x: 0, y: 0 }, fields: ['x', 'y'] };
+    const row = { x: 0, y: 0 };
+    const edit: EntityPublicationEdit = { subject: 1, before: undefined, after: row, fields: ['x', 'y'],
+      structural: storage === 'packed' ? { kind: 'add', subject: 1, key: 1, value: row } : undefined };
     install(source, source.prepare({ owner: 0, id: {}, meta: undefined, ordinary: [edit], physical: [edit] }));
     if (!preparePoint) throw new Error('Missing source-issued point capability');
     // Capture the plan after target selection. Escape marking during plan
