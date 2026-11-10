@@ -1,0 +1,21 @@
+# Independent released-v15/C cost plan review
+
+No concrete blocker to reusing the existing common-ordinary harness/24-child runner/analyzer for a newly bound released15.4.4 versus C cohort. This is source-only plan review, not generated-packet preflight or cost acceptance. No execution or tool edits performed.
+
+The referenced runner already expects24 children and validates construction200/point2000 iteration counts with10% warmup. Its analyzer requires8 valid children/profile and three paired samples/arm, keeping the two released A/A observations separate. Preserve these exact counts and alternating pair order; do not accidentally copy a48/84-child analyzer assumption. Construction dispatch0 still means100-row create/populate/count/destroy fixtures; point is one warm row in1000 three-field rows with inline success assertions. Corrected child-heap-v2 uses scoped fixture helpers and finite WeakRefs. Preserve that body and quiescence protocol, not the obsolete heap body in child.mjs.
+
+## Provenance before launch
+
+- Create a new packet/registration/schedule/STARTED boundary; old data and old source identity labels must not be copied into results or pooled. Retained means actual published npm15.4.4, selected means final clean C, not frozen fe18 or the old singleton/fused prototype.
+- Bind v15 registry metadata/tarball URL, registrySHA512/SHA1 verification, downloaded tarball hash and exact extracted109-file map. Published npm bytes have no local successful-build receipt. If reusing the already verified download, name its original retrieval evidence and reverify current tarball/extracted identity; do not falsely claim a new download/build.
+- Bind C's actual post-qualification clean-build COMMAND/RESULT/source manifest and full193-file map/modes, plus exact production runtime-source hashes. State artifact equality with measured C separately if verified. Do not reuse the old frozen corrected-five-build or prototype receipt as C's current build proof. The prior baseline packet's BINDING-CORRECTION explicitly documents this stale copied-receipt defect; avoid reproducing it in the new binding, including the old blanket phrase that both arms have build receipts.
+- Check actual24 unique IDs/argv/output paths: originals for both arms, no instrumented copies, correct v15 extracted entry versus C kernel/dist path, two v15AA plus three alternating pairs/profile. Bind current harness/analyzer/runner/dependency hashes and preregister descriptive rules before any sample. Let main guards check source before/after; no duplicate repository reread is needed by review.
+- Preserve Node24.15.0/production mode, sanitized launch conditions, sole heavy slot after qualification artifacts settle, resource/PID-birth cleanup, first failures and no favorable retry. A profiler or heap snapshot must not contaminate this cohort.
+
+## Comparability and limits
+
+These profiles compare useful common ordinary outcomes, not capability parity. The harness imports internal transaction runtime in both versions even though the three profiles do not transact; successful import is a setup requirement, not evidence of equivalent transaction semantics. Same public API spelling and row widths must be checked against actual installed/published types and inline outcomes. No v15 build/source checkout is substituted for released bytes.
+
+Report sync wall, synchronous process CPU, total process CPU, drain and all heap phases separately. Three comparison samples/arm and two A/A controls support only the registered range-based descriptive classifications; unresolved is not equivalence. One1000-row heap point cannot establish slope, mandatory semantic overhead or per-owner storage; process heap is not dominator attribution and finite weak clearance is not universal lifetime proof. No old-cohort ratios or historical before-arm medians may substitute for this new matched comparison.
+
+The cohort has no promotion rule or authority to waive a requirement. It supplies the requested released-v15 ordinary baseline context after qualification; it cannot erase prior pending/drain regressions, establish complete runtime-cost acceptance or authorize adoption/release by itself. Actual binding/receipt preflight and raw-result interpretation remain separate steps.

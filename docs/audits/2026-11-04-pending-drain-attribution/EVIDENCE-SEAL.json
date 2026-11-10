@@ -1,0 +1,25 @@
+{
+  "format": "concatenated gzip tar chunks, ordered as listed",
+  "bytes": 56256778,
+  "sha256": "38dca1744bc614092c50ba9d4844b0c9a49fb6ce72177496fe45a58cbb578911",
+  "mapSha256": "ae734691a8a0c67f40474120d84feae20cd3916f8e49cd0cbb22f665da80930d",
+  "verifiedPayloads": 2294,
+  "chunks": [
+    {
+      "name": "attribution-evidence.tar.gz.part01",
+      "bytes": 25165824,
+      "sha256": "04c092c4762f7a5345ad82d0836081d11f39bada5203d9f78f0041ab68ca5e82"
+    },
+    {
+      "name": "attribution-evidence.tar.gz.part02",
+      "bytes": 25165824,
+      "sha256": "8fa13815b3493bb7bcf5e050f3c752394e41ccfd1560d83d38a445d164075962"
+    },
+    {
+      "name": "attribution-evidence.tar.gz.part03",
+      "bytes": 5925130,
+      "sha256": "7b9ef11ee25661edeabe30dff615d006b7a4fc137321b5f4f02de436b6b93ad3"
+    }
+  ],
+  "exclusions": "Regenerable node_modules, nx/npm caches, Python bytecode, .git and guarded run temporary directories. Original source identities are manifests/repository revisions, not a full history archive."
+}
