@@ -259,7 +259,7 @@ export const createEntityPublicationParticipant: () => EntityPublicationParticip
         pairPhysicalUnit(paired, packet.ordinary, packet.physical);
       }
       const physicalAt=new Map<EntityPublicationEdit,Map<string,View>>();
-      const selectedAt=new Map<EntityPublicationEdit,EntityPublicationEvidence>();
+      const selectedAt=new Map<EntityPublicationEdit,()=>EntityPublicationEvidence>();
       const rowFields=(id:number):Map<string,NativeFieldEndpoint>=>{let row=nextFields.get(id);if(!row)nextFields.set(id,row=new Map(fields.get(id)));return row;};
       const rowViews=(id:number):Map<string,View>=>{let row=nextViews.get(id);if(!row)nextViews.set(id,row=new Map(views.get(id)));return row;};
       // Physical support is distinct from ordinary eligibility. Inspection
@@ -308,11 +308,25 @@ export const createEntityPublicationParticipant: () => EntityPublicationParticip
         }
         // A unique subject's prepared row is final within this admitted sequence.
         // Later units clone installed rows; repeated subjects retain per-edit images.
-        const ordinaryRow=!repeatedSubjects?.has(edit.subject)?row:new Map(row),physicalRow=new Map(physical&&physicalAt.get(physical)||view);
+        const unique = !repeatedSubjects?.has(edit.subject);
+        const ordinaryRow = unique ? row : new Map(row);
+        const physicalSnapshot = physical && physicalAt.get(physical);
+        // Only this ordinary edit can select the paired snapshot for a unique
+        // subject. Take ownership of the detached image and apply the selection
+        // there. Installed views and repeated-subject images stay independent.
+        const fresh = unique && edit.structural?.kind === 'add' &&
+          physical?.structural?.kind === 'add';
+        const physicalRow = fresh && physicalSnapshot
+          ? physicalSnapshot
+          : new Map(physicalSnapshot ?? view);
         for(const key of keys){const endpoint=row.get(key);if(!endpoint)throw new Error('Missing prepared field endpoint');physicalRow.set(key,{requirement:endpoint.requirement as Requirement,present:own(physical?.after??edit.after,key)});}
         const member=nextMembers.get(edit.subject)??members.get(edit.subject),placement=nextPlacements.get(edit.subject)??placements.get(edit.subject);
         const ordinaryKey=nextMappings.get(edit.subject)??mappings.get(edit.subject)??missing,physicalKey=nextMappingViews.get(edit.subject)?.requirement??mappingViews.get(edit.subject)?.requirement??missing;
-        selectedAt.set(edit,{
+        // Capture the selected inputs during preparation, including on a
+        // refused attempt. A recipient can enroll during payload reflection.
+        // Only allocate the reader methods if someone asks for this edit.
+        let reader: EntityPublicationEvidence | undefined;
+        selectedAt.set(edit, () => reader ??= {
           member:(id,kind)=>id===edit.subject&&kind==='ordinary'?(member?.requirement??missing):evidence().member(id,kind),
           field:(id,key,kind)=>id===edit.subject?(kind==='ordinary'?(ordinaryRow.get(key)?.requirement as Requirement|undefined)??missing:physicalRow.get(key)?.requirement??missing):evidence().field(id,key,kind),
           placement:(id,kind)=>id===edit.subject&&kind==='ordinary'?(placement??missing):evidence().placement(id,kind),
@@ -327,7 +341,7 @@ export const createEntityPublicationParticipant: () => EntityPublicationParticip
       for(const [key,value]of nextMappings)if(value!==mappings.get(key))writes.push({map:mappings,key,value});
       for(const [key,value]of nextMappingViews)if(value!==mappingViews.get(key))writes.push({map:mappingViews,key,value});
       const selected=evidence(overlay(fields,nextFields,removed),overlay(views,nextViews,removed),overlay(members,nextMembers),overlay(visible,physicalMembers),overlay(placements,nextPlacements,removed),overlay(placementViews,physicalPlacements,removed),overlay(mappings,nextMappings),overlay(mappingViews,nextMappingViews));
-      selected.forEdit=edit=>selectedAt.get(edit)??selected;
+      selected.forEdit=edit=>selectedAt.get(edit)?.()??selected;
       const support=(subject?:number,field?:string):Requirement=>{
         const sources:Requirement[]=[];
         const selected=subject===undefined?[...new Set([...members.keys(),...fields.keys(),...(singleton?[singleton.subject]:lastOrdinaryBySubject?.keys()??[])])]:[subject];

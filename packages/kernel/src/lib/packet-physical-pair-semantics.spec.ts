@@ -247,3 +247,57 @@ it('unique-subject prepared readers survive installation, refused preparation an
     expect(source.evidence()?.field(1, 'x', 'ordinary')).toBe(later);
   } finally { off(); source.dispose(); }
 });
+
+it('seals fresh bulk evidence for a recipient enrolled during payload reflection', () => {
+  const source = new EntityPublicationSource();
+  let saved: Evidence | undefined;
+  let off: (() => void) | undefined;
+  const payload = new Proxy({ x: 1 }, {
+    getOwnPropertyDescriptor(target, key) {
+      off ??= source.subscribe({
+        prepare(_packet, native) {
+          saved = (native as { facts: Evidence }).facts;
+          return undefined;
+        },
+        complete() { throw Error('a refused bulk preparation cannot complete'); },
+      });
+      return Reflect.getOwnPropertyDescriptor(target, key);
+    },
+  });
+  const add = (subject: number, value: { x: number }): Edit => ({
+    subject,
+    before: undefined,
+    after: value,
+    fields: ['x'],
+    structural: { kind: 'add', subject, key: subject, value },
+  });
+  const first = add(1, payload);
+  const second = add(2, { x: 2 });
+  const lateReader = source.evidence();
+  const missing = lateReader?.field(1, 'x', 'physical');
+  try {
+    expect(() => source.prepare(packet([first, second], [first, second])))
+      .toThrow('recipients changed during preparation');
+    expect(source.evidence()?.field(1, 'x', 'physical')).toBe(missing);
+    off?.();
+
+    // Defer the first forEdit call until after a later installed batch. The
+    // reader must use the refused attempt's own paired physical image.
+    const a = add(1, { x: 7 });
+    const b = add(2, { x: 8 });
+    install(source, packet([a, b], [a, b]));
+    const current = source.evidence()?.field(1, 'x', 'physical');
+    expect(current).not.toBe(missing);
+    if (!saved?.forEdit) throw Error('missing refused bulk evidence');
+    const reader = saved.forEdit(first);
+    expect(saved.forEdit(first)).toBe(reader);
+    const refused = reader.field(1, 'x', 'physical');
+    expect(refused).not.toBe(current);
+    expect(refused).not.toBe(missing);
+    expect(reader.field(1, 'x', 'ordinary')).toBe(refused);
+    expect(saved.forEdit(second).field(2, 'x', 'physical')).toBe(refused);
+  } finally {
+    off?.();
+    source.dispose();
+  }
+});
