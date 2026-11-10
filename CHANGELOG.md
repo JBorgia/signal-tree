@@ -1,3 +1,15 @@
+## Unreleased — v15 retention repairs
+
+- Abandoned derived-state graphs can now be collected when a computation closes
+  over its owning store. Finalizer bookkeeping no longer owns the dependency
+  nodes it is meant to clean up.
+- The globally registered EntityMap processor no longer retains the first
+  builder's configuration and application closures after its tree is destroyed.
+
+These repairs preserve v15 transaction, observer-delivery and settlement behavior.
+They are a review candidate based on 15.4.4, not a republication of that version.
+See [the current controller](RELEASE-CURRENT.md) for qualification and release status.
+
 ## 15.4.4 (2026-10-07)
 
 **Patch — reversals restore exactly what they reverse.** Every reversal defect
