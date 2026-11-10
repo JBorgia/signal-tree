@@ -4,11 +4,13 @@ import { combineTerminalRecords, type TerminalRecordPlan } from '../internals/in
 import { entityPublicationOrdinary, currentEntityPublicationInputs, type EntityPublicationParticipant, type EntityPublicationEvidence, type EntityPublicationEdit, type EntityPublicationPacket } from '../internals/entity-publication';
 import * as lifecycle from './lifecycle';
 import { currentNativePublicationInputs } from './private';
+import { PackedFieldRow } from './packed-field-row';
 
 type Requirement = lifecycle.NativeRequirement;
 type Lookup<V>=Pick<ReadonlyMap<number,V>,'get'>;
 const overlay=<V>(base:Lookup<V>,next:Lookup<V>,removed?:ReadonlySet<number>):Lookup<V>=>({get:key=>next.get(key)??(removed?.has(key)?undefined:base.get(key))});
 type View = {requirement:Requirement; present?:boolean};
+type FieldRow<T extends object> = Map<string,T> | PackedFieldRow<T>;
 type Member = {readonly present:boolean;readonly requirement:Requirement};
 const unavailable = lifecycle.unavailableRequirement;
 const own = (row:unknown,key:string):boolean=>row!==null&&typeof row==='object'&&Object.prototype.hasOwnProperty.call(row,key);
@@ -58,10 +60,10 @@ function pairPhysicalUnit(
 
 /** Only current support identities; values and placement remain native kernel truth. */
 export const createEntityPublicationParticipant: () => EntityPublicationParticipant = () => {
-  const fields=new Map<number,Map<string,NativeFieldEndpoint>>();
+  const fields=new Map<number,FieldRow<NativeFieldEndpoint>>();
   const members=new Map<number,Member>();
   const placements=new Map<number,Requirement>();
-  const views=new Map<number,Map<string,View>>();
+  const views=new Map<number,FieldRow<View>>();
   const visible=new Map<number,View>();
   const placementViews=new Map<number,View>();
   const mappings=new Map<number,Requirement>();
@@ -78,7 +80,7 @@ export const createEntityPublicationParticipant: () => EntityPublicationParticip
     escaped.add(row);return revision;
   };
   const missing=unavailable();
-  const evidence=(ordinaryFields:Lookup<Map<string,NativeFieldEndpoint>>=fields,physicalFields:Lookup<Map<string,View>>=views,ordinaryMembers:Lookup<Member>=members,physicalMembers:Lookup<View>=visible,ordinaryPlacements:Lookup<Requirement>=placements,physicalPlacements:Lookup<View>=placementViews,ordinaryMappings:Lookup<Requirement>=mappings,physicalMappings:Lookup<View>=mappingViews):EntityPublicationEvidence=>({
+  const evidence=(ordinaryFields:Lookup<FieldRow<NativeFieldEndpoint>>=fields,physicalFields:Lookup<FieldRow<View>>=views,ordinaryMembers:Lookup<Member>=members,physicalMembers:Lookup<View>=visible,ordinaryPlacements:Lookup<Requirement>=placements,physicalPlacements:Lookup<View>=placementViews,ordinaryMappings:Lookup<Requirement>=mappings,physicalMappings:Lookup<View>=mappingViews):EntityPublicationEvidence=>({
     member:(id,view)=>view==='ordinary'?ordinaryMembers.get(id)?.requirement??missing:physicalMembers.get(id)?.requirement??missing,
     field:(id,key,view)=>view==='ordinary'?(ordinaryFields.get(id)?.get(key)?.requirement as Requirement|undefined)??missing:physicalFields.get(id)?.get(key)?.requirement??missing,
     placement:(id,view)=>view==='ordinary'?ordinaryPlacements.get(id)??missing:physicalPlacements.get(id)?.requirement??missing,
@@ -146,8 +148,10 @@ export const createEntityPublicationParticipant: () => EntityPublicationParticip
         // Generic per-edit selection performs this presence read after the
         // ordinary overlay too; retain callback/trap order even before exposure.
         const selectedPresent=own(physical.after??edit.after,key);
-        let targetFields=copyFields||escaped.has(baseFields)?new Map(baseFields):baseFields;
-        let targetViews=copyViews||escaped.has(baseViews)?new Map(baseViews):baseViews;
+        let targetFields=copyFields||escaped.has(baseFields)||
+          baseFields instanceof PackedFieldRow&&!baseFields.canSet(key)?new Map(baseFields):baseFields;
+        let targetViews=copyViews||escaped.has(baseViews)||
+          baseViews instanceof PackedFieldRow&&!baseViews.canSet(key)?new Map(baseViews):baseViews;
         const revision={};
         const member=members.get(edit.subject),placement=placements.get(edit.subject);
         const ordinaryKey=mappings.get(edit.subject)??missing,physicalKey=mappingViews.get(edit.subject)?.requirement??missing;
@@ -159,8 +163,8 @@ export const createEntityPublicationParticipant: () => EntityPublicationParticip
           targetFields.set(key,endpoint);targetViews.set(key,view);
           escaped.add(baseFields);escaped.add(baseViews);escaped.add(targetFields);escaped.add(targetViews);
           const pointFields=targetFields,pointViews=targetViews;
-          const ordinaryRows:Lookup<Map<string,NativeFieldEndpoint>>={get:id=>id===edit.subject?pointFields:fields.get(id)};
-          const physicalRows:Lookup<Map<string,View>>={get:id=>id===edit.subject?pointViews:views.get(id)};
+          const ordinaryRows:Lookup<FieldRow<NativeFieldEndpoint>>={get:id=>id===edit.subject?pointFields:fields.get(id)};
+          const physicalRows:Lookup<FieldRow<View>>={get:id=>id===edit.subject?pointViews:views.get(id)};
           const physicalRow=new Map(pointViews);
           // Selected per-edit physical support is a captured requirement, not
           // the source's deliberately mutable equal-value physical View cell.
@@ -320,8 +324,15 @@ export const createEntityPublicationParticipant: () => EntityPublicationParticip
         });
       }
       if(packet.ordinaryOrder)for(const subject of packet.ordinaryOrder)nextPlacements.set(subject,requirement);
-      for(const [key,value]of nextFields)if(!removed.has(key))writes.push({map:fields,key,value});
-      for(const [key,value]of nextViews)if(!removed.has(key))writes.push({map:views,key,value});
+      // Only new, narrow rows are packed. The detached prepared evidence keeps
+      // its Maps, so exposed readers cannot acquire the mutable installed row.
+      const pack = <T extends object>(subject: number, row: Map<string,T>) =>
+        row.size > 0 && row.size <= 3 && !fields.has(subject) && !views.has(subject) &&
+        nextMembers.get(subject)?.present === true
+          ? new PackedFieldRow(row)
+          : row;
+      for(const [key,value]of nextFields)if(!removed.has(key))writes.push({map:fields,key,value:pack(key,value)});
+      for(const [key,value]of nextViews)if(!removed.has(key))writes.push({map:views,key,value:pack(key,value)});
       for(const [key,value]of nextMembers)writes.push({map:members,key,value});
       for(const [key,value]of nextPlacements)writes.push({map:placements,key,value});
       for(const [key,value]of nextMappings)if(value!==mappings.get(key))writes.push({map:mappings,key,value});
