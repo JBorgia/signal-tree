@@ -1,7 +1,7 @@
 import type {NativeFieldEndpoint,NativeFieldSelections} from '../internals/native-field-selection';
 import { getActiveWriteContext } from '../write-context';
 import { combineTerminalRecords, type TerminalRecordPlan } from '../internals/intrinsic-mutation';
-import { entityPublicationOrdinary, currentEntityPublicationInputs, type EntityPublicationParticipant, type EntityPublicationEvidence, type EntityPublicationEdit, type EntityPublicationPacket } from '../internals/entity-publication';
+import { entityPublicationOrdinary, isFreshEntityProposal, currentEntityPublicationInputs, type EntityPublicationParticipant, type EntityPublicationEvidence, type EntityPublicationEdit, type EntityPublicationPacket } from '../internals/entity-publication';
 import * as lifecycle from './lifecycle';
 import { currentNativePublicationInputs } from './private';
 import { PackedFieldRow } from './packed-field-row';
@@ -299,6 +299,13 @@ export const createEntityPublicationParticipant: () => EntityPublicationParticip
         }
         const keys=edit.fields===null?[...new Set([...row.keys(),...Object.keys(edit.after??{})])]:edit.fields;
         const physical=paired.get(edit);
+        const physicalSnapshot = physical && physicalAt.get(physical);
+        // A fresh ordinary row is exactly this step's selected field domain.
+        // Its frozen proposal endpoints can answer the selected requirement
+        // without duplicating them into a second detached physical map.
+        const sharedSelection = isFreshEntityProposal(edit) &&
+          physicalSnapshot !== undefined && row.size === 0 &&
+          !repeatedSubjects?.has(edit.subject) && !packet.prepareResponsibility;
         for(const key of keys){
           const endpoint=chosen(edit,key),fieldRequirement=endpoint.requirement as Requirement;
           row.set(key,endpoint);
@@ -312,13 +319,26 @@ export const createEntityPublicationParticipant: () => EntityPublicationParticip
         }
         // A unique subject's prepared row is final within this admitted sequence.
         // Later units clone installed rows; repeated subjects retain per-edit images.
-        const ordinaryRow=!repeatedSubjects?.has(edit.subject)?row:new Map(row),physicalRow=new Map(physical&&physicalAt.get(physical)||view);
-        for(const key of keys){const endpoint=row.get(key);if(!endpoint)throw new Error('Missing prepared field endpoint');physicalRow.set(key,{requirement:endpoint.requirement as Requirement,present:own(physical?.after??edit.after,key)});}
+        const ordinaryRow=!repeatedSubjects?.has(edit.subject)?row:new Map(row);
+        const physicalRow = sharedSelection ? physicalSnapshot : new Map(physicalSnapshot ?? view);
+        for (const key of keys) {
+          const endpoint = row.get(key);
+          if (!endpoint) throw new Error('Missing prepared field endpoint');
+          // Preserve the presence read, including traps and refused attempts.
+          const present = own(physical?.after ?? edit.after, key);
+          if (!sharedSelection)
+            physicalRow.set(key, { requirement: endpoint.requirement as Requirement, present });
+        }
         const member=nextMembers.get(edit.subject)??members.get(edit.subject),placement=nextPlacements.get(edit.subject)??placements.get(edit.subject);
         const ordinaryKey=nextMappings.get(edit.subject)??mappings.get(edit.subject)??missing,physicalKey=nextMappingViews.get(edit.subject)?.requirement??mappingViews.get(edit.subject)?.requirement??missing;
         selectedAt.set(edit,{
           member:(id,kind)=>id===edit.subject&&kind==='ordinary'?(member?.requirement??missing):evidence().member(id,kind),
-          field:(id,key,kind)=>id===edit.subject?(kind==='ordinary'?(ordinaryRow.get(key)?.requirement as Requirement|undefined)??missing:physicalRow.get(key)?.requirement??missing):evidence().field(id,key,kind),
+          field(id, key, kind) {
+            if (id !== edit.subject) return evidence().field(id, key, kind);
+            if (kind === 'ordinary') return ordinaryRow.get(key)?.requirement ?? missing;
+            const selected = sharedSelection ? ordinaryRow.get(key)?.requirement : undefined;
+            return selected ?? physicalRow.get(key)?.requirement ?? missing;
+          },
           placement:(id,kind)=>id===edit.subject&&kind==='ordinary'?(placement??missing):evidence().placement(id,kind),
           keyMapping:(id,kind)=>id===edit.subject?(kind==='ordinary'?ordinaryKey:physicalKey):evidence().keyMapping(id,kind),
         });

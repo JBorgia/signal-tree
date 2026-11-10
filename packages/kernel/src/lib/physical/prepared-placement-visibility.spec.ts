@@ -97,3 +97,21 @@ it('backward queries and rekey visibility updates preserve current nearest ident
   expect(q.resolve(5, 'before')).toBe(2);
   expect(q.resolve(5, 'before', 3)).toBeUndefined();
 });
+
+it('keeps prefix updates and promotes when an interior visibility hole opens', () => {
+  const { q } = setup(8, [0, 1, 2, 3, 4, 5]);
+  // The first query snapshots index 0 as the only visible run member.
+  expect(q.resolve(undefined, 'after')).toBeUndefined();
+  q.setVisible(1, true);
+  q.setVisible(2, true);
+  expect(q.resolve(4, 'before', 1)).toBe(2);
+  q.setVisible(2, false);
+  expect(q.resolve(4, 'before', 1)).toBeUndefined();
+  q.setVisible(2, true);
+  q.setVisible(1, false);
+  expect(q.resolve(1, 'after')).toBe(2);
+  expect(q.resolve(1, 'before')).toBe(0);
+  expect(q.resolve(1, 'after', 2)).toBeUndefined();
+  q.setVisible(1, true);
+  expect(q.resolve(1, 'after')).toBe(1);
+});

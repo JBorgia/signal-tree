@@ -10,7 +10,7 @@ import { ordinaryAdmissionKey } from './physical/ordinary-key-evidence';
 import type {SelectedRowIntent,SelectedRowEdit} from './internals/selected-write-operation';
 import {type ClaimedFieldEndpoint,type NativeFieldEndpoint} from './internals/native-field-selection';
 import type { EntityProjectionSeedEntry } from './internals/entity-projection-seed';
-import { EntityPublicationSource, markEntityPublicationFacts, entityPublicationFactsUnit, defineEntityPublicationBinding, currentEntityPublicationInputs, withEntityPublicationInput, withEntityPublicationUnit, type EntityPublicationEdit, type EntityPublicationStep, type SourcePointPreparer } from './internals/entity-publication';
+import { EntityPublicationSource, markEntityPublicationFacts, withFreshEntityProposals, entityPublicationFactsUnit, defineEntityPublicationBinding, currentEntityPublicationInputs, withEntityPublicationInput, withEntityPublicationUnit, type EntityPublicationEdit, type EntityPublicationPacket, type EntityPublicationStep, type SourcePointPreparer } from './internals/entity-publication';
 import { createPreparedPlacementVisibility } from './physical/prepared-placement-visibility';
 import { withSelectedEntityDisposition } from './internals/selected-entity-disposition';
 import { realizationPlacement } from './internals/causal-runtime/ordinary-realization';
@@ -1605,6 +1605,7 @@ export function createEntitySignal<
       import('./internals/mutation-capture-runtime').CommittedEntityMutation,
       EntityPublicationEdit
     >();
+    let freshProposals: Set<EntityPublicationEdit> | undefined;
     const publicationSteps = changes.map((change, ordinal) => {
       const footprint = authoredByStep.get(ordinal);
       return {
@@ -1617,7 +1618,11 @@ export function createEntitySignal<
           const fields = !effect.structural && footprint?.kind === 'whole'
             ? Object.freeze([...new Set([...(changedFields ?? []), ...Object.keys(effect.after ?? {})])])
             : changedFields;
-          const edit = {...effect, restoredFields:restoredByStep.get(ordinal), fields, structural:effect.structuralRecord};
+          const restoredFields = restoredByStep.get(ordinal);
+          const edit = {...effect, restoredFields, fields, structural:effect.structuralRecord};
+          if (fields === null && restoredFields === undefined &&
+              change.structuralRecord?.kind === 'add' && effect.structuralRecord?.kind === 'add')
+            (freshProposals ??= new Set()).add(edit);
           ordinaryPublicationByChange.set(effect, edit);
           return edit;
         }),
@@ -1636,7 +1641,9 @@ export function createEntitySignal<
           return {subjectId,key:placement.key,row};
         });
       })():undefined,
-      prepareResponsibilityCapture(ordinaryPlan.changes, topologyUnit, structuralFrontier)
+      prepareResponsibilityCapture(ordinaryPlan.changes, topologyUnit, structuralFrontier),
+      undefined,
+      freshProposals
     );
     if(publication.unit){
       markEntityPublicationFacts(ordinaryPlan.changes,publication.id);
@@ -2532,9 +2539,12 @@ export function createEntitySignal<
     return { owner, ownerPath: basePath, meta: ambientMeta(), changes, topologyUnit, structuralFrontier };
   }
 
-  function prepareEntityPublication(physical: readonly EntityPublicationEdit[], ordinary: readonly EntityPublicationEdit[], physicalOrder?: readonly number[], ordinaryOrder?: readonly number[], point=false, steps?: readonly EntityPublicationStep[],seed?:readonly EntityProjectionSeedEntry<K,E|undefined>[],capture?:import('./internals/mutation-capture-runtime').CommittedEntityCapture,ordinaryPlacements?:readonly OrdinaryRestorationPlacement[]) {
+  function prepareEntityPublication(physical: readonly EntityPublicationEdit[], ordinary: readonly EntityPublicationEdit[], physicalOrder?: readonly number[], ordinaryOrder?: readonly number[], point=false, steps?: readonly EntityPublicationStep[],seed?:readonly EntityProjectionSeedEntry<K,E|undefined>[],capture?:import('./internals/mutation-capture-runtime').CommittedEntityCapture,ordinaryPlacements?:readonly OrdinaryRestorationPlacement[],freshProposals?:ReadonlySet<EntityPublicationEdit>) {
     const id=Object.freeze({});
-    const unit=(point?entityPublication.preparePoint.bind(entityPublication):entityPublication.prepare.bind(entityPublication))({id,owner:ownerId??-1,ordinaryPlacements,meta:ambientMeta(),prepareResponsibility:capture?fieldSelections=>mutationCaptureRuntime?.prepareEntityResponsibility?.({...capture,fieldSelections}):undefined,seed,physical,steps:ambientMeta()?.participation==='inspection'?undefined:steps?.map(step=>({...step,physical:step.physical??physical.slice(step.ordinal,step.ordinal+1)})),ordinary:ambientMeta()?.participation==='inspection'?[]:ordinary,physicalOrder,ordinaryOrder:ambientMeta()?.participation==='inspection'?undefined:ordinaryOrder,inputs:currentEntityPublicationInputs()});
+    const packet: EntityPublicationPacket = {id,owner:ownerId??-1,ordinaryPlacements,meta:ambientMeta(),prepareResponsibility:capture?fieldSelections=>mutationCaptureRuntime?.prepareEntityResponsibility?.({...capture,fieldSelections}):undefined,seed,physical,steps:ambientMeta()?.participation==='inspection'?undefined:steps?.map(step=>({...step,physical:step.physical??physical.slice(step.ordinal,step.ordinal+1)})),ordinary:ambientMeta()?.participation==='inspection'?[]:ordinary,physicalOrder,ordinaryOrder:ambientMeta()?.participation==='inspection'?undefined:ordinaryOrder,inputs:currentEntityPublicationInputs()};
+    const unit = freshProposals
+      ? withFreshEntityProposals(freshProposals, () => entityPublication.prepare(packet))
+      : point ? entityPublication.preparePoint(packet) : entityPublication.prepare(packet);
     return {id,unit};
   }
   function commitExistingSubjectValue(

@@ -247,3 +247,47 @@ it('unique-subject prepared readers survive installation, refused preparation an
     expect(source.evidence()?.field(1, 'x', 'ordinary')).toBe(later);
   } finally { off(); source.dispose(); }
 });
+
+it('keeps distinct ordinary and selected physical domains for an explicit field iterator', () => {
+  const source = new EntityPublicationSource();
+  let iterations = 0;
+  const fields = ['x', 'y'];
+  Object.defineProperty(fields, Symbol.iterator, {
+    value: function* () {
+      iterations++;
+      yield 'x';
+      if (iterations === 1) yield 'y';
+    },
+  });
+  Object.freeze(fields);
+  const physicalValue = { x: 1 };
+  const ordinaryValue = { x: 1, y: 2 };
+  const physical: Edit = {
+    subject: 1, fields: ['x'], before: undefined, after: physicalValue,
+    structural: { kind: 'add', subject: 1, key: 1, value: physicalValue },
+  };
+  const ordinary: Edit = {
+    subject: 1, fields, before: undefined, after: ordinaryValue,
+    structural: { kind: 'add', subject: 1, key: 1, value: ordinaryValue },
+  };
+  const missing = source.evidence()!.field(1, 'y', 'physical');
+  let seen = false;
+  const off = source.subscribe({
+    prepare(_packet, native) {
+      const facts = (native as { facts: Evidence }).facts.forEdit!(ordinary);
+      expect(facts.field(1, 'y', 'ordinary')).not.toBe(missing);
+      expect(facts.field(1, 'y', 'physical')).toBe(missing);
+      seen = true;
+      return undefined;
+    },
+    complete() { throw Error('capture-only participant produced a unit'); },
+  });
+  try {
+    install(source, packet([ordinary], [physical]));
+    expect(iterations).toBe(2);
+    expect(seen).toBe(true);
+  } finally {
+    off();
+    source.dispose();
+  }
+});

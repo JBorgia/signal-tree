@@ -3,7 +3,22 @@ import type {
   PreparedPlacementEntries,
 } from './entity-placement-stage';
 type Direction = 'before' | 'after';
-type Run = { ids: number[]; size: number; counts: number[] };
+type Run = {
+  ids: number[];
+  size: number;
+  // A contiguous visible prefix needs neither a tree nor logarithmic updates.
+  prefix: number;
+  counts?: number[];
+};
+function prefixLeaves(run: Run): number[] {
+  const counts = new Array<number>(run.size * 2).fill(0);
+  counts.fill(1, run.size, run.size + run.prefix);
+  return counts;
+}
+function sumBranches(counts: number[], size: number): void {
+  for (let i = size - 1; i > 0; i--)
+    counts[i] = counts[i * 2] + counts[i * 2 + 1];
+}
 /** Transient query index over one fixed physical preparation, never state authority. */
 export function createPreparedPlacementVisibility<K>(
   physical: EntityPlacementStage<K>,
@@ -43,36 +58,39 @@ export function createPreparedPlacementVisibility<K>(
       }
       let size = 1;
       while (size < ids.length) size *= 2;
-      const run: Run = { ids, size, counts: new Array(size * 2).fill(0) };
-      ids.forEach((subject, at) => {
+      const run: Run = { ids, size, prefix: 0 };
+      for (let at = 0; at < ids.length; at++) {
+        const subject = ids[at];
         positions.set(subject, { run, at });
-        run.counts[size + at] = Number(visible(subject));
-      });
-      for (let i = size - 1; i > 0; i--)
-        run.counts[i] = run.counts[i * 2] + run.counts[i * 2 + 1];
+        if (!visible(subject)) continue;
+        if (!run.counts && at === run.prefix) run.prefix++;
+        else (run.counts ??= prefixLeaves(run))[size + at] = 1;
+      }
+      if (run.counts) sumBranches(run.counts, size);
     }
     // Components without a start are cyclic: preserve original guarded traversal.
   }
   function find(
-    run: Run,
+    counts: number[],
+    size: number,
     lo: number,
     hi: number,
     reverse: boolean,
     node = 1,
     left = 0,
-    right = run.size - 1
+    right = size - 1
   ): number | undefined {
-    if (lo > right || hi < left || run.counts[node] === 0) return undefined;
+    if (lo > right || hi < left || counts[node] === 0) return undefined;
     if (left === right) return left;
     const mid = (left + right) >>> 1;
     const first = reverse
-      ? find(run, lo, hi, reverse, node * 2 + 1, mid + 1, right)
-      : find(run, lo, hi, reverse, node * 2, left, mid);
+      ? find(counts, size, lo, hi, reverse, node * 2 + 1, mid + 1, right)
+      : find(counts, size, lo, hi, reverse, node * 2, left, mid);
     return (
       first ??
       (reverse
-        ? find(run, lo, hi, reverse, node * 2, left, mid)
-        : find(run, lo, hi, reverse, node * 2 + 1, mid + 1, right))
+        ? find(counts, size, lo, hi, reverse, node * 2, left, mid)
+        : find(counts, size, lo, hi, reverse, node * 2 + 1, mid + 1, right))
     );
   }
   return {
@@ -80,11 +98,20 @@ export function createPreparedPlacementVisibility<K>(
       overrides.set(subject, value);
       const at = positions.get(subject);
       if (!at) return;
-      let n = at.run.size + at.at;
-      at.run.counts[n] = Number(value);
+      const { run, at: position } = at;
+      if (!run.counts) {
+        if (value === (position < run.prefix)) return;
+        if (value && position === run.prefix) { run.prefix++; return; }
+        if (!value && position === run.prefix - 1) { run.prefix--; return; }
+        run.counts = prefixLeaves(run);
+        sumBranches(run.counts, run.size);
+      }
+      const counts = run.counts;
+      let n = run.size + position;
+      counts[n] = Number(value);
       while (n > 1) {
         n >>>= 1;
-        at.run.counts[n] = at.run.counts[n * 2] + at.run.counts[n * 2 + 1];
+        counts[n] = counts[n * 2] + counts[n * 2 + 1];
       }
     },
     resolve(
@@ -118,7 +145,10 @@ export function createPreparedPlacementVisibility<K>(
             : bound !== undefined && bound >= at
             ? bound - 1
             : run.ids.length - 1;
-          const found = find(run, lo, hi, reverse);
+          const last = Math.min(hi, run.prefix - 1);
+          const found = run.counts
+            ? find(run.counts, run.size, lo, hi, reverse)
+            : lo > last ? undefined : reverse ? last : lo;
           if (found !== undefined) return run.ids[found];
           if (bound !== undefined && (reverse ? bound <= at : bound >= at))
             return undefined;

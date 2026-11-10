@@ -24,6 +24,24 @@ export interface EntityPublicationStep {
   readonly ordinary: readonly EntityPublicationEdit[];
   readonly physical?: readonly EntityPublicationEdit[];
 }
+// Fresh proposal certification lives only for the synchronous source attempt.
+let freshProposals: ReadonlySet<EntityPublicationEdit> | undefined;
+export function withFreshEntityProposals<T>(
+  proposals: ReadonlySet<EntityPublicationEdit>,
+  prepare: () => T
+): T {
+  const previous = freshProposals;
+  freshProposals = proposals;
+  try {
+    return prepare();
+  } finally {
+    freshProposals = previous;
+  }
+}
+export function isFreshEntityProposal(edit: EntityPublicationEdit): boolean {
+  return freshProposals?.has(edit) ?? false;
+}
+
 /** Preserve authored tombstones even when source ordinary membership was absent. */
 export function entityPublicationOrdinary(packet: EntityPublicationPacket): readonly EntityPublicationEdit[] {
   if (!packet.steps) return packet.ordinary;
