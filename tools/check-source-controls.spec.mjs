@@ -26,7 +26,7 @@ function checkFile(name, bytes, args = []) {
   }
 }
 
-for (const name of ['evidence.heapsnapshot.xz', 'evidence.XZ', 'evidence.tar.gz', 'image.png']) {
+for (const name of ['evidence.heapsnapshot.xz', 'evidence.XZ', 'evidence.tar.gz', 'image.png', 'evidence.tar.gz.part01', 'evidence.tar.gz.part02', 'evidence.XZ.part03']) {
   test(`binary suffix excludes ${name} from text scanning`, () => {
     const result = checkFile(name, Buffer.from([0, 1, 127]));
     assert.equal(result.status, 0, result.stderr);
@@ -34,7 +34,7 @@ for (const name of ['evidence.heapsnapshot.xz', 'evidence.XZ', 'evidence.tar.gz'
   });
 }
 
-for (const name of ['source.ts', 'README.md', 'evidence.xz.ts', 'evidence.XZ.md', 'evidence.xz/source.ts', 'unknown.format', 'no-extension']) {
+for (const name of ['source.ts', 'README.md', 'evidence.xz.ts', 'evidence.XZ.md', 'evidence.xz/source.ts', 'unknown.format', 'no-extension', 'source.ts.part01', 'evidence.tar.gz.part', 'evidence.tar.gz.part01.ts', 'evidence.tar.gz.part01/source.ts']) {
   test(`text NUL remains rejected in ${name}`, () => {
     const result = checkFile(name, Buffer.from('text\0\n'));
     assert.equal(result.status, 1, `${result.stdout}\n${result.stderr}`);

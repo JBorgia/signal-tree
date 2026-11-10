@@ -1,9 +1,27 @@
-# Current release decision — packed v16 NO-GO
+# Current work — v16 repairs and release qualification
 
 Updated November 10, 2026. This is the single active acceptance ledger. Historical
 first failures and sealed predecessors remain evidence, not competing queues.
 
-## Current disposition — reject the packed candidate
+## Active owner instruction
+
+The owner corrected the preceding disposition: continue until v16 is ready,
+fix retention, pending memory and startup, weigh engineering budgets against
+application impact and implementation feasibility, and continue through release
+qualification without routine check-ins. That instruction supersedes the former
+stop and its requirement to hold every provisional economic allocation fixed.
+The prior measured failures and rejected exact artifact remain evidence below.
+
+The active repair branch is `codex/v16-release-readiness`, starting at
+`667e4c0923ba379116bdd724dbe80fe541dad14d`. Preserve semantics, actual lifecycle
+cleanup and the original point-work bound. Attribute and repair avoidable costs;
+document any residual budget disposition using application evidence and feasible
+alternatives. Then run the required complete exact-artifact release checks,
+mutation proofs, installed consumers and production browser qualification.
+Routine corrective work is authorized. Branch sharing remains authorized;
+merge, tag and package publication are separate actions.
+
+## Historical disposition — rejected packed artifact
 
 The owner authorized application-based ordinary budgets, an equivalent
 coordinated-workflow comparison, and a clear release decision. The
@@ -30,14 +48,14 @@ gates are unnecessary to reject a candidate already failing mandatory
 acceptance; focused witness, documentation and production-demo checks are
 recorded separately, without claiming release-green.
 
-A future candidate must address coordinated pending-state representation,
+A successor must address coordinated pending-state representation,
 coordinated start preparation, destroyed derived-dependency retention, and
 first-use construction under these same workloads and budgets, then complete
 exact-artifact qualification. The bounded alternative demonstrates that the
 measured costs are not an established unavoidable price of the exercised
 guarantees. It does not implement every v16 contract or authorize an API/semantic
-redesign. Stable release-line source is unchanged. No further micro-optimization
-queue is opened by this disposition.
+redesign. Stable release-line source is unchanged. The subsequent active owner
+instruction above opens and governs the repair work.
 
 ## Historical goal and authority
 
