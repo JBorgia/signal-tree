@@ -1,0 +1,46 @@
+{
+  "decision": "NO-GO",
+  "sourceCheckpoint": "1a6225a386825c12f60d799a59db34c6341cc1e2",
+  "packedRuntime": "b6acda57552affb0fdcbc0b40f1996c4345ed5d8",
+  "ordinaryChildrenCompleted": 60,
+  "ordinaryLifecycleAssertionFailures": {
+    "packedComparison": 5,
+    "packedAA": 2,
+    "v15Comparison": 5
+  },
+  "coordinatedChildrenCompleted": 24,
+  "coordinatedSemanticOrCollectionFailures": 0,
+  "commonFunctionalResultRecords": 22,
+  "plantedControlsKilled": 4,
+  "isolatedRetentionChildren": 18,
+  "originalPointVisits": {
+    "2000rows": 1800,
+    "20000rows": 1800,
+    "unchangedStrictCeiling": 2000
+  },
+  "documentationGatesPassed": [
+    "version-claims",
+    "readme-apis",
+    "documented-imports",
+    "doc-links"
+  ],
+  "finalDocLinks": {
+    "links": 1161,
+    "liveSurfaces": 233,
+    "resolved": 1161
+  },
+  "productionDemo": {
+    "command": "NX_DAEMON=false NX_ISOLATE_PLUGINS=false NG_BUILD_MAX_WORKERS=1 pnpm nx build demo --configuration=production --skip-nx-cache --verbose",
+    "exit": 1,
+    "initialKB": 814.69,
+    "unchangedErrorBudgetKB": 570,
+    "disposition": "Owner-accepted size failure, not a NO-GO reason; no production browser/full release pass claimed"
+  },
+  "packageRebuildIdenticalFiles": 141,
+  "archive": {
+    "sha256": "575e602941fd239e3506e94daf1606cf2e1fc39166212586396d5c79a2d41818",
+    "verifiedPayloads": 862
+  },
+  "runtimeOrPublicApiChanges": false,
+  "fullReleaseQualificationRun": false
+}
