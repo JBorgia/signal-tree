@@ -18,6 +18,7 @@ import { registerIntrinsicMutationSource } from './intrinsic-mutation';
 
 interface DependencyConsumer {
   readonly dependencies: Map<DependencyNode, DependencyEdge>;
+  readonly cleanupEdges: DependencyEdge[];
   level: number;
   invalidate(delivery: Set<DependencyConsumer>): void;
   settle(): void;
@@ -25,6 +26,7 @@ interface DependencyConsumer {
 
 interface DependencyEdge {
   readonly reference: WeakRef<DependencyConsumer>;
+  readonly consumers: Set<WeakRef<DependencyConsumer>>;
   version: number;
 }
 
@@ -208,11 +210,13 @@ export function createWritableProjection<T>(
 let activeConsumer: DependencyConsumer | undefined;
 let publicationDepth = 0;
 const pendingConsumers = new Set<DependencyConsumer>();
-const dependencyFinalizer = new FinalizationRegistry<
-  Map<DependencyNode, DependencyEdge>
->((dependencies) => {
-  for (const [node, edge] of dependencies) {
-    node.consumers.delete(edge.reference);
+// Holdings must not own dependency nodes. A derived node's refresh closure can
+// reach its recipe and the consumer being finalized through a captured owner.
+// These source Sets contain only WeakRefs, so they permit edge cleanup without
+// making the finalizer itself a root for an abandoned derived graph.
+const dependencyFinalizer = new FinalizationRegistry<DependencyEdge[]>((edges) => {
+  for (const edge of edges) {
+    edge.consumers.delete(edge.reference);
   }
 });
 
@@ -269,9 +273,10 @@ const trackDependency = (
     let edge = activeConsumer.dependencies.get(node);
     if (!edge) {
       const reference = new WeakRef(activeConsumer);
-      edge = { reference, version: node.version };
+      edge = { reference, consumers: node.consumers, version: node.version };
       node.consumers.add(reference);
       activeConsumer.dependencies.set(node, edge);
+      activeConsumer.cleanupEdges.push(edge);
     } else {
       edge.version = node.version;
     }
@@ -566,6 +571,7 @@ export function createLocationRuntime(
     const token = () => (observationToken ??= realization.createToken());
     const consumer: DependencyConsumer = {
       dependencies: new Map(),
+      cleanupEdges: [],
       level: 1,
       invalidate: (delivery) => {
         if (
@@ -594,7 +600,7 @@ export function createLocationRuntime(
         }
       },
     };
-    dependencyFinalizer.register(consumer, consumer.dependencies);
+    dependencyFinalizer.register(consumer, consumer.cleanupEdges);
     const publisher: LocationPublisher = {
       notify: () => {
         notifyObservers(observationToken, listeners);
@@ -620,6 +626,7 @@ export function createLocationRuntime(
         dependency.consumers.delete(edge.reference);
       }
       consumer.dependencies.clear();
+      consumer.cleanupEdges.length = 0;
       consumer.level = 1;
       const previous = value;
       const wasInitialized = initialized;

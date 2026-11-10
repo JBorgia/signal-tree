@@ -1,4 +1,26 @@
-# Active release takeover — October 7, 2026
+# Current v15 retention follow-through — November 10, 2026
+
+The owner authorized both demonstrated v15 retention repairs, direct comparison
+with released v15 and qualified v16, and complete qualification. Work is isolated
+on `codex/v15-retention-backport` from published tag `v15.4.4` at
+`2bdf2ec54622e41b607242c8345b3389ce4ffb6c`. Preserve the v15 public API, transaction
+spelling, invalidation/delivery behavior and settlement semantics.
+
+Scope: remove the finalizer-held dependency-node cycle and move globally retained
+EntityMap processor registration out of builder lexical scope. Add actual-resource
+and live-subscriber regression controls, verify failures on original source, then
+qualify exact repaired artifacts. Other v16 publication/packed-field structures
+are absent here and are not backport targets. An unused-code claim needs supported
+reachability and measured benefit before removal.
+
+The root agent owns controllers, release metadata, audit records and branch
+integration. Historical takeover/publication instructions below describe earlier
+work, not current publication authorization. Sharing the completed review branch
+is authorized; no merge, tag or registry publication is selected here.
+
+---
+
+# Historical release takeover — October 7, 2026
 
 The owner authorized this chat to take over and finish the existing v15 release,
 including its inherited uncommitted repairs, then publish if verification passes.

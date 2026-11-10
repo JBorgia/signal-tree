@@ -245,6 +245,42 @@ export function entityMap<E, K extends string | number = DefaultKey<E>>(
   // named could not be imported. The check documented an unreachable path as
   // the solution.
 
+  registerEntityMapProcessor<E>();
+
+  const slices: EntityMapComputedSlices<E> = {};
+
+  const combined = {
+    __isEntityMap: true as const,
+    __entityMapConfig: config ?? {},
+    __computedSlices: slices,
+
+    computed<N extends string, R>(
+      name: N,
+      compute: (entities: E[]) => R
+    ): EntityMapBuilder<E, K, Record<N, R>> {
+      if (ENTITY_SLICE_RESERVED_NAMES.includes(name)) {
+        throw new TypeError(`SignalTree: reserved entityMap slice "${name}".`);
+      }
+      slices[name] = { compute: compute as (entities: E[]) => unknown };
+      return combined as unknown as EntityMapBuilder<E, K, Record<N, R>>;
+    },
+
+    build(): EntityMapMarkerWithSlices<E, K, Record<string, never>> {
+      return combined as unknown as EntityMapMarkerWithSlices<
+        E,
+        K,
+        Record<string, never>
+      >;
+    },
+  };
+
+  return combined as unknown as EntityMapBuilder<E, K, Record<string, never>>;
+}
+
+// Registry callbacks must not share the per-builder lexical scope. That scope
+// contains the first marker/config and can retain application closures after
+// its tree is destroyed. Keep lazy registration and registry-owned deduplication.
+function registerEntityMapProcessor<E>(): void {
   // Self-register on first use (tree-shakeable).
   //
   // ⚠️ A `entityMapRegistered` BOOLEAN GUARDED THIS UNTIL 15.0. It duplicated a
@@ -435,32 +471,4 @@ export function entityMap<E, K extends string | number = DefaultKey<E>>(
     }
   );
 
-  const slices: EntityMapComputedSlices<E> = {};
-
-  const combined = {
-    __isEntityMap: true as const,
-    __entityMapConfig: config ?? {},
-    __computedSlices: slices,
-
-    computed<N extends string, R>(
-      name: N,
-      compute: (entities: E[]) => R
-    ): EntityMapBuilder<E, K, Record<N, R>> {
-      if (ENTITY_SLICE_RESERVED_NAMES.includes(name)) {
-        throw new TypeError(`SignalTree: reserved entityMap slice "${name}".`);
-      }
-      slices[name] = { compute: compute as (entities: E[]) => unknown };
-      return combined as unknown as EntityMapBuilder<E, K, Record<N, R>>;
-    },
-
-    build(): EntityMapMarkerWithSlices<E, K, Record<string, never>> {
-      return combined as unknown as EntityMapMarkerWithSlices<
-        E,
-        K,
-        Record<string, never>
-      >;
-    },
-  };
-
-  return combined as unknown as EntityMapBuilder<E, K, Record<string, never>>;
 }
