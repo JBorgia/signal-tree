@@ -5,8 +5,9 @@ automated application comparison. Preparation starts from
 `197baa287d12319558886e2298b34ef963801d6f`; the runtime remains
 `ef806bef2a71aa48709c2b4cad5e71d1ee359c2f`. Initial patch 15.4.5 was checked
 against remote tags and npm before preparation. It remains an unpublished,
-superseded signed attempt; the next candidate is 15.4.6 for the runner and
-provenance reasons below.
+superseded signed attempt. The subsequent 15.4.6 preparation also remains
+unpublished after runner connectivity failures. The next candidate is 15.4.7
+for the supported-container reasons below.
 
 The [preceding qualification](../2026-11-10-v15-retention-followthrough/README.md)
 contains the actual-resource retention controls, demand-sensitive allocation
@@ -77,3 +78,37 @@ prepare 15.4.6 with the runner fix included, and execute from that exact tag.
 The failed run, signed 15.4.5 tag and prepared archives remain intact; no npm
 publication of 15.4.5 occurred. Full exact-tag validation and registry verification
 remain required. Runtime behavior and all gate/signature requirements are unchanged.
+
+## Ubuntu DNS failure and supported-container successor
+
+Signed `v15.4.6` at `d78dc2377ad8f6cfae77d89f925d73591455532a` passed
+[full exact-tag release CI](https://github.com/JBorgia/signal-tree/actions/runs/43031952720):
+91/91 ordinary/release gates and 91/91 mutation proofs (15 indirect, zero blind,
+vacuous, unproven or errored), followed by clean rebuilds and installed consumers.
+The GitHub release was created. All three attempts of
+[its npm publisher](https://github.com/JBorgia/signal-tree/actions/runs/43035473289)
+failed to acquire browser system dependencies because Ubuntu mirror hostnames
+could not resolve. Attempt one was cancelled after preserving repeated DNS
+errors; attempts two and three failed naturally. No attempt reached publication.
+
+The [read-only runner diagnostic](https://github.com/JBorgia/signal-tree/actions/runs/43040810114)
+attempted to resolve and fetch each mirror independently. Azure, archive.ubuntu.com and
+security.ubuntu.com all failed DNS and bounded HTTPS transfer on that runner.
+This disproves treating a different mirror alone as a demonstrated remedy.
+A [separate supported-container probe](https://github.com/JBorgia/signal-tree/actions/runs/43042033281)
+checked out unchanged `d78dc2377`, installed locked dependencies, asserted
+Playwright 1.56.1, launched Chromium, built the packages and passed the existing
+packed production Angular AOT consumer.
+
+The official Playwright 1.56.1 Noble image supplies its browsers and system
+libraries. Its registry index digest is
+`sha256:f1e7e01021efd65dd1a2c56064be399f3e4de00fd021ac561325f2bfbb2b837a`.
+The repository still installs its locked JavaScript dependency and verifies the
+version match. This is a supported environment change, not omitted browser
+verification. See the [versioned vendor Dockerfile](https://raw.githubusercontent.com/microsoft/playwright/v1.56.1/utils/docker/Dockerfile.noble).
+
+The successor preparation is 15.4.7. Both verification/publisher jobs use that
+pinned container; every normal gate, mutation proof, clean rebuild and consumer
+check remains. New signed-tag qualification and registry receipts are required;
+prior passes establish supporting evidence only. Runtime, lockfile and public
+API are unchanged by this environment correction. No tag is rewritten.

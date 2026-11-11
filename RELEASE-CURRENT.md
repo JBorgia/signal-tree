@@ -6,15 +6,23 @@ evaluation and improvements without routine check-ins. Publication, the signed
 release tag and the canonical tagged CI path are authorized for this maintenance
 scope. No v16 runtime changes belong in this release.
 
-Publish the next unused patch, 15.4.6, from `codex/v15-release-ci`. The signed
-15.4.5 preparation remains unpublished and superseded after the tagged runner
-failed before tests. Preserve that tag and its evidence. The new candidate
-includes the Ubuntu 24.04 runner pin so workflow identity, package-source identity
-and npm provenance agree. Preserve runtime checkpoint `ef806bef2`, finalize
-version/changelog metadata and verify the exact committed/tagged artifacts.
-Publish only through the canonical CI publisher, then verify all five registry
-artifacts, fresh installed consumers and release notes. The prior Linux run was
-retention/cleanup evidence; full tagged release CI remains required.
+Publish the next unused patch, 15.4.7, from `codex/v15-release-container`.
+Signed preparations 15.4.5 and 15.4.6 remain unpublished and superseded; preserve
+both tags and all first-failure evidence. Version 15.4.6 passed exact tagged
+release CI, but three publisher runners could not resolve Ubuntu mirrors before
+package tests or publication. Independent runner diagnostics reproduced failure
+for all three official mirror hosts; changing only the mirror is not supported
+by that evidence.
+
+The successor uses the official Playwright 1.56.1 Noble container pinned by
+registry digest. A separate exact-source probe launched its matching Chromium
+and passed the unchanged candidate's packed production Angular AOT consumer.
+This establishes environment feasibility, not release qualification. Full
+normal/mutation gates, clean rebuilds, consumer checks and canonical publication
+remain mandatory. Dispatch from the successor's exact tag so workflow/source/npm
+provenance agree. Runtime remains `ef806bef2`; no public behavior is changed.
+Verify all five published archives, dist-tags, provenance, fresh registry
+consumers, release notes and the exact-commit production demo after publication.
 
 Under the owner's standing cost/feasibility instruction, the entities production
 ceiling is explicitly adjusted from 24.60 to 24.70 KB for the demonstrated
