@@ -428,10 +428,11 @@ export const createEntityPublicationParticipant: () => EntityPublicationParticip
       // A blocked proof is still required evidence. Pack exact identical facts
       // only after the source verifies the installed-forget authority/currentness.
       // Own-window requests keep their existing terminal-deletion subscription.
-      const packable=Number.isSafeInteger(subject)&&subject>=0&&ready&&!canRelease&&!retired?.get(subject)&&!snapshots[0]&&!snapshots[2]&&!snapshots[3]&&snapshots[1]?.present===false&&snapshots[4]?.present===false&&!!snapshots[5]&&!!snapshots[6]&&!!snapshots[7];
+      const member=snapshots[1],visibleFact=snapshots[4],placement=snapshots[5],mapping=snapshots[6],mappingView=snapshots[7];
+      const packable=Number.isSafeInteger(subject)&&subject>=0&&ready&&!canRelease&&!retired?.get(subject)&&!snapshots[0]&&!snapshots[2]&&!snapshots[3]&&member?.present===false&&visibleFact?.present===false&&!!placement&&!!mapping&&!!mappingView;
       return { ready, canRetire,
         compact:packable?()=>{
-          const fact:RetiredFacts={member:snapshots[1]!,visible:snapshots[4]!,placement:snapshots[5]!,mapping:snapshots[6]!,mappingView:snapshots[7]!};
+          const fact:RetiredFacts={member,visible:visibleFact,placement,mapping,mappingView};
           if(!(retired??=new ExactSubjectRuns(sameRetired)).tryAppend(subject,fact))return false;
           members.delete(subject);visible.delete(subject);placementViews.delete(subject);mappings.delete(subject);mappingViews.delete(subject);
           return true;
