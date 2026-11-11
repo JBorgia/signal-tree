@@ -1,0 +1,253 @@
+{
+  "version": "15.4.8",
+  "tag": "v15.4.8",
+  "candidateCommit": "37ef1788f6bac61678fc312f391b180bd7a6bbd7",
+  "runtimeCommit": "ef806bef2a71aa48709c2b4cad5e71d1ee359c2f",
+  "npmPublishedAndVerified": true,
+  "productionDemoComplete": false,
+  "productionDemoPending": "Vercel requires email identity verification; one-time code masked by email connector. User asked to complete verification; comparison work continues.",
+  "packages": [
+    {
+      "name": "@signal-tree/kernel",
+      "version": "15.4.8",
+      "latest": "15.4.8",
+      "integrity": "sha512-LTFxvZFTHk8qsGhleoZS8OZDl+6ACaQC1vAsjgC2zm1tAc8+T7aQUFLHh80EzG7JpaXHqKVeGfQUFjZA6k02Rg==",
+      "tarball": "/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-v15-release-4b1jd_ka/registry-15.4.8/signal-tree-kernel-15.4.8.tgz",
+      "registryPublishedAt": "2026-11-11T16:26:17.818Z",
+      "provenancePayloadIdentity": "tag/commit/workflow/subject matched; cryptographic trust pending separate npm audit signatures verification"
+    },
+    {
+      "name": "@signal-tree/angular",
+      "version": "15.4.8",
+      "latest": "15.4.8",
+      "integrity": "sha512-i/ip0wV+3SGSD43C+xFLR7z/7GVS/vGIpbAXfCt1YfeJF2v08aJvoLz+l7PZteUCC1OZNLW6Urfd2q0swLvECg==",
+      "tarball": "/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-v15-release-4b1jd_ka/registry-15.4.8/signal-tree-angular-15.4.8.tgz",
+      "registryPublishedAt": "2026-11-11T16:23:24.678Z",
+      "provenancePayloadIdentity": "tag/commit/workflow/subject matched; cryptographic trust pending separate npm audit signatures verification"
+    },
+    {
+      "name": "@signal-tree/react",
+      "version": "15.4.8",
+      "latest": "15.4.8",
+      "integrity": "sha512-1O6GantRyjkZr89j8GhkuGiLiLNWBHIi7NRyhgNcT7012pqN8JZ7j5Yit7NL9Xvu0/Qi+TeeyT0hizqkiKljnw==",
+      "tarball": "/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-v15-release-4b1jd_ka/registry-15.4.8/signal-tree-react-15.4.8.tgz",
+      "registryPublishedAt": "2026-11-11T16:23:01.406Z",
+      "provenancePayloadIdentity": "tag/commit/workflow/subject matched; cryptographic trust pending separate npm audit signatures verification"
+    },
+    {
+      "name": "@signal-tree/vue",
+      "version": "15.4.8",
+      "latest": "15.4.8",
+      "integrity": "sha512-G8jT02botkzQazkbGrbTLRORaZ5oDCo4ehp5gX5DKoIbvO77kMOIf87WZ0Q/9ZljEzglNEh1nmb+0Fhvci2yzA==",
+      "tarball": "/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-v15-release-4b1jd_ka/registry-15.4.8/signal-tree-vue-15.4.8.tgz",
+      "registryPublishedAt": "2026-11-11T16:24:42.536Z",
+      "provenancePayloadIdentity": "tag/commit/workflow/subject matched; cryptographic trust pending separate npm audit signatures verification"
+    },
+    {
+      "name": "@signal-tree/solid",
+      "version": "15.4.8",
+      "latest": "15.4.8",
+      "integrity": "sha512-4BSxxvWoQxbUTXSqw83HPqKI0/v/wDkyl4BOLut1j4/aOxM0VJ4sWGxIFrnuWkQbHAt0GmGA1xWdxvJzC4t+Lw==",
+      "tarball": "/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-v15-release-4b1jd_ka/registry-15.4.8/signal-tree-solid-15.4.8.tgz",
+      "registryPublishedAt": "2026-11-11T16:23:02.103Z",
+      "provenancePayloadIdentity": "tag/commit/workflow/subject matched; cryptographic trust pending separate npm audit signatures verification"
+    }
+  ],
+  "registryConsumerClosure": {
+    "passed": true,
+    "candidateCommit": "37ef1788f6bac61678fc312f391b180bd7a6bbd7",
+    "version": "15.4.8",
+    "completedUTC": "2026-11-11T16:27:28.864767+00:00",
+    "registryVerificationSha256": "a00f2c70135149a6e45b129d40fd8debd2e4a73fddb303073aa7e361c1d65738",
+    "checks": {
+      "install": {
+        "exit": 0,
+        "command": [
+          "npm",
+          "install",
+          "--ignore-scripts",
+          "--no-fund",
+          "--no-audit"
+        ],
+        "cwd": "/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-v15-release-4b1jd_ka/registry-consumer-15.4.8",
+        "log": "/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-v15-release-4b1jd_ka/v15.4.8-registry-install.log",
+        "logSha256": "aaedb43aa7e9fa5839400a9f764276452b142bd1f6c038df20916f002124091c"
+      },
+      "runtime": {
+        "exit": 0,
+        "command": [
+          "node",
+          "runtime.mjs"
+        ],
+        "cwd": "/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-v15-release-4b1jd_ka/registry-consumer-15.4.8",
+        "log": "/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-v15-release-4b1jd_ka/v15.4.8-registry-runtime.log",
+        "logSha256": "2532500745cf8614fae5c9cb88d6bff7f7780cc5bd26d8eaf280cc0c46a96566"
+      },
+      "signatures": {
+        "exit": 0,
+        "command": [
+          "npm",
+          "audit",
+          "signatures"
+        ],
+        "cwd": "/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-v15-release-4b1jd_ka/registry-consumer-15.4.8",
+        "log": "/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-v15-release-4b1jd_ka/v15.4.8-registry-signatures.log",
+        "logSha256": "4a98aa82ef4898f386c5f55e85d6d281db4d9231668a91a774ca3e00039459b5"
+      },
+      "types": {
+        "exit": 0,
+        "command": [
+          "node",
+          "tools/verify-consumer-typecheck.mjs",
+          "--tarball=/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-v15-release-4b1jd_ka/registry-15.4.8/signal-tree-kernel-15.4.8.tgz",
+          "--tarball=/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-v15-release-4b1jd_ka/registry-15.4.8/signal-tree-angular-15.4.8.tgz",
+          "--tarball=/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-v15-release-4b1jd_ka/registry-15.4.8/signal-tree-react-15.4.8.tgz",
+          "--tarball=/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-v15-release-4b1jd_ka/registry-15.4.8/signal-tree-vue-15.4.8.tgz",
+          "--tarball=/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-v15-release-4b1jd_ka/registry-15.4.8/signal-tree-solid-15.4.8.tgz"
+        ],
+        "cwd": "/Users/jonathanborgia/code/signaltree/.worktrees/v15-release-container",
+        "log": "/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-v15-release-4b1jd_ka/v15.4.8-registry-types.log",
+        "logSha256": "a773289051a58cf35d19065195c79fa3457480d3518e371785cbe0611ffd35c0"
+      },
+      "aot": {
+        "exit": 0,
+        "command": [
+          "node",
+          "tools/verify-angular-aot-consumer.mjs",
+          "--kernel-tarball=/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-v15-release-4b1jd_ka/registry-15.4.8/signal-tree-kernel-15.4.8.tgz",
+          "--angular-tarball=/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-v15-release-4b1jd_ka/registry-15.4.8/signal-tree-angular-15.4.8.tgz"
+        ],
+        "cwd": "/Users/jonathanborgia/code/signaltree/.worktrees/v15-release-container",
+        "log": "/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-v15-release-4b1jd_ka/v15.4.8-registry-aot.log",
+        "logSha256": "8076ea766d301ae307069e3114a197e0f4bd02dcc0768c6ab14420c725d817ed"
+      }
+    }
+  },
+  "localQualification": {
+    "ordinaryGates": "91/91",
+    "mutationProofs": "91/91;15 indirect;0 unproven/vacuous/blind/errored",
+    "postMutationRebuild": true,
+    "candidateArchivesIdentical": true,
+    "browserSmoke": "146/146",
+    "strictConsumers": "bundler and node16",
+    "angularAOT": "passed"
+  },
+  "hostedRuns": {
+    "release": "https://github.com/JBorgia/signal-tree/actions/runs/43051882864",
+    "publisher": "https://github.com/JBorgia/signal-tree/actions/runs/43054521673"
+  },
+  "demoPreview": {
+    "candidateCommit": "37ef1788f6bac61678fc312f391b180bd7a6bbd7",
+    "tag": "v15.4.8",
+    "deploymentId": "dpl_5BcakwMuePWuZmvj9aMHcveKH2Pw",
+    "deploymentPage": "https://vercel.com/jonathan-d-borgias-projects/signaltree/5BcakwMuePWuZmvj9aMHcveKH2Pw",
+    "previewURL": "https://signaltree-gzr2tko7c-jonathan-d-borgias-projects.vercel.app",
+    "visibleKernelVersion": "15.4.8",
+    "trace": [
+      {
+        "order101": {
+          "priority": "Standard",
+          "status": "Packing"
+        },
+        "order102": {
+          "priority": "Standard",
+          "status": "Ready"
+        }
+      },
+      {
+        "action": "Make it Rush",
+        "order101": {
+          "priority": "Rush",
+          "status": "Packing"
+        },
+        "order102": {
+          "priority": "Standard",
+          "status": "Ready"
+        }
+      },
+      {
+        "action": "Receive server update",
+        "order101": {
+          "priority": "Rush",
+          "status": "Shipped"
+        },
+        "order102": {
+          "priority": "Standard",
+          "status": "Ready"
+        }
+      },
+      {
+        "action": "Undo my edit",
+        "order101": {
+          "priority": "Standard",
+          "status": "Shipped"
+        },
+        "order102": {
+          "priority": "Standard",
+          "status": "Ready"
+        }
+      }
+    ],
+    "method": "Authenticated Chrome, visible DOM after each user action; no production promotion yet",
+    "browserErrors": "No error entry for this deployment URL; retained entries belonged to older 15.4.6 preview."
+  },
+  "preservedFirstFailures": [
+    {
+      "failure": "Sandbox npm cache EPERM during final tarball packaging",
+      "resolution": "Unchanged check passed with host cache/network access; original log retained"
+    },
+    {
+      "failure": "Initial public kernel metadata still latest15.4.4 and version15.4.8 absent after CI publish success",
+      "resolution": "Kernel became visible with last-modified2026-11-11T16:26:20Z; all five exact registry archives and fresh installation then verified. Exact propagation/cache mechanism unproven."
+    }
+  ],
+  "sourceReview": "Independent read-only source/log and registry-closure reviews demonstrate no npm-release blocker; they do not establish live-demo completion.",
+  "rawEvidenceLocalDirectory": "/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-v15-release-4b1jd_ka",
+  "logs": {
+    "v15.4.8-prepare-patch.log": {
+      "sha256": "530a300d68235e4664040d384b253ba4192cec499b8e1eea44865ca392320a61"
+    },
+    "v15.4.8-mutations.log": {
+      "sha256": "a043c8ee3b872bb8f86787f1baf823c67805da0a55d0f9dfc9f1a82e70d40d3f"
+    },
+    "v15.4.8-final-rebuild.log": {
+      "sha256": "331d107155009acaacd479e8078aab5e4e4c4b29bd94e6f3d43c1e9bf83ad994"
+    },
+    "v15.4.8-final-tarballs.log": {
+      "sha256": "c173abff962009956b7263151b16a6f4ccab3e73b37f578c2aa2cc9968eed2c2"
+    },
+    "v15.4.8-pack-diagnostic.log": {
+      "sha256": "979d0018b27fe6971bbab2d9cc1e50124e447d72f1bfab8716d955bbbff260c7"
+    },
+    "v15.4.8-final-tarballs-host.log": {
+      "sha256": "141ef3ed7053d1e84a454073c419c1c1d7c685801bca01d6df8b1b79d057264b"
+    },
+    "v15.4.8-final-types.log": {
+      "sha256": "a773289051a58cf35d19065195c79fa3457480d3518e371785cbe0611ffd35c0"
+    },
+    "v15.4.8-final-aot.log": {
+      "sha256": "8076ea766d301ae307069e3114a197e0f4bd02dcc0768c6ab14420c725d817ed"
+    },
+    "v15.4.8-final-demo.log": {
+      "sha256": "228ff76a370e3f016b968485002ce5b03bb0dbdb3bf27144a8a30c7ed2c2a499"
+    },
+    "v15.4.8-final-browser.log": {
+      "sha256": "567bc7398d6e3e6e95d78955972970f1873916e0ce0032a55da7feb024944d0d"
+    },
+    "v15.4.8-final-candidate.log": {
+      "sha256": "96f72531bcfa27e97976fb9231574b365f37d0b0d9126804c463e1ba0403ef66"
+    },
+    "v15.4.8-linux-release.log": {
+      "sha256": "3ff93b935e4aefdb1eaabeeb2319f48a4266bb0a9884c5b066b9be1e8a770ac9"
+    },
+    "v15.4.8-publisher.log": {
+      "sha256": "d20a29db6e3f9e644980b62f0a4ee05bb7c5c94e023b7bf1e952383d5dd08ae9"
+    },
+    "v15.4.8-registry-integrity.log": {
+      "sha256": "c67ffbc674d0c431b92771857c00ced5dc7bd71656a73c66049af11d383864e0"
+    },
+    "v15.4.8-registry-integrity-after-propagation.log": {
+      "sha256": "b3303c9d7f6f0a286ac6cef2313d9c4031c41059a99d00e00581e60431bc4f34"
+    }
+  }
+}

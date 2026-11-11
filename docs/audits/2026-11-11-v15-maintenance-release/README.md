@@ -1,4 +1,43 @@
-# v15 maintenance release
+# v15.4.8 published and registry-verified
+
+Signed tag `v15.4.8` identifies `37ef1788f6bac61678fc312f391b180bd7a6bbd7`.
+All five packages are on npm `latest`; their downloaded SHA-512 integrities
+match the qualified candidate. Provenance binds the exact tag, commit, workflow,
+publisher run and package subject. Fresh registry installation, all-five-facade
+runtime checks, cryptographic signatures/attestations, strict `bundler`/`node16`
+consumers and production Angular AOT pass. See [the exact receipt](v15.4.8-receipt.json).
+
+Local preparation and exact tagged Linux verification passed all 91 normal gates
+and all 91 mutation proofs, followed by clean rebuilds and installed consumers.
+Local final demo smoke passed 146/146. Commands, artifact identities, raw-log
+hashes and the retained earlier failures are in the receipt. Neither coverage
+percentages nor unlimited retention boundedness are established by these checks.
+
+- [Tagged Linux qualification](https://github.com/JBorgia/signal-tree/actions/runs/43051882864)
+- [Canonical npm publisher](https://github.com/JBorgia/signal-tree/actions/runs/43054521673)
+- [Published release notes](https://github.com/JBorgia/signal-tree/releases/tag/v15.4.8)
+
+The initial registry read still omitted the kernel version after CI reported
+publication. The four facades appeared first; kernel metadata subsequently
+updated, and exact archive/consumer verification then passed. The original 404
+and stale metadata remain evidence. This establishes observed visibility delay,
+not a proven internal npm cache mechanism.
+
+The exact-commit demo preview serves 15.4.8 and passes edit/server-update/undo.
+**Production-demo promotion remains pending Vercel email identity verification.**
+The email connector masks the one-time code; the owner has been asked to complete
+Vercel's challenge. npm release completion is separate from live-site completion.
+
+The release is the v15 retention and lazy entity-field maintenance update.
+Transaction, observer-delivery and settlement behavior remain v15's. Fully
+materialized rows retain extra getter/cache bookkeeping; no universal memory or
+speed improvement is claimed. Superseded signed preparations 15.4.5–15.4.7 remain
+intact and were never published to npm. The 15.4.6 GitHub entry is labeled accordingly.
+
+---
+
+## Preparation history
+
 
 The owner authorized publication on November 11, 2026, before the separate
 automated application comparison. Preparation starts from
