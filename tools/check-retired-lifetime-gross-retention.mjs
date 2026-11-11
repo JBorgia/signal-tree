@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Gross-retention contract independently validated on the Linux release runner.
+ * Gross-retention ceiling originally validated on the Linux release runner.
  * 40 MiB was selected from prior Linux characterization: healthy max 16.235 MiB,
  * intentionally held 10k-handle min 96.423 MiB. These are threshold-selection
  * observations. Independent validation is recorded in
@@ -14,9 +14,13 @@
  * THREE fresh children, each width 1000 / rounds 150 / retain 0. Every raw
  * (after.quiesceHeapUsed - before.quiesceHeapUsed) / 1048576 must be <= 40.
  * No median, retry, ratio, rounding before judgement, or asymptotic claim.
- * Self-test: six fresh children, control / retain 10000 / neutralized for BOTH
+ * Self-test: six fresh children, control / retain 50000 / neutralized for BOTH
  * arms. Control and neutralized must pass, intentional retention must fail the
  * numeric verdict with valid diagnostics (a crash cannot satisfy sensitivity).
+ * Lazy field carriers made the original 10000-handle control fall below the
+ * unchanged ceiling. The current-artifact sensitivity validation is recorded in
+ * docs/audits/2026-11-10-v15-retention-followthrough/README.md. This does not
+ * transfer the historical Linux validation to a different artifact or control.
  * Helpers are synthetic contract checks only; they launch no workload.
  *
  * JSONL stdout preserves the pre-run plan, each child's entire stdout/stderr,
@@ -44,7 +48,7 @@ const ENTRY = join(ARTIFACT, 'dist/index.js');
 const ARMS = ['no-history-reads', 'no-history-node-reads'];
 const WIDTH = 1000;
 const ROUNDS = 150;
-const HELD = 10000;
+const HELD = 50000;
 const MIB = 1024 * 1024;
 export const MAX_GROWTH_MIB = 40;
 const TIMEOUT_MS = 300000;
@@ -434,7 +438,9 @@ function helperChecks() {
         heldHandles: held,
         uniqueHeldHandles: held,
         firstSelectedGeneration: entry.retain ? 1 : null,
-        lastSelectedGeneration: entry.retain ? 10 : null,
+        lastSelectedGeneration: entry.retain
+          ? Math.ceil(entry.retain / WIDTH)
+          : null,
         liveGenerationHeld: 0,
         byIdCalls: WIDTH * (ROUNDS + 1),
         nodeReads: entry.arm === ARMS[1] ? WIDTH * (ROUNDS + 1) : 0,
@@ -545,11 +551,17 @@ async function main() {
     results = [];
   emit({
     type: 'registered-plan',
-    status: 'independently-validated-linux-release-contract',
+    status: 'current-artifact-gross-retention-check',
     thresholdSelection: {
       healthyMaximumMiB: 16.235,
       heldMinimumMiB: 96.423,
+      heldHandles: 10000,
       source: 'prior Linux characterization; selection data, not validation',
+    },
+    sensitivityControl: {
+      heldHandles: HELD,
+      change: 'real retained handles increased after lazy-field allocation',
+      historicalLinuxValidationDoesNotQualifyCurrentArtifact: true,
     },
     maxGrowthMiB: MAX_GROWTH_MIB,
     width: WIDTH,
@@ -672,7 +684,7 @@ async function main() {
       identityError,
       pairError,
       independentValidation:
-        'validated by Linux run 36948765496; no asymptotic or 20 B sensitivity claim',
+        'historical 10000-handle Linux run 36948765496 is not current-artifact validation; see current follow-through audit; no asymptotic or 20 B sensitivity claim',
     });
   }
 }

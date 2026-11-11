@@ -4,13 +4,14 @@ on:
   workflow_dispatch:
     inputs:
       phase:
-        description: Raw characterization or frozen independent heap validation
+        description: Historical characterization/validation or current sensitivity validation
         type: choice
         required: true
         default: characterization
         options:
           - characterization
           - validation
+          - sensitivity
 
 permissions:
   contents: read
@@ -48,7 +49,8 @@ jobs:
           set -o pipefail
           pnpm exec nx build kernel --skip-nx-cache 2>&1 | tee artifacts/retention-characterization/build.log
 
-      - name: Collect preregistered raw fresh-process batch
+      - name: Collect historical preregistered raw fresh-process batch
+        if: inputs.phase != 'sensitivity'
         env:
           PHASE: ${{ inputs.phase }}
         run: |
@@ -59,6 +61,18 @@ jobs:
             *) echo "Unknown diagnostic phase: $PHASE"; exit 1 ;;
           esac
           node tools/characterize-retired-node-memory.mjs "${mode[@]}" --out artifacts/retention-characterization/data 2>&1 | tee artifacts/retention-characterization/driver.log
+
+      - name: Validate current artifact sensitivity with eighteen fresh children
+        if: inputs.phase == 'sensitivity'
+        run: |
+          set -o pipefail
+          node tools/check-retired-lifetime-gross-retention.mjs --check-helpers 2>&1 | tee artifacts/retention-characterization/helpers.log
+          for repetition in 1 2 3; do
+            node tools/check-retired-lifetime-gross-retention.mjs --self-test 2>&1 | tee "artifacts/retention-characterization/sensitivity-$repetition.jsonl"
+          done
+          node tools/check-retired-lifetime-gross-retention.mjs 2>&1 | tee artifacts/retention-characterization/lookup-normal.jsonl
+          node tools/check-retired-lifetime-gross-retention.mjs --arm no-history-node-reads 2>&1 | tee artifacts/retention-characterization/node-normal.jsonl
+          node tools/check-retired-lifetime-cleanup.mjs --self-test 2>&1 | tee artifacts/retention-characterization/cleanup-self.log
 
       - name: Upload raw evidence even after failure
         if: always()

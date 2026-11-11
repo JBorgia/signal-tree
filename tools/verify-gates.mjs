@@ -894,7 +894,7 @@ const GATES = [
   {
     name: 'retired-lifetime-gross-retention:self',
     covers:
-      'both churn arms reject actual retention of 10000 retired handles and pass controls and neutralized retention',
+      'both churn arms reject actual retention of 50000 retired handles and pass controls and neutralized retention; smaller retention can remain below the gross ceiling',
     cmd: [
       'node',
       'tools/check-retired-lifetime-gross-retention.mjs',
