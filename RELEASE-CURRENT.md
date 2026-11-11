@@ -6,8 +6,11 @@ evaluation and improvements without routine check-ins. Publication, the signed
 release tag and the canonical tagged CI path are authorized for this maintenance
 scope. No v16 runtime changes belong in this release.
 
-Prepare the next unused patch (15.4.5 after registry/remote verification) from
-`codex/v15-retention-backport`. Preserve runtime checkpoint `ef806bef2`, finalize
+Publish the next unused patch, 15.4.6, from `codex/v15-release-ci`. The signed
+15.4.5 preparation remains unpublished and superseded after the tagged runner
+failed before tests. Preserve that tag and its evidence. The new candidate
+includes the Ubuntu 24.04 runner pin so workflow identity, package-source identity
+and npm provenance agree. Preserve runtime checkpoint `ef806bef2`, finalize
 version/changelog metadata and verify the exact committed/tagged artifacts.
 Publish only through the canonical CI publisher, then verify all five registry
 artifacts, fresh installed consumers and release notes. The prior Linux run was

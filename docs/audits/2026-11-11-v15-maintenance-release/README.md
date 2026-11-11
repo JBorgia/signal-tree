@@ -3,8 +3,10 @@
 The owner authorized publication on November 11, 2026, before the separate
 automated application comparison. Preparation starts from
 `197baa287d12319558886e2298b34ef963801d6f`; the runtime remains
-`ef806bef2a71aa48709c2b4cad5e71d1ee359c2f`. The next unused patch is 15.4.5,
-checked against remote tags and npm before preparation.
+`ef806bef2a71aa48709c2b4cad5e71d1ee359c2f`. Initial patch 15.4.5 was checked
+against remote tags and npm before preparation. It remains an unpublished,
+superseded signed attempt; the next candidate is 15.4.6 for the runner and
+provenance reasons below.
 
 The [preceding qualification](../2026-11-10-v15-retention-followthrough/README.md)
 contains the actual-resource retention controls, demand-sensitive allocation
@@ -64,9 +66,14 @@ failed before tests: `ubuntu-latest` selected Ubuntu 26.04, which locked
 Playwright 1.56.1 cannot install Chromium dependencies on. Its bundled
 `nativeDeps.js` explicitly supports Ubuntu 24.04.
 
-The isolated `codex/v15-release-ci` control branch pins the release and publisher
-jobs to Ubuntu 24.04. Manual dispatch uses this workflow definition while its
-existing `release_tag` checkout still selects the immutable signed v15.4.5
-source. No runtime, artifact content, gate or signature requirement changes,
-and the failed run and original signed tag remain intact. Full tagged-source
-validation and publication receipts remain required.
+The isolated `codex/v15-release-ci` branch pins the release and publisher jobs
+to Ubuntu 24.04. A proposed manual dispatch against the old tag was rejected
+with HTTP 403 (repository administrator rights required), before any run was
+created. Independent review also identified that npm's automatic provenance
+uses the workflow ref/SHA, while the candidate journal uses checked-out git HEAD.
+A control-branch dispatch against the old tag would therefore have two source
+identities. Rather than overwrite environment claims or rewrite a signed tag,
+prepare 15.4.6 with the runner fix included, and execute from that exact tag.
+The failed run, signed 15.4.5 tag and prepared archives remain intact; no npm
+publication of 15.4.5 occurred. Full exact-tag validation and registry verification
+remain required. Runtime behavior and all gate/signature requirements are unchanged.
