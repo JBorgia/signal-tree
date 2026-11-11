@@ -112,3 +112,28 @@ pinned container; every normal gate, mutation proof, clean rebuild and consumer
 check remains. New signed-tag qualification and registry receipts are required;
 prior passes establish supporting evidence only. Runtime, lockfile and public
 API are unchanged by this environment correction. No tag is rewritten.
+
+## Container checkout ownership
+
+Signed `v15.4.7` at `0b29a189798b65ba0a243da349036d5b1e1b7168` passed
+91/91 local gates and 91/91 mutation proofs, followed by clean rebuilds,
+strict packed consumers, production Angular AOT, the demo and all 146 browser
+checks. All five rebuilt archives match the signed preparation's integrity.
+[Tagged container CI](https://github.com/JBorgia/signal-tree/actions/runs/43045228144)
+passed browser setup and package tests, but finished 85/91: four gates explicitly
+reported Git's dubious-ownership rejection; two artifact wrappers failed their
+initial source-HEAD command in the same environment. The shared ownership cause
+for those two is an inference from source and execution order, pending the probe.
+
+Checkout's action configured trust under a temporary HOME; ordinary container
+steps use `/github/home`. The mounted checkout is owned by the host runner.
+The successor adds only the exact `GITHUB_WORKSPACE` to that container user's
+`safe.directory`, then checks HEAD against the selected tag. It does not trust
+arbitrary directories or alter the checkout identity. The
+[complete no-publication probe](https://github.com/JBorgia/signal-tree/actions/runs/43047329100)
+uses immutable `0b29a1897`, full history, every normal/mutation gate, clean
+consumers and canonical `--prepare-only` packaging. Its completion is required
+before signing 15.4.8; focused environment feasibility is insufficient.
+
+The 15.4.7 tag remains intact and unpublished. Runtime behavior, public API,
+budgets and gates are unchanged by the checkout configuration repair.

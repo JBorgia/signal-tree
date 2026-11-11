@@ -57,6 +57,13 @@ jobs:
           fetch-depth: 0
           fetch-tags: true
 
+      - name: Trust the mounted candidate checkout for container Git commands
+        env:
+          ST_RELEASE_TAG: ${{ steps.release_tag.outputs.tag_name }}
+        run: |
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
+          test "$(git rev-parse HEAD)" = "$(git rev-parse "${ST_RELEASE_TAG}^{commit}")"
+
       - name: Setup pnpm
         uses: pnpm/action-setup@v4 # version comes from package.json "packageManager"
 
