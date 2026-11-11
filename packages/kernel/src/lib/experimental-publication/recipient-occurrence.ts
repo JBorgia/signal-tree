@@ -29,8 +29,8 @@ function contribution(proof:Proof,unresolved:boolean):Contribution {
   return rolelessContributions[key]??=(Object.freeze({flags,rejected,unresolved:Number(unresolved)}));
  }
  const result:Partial<Record<typeof roles[number],readonly lifecycle.OwnerCell[]>>&{flags:number;rejected:number;unresolved:number}={flags,rejected,unresolved:Number(unresolved)};
- for(const role of roles)if(proof[role]?.length)result[role]=Object.freeze([...proof[role]]);
- return Object.freeze(result);
+ for(const role of roles)if(proof[role]?.length)result[role]=[...proof[role]];
+ return result;
 }
 function addContribution(target:Counts,source:Contribution,direction:number):void {
  for(const role of roles)for(const owner of source[role]??[])count(target[role],owner,direction);
@@ -39,30 +39,29 @@ function addContribution(target:Counts,source:Contribution,direction:number):voi
  target.unresolved+=source.unresolved*direction;if(target.unresolved<0)throw Error('Negative occurrence readiness');
 }
 type Entry={counts:Contribution;release?:()=>void;onProof?:(proof:Proof)=>void};
-// Roleless entries have a fixed flag domain and retain no owner identities.
-const rolelessReadyEntries:(Entry|undefined)[]=new Array(256);
-// Consecutive bulk facts share one exact ready entry. Weak references keep this
-// bounded one-item cache from owning a disposed slot or a mutated old proof.
-let lastReadyProof:WeakRef<Proof>|undefined,lastReadyEntry:WeakRef<Entry>|undefined;
-function readyEntry(proof:Proof):Entry {
- const prior=lastReadyProof?.deref()===proof?lastReadyEntry?.deref():undefined;
+type ReadyBatch={proof?:Proof;entry?:Entry;shared:boolean};
+/** Only a synchronous collection batch owns this cache. Direct replacements,
+ * misses and unresolved entries retain their original allocation path. */
+function batchEntry(proof:Proof,batch:ReadyBatch):Entry {
+ const prior=batch.proof===proof?batch.entry:undefined;
  if(prior){
   let flags=0;for(let i=0;i<flagKeys.length;i++)if(proof[flagKeys[i]])flags|=1<<i;
   const saved=prior.counts;
-  // Proof objects may change in place. Identity is only a candidate lookup;
-  // every role, duplicate, flag and rejected bit must still match the snapshot.
+  // Proof identity is only a candidate: mutable arrays, duplicate roles and
+  // each flag must still match the independently captured slot snapshot.
   if(saved.flags===flags&&saved.rejected===((proof.terminalRejectedRoles??0)&15)&&roles.every(role=>{
    const current=proof[role]??[],before=saved[role]??[];
    return current.length===before.length&&current.every((cell,index)=>cell===before[index]);
-  }))return prior;
+  })){
+   if(!batch.shared){
+    for(const role of roles)if(saved[role])Object.freeze(saved[role]);
+    Object.freeze(saved);Object.freeze(prior);batch.shared=true;
+   }
+   return prior;
+  }
  }
- const counts=contribution(proof,false);
- if(roles.every(role=>!counts[role]?.length)){
-  const key=counts.flags|(counts.rejected<<4);
-  return rolelessReadyEntries[key]??=(Object.freeze({counts}));
- }
- const entry=Object.freeze({counts});
- lastReadyProof=new WeakRef(proof);lastReadyEntry=new WeakRef(entry);
+ const entry:Entry={counts:contribution(proof,false)};
+ batch.proof=proof;batch.entry=entry;batch.shared=false;
  return entry;
 }
 export interface OccurrenceHandle { readonly identity:object }
@@ -106,13 +105,13 @@ export class RecipientOccurrences {
   return false;
  }
  private cancel(entry:Entry):void {if(entry.release){entry.release();entry.release=undefined;this.counters.subscriptions--;}}
- private replaceEntry(group:Group,key:unknown,requirement?:Requirement,onProof?:(proof:Proof)=>void):void {
+ private replaceEntry(group:Group,key:unknown,requirement?:Requirement,onProof?:(proof:Proof)=>void,batch?:ReadyBatch):void {
   const old=group.entries.get(key);if(old){this.cancel(old);this.propagateContribution(group,old.counts,-1);group.entries.delete(key);}
   if(!requirement)return;
   const proof=lifecycle.nativeProof(requirement),unresolved=!lifecycle.nativeRequirementReady(requirement);
   // Pending readiness and callbacks remain owned by their exact address. A
   // ready callback-free entry has no mutable lifecycle and can be shared.
-  const entry:Entry=unresolved||onProof?{counts:contribution(proof,unresolved),onProof}:readyEntry(proof);group.entries.set(key,entry);this.propagateContribution(group,entry.counts,1);onProof?.(proof);
+  const entry:Entry=batch&&!unresolved&&!onProof?batchEntry(proof,batch):{counts:contribution(proof,unresolved),onProof};group.entries.set(key,entry);this.propagateContribution(group,entry.counts,1);onProof?.(proof);
   if(unresolved){
    this.counters.subscriptions++;
    entry.release=lifecycle.onNativeRequirementReady(requirement,()=>{
@@ -124,6 +123,14 @@ export class RecipientOccurrences {
   }
  }
  replace(handle:OccurrenceHandle,key:unknown,requirement?:Requirement,onProof?:(proof:Proof)=>void):void {this.replaceEntry(this.get(handle),key,requirement,onProof);}
+ replaceEntries(handle:OccurrenceHandle,entries:Iterable<readonly [unknown,Requirement|undefined]>):void {
+  const batch:ReadyBatch={shared:false};
+  for(const [key,requirement]of entries)this.replaceEntry(this.get(handle),key,requirement,undefined,batch);
+ }
+ replaceChanges(handle:OccurrenceHandle,changes:readonly {readonly key:string;readonly after?:Requirement}[]):void {
+  const batch:ReadyBatch={shared:false};
+  for(const change of changes){const key=change.key,requirement=change.after;this.replaceEntry(this.get(handle),key,requirement,undefined,batch);}
+ }
  setPresence(handle:OccurrenceHandle,present:boolean,requirement:Requirement):void {
   const group=this.get(handle);if(!group.parent)throw Error('Root has no membership edge');
   this.replaceEntry(group.parent,group.guard,requirement);

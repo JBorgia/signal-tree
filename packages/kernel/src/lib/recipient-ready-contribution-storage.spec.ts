@@ -12,6 +12,76 @@ const storage = (index: RecipientOccurrences) => [...(index as unknown as {
 }).groups.values()].flatMap(group => [...group.entries].filter(([key]) => typeof key === 'string').map(([, entry]) => entry));
 
 describe('ready recipient contribution storage', () => {
+  it('keeps direct replacements on their original independent allocation path', () => {
+    const tree = signalTree({ value: 0 }), index = makeIndex();
+    try {
+      const handle = index.enroll(tree.$.value), value = requirement({ owners: [owner(1)], unknown: true, invalid: false });
+      index.replace(handle, 'one', value);
+      index.replace(handle, 'two', value);
+      expect(storage(index)[0]).not.toBe(storage(index)[1]);
+      expect(storage(index)[0].counts).not.toBe(storage(index)[1].counts);
+      expect(Object.isFrozen(storage(index)[0])).toBe(false);
+    } finally { index.dispose(); tree.destroy(); }
+  });
+
+  it('isolates nested batches and never freezes the owner cells', () => {
+    const tree = signalTree({ value: 0 }), index = makeIndex();
+    const a = owner(1), b = owner(2);
+    try {
+      const handle = index.enroll(tree.$.value), outer = requirement({ owners: [a], unknown: false, invalid: false }), inner = requirement({ owners: [b], unknown: false, invalid: false });
+      index.replaceEntries(handle, (function* (): IterableIterator<readonly [string, lifecycle.NativeRequirement]> {
+        yield ['outer1', outer];
+        index.replaceEntries(handle, [['inner1', inner], ['inner2', inner]]);
+        yield ['outer2', outer];
+      })());
+      const entries = storage(index);
+      expect(entries).toHaveLength(4);
+      expect(entries[0]).toBe(entries[3]);
+      expect(entries[1]).toBe(entries[2]);
+      expect(entries[0]).not.toBe(entries[1]);
+      expect(entries.every(Object.isFrozen)).toBe(true);
+      expect(Object.isFrozen(a)).toBe(false);
+      a.outcome = 'confirmed';
+      expect(index.proof().owners).toEqual([a, b]);
+    } finally { index.dispose(); tree.destroy(); }
+  });
+
+  it('rechecks disposed handles after an iterator resumes and preserves its first installed slot', () => {
+    const tree = signalTree({ value: 0 }), index = makeIndex();
+    try {
+      const handle = index.enroll(tree.$.value), value = requirement({ owners: [owner(1)], unknown: true, invalid: false });
+      let witnessed = false;
+      expect(() => index.replaceEntries(handle, (function* (): IterableIterator<readonly [string, lifecycle.NativeRequirement]> {
+        yield ['one', value];
+        witnessed = storage(index).length === 1;
+        index.dispose();
+        yield ['two', value];
+      })())).toThrow('Stale occurrence handle');
+      expect(witnessed).toBe(true);
+      expect(index.inspect().slots).toBe(0);
+    } finally { index.dispose(); tree.destroy(); }
+  });
+
+  it('preserves an iterator throw without retaining its cache for a later batch', () => {
+    const tree = signalTree({ value: 0 }), index = makeIndex();
+    const failure = { exact: 'iterator' };
+    try {
+      const handle = index.enroll(tree.$.value), value = requirement({ owners: [owner(1)], unknown: true, invalid: false });
+      let caught: unknown;
+      try { index.replaceEntries(handle, (function* (): IterableIterator<readonly [string, lifecycle.NativeRequirement]> {
+        yield ['old', value];
+        throw failure;
+      })()); } catch (error) { caught = error; }
+      expect(caught).toBe(failure);
+      expect(storage(index)).toHaveLength(1);
+      const old = storage(index)[0];
+      index.replaceEntries(handle, [['one', value], ['two', value]]);
+      expect(storage(index)[1]).toBe(storage(index)[2]);
+      expect(storage(index)[1]).not.toBe(old);
+      expect(Object.isFrozen(old)).toBe(false);
+    } finally { index.dispose(); tree.destroy(); }
+  });
+
   it('shares the actual bulk rollback membership entries without removing any address', async () => {
     type Row = { id: string; value: number };
     const descriptor = Object.getOwnPropertyDescriptor(Map.prototype, 'set')!;
@@ -80,9 +150,11 @@ describe('ready recipient contribution storage', () => {
       const proof = { owners: [a], destination: [a], input: [a], validation: [a], possible: [a], unknown: true, invalid: false };
       try {
         const handle = index.enroll(tree.$.value), value = requirement(proof);
-        index.replace(handle, 'old', value);
-        proof[role][0] = b;
-        index.replace(handle, 'new', value);
+        index.replaceEntries(handle, (function* (): IterableIterator<readonly [string, lifecycle.NativeRequirement]> {
+          yield ['old', value];
+          proof[role][0] = b;
+          yield ['new', value];
+        })());
         expect(storage(index)[0].counts).not.toBe(storage(index)[1].counts);
         index.replace(handle, 'old');
         expect(index.proof()[role]).toEqual([b]);
@@ -99,9 +171,11 @@ describe('ready recipient contribution storage', () => {
       const proof = { owners: [a], unknown: false, invalid: false, unavailableInput: false, historicalWindow: false };
       try {
         const handle = index.enroll(tree.$.value), value = requirement(proof);
-        index.replace(handle, 'old', value);
-        proof[flag] = true;
-        index.replace(handle, 'new', value);
+        index.replaceEntries(handle, (function* (): IterableIterator<readonly [string, lifecycle.NativeRequirement]> {
+          yield ['old', value];
+          proof[flag] = true;
+          yield ['new', value];
+        })());
         expect(storage(index)[0].counts).not.toBe(storage(index)[1].counts);
         index.replace(handle, 'old');
         expect(index.proof()[flag]).toBe(true);
@@ -117,9 +191,11 @@ describe('ready recipient contribution storage', () => {
     const proof = { owners: [a], unknown: false, invalid: false, terminalRejectedRoles: 1 };
     try {
       const handle = index.enroll(tree.$.value), value = requirement(proof);
-      index.replace(handle, 'old', value);
-      proof.terminalRejectedRoles = 4;
-      index.replace(handle, 'new', value);
+      index.replaceEntries(handle, (function* (): IterableIterator<readonly [string, lifecycle.NativeRequirement]> {
+        yield ['old', value];
+        proof.terminalRejectedRoles = 4;
+        yield ['new', value];
+      })());
       expect(storage(index)[0].counts).not.toBe(storage(index)[1].counts);
       index.replace(handle, 'old');
       expect(index.proof().terminalRejectedRoles).toBe(4);
@@ -135,8 +211,7 @@ describe('ready recipient contribution storage', () => {
     try {
       const handle = index.enroll(tree.$.value), value = requirement(proof);
       const inheritedSlots = index.inspect().slots;
-      index.replace(handle, 'one', value);
-      index.replace(handle, 'two', value);
+      index.replaceEntries(handle, [['one', value], ['two', value]]);
       expect(index.inspect()).toMatchObject({ slots: inheritedSlots + 2, subscriptions: 0, finalized: 0 });
       expect(index.proof().owners).toEqual([a, b]);
       const entries = storage(index);
@@ -158,18 +233,20 @@ describe('ready recipient contribution storage', () => {
     const proof = { owners: [a, a], destination: [a], input: [b], validation: [c], possible: [b], unknown: true, invalid: false, unavailableInput: false, historicalWindow: true, terminalRejectedRoles: 1 };
     try {
       const handle = index.enroll(tree.$.value), value = requirement(proof);
-      index.replace(handle, 'old', value);
-      proof.owners.splice(0, 2, b, b);
-      proof.destination.splice(0, 1, b);
-      proof.input.splice(0, 1, c);
-      proof.validation.splice(0, 1, a);
-      proof.possible.splice(0, 1, c);
-      proof.unknown = false;
-      proof.invalid = true;
-      proof.unavailableInput = true;
-      proof.historicalWindow = false;
-      proof.terminalRejectedRoles = 4;
-      index.replace(handle, 'new', value);
+      index.replaceEntries(handle, (function* (): IterableIterator<readonly [string, lifecycle.NativeRequirement]> {
+        yield ['old', value];
+        proof.owners.splice(0, 2, b, b);
+        proof.destination.splice(0, 1, b);
+        proof.input.splice(0, 1, c);
+        proof.validation.splice(0, 1, a);
+        proof.possible.splice(0, 1, c);
+        proof.unknown = false;
+        proof.invalid = true;
+        proof.unavailableInput = true;
+        proof.historicalWindow = false;
+        proof.terminalRejectedRoles = 4;
+        yield ['new', value];
+      })());
       expect(storage(index)[0].counts).not.toBe(storage(index)[1].counts);
       expect(index.proof()).toMatchObject({ owners: [a, b], destination: [a, b], input: [b, c], validation: [c, a], possible: [b, c], unknown: true, invalid: true, unavailableInput: true, historicalWindow: true, terminalRejectedRoles: 5 });
       index.replace(handle, 'old');
@@ -209,7 +286,7 @@ describe('ready recipient contribution storage', () => {
       const proofs = cells.map(cell => ({ owners: [cell, cell], destination: [cell], unknown: false, invalid: false }));
       try {
         const handle = index.enroll(tree.$.value);
-        for (let n = 0; n < 40; n++) index.replace(handle, `entry${n}`, requirement(proofs[n % proofs.length]));
+        index.replaceEntries(handle, Array.from({ length: 40 }, (_, n) => [`entry${n}`, requirement(proofs[n % proofs.length])] as const));
         expect(storage(index)).toHaveLength(40);
         expect(new Set(storage(index)).size).toBe(40);
         expect(index.proof().owners).toEqual(cells);
