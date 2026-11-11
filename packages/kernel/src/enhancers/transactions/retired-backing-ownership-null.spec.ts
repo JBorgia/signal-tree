@@ -260,9 +260,10 @@ describe('ownership of retired value backing', () => {
         undoable(() => store.$.rows.removeOne('a'));
       })
       .confirm();
-    await tick();
-
+    // Perform the value-only null before automatic post-capture reclamation
+    // also forgets this unowned lifetime. The later behavior remains the oracle.
     deleteValueBacking(store.$.rows, subject);
+    await tick();
 
     expect(store.$.rows.ids()).toEqual(['b']);
     undoable(() => store.$.rows.addOne({ id: 'c', name: 'Gamma' }));
@@ -310,9 +311,9 @@ describe('ownership of retired value backing', () => {
     const subject = subjectOf(store.$.rows, 'a');
 
     undoable(() => store.$.rows.removeOne('a'));
-    await tick();
-    await tick();
     deleteValueBacking(store.$.rows, subject);
+    await tick();
+    await tick();
 
     const pending = store.transaction(() => {
       undoable(() => store.$.rows.updateOne('b', { name: 'Beta2' }));
@@ -348,12 +349,10 @@ describe('ownership of retired value backing', () => {
     await tick();
     const subject = subjectOf(store.$.rows, 'a');
     undoable(() => store.$.rows.removeOne('a'));
-    await tick();
-    await tick();
 
+    // Destroy cancels deferred reclamation before it forgets this tombstone.
     store.destroy();
-    // The sink runs at teardown too, and a throw there takes the cleanup with
-    // it.
+    // The value-only null still operates on that retired lifetime after teardown.
     expect(() => deleteValueBacking(store.$.rows, subject)).not.toThrow();
   });
 });

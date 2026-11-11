@@ -48,7 +48,7 @@ import {
   openPhysicalRows,
   physicalRows,
 } from '../../lib/internals/physical-rows';
-import { getOrCreateSubjectReclamationSink } from '../../lib/internals/subject-reclamation-sink';
+import { getOrCreateSubjectReclamationSink, initializeSubjectReclamation } from '../../lib/internals/subject-reclamation-sink';
 import {
   installRestorationReader,
   type RestorationEntryId,
@@ -5365,6 +5365,7 @@ export function restoration(
       );
     }
 
+    initializeSubjectReclamation(tree);
     // Create restoration manager with restoration function
     const restorationManager = new RestorationManager(
       tree,

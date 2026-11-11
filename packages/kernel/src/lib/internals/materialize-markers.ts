@@ -116,7 +116,7 @@ export interface MaterializationContext {
       options: { causallyEligible: boolean; reclaimLifetimeRecord?: boolean }
     ): unknown;
     __applyPreparedSubjectReclamation(prepared: unknown): void;
-  }>;
+  }> & { offerRetiredSubjects?: (subjectIds: readonly number[]) => void };
 }
 
 export function createMaterializationContext(
