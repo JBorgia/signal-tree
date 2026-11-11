@@ -3764,6 +3764,10 @@ export function createEntitySignal<
     subjectId: number,
     options: EntitySubjectReclamationPlanningOptions
   ): PreparedEntitySubjectReclamation | undefined {
+    // Active subjects cannot have a reclamation plan. Reject before inventory
+    // enumerates a materialized row's fields after a value-only settlement.
+    const state = resolveSubjectState(subjectId);
+    if (!state || state.active) return undefined;
     // Inspection can hide a row physically while ordinary readers still own
     // its lifetime. Restoration claims alone do not describe that ownership.
     if (ordinaryTopology.retains(subjectId)) return undefined;
