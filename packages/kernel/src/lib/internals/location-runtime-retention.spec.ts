@@ -128,6 +128,45 @@ describe('LocationRuntime retention', () => {
     ]);
   });
 
+  it('releases a deleted field carrier while its row and tree remain alive', async () => {
+    expect(typeof (globalThis as { gc?: unknown }).gc).toBe('function');
+    const tree = signalTree({ rows: entityMap<{ id: string; value: number }, string>() });
+    tree.$.rows.addOne({ id: 'a', value: 1 });
+    const row = tree.$.rows.byIdOrFail('a');
+    const reference = (() => {
+      const field = row.value;
+      expect(field()).toBe(1);
+      const weak = new WeakRef(field);
+      expect(Reflect.deleteProperty(row, 'value')).toBe(true);
+      return weak;
+    })();
+    try {
+      await applyPressure();
+      expect(reference.deref()).toBeUndefined();
+      tree.$.rows.updateOne('a', { value: 2 });
+      expect(row()).toEqual({ id: 'a', value: 2 });
+    } finally { tree.destroy(); }
+  });
+
+  it('does not retain a row creation value through unmaterialized field getters', async () => {
+    expect(typeof (globalThis as { gc?: unknown }).gc).toBe('function');
+    type Row = { id: string; payload: { value: number } };
+    const tree = signalTree({ rows: entityMap<Row, string>() });
+    const held = (() => {
+      const payload = { value: 1 };
+      tree.$.rows.addOne({ id: 'a', payload });
+      const row = tree.$.rows.byIdOrFail('a');
+      const reference = new WeakRef(payload);
+      tree.$.rows.replaceOne('a', { id: 'a', payload: { value: 2 } });
+      return { row, reference };
+    })();
+    try {
+      await applyPressure();
+      expect(held.reference.deref()).toBeUndefined();
+      expect(held.row.payload()).toEqual({ value: 2 });
+    } finally { tree.destroy(); }
+  });
+
   it('keeps a live subscribed chain current while replacing its dependencies', async () => {
     expect(typeof (globalThis as { gc?: unknown }).gc).toBe('function');
     const runtime = createLocationRuntime(NEUTRAL_OBSERVATION_ADAPTER);
