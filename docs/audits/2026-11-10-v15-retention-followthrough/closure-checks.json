@@ -1,0 +1,23 @@
+{
+  "scope": "Post-commit documentation verification supplement. This record is the only subsequent source-tree addition; runtime, other records and sealed archive are unchanged.",
+  "checkedCommit": "2f3ccad6208da89379c320b3257d8c9c89baed95",
+  "receipt": {
+    "label": "v15-closure-docs-committed",
+    "cwd": "/Users/jonathanborgia/code/signaltree/.worktrees/v15-retention-backport",
+    "command": [
+      "node",
+      "tools/verify-gates.mjs",
+      "--only=source-controls,version-claims,readme-apis:teaching,readme-apis,release-claims,documented-imports,semantic-discoverability,documented-symbols,documented-examples,error-codes,doc-links"
+    ],
+    "source": "2f3ccad6208da89379c320b3257d8c9c89baed95",
+    "startedUTC": "2026-11-11T01:19:24Z",
+    "seconds": 33.35221815109253,
+    "exit": 0
+  },
+  "rawLog": "\n\u00b7 building packages \u2014 2 gate(s) read dist/\n\nRunning 11 gates\n\n  \u00b7 version-claims       pass \u2713  (every documented Angular-version claim matches peerDependencies)\n  \u00b7 source-controls      pass \u2713  (no raw NUL or unexpected C0 control character in any tracked source)\n  \u00b7 readme-apis:teaching pass \u2713  (the retired-API half of the doc gate \u2014 proven separately because one mutation cannot exercise two independent checks)\n  \u00b7 readme-apis          pass \u2713  (every @signaltree symbol named in a shipped README or live doc exists, and no live doc EXAMPLE teaches a retired API)\n  \u00b7 release-claims       pass \u2713  (every symbol/code ADDED since the last release tag reaches every surface that claims to describe the library)\n  \u00b7 documented-imports   pass \u2713  (every import specifier a LIVE document teaches resolves against the published export map \u2014 the documented -> publishable edge no other gate checks)\n  \u00b7 semantic-discoverability pass \u2713  (the canonical manifest states the v15 model, facade rule, link/persistence, external-authority, and causal-projection boundaries, and each primary package README reaches its co-packed manifest)\n  \u00b7 documented-symbols   pass \u2713  (a package barrel's own API-SUMMARY list does not advertise a symbol the barrel fails to export \u2014 the symbol-level complement to documented-imports' specifier-level check)\n  \u00b7 documented-examples  pass \u2713  (every example a LIVE document teaches still typechecks against the API it imports \u2014 the block-level complement to documented-symbols and documented-imports, which check names and specifiers but never the call)\n  \u00b7 error-codes          pass \u2713  (every diagnostic code the packages can emit is in docs/errors/README.md, and the catalogue invents none)\n  \u00b7 doc-links            pass \u2713  (every relative link resolves AND every install instruction selects a publishable current package (archive/CHANGELOG excluded as point-in-time))\n\n\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n11/11 passed, 0 failed, 0 known-red.\n",
+  "rawLogSHA256": "f5617aa96f57a0ab4bf00b055ca617a8c59c4c639c6637eb41d2e4ab86bf0a1b",
+  "archiveSHA256": "1703d51f7562067d44aed9fff78dc9f65ef1ba19dfb7b95bf8c32308b67a6478",
+  "archivePayloadsVerified": 3078,
+  "checkoutCleanAtCheckCompletion": true,
+  "packageSeal": "sha256-8f11180b4410a9402ee28aafcdcb8f5e01ee60def75bffddeb6d8a5f5e5edda9"
+}
