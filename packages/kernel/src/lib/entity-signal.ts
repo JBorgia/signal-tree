@@ -2586,7 +2586,18 @@ export function createEntitySignal<
       subjectEpochs.delete(prepared.subjectId);
     }
 
-    const result = commitAndProjectEntityMutationFrame(frame);
+    let result: ReturnType<typeof commitAndProjectEntityMutationFrame>;
+    try {
+      result = commitAndProjectEntityMutationFrame(frame);
+    } finally {
+      // Rollback validation can create activation entries without a user read.
+      // Clean up only after actual whole-lifetime forgetting, including when
+      // completion throws. A failed pre-install keeps its carrier routing.
+      // Held nodes own their carrier and forgotten IDs are never reused.
+      if (forgetLifetime && resolveSubjectState(prepared.subjectId) === undefined) {
+        subjectStateSignals.delete(prepared.subjectId);
+      }
+    }
     for (const changedSubjectId of result.physicallyChangedSubjectIds) {
       if (forgetLifetime && changedSubjectId === prepared.subjectId) {
         // NO PUBLISH for a forgotten subject, and this is load-bearing rather
