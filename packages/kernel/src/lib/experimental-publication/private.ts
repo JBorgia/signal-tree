@@ -317,9 +317,9 @@ function ready(channel:object,b:Binding):void{
   const authoredProof=lifecycle.nativeProof(authoredRequirement);ownProofs.set(unit.fact,authoredProof);
   if(unit.collection){
    const collection=b.collections.get(unit.collection.key);
-   if(collection){for(const edit of unit.collection.edits){
-     setCollectionEntry(channel,b,collection,edit.key,edit.after as lifecycle.NativeRequirement|undefined);
-   }
+   if(collection){
+    if(unit.collection.edits.length>1)b.index.replaceChanges(collection.occurrence,unit.collection.edits as readonly {readonly key:string;readonly after?:lifecycle.NativeRequirement}[]);
+    else for(const edit of unit.collection.edits)setCollectionEntry(channel,b,collection,edit.key,edit.after as lifecycle.NativeRequirement|undefined);
    collection.payload=unit.payload;
    if(collectionSelected(b,collection))b.valuePayload=collection.relative?applyAtRelativePath(b.valuePayload,collection.relative,{all:unit.payload}):unit.payload;}
   }else if(unit.presence){
@@ -441,7 +441,8 @@ export function registerCollectionProjection(channel:object,key:object,relative:
  const b=bindings.get(channel);if(!b)return;
  const occurrence=b.index.enroll(key);b.occurrences.set(key,occurrence);
  const support:CollectionSupport={occurrence,payload:payload??pathValue(b.valuePayload,relative??[]).value,relative};
- for(const [slot,reference]of initial)setCollectionEntry(channel,b,support,slot,reference as lifecycle.NativeRequirement);
+ if(initial.size>1)b.index.replaceEntries(occurrence,initial as ReadonlyMap<string,lifecycle.NativeRequirement>);
+ else for(const [slot,reference]of initial)setCollectionEntry(channel,b,support,slot,reference as lifecycle.NativeRequirement);
  b.collections.set(key,support);
 }
 export function completeSourceProjection(completion:object):void { completeScalar(completion); }
