@@ -5,6 +5,11 @@
   nodes it is meant to clean up.
 - The globally registered EntityMap processor no longer retains the first
   builder's configuration and application closures after its tree is destroyed.
+- Entity rows construct each field carrier on first acquisition. Whole-row use
+  avoids unused field allocations; field descriptors, cached identity, reads,
+  writes and entity lifetime remain stable. Custom adapter factory initialization
+  moves to field acquisition. Fully materialized rows retain additional
+  getter/cache bookkeeping; this is a workload-dependent tradeoff.
 
 These repairs preserve v15 transaction, observer-delivery and settlement behavior.
 They are a review candidate based on 15.4.4, not a republication of that version.
