@@ -137,3 +137,10 @@ before signing 15.4.8; focused environment feasibility is insufficient.
 
 The 15.4.7 tag remains intact and unpublished. Runtime behavior, public API,
 budgets and gates are unchanged by the checkout configuration repair.
+
+Independent review found that comparing two inline Git substitutions could
+accidentally accept two empty outputs after both commands failed. The successor
+captures each `git rev-parse --verify` in a separate assignment before comparing,
+so Bash's error handling stops on either failure. The shell control reproduced
+the old false acceptance, rejected each failed lookup with the corrected form,
+and accepted equal successful results. This correction precedes signed freeze.

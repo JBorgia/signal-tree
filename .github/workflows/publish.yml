@@ -91,7 +91,9 @@ jobs:
           ST_RELEASE_TAG: ${{ steps.release_tag.outputs.tag_name }}
         run: |
           git config --global --add safe.directory "$GITHUB_WORKSPACE"
-          test "$(git rev-parse HEAD)" = "$(git rev-parse "${ST_RELEASE_TAG}^{commit}")"
+          ST_CHECKOUT_HEAD=$(git rev-parse --verify 'HEAD^{commit}')
+          ST_TAG_HEAD=$(git rev-parse --verify "${ST_RELEASE_TAG}^{commit}")
+          test "$ST_CHECKOUT_HEAD" = "$ST_TAG_HEAD"
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v4 # version comes from package.json "packageManager"
