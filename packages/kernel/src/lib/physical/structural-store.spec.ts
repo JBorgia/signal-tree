@@ -105,6 +105,7 @@ function assertActiveOrderIntegrity<K extends string | number>(
 function resetStructureForTest<K extends string | number>(store: StructuralStore<K>): void {
   const graph = store as unknown as {
     keysCache: K[] | undefined;
+    subjectsCache: number[] | undefined;
     subjectIds: Map<K, number>;
     subjectStates: Map<number, SubjectLifetimeRecord<K>>;
     subjectRevisions: Map<number, number>;
@@ -117,7 +118,7 @@ function resetStructureForTest<K extends string | number>(store: StructuralStore
     collectionIncarnation: number;
     orderFrontier: object;
   };
-  graph.keysCache = undefined;
+  graph.keysCache = graph.subjectsCache = undefined;
   graph.subjectIds.clear();
   graph.subjectStates.clear();
   graph.subjectRevisions.clear();

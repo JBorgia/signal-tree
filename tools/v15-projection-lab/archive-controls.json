@@ -1,0 +1,17 @@
+{
+  "archiveSha256": "2204f26e69c2ae88816a93d40ac25b5231fa8783149fa4d3f35b9965be26c734",
+  "controls": [
+    {
+      "mode": "corrupt",
+      "target": "PROTOCOL.md",
+      "status": 1,
+      "stderr": "Traceback (most recent call last):\n  File \"/Users/jonathanborgia/code/signaltree/.worktrees/v15-long-lived-projection/tools/v15-projection-lab/verify-evidence.py\", line 23, in <module>\n    assert hashlib.sha256(data).hexdigest() == expected['sha256'], f'Hash mismatch: {name}'\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: Hash mismatch: PROTOCOL.md\n"
+    },
+    {
+      "mode": "missing",
+      "target": "PROTOCOL.md",
+      "status": 1,
+      "stderr": "Traceback (most recent call last):\n  File \"/Users/jonathanborgia/code/signaltree/.worktrees/v15-long-lived-projection/tools/v15-projection-lab/verify-evidence.py\", line 19, in <module>\n    assert set(by_name) == set(manifest) | {'MANIFEST.json'}, 'Payload set differs'\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: Payload set differs\n"
+    }
+  ]
+}

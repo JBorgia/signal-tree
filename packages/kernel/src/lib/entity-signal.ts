@@ -481,8 +481,8 @@ export function createEntitySignal<
     // Keep a fresh array: held snapshots and sorted projections must not share
     // a mutable backing buffer with later reads.
     const entities: E[] = [];
-    for (const id of structuralStore.activeKeysSnapshot()) {
-      const entity = getProjectedEntity(id);
+    for (const subjectId of structuralStore.activeSubjectsSnapshot()) {
+      const entity = valueStore.backingForSubject(subjectId);
       if (entity !== undefined) entities.push(entity);
     }
     return entities;
@@ -4107,9 +4107,9 @@ export function createEntitySignal<
   });
   // ⚠️ THE PROJECTION SEED — internal, WeakMap-carried, never public.
   //
-  // Built from the SAME ordered active-key snapshot `getProjectedEntries()`
-  // uses, and the SAME `getProjectedEntity` row path, so a consumer's seeded
-  // projection cannot drift from `all()` by construction.
+  // Reads the same active order and subject-owned values as
+  // `getProjectedEntries()` and `all()`. A consumer's seeded projection must
+  // agree even when a value-only projection skips the key lookup.
   //
   // `key` is carried explicitly alongside `subjectId` because it is genuinely
   // separate information: after `changeId(1, 77)` the row payload still reads
