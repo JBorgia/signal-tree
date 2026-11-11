@@ -4,8 +4,7 @@
   "candidateCommit": "37ef1788f6bac61678fc312f391b180bd7a6bbd7",
   "runtimeCommit": "ef806bef2a71aa48709c2b4cad5e71d1ee359c2f",
   "npmPublishedAndVerified": true,
-  "productionDemoComplete": false,
-  "productionDemoPending": "Vercel requires email identity verification; one-time code masked by email connector. User asked to complete verification; comparison work continues.",
+  "productionDemoComplete": true,
   "packages": [
     {
       "name": "@signal-tree/kernel",
@@ -248,6 +247,112 @@
     },
     "v15.4.8-registry-integrity-after-propagation.log": {
       "sha256": "b3303c9d7f6f0a286ac6cef2313d9c4031c41059a99d00e00581e60431bc4f34"
+    }
+  },
+  "productionDemo": {
+    "candidateCommit": "37ef1788f6bac61678fc312f391b180bd7a6bbd7",
+    "deploymentId": "dpl_2YdHyspNMoEW3Q1Tiscrt88us1Bp",
+    "deploymentPage": "https://vercel.com/jonathan-d-borgias-projects/signaltree/2YdHyspNMoEW3Q1Tiscrt88us1Bp",
+    "productionURL": "https://signaltree.io",
+    "version": "15.4.8",
+    "observedUTC": "2026-11-11T17:09:51.610629+00:00",
+    "method": "Authenticated browser visible DOM; exact source commit and current production domain on deployment page, live version and action trace on signaltree.io",
+    "trace": [
+      {
+        "order101": {
+          "priority": "Standard",
+          "status": "Packing"
+        },
+        "order102": {
+          "priority": "Standard",
+          "status": "Ready"
+        }
+      },
+      {
+        "action": "Make it Rush",
+        "order101": {
+          "priority": "Rush",
+          "status": "Packing"
+        },
+        "order102": {
+          "priority": "Standard",
+          "status": "Ready"
+        }
+      },
+      {
+        "action": "Receive server update",
+        "order101": {
+          "priority": "Rush",
+          "status": "Shipped"
+        },
+        "order102": {
+          "priority": "Standard",
+          "status": "Ready"
+        }
+      },
+      {
+        "action": "Undo my edit",
+        "order101": {
+          "priority": "Standard",
+          "status": "Shipped"
+        },
+        "order102": {
+          "priority": "Standard",
+          "status": "Ready"
+        }
+      }
+    ],
+    "limits": "Visible deployed behavior check; no new runtime edit. Browser session expiry concealed accepted promotion and created two builds of the same signed source. Both completed; duplicate cancellation was rejected by automatic approval review and not performed.",
+    "deploymentURL": "https://signaltree-rxoixfehz-jonathan-d-borgias-projects.vercel.app",
+    "readyProductionWithDomainAssigned": true,
+    "previousIdenticalDeploymentId": "dpl_3moVkiWQT4VBLmCJvoK9BUZhmbYW",
+    "browserErrors": "No error entries for signaltree.io in the captured browser log; retained extension listener errors belong to older preview URLs.",
+    "screenshots": {
+      "/Users/jonathanborgia/.codex/visualizations/2026/11/03/01a1a2f3-00c3-7d80-99bb-6837f47de064/v15-4-8-final-production-undo.jpg": "3d05b9661a949246238d636aed7cd274ef5021598505aa20d4632b84085e16bd",
+      "/Users/jonathanborgia/.codex/visualizations/2026/11/03/01a1a2f3-00c3-7d80-99bb-6837f47de064/v15-4-8-final-production-deployment.jpg": "fb3ee2b5707159955d57898a364ad86bfc5cf179f0a208cd19abe53115f799ec"
+    },
+    "visibleEvidence": {
+      "v15.4.8-final-deployment-visible.txt": {
+        "sha256": "685c767754a9b1ca391a760f518a28048a374fc8b0bb441b6afc9f3affcec0ab"
+      },
+      "v15.4.8-final-production-visible.txt": {
+        "sha256": "35319e24b8f2ecdc551bba64b149bc8eaa54cef506defc37bfdbffbb3c50835c"
+      },
+      "v15.4.8-release-notes-production.md": {
+        "sha256": "12bab9885976294d52bb0441f463b2403fc5e5a7d8a7490879eaffc174470fb1"
+      }
+    }
+  },
+  "releaseNotesURL": "https://github.com/JBorgia/signal-tree/releases/tag/v15.4.8",
+  "productionClosureDocumentationChecks": {
+    "v15.4.8-production-doc-gates": {
+      "command": [
+        "node",
+        "tools/verify-gates.mjs",
+        "--only=source-controls,version-claims,release-claims,doc-links"
+      ],
+      "cwd": "/Users/jonathanborgia/code/signaltree/.worktrees/v15-release-container",
+      "startedUTC": "2026-11-11T18:04:29.439447+00:00",
+      "seconds": 8.335716962814331,
+      "exit": 0,
+      "log": "/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-v15-release-4b1jd_ka/v15.4.8-production-doc-gates.log",
+      "logSha256": "f2efd4c6fce453c6a61e91b510221980a247fbe9f70e8f0658e304c72c9ea254"
+    },
+    "v15.4.8-production-doc-demo": {
+      "command": [
+        "pnpm",
+        "nx",
+        "build",
+        "demo",
+        "--configuration=production",
+        "--skip-nx-cache"
+      ],
+      "cwd": "/Users/jonathanborgia/code/signaltree/.worktrees/v15-release-container",
+      "startedUTC": "2026-11-11T18:04:37.775915+00:00",
+      "seconds": 9.224998235702515,
+      "exit": 0,
+      "log": "/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-v15-release-4b1jd_ka/v15.4.8-production-doc-demo.log",
+      "logSha256": "5b6b31e41f7aabbd0405af48013f01ef1b9b9a0df112ab5eed507372c60dc200"
     }
   }
 }
