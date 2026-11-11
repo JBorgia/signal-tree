@@ -13,6 +13,14 @@ qualify exact repaired artifacts. Other v16 publication/packed-field structures
 are absent here and are not backport targets. An unused-code claim needs supported
 reachability and measured benefit before removal.
 
+The measured follow-through also defers entity field carriers until first
+acquisition. Runtime checkpoint `ef806bef2` preserves v15 reads, updateOne,
+metadata, transaction spelling and settlement behavior. It does not import v16
+field-Link ownership or selected-publication bindings. Focused tests and original
+controls pass; the exact-artifact full qualification is being completed. The
+fully materialized heap tradeoff remains explicit in the
+[follow-through audit](docs/audits/2026-11-10-v15-retention-followthrough/README.md).
+
 The root agent owns controllers, release metadata, audit records and branch
 integration. Historical takeover/publication instructions below describe earlier
 work, not current publication authorization. Sharing the completed review branch
