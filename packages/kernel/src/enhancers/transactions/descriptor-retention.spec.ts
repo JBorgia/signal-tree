@@ -208,29 +208,32 @@ describe('transaction descriptor retention follows reversal responsibility', () 
     }
   );
 
-  it('distinguishes descriptor release from physical subject reclamation', async () => {
+  it('keeps physical backing until post-capture reclamation also releases it', async () => {
     const tree = make();
     const rows = tree.$.rows as unknown as {
       __listSubjectReclamationCandidates(): readonly number[];
       __inspectSubjectResources(subject: number): {
         retainedSubjectState: boolean;
         retainedValueBacking: unknown;
-      };
+      } | undefined;
     };
     tree.$.rows.addOne({ id: 1, value: 10 });
     await flush();
     const subject = subjectOf(tree, 1);
     tree.$.rows.removeOne(1);
-    await flush();
-    // This slice does not drive the physical sink. Keep the distinction
-    // executable instead of interpreting an empty descriptor map as flat heap.
+    // Retirement itself cannot know whether the forthcoming flush will author
+    // restoration claims. Its physical backing survives that capture gap.
     expect(rows.__listSubjectReclamationCandidates()).toContain(subject);
-    expect(rows.__inspectSubjectResources(subject).retainedSubjectState).toBe(
+    expect(rows.__inspectSubjectResources(subject)?.retainedSubjectState).toBe(
       true
     );
     expect(
-      rows.__inspectSubjectResources(subject).retainedValueBacking
+      rows.__inspectSubjectResources(subject)?.retainedValueBacking
     ).toBeTruthy();
+    await flush();
+    // Empty descriptor state alone never proves bounded physical retention.
+    expect(rows.__listSubjectReclamationCandidates()).toEqual([]);
+    expect(rows.__inspectSubjectResources(subject)).toBeUndefined();
     expect(hasDescriptor(tree, subject)).toBe(false);
   });
 

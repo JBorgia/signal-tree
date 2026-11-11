@@ -377,6 +377,7 @@ export function createEntitySignal<
      * unseen owner could restore is unrecoverable.
      */
     hasRestorationAuthority?: boolean;
+    offerRetiredSubjects?: (subjectIds: readonly number[]) => void;
   }
 ): EntitySignal<E, K> {
   const locations = options?.locationRuntime ?? NEUTRAL_LOCATION_RUNTIME;
@@ -2607,7 +2608,7 @@ export function createEntitySignal<
   }
 
   /**
-   * ZERO-OWNER RECLAMATION — the only reclamation that runs automatically.
+   * Immediate zero-owner reclamation; owned trees defer exact candidates.
    *
    * When the tree has no restoration authority, a tombstoned subject's retained
    * value backing is unreachable: nothing can undo, roll back, or re-project it,
@@ -2623,10 +2624,9 @@ export function createEntitySignal<
    * absence is not a gap to work around; it IS the answer. With no owner there
    * are no turns, so there is nothing a turn could be holding.
    *
-   * This is therefore NOT a bypass of the coordinator, and must not grow into
-   * one. The moment a tree has restoration authority this function returns
-   * immediately, and reclaiming there stays the coordinator's problem — it needs
-   * history-aware eligibility, which is a separate piece of work.
+   * Trees with restoration authority offer the same exact retirement IDs to
+   * their enhancer's post-capture queue. They cannot use the immediate proof:
+   * notifier capture may still be about to install a legal restoration claim.
    *
    * ## What it reclaims: EVERYTHING physical, the lifetime ledger included
    *
@@ -2664,7 +2664,9 @@ export function createEntitySignal<
   function reclaimRetiredSubjectsWithoutOwner(
     subjectIds: readonly number[]
   ): void {
-    if (hasRestorationAuthority || subjectIds.length === 0) {
+    if (subjectIds.length === 0) return;
+    if (hasRestorationAuthority) {
+      options?.offerRetiredSubjects?.(subjectIds);
       return;
     }
 
@@ -3776,7 +3778,7 @@ export function createEntitySignal<
 
       membershipUnit.commit(membershipChanges);
       for (const { subjectId } of stagedRemovals) { tombstoneSubjectSignal(subjectId); publishSubjectPhysicalChange(subjectId); }
-      if (!hasRestorationAuthority && stagedRemovals.length > 0) {
+      if (stagedRemovals.length > 0) {
         reclaimRetiredSubjectsWithoutOwner(
           stagedRemovals.map(({ subjectId }) => subjectId)
         );

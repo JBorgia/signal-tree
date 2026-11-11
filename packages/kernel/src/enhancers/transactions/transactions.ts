@@ -52,6 +52,7 @@ import {
   getOrCreateSubjectRestorationClaims,
   getSubjectRestorationClaims,
 } from '../../lib/internals/subject-restoration-claims';
+import { initializeSubjectReclamation } from '../../lib/internals/subject-reclamation-sink';
 import type {
   Enhancer,
   EnhancerMeta,
@@ -1382,15 +1383,11 @@ export function getOrCreateInternalTransactionRuntime<T>(
       );
     },
     (turnId) => {
-      // Releases the claim; deliberately does NOT drive the reclamation sink.
-      // Settlement can land before the notifier flush that lets `restoration()`
-      // claim the same subjects, and reclaiming in that gap is the
-      // premature-reclamation hazard `never-claimed-retirement.spec.ts` pins.
-      // Reclamation happens at the history eviction boundary, which is late
-      // enough that every capture has run.
-      getOrCreateSubjectRestorationClaims(tree)?.release(
+      // Settlement can precede restoration capture. Queue last-owner releases
+      // for the shared post-capture boundary, never reclaim them inline.
+      reclamation.offer(getOrCreateSubjectRestorationClaims(tree)?.release(
         `transaction:${turnId}`
-      );
+      ) ?? []);
     },
     // Structured addresses, never display paths: `outer` encloses `inner`
     // when its address is a strict prefix of inner's.
@@ -1447,6 +1444,9 @@ export function getOrCreateInternalTransactionRuntime<T>(
   let restoreLeafInterceptors: (() => void) | null = null;
   const pendingCapture = createCaptureBucket();
   const pendingTransactions = new Map<number, CaptureBucket>();
+  const reclamation = initializeSubjectReclamation(
+    tree, () => pendingTransactions.size === 0
+  );
   const pendingOrderDeltas = new Map<number, CollectionOrderDelta[]>();
   /** Each pending turn's order-frontier transitions on collections it changed
    * without reordering survivors; a rollback reinstates the earlier token. */
@@ -1556,6 +1556,7 @@ export function getOrCreateInternalTransactionRuntime<T>(
   };
   const releaseWindowIfClosed = (): void => {
     if (pendingTransactions.size === 0) {
+      reclamation.resume();
       lastWindowWriteSeq.clear();
       lastWindowRowWriteSeq.clear();
     }
