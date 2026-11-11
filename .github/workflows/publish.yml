@@ -41,7 +41,9 @@ on:
 jobs:
   verify:
     name: Verify and publish tagged commit
-    runs-on: ubuntu-latest
+    # Keep the runner compatible with the locked Playwright browser install.
+    # The publication source remains the exact release_tag checkout below.
+    runs-on: ubuntu-24.04
     if: github.repository == 'JBorgia/signal-tree'
     permissions:
       contents: read
