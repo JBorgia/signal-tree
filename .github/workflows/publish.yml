@@ -44,6 +44,13 @@ jobs:
     # Keep the runner compatible with the locked Playwright browser install.
     # The publication source remains the exact release_tag checkout below.
     runs-on: ubuntu-24.04
+    container:
+      # Official Playwright 1.56.1 Noble image; includes matching system dependencies.
+      image: mcr.microsoft.com/playwright@sha256:f1e7e01021efd65dd1a2c56064be399f3e4de00fd021ac561325f2bfbb2b837a
+      options: --init --shm-size=1g
+    defaults:
+      run:
+        shell: bash
     if: github.repository == 'JBorgia/signal-tree'
     permissions:
       contents: read
@@ -92,8 +99,10 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile --ignore-scripts
 
-      - name: Install Chromium for packed Angular AOT gate
-        run: pnpm exec playwright install --with-deps chromium
+      - name: Verify matching packaged Chromium for packed Angular AOT gate
+        run: |
+          node -e 'require("node:assert/strict").equal(require("playwright/package.json").version, "1.56.1")'
+          pnpm exec playwright install chromium
 
       - name: Use npm CLI with trusted publishing support
         run: npm install -g npm@^11.5.1 && npm --version
