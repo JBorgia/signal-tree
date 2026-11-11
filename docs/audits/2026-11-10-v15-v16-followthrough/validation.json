@@ -1,0 +1,827 @@
+{
+  "decision": "both review candidates qualified; unreleased; numerical size failures dispositioned under standing owner instruction",
+  "node": "24.15.0",
+  "pnpm": "10.17.0",
+  "authority": {
+    "size": "I do not care about the production budget size.",
+    "economics": "budgets should always be weighed against cost and feasibility",
+    "publication": "No merge, tag or registry publication selected for this follow-through."
+  },
+  "lines": {
+    "v15": {
+      "runtimeCommit": "ef806bef2a71aa48709c2b4cad5e71d1ee359c2f",
+      "qualificationCheckpoint": "2101a16c763f135bf421b341497803e91a469f19",
+      "version": "15.4.4-based unreleased maintenance candidate",
+      "normalRegistry": {
+        "initialPasses": 89,
+        "total": 91,
+        "initialFailures": [
+          "retired-lifetime-gross-retention:self",
+          "bundle-budget"
+        ],
+        "correction": "All three affected retention gates pass after fixed 50000 real-handle control; 40 MiB and healthy workload unchanged.",
+        "nonSizeGatesSatisfied": 90,
+        "remainingNumericalFailure": "bundle-budget"
+      },
+      "mutation": {
+        "reportedProven": 91,
+        "indirect": 15,
+        "blind": 0,
+        "vacuous": 0,
+        "unproven": 0,
+        "errored": 0,
+        "sizeCaveat": "Already-red baseline; not independent sensitivity proof."
+      },
+      "sourceRestoration": {
+        "files": 1736,
+        "equal": true,
+        "statusBefore": "",
+        "statusAfter": "",
+        "gateExit": 0
+      },
+      "artifactEquivalence": {
+        "seal": "sha256-8f11180b4410a9402ee28aafcdcb8f5e01ee60def75bffddeb6d8a5f5e5edda9",
+        "expectedSeal": "sha256-8f11180b4410a9402ee28aafcdcb8f5e01ee60def75bffddeb6d8a5f5e5edda9",
+        "kernelFiles": 109,
+        "kernelEqual": true
+      },
+      "packageFiles": 162,
+      "demoFiles": 89,
+      "browser": {
+        "startTime": "2026-11-11T01:05:38.982Z",
+        "duration": 67836.975,
+        "expected": 146,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0
+      },
+      "productionDemo": "strict build passes",
+      "numericSizeFailures": {
+        "entitiesProductionKB": 24.63,
+        "ceilingKB": 24.6
+      },
+      "sequence": [
+        {
+          "label": "v15-environment-corrections",
+          "cwd": "/Users/jonathanborgia/code/signaltree/.worktrees/v15-retention-backport",
+          "command": [
+            "node",
+            "tools/verify-gates.mjs",
+            "--only=v15-followup-artifacts,v15-refusal-artifacts,test:all,package-hygiene,angular-aot-consumer,framework-facade-closure,react-ssr-facade"
+          ],
+          "source": "713f8a45841f84ca7740afc1515964f367227133",
+          "startedUTC": "2026-11-10T23:51:40Z",
+          "seconds": 120.96864318847656,
+          "exit": 0,
+          "log": "checks/v15-environment-corrections.log",
+          "logSHA256": "a6d0225ec27254bed70e8dca0c66aff5b50bfd32299d78fe37c728163bacf61b"
+        },
+        {
+          "label": "v15-lazy-build",
+          "cwd": "/Users/jonathanborgia/code/signaltree/.worktrees/v15-retention-backport",
+          "command": [
+            "pnpm",
+            "run",
+            "build:all",
+            "--skip-nx-cache",
+            "--parallel=1"
+          ],
+          "source": "ef806bef2a71aa48709c2b4cad5e71d1ee359c2f",
+          "startedUTC": "2026-11-11T00:02:44Z",
+          "seconds": 116.98048496246338,
+          "exit": 130,
+          "log": "checks/v15-lazy-build.log",
+          "logSHA256": "0bd60fc4ab5d80c82603e79fb7ba982642458ef4f3932057d889cefc630a3e07"
+        },
+        {
+          "label": "v15-lazy-build-host",
+          "cwd": "/Users/jonathanborgia/code/signaltree/.worktrees/v15-retention-backport",
+          "command": [
+            "pnpm",
+            "run",
+            "build:all",
+            "--skip-nx-cache",
+            "--parallel=1"
+          ],
+          "source": "ef806bef2a71aa48709c2b4cad5e71d1ee359c2f",
+          "startedUTC": "2026-11-11T00:04:53Z",
+          "seconds": 9.759505987167358,
+          "exit": 0,
+          "log": "checks/v15-lazy-build-host.log",
+          "logSHA256": "d8aaab3d3dfeaee424301814627c151387c7080504154f1e42ca17eff462023d"
+        },
+        {
+          "label": "v15-lazy-demand",
+          "cwd": "/Users/jonathanborgia/code/signaltree/.worktrees/v16-followthrough",
+          "command": [
+            "python3",
+            "tools/release-followthrough/compare-v15-fields.py",
+            "/private/tmp/st-followthrough-30enof4m",
+            "demand"
+          ],
+          "source": "2826cc94185b4cccc3717ea1e6370d7bc27cbf27",
+          "startedUTC": "2026-11-11T00:05:34Z",
+          "seconds": 50.80342102050781,
+          "exit": 0,
+          "log": "checks/v15-lazy-demand.log",
+          "logSHA256": "895b3f0584800a5694bc661fdd9f1ad02f161367305f35973c172008838b357a"
+        },
+        {
+          "label": "v15-final-normal",
+          "cwd": "/Users/jonathanborgia/code/signaltree/.worktrees/v15-retention-backport",
+          "command": ["node", "tools/verify-gates.mjs", "--release"],
+          "source": "8dc9d21dc27fe31c1f7433910b9f4092c72091b6",
+          "startedUTC": "2026-11-11T00:31:10Z",
+          "seconds": 277.791620016098,
+          "exit": 1,
+          "log": "checks/v15-final-normal.log",
+          "logSHA256": "ae84107544bd1b9b46f3fa1eb89f9d0ef471e8332f2c1dd18a4c50f9ccd46af1"
+        },
+        {
+          "label": "v15-sensitivity-1",
+          "cwd": "/Users/jonathanborgia/code/signaltree/.worktrees/v15-retention-backport",
+          "command": [
+            "node",
+            "tools/check-retired-lifetime-gross-retention.mjs",
+            "--self-test"
+          ],
+          "source": "8dc9d21dc27fe31c1f7433910b9f4092c72091b6",
+          "startedUTC": "2026-11-11T00:43:06Z",
+          "seconds": 7.331209182739258,
+          "exit": 0,
+          "log": "checks/v15-sensitivity-1.log",
+          "logSHA256": "a742230179d45c38843667b809d6f87d463f1b149ca04dd15fe3d393e9a4da27"
+        },
+        {
+          "label": "v15-sensitivity-2",
+          "cwd": "/Users/jonathanborgia/code/signaltree/.worktrees/v15-retention-backport",
+          "command": [
+            "node",
+            "tools/check-retired-lifetime-gross-retention.mjs",
+            "--self-test"
+          ],
+          "source": "8dc9d21dc27fe31c1f7433910b9f4092c72091b6",
+          "startedUTC": "2026-11-11T00:43:14Z",
+          "seconds": 6.60986590385437,
+          "exit": 0,
+          "log": "checks/v15-sensitivity-2.log",
+          "logSHA256": "cf8fef7053d69bff8afb5f061c3c85aa8f3cd0a0fae757262d83b09215d5c394"
+        },
+        {
+          "label": "v15-sensitivity-3",
+          "cwd": "/Users/jonathanborgia/code/signaltree/.worktrees/v15-retention-backport",
+          "command": [
+            "node",
+            "tools/check-retired-lifetime-gross-retention.mjs",
+            "--self-test"
+          ],
+          "source": "8dc9d21dc27fe31c1f7433910b9f4092c72091b6",
+          "startedUTC": "2026-11-11T00:43:20Z",
+          "seconds": 7.219236850738525,
+          "exit": 0,
+          "log": "checks/v15-sensitivity-3.log",
+          "logSHA256": "c83557249c9fbda9ffc7dab4e790c0a0ef4613b38a2da6ae4842fc4d7935584e"
+        },
+        {
+          "label": "v15-sensitivity-normal",
+          "cwd": "/Users/jonathanborgia/code/signaltree/.worktrees/v15-retention-backport",
+          "command": [
+            "node",
+            "tools/verify-gates.mjs",
+            "--release",
+            "--only=retired-lifetime-gross-retention,retired-lifetime-gross-retention:node-reads,retired-lifetime-gross-retention:self"
+          ],
+          "source": "8dc9d21dc27fe31c1f7433910b9f4092c72091b6",
+          "startedUTC": "2026-11-11T00:43:53Z",
+          "seconds": 14.776800870895386,
+          "exit": 0,
+          "log": "checks/v15-sensitivity-normal.log",
+          "logSHA256": "a9e935ca812829b06fb5270bc19175647b2a2e198988776b51dbbd164f7b409e"
+        },
+        {
+          "label": "v15-mutation",
+          "cwd": "/Users/jonathanborgia/code/signaltree/.worktrees/v15-retention-backport",
+          "command": [
+            "node",
+            "tools/verify-gates.mjs",
+            "--self-test",
+            "--release"
+          ],
+          "source": "7a418942d1c2f57d223ae60ddbc16bbeaf5f1b44",
+          "startedUTC": "2026-11-11T00:45:19Z",
+          "seconds": 219.91990780830383,
+          "exit": 0,
+          "log": "checks/v15-mutation.log",
+          "logSHA256": "a043c8ee3b872bb8f86787f1baf823c67805da0a55d0f9dfc9f1a82e70d40d3f"
+        },
+        {
+          "label": "v15-post-build",
+          "cwd": "/Users/jonathanborgia/code/signaltree/.worktrees/v15-retention-backport",
+          "command": [
+            "pnpm",
+            "run",
+            "build:all",
+            "--skip-nx-cache",
+            "--parallel=1"
+          ],
+          "source": "2101a16c763f135bf421b341497803e91a469f19",
+          "startedUTC": "2026-11-11T01:04:56Z",
+          "seconds": 9.678953170776367,
+          "exit": 0,
+          "log": "checks/v15-post-build.log",
+          "logSHA256": "3e74d97cc048d0827878c2ed5494e087fe6a398dc9330f0a88ca36057453bba3"
+        },
+        {
+          "label": "v15-final-verify-tarball-consumer",
+          "cwd": "/Users/jonathanborgia/code/signaltree/.worktrees/v15-retention-backport",
+          "command": ["node", "tools/verify-tarball-consumer.mjs"],
+          "source": "2101a16c763f135bf421b341497803e91a469f19",
+          "startedUTC": "2026-11-11T01:05:06Z",
+          "seconds": 1.797950029373169,
+          "exit": 0,
+          "log": "checks/v15-final-verify-tarball-consumer.log",
+          "logSHA256": "141ef3ed7053d1e84a454073c419c1c1d7c685801bca01d6df8b1b79d057264b"
+        },
+        {
+          "label": "v15-final-verify-consumer-typecheck",
+          "cwd": "/Users/jonathanborgia/code/signaltree/.worktrees/v15-retention-backport",
+          "command": ["node", "tools/verify-consumer-typecheck.mjs"],
+          "source": "2101a16c763f135bf421b341497803e91a469f19",
+          "startedUTC": "2026-11-11T01:05:08Z",
+          "seconds": 6.651952743530273,
+          "exit": 0,
+          "log": "checks/v15-final-verify-consumer-typecheck.log",
+          "logSHA256": "a773289051a58cf35d19065195c79fa3457480d3518e371785cbe0611ffd35c0"
+        },
+        {
+          "label": "v15-final-verify-angular-aot-consumer",
+          "cwd": "/Users/jonathanborgia/code/signaltree/.worktrees/v15-retention-backport",
+          "command": ["node", "tools/verify-angular-aot-consumer.mjs"],
+          "source": "2101a16c763f135bf421b341497803e91a469f19",
+          "startedUTC": "2026-11-11T01:05:14Z",
+          "seconds": 14.695176124572754,
+          "exit": 0,
+          "log": "checks/v15-final-verify-angular-aot-consumer.log",
+          "logSHA256": "8076ea766d301ae307069e3114a197e0f4bd02dcc0768c6ab14420c725d817ed"
+        },
+        {
+          "label": "v15-demo-strict",
+          "cwd": "/Users/jonathanborgia/code/signaltree/.worktrees/v15-retention-backport",
+          "command": [
+            "pnpm",
+            "nx",
+            "build",
+            "demo",
+            "--configuration=production",
+            "--skip-nx-cache"
+          ],
+          "source": "2101a16c763f135bf421b341497803e91a469f19",
+          "startedUTC": "2026-11-11T01:05:29Z",
+          "seconds": 8.531734943389893,
+          "exit": 0,
+          "log": "checks/v15-demo-strict.log",
+          "logSHA256": "d5885e92b25f1bdd4d1cd4b6c6d357a5037aa8c402bd8ca19f2fe1279c0eb723"
+        },
+        {
+          "label": "v15-final-point",
+          "cwd": "/Users/jonathanborgia/code/signaltree/.worktrees/v15-retention-backport",
+          "command": [
+            "node",
+            "/private/tmp/st-followthrough-30enof4m/qualification-witnesses/replay/counter-child.mjs",
+            "v15",
+            "/Users/jonathanborgia/code/signaltree/.worktrees/v15-retention-backport/dist/packages/kernel/dist/index.js"
+          ],
+          "source": "2101a16c763f135bf421b341497803e91a469f19",
+          "startedUTC": "2026-11-11T01:05:29Z",
+          "seconds": 0.07898497581481934,
+          "exit": 0,
+          "log": "checks/v15-final-point.log",
+          "logSHA256": "43fad8d739b0fb895fa12071995034085be2fdaee4e268431aac3f3ee5021bdb"
+        },
+        {
+          "label": "v15-browser",
+          "cwd": "/Users/jonathanborgia/code/signaltree/.worktrees/v15-retention-backport",
+          "command": [
+            "pnpm",
+            "exec",
+            "playwright",
+            "test",
+            "--config",
+            "scripts/playwright/route-smoke.config.ts",
+            "--workers=1",
+            "--retries=0",
+            "--reporter=list,json"
+          ],
+          "source": "2101a16c763f135bf421b341497803e91a469f19",
+          "startedUTC": "2026-11-11T01:05:38Z",
+          "seconds": 68.47219681739807,
+          "exit": 0,
+          "log": "checks/v15-browser.log",
+          "logSHA256": "7b09f9b0de850b6794f4e79ccdd34911e946d14659c836d118c1f9e884f51d13"
+        },
+        {
+          "label": "v15-final-release-state",
+          "cwd": "/Users/jonathanborgia/code/signaltree/.worktrees/v15-retention-backport",
+          "command": ["node", "scripts/verify-release-state.js"],
+          "source": "2101a16c763f135bf421b341497803e91a469f19",
+          "startedUTC": "2026-11-11T01:06:46Z",
+          "seconds": 0.02974390983581543,
+          "exit": 0,
+          "log": "checks/v15-final-release-state.log",
+          "logSHA256": "941b33ad508de62b6d39074edfcc65a6a9cb2f7fd416e2e50686af5b119c7b48"
+        },
+        {
+          "label": "v15-final-version-claims",
+          "cwd": "/Users/jonathanborgia/code/signaltree/.worktrees/v15-retention-backport",
+          "command": ["node", "scripts/verify-version-claims.js"],
+          "source": "2101a16c763f135bf421b341497803e91a469f19",
+          "startedUTC": "2026-11-11T01:06:46Z",
+          "seconds": 0.04216599464416504,
+          "exit": 0,
+          "log": "checks/v15-final-version-claims.log",
+          "logSHA256": "41a04cf1861a570f722448cefa8f7dadbb827d1a489b54f31198311d3dcbd457"
+        },
+        {
+          "label": "v15-final-changelog",
+          "cwd": "/Users/jonathanborgia/code/signaltree/.worktrees/v15-retention-backport",
+          "command": ["bash", "scripts/verify-changelog-entry.sh", "15.4.4"],
+          "source": "2101a16c763f135bf421b341497803e91a469f19",
+          "startedUTC": "2026-11-11T01:06:47Z",
+          "seconds": 0.013294219970703125,
+          "exit": 0,
+          "log": "checks/v15-final-changelog.log",
+          "logSHA256": "1f11018aa9337d466108ab914537466c98395d217f8cd12e21c37ed4bd0e4633"
+        },
+        {
+          "label": "v15-closure-docs-working",
+          "cwd": "/Users/jonathanborgia/code/signaltree/.worktrees/v15-retention-backport",
+          "command": [
+            "node",
+            "tools/verify-gates.mjs",
+            "--only=source-controls,version-claims,readme-apis:teaching,readme-apis,release-claims,documented-imports,semantic-discoverability,documented-symbols,documented-examples,error-codes,doc-links"
+          ],
+          "source": "2101a16c763f135bf421b341497803e91a469f19",
+          "startedUTC": "2026-11-11T01:14:36Z",
+          "seconds": 34.284239053726196,
+          "exit": 0,
+          "log": "checks/v15-closure-docs-working.log",
+          "logSHA256": "f5617aa96f57a0ab4bf00b055ca617a8c59c4c639c6637eb41d2e4ab86bf0a1b"
+        }
+      ]
+    },
+    "v16": {
+      "runtimeCommit": "2826cc94185b4cccc3717ea1e6370d7bc27cbf27",
+      "qualificationCheckpoint": "605b3c5b98b133ebf5aa8dd79c7b35acf38ce068",
+      "version": "16.0.0-dev",
+      "normalRegistry": {
+        "initialPasses": 86,
+        "total": 87,
+        "initialFailures": ["bundle-budget"],
+        "correction": null,
+        "nonSizeGatesSatisfied": 86,
+        "remainingNumericalFailure": "bundle-budget"
+      },
+      "mutation": {
+        "reportedProven": 87,
+        "indirect": 13,
+        "blind": 0,
+        "vacuous": 0,
+        "unproven": 0,
+        "errored": 0,
+        "sizeCaveat": "Already-red baseline; not independent sensitivity proof."
+      },
+      "sourceRestoration": {
+        "files": 3772,
+        "equal": true,
+        "statusBefore": "",
+        "statusAfter": "",
+        "gateExit": 0
+      },
+      "artifactEquivalence": {
+        "seal": "sha256-ba5c01b75cd74e50293262f2a324cfe4072353dc845211e5c95e19948b126e05",
+        "expectedSeal": "sha256-ba5c01b75cd74e50293262f2a324cfe4072353dc845211e5c95e19948b126e05",
+        "kernelFiles": 141,
+        "kernelEqual": true
+      },
+      "packageFiles": 194,
+      "demoFiles": 86,
+      "browser": {
+        "startTime": "2026-11-11T01:02:54.931Z",
+        "duration": 68696.64700000001,
+        "expected": 137,
+        "skipped": 0,
+        "unexpected": 1,
+        "flaky": 0
+      },
+      "productionDemo": "strict size-only failure; temporary budget omission restored byte for byte; all other build checks pass",
+      "numericSizeFailures": {
+        "bareProductionKB": 17.98,
+        "bareDevelopmentKB": 20.3,
+        "entitiesProductionKB": 43.96,
+        "entitiesDevelopmentKB": 47.6,
+        "demoInitialKB": 815.62,
+        "demoInitialErrorCeilingKB": 570,
+        "mainJavaScriptBytes": 789924,
+        "browserErrorCeilingBytes": 570000
+      },
+      "sequence": [
+        {
+          "label": "v16-lazy-canonical-types",
+          "cwd": "/Users/jonathanborgia/code/signaltree/.worktrees/v16-followthrough",
+          "command": ["pnpm", "run", "typecheck"],
+          "source": "83b8fe19e924e87dd66f28ef1b1c2756a4e4cfd9",
+          "startedUTC": "2026-11-10T23:53:56Z",
+          "seconds": 4.443035125732422,
+          "exit": 0,
+          "log": "checks/v16-lazy-canonical-types.log",
+          "logSHA256": "747d451e252e4b439d73112d752d22f1f2043b2fd53cd7e02fcd0bb0345d3ff0"
+        },
+        {
+          "label": "v16-lazy-build",
+          "cwd": "/Users/jonathanborgia/code/signaltree/.worktrees/v16-followthrough",
+          "command": [
+            "pnpm",
+            "run",
+            "build:all",
+            "--skip-nx-cache",
+            "--parallel=1"
+          ],
+          "source": "2826cc94185b4cccc3717ea1e6370d7bc27cbf27",
+          "startedUTC": "2026-11-10T23:54:48Z",
+          "seconds": 10.267847061157227,
+          "exit": 0,
+          "log": "checks/v16-lazy-build.log",
+          "logSHA256": "e1801a143a61d06358b67267a41374bf6bf2b4023e7fdd9705903079cdacc353"
+        },
+        {
+          "label": "v16-final-normal",
+          "cwd": "/Users/jonathanborgia/code/signaltree/.worktrees/v16-followthrough",
+          "command": ["node", "tools/verify-gates.mjs", "--release"],
+          "source": "0de357aa3302d57a8937de7987f26b9830f0f17e",
+          "startedUTC": "2026-11-11T00:19:03Z",
+          "seconds": 679.5882441997528,
+          "exit": 1,
+          "log": "checks/v16-final-normal.log",
+          "logSHA256": "d3bafa8b402ddc9d134360153f9412ff8d7f41eeb51821e3efea67277045e969"
+        },
+        {
+          "label": "v16-mutation",
+          "cwd": "/Users/jonathanborgia/code/signaltree/.worktrees/v16-followthrough",
+          "command": [
+            "node",
+            "tools/verify-gates.mjs",
+            "--self-test",
+            "--release"
+          ],
+          "source": "605b3c5b98b133ebf5aa8dd79c7b35acf38ce068",
+          "startedUTC": "2026-11-11T00:49:53Z",
+          "seconds": 639.7992577552795,
+          "exit": 0,
+          "log": "checks/v16-mutation.log",
+          "logSHA256": "0e843b44ff2a29d93f30305b03ef5aa565af3ff419bf508dd35da531e1116f06"
+        },
+        {
+          "label": "v16-post-build",
+          "cwd": "/Users/jonathanborgia/code/signaltree/.worktrees/v16-followthrough",
+          "command": [
+            "pnpm",
+            "run",
+            "build:all",
+            "--skip-nx-cache",
+            "--parallel=1"
+          ],
+          "source": "605b3c5b98b133ebf5aa8dd79c7b35acf38ce068",
+          "startedUTC": "2026-11-11T01:01:50Z",
+          "seconds": 10.298993825912476,
+          "exit": 0,
+          "log": "checks/v16-post-build.log",
+          "logSHA256": "e732f8ad9b8129e30f3e1b332ff23b84a1cc4ca651f0b5223fb3c3b7310d0892"
+        },
+        {
+          "label": "v16-final-verify-tarball-consumer",
+          "cwd": "/Users/jonathanborgia/code/signaltree/.worktrees/v16-followthrough",
+          "command": ["node", "tools/verify-tarball-consumer.mjs"],
+          "source": "605b3c5b98b133ebf5aa8dd79c7b35acf38ce068",
+          "startedUTC": "2026-11-11T01:02:01Z",
+          "seconds": 1.8607978820800781,
+          "exit": 0,
+          "log": "checks/v16-final-verify-tarball-consumer.log",
+          "logSHA256": "141ef3ed7053d1e84a454073c419c1c1d7c685801bca01d6df8b1b79d057264b"
+        },
+        {
+          "label": "v16-final-verify-consumer-typecheck",
+          "cwd": "/Users/jonathanborgia/code/signaltree/.worktrees/v16-followthrough",
+          "command": ["node", "tools/verify-consumer-typecheck.mjs"],
+          "source": "605b3c5b98b133ebf5aa8dd79c7b35acf38ce068",
+          "startedUTC": "2026-11-11T01:02:03Z",
+          "seconds": 6.791426181793213,
+          "exit": 0,
+          "log": "checks/v16-final-verify-consumer-typecheck.log",
+          "logSHA256": "a773289051a58cf35d19065195c79fa3457480d3518e371785cbe0611ffd35c0"
+        },
+        {
+          "label": "v16-final-verify-angular-aot-consumer",
+          "cwd": "/Users/jonathanborgia/code/signaltree/.worktrees/v16-followthrough",
+          "command": ["node", "tools/verify-angular-aot-consumer.mjs"],
+          "source": "605b3c5b98b133ebf5aa8dd79c7b35acf38ce068",
+          "startedUTC": "2026-11-11T01:02:10Z",
+          "seconds": 24.754013776779175,
+          "exit": 0,
+          "log": "checks/v16-final-verify-angular-aot-consumer.log",
+          "logSHA256": "8076ea766d301ae307069e3114a197e0f4bd02dcc0768c6ab14420c725d817ed"
+        },
+        {
+          "label": "v16-final-coordinated",
+          "cwd": "/Users/jonathanborgia/code/signaltree/.worktrees/v16-followthrough",
+          "command": [
+            "node",
+            "tools/release-economics/coordinated.mjs",
+            "selftest",
+            "/Users/jonathanborgia/code/signaltree/.worktrees/v16-followthrough/dist/packages/kernel",
+            "1000"
+          ],
+          "source": "605b3c5b98b133ebf5aa8dd79c7b35acf38ce068",
+          "startedUTC": "2026-11-11T01:02:34Z",
+          "seconds": 1.2016270160675049,
+          "exit": 0,
+          "log": "checks/v16-final-coordinated.log",
+          "logSHA256": "6339fa0d930c52fe23edf7908de9655d031bbf4e34b2ac6fe0d43b49effd1913"
+        },
+        {
+          "label": "v16-demo-strict",
+          "cwd": "/Users/jonathanborgia/code/signaltree/.worktrees/v16-followthrough",
+          "command": [
+            "pnpm",
+            "nx",
+            "build",
+            "demo",
+            "--configuration=production",
+            "--skip-nx-cache"
+          ],
+          "source": "605b3c5b98b133ebf5aa8dd79c7b35acf38ce068",
+          "startedUTC": "2026-11-11T01:02:36Z",
+          "seconds": 10.057873010635376,
+          "exit": 1,
+          "log": "checks/v16-demo-strict.log",
+          "logSHA256": "361037454bcdf790d060151a20a55ab89bdac4c5c228c1103a9896c775ce949e"
+        },
+        {
+          "label": "v16-final-built-witnesses",
+          "cwd": "/Users/jonathanborgia/code/signaltree/.worktrees/v16-followthrough",
+          "command": [
+            "node",
+            "/private/tmp/st-followthrough-30enof4m/qualification-witnesses/built-witnesses.mjs",
+            "/Users/jonathanborgia/code/signaltree/.worktrees/v16-followthrough/dist/packages/kernel/dist"
+          ],
+          "source": "605b3c5b98b133ebf5aa8dd79c7b35acf38ce068",
+          "startedUTC": "2026-11-11T01:02:36Z",
+          "seconds": 0.09982013702392578,
+          "exit": 0,
+          "log": "checks/v16-final-built-witnesses.log",
+          "logSHA256": "8e08c740124f062f69b3b9ff0732a3f7d6fc0b079a5ed8e2fcdbae2e06dab7cc"
+        },
+        {
+          "label": "v16-final-clone-reentry-review",
+          "cwd": "/Users/jonathanborgia/code/signaltree/.worktrees/v16-followthrough",
+          "command": [
+            "node",
+            "/private/tmp/st-followthrough-30enof4m/qualification-witnesses/clone-reentry-review.mjs",
+            "/Users/jonathanborgia/code/signaltree/.worktrees/v16-followthrough/dist/packages/kernel/dist"
+          ],
+          "source": "605b3c5b98b133ebf5aa8dd79c7b35acf38ce068",
+          "startedUTC": "2026-11-11T01:02:36Z",
+          "seconds": 0.06412005424499512,
+          "exit": 0,
+          "log": "checks/v16-final-clone-reentry-review.log",
+          "logSHA256": "a6c8ab950f27fe2f139f0ca58870a1a587ca480d1120cf2598ad2f6ff682d132"
+        },
+        {
+          "label": "v16-final-frame-packet-witness",
+          "cwd": "/Users/jonathanborgia/code/signaltree/.worktrees/v16-followthrough",
+          "command": [
+            "node",
+            "/private/tmp/st-followthrough-30enof4m/qualification-witnesses/frame-packet-witness.mjs",
+            "/Users/jonathanborgia/code/signaltree/.worktrees/v16-followthrough/dist/packages/kernel/dist"
+          ],
+          "source": "605b3c5b98b133ebf5aa8dd79c7b35acf38ce068",
+          "startedUTC": "2026-11-11T01:02:36Z",
+          "seconds": 0.0611262321472168,
+          "exit": 0,
+          "log": "checks/v16-final-frame-packet-witness.log",
+          "logSHA256": "d24b877cb8cd8a98d9e0db944bdccc8d4ef66aa6359a80f7d465ad1001d2789b"
+        },
+        {
+          "label": "v16-final-point",
+          "cwd": "/Users/jonathanborgia/code/signaltree/.worktrees/v16-followthrough",
+          "command": [
+            "node",
+            "/private/tmp/st-followthrough-30enof4m/qualification-witnesses/replay/counter-child.mjs",
+            "v16",
+            "/Users/jonathanborgia/code/signaltree/.worktrees/v16-followthrough/dist/packages/kernel/dist/index.js"
+          ],
+          "source": "605b3c5b98b133ebf5aa8dd79c7b35acf38ce068",
+          "startedUTC": "2026-11-11T01:02:36Z",
+          "seconds": 0.3891119956970215,
+          "exit": 0,
+          "log": "checks/v16-final-point.log",
+          "logSHA256": "18c5ea128a8874f7334b2a90b429ef8c2177f962ace4d7b3c9655c5f6caba083"
+        },
+        {
+          "label": "v16-final-public-reentry",
+          "cwd": "/Users/jonathanborgia/code/signaltree/.worktrees/v16-followthrough",
+          "command": [
+            "node",
+            "/private/tmp/st-followthrough-30enof4m/qualification-witnesses/public-reentry.mjs",
+            "/Users/jonathanborgia/code/signaltree/.worktrees/v16-followthrough/dist/packages/kernel/dist"
+          ],
+          "source": "605b3c5b98b133ebf5aa8dd79c7b35acf38ce068",
+          "startedUTC": "2026-11-11T01:02:36Z",
+          "seconds": 0.06140589714050293,
+          "exit": 0,
+          "log": "checks/v16-final-public-reentry.log",
+          "logSHA256": "f01fa56249f6f79d4ca7f98a111c9bb551eefc2e5322ab0e9cb31398bb432f49"
+        },
+        {
+          "label": "v16-demo-owner-size-disposition",
+          "cwd": "/Users/jonathanborgia/code/signaltree/.worktrees/v16-followthrough",
+          "command": [
+            "pnpm",
+            "nx",
+            "build",
+            "demo",
+            "--configuration=production",
+            "--skip-nx-cache"
+          ],
+          "source": "605b3c5b98b133ebf5aa8dd79c7b35acf38ce068",
+          "startedUTC": "2026-11-11T01:02:47Z",
+          "seconds": 7.157835960388184,
+          "exit": 0,
+          "log": "checks/v16-demo-owner-size-disposition.log",
+          "logSHA256": "5ce0ace8046931a784f014c529f03eebd78ad185741a8df90725c7b7c164dcbe"
+        },
+        {
+          "label": "v16-browser",
+          "cwd": "/Users/jonathanborgia/code/signaltree/.worktrees/v16-followthrough",
+          "command": [
+            "pnpm",
+            "exec",
+            "playwright",
+            "test",
+            "--config",
+            "scripts/playwright/route-smoke.config.ts",
+            "--workers=1",
+            "--retries=0",
+            "--reporter=list,json"
+          ],
+          "source": "605b3c5b98b133ebf5aa8dd79c7b35acf38ce068",
+          "startedUTC": "2026-11-11T01:02:54Z",
+          "seconds": 69.40366792678833,
+          "exit": 1,
+          "log": "checks/v16-browser.log",
+          "logSHA256": "a45f1d689166afd01e284e7ff50e4a8088d85e5a77f21b91154aca6cb072627e"
+        },
+        {
+          "label": "v16-final-changelog",
+          "cwd": "/Users/jonathanborgia/code/signaltree/.worktrees/v16-followthrough",
+          "command": [
+            "bash",
+            "scripts/verify-changelog-entry.sh",
+            "16.0.0-dev"
+          ],
+          "source": "605b3c5b98b133ebf5aa8dd79c7b35acf38ce068",
+          "startedUTC": "2026-11-11T01:04:03Z",
+          "seconds": 0.01476597785949707,
+          "exit": 0,
+          "log": "checks/v16-final-changelog.log",
+          "logSHA256": "cd34ea6f5414e0a582444d3acca8e74a1884dab48cb8770def040b9efaa2b726"
+        },
+        {
+          "label": "v16-final-release-state",
+          "cwd": "/Users/jonathanborgia/code/signaltree/.worktrees/v16-followthrough",
+          "command": ["node", "scripts/verify-release-state.js"],
+          "source": "605b3c5b98b133ebf5aa8dd79c7b35acf38ce068",
+          "startedUTC": "2026-11-11T01:04:03Z",
+          "seconds": 0.03847789764404297,
+          "exit": 0,
+          "log": "checks/v16-final-release-state.log",
+          "logSHA256": "3529b79aa18d3a0835b3fd14e12bcacfbb15354157132635dae1de817b4116df"
+        },
+        {
+          "label": "v16-final-version-claims",
+          "cwd": "/Users/jonathanborgia/code/signaltree/.worktrees/v16-followthrough",
+          "command": ["node", "scripts/verify-version-claims.js"],
+          "source": "605b3c5b98b133ebf5aa8dd79c7b35acf38ce068",
+          "startedUTC": "2026-11-11T01:04:03Z",
+          "seconds": 0.03426814079284668,
+          "exit": 0,
+          "log": "checks/v16-final-version-claims.log",
+          "logSHA256": "b361a9e8656f756995349803be9fbc822daa18a80ad6fadd42afb849bc069b01"
+        },
+        {
+          "label": "v16-closure-docs-working",
+          "cwd": "/Users/jonathanborgia/code/signaltree/.worktrees/v16-followthrough",
+          "command": [
+            "node",
+            "tools/verify-gates.mjs",
+            "--only=source-controls,version-claims,readme-apis:teaching,readme-apis,release-claims,documented-imports,semantic-discoverability,documented-symbols,documented-examples,error-codes,doc-links",
+            "--artifact-integrity=sha256-ba5c01b75cd74e50293262f2a324cfe4072353dc845211e5c95e19948b126e05"
+          ],
+          "source": "605b3c5b98b133ebf5aa8dd79c7b35acf38ce068",
+          "startedUTC": "2026-11-11T01:12:26Z",
+          "seconds": 44.07313585281372,
+          "exit": 0,
+          "log": "checks/v16-closure-docs-working.log",
+          "logSHA256": "e2ad26cd29753a4c1d84d4f12077a6d8e7dba0d8c6543c5403a12987f1b7ba60"
+        }
+      ]
+    }
+  },
+  "linux": {
+    "url": "https://github.com/JBorgia/signal-tree/actions/runs/42935863770",
+    "run": 42935863770,
+    "source": "2101a16c763f135bf421b341497803e91a469f19",
+    "artifactId": 13819245017,
+    "zipSHA256": "60b7d393db2f9079162593b491d8a03ce718aeca7b8f6b20762759be280fd97a",
+    "runtime": {
+      "node": "v24.15.0",
+      "v8": "13.6.233.17-node.48",
+      "execPath": "/opt/hostedtoolcache/node/24.15.0/x64/bin/node",
+      "execArgv": [],
+      "nodeOptions": null,
+      "platform": "linux",
+      "arch": "x64",
+      "osRelease": "7.0.0-1019-azure",
+      "cpuCount": 4,
+      "cpuModels": ["AMD EPYC 7763 64-Core Processor"],
+      "totalMemoryBytes": 16759439360
+    },
+    "kernelPayloads": 109,
+    "kernelMatchesMeasuredV15": true,
+    "sensitivityChildren": 18,
+    "ordinaryChildren": 6,
+    "uniqueChildPIDs": 24,
+    "allRawVerdictsRecomputed": true,
+    "cells": {
+      "no-history-reads/control": {
+        "samples": 6,
+        "minimumMiB": 0.5477828979492188,
+        "maximumMiB": 0.553314208984375
+      },
+      "no-history-node-reads/control": {
+        "samples": 6,
+        "minimumMiB": 7.4641571044921875,
+        "maximumMiB": 7.466835021972656
+      },
+      "no-history-reads/retained": {
+        "samples": 3,
+        "minimumMiB": 63.5548095703125,
+        "maximumMiB": 63.555747985839844
+      },
+      "no-history-reads/neutralized": {
+        "samples": 3,
+        "minimumMiB": 0.5487594604492188,
+        "maximumMiB": 0.5518341064453125
+      },
+      "no-history-node-reads/retained": {
+        "samples": 3,
+        "minimumMiB": 148.42510986328125,
+        "maximumMiB": 148.4284210205078
+      },
+      "no-history-node-reads/neutralized": {
+        "samples": 3,
+        "minimumMiB": 7.462242126464844,
+        "maximumMiB": 7.465019226074219
+      }
+    },
+    "cleanupSelfTest": {
+      "status": "passed",
+      "mutations": [
+        "late-registration",
+        "activation-deletion",
+        "revision-resurrection"
+      ],
+      "artifactUnchanged": true,
+      "allMutantsRestored": true,
+      "rawLogSHA256": "66bae25ded53da26df9d59f2cd115e9a469e18258e52269c089e7bd0b3dbd3ec"
+    },
+    "scope": "Linux kernel retention sensitivity and cleanup validation; not the full Linux release registry."
+  },
+  "limits": [
+    "No whole-workspace coverage percentage is established by the registry.",
+    "Mutation count is the runner report; a size baseline already red does not independently prove size sensitivity.",
+    "Linux evidence covers v15 retention sensitivity and cleanup, not the full release registry.",
+    "Browser suites differ between release lines; counts are not a comparative coverage percentage.",
+    "Artifact hashes establish included payload identity, not complete Git history or universal test reproducibility."
+  ],
+  "closureOnlyFiles": {
+    "v15": [
+      "RELEASE-CURRENT.md",
+      "docs/audits/2026-11-10-v15-retention-followthrough"
+    ],
+    "v16": [
+      "RELEASE-CURRENT.md",
+      "TODO.md",
+      "docs/audits/2026-11-10-v15-v16-followthrough"
+    ]
+  }
+}

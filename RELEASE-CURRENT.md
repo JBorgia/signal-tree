@@ -5,7 +5,7 @@ first failures and sealed predecessors remain evidence, not competing queues.
 
 ## Active owner instruction
 
-### November 10 follow-through — authorized and active
+### November 10 follow-through — complete
 
 The owner accepted the recommendation to do all of: backport both demonstrated
 retention repairs to v15; repeat wide-row aging on qualified v16; compare released
@@ -27,20 +27,39 @@ no merge, tag or registry publication has been selected for this follow-through.
 - [x] Direct released/repaired-v15/v16 application cost comparison.
 - [x] Evidence-led optimization/removal disposition with preserved semantics.
 - [x] Actual production Angular app measurements, including clearly labeled CPU
-  throttling; no claim that emulation is a physical target-device measurement.
-- [ ] Reconciled release-facing documents and metadata, complete affected
-  qualification, independent closure and review-branch pushes.
+      throttling; no claim that emulation is a physical target-device measurement.
+- [x] Reconciled release-facing documents and metadata, complete affected
+      qualification, independent closure and review-branch pushes.
 
-The prior GO remains evidence for its exact artifact. New candidate changes need
-their own relevant checks and artifact qualification before inheriting it.
+**GO: the v16 successor is release-qualified.** Runtime `2826cc941` and v15
+maintenance runtime `ef806bef2` complete the authorized follow-through. Both
+remain unreleased review candidates; the original version metadata is not
+publication authority.
 
 The [follow-through record](docs/audits/2026-11-10-v15-v16-followthrough/README.md)
 binds runtime `2826cc941` and v15 port `ef806bef2`, exact package copies, registered
 comparisons and actual Angular results. Deferred field creation retains all
 existing lifetime, mutation and publication bindings. Its large savings for
 whole-row/sparse-field use and small fully materialized heap cost are explicit.
-No wholesale deletion of supported v15 machinery is justified. Full successor
-qualification and final branch sharing are the remaining execution checkpoint.
+No wholesale deletion of supported v15 machinery is justified. All required
+non-size checks pass: full normal registries with the v15 sensitivity correction,
+full mutation/restoration, clean artifacts matching the measured builds, fresh
+installed consumers and production browser checks. v16 reports 137 browser passes
+and its accepted size failure; v15 reports 146 passes and a strict demo build
+pass. Linux independently validates the corrected v15 retention detector and
+cleanup controls against the same 109 kernel payloads.
+
+The v16 five-package seal is
+`sha256-ba5c01b75cd74e50293262f2a324cfe4072353dc845211e5c95e19948b126e05`.
+The v15 seal is
+`sha256-8f11180b4410a9402ee28aafcdcb8f5e01ee60def75bffddeb6d8a5f5e5edda9`.
+Numerical startup misses, the promoted-row CPU cost, fully demanded heap premium
+and size failures remain explicit in the audit. Economic acceptance follows the
+owner's cost/feasibility instruction; ceilings are unchanged. Stable v15 preserves
+its API and settlement behavior. Migration and release notes describe v16
+behavior and boundaries rather than treating older v15 features as new.
+
+## Prior qualified artifact — November 10
 
 **GO: v16 candidate release-qualified.** The
 [completed readiness audit](docs/audits/2026-11-10-release-readiness/README.md)

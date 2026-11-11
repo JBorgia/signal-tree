@@ -13,12 +13,20 @@ resource collection and the original point-work bound pass. Full release gates,
 mutation restoration, clean installed consumers and production browser checks
 are complete, with only the previously accepted numerical size failures.
 
-The owner subsequently authorized the follow-through recorded in the current
-controller: stable-v15 retention repairs, a direct three-build comparison, wider
-aging and field-allocation attribution, actual Angular application measurements,
-targeted improvements and reconciled release documentation. The earlier GO binds
-its exact artifact; successor runtime changes require their own qualification.
-Keep first failures and exact artifact bindings. This work preserves the frozen
+The November 10 follow-through is also complete. The
+[successor audit](docs/audits/2026-11-10-v15-v16-followthrough/README.md)
+qualifies v16 runtime `2826cc941` and stable-v15 repair `ef806bef2`: both retention
+backports, lazy field allocation, direct three-build comparison, wider aging,
+actual Angular measurements, reconciled migration/release notes and complete
+artifact verification. Source and measurement controls preserve first failures.
+The repaired-v15 detector has fresh Linux sensitivity and cleanup evidence.
+No wholesale deletion of supported stable-line machinery was justified.
+
+The remaining release actions are merge, final version/tag preparation and
+publication under separately selected authority. Fully demanded heap and deferred
+first-field construction, promoted-row CPU, ordinary v16 startup and emulated
+Angular latency are documented tradeoffs and reopening conditions, not hidden
+passing targets or an unbounded optimization queue. This work preserves frozen
 semantics and does not reopen B or start another architecture competition.
 
 Historical entries and prior decisions are preserved byte-for-byte in the
