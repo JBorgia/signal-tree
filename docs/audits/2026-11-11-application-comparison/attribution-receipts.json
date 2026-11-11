@@ -1,0 +1,133 @@
+{
+  "profile-v15-inventory-10000-1": {
+    "command": [
+      "node",
+      "tools/application-lab/profile.mjs",
+      "/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/application-baseline-4",
+      "v15",
+      "inventory",
+      "/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/profile-v15-inventory-10000-1",
+      "10000"
+    ],
+    "cwd": "/Users/jonathanborgia/code/signaltree/.worktrees/application-comparison",
+    "startedUTC": "2026-11-11T17:57:10.696189+00:00",
+    "seconds": 1.1837949752807617,
+    "exit": 0,
+    "log": "/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/profile-v15-inventory-10000-1.log",
+    "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "resultPath": "/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/profile-v15-inventory-10000-1/result.json",
+    "resultSha256": "46c2e8682362006756bfefd2d231e58834b4d9c52a7ef1b19a89675692438d2d"
+  },
+  "profile-v15-dispatch-10000-1": {
+    "command": [
+      "node",
+      "tools/application-lab/profile.mjs",
+      "/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/application-baseline-4",
+      "v15",
+      "dispatch",
+      "/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/profile-v15-dispatch-10000-1",
+      "10000"
+    ],
+    "cwd": "/Users/jonathanborgia/code/signaltree/.worktrees/application-comparison",
+    "startedUTC": "2026-11-11T17:58:35.234229+00:00",
+    "seconds": 3.245576858520508,
+    "exit": 0,
+    "log": "/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/profile-v15-dispatch-10000-1.log",
+    "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "resultPath": "/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/profile-v15-dispatch-10000-1/result.json",
+    "resultSha256": "b3d1a416bf1c50c1d11ff53e4c736e40636d4e5a5f658fef8604dd5fa07c20aa"
+  },
+  "profile-v16-inventory-10000-1": {
+    "command": [
+      "node",
+      "tools/application-lab/profile.mjs",
+      "/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/application-baseline-4",
+      "v16",
+      "inventory",
+      "/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/profile-v16-inventory-10000-1",
+      "10000"
+    ],
+    "cwd": "/Users/jonathanborgia/code/signaltree/.worktrees/application-comparison",
+    "startedUTC": "2026-11-11T17:57:08.502408+00:00",
+    "seconds": 2.193445920944214,
+    "exit": 0,
+    "log": "/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/profile-v16-inventory-10000-1.log",
+    "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "resultPath": "/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/profile-v16-inventory-10000-1/result.json",
+    "resultSha256": "ca68deb391cd7f6804c2cfb21ebf1144928960a4c7de48c44b48e916f9752cbe"
+  },
+  "profile-v16-dispatch-10000-1": {
+    "command": [
+      "node",
+      "tools/application-lab/profile.mjs",
+      "/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/application-baseline-4",
+      "v16",
+      "dispatch",
+      "/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/profile-v16-dispatch-10000-1",
+      "10000"
+    ],
+    "cwd": "/Users/jonathanborgia/code/signaltree/.worktrees/application-comparison",
+    "startedUTC": "2026-11-11T17:58:31.787763+00:00",
+    "seconds": 3.4460768699645996,
+    "exit": 0,
+    "log": "/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/profile-v16-dispatch-10000-1.log",
+    "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "resultPath": "/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/profile-v16-dispatch-10000-1/result.json",
+    "resultSha256": "97d8bf3a70677ba6ea242758fdefb954609fdc21660b7fc9a9ad754fa5831782"
+  },
+  "profile-tanstack-inventory-10000-1": {
+    "command": [
+      "node",
+      "tools/application-lab/profile.mjs",
+      "/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/application-baseline-4",
+      "tanstack",
+      "inventory",
+      "/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/profile-tanstack-inventory-10000-1",
+      "10000"
+    ],
+    "cwd": "/Users/jonathanborgia/code/signaltree/.worktrees/application-comparison",
+    "startedUTC": "2026-11-11T17:57:11.880465+00:00",
+    "seconds": 4.822521924972534,
+    "exit": 0,
+    "log": "/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/profile-tanstack-inventory-10000-1.log",
+    "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "resultPath": "/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/profile-tanstack-inventory-10000-1/result.json",
+    "resultSha256": "fdc9934ea69c1788027f8fcf48c2480671770769928104b907b1f0b046027d43"
+  },
+  "profile-tanstack-dispatch-10000-1": {
+    "command": [
+      "node",
+      "tools/application-lab/profile.mjs",
+      "/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/application-baseline-4",
+      "tanstack",
+      "dispatch",
+      "/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/profile-tanstack-dispatch-10000-1",
+      "10000"
+    ],
+    "cwd": "/Users/jonathanborgia/code/signaltree/.worktrees/application-comparison",
+    "startedUTC": "2026-11-11T17:58:27.769596+00:00",
+    "seconds": 4.017712831497192,
+    "exit": 0,
+    "log": "/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/profile-tanstack-dispatch-10000-1.log",
+    "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "resultPath": "/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/profile-tanstack-dispatch-10000-1/result.json",
+    "resultSha256": "a7280eae931768e1d7107ad462956dfbd65120afe0790f4c70f939eb0d8b1796"
+  },
+  "population-probe-1": {
+    "command": [
+      "node",
+      "tools/application-lab/population-probe.mjs",
+      "compare",
+      "/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/application-baseline-4",
+      "/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/population-probe-1"
+    ],
+    "cwd": "/Users/jonathanborgia/code/signaltree/.worktrees/application-comparison",
+    "startedUTC": "2026-11-11T17:57:16.703362+00:00",
+    "seconds": 10.404858112335205,
+    "exit": 0,
+    "log": "/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/population-probe-1.log",
+    "logSha256": "a8664a67938d8aaa36287ce6f9bef43cc4187ca67778a7511764677255371400",
+    "resultPath": "/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/population-probe-1/results.json",
+    "resultSha256": "4b90a22affd461da33473b8ca94cd8e401e02dda91addf4d3c152835f03cb49c"
+  }
+}
