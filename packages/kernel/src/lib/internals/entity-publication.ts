@@ -143,6 +143,8 @@ export interface EntityRetirementPlan {
   /** Source facts may be neutral or have only a discharged own window. */
   readonly canRetire: boolean;
   current(): boolean;
+  /** Preserve exact blocked facts in a compact representation, without erasure. */
+  compact?(): boolean;
   onReady(callback: () => void): () => void;
   /** Only exact live cells whose settlement could make this snapshot releasable. */
   onSettlement?(callback: () => void): () => void;
@@ -219,7 +221,14 @@ export class EntityPublicationSource {
       // ineligible proof remains evidence, without retaining a dead request.
       if (!plan.canRetire) {
         if (plan.onSettlement) request.release = plan.onSettlement(() => this.scheduleRetirement(subject, request));
-        else this.cancelRetirement(subject);
+        else {
+          if(plan.compact&&request.eligible()&&revision===this.revisionToken&&plan.current()){
+            if(plan.compact()){
+              this.revisionToken={};this.retirementRevision={};
+            }
+          }
+          this.cancelRetirement(subject);
+        }
         return;
       }
       if (!request.eligible() || revision !== this.revisionToken || !plan.current()) {
