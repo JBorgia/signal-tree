@@ -2265,7 +2265,11 @@ export function createEntitySignal<
     // a nonce: every observer that could have compared against the old count
     // was retaining the old carrier, which is why this branch was not taken.
     const created = locations.createCell(0);
-    subjectStateSignals.set(subjectId, new WeakRef(created));
+    // A held node may be read for the first time after its lifetime was
+    // forgotten. It owns this inert carrier; the collection must not re-index it.
+    if (resolveSubjectState(subjectId) !== undefined) {
+      subjectStateSignals.set(subjectId, new WeakRef(created));
+    }
     return created;
   }
 
@@ -3844,7 +3848,18 @@ export function createEntitySignal<
       subjectEpochs.delete(prepared.subjectId);
     }
 
-    const result = commitAndProjectEntityMutationFrame(frame);
+    let result: ReturnType<typeof commitAndProjectEntityMutationFrame>;
+    try {
+      result = commitAndProjectEntityMutationFrame(frame);
+    } finally {
+      // Rollback validation can create activation entries without a user read.
+      // Clean up only after actual whole-lifetime forgetting, including when
+      // completion throws. A failed pre-install keeps its carrier routing.
+      // Held nodes own their carrier and forgotten IDs are never reused.
+      if (forgetLifetime && resolveSubjectState(prepared.subjectId) === undefined) {
+        subjectStateSignals.delete(prepared.subjectId);
+      }
+    }
     // Shared installed-frame completion requests publication retirement.
     for (const changedSubjectId of result.physicallyChangedSubjectIds) {
       if (forgetLifetime && changedSubjectId === prepared.subjectId) {
@@ -3960,7 +3975,15 @@ export function createEntitySignal<
       return;
     }
 
-    commitAndProjectEntityMutationFrame(frame);
+    try {
+      commitAndProjectEntityMutationFrame(frame);
+    } finally {
+      for (const subjectId of subjectIds) {
+        if (resolveSubjectState(subjectId) === undefined) {
+          subjectStateSignals.delete(subjectId);
+        }
+      }
+    }
 
     // DELIBERATELY NO PUBLISH, and this is load-bearing rather than an omission.
     // `publishSubjectPhysicalChange` -> `bumpSubjectRevision` writes
