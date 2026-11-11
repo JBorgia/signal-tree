@@ -21,6 +21,9 @@ ordinary cached readonly behavior is unchanged.
 
 ### Read-only runtime observation
 
+These reader entry points and structured effect-address fields already exist in
+v15.4.4. This section restates their supported boundaries for the v16 line.
+
 Tooling can import `stateLocationReader`, `entityMembershipReader`,
 `linkStateReader`, `transactionLifecycleReader` and `restorationReader` from
 `@signal-tree/kernel/internals`. These observe the constructed tree; they do not
@@ -45,26 +48,25 @@ and after an effect. Neither display paths nor an absent value can replace those
 facts. Confirmed-history access remains subject to configured retention.
 
 
-**TL;DR** — **Breaking, and deliberately so.** `tree.transaction()` is renamed
-to `tree.transact()` and the old spelling is **removed, not deprecated**. One
-`inspect()` on every transaction handle, plus three new public types. The transaction rollback
-correctness defects described here SHIPPED IN 15.3.0 — see that entry; this
-section predates it and is kept for the vocabulary change only. The rename is
-mechanical; if you read confirmed history through `@signaltree/kernel/internals`,
-see the retention note below.
+Applications migrating from v15 must rename `tree.transaction()` to
+`tree.transact()`. Open string-indexed Record access has a narrower type contract,
+and custom native adapters must supply `createCurrentReadonlyCell`. The
+[v15 to v16 migration guide](docs/guides/migration-v15-v16.md) covers these changes.
+Confirmed-history opt-in and the v15.3 rollback corrections already ship in v15;
+they are not additional migrations from v15.4.4.
 
 ### Breaking changes
 
 ```text
-15.2.1                    16.0.0
+15.x                      16.0.0
 tree.transaction(fn)  ->  tree.transact(fn)
 ```
 
 No alias ships. A missed call site is a **compile error**, not a silent
 deprecation warning — which is the reason for breaking rather than bridging.
 
-Nothing else migrates: `propose()` never reached a release, so there is no
-second rename to make.
+`propose()` never reached a release, so there is no second transaction rename.
+Open-Record typing and custom native-adapter changes are described in the guide.
 
 #### Why this did not go through a deprecation cycle
 
@@ -80,6 +82,15 @@ the rule.** From 16.0.0 the corrected surface is the compatibility baseline and
 the deprecation path applies normally. See
 [`docs/support-policy.md`](docs/support-policy.md) and
 [`docs/research/api-breaking-reset-0.md`](docs/research/api-breaking-reset-0.md).
+
+### Entity field allocation
+
+Acquiring an entity row no longer constructs every field carrier. Each field is
+initialized on first acquisition, preserving its accessor descriptor, cached
+identity and entity lifetime. Whole-row use avoids unused field allocations;
+applications that acquire every field still pay that construction cost and retain
+additional getter/cache bookkeeping. Custom adapter factory initialization now
+happens at field acquisition, as described in the migration guide.
 
 ### Carried from 15.3.1
 
@@ -110,20 +121,21 @@ Differences from 15.x, following this line's recovery-handle contract:
   thrown and the delivery error is reported.
 - `SignalTreeRollbackRecovery` documents the post-callback case. Its shape is
   unchanged.
-- Still open on this line, with no known supported trigger: a failure while
-  recording the pending turn, and a throw out of the post-callback flush.
+- A post-callback flush failure discards the reserved pending identity and
+  lifecycle view before rethrowing. Its regression checks that a later flush
+  cannot acquire a phantom confirmed turn. This does not promise compensation
+  for arbitrary failures while internal history objects are materialized.
 
-Known issues that also reproduce here: an entity row restored by rollback or
-undo/redo is not seen by linked endpoints; work an observer does while
-`transact()` is still running is ordered before it, so an explicit rollback
-afterwards can undo it; same-tick coalescing can lose a write for observers
-(for example a newest-first double rollback, a rollback and then an undo of
-the same location, and entity writes on two same-shaped trees); a whole-value
-branch write that leaves out a key loses it for good (no observer is told, and
-rollback and undo never restore it); and realization descriptors are retained
-for retired entities.
+Current regression coverage verifies restored entity delivery, later reentrant
+writer ordering, same-tick attribution across trees and reversals, branch
+omission/re-addition, and responsibility-governed descriptor release. The earlier
+development entry listed these as open; its exact text is preserved in the
+[historical entry](docs/archive/2026-11-10-release-notes/v16-development-entry.before.md).
+The old materialization-failure concern had no supported reproducer and is not
+reported as a demonstrated current defect. See the current release controller for
+the exact qualified artifact and remaining follow-through work.
 
-### For users
+### Behavior preserved and verified on this line
 
 - **Undo, redo and `jumpTo()` never write state an omission has hidden.** A
   location under an omitted member is restored by re-adding only the way to

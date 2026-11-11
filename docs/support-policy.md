@@ -145,8 +145,12 @@ v14 backport.
 
 When you are ready, see
 [Migration `@signaltree/*` → `@signal-tree/*` (v15)](guides/migration-v14-v15.md).
-It is the single migration target for every earlier version; the historical
+It is the scope/package migration target for v14 and earlier; the historical
 inter-version guides under [`legacy/`](legacy/README.md) are kept for provenance.
+
+For the unreleased v16 candidate, use the separate
+[v15 to v16 migration guide](guides/migration-v15-v16.md). Qualification and
+publication status come from [the current controller](../RELEASE-CURRENT.md).
 
 ## Transaction failure policy
 

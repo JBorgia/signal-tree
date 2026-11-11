@@ -6,7 +6,9 @@
 
 Use this index to navigate the documentation.
 
-**Publication status:** This v16 development candidate is unreleased and held for verification. See [CHANGELOG](../CHANGELOG.md).
+**Publication status:** v16 is unreleased. The qualified baseline and authorized
+follow-through work are recorded in [RELEASE-CURRENT](../RELEASE-CURRENT.md).
+See [CHANGELOG](../CHANGELOG.md) for behavior and migration changes.
 
 **Workspace version:** 16.0.0-dev — development only. The workspace version does
 NOT establish that 16.0.0 was published or is safe to release.
@@ -37,7 +39,8 @@ NOT establish that 16.0.0 was published or is safe to release.
 | Document                                                                          | Description                                                                                                          |
 | --------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------- |
 | [Support policy](support-policy.md)                                               | The two supported release lines (`@signal-tree/*` v15, `@signaltree/*` v14), what v14 still receives, and EOL intent |
-| [Migration `@signaltree/*` → `@signal-tree/*` (v15)](guides/migration-v14-v15.md) | **Current migration target for every earlier version** — rename, package consolidation, removed APIs                 |
+| [Migration `@signaltree/*` → `@signal-tree/*` (v15)](guides/migration-v14-v15.md) | **Scope/package migration for v14 and earlier** — rename, package consolidation, removed APIs                 |
+| [Migration v15 → v16](guides/migration-v15-v16.md) | Transaction naming, open-Record typing and custom native adapters |
 | [Composition Recipes](guides/composition-recipes.md)                              | Ops-service patterns, entity-CRUD base, optimistic UI                                                                |
 | [Legacy docs (`@signaltree/*`, pre-15)](legacy/README.md)                         | Per-version migration guides and the 14.0.0 capability audit, quarantined                                            |
 | [Persistence and Security](guides/persistence-and-security.md)                    | Withdrawn: its subject, the `stored()` marker, is deleted                                                            |
@@ -67,8 +70,10 @@ NOT establish that 16.0.0 was published or is safe to release.
 | [React](../packages/react/README.md)     | `@signal-tree/react` — owner-bound React observation (`useSignalTree`)   |
 | [Vue](../packages/vue/README.md)         | `@signal-tree/vue` — native Vue refs over kernel-owned state             |
 
-Historical inter-version migration guides live in [Guides](#-guides); the
-[v15 migration guide](guides/migration-v14-v15.md) is the current target.
+Use the [v15 to v16 guide](guides/migration-v15-v16.md) for the current candidate.
+Applications on v14 or earlier first need the
+[scope/package migration](guides/migration-v14-v15.md). Historical guides remain
+under [Guides](#-guides).
 
 ---
 
