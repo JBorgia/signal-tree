@@ -1,4 +1,21 @@
-# Current v15 maintenance publication — authorized November 11, 2026
+# v15.4.8 published — npm closure complete
+
+November 11, 2026: signed `v15.4.8` at `37ef1788f6bac61678fc312f391b180bd7a6bbd7`
+is published on all five npm `latest` tags. Exact archive integrity, provenance,
+signatures and fresh registry runtime/type/AOT consumers pass. Local and tagged
+Linux normal/mutation qualification passed; clean rebuilt archives match the
+signed candidate. [Release receipt](docs/audits/2026-11-11-v15-maintenance-release/v15.4.8-receipt.json).
+
+The exact-commit demo preview passes its visible behavior check. Production
+promotion awaits the owner's Vercel email identity verification; do not report
+the live demo updated until its version and behavior are verified. The separately
+authorized automated application comparison continues on `codex/application-comparison`
+using these verified registry artifacts and the qualified v16 baseline. No v16
+registry publication is authorized.
+
+---
+
+# Historical v15 maintenance preparation — authorized November 11, 2026
 
 The owner explicitly directed: release the v15 maintenance update first, then
 build automated application scenarios, define metrics and run comparative
