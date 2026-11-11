@@ -144,3 +144,10 @@ captures each `git rev-parse --verify` in a separate assignment before comparing
 so Bash's error handling stops on either failure. The shell control reproduced
 the old false acceptance, rejected each failed lookup with the corrected form,
 and accepted equal successful results. This correction precedes signed freeze.
+
+The complete container probe passed: all normal gates, all mutation proofs,
+clean rebuilds, strict tarball consumers, production Angular AOT and canonical
+prepare-only packaging on immutable `0b29a1897`. All six formerly failing gates
+now pass with the exact checkout trust configuration. This resolves the observed
+environment cause; it does not substitute for fresh 15.4.8 tagged qualification
+or registry verification. The raw run remains linked above.
