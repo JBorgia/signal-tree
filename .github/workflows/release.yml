@@ -21,7 +21,9 @@ on:
 jobs:
   verify:
     name: Verify tagged commit (full gate set)
-    runs-on: ubuntu-latest
+    # Playwright 1.56.1 supports Ubuntu 24.04; ubuntu-latest moved to 26.04.
+    # Manual dispatch still checks out and verifies the exact release_tag.
+    runs-on: ubuntu-24.04
     outputs:
       tag_name: ${{ steps.release_tag.outputs.tag_name }}
     steps:
@@ -101,7 +103,7 @@ jobs:
 
   release:
     needs: verify
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     permissions:
       contents: write
 
