@@ -2154,6 +2154,9 @@ export function createEntitySignal<
    * behaviour is unchanged for every reference anyone can actually observe.
    */
   const nodeCache = new Map<number, WeakRef<EntityNode<E>>>();
+  // Inventory observes allocation without invoking getters. Weak identities
+  // do not retain a carrier after its configurable property is removed.
+  const materializedFieldGetters = new WeakSet<() => unknown>();
   const nodeFinalizer =
     typeof FinalizationRegistry === 'function'
       ? new FinalizationRegistry<number>((subjectId) => {
@@ -2373,52 +2376,72 @@ export function createEntitySignal<
       return undefined;
     }) as unknown as EntityNode<E>;
 
-    // Field projections derive their read from the subject-owned entity location.
-    // Writes delegate to api.updateOne so interceptors and tap handlers still run.
+    // Preserve the creation-time field surface, but allocate each projection
+    // only when acquired. Whole-row readers need no per-field carriers.
+    // Reads retain the captured entity lifetime; writes retain v15's complete
+    // updateOne path, including interceptors and taps.
     for (const key of Object.keys(entity)) {
       const fieldKey = key as keyof E;
-      const computeField = () => entitySig()?.[fieldKey];
-      const writeField = (value: E[typeof fieldKey] | undefined) => {
-        const key = currentKey();
-        if (key === undefined) {
-          throw new Error(`Entity with subject ${String(subjectId)} not found`);
+      let fieldSignal: Location<E[typeof fieldKey] | undefined> | undefined;
+      let initializing = false;
+      const getField = (): Location<E[typeof fieldKey] | undefined> => {
+        if (fieldSignal !== undefined) return fieldSignal;
+        if (initializing) {
+          throw new Error(`Recursive initialization of entity field ${key}`);
         }
-        api.updateOne(key, { [fieldKey]: value } as Partial<E>);
-      };
-      const fieldSignal = locations.createWritableProjection
-        ? locations.createWritableProjection(computeField, writeField)
-        : createWritableProjection(
-            locations.createDerived(computeField),
-            writeField
-          );
-
-      if (ownerMetadataEnabled) {
-        Object.defineProperty(fieldSignal, '__ownerPath', {
-          get: () => {
+        initializing = true;
+        try {
+          const computeField = () => entitySig()?.[fieldKey];
+          const writeField = (value: E[typeof fieldKey] | undefined) => {
             const key = currentKey();
-            return key === undefined ? undefined : `${basePath}.${String(key)}`;
-          },
-          enumerable: false,
-          configurable: true,
-        });
-      }
-      if (subjectMetadataEnabled) {
-        Object.defineProperty(fieldSignal, '__subjectIds', {
-          get: () => [subjectId],
-          enumerable: false,
-          configurable: true,
-        });
-      }
-      if (positionMetadataEnabled) {
-        Object.defineProperty(fieldSignal, '__positionIds', {
-          get: getPositionIds,
-          enumerable: false,
-          configurable: true,
-        });
-      }
+            if (key === undefined) {
+              throw new Error(`Entity with subject ${String(subjectId)} not found`);
+            }
+            api.updateOne(key, { [fieldKey]: value } as Partial<E>);
+          };
+          const created = locations.createWritableProjection
+            ? locations.createWritableProjection(computeField, writeField)
+            : createWritableProjection(
+                locations.createDerived(computeField),
+                writeField
+              );
+
+          if (ownerMetadataEnabled) {
+            Object.defineProperty(created, '__ownerPath', {
+              get: () => {
+                const key = currentKey();
+                return key === undefined ? undefined : `${basePath}.${String(key)}`;
+              },
+              enumerable: false,
+              configurable: true,
+            });
+          }
+          if (subjectMetadataEnabled) {
+            Object.defineProperty(created, '__subjectIds', {
+              get: () => [subjectId],
+              enumerable: false,
+              configurable: true,
+            });
+          }
+          if (positionMetadataEnabled) {
+            Object.defineProperty(created, '__positionIds', {
+              get: getPositionIds,
+              enumerable: false,
+              configurable: true,
+            });
+          }
+          // Cache only a fully initialized carrier. A throwing adapter may
+          // retry without exposing a partial write or metadata registration.
+          fieldSignal = created;
+          materializedFieldGetters.add(getField);
+          return created;
+        } finally {
+          initializing = false;
+        }
+      };
 
       Object.defineProperty(node, key, {
-        get: () => fieldSignal,
+        get: getField,
         enumerable: true,
         configurable: true,
       });
@@ -2452,10 +2475,10 @@ export function createEntitySignal<
       node === undefined
         ? []
         : Object.keys(node as Record<string, unknown>)
-            .filter(
-              (key) =>
-                typeof (node as Record<string, unknown>)[key] === 'function'
-            )
+            .filter((key) => {
+              const getter = Object.getOwnPropertyDescriptor(node, key)?.get;
+              return getter !== undefined && materializedFieldGetters.has(getter);
+            })
             .sort((left, right) => left.localeCompare(right));
 
     return {

@@ -149,7 +149,7 @@ describe('subject reclamation coordinator', () => {
       entitySignal: false,
       activationToken: true,
       nodeFacadeMaterialized: true,
-      fieldFacadesMaterialized: ['active', 'id', 'name'],
+      fieldFacadesMaterialized: ['name'],
       positionIds: heldName.__positionIds,
       retainedValueBacking: undefined,
     });
@@ -274,7 +274,7 @@ describe('subject reclamation coordinator', () => {
       entitySignal: true,
       activationToken: false,
       nodeFacadeMaterialized: true,
-      fieldFacadesMaterialized: ['active', 'id', 'name'],
+      fieldFacadesMaterialized: ['name'],
       positionIds: heldName.__positionIds,
       retainedValueBacking: {
         kind: 'retained-entity-signal',
@@ -385,7 +385,7 @@ describe('subject reclamation coordinator', () => {
       entitySignal: false,
       activationToken: false,
       nodeFacadeMaterialized: true,
-      fieldFacadesMaterialized: ['active', 'id', 'name'],
+      fieldFacadesMaterialized: ['name'],
       positionIds: heldName.__positionIds,
       retainedValueBacking: undefined,
     });
@@ -466,7 +466,7 @@ describe('subject reclamation coordinator', () => {
       entitySignal: false,
       activationToken: false,
       nodeFacadeMaterialized: true,
-      fieldFacadesMaterialized: ['active', 'id', 'name'],
+      fieldFacadesMaterialized: ['name'],
       positionIds: heldOne.__positionIds,
       retainedValueBacking: undefined,
     });
@@ -479,7 +479,7 @@ describe('subject reclamation coordinator', () => {
       entitySignal: true,
       activationToken: false,
       nodeFacadeMaterialized: true,
-      fieldFacadesMaterialized: ['active', 'id', 'name'],
+      fieldFacadesMaterialized: ['name'],
       positionIds: heldTwo.__positionIds,
       retainedValueBacking: {
         kind: 'retained-entity-signal',

@@ -712,7 +712,7 @@ describe('rollbackPendingTurnAt', () => {
       entitySignal: false,
       activationToken: true,
       nodeFacadeMaterialized: true,
-      fieldFacadesMaterialized: ['active', 'id', 'name'],
+      fieldFacadesMaterialized: ['name'],
       positionIds: getOwnedPositionIds(heldName),
       retainedValueBacking: undefined,
     });
@@ -790,7 +790,7 @@ describe('rollbackPendingTurnAt', () => {
       entitySignal: true,
       activationToken: false,
       nodeFacadeMaterialized: true,
-      fieldFacadesMaterialized: ['active', 'id', 'name'],
+      fieldFacadesMaterialized: ['name'],
       positionIds: getOwnedPositionIds(heldName),
       retainedValueBacking: {
         kind: 'retained-entity-signal',
