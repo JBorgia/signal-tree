@@ -25,7 +25,9 @@ Version 15.4.7 passed local full qualification but its container CI failed Git
 source-identity gates because the mounted checkout's owner differs from the
 container user. Configure only the exact `GITHUB_WORKSPACE` as trusted under the
 ordinary container HOME and verify HEAD against the selected tag. The complete
-container diagnostic must pass before preparing another signed version.
+container diagnostic passed before preparation: normal/mutation gates, clean
+consumers, Angular AOT and canonical prepare-only packaging. The successor still
+requires its own signed-source qualification and registry receipts.
 Verify all five published archives, dist-tags, provenance, fresh registry
 consumers, release notes and the exact-commit production demo after publication.
 
