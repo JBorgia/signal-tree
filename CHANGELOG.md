@@ -1,4 +1,4 @@
-## 15.4.7 (2026-11-11)
+## Unreleased
 
 - Abandoned derived-state graphs can now be collected when a computation closes
   over its owning store. Finalizer bookkeeping no longer owns the dependency

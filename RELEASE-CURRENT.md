@@ -6,9 +6,9 @@ evaluation and improvements without routine check-ins. Publication, the signed
 release tag and the canonical tagged CI path are authorized for this maintenance
 scope. No v16 runtime changes belong in this release.
 
-Publish the next unused patch, 15.4.7, from `codex/v15-release-container`.
-Signed preparations 15.4.5 and 15.4.6 remain unpublished and superseded; preserve
-both tags and all first-failure evidence. Version 15.4.6 passed exact tagged
+Publish the next unused patch, 15.4.8, from `codex/v15-release-owned-checkout`.
+Signed preparations 15.4.5, 15.4.6 and 15.4.7 remain unpublished and superseded;
+preserve their tags and all first-failure evidence. Version 15.4.6 passed exact tagged
 release CI, but three publisher runners could not resolve Ubuntu mirrors before
 package tests or publication. Independent runner diagnostics reproduced failure
 for all three official mirror hosts; changing only the mirror is not supported
@@ -21,6 +21,11 @@ This establishes environment feasibility, not release qualification. Full
 normal/mutation gates, clean rebuilds, consumer checks and canonical publication
 remain mandatory. Dispatch from the successor's exact tag so workflow/source/npm
 provenance agree. Runtime remains `ef806bef2`; no public behavior is changed.
+Version 15.4.7 passed local full qualification but its container CI failed Git
+source-identity gates because the mounted checkout's owner differs from the
+container user. Configure only the exact `GITHUB_WORKSPACE` as trusted under the
+ordinary container HOME and verify HEAD against the selected tag. The complete
+container diagnostic must pass before preparing another signed version.
 Verify all five published archives, dist-tags, provenance, fresh registry
 consumers, release notes and the exact-commit production demo after publication.
 
