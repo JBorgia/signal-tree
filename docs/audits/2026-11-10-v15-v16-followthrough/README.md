@@ -14,7 +14,8 @@ Runtime identities:
   runtime `5dca0e457a1a348190275c560fc6d93aec88e5e4`.
 - v16 lazy-field successor: `2826cc94185b4cccc3717ea1e6370d7bc27cbf27`.
 
-**Execution checkpoint:** semantic and economic experiments below pass. Full
+**Execution checkpoint:** the registered cohorts are complete, with behavioral
+checks, preserved control failures and economic tradeoffs stated below. Full
 successor qualification is still being completed; the predecessor GO binds its
 own artifact. Neither review branch is a package publication. v15 retains its
 15.4.4-based metadata; v16 remains 16.0.0-dev. Final version preparation must not
@@ -72,8 +73,13 @@ Second-phase live heap above imported baseline, MiB:
 | steady | 56.36 | 27.80 |
 | promote | 58.70 | 30.08 |
 
-All four heap reductions clear the registered observed-range rule. Wide-row CPU
-has a resolved reduction; most edit wall-time/CPU directions remain unresolved.
+All four heap reductions clear the registered observed-range rule. The width-32
+profile has resolved synchronous and total CPU reductions in both edit phases;
+the width-8 directions remain unresolved. Promoted rows' second-phase total CPU
+increases from 332.103 to 344.416 ms (+3.71%) under that same rule, while its
+synchronous CPU and wall-time directions remain unresolved. Most other edit
+wall-time/CPU directions remain unresolved. This modest CPU cost is retained in
+the economic disposition alongside the substantial heap saving.
 Finite edit phases do not establish an unlimited-time plateau. Held-store heap
 is working set, and post-destruction heap residue is not a leak proof.
 
@@ -120,13 +126,23 @@ This does not establish the minimum possible cost of v16 guarantees.
 ## Direct ordinary application comparison
 
 Generator: `python3 tools/release-followthrough/compare.py FINAL_PACKET ordinary`.
-It runs the actual job and inventory app bodies at 1,000 rows, with identical
-model outcomes/actions and only the v15 transaction-spelling adaptation. Two
+It runs the actual job and inventory app bodies at 1,000 rows through the existing
+neutral state-layer adaptation. Inventory imports use the kernel and its Angular
+signals/computeds become explicit reads; this does not execute Angular rendering.
+Model outcomes/actions are identical. Between arms, only library selection and
+v15 transaction spelling differ. Two
 released-v15 A/A controls and five balanced three-arm rounds per profile give
 51 fresh serial children. The three arms below use the exact runtime identities
 above. All six app self-tests pass, including wrong-selection/empty-output
 negative controls. Seven released-v15 resource-collection failures remain
 failures; both repaired candidates have none. All inputs stay unchanged.
+
+The raw ordinary plan embeds the task's earlier qualified-v16 baseline label in
+its copied policy. Its registered package payloads are the final successor, as
+the [provenance clarification](provenance-clarification.json) verifies against
+the preserved artifact bindings. The pre-run arm-description file was not itself
+in the registered inputs. Raw registration and results remain unchanged; this
+clarification does not silently relabel or replace an executed artifact.
 
 Milliseconds, medians of five first-use samples or five child p95s:
 
@@ -151,9 +167,13 @@ live heap is lower and actual resources collect. v16 remains measurably more
 expensive for ordinary construction and interactions. These workloads normalize
 ordinary outcomes, not v16's additional publication/refusal guarantees. Warm
 route samples are not first-process startup, and child p95s are not population
-percentiles. The existing state-start targets and interaction allocations are
+percentiles. The 25 ms state-start target is missed in all five final-v16 job
+samples (28.371–30.102 ms) and four of five inventory samples (24.726–27.385 ms).
+These remain misses. The existing targets and interaction allocations are
 retained; residual startup cost is assessed under the existing application-impact
-policy, not hidden by changing a ceiling.
+policy, not hidden by changing a ceiling. The host Angular view below reaches
+stable layout in 73–79 ms; its emulated result is materially slower and is not
+represented as satisfying a universal readiness allocation.
 
 ## Actual production Angular inventory view
 
