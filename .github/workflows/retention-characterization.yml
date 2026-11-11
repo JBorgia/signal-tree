@@ -1,6 +1,16 @@
 name: Retired node memory characterization
 
 on:
+  # The review branch qualifies the revised control without manual-dispatch
+  # permissions. Documentation-only pushes do not repeat the measurement.
+  push:
+    branches: [codex/v15-retention-backport]
+    paths:
+      - '.github/workflows/retention-characterization.yml'
+      - 'tools/check-retired-lifetime-gross-retention.mjs'
+      - 'tools/bench-entity-churn-retention.mjs'
+      - 'tools/lib/heap-quiescence.mjs'
+      - 'packages/kernel/**'
   workflow_dispatch:
     inputs:
       phase:
@@ -50,7 +60,7 @@ jobs:
           pnpm exec nx build kernel --skip-nx-cache 2>&1 | tee artifacts/retention-characterization/build.log
 
       - name: Collect historical preregistered raw fresh-process batch
-        if: inputs.phase != 'sensitivity'
+        if: github.event_name == 'workflow_dispatch' && inputs.phase != 'sensitivity'
         env:
           PHASE: ${{ inputs.phase }}
         run: |
@@ -63,7 +73,7 @@ jobs:
           node tools/characterize-retired-node-memory.mjs "${mode[@]}" --out artifacts/retention-characterization/data 2>&1 | tee artifacts/retention-characterization/driver.log
 
       - name: Validate current artifact sensitivity with eighteen fresh children
-        if: inputs.phase == 'sensitivity'
+        if: github.event_name == 'push' || inputs.phase == 'sensitivity'
         run: |
           set -o pipefail
           node tools/check-retired-lifetime-gross-retention.mjs --check-helpers 2>&1 | tee artifacts/retention-characterization/helpers.log
@@ -78,6 +88,6 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: retired-node-memory-${{ inputs.phase }}-${{ github.sha }}-${{ github.run_attempt }}
+          name: retired-node-memory-${{ inputs.phase || 'sensitivity' }}-${{ github.sha }}-${{ github.run_attempt }}
           path: artifacts/retention-characterization/
           if-no-files-found: warn
