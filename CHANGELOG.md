@@ -1,4 +1,4 @@
-## Unreleased — v15 retention repairs
+## Unreleased
 
 - Abandoned derived-state graphs can now be collected when a computation closes
   over its owning store. Finalizer bookkeeping no longer owns the dependency
@@ -12,7 +12,6 @@
   getter/cache bookkeeping; this is a workload-dependent tradeoff.
 
 These repairs preserve v15 transaction, observer-delivery and settlement behavior.
-They are a review candidate based on 15.4.4, not a republication of that version.
 See [the current controller](RELEASE-CURRENT.md) for qualification and release status.
 
 ## 15.4.4 (2026-10-07)

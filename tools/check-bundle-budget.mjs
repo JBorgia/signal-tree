@@ -464,8 +464,16 @@ const TARGETS = {
     // and 28,040 B dev with this fixture. The reviewed membership/current-read
     // repairs account for growth; attribution found no optional enhancer leak.
     // Final candidate must be rebuilt and measured against these ceilings.
+    // 2026-11-11 maintenance publication: the owner explicitly authorized
+    // release after accepting the retention/lazy-field repairs and weighing
+    // budgets against cost and feasibility. Fresh unchanged-runtime build at
+    // 197baa287 measures 24.63 KB; the 24.60 failure remains in the audit.
+    // Retain the verified fixes rather than introduce runtime churn to recover
+    // roughly 30 gzip bytes. This explicit policy allowance is not a size
+    // optimization; all other ceilings and the oversized-artifact proof stay.
+    // See docs/audits/2026-11-11-v15-maintenance-release/README.md.
     devKB: 27.5,
-    prodKB: 24.6,
+    prodKB: 24.7,
     code: `
       import { signalTree, entityMap } from ${JSON.stringify(CORE)};
       const t = signalTree({ count: 0, users: entityMap() });

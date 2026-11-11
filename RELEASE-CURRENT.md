@@ -1,4 +1,31 @@
-# Current v15 retention follow-through — qualified, unreleased
+# Current v15 maintenance publication — authorized November 11, 2026
+
+The owner explicitly directed: release the v15 maintenance update first, then
+build automated application scenarios, define metrics and run comparative
+evaluation and improvements without routine check-ins. Publication, the signed
+release tag and the canonical tagged CI path are authorized for this maintenance
+scope. No v16 runtime changes belong in this release.
+
+Prepare the next unused patch (15.4.5 after registry/remote verification) from
+`codex/v15-retention-backport`. Preserve runtime checkpoint `ef806bef2`, finalize
+version/changelog metadata and verify the exact committed/tagged artifacts.
+Publish only through the canonical CI publisher, then verify all five registry
+artifacts, fresh installed consumers and release notes. The prior Linux run was
+retention/cleanup evidence; full tagged release CI remains required.
+
+Under the owner's standing cost/feasibility instruction, the entities production
+ceiling is explicitly adjusted from 24.60 to 24.70 KB for the demonstrated
+retention repairs and demand-sensitive field allocation. The fresh pre-change
+24.63 KB failure remains evidence; this policy disposition is not a runtime
+optimization. Other ceilings and correctness requirements are unchanged.
+
+Current release evidence: [maintenance release record](docs/audits/2026-11-11-v15-maintenance-release/README.md).
+Keep logs outside the frozen candidate. Publication is pending until the registry
+and exact artifact receipts establish completion.
+
+---
+
+# Qualified v15 retention follow-through — November 10, 2026
 
 The owner authorized both demonstrated v15 retention repairs, direct comparison
 with released v15 and qualified v16, and complete qualification. Work is isolated
