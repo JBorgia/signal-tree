@@ -1,4 +1,4 @@
-name: Release runner mirror diagnostics
+name: Release container full qualification probe
 
 # One isolated investigation branch. No publishing, secrets, gate substitution
 # or production deployment. The container probe builds the immutable candidate.
@@ -12,7 +12,7 @@ permissions:
 jobs:
   packaged-browser:
     runs-on: ubuntu-24.04
-    timeout-minutes: 15
+    timeout-minutes: 45
     container:
       # Official Playwright 1.56.1 Noble image, matching the locked JS package.
       image: mcr.microsoft.com/playwright@sha256:f1e7e01021efd65dd1a2c56064be399f3e4de00fd021ac561325f2bfbb2b837a
@@ -23,7 +23,13 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: d78dc2377ad8f6cfae77d89f925d73591455532a
+          ref: 0b29a189798b65ba0a243da349036d5b1e1b7168
+          fetch-depth: 0
+      - name: Trust only the exact mounted candidate checkout
+        run: |
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
+          test "$(git rev-parse HEAD)" = 0b29a189798b65ba0a243da349036d5b1e1b7168
+          git status --porcelain
       - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v4
         with:
@@ -48,10 +54,22 @@ jobs:
             console.log(JSON.stringify({ node: process.version, browser: browser.version(), playwright: '1.56.1' }));
           } finally { await browser.close(); }
           JS
-      - name: Build the unchanged candidate and run its real packed AOT consumer
+      - name: Full unchanged candidate gates
         run: |
           pnpm run build:all
+          node tools/verify-gates.mjs --release
+      - name: Full mutation proofs
+        run: node tools/verify-gates.mjs --self-test --release
+      - name: Rebuild and verify final candidate without publication
+        run: |
+          git diff --exit-code
+          rm -rf dist
+          pnpm run build:all --skip-nx-cache
+          node tools/verify-tarball-consumer.mjs
+          node tools/verify-consumer-typecheck.mjs
           node tools/verify-angular-aot-consumer.mjs
+          node scripts/publish-candidate.mjs --prepare-only --prebuilt
+          git diff --exit-code
 
   mirrors:
     runs-on: ubuntu-24.04
