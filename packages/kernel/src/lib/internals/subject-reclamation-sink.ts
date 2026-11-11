@@ -1,8 +1,10 @@
 import {
+  getOrCreateSubjectRestorationClaims,
   getSubjectRestorationClaims,
   type SubjectRestorationClaims,
 } from './subject-restoration-claims';
 import { isTraversableNode } from './node-shape';
+import { getPathNotifier } from '../path-notifier';
 
 /**
  * THE RECLAMATION SINK — where a released claim becomes freed memory.
@@ -131,6 +133,97 @@ const SUBJECT_RECLAMATION_SINK_SYMBOL = Symbol.for(
   // every snapshot the tree produces.
   'SignalTree:SubjectReclamationSink'
 );
+
+const DEFERRED_RECLAMATION = Symbol.for(
+  'SignalTree:DeferredSubjectReclamation'
+);
+type DeferredReclamation = {
+  offer(subjectIds: readonly number[]): void;
+  resume(): void;
+  captureReady: Set<() => boolean>;
+};
+
+/**
+ * Retiring a row precedes notification capture: absence of a claim at that
+ * instant is not permission to forget its lifetime. Exact retirement/release
+ * candidates wait until all queued capture has run, then the sink checks the
+ * current owners again. This also reaches subjects that never had a claim.
+ *
+ * The optional enhancer installs the callback on the existing owner registry;
+ * bare trees neither import this scheduler nor allocate its queue. No scan or
+ * idle polling is involved. A blocked notifier wakes the queue once at flush;
+ * an open transaction capture wakes it when its synchronous callback closes.
+ */
+export function initializeSubjectReclamation(
+  tree: { $: unknown; registerCleanup(cleanup: () => void): unknown },
+  captureReady?: () => boolean
+): DeferredReclamation {
+  const host = tree.$ as Record<symbol, unknown>;
+  let deferred = host[DEFERRED_RECLAMATION] as DeferredReclamation | undefined;
+  if (!deferred) {
+    const owners = host[SUBJECT_PHYSICAL_OWNERS_SYMBOL] as
+      | (SubjectPhysicalOwner[] & {
+          offerRetiredSubjects?: (ids: readonly number[]) => void;
+        })
+      | undefined;
+    let candidates: Set<number> | undefined;
+    let scheduled = false;
+    let destroyed = false;
+    let stopWaiting: (() => void) | undefined;
+    const guards = new Set<() => boolean>();
+    const resume = (): void => {
+      if (destroyed || scheduled || !candidates?.size) return;
+      scheduled = true;
+      queueMicrotask(() => {
+        scheduled = false;
+        if (destroyed || !candidates?.size) return;
+        const notifier = getPathNotifier();
+        if (notifier.hasPending()) {
+          stopWaiting ??= notifier.onFlush(() => {
+            stopWaiting?.();
+            stopWaiting = undefined;
+            resume();
+          });
+          return;
+        }
+        if ([...guards].some((ready) => !ready())) return;
+        const subjects = [...candidates];
+        candidates = undefined;
+        getOrCreateSubjectRestorationClaims(tree);
+        getOrCreateSubjectReclamationSink(tree)?.offerUnclaimed(subjects);
+      });
+    };
+    const offer = (ids: readonly number[]): void => {
+      if (destroyed || ids.length === 0) return;
+      const pending = (candidates ??= new Set());
+      for (const id of ids) pending.add(id);
+      resume();
+    };
+    deferred = { offer, resume, captureReady: guards };
+    Object.defineProperty(host, DEFERRED_RECLAMATION, {
+      value: deferred,
+      configurable: true,
+    });
+    if (owners) owners.offerRetiredSubjects = offer;
+    tree.registerCleanup(() => {
+      destroyed = true;
+      candidates = undefined;
+      guards.clear();
+      stopWaiting?.();
+      stopWaiting = undefined;
+      if (owners?.offerRetiredSubjects === offer)
+        delete owners.offerRetiredSubjects;
+      if (host[DEFERRED_RECLAMATION] === deferred)
+        delete host[DEFERRED_RECLAMATION];
+    });
+  }
+  if (captureReady) {
+    const guards = deferred.captureReady;
+    guards.add(captureReady);
+    tree.registerCleanup(() => guards.delete(captureReady));
+  }
+  return deferred;
+}
 
 /**
  * Resolve the tree's sink, creating it on first use.

@@ -57,6 +57,7 @@ import {
   getOrCreateSubjectRestorationClaims,
   getSubjectRestorationClaims,
 } from '../../lib/internals/subject-restoration-claims';
+import { initializeSubjectReclamation } from '../../lib/internals/subject-reclamation-sink';
 import type {
   CarrierKind,
   Enhancer,
@@ -1439,15 +1440,11 @@ export function getOrCreateInternalTransactionRuntime<T>(
       );
     },
     (turnId) => {
-      // Releases the claim; deliberately does NOT drive the reclamation sink.
-      // Settlement can land before the notifier flush that lets `restoration()`
-      // claim the same subjects, and reclaiming in that gap is the
-      // premature-reclamation hazard `never-claimed-retirement.spec.ts` pins.
-      // Reclamation happens at the history eviction boundary, which is late
-      // enough that every capture has run.
-      getOrCreateSubjectRestorationClaims(tree)?.release(
+      // Settlement can precede restoration capture. Queue last-owner releases
+      // for the shared post-capture boundary, never reclaim them inline.
+      reclamation.offer(getOrCreateSubjectRestorationClaims(tree)?.release(
         `transaction:${turnId}`
-      );
+      ) ?? []);
     },
     // Structured addresses, never display paths: `outer` encloses `inner`
     // when its address is a strict prefix of inner's.
@@ -1498,6 +1495,10 @@ export function getOrCreateInternalTransactionRuntime<T>(
   let scalarAttachmentFailed=false;
   const pendingCapture = createCaptureBucket();
   const pendingTransactions = new Map<number, CaptureBucket>();
+  const reclamation = initializeSubjectReclamation(
+    { $: tree.$, registerCleanup: registerOwnedCleanup },
+    () => pendingTransactions.size === 0
+  );
   // External writes can arrive while the callback is still collecting, before
   // it has a turn id. Keep that evidence under the transaction id until admission.
   const callbackExternalEffects = new Map<number, TurnEffect[]>();
@@ -1759,6 +1760,7 @@ export function getOrCreateInternalTransactionRuntime<T>(
   };
   const releaseWindowIfClosed = (): void => {
     if (pendingTransactions.size === 0) {
+      reclamation.resume();
       lastWindowWriteSeq.clear();
       lastWindowRowWriteSeq.clear();
     }

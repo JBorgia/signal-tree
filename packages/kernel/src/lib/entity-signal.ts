@@ -386,6 +386,7 @@ export function createEntitySignal<
      * unseen owner could restore is unrecoverable.
      */
     hasRestorationAuthority?: boolean;
+    offerRetiredSubjects?: (subjectIds: readonly number[]) => void;
     onDispose?: (callback: () => void) => () => void;
   }
 ): EntitySignal<E, K> {
@@ -1703,8 +1704,12 @@ export function createEntitySignal<
               entityPublication.requestRetirement(subject, () => resolveSubjectState(subject) === undefined && !ordinaryTopology.retains(subject));
             }
           }
-          const removed = [...new Set(frame.mutations.filter(mutation => mutation.kind === 'tombstone-subject').map(mutation => mutation.subjectId))];
-          attempt(() => reclaimRetiredSubjectsWithoutOwner(removed));
+          const removed = new Set(frame.mutations.filter(mutation => mutation.kind === 'tombstone-subject').map(mutation => mutation.subjectId));
+          // A physically hidden row can lose its final ordinary placement
+          // without another physical tombstone. Reoffer that exact lifetime.
+          for (const change of ordinaryPlan.changes)
+            if (change.after === undefined) removed.add(change.subject);
+          attempt(() => reclaimRetiredSubjectsWithoutOwner([...removed]));
         } finally {
           observations.length = 0;
           attempt(() => releaseMembership?.());
@@ -2611,6 +2616,9 @@ export function createEntitySignal<
     let completed=false;
     const complete=()=>{if(completed)return;completed=true;let failed=false,first:unknown;
       for(const deliver of [...observations,()=>{if(publication.unit)entityPublication.complete(publication.unit.completion);}])try{deliver();}catch(error){if(!failed){failed=true;first=error;}}
+      if (!sourcePoint) try {
+        reclaimRetiredSubjectsWithoutOwner(ordinaryPlan.changes.filter(change => change.after === undefined).map(change => change.subject));
+      } catch (error) { if (!failed) { failed = true; first = error; } }
       observations.length=0;if(failed)throw first;
     };
     return Object.freeze({
@@ -3756,6 +3764,9 @@ export function createEntitySignal<
     subjectId: number,
     options: EntitySubjectReclamationPlanningOptions
   ): PreparedEntitySubjectReclamation | undefined {
+    // Inspection can hide a row physically while ordinary readers still own
+    // its lifetime. Restoration claims alone do not describe that ownership.
+    if (ordinaryTopology.retains(subjectId)) return undefined;
     const inventory = inspectSubjectResources(subjectId);
     if (!inventory) {
       return undefined;
@@ -3856,7 +3867,7 @@ export function createEntitySignal<
   }
 
   /**
-   * ZERO-OWNER RECLAMATION — the only reclamation that runs automatically.
+   * Immediate zero-owner reclamation; owned trees defer exact candidates.
    *
    * When the tree has no restoration authority, a tombstoned subject's retained
    * value backing is unreachable: nothing can undo, roll back, or re-project it,
@@ -3872,10 +3883,9 @@ export function createEntitySignal<
    * absence is not a gap to work around; it IS the answer. With no owner there
    * are no turns, so there is nothing a turn could be holding.
    *
-   * This is therefore NOT a bypass of the coordinator, and must not grow into
-   * one. The moment a tree has restoration authority this function returns
-   * immediately, and reclaiming there stays the coordinator's problem — it needs
-   * history-aware eligibility, which is a separate piece of work.
+   * Trees with restoration authority offer the same exact retirement IDs to
+   * their enhancer's post-capture queue. They cannot use the immediate proof:
+   * notifier capture may still be about to install a legal restoration claim.
    *
    * ## What it reclaims: EVERYTHING physical, the lifetime ledger included
    *
@@ -3913,7 +3923,9 @@ export function createEntitySignal<
   function reclaimRetiredSubjectsWithoutOwner(
     subjectIds: readonly number[]
   ): void {
-    if (hasRestorationAuthority || subjectIds.length === 0) {
+    if (subjectIds.length === 0) return;
+    if (hasRestorationAuthority) {
+      options?.offerRetiredSubjects?.(subjectIds);
       return;
     }
 
