@@ -82,7 +82,8 @@ for count in [1000, 10000]:
                                'pairedRatios': ratios})
 
 report = {'resultsSha256': hashlib.sha256(source.read_bytes()).hexdigest(),
-          'limits': 'Observed development samples, not confidence intervals; whole-process heap; neutral kernel workload.',
+          'buildDefines': bindings.get('defines'),
+          'limits': 'Local observed samples, not confidence intervals; whole-process heap; neutral kernel workload. Build definitions identify the diagnostic configuration separately.',
           'measurements': output}
 (root / 'analysis.json').write_text(json.dumps(report, indent=2) + '\n')
 for row in output:

@@ -38,15 +38,58 @@ has hidden a physical row, and reoffers the lifetime when an ordinary companion
 removes that placement. V15 has no equivalent ordinary-topology representation;
 this port does not import that machinery or v16 settlement semantics.
 
+The current v15 runtime is `0d2b9619206ab9e7a7af998944e744f6d2b6e492`.
+It follows the reclamation port in `20d7f7c0e6c236b89d3d8f093df80a00fb1c7ac5`
+and the early eligibility guard in `4b363dd1a480d63f8ae0208ca293dd35661af7de`.
+That guard rejects active or absent subjects before preparing a
+retirement inventory. The planner already categorically refuses those states.
+An exact installed-artifact counter showed that a real confirmation plus drain
+previously enumerated all 65 keys of an active row unnecessarily. The final
+counter visits zero active/cold keys, while the retired positive control still
+visits 65 and produces a valid plan. Both original and final counter receipts
+are preserved in `/private/tmp/st-reclamation-active-inventory-counter.json`
+and `/private/tmp/st-reclamation-active-inventory-guard-counter.json`; all
+pre-guard package bytes are recovered and hash-verified in
+`/private/tmp/st-reclamation-preguard-counter-recovery/receipt.json`.
+
+The subsequent thirty-cycle intervention found a second retention mechanism.
+Growth survived both removing the active Link recipient and replacing the
+cumulative numeric diagnostic oracle with current-cycle IDs. Without either,
+heap still grew from 1.53 to 3.75 MiB above the empty tree; cycle 20→30 added
+272–317 KB, and about 2.27 MB disappeared after destroy/helper exit. Claim and
+realization-descriptor maps were zero, and position registries stayed at 2/2/1.
+The exact eight-child result is `/private/tmp/st-v15-residual-heap-1/results.json`.
+
+A separate instrumented count diagnostic then identified the owner:
+`subjectStateSignals`, a map of lifetime IDs to weak activation carriers,
+contained 2,000/10,000/20,000/30,000 entries after the matching retirement
+counts. Rollback validation materializes these carriers even without an
+application row reader. The map's WeakRef targets collected, but its numeric
+keys and wrappers remained. The ordinary zero-owner path already deleted this
+index; the owned reclamation path did not. Resource inventory returned absent
+after lifetime deletion and therefore could not detect these orphaned entries.
+The instrumented map census binds the original bundle and script at
+`/private/tmp/st-v15-residual-map-census.json`; it supports counts and call-site
+attribution, not CPU or heap figures.
+
+The successor now removes the activation index only after whole-lifetime
+forgetting actually installs. A `finally` check also handles completion errors
+while preserving routing on failed preparation. Value-only retirement retains
+the carrier. Held old nodes keep their own closure, and lifetime IDs are never
+reused. Direct-map regression tests failed the predecessor and pass the repair;
+undo/history and value-only controls also pass. V16 receives the same owned
+repair plus v15's established bare-retirement and late-read registration rules,
+with its ordinary-topology retention guard preserved.
+
 ## Verification and limits
 
 Using Node 24.15.0/pnpm 10.17.0 with `NX_DAEMON=false`,
 `NX_ISOLATE_PLUGINS=false`, and `CI=true`:
 
-- `pnpm nx test kernel --skip-nx-cache`: 433 files, 7,856 ordinary passes,
+- `pnpm nx run-many --target=test --projects=kernel,angular --parallel=1
+  --skip-nx-cache --maxWorkers=4`: kernel 435 files, 7,861 ordinary passes,
   seven existing expected failures, thirteen skips and one todo.
-- `pnpm nx test angular --skip-nx-cache` (run through serial Nx run-many):
-  214 passes and three existing skips.
+- The same serial Nx run includes Angular: 214 passes and three existing skips.
 - `pnpm run typecheck`, `node tools/check-spec-types.mjs`, and
   `pnpm nx build kernel --skip-nx-cache` pass. The spec-type ratchet still has
   222 existing errors across 36 files; no new/worsened errors is the claim.
@@ -61,13 +104,15 @@ node tools/verify-gates.mjs --only=lint:budget,api-baseline,tree-shaking,declara
 
 `budget-bytes.mjs` evaluates the canonical gate's exact fixture strings and
 build settings while reporting integer gzip bytes. Against released v15,
-projection-only, and this port respectively, entities measure
-25,222/25,269/25,300 production bytes and 28,147/28,194/28,232 development bytes.
-The existing ceilings are 25,292.8 and 28,160 bytes. This repair adds 31 production
-and 38 development bytes to the projection candidate; its final excess is 7.2
-and 72 bytes. Bare fixtures remain 11,011/13,159 bytes, with zero scheduler bytes
+projection-only, and the final port respectively, entities measure
+25,222/25,269/25,333 production bytes and 28,147/28,194/28,273 development bytes.
+The existing ceilings are 25,292.8 and 28,160 bytes. The complete repairs add
+64 production and 79 development bytes to the projection candidate; final
+excess is 40.2 and 113 bytes. Activation-index cleanup itself adds 19 production
+and 17 development bytes to the previous port/guard artifact. Bare fixtures
+remain 11,011/13,159 bytes, with zero scheduler bytes
 in either ordinary fixture. The exact receipt is
-`/private/tmp/st-v15-reclamation-budget-bytes-1.json`. The central task accepts
+`/private/tmp/st-v15-activation-wrapper-budget.json`. The central task accepts
 this small code cost under the owner's instruction to weigh budgets against
 cost and feasibility. That economic acceptance is separate from the failing
 numerical gate; it is not a claim that every release gate passed.
@@ -79,7 +124,7 @@ their pending/history ownership controls and subsequent public-behavior
 assertions remain. First failures and corrected runs are preserved in
 `/private/tmp/st-v15-reclamation-full-tests-1.log`,
 `/private/tmp/st-v15-reclamation-ownership-null-1.log`, and
-`/private/tmp/st-v15-reclamation-full-kernel-2.log`.
+`/private/tmp/st-v15-reclamation-full-kernel-final.log`.
 
 An exploratory fixture deliberately disabled internal PathNotifier batching and
 threw `undefined` during synchronous rollback delivery. V15 classifies that
@@ -99,14 +144,123 @@ separate evidence.
 
 ## Exact-artifact comparisons
 
-The prior 112-child projection study belongs to its original artifact. A fresh
-run of `tools/v15-projection-lab/compare.mjs` must bind this successor before
-attributing those results to it. `bundle-aging.mjs` prepares production bundles
+The prior projection studies belong to their original artifacts. The
+112-child run of the `4b363dd1a` predecessor is at
+`/private/tmp/st-v15-final-projection-comparison`. It preserves the original
+neutral configuration: production NODE_ENV and `__DEV__=false`, but `ngDevMode`
+is neither folded nor set at runtime. Its retained diagnostics mean it must not
+be confused with strict production bundles. At 10,000 rows and 5,000 edits,
+cumulative setup/edit CPU medians were 786.315→347.011 ms for full projection,
+1,019.626→593.600 ms for projection plus filtering, and 786.879→356.017 ms
+for projection plus IDs. Point-only 76.806→84.524 ms and setup differences
+remained unresolved under the preregistered observed-noise rule. Reading both
+projection and IDs cost 82,864 additional live heap bytes at that endpoint;
+projection-only differences were unresolved. All 112 children and the planted
+skipped-write controls passed. These observations are kept separately from the
+strict production cohort selected by `--fold-ng-dev-mode`.
+
+`bundle-aging.mjs` prepares production bundles
 for the shared `bulk-rollback-aging.mjs` workload, retaining exact package
 archives, input manifests and bundle hashes. Its identical v15 adapters route
 the workload's `transact` slot to the real public `transaction()` method; they
 ship no runtime API alias and make no v15/v16 guarantee-equivalence claim.
 
-The central task serializes timing and forced-GC cohorts. Their final results
-will be recorded after those frozen-artifact runs; the source validation above
-does not substitute for them.
+`v15-rollback-aging.mjs` preserves the common aging workload while obtaining
+IDs from the v15 collection's existing metadata. V15 folds the common runner's
+testing handle hook out of production; the first incompatible invocation is
+preserved in `/private/tmp/st-v15-final-rollback-aging-control`. The adapted
+runner verifies every ID against its current row key and acquires no row facade.
+
+The pre-index-repair strict production aging cohort at
+`/private/tmp/st-v15-final-rollback-aging` passed all 14 children: three fresh
+processes for each candidate/baseline and reused/fresh-key cell, plus actual
+pin/release controls. Ten consecutive 1,000-row pending population/rollback
+cycles kept the same tree and an active collection Link alive. Every cycle
+checked meaningful writes, pending one then zero, no early delivery, empty
+final state and empty outbound values. The baseline retained 1,000 more entity
+lifetimes and value backings per cycle, reaching 10,000; the candidate retained
+zero at every checkpoint. Sampled candidate row payloads and transaction
+handles collected while the tree remained alive. A separate deterministic
+final-artifact witness also reduces never-claimed ordinary churn from
+10/20/30 retained lifetimes to 0/0/0, preserving the history-owner control.
+
+Whole-process heap is a distinct result. Reused-key median growth above the
+empty tree was 2.733→15.346 MiB in the baseline and 1.644→2.810 MiB in the
+candidate across cycles 1→10; fresh-key results were 2.877→15.347 and
+1.523→2.814 MiB. The candidate still added roughly 550 KB over cycles 6→10.
+Its numeric diagnostic oracle alone does not explain that residue, and no JIT
+or boundedness attribution is asserted. The preregistered thirty-cycle
+`v15-residual-heap.mjs` factorial study separates active Link from no recipient
+and cumulative IDs from current-cycle IDs. Original cohorts remain immutable.
+
+## Final successor measurements
+
+The final strict projection cohort is
+`/private/tmp/st-v15-final-production-projection`. Its recorded compiler
+definitions include `ngDevMode=false`, `__DEV__=false` and production NODE_ENV.
+The candidate bundle SHA-256 is
+`1aef7154ae78615955b6515d1d47cefd1715094784a78b94b37fbd658b954a62`;
+the released baseline is
+`84b4963a8ce0851d27675d8bc0b8f5efd3571820dcfb1c537f2df95f2138309d`.
+All 112 fresh children and both planted skipped-write controls pass. The
+analyzer verifies all raw child receipts, schedule identities and artifact
+hashes. No warm-up or adverse sample is discarded.
+
+For 10,000 rows and 5,000 cumulative retained-store edits, setup plus measured
+edit CPU is:
+
+| Workload | Released v15.4.8 median | Final candidate median | Observed classification |
+| --- | ---: | ---: | --- |
+| Full projection after each edit | 751.401 ms | 354.034 ms | Lower |
+| Projection plus inventory filter | 993.190 ms | 549.815 ms | Lower |
+| Projection plus `ids()` | 788.306 ms | 366.141 ms | Lower |
+| Edited row only | 85.391 ms | 96.907 ms | Unresolved |
+
+Setup differences are unresolved. At 1,000 rows, projection and inventory are
+also lower, while projection-plus-IDs is unresolved because the preregistered
+noise rule preserves an adverse host sample. This is a local neutral workload,
+not Angular rendering or a universal speed claim. The 10,000-row projection-plus-
+IDs endpoint retains an additional 82,136 bytes, consistent with separately
+demanding both order arrays; projection-only and point heap differences are
+unresolved. Synchronous live GC checkpoints retain the original WeakRef job
+caveat. These figures never pool the earlier diagnostic configuration.
+
+The final aging bundle in
+`/private/tmp/st-v15-activation-wrapper-aging-bundles` binds the complete
+successor package and has SHA-256
+`173f2b4382d9d407c75a335eae61438498741cdf372346d726da8ef824b6e8d2`.
+The same 14-child aging schedule passes at
+`/private/tmp/st-v15-activation-wrapper-aging`, including actual tree pin and
+release controls. Every candidate checkpoint has zero retired lifetimes and
+backings, with all sampled payloads and transaction handles collected while
+the tree remains alive. Baseline retained lifetimes/backings still reach
+10,000. Reused-key median heap over cycles 1→10 is 2.733→15.367 MiB for the
+baseline and 1.595→2.075 MiB for the successor; fresh-key results are
+2.737→15.359 and 1.587→2.085 MiB.
+
+The final eight-child thirty-cycle intervention at
+`/private/tmp/st-v15-residual-heap-final` passes both fault controls and all
+state/ownership/collection oracles. With current-cycle IDs only, no-recipient
+heap at cycle 30 is 1.95–1.98 MiB above the empty tree, and cycle 20→30 changes
+by −25/−61 KB. Active-Link/current-ID heap is 2.11 MiB, with tail changes of
++29/+37 KB. The original corresponding tails were +272/+317 KB and +346/+347 KB.
+The identified activation-index growth is therefore removed by intervention;
+the remaining process and finite-window residue is not silently assigned to
+JIT or called a proof of unlimited boundedness. The cumulative-ID cells retain
+their explicitly priced diagnostic array.
+
+The separate post-repair map census at
+`/private/tmp/st-v15-residual-map-census-after.json` no longer finds the
+30,000-entry activation map: the sole captured oversize map at later
+checkpoints is the distinct node cache, already back to zero after collection.
+Direct-map unit tests additionally assert actual zero activation entries,
+retained pending/history carriers, old/late reader isolation and failed
+preparation routing. Instrumented census results remain count-only evidence.
+
+Final check receipts are `/private/tmp/st-v15-activation-wrapper-` followed by
+`full-tests.log`, `typecheck.log`, `spec-types.log`, `build.log`, `demo.log`,
+`gates.log` or `budget.json`. Numerical bundle failure remains visible and
+separate from the cost acceptance; no version was changed or package published.
+
+All timing and forced-GC cohorts run in windows serialized by the central task;
+source validation does not substitute for exact-artifact measurement.

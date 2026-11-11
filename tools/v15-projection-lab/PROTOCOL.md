@@ -37,6 +37,19 @@ NX_DAEMON=false NX_ISOLATE_PLUGINS=false CI=true pnpm nx build kernel --skip-nx-
 node tools/v15-projection-lab/compare.mjs compare FROZEN_PACKAGE_ROOT dist/packages/kernel NEW_OUTPUT_DIRECTORY
 ```
 
+The original neutral configuration sets `NODE_ENV=production` and folds
+`__DEV__=false`, but neither defines `ngDevMode` during bundling nor sets it at
+runtime. Its surviving diagnostic branches must not be described as the strict
+production configuration. Those existing cohorts and their exact generator
+snapshots remain evidence for that configuration only.
+
+For the final production comparison, append `--fold-ng-dev-mode`. This adds only
+the compile-time definition `ngDevMode=false` for both artifacts. The workload,
+oracles, controls, schedules and analysis stay identical, and `bindings.json`
+records all compile-time definitions and the protocol hash. Record this as a
+separate 112-child cohort, never pool it with the original configuration. Neither
+configuration mutates the runtime global `ngDevMode`.
+
 The entire schedule is saved before comparative execution. Each of eight cells
 (1,000/10,000 rows crossed with projection, inventory filter, point-only control
 and projection-plus-IDs) has two

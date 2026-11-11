@@ -1,5 +1,6 @@
 #!/usr/bin/env node
-// Neutral production-kernel screen. Each child keeps one populated store alive
+// Neutral kernel screen; --fold-ng-dev-mode selects strict production folding.
+// Each child keeps one populated store alive
 // through every checkpoint; no phase p95s are added into a synthetic lifetime.
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
@@ -102,9 +103,12 @@ async function child() {
 }
 
 async function compare() {
-  const [, , , frozenPath, variantPath, outPath] = process.argv;
+  const [, , , frozenPath, variantPath, outPath, buildOption] = process.argv;
   assert(frozenPath && variantPath && outPath,
-    'compare FROZEN_PACKAGE_ROOT VARIANT_PACKAGE_ROOT NEW_OUTPUT_DIRECTORY');
+    'compare FROZEN_PACKAGE_ROOT VARIANT_PACKAGE_ROOT NEW_OUTPUT_DIRECTORY [--fold-ng-dev-mode]');
+  assert(buildOption === undefined || buildOption === '--fold-ng-dev-mode');
+  const defines = { __DEV__: 'false', 'process.env.NODE_ENV': '"production"',
+    ...(buildOption === '--fold-ng-dev-mode' ? { ngDevMode: 'false' } : {}) };
   const out = resolve(outPath);
   mkdirSync(out, { recursive: false });
   writeFileSync(join(out, 'compare.mjs'), readFileSync(runner));
@@ -112,7 +116,9 @@ async function compare() {
   const roots = { frozen: resolve(frozenPath), variant: resolve(variantPath) };
   const sourceRoot = execFileSync('git', ['rev-parse', '--show-toplevel'],
     { cwd: dirname(runner), encoding: 'utf8' }).trim();
-  const bindings = { runner: digest(runner), roots: {}, artifacts: {} };
+  const bindings = { runner: digest(runner),
+    protocol: digest(join(dirname(runner), 'PROTOCOL.md')), defines,
+    roots: {}, artifacts: {} };
   for (const [arm, root] of Object.entries(roots)) {
     bindings.roots[arm] = { path: root, files: manifest(root) };
     const entry = join(out, `${arm}-entry.mjs`);
@@ -120,7 +126,7 @@ async function compare() {
     const outfile = join(out, `${arm}.mjs`);
     const result = await build({ entryPoints: [entry], outfile, bundle: true,
       format: 'esm', platform: 'node', target: 'node24', minify: true,
-      define: { __DEV__: 'false', 'process.env.NODE_ENV': '"production"' },
+      define: defines,
       metafile: true, write: true });
     bindings.artifacts[arm] = { path: outfile, sha256: digest(outfile), bytes: readFileSync(outfile).length };
     write(join(out, `${arm}-metafile.json`), result.metafile);
