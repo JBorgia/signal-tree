@@ -321,6 +321,9 @@ function registerEntityMapProcessor<E>(): void {
           // value backing immediately.
           hasRestorationAuthority:
             context.runtimeTreePlan.hasRestorationAuthority,
+          offerRetiredSubjects: context.runtimeTreePlan.hasRestorationAuthority
+            ? (ids) => context.physicalOwners.offerRetiredSubjects?.(ids)
+            : undefined,
         }
       );
 
