@@ -1,7 +1,7 @@
 name: Release runner mirror diagnostics
 
-# One isolated investigation branch. No publishing, secrets, source checkout,
-# package installation, gate substitution or production deployment.
+# One isolated investigation branch. No publishing, secrets, gate substitution
+# or production deployment. The container probe builds the immutable candidate.
 on:
   push:
     branches: [codex/v15-runner-diagnostics]
@@ -10,6 +10,49 @@ permissions:
   contents: read
 
 jobs:
+  packaged-browser:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    container:
+      # Official Playwright 1.56.1 Noble image, matching the locked JS package.
+      image: mcr.microsoft.com/playwright@sha256:f1e7e01021efd65dd1a2c56064be399f3e4de00fd021ac561325f2bfbb2b837a
+      options: --init --shm-size=1g
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: d78dc2377ad8f6cfae77d89f925d73591455532a
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - name: Install locked JavaScript dependencies
+        run: pnpm install --frozen-lockfile --ignore-scripts
+      - name: Verify matching packaged Chromium
+        run: |
+          pnpm exec playwright install chromium
+          node --input-type=module <<'JS'
+          import assert from 'node:assert/strict';
+          import { createRequire } from 'node:module';
+          import { chromium } from 'playwright';
+          const require = createRequire(import.meta.url);
+          assert.equal(require('playwright/package.json').version, '1.56.1');
+          const browser = await chromium.launch({ headless: true });
+          try {
+            const page = await browser.newPage();
+            await page.setContent('<!doctype html><title>Packaged browser ready</title>');
+            assert.equal(await page.title(), 'Packaged browser ready');
+            console.log(JSON.stringify({ node: process.version, browser: browser.version(), playwright: '1.56.1' }));
+          } finally { await browser.close(); }
+          JS
+      - name: Build the unchanged candidate and run its real packed AOT consumer
+        run: |
+          pnpm run build:all
+          node tools/verify-angular-aot-consumer.mjs
+
   mirrors:
     runs-on: ubuntu-24.04
     timeout-minutes: 5
