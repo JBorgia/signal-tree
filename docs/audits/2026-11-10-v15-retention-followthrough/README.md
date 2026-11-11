@@ -6,9 +6,11 @@ November 10, 2026. Based on published v15.4.4 source
 and first EntityMap builder configuration retention. Field-allocation checkpoint
 `ef806bef2a71aa48709c2b4cad5e71d1ee359c2f` adds the bounded lazy-field port.
 
-Execution checkpoint: source controls, focused tests and measurements pass;
-full final-artifact qualification is still in progress. This is an unreleased
-15.4.4-based review candidate, not a republication of that registry version.
+**GO: qualified maintenance candidate**, with the documented approximately
+30-byte production entities size overage. Source controls, measurements, full
+normal/mutation qualification, clean artifact equivalence, installed consumers
+and production browser checks are complete. This is an unreleased 15.4.4-based
+review candidate, not a republication of that registry version.
 
 ## Correctness and compatibility
 
@@ -45,11 +47,11 @@ holds six 512-row stores with 32 fields, performs 36,864 edits, then acquires on
 field and every field. All input bindings remain unchanged and all sampled
 actual resources collect.
 
-| Live heap above imported baseline | Retention-fixed v15 | Lazy v15 |
-| --- | ---: | ---: |
-| Handles held | 219.43 MiB | 28.40 MiB |
-| After whole-row edits | 224.41 MiB | 33.63 MiB |
-| All fields acquired | 271.28 MiB | 279.55 MiB |
+| Live heap above imported baseline | Retention-fixed v15 |   Lazy v15 |
+| --------------------------------- | ------------------: | ---------: |
+| Handles held                      |          219.43 MiB |  28.40 MiB |
+| After whole-row edits             |          224.41 MiB |  33.63 MiB |
+| All fields acquired               |          271.28 MiB | 279.55 MiB |
 
 Fully materialized rows cost about 3.05% more heap. Construction is deferred until
 first access, so this is a saving for unused fields, not free field construction.
@@ -89,11 +91,51 @@ historical; current-artifact Linux sensitivity validation uses the manual
 do not claim Linux execution. Direct cleanup mutations and actual-resource GC
 checks remain separate requirements; this gross ceiling cannot detect all leaks.
 
+The [Linux run](https://github.com/JBorgia/signal-tree/actions/runs/42935863770)
+at `2101a16c763f135bf421b341497803e91a469f19` completed that validation with 18
+sensitivity children, six ordinary children and three direct cleanup mutations.
+All raw heap verdicts were recomputed, all cleanup mutants restored, and all 109
+Linux-built kernel payloads match the measured local candidate. Linux retained
+growth is 63.555–63.556 MiB for lookup-only and 148.425–148.429 MiB for node-read;
+all healthy and neutralized children remain below 40 MiB. Node is 24.15.0 on
+Linux x64. This is retention/cleanup evidence, not a full Linux release registry.
+Manual dispatch first failed for access reasons; a push trigger confined to this
+review branch ran the same fixed sensitivity phase. Documentation-only pushes
+do not rerun it. Both the initial access failure and completed raw evidence are
+preserved.
+
 The other normal-registry failure was entities production size: 24.63 KB against
 24.60 KB, roughly 30 bytes over. The ceiling remains unchanged. Retaining the
 tested compatibility and memory improvements is the engineering disposition
 under the owner's standing instruction to weigh budgets against cost and
 feasibility; the numerical size failure is not reported as a passing gate.
+
+## Final artifact qualification
+
+The canonical normal registry was run in full. After the sensitivity correction,
+all 90 non-size gates are satisfied. Its three affected canonical gates pass on
+the corrected tool. The full mutation registry reports 91/91, including 15
+indirect proofs, with zero blind, vacuous, unproven or errored checks. All 1,736
+tracked source files and the clean status restore exactly. The size baseline was
+already red, so its mutation is not independent detection proof.
+
+Deleting generated `dist/` and rebuilding all packages from restored source
+reproduces all 109 measured kernel payloads. Five-package integrity is
+`sha256-8f11180b4410a9402ee28aafcdcb8f5e01ee60def75bffddeb6d8a5f5e5edda9`.
+Fresh packed imports, strict consumer types with `skipLibCheck: false` under
+bundler and node16 resolution, and installed production Angular AOT/Chromium pass.
+The strict production demo build and all 146 Playwright checks pass with no
+skips or retries. Version claims, release state, changelog and diff checks pass.
+Qualification binds runtime `ef806bef2` through checkpoint `2101a16c7`; later
+closure edits affect records only. Original failures and artifact bindings are
+preserved in `validation.json` and the evidence archive.
+
+Run `python3 verify-evidence.py` in this directory to verify the archive and every
+included payload without extraction or execution. The shared packet also
+contains the direct v15/v16 comparisons and actual Angular characterization.
+It establishes supplied-payload integrity, not complete Git history or universal
+test reproducibility. Independent review and its limits are recorded in
+`independent-review.md`.
 
 The [current controller](../../../RELEASE-CURRENT.md) owns qualification and release
 status. No merge, tag or registry publication is selected by this review branch.

@@ -1,4 +1,4 @@
-# Current v15 retention follow-through — November 10, 2026
+# Current v15 retention follow-through — qualified, unreleased
 
 The owner authorized both demonstrated v15 retention repairs, direct comparison
 with released v15 and qualified v16, and complete qualification. Work is isolated
@@ -16,10 +16,19 @@ reachability and measured benefit before removal.
 The measured follow-through also defers entity field carriers until first
 acquisition. Runtime checkpoint `ef806bef2` preserves v15 reads, updateOne,
 metadata, transaction spelling and settlement behavior. It does not import v16
-field-Link ownership or selected-publication bindings. Focused tests and original
-controls pass; the exact-artifact full qualification is being completed. The
+field-Link ownership or selected-publication bindings. Full normal and mutation qualification, clean artifact equivalence, fresh
+installed consumers, strict production demo and all 146 browser checks pass
+except the documented approximately 30-byte entities size overage. The ordinary
+retention ceiling is unchanged; the corrected 50,000-handle sensitivity control
+has 18 local and 18 Linux children plus ordinary and cleanup controls. The
 fully materialized heap tradeoff remains explicit in the
 [follow-through audit](docs/audits/2026-11-10-v15-retention-followthrough/README.md).
+
+**GO: qualified v15 maintenance candidate.** Five-package integrity is
+`sha256-8f11180b4410a9402ee28aafcdcb8f5e01ee60def75bffddeb6d8a5f5e5edda9`.
+The 15.4.4-based metadata is a review identity, not an instruction to republish an
+existing version. The audit records the original detector failure, corrected
+sensitivity, all remaining costs, exact source/artifacts and verification limits.
 
 The root agent owns controllers, release metadata, audit records and branch
 integration. Historical takeover/publication instructions below describe earlier
