@@ -1,6 +1,8 @@
 import type { TerminalRecordPlan } from './intrinsic-mutation';
 import { entityPublicationOrdinary, type EntityPublicationPacket, type EntityPublicationEvidence } from './entity-publication';
 import type { EntityProjectionSeedEntry } from './entity-projection-seed';
+import { EntityContributorMap } from './entity-contributor-map';
+import { EntityEgressKeys } from './entity-egress-keys';
 import {
   createEntityTopology,
   type EntityTopology,
@@ -100,7 +102,7 @@ export function createEntityEgressProjection(
 
   let order: number[] = [];
   const rows = new Map<number, unknown>();
-  const keyOf = new Map<number, Key>();
+  const keyOf = new EntityEgressKeys();
 
   function load(entries: readonly EntityProjectionSeedEntry<Key, unknown>[]) {
     order = [];
@@ -113,7 +115,7 @@ export function createEntityEgressProjection(
     }
   }
   load(seed);
-  const contributors=new Map<string,object>(inheritedSupport);
+  const contributors=new EntityContributorMap(inheritedSupport);
   const slot=(subject:number,dimension:string)=>`${subject}:${dimension}`;
   const setField=(subject:number,key:string,fact:object)=>contributors.set(slot(subject,`f:${key}`),fact);
   const seedSupport=(entries:readonly EntityProjectionSeedEntry<Key,unknown>[],facts:EntityPublicationEvidence)=>{
@@ -126,7 +128,7 @@ export function createEntityEgressProjection(
     }
   };
   if(!inheritedSupport&&seedEvidence)seedSupport(seed,seedEvidence);
-  const removeSupport=(subject:number)=>{for(const key of [...contributors.keys()])if(key.startsWith(`${subject}:`))contributors.delete(key);};
+  const removeSupport=(subject:number)=>contributors.deleteSubject(subject);
   const editsFrom=(after:ReadonlyMap<string,object>):EntityContributorEdit[]=>{
     const edits:EntityContributorEdit[]=[];
     for(const [key,before]of contributors)if(after.get(key)!==before)edits.push({key,before,after:after.get(key)});
@@ -176,8 +178,8 @@ export function createEntityEgressProjection(
    */
   function reconcileAddress(key: Key | undefined, incoming: number) {
     if (key === undefined) return;
-    for (const [subject, held] of keyOf) {
-      if (held !== key || subject === incoming) continue;
+    for (const subject of keyOf.subjectsAt(key)) {
+      if (subject === incoming) continue;
       if (!topology.has(subject)) remove(subject);
       return;
     }
@@ -297,7 +299,7 @@ export function createEntityEgressProjection(
 
       if (effect?.kind === 'add') {
         if(evidence){
-          for(const [old,key]of keyOf)if(old!==effect.subject&&key===effect.key&&!topology.has(old)){removeSupport(old);contributors.set(slot(old,'m'),evidence.member(old,'physical'));contributors.set(slot(effect.subject,'k'),evidence.keyMapping(effect.subject,'ordinary'));}
+          for(const old of keyOf.subjectsAt(effect.key))if(old!==effect.subject&&!topology.has(old)){removeSupport(old);contributors.set(slot(old,'m'),evidence.member(old,'physical'));contributors.set(slot(effect.subject,'k'),evidence.keyMapping(effect.subject,'ordinary'));}
           removeSupport(effect.subject);
           contributors.set(slot(effect.subject,'m'),evidence.member(effect.subject,'ordinary'));
           contributors.set(slot(effect.subject,'p'),evidence.placement(effect.subject,'ordinary'));
@@ -345,7 +347,7 @@ export function createEntityEgressProjection(
           contributors.set(slot(subjectId,'p'),evidence.placement(subjectId,'physical'));
           contributors.set(slot(subjectId,'k'),evidence.keyMapping(subjectId,'physical'));
           for(const key of Object.keys(row??{}))setField(subjectId,key,evidence.field(subjectId,key,fields===null||fields?.includes(key)?'ordinary':'physical'));
-          for(const [old,key]of keyOf)if(old!==subjectId&&key===k&&!topology.has(old)){removeSupport(old);contributors.set(slot(old,'m'),evidence.member(old,'physical'));}
+          for(const old of keyOf.subjectsAt(k))if(old!==subjectId&&!topology.has(old)){removeSupport(old);contributors.set(slot(old,'m'),evidence.member(old,'physical'));}
         }
         reconcileAddress(k, subjectId);
         place(subjectId);
