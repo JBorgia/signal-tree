@@ -1,0 +1,67 @@
+name: Release runner mirror diagnostics
+
+# One isolated investigation branch. No publishing, secrets, source checkout,
+# package installation, gate substitution or production deployment.
+on:
+  push:
+    branches: [codex/v15-runner-diagnostics]
+
+permissions:
+  contents: read
+
+jobs:
+  mirrors:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - name: Record APT sources and independently test signed mirror metadata
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import json, pathlib, subprocess, tempfile
+
+          for source in [
+              '/etc/os-release',
+              '/etc/apt/sources.list',
+              '/etc/apt/sources.list.d/ubuntu.sources',
+              '/etc/apt/apt-mirrors.txt',
+              '/etc/apt/security-mirrors.txt',
+          ]:
+              path = pathlib.Path(source)
+              print(json.dumps({'source': source, 'text': path.read_text() if path.exists() else None}), flush=True)
+
+          destinations = [
+              ('azure.archive.ubuntu.com', 'noble'),
+              ('archive.ubuntu.com', 'noble'),
+              ('security.ubuntu.com', 'noble-security'),
+          ]
+          work = pathlib.Path(tempfile.mkdtemp(prefix='release-mirror-diagnostic-'))
+          for index, (host, suite) in enumerate(destinations):
+              try:
+                  resolved = subprocess.run(['getent', 'ahostsv4', host], capture_output=True, text=True, timeout=15)
+                  print(json.dumps({'host': host, 'dnsExit': resolved.returncode, 'addresses': resolved.stdout, 'stderr': resolved.stderr}), flush=True)
+              except subprocess.TimeoutExpired:
+                  print(json.dumps({'host': host, 'dnsTimeoutSeconds': 15}), flush=True)
+              target = work / str(index)
+              try:
+                  fetched = subprocess.run([
+                      'curl', '--fail', '--silent', '--show-error', '--location',
+                      '--proto', '=https', '--proto-redir', '=https',
+                      '--connect-timeout', '10', '--max-time', '30',
+                      '--write-out', '%{http_code} %{remote_ip}', '--output', str(target),
+                      f'https://{host}/ubuntu/dists/{suite}/InRelease',
+                  ], capture_output=True, text=True, timeout=35)
+              except subprocess.TimeoutExpired:
+                  print(json.dumps({'host': host, 'httpsTimeoutSeconds': 35}), flush=True)
+                  continue
+              print(json.dumps({'host': host, 'httpsExit': fetched.returncode, 'httpAndPeer': fetched.stdout, 'stderr': fetched.stderr}), flush=True)
+              if fetched.returncode == 0:
+                  try:
+                      verified = subprocess.run([
+                          'gpgv', '--keyring', '/usr/share/keyrings/ubuntu-archive-keyring.gpg', str(target),
+                      ], capture_output=True, text=True, timeout=10)
+                  except subprocess.TimeoutExpired:
+                      print(json.dumps({'host': host, 'signatureTimeoutSeconds': 10}), flush=True)
+                      continue
+                  print(json.dumps({'host': host, 'ubuntuSignatureExit': verified.returncode, 'stderr': verified.stderr}), flush=True)
+          PY
