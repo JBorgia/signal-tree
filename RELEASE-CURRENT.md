@@ -1,9 +1,52 @@
 # Current release — v16 candidate qualified
 
-Updated November 10, 2026. This is the single active acceptance ledger. Historical
+Updated November 11, 2026. This is the single active acceptance ledger. Historical
 first failures and sealed predecessors remain evidence, not competing queues.
 
 ## Active owner instruction
+
+### November 11 release and automated application study — complete
+
+The owner explicitly authorized publishing the v15 maintenance update first,
+then building automated application scenarios, defining metrics, running
+comparisons and following findings through feasible improvements without routine
+check-ins. v15.4.8 is published from signed `37ef1788f` on
+`codex/v15-release-owned-checkout`. All five registry archives/latest tags,
+provenance/signatures and fresh runtime/type/AOT consumers are verified. The
+exact signed source is deployed to signaltree.io; visible v15.4.8 and the live
+edit/server-update/undo trace pass after the final production deployment.
+Superseded signed tags and frozen
+candidates are preserved. No v16 publication is selected.
+
+The isolated `codex/application-comparison` branch starts at `1ce1a5013`.
+Its [registered protocol](docs/audits/2026-11-11-application-comparison/PROTOCOL.md)
+defines observable tasks, competitor versions, correctness controls, metric
+boundaries and independent review corrections before implementation. Comparative
+runs consume verified published v15 and the qualified v16 artifact below.
+Preserve first failures, use serial heavy execution, and do not equate source
+inspection with tests or synthetic browser timing with INP or human productivity.
+
+- [x] Finish v15 registry/demo publication receipts.
+- [x] Implement common production Angular scenarios and credible library arms.
+- [x] Prove stage oracles with planted defects and run native overlap probes.
+- [x] Freeze calibrated sample plan, execute comparisons and collect attribution
+      profiles against the exact builds.
+- [x] Follow concrete findings through fixes, matched verification and review.
+
+The [application audit](docs/audits/2026-11-11-application-comparison/README.md)
+records 387 passing comparison children, 36 supplemental lifecycle children and
+independent raw-result checks. The complete evidence archive verifies after
+extraction and rejects deliberate payload corruption and removal.
+The fresh-store `addMany` diagnostic is not adopted: no dependable v16 reduction
+and worse v15 population in the tested neutral workload. Private TanStack query
+and payload-storage variants preserve the baseline and runtime packages. The
+payload separation improves acknowledgement latency and releases observed
+payload roots on destruction even while the test backend remains held. The
+search variant trades faster filtering for more 10,000-row live heap and slower
+edits; it is limited to suitable search-heavy applications. v16 construction
+cost remains explicit under the prior qualification's cost disposition. No new
+performance ceiling or library-wide winner is inferred. v16 remains qualified
+and unpublished; v15.4.8 is released and deployed.
 
 ### November 10 follow-through — complete
 

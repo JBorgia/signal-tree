@@ -1,0 +1,296 @@
+{
+  "createdUTC": "2026-11-11T18:58:45.941901+00:00",
+  "archive": {
+    "path": "/Users/jonathanborgia/code/signaltree/.worktrees/application-comparison/docs/audits/2026-11-11-application-comparison/application-evidence.tar.gz",
+    "sha256": "2ffd6bb7034311ab73270685486b119d3b186ba399c3a354d3c01f15325fb5c0",
+    "bytes": 54586276,
+    "originalPacket": "/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/application-evidence-final-2026-11-11.tar.gz",
+    "manifestSha256": "b0a0fb39a5599f0296b94d2c1e6e3266b64e3688744fb059d90c762dedb8e442",
+    "uniquePayloads": 3210,
+    "identityMappings": 10338
+  },
+  "checks": [
+    {
+      "command": [
+        "node",
+        "tools/verify-gates.mjs",
+        "--only=lint:budget,source-controls,version-claims,numeric-claims,release-claims,doc-links"
+      ],
+      "cwd": "/Users/jonathanborgia/code/signaltree/.worktrees/application-comparison",
+      "startedUTC": "2026-11-11T18:47:19.414368+00:00",
+      "seconds": 32.90912413597107,
+      "exit": 0,
+      "log": "/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/application-final-gates.log",
+      "logSha256": "a05e299d3b36740c8a9f36ab1818e6b59b253474787e0c5ee73cc7fdb7d95a52",
+      "name": "application-final-gates",
+      "logText": "\nRunning 6 gates\n\n  \u00b7 lint:budget          pass \u2713  (eslint errors across all configured packages, applications and tooling, AND warnings never grow)\n  \u00b7 version-claims       pass \u2713  (every documented Angular-version claim matches peerDependencies)\n  \u00b7 source-controls      pass \u2713  (no raw NUL or unexpected C0 control character in any tracked source)\n  \u00b7 numeric-claims       pass \u2713  (every measured figure on a live surface names a tool that produces it \u2014 ratcheted, so new ungenerated numbers cannot land)\n  \u00b7 release-claims       pass \u2713  (every symbol/code ADDED since the last release tag reaches every surface that claims to describe the library)\n  \u00b7 doc-links            pass \u2713  (every relative link resolves AND every install instruction selects a publishable current package (archive/CHANGELOG excluded as point-in-time))\n\n\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n6/6 passed, 0 failed, 0 known-red.\n"
+    },
+    {
+      "command": [
+        "pnpm",
+        "nx",
+        "build",
+        "demo",
+        "--configuration=production",
+        "--skip-nx-cache"
+      ],
+      "cwd": "/Users/jonathanborgia/code/signaltree/.worktrees/application-comparison",
+      "startedUTC": "2026-11-11T18:37:05.015024+00:00",
+      "seconds": 9.952616214752197,
+      "exit": 1,
+      "log": "/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/application-production-demo-final-1.log",
+      "logSha256": "7ac03346efb9320aaba851eb288907d6a24a97223abb9672bdd960fed286fa37",
+      "name": "application-production-demo-final-1",
+      "logText": "\n NX   Running target build for project demo and 2 tasks it depends on:\n\n\n\n> nx run demo:generate-deep-typing-proofs\n\n> node tools/generate-deep-typing-proofs.mjs\r\n\r\n\n> nx run demo:generate-versions\n\n> node tools/generate-version-env.cjs\r\n\r\n\u2714 Wrote versions to apps/demo/src/app/version.ts: kernel=16.0.0-dev\n\u2714 Wrote demo library versions to apps/demo/src/app/library-versions.ts\nGenerated deep-typing proofs for depths 1-40.\n(node:47022) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n(Use `node --trace-warnings ...` to show where the warning was created)\n\n> nx run demo:build:production\n\n(node:47033) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n(Use `node --trace-warnings ...` to show where the warning was created)\n\u001b[33m\u276f\u001b[39m Building...\n(node:47033) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n(Use `node --trace-warnings ...` to show where the warning was created)\n\u001b[32m\u2714\u001b[39m Building...\n\u001b[1mInitial chunk files\u001b[22m\u001b[2m | \u001b[22m\u001b[1mNames\u001b[22m                                \u001b[2m | \u001b[22m \u001b[1mRaw size\u001b[22m\u001b[2m | \u001b[22m\u001b[1mEstimated transfer size\u001b[22m\n\u001b[32mmain-AB3QHKVM.js\u001b[39m   \u001b[2m | \u001b[22m\u001b[2mmain\u001b[22m                                 \u001b[2m | \u001b[22m\u001b[36m789.92 kB\u001b[39m\u001b[2m | \u001b[22m              \u001b[36m201.96 kB\u001b[39m\n\u001b[32mstyles-ACDZXSLE.css\u001b[39m\u001b[2m | \u001b[22m\u001b[2mstyles\u001b[22m                               \u001b[2m | \u001b[22m \u001b[36m25.69 kB\u001b[39m\u001b[2m | \u001b[22m                \u001b[36m4.66 kB\u001b[39m\n\u001b[1m \u001b[22m                  \u001b[2m | \u001b[22m\u001b[1mInitial total\u001b[22m                        \u001b[2m | \u001b[22m\u001b[1m\u001b[91m815.62 kB\u001b[39m\u001b[22m\u001b[2m | \u001b[22m              \u001b[1m206.63 kB\u001b[22m\n\u001b[1mLazy chunk files\u001b[22m   \u001b[2m | \u001b[22m\u001b[1mNames\u001b[22m                                \u001b[2m | \u001b[22m \u001b[1mRaw size\u001b[22m\u001b[2m | \u001b[22m\u001b[1mEstimated transfer size\u001b[22m\n\u001b[32mchunk-CMpoGiIZ.js\u001b[39m  \u001b[2m | \u001b[22m\u001b[2mv15-benchmarks-component\u001b[22m             \u001b[2m | \u001b[22m\u001b[36m199.41 kB\u001b[39m\u001b[2m | \u001b[22m               \u001b[36m46.37 kB\u001b[39m\n\u001b[32mchunk-DWkefpCm.js\u001b[39m  \u001b[2m | \u001b[22m\u001b[2m-\u001b[22m                                    \u001b[2m | \u001b[22m\u001b[36m194.87 kB\u001b[39m\u001b[2m | \u001b[22m               \u001b[36m16.49 kB\u001b[39m\n\u001b[32mchunk-CrpAsLQH.js\u001b[39m  \u001b[2m | \u001b[22m\u001b[2mlegacy-changelog-component\u001b[22m           \u001b[2m | \u001b[22m\u001b[36m112.78 kB\u001b[39m\u001b[2m | \u001b[22m               \u001b[36m25.91 kB\u001b[39m\n\u001b[32mchunk-DJRi-EB3.js\u001b[39m  \u001b[2m | \u001b[22m\u001b[2mdocumentation-component\u001b[22m              \u001b[2m | \u001b[22m \u001b[36m55.83 kB\u001b[39m\u001b[2m | \u001b[22m               \u001b[36m15.25 kB\u001b[39m\n\u001b[32mchunk-CJldJhWC.js\u001b[39m  \u001b[2m | \u001b[22m\u001b[2mrecommended-architecture-component\u001b[22m   \u001b[2m | \u001b[22m \u001b[36m55.06 kB\u001b[39m\u001b[2m | \u001b[22m                \u001b[36m9.23 kB\u001b[39m\n\u001b[32mchunk-DY0c9np5.js\u001b[39m  \u001b[2m | \u001b[22m\u001b[2mwhy-causality-component\u001b[22m              \u001b[2m | \u001b[22m \u001b[36m50.96 kB\u001b[39m\u001b[2m | \u001b[22m               \u001b[36m11.43 kB\u001b[39m\n\u001b[32mchunk-Ba7nu_Fu.js\u001b[39m  \u001b[2m | \u001b[22m\u001b[2marchitecture-overview-component\u001b[22m      \u001b[2m | \u001b[22m \u001b[36m46.56 kB\u001b[39m\u001b[2m | \u001b[22m               \u001b[36m11.55 kB\u001b[39m\n\u001b[32mchunk-DaGSgkG1.js\u001b[39m  \n\u001b[2m | \u001b[22m\u001b[2mrealistic-benchmark-history-component\u001b[22m\u001b[2m | \u001b[22m \u001b[36m46.48 kB\u001b[39m\u001b[2m | \u001b[22m               \u001b[36m10.54 kB\u001b[39m\n\u001b[32mchunk-CjbEEtkI.js\u001b[39m  \u001b[2m | \u001b[22m\u001b[2m-\u001b[22m                                    \u001b[2m | \u001b[22m \u001b[36m38.63 kB\u001b[39m\u001b[2m | \u001b[22m               \u001b[36m11.53 kB\u001b[39m\n\u001b[32mchunk-QFGeOmuE.js\u001b[39m  \u001b[2m | \u001b[22m\u001b[2m-\u001b[22m                                    \u001b[2m | \u001b[22m \u001b[36m36.65 kB\u001b[39m\u001b[2m | \u001b[22m                \u001b[36m8.15 kB\u001b[39m\n\u001b[32mchunk-B-HEr9_H.js\u001b[39m  \u001b[2m | \u001b[22m\u001b[2mdevtools-demo-component\u001b[22m              \u001b[2m | \u001b[22m \u001b[36m27.84 kB\u001b[39m\u001b[2m | \u001b[22m                \u001b[36m6.29 kB\u001b[39m\n\u001b[32mchunk-BoU4ri0J.js\u001b[39m  \u001b[2m | \u001b[22m\u001b[2mbatching-demo-component\u001b[22m              \u001b[2m | \u001b[22m \u001b[36m26.69 kB\u001b[39m\u001b[2m | \u001b[22m                \u001b[36m5.44 kB\u001b[39m\n\u001b[32mchunk-CGLJ3vCK.js\u001b[39m  \u001b[2m | \u001b[22m\u001b[2mentities-demo-component\u001b[22m              \u001b[2m | \u001b[22m \u001b[36m24.50 kB\u001b[39m\u001b[2m | \u001b[22m                \u001b[36m5.30 kB\u001b[39m\n\u001b[32mchunk-BOgm9UzA.js\u001b[39m  \u001b[2m | \u001b[22m\u001b[2mrestoration-demo-component\u001b[22m           \u001b[2m | \u001b[22m \u001b[36m22.30 kB\u001b[39m\u001b[2m | \u001b[22m                \u001b[36m5.66 kB\u001b[39m\n\u001b[32mchunk-BAqRtQ0p.js\u001b[39m  \u001b[2m | \u001b[22m\u001b[2mhome-component\u001b[22m                       \u001b[2m | \u001b[22m \u001b[36m19.94 kB\u001b[39m\u001b[2m | \u001b[22m                \u001b[36m4.79 kB\u001b[39m\n\u001b[2m...and 10 more lazy chunks files. Use \"--verbose\" to show all the files.\u001b[22m\nApplication bundle generation failed. [7.346 seconds] - 2026-11-11T18:37:14.801Z\n\u001b[33m\u25b2 \u001b[43;33m[\u001b[43;30mWARNING\u001b[43;33m]\u001b[0m \u001b[1mbundle initial exceeded maximum budget. Budget 525.00 kB was not met by 290.62 kB with a total of 815.62 kB.\u001b[0m\n\u001b[31m\u2718 \u001b[41;31m[\u001b[41;97mERROR\u001b[41;31m]\u001b[0m \u001b[1mbundle initial exceeded maximum budget. Budget 570.00 kB was not met by 245.62 kB with a total of 815.62 kB.\u001b[0m\n\n\n\n NX   Running target build for project demo and 2 tasks it depends on failed\n\nFailed tasks:\n\n- demo:build:production\n\nHint: run the command with --verbose for more details.\n\n  Run duration:      8.5s\n  Cache:             Skipped (--skip-nx-cache)\n  Critical path:     8.5s (2 tasks)\n  Recoverable time:  <1ms\n\n  Recommendations:\n    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.\n    - Speed up or split the longest tasks on the critical path:\n        demo:build:production                8.2s\n        demo:generate-deep-typing-proofs    277ms\n"
+    },
+    {
+      "command": [
+        "python3",
+        "tools/application-lab/archive-evidence.py",
+        "self-test"
+      ],
+      "cwd": "/Users/jonathanborgia/code/signaltree/.worktrees/application-comparison",
+      "startedUTC": "2026-11-11T18:52:47.124240+00:00",
+      "seconds": 0.11835694313049316,
+      "exit": 0,
+      "log": "/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/archive-tool-final-self-test.log",
+      "logSha256": "07330cec148a2c399c8fd48eb0b728ed88db0f448d5686da47c425fcbeff66b7",
+      "name": "archive-tool-final-self-test",
+      "logText": "PASS: tiny synthetic archive, historical hash recovery, original-free verification/extraction, missing/tampered payload rejection, missing expected hash and unsafe path/symlink rejection. No real study archive created.\n"
+    },
+    {
+      "command": [
+        "python3",
+        "tools/application-lab/archive-evidence.py",
+        "create",
+        "/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/evidence-archive-3",
+        "--selection",
+        "/private/tmp/application-archive-final-selection-3.json",
+        "--recover",
+        "/private/tmp/application-archive-recovery",
+        "--recover",
+        "/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/evidence-archive-1/payloads"
+      ],
+      "cwd": "/Users/jonathanborgia/code/signaltree/.worktrees/application-comparison",
+      "startedUTC": "2026-11-11T18:56:26.220287+00:00",
+      "seconds": 15.118462085723877,
+      "exit": 0,
+      "log": "/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/application-evidence-create-3.log",
+      "logSha256": "8b9c3595bd4912d6cb0905acf8f625431e4cdba14c0be6f638cc6f979cb1be06",
+      "name": "application-evidence-create-3",
+      "logText": "Created 10338 original/version mappings and 3210 unique payloads in /var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/evidence-archive-3\n"
+    },
+    {
+      "command": [
+        "python3",
+        "tools/application-lab/archive-evidence.py",
+        "verify",
+        "/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/evidence-archive-3"
+      ],
+      "cwd": "/Users/jonathanborgia/code/signaltree/.worktrees/application-comparison",
+      "startedUTC": "2026-11-11T18:56:41.339903+00:00",
+      "seconds": 3.5989980697631836,
+      "exit": 0,
+      "log": "/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/application-evidence-verify-directory-3.log",
+      "logSha256": "f6368e4f964e0c06348214133b6ec5a338c6c422a8af8b3eb03ffd361e1f548d",
+      "name": "application-evidence-verify-directory-3",
+      "logText": "Verified 10338 mappings / 3210 payloads; integrity only, not authenticity.\n"
+    },
+    {
+      "command": [
+        "python3",
+        "tools/application-lab/archive-evidence.py",
+        "pack",
+        "/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/evidence-archive-3",
+        "/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/application-evidence-final-2026-11-11.tar.gz"
+      ],
+      "cwd": "/Users/jonathanborgia/code/signaltree/.worktrees/application-comparison",
+      "startedUTC": "2026-11-11T18:56:44.939526+00:00",
+      "seconds": 17.8541419506073,
+      "exit": 0,
+      "log": "/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/application-evidence-pack-3.log",
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "name": "application-evidence-pack-3",
+      "logText": ""
+    },
+    {
+      "command": [
+        "python3",
+        "tools/application-lab/archive-evidence.py",
+        "extract",
+        "/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/application-evidence-final-2026-11-11.tar.gz",
+        "/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/evidence-extracted-3"
+      ],
+      "cwd": "/Users/jonathanborgia/code/signaltree/.worktrees/application-comparison",
+      "startedUTC": "2026-11-11T18:57:02.794371+00:00",
+      "seconds": 8.511587142944336,
+      "exit": 0,
+      "log": "/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/application-evidence-extract-3.log",
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "name": "application-evidence-extract-3",
+      "logText": ""
+    },
+    {
+      "command": [
+        "python3",
+        "/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/evidence-extracted-3/archive-evidence.py",
+        "verify",
+        "/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/evidence-extracted-3"
+      ],
+      "cwd": "/Users/jonathanborgia/code/signaltree/.worktrees/application-comparison",
+      "startedUTC": "2026-11-11T18:57:11.306529+00:00",
+      "seconds": 3.692641019821167,
+      "exit": 0,
+      "log": "/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/application-evidence-verify-extracted-3.log",
+      "logSha256": "f6368e4f964e0c06348214133b6ec5a338c6c422a8af8b3eb03ffd361e1f548d",
+      "name": "application-evidence-verify-extracted-3",
+      "logText": "Verified 10338 mappings / 3210 payloads; integrity only, not authenticity.\n"
+    },
+    {
+      "command": [
+        "python3",
+        "/private/tmp/application-evidence-controls.py"
+      ],
+      "cwd": "/Users/jonathanborgia/code/signaltree/.worktrees/application-comparison",
+      "startedUTC": "2026-11-11T18:57:14.999916+00:00",
+      "seconds": 1.9366660118103027,
+      "exit": 0,
+      "log": "/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/application-evidence-controls-3.log",
+      "logSha256": "204a070a6ba9a8054c5a4cb3eba049ff5484d8f2348417ff2c57a0da62b78e5e",
+      "name": "application-evidence-controls-3",
+      "logText": "PASS: actual extracted archive rejects altered and missing payloads; original bytes unchanged\n"
+    },
+    {
+      "command": [
+        "pnpm",
+        "exec",
+        "prettier",
+        "--write",
+        "tools/application-lab/README.md",
+        "docs/audits/2026-11-11-application-comparison/README.md",
+        "docs/audits/2026-11-11-application-comparison/REVIEW.md"
+      ],
+      "cwd": "/Users/jonathanborgia/code/signaltree/.worktrees/application-comparison",
+      "startedUTC": "2026-11-11T18:59:41.314995+00:00",
+      "seconds": 0.5214660167694092,
+      "exit": 0,
+      "log": "/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/application-final-report-format.log",
+      "logSha256": "f5cbe918f64472fb9d1248231ac2bbfd2637391d51f72c64fbc55bb3b886dd2b",
+      "name": "application-final-report-format",
+      "logText": "tools/application-lab/README.md 47ms\ndocs/audits/2026-11-11-application-comparison/README.md 61ms\ndocs/audits/2026-11-11-application-comparison/REVIEW.md 11ms\n"
+    },
+    {
+      "command": [
+        "node",
+        "tools/verify-gates.mjs",
+        "--only=source-controls,version-claims,numeric-claims,release-claims,doc-links"
+      ],
+      "cwd": "/Users/jonathanborgia/code/signaltree/.worktrees/application-comparison",
+      "startedUTC": "2026-11-11T18:59:41.837142+00:00",
+      "seconds": 11.166666030883789,
+      "exit": 0,
+      "log": "/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/application-final-report-gates.log",
+      "logSha256": "0558ea30d2c5be300ded546a0764e8b8d5792300370e6e14858b29273c1f65e3",
+      "name": "application-final-report-gates",
+      "logText": "\nRunning 5 gates\n\n  \u00b7 version-claims       pass \u2713  (every documented Angular-version claim matches peerDependencies)\n  \u00b7 source-controls      pass \u2713  (no raw NUL or unexpected C0 control character in any tracked source)\n  \u00b7 numeric-claims       pass \u2713  (every measured figure on a live surface names a tool that produces it \u2014 ratcheted, so new ungenerated numbers cannot land)\n  \u00b7 release-claims       pass \u2713  (every symbol/code ADDED since the last release tag reaches every surface that claims to describe the library)\n  \u00b7 doc-links            pass \u2713  (every relative link resolves AND every install instruction selects a publishable current package (archive/CHANGELOG excluded as point-in-time))\n\n\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n5/5 passed, 0 failed, 0 known-red.\n"
+    }
+  ],
+  "corruptionControls": {
+    "passed": true,
+    "verifier": {
+      "path": "/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/evidence-extracted-3/archive-evidence.py",
+      "sha256": "71683eb8d1a3a7470aa859fa87882222000e6795ca7fc6b33d37281000025c1f"
+    },
+    "originalPayload": {
+      "path": "/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/evidence-extracted-3/payloads/sha256/0009683289398eb4d4f3c200bfafb14f7f93cc170a2fae6933a83cff7bac0fbb",
+      "sha256": "0009683289398eb4d4f3c200bfafb14f7f93cc170a2fae6933a83cff7bac0fbb"
+    },
+    "originalPayloadUnchanged": true,
+    "checks": [
+      {
+        "control": "tamper",
+        "command": [
+          "/Library/Frameworks/Python.framework/Versions/3.14/bin/python3",
+          "/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/evidence-extracted-3/archive-evidence.py",
+          "verify",
+          "/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/evidence-control-copy-3"
+        ],
+        "exit": 1,
+        "expectedRejection": true,
+        "requiredMessage": "Payload checksum/size mismatch",
+        "log": "/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/application-evidence-tamper-control-3.log",
+        "logSha256": "0f517f93dc7d8f7d778f3062bd9047ffab3132efa6080d3afd697c99d3986265",
+        "logText": "Archive verification failed: Payload checksum/size mismatch: payloads/sha256/0009683289398eb4d4f3c200bfafb14f7f93cc170a2fae6933a83cff7bac0fbb\n"
+      },
+      {
+        "control": "missing",
+        "command": [
+          "/Library/Frameworks/Python.framework/Versions/3.14/bin/python3",
+          "/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/evidence-extracted-3/archive-evidence.py",
+          "verify",
+          "/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/evidence-control-copy-3"
+        ],
+        "exit": 1,
+        "expectedRejection": true,
+        "requiredMessage": "Missing archived file",
+        "log": "/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/application-evidence-missing-control-3.log",
+        "logSha256": "198c475cadc815b3c1c15fd251c6c728f745d269b7a3f1619a46fee5c61c887b",
+        "logText": "Archive verification failed: Missing archived file: payloads/sha256/0009683289398eb4d4f3c200bfafb14f7f93cc170a2fae6933a83cff7bac0fbb\n"
+      }
+    ],
+    "limits": "Controls mutate a separate hardlinked copy by unlinking targets before write. Original payloads are never written."
+  },
+  "scope": "Exact retained payload integrity/reference closure and final tooling/docs checks. Not signed authenticity, complete Git history, fully installed reproducible environment or new runtime release qualification. The original development-host application cohorts remain separate.",
+  "demoDisposition": "Compilation reaches bundle output; exit1 only for unchanged initial-size ceiling815.62kB vs570kB, previously owneraccepted. No numerical pass claimed.",
+  "finalSourceHashes": {
+    "/Users/jonathanborgia/code/signaltree/.worktrees/application-comparison/tools/application-lab/measure-variants.mjs": "107b3e151675a34f4d233d5c7a3534c9a5390411c9c343c3c49a07b7c3798a39",
+    "/Users/jonathanborgia/code/signaltree/.worktrees/application-comparison/tools/application-lab/dispatch-backend.ts": "5344c6239a95a25ebf0d2cceaa77efd4979bc1a97bb2509e4fdc052d041c256e",
+    "/Users/jonathanborgia/code/signaltree/.worktrees/application-comparison/tools/application-lab/dispatch-main.ts": "68a3e761d15b64f74adf8f8b0eabffe577a990ba301858ee182bb22728bf8bb6",
+    "/Users/jonathanborgia/code/signaltree/.worktrees/application-comparison/tools/application-lab/inventory-main.ts": "158789b17e09313deeafb96621ee364b83b6715034fc827cec445e47554876b1",
+    "/Users/jonathanborgia/code/signaltree/.worktrees/application-comparison/tools/application-lab/source-inventory.mjs": "3b60aef86614c1627886e5e368567d0142fad79ef8ccdb55ba132ee9b5318e28",
+    "/Users/jonathanborgia/code/signaltree/.worktrees/application-comparison/tools/application-lab/profile.mjs": "e47e3e078efccf725730f082b614fdc3d3e9479930d5630cbfcb064cc68be708",
+    "/Users/jonathanborgia/code/signaltree/.worktrees/application-comparison/tools/application-lab/signaltree-proposals.mjs": "42996272482303de8091e836b581c32ecd9c110d68a9be25887a51e3b16ecf15",
+    "/Users/jonathanborgia/code/signaltree/.worktrees/application-comparison/tools/application-lab/analyze-variants.mjs": "798532f2593605046e28279033056a964bdd4ee1e23d6644ded67f1ad0b98a19",
+    "/Users/jonathanborgia/code/signaltree/.worktrees/application-comparison/tools/application-lab/measure.mjs": "27a5ab399db59822edd5de6d14be5ad875ed93adc89eb0b77baff24a6758d001",
+    "/Users/jonathanborgia/code/signaltree/.worktrees/application-comparison/tools/application-lab/started-payload-teardown.mjs": "264e4eac30a83a7f76dd6c6948ca74ed39775c2f2a14afa8a5df2e8b8cf43eb3",
+    "/Users/jonathanborgia/code/signaltree/.worktrees/application-comparison/tools/application-lab/dispatch-measure.mjs": "2b08dccd85962afeeee2bde51a980edc154ad56b3ed3a38c76375e788a5db232",
+    "/Users/jonathanborgia/code/signaltree/.worktrees/application-comparison/tools/application-lab/backend-check.mjs": "2b84a2fce1e62ab6ae3023058d92507f3453493bef966adedfa3c1fda28c4b5a",
+    "/Users/jonathanborgia/code/signaltree/.worktrees/application-comparison/tools/application-lab/inventory-check.mjs": "df3010e25ecbe715a6b9590908e344dd537f706658c80d86ca31b7d5c232a19e",
+    "/Users/jonathanborgia/code/signaltree/.worktrees/application-comparison/tools/application-lab/tanstack-overlap.mjs": "a0dde3e07cd6ac07f6c38f78a81533ebd67609585b6d9cbf29bd253764891567",
+    "/Users/jonathanborgia/code/signaltree/.worktrees/application-comparison/tools/application-lab/prepare-variant.mjs": "973474e71a72d20b27e55bb2310b807a086aac0be95d2ab9a98c1dde94530538",
+    "/Users/jonathanborgia/code/signaltree/.worktrees/application-comparison/tools/application-lab/archive-evidence.py": "71683eb8d1a3a7470aa859fa87882222000e6795ca7fc6b33d37281000025c1f",
+    "/Users/jonathanborgia/code/signaltree/.worktrees/application-comparison/tools/application-lab/model.ts": "128a5fb3e1be006b4a7b72d518aa7ca204d24f91cc70fd18dc3851fa009a2e6c",
+    "/Users/jonathanborgia/code/signaltree/.worktrees/application-comparison/tools/application-lab/README.md": "67939c525a08386aff9b7dfd00fb822083ea745f32fb8508a5c39e36ce307448",
+    "/Users/jonathanborgia/code/signaltree/.worktrees/application-comparison/tools/application-lab/.gitignore": "32dae3052f331ee34d628ef535709b301259a45df7c7522c4d35dcf49873f00b",
+    "/Users/jonathanborgia/code/signaltree/.worktrees/application-comparison/tools/application-lab/analyze.mjs": "8839cea2c25fd27c5ecc20e5a870f0b9ae34d36e8154b213effe0cb66d33365e",
+    "/Users/jonathanborgia/code/signaltree/.worktrees/application-comparison/tools/application-lab/dispatch-model.ts": "f39b9fcf1870dcd7df89d6ade26c672e931840261c1d38a9c0d0c75ecf428a64",
+    "/Users/jonathanborgia/code/signaltree/.worktrees/application-comparison/tools/application-lab/lab.mjs": "e3b7f5fa99d74539cae1209054dd4ae6c7c69a4b255b05ac202de6952227e196",
+    "/Users/jonathanborgia/code/signaltree/.worktrees/application-comparison/tools/application-lab/analyze-lifecycle.py": "8cdc7105458b8ce24797e195bbbc1796bf49146673ac9ababe805fb99d7d8556",
+    "/Users/jonathanborgia/code/signaltree/.worktrees/application-comparison/tools/application-lab/dispatch-check.mjs": "d5a8daf18d1f527789dd63abec03afe9f237e744e871ea70223c95a8f5c61d90",
+    "/Users/jonathanborgia/code/signaltree/.worktrees/application-comparison/tools/application-lab/lifecycle-followup.mjs": "e9027e2163836336d57d2310bbf03bba32015d3dc5c7e18579c057fcee92510a",
+    "/Users/jonathanborgia/code/signaltree/.worktrees/application-comparison/tools/application-lab/publication-payload-check.mjs": "f7ed5098feed6423f671d728352bf09a2bf161b35cc4e0d476cc94dbb86368fe",
+    "/Users/jonathanborgia/code/signaltree/.worktrees/application-comparison/tools/application-lab/dispatch-measure-variants.mjs": "547d817176728e3cf66d13905f809c76850af80cd97af41f2e9d0b2d167ffe1a",
+    "/Users/jonathanborgia/code/signaltree/.worktrees/application-comparison/tools/application-lab/population-probe.mjs": "3070b174d254245432d546ec868aafdf5c02a6b9aebff5a93fb809793d5cb73d",
+    "/Users/jonathanborgia/code/signaltree/.worktrees/application-comparison/tools/application-lab/signaltree-overlap.mjs": "d5c56c61bab7128b6f385b33d20e4ff69bc0af508ef07ba97716a552304064da",
+    "/Users/jonathanborgia/code/signaltree/.worktrees/application-comparison/tools/application-lab/arms/ngrx-dispatch.ts": "d46436a90069398c3d63876715f06520f23aee2cf03a30171eff951821f43181",
+    "/Users/jonathanborgia/code/signaltree/.worktrees/application-comparison/tools/application-lab/arms/tanstack-inventory.ts": "c9190dab07b4d3a53cbbe1f4175a2a8b8c399097caebf89b1747ef061afa03e0",
+    "/Users/jonathanborgia/code/signaltree/.worktrees/application-comparison/tools/application-lab/arms/tanstack-dispatch-detached-payload.ts": "2084a71e65948cef79cbe9d8468c4e50342401c55a0fce599399162825798266",
+    "/Users/jonathanborgia/code/signaltree/.worktrees/application-comparison/tools/application-lab/arms/native-dispatch.ts": "9f0629e0f2adeae4e7408ccfd2ed1ead78f6c331d6ede9d2340ecc778dadda15",
+    "/Users/jonathanborgia/code/signaltree/.worktrees/application-comparison/tools/application-lab/arms/signaltree-inventory.ts": "b44ec1ef60dc71217c83b20f3b23d8f53dcb1f771114993935e2ddd5fccb6807",
+    "/Users/jonathanborgia/code/signaltree/.worktrees/application-comparison/tools/application-lab/arms/tanstack-dispatch.ts": "9c40ff9eecf1f9b85daad84129a8775e96df94f8ffee0433916a9d34ab97803c",
+    "/Users/jonathanborgia/code/signaltree/.worktrees/application-comparison/tools/application-lab/arms/native-inventory.ts": "67f062ad4fa04acffb242c2e72b3404e6dd1b8f849abb35a1aa7c0d21bc5ee92",
+    "/Users/jonathanborgia/code/signaltree/.worktrees/application-comparison/tools/application-lab/arms/ngrx-inventory.ts": "a8ba4e8d201f295463ac62628865c0b79ac4bf0706e5e5d06b2d8afa89985aa5",
+    "/Users/jonathanborgia/code/signaltree/.worktrees/application-comparison/tools/application-lab/arms/tanstack-inventory-stable-view.ts": "e071db0326e7071c3dc632bfd0d0d11cd804567899d32e808aee357fe8746791",
+    "/Users/jonathanborgia/code/signaltree/.worktrees/application-comparison/tools/application-lab/arms/tanstack-inventory-notes.md": "7fe163e1fe483e24b9a007a4fdd6050bbc302019bd0096819bf32c6d0f56091e",
+    "/Users/jonathanborgia/code/signaltree/.worktrees/application-comparison/tools/application-lab/arms/signaltree-dispatch.ts": "3574dfe0f89c32c573b5975a0e8863212ea9f8a8c402f05d7e00af3669f9d91b",
+    "/Users/jonathanborgia/code/signaltree/.worktrees/application-comparison/tools/application-lab/arms/tanstack-dispatch-notes.md": "ded5b86300f91c2e6ea1acb805c0c9d9aba42d71de39cc07d328f351358d0aa2",
+    "/Users/jonathanborgia/code/signaltree/.worktrees/application-comparison/tools/application-lab/arms/signaltree-dispatch-notes.md": "8c255760f8c082a3da50405b56fd85c19d92f5f814ecb1741b35b1c551d0e6dc",
+    "/Users/jonathanborgia/code/signaltree/.worktrees/application-comparison/RELEASE-CURRENT.md": "25234f3e77163e12a32db77a1afdcb8afe4a4085dd2713f99d781c398bc3471e",
+    "/Users/jonathanborgia/code/signaltree/.worktrees/application-comparison/docs/audits/2026-11-11-application-comparison/README.md": "9889f888c236d4c4903ec939bd99d6a751710f40312e5602dee2e3158d4f2a20",
+    "/Users/jonathanborgia/code/signaltree/.worktrees/application-comparison/docs/audits/2026-11-11-application-comparison/REVIEW.md": "ba0f4579e05f6874d09c95d1fcb66e26f5e82997bf74357abe1b245a4b09510c",
+    "/Users/jonathanborgia/code/signaltree/.worktrees/application-comparison/docs/audits/2026-11-11-application-comparison/PROTOCOL.md": "6a82eb214b26d5103d160fc464f953a53ac32b6289383d0e607ae33e28e460bd",
+    "/Users/jonathanborgia/code/signaltree/.worktrees/application-comparison/docs/audits/2026-11-11-application-comparison/IMPROVEMENTS.md": "a00a5a6a8fbe21daf6bed96007aa7298a71a3fe9ec75d0ab9a9be84164c95964",
+    "/Users/jonathanborgia/code/signaltree/.worktrees/application-comparison/docs/audits/2026-11-11-application-comparison/LIFECYCLE-FOLLOWUP.md": "54a53d8f494c2387735b49f511b3c26a885698c14838e945e15c65ea1ee7bbd8",
+    "/Users/jonathanborgia/code/signaltree/.worktrees/application-comparison/docs/audits/2026-11-11-application-comparison/STARTED-TEARDOWN.md": "6ad7cf95eb9d4b0cdb726e8ca84cedbd6d6766c5375f6c34239ec51ca71bfcc5"
+  }
+}

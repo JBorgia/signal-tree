@@ -1,0 +1,3235 @@
+{
+  "passed": true,
+  "command": [
+    "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+    "/Users/jonathanborgia/code/signaltree/.worktrees/application-comparison/tools/application-lab/started-payload-teardown.mjs",
+    "/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/application-baseline-4",
+    "/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/application-variant-1",
+    "/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/started-teardown-1",
+    "/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/lifecycle-publication-payloads-1"
+  ],
+  "rawResults": {
+    "path": "/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/started-teardown-1/results.json",
+    "sha256": "fae5b9b735ae24f281af23275060a10909b6af02acf3b246998cff6ed8a74ec6"
+  },
+  "pairedHeap": [
+    {
+      "rows": 1000,
+      "stages": [
+        {
+          "stage": "populated",
+          "unit": "bytes",
+          "samples": [
+            {
+              "round": 0,
+              "before": 3241736,
+              "after": 3244860,
+              "difference": 3124,
+              "beforeReceipt": {
+                "path": "/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/started-teardown-1/000-before-1000-stage-01.json",
+                "sha256": "490bc5579f700cff20c834b7b4f2b16e0c853c6616f578c0d4a41e1f1a117fc3"
+              },
+              "afterReceipt": {
+                "path": "/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/started-teardown-1/001-after-1000-stage-01.json",
+                "sha256": "2acc10d4c61fa2b951ad8ff73abc72f907f491f316bc5b26a187cb1aef9cfcf8"
+              }
+            },
+            {
+              "round": 1,
+              "before": 3244284,
+              "after": 3244464,
+              "difference": 180,
+              "beforeReceipt": {
+                "path": "/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/started-teardown-1/003-before-1000-stage-01.json",
+                "sha256": "a8e5b8f43b53574430399604ca54b45676feec16413cc66dc91ed4db658538f9"
+              },
+              "afterReceipt": {
+                "path": "/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/started-teardown-1/002-after-1000-stage-01.json",
+                "sha256": "3a271fe8d77c263c6c942edbe114f7d6f571f3ef1b0dccfee468c2678823a5b6"
+              }
+            },
+            {
+              "round": 2,
+              "before": 3244284,
+              "after": 3244476,
+              "difference": 192,
+              "beforeReceipt": {
+                "path": "/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/started-teardown-1/004-before-1000-stage-01.json",
+                "sha256": "87ea8b7e0fda65598baa8e23a2eeaf2e9c909fc60fde39a36d7c65288e82a070"
+              },
+              "afterReceipt": {
+                "path": "/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/started-teardown-1/005-after-1000-stage-01.json",
+                "sha256": "4174720c4a917664ea07fac37381ef4c8220c5d593c7bc8fdb59ab1c7163e8ba"
+              }
+            }
+          ],
+          "before": {
+            "n": 3,
+            "min": 3241736,
+            "median": 3244284,
+            "max": 3244284
+          },
+          "after": {
+            "n": 3,
+            "min": 3244464,
+            "median": 3244476,
+            "max": 3244860
+          },
+          "difference": {
+            "n": 3,
+            "min": 180,
+            "median": 192,
+            "max": 3124
+          }
+        },
+        {
+          "stage": "eight-started-unacknowledged",
+          "unit": "bytes",
+          "samples": [
+            {
+              "round": 0,
+              "before": 6420536,
+              "after": 5885372,
+              "difference": -535164,
+              "beforeReceipt": {
+                "path": "/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/started-teardown-1/000-before-1000-stage-03.json",
+                "sha256": "083db908bb2ff8b42fe6c9fb973bda32bbe486072b17fbb0b812a71b4e65585d"
+              },
+              "afterReceipt": {
+                "path": "/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/started-teardown-1/001-after-1000-stage-03.json",
+                "sha256": "57bdb0c042620415fe4251a7eac1594889d0c8d027f6046bb388d818df1c79c2"
+              }
+            },
+            {
+              "round": 1,
+              "before": 6421808,
+              "after": 5884236,
+              "difference": -537572,
+              "beforeReceipt": {
+                "path": "/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/started-teardown-1/003-before-1000-stage-03.json",
+                "sha256": "79e8f7cfcf1bf106a5bc25b7810b3ea391dc52ac00924c7ad9f2e0f51c9a3e90"
+              },
+              "afterReceipt": {
+                "path": "/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/started-teardown-1/002-after-1000-stage-03.json",
+                "sha256": "b23c93fb3e0102ee17a79fb53be5f80f612c2250805efb72d6a0d86a76144ff1"
+              }
+            },
+            {
+              "round": 2,
+              "before": 6419780,
+              "after": 5885376,
+              "difference": -534404,
+              "beforeReceipt": {
+                "path": "/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/started-teardown-1/004-before-1000-stage-03.json",
+                "sha256": "5bc6eb875639fda588511140fb864cd5950d5040eca727299b98363176fdfcba"
+              },
+              "afterReceipt": {
+                "path": "/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/started-teardown-1/005-after-1000-stage-03.json",
+                "sha256": "f797a3f992592175e4ed32dd9bb55710e975ec13932d621c0fa33d002dde5657"
+              }
+            }
+          ],
+          "before": {
+            "n": 3,
+            "min": 6419780,
+            "median": 6420536,
+            "max": 6421808
+          },
+          "after": {
+            "n": 3,
+            "min": 5884236,
+            "median": 5885372,
+            "max": 5885376
+          },
+          "difference": {
+            "n": 3,
+            "min": -537572,
+            "median": -535164,
+            "max": -534404
+          }
+        },
+        {
+          "stage": "before-pending-teardown",
+          "unit": "bytes",
+          "samples": [
+            {
+              "round": 0,
+              "before": 6456604,
+              "after": 5921328,
+              "difference": -535276,
+              "beforeReceipt": {
+                "path": "/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/started-teardown-1/000-before-1000-stage-05.json",
+                "sha256": "b05a58a1ec7361d869f464bb15bcc2f41db1da65791eb621340aa6432c5efd1f"
+              },
+              "afterReceipt": {
+                "path": "/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/started-teardown-1/001-after-1000-stage-05.json",
+                "sha256": "62a1159327acd44661f616640c05f262bf58c0a5f9364b0431028b9e4d24cd6b"
+              }
+            },
+            {
+              "round": 1,
+              "before": 6457328,
+              "after": 5919540,
+              "difference": -537788,
+              "beforeReceipt": {
+                "path": "/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/started-teardown-1/003-before-1000-stage-05.json",
+                "sha256": "2d5eb439734c0175938362e333ee10454542201f6efe4bfbdd4eb4a5b63a08ef"
+              },
+              "afterReceipt": {
+                "path": "/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/started-teardown-1/002-after-1000-stage-05.json",
+                "sha256": "a7fc7fbcf469c8395bcd3b28ab793701e23e4ed071b8d7ac07ac17b7e641b857"
+              }
+            },
+            {
+              "round": 2,
+              "before": 6455260,
+              "after": 5921372,
+              "difference": -533888,
+              "beforeReceipt": {
+                "path": "/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/started-teardown-1/004-before-1000-stage-05.json",
+                "sha256": "d836e2e731d7b2a1d507f0413492c14f2406f133c6fe18916e1f76c93636a430"
+              },
+              "afterReceipt": {
+                "path": "/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/started-teardown-1/005-after-1000-stage-05.json",
+                "sha256": "fd870e7b35b1cc76ff7641e16d14afbc3d52c54fe483745f644795022eb25764"
+              }
+            }
+          ],
+          "before": {
+            "n": 3,
+            "min": 6455260,
+            "median": 6456604,
+            "max": 6457328
+          },
+          "after": {
+            "n": 3,
+            "min": 5919540,
+            "median": 5921328,
+            "max": 5921372
+          },
+          "difference": {
+            "n": 3,
+            "min": -537788,
+            "median": -535276,
+            "max": -533888
+          }
+        },
+        {
+          "stage": "after-destroy-before-late",
+          "unit": "bytes",
+          "samples": [
+            {
+              "round": 0,
+              "before": 6720512,
+              "after": 5671396,
+              "difference": -1049116,
+              "beforeReceipt": {
+                "path": "/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/started-teardown-1/000-before-1000-stage-07.json",
+                "sha256": "e522f3d0b18323475916506f1604c33b8efb5259bcb85ce9f344bff11baccd12"
+              },
+              "afterReceipt": {
+                "path": "/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/started-teardown-1/001-after-1000-stage-07.json",
+                "sha256": "070ae31462f310da6de0d164c5b575a670577cde7164f604bb0fa6fb55c51c25"
+              }
+            },
+            {
+              "round": 1,
+              "before": 6721236,
+              "after": 5669544,
+              "difference": -1051692,
+              "beforeReceipt": {
+                "path": "/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/started-teardown-1/003-before-1000-stage-07.json",
+                "sha256": "60b1a4aa4ab5b5278ff4b6406a409f3f16bdf935a3cc6d4fc59aa4f02e6e25b4"
+              },
+              "afterReceipt": {
+                "path": "/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/started-teardown-1/002-after-1000-stage-07.json",
+                "sha256": "7d811527eef5da83356710659253b5c6aa99a610d2b3f5b520af35baf4859ffc"
+              }
+            },
+            {
+              "round": 2,
+              "before": 6719168,
+              "after": 5671376,
+              "difference": -1047792,
+              "beforeReceipt": {
+                "path": "/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/started-teardown-1/004-before-1000-stage-07.json",
+                "sha256": "f844c80a6de8cb41527ef17db5b4d545d4103577899a831e504c0702d6cccedc"
+              },
+              "afterReceipt": {
+                "path": "/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/started-teardown-1/005-after-1000-stage-07.json",
+                "sha256": "b0d55327a341ebb27ee905449e10ac6f6ecee86a904e7235225c8a943d7fa6fe"
+              }
+            }
+          ],
+          "before": {
+            "n": 3,
+            "min": 6719168,
+            "median": 6720512,
+            "max": 6721236
+          },
+          "after": {
+            "n": 3,
+            "min": 5669544,
+            "median": 5671376,
+            "max": 5671396
+          },
+          "difference": {
+            "n": 3,
+            "min": -1051692,
+            "median": -1049116,
+            "max": -1047792
+          }
+        },
+        {
+          "stage": "after-destroy-after-late",
+          "unit": "bytes",
+          "samples": [
+            {
+              "round": 0,
+              "before": 3831164,
+              "after": 3820208,
+              "difference": -10956,
+              "beforeReceipt": {
+                "path": "/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/started-teardown-1/000-before-1000-stage-09.json",
+                "sha256": "305bbc23f6cd445185ec77fc875b7357cf04f373041aec7aa620d7a9b1eac0dc"
+              },
+              "afterReceipt": {
+                "path": "/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/started-teardown-1/001-after-1000-stage-09.json",
+                "sha256": "02ee2271994748ca2ef325c826fc7957600b99e45c2a3981b729174ec49c9785"
+              }
+            },
+            {
+              "round": 1,
+              "before": 3830832,
+              "after": 3818356,
+              "difference": -12476,
+              "beforeReceipt": {
+                "path": "/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/started-teardown-1/003-before-1000-stage-09.json",
+                "sha256": "1e5a3ab0da5cb891fa7c8cd957966cc1b0f85c59ca5f3961a121fe7136add879"
+              },
+              "afterReceipt": {
+                "path": "/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/started-teardown-1/002-after-1000-stage-09.json",
+                "sha256": "205e9598e6133e62d1dcbb3b1faeffc2edcc7b53cbda0952a6566cb41063401e"
+              }
+            },
+            {
+              "round": 2,
+              "before": 3829608,
+              "after": 3819344,
+              "difference": -10264,
+              "beforeReceipt": {
+                "path": "/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/started-teardown-1/004-before-1000-stage-09.json",
+                "sha256": "c185baf534624735db668fec42f1722495e613de94cd3ba8309e44af15e70ac9"
+              },
+              "afterReceipt": {
+                "path": "/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/started-teardown-1/005-after-1000-stage-09.json",
+                "sha256": "4702bc270f4fee60266aff8534d0ea18fe2961b75d2c598e0ffb5bef804d33d8"
+              }
+            }
+          ],
+          "before": {
+            "n": 3,
+            "min": 3829608,
+            "median": 3830832,
+            "max": 3831164
+          },
+          "after": {
+            "n": 3,
+            "min": 3818356,
+            "median": 3819344,
+            "max": 3820208
+          },
+          "difference": {
+            "n": 3,
+            "min": -12476,
+            "median": -10956,
+            "max": -10264
+          }
+        }
+      ]
+    },
+    {
+      "rows": 10000,
+      "stages": [
+        {
+          "stage": "populated",
+          "unit": "bytes",
+          "samples": [
+            {
+              "round": 0,
+              "before": 8184564,
+              "after": 8185632,
+              "difference": 1068,
+              "beforeReceipt": {
+                "path": "/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/started-teardown-1/006-before-10000-stage-01.json",
+                "sha256": "1fe1cdab920c4681c71847403275cd4ba3546495a3cfcdee46d1e7ccd6959951"
+              },
+              "afterReceipt": {
+                "path": "/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/started-teardown-1/007-after-10000-stage-01.json",
+                "sha256": "6266e40f646ddc0fcda25827db9cc79d288e3111579cf57fc76c61d5d5f78f94"
+              }
+            },
+            {
+              "round": 1,
+              "before": 8185024,
+              "after": 8185360,
+              "difference": 336,
+              "beforeReceipt": {
+                "path": "/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/started-teardown-1/009-before-10000-stage-01.json",
+                "sha256": "994ba2cd911682513abf984cd6d37d3cf440456db28e1cb9549cc4663b88eecc"
+              },
+              "afterReceipt": {
+                "path": "/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/started-teardown-1/008-after-10000-stage-01.json",
+                "sha256": "d4bf0972fd1d343a1ccbd99d25ff5bd1c062accef1122277dfbbf42288eef577"
+              }
+            },
+            {
+              "round": 2,
+              "before": 8184352,
+              "after": 8185200,
+              "difference": 848,
+              "beforeReceipt": {
+                "path": "/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/started-teardown-1/010-before-10000-stage-01.json",
+                "sha256": "05094d0a9f78b438bde691fbb1a17d416a528d5af196c02f8c25f2986e0e0bc9"
+              },
+              "afterReceipt": {
+                "path": "/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/started-teardown-1/011-after-10000-stage-01.json",
+                "sha256": "c3cb9e9a99cb543de39a17fa621ba7455668bb75b3b80da930f68639c35fb268"
+              }
+            }
+          ],
+          "before": {
+            "n": 3,
+            "min": 8184352,
+            "median": 8184564,
+            "max": 8185024
+          },
+          "after": {
+            "n": 3,
+            "min": 8185200,
+            "median": 8185360,
+            "max": 8185632
+          },
+          "difference": {
+            "n": 3,
+            "min": 336,
+            "median": 848,
+            "max": 1068
+          }
+        },
+        {
+          "stage": "eight-started-unacknowledged",
+          "unit": "bytes",
+          "samples": [
+            {
+              "round": 0,
+              "before": 33599516,
+              "after": 28460632,
+              "difference": -5138884,
+              "beforeReceipt": {
+                "path": "/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/started-teardown-1/006-before-10000-stage-03.json",
+                "sha256": "9c31ef70085aa36a92a740e01d7cf02b7fe2af2f32b9aaed6de6d04d27d3ae34"
+              },
+              "afterReceipt": {
+                "path": "/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/started-teardown-1/007-after-10000-stage-03.json",
+                "sha256": "dbccf15b1572c0f9ef1f3890502408cc402de5e98ab0ba3a1b76c4a7bafc9032"
+              }
+            },
+            {
+              "round": 1,
+              "before": 33602212,
+              "after": 28458920,
+              "difference": -5143292,
+              "beforeReceipt": {
+                "path": "/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/started-teardown-1/009-before-10000-stage-03.json",
+                "sha256": "79f796c06f68697124d4229ac2e3145ec40b45b8125af482d605ecd8db75b143"
+              },
+              "afterReceipt": {
+                "path": "/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/started-teardown-1/008-after-10000-stage-03.json",
+                "sha256": "c431b7f43e9c65fdaa6786c718734bf306a0c5d8f931f8775472edaf87de6da1"
+              }
+            },
+            {
+              "round": 2,
+              "before": 33602916,
+              "after": 28462552,
+              "difference": -5140364,
+              "beforeReceipt": {
+                "path": "/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/started-teardown-1/010-before-10000-stage-03.json",
+                "sha256": "6bc082e7bc982dc7aaeacc9ab9250712d68af101eaec5a85c0e3a72ee01e9aca"
+              },
+              "afterReceipt": {
+                "path": "/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/started-teardown-1/011-after-10000-stage-03.json",
+                "sha256": "073bf5057ad2e2b73e82e183282b63e3dfd3b65de215eab46f1f4c94346a7460"
+              }
+            }
+          ],
+          "before": {
+            "n": 3,
+            "min": 33599516,
+            "median": 33602212,
+            "max": 33602916
+          },
+          "after": {
+            "n": 3,
+            "min": 28458920,
+            "median": 28460632,
+            "max": 28462552
+          },
+          "difference": {
+            "n": 3,
+            "min": -5143292,
+            "median": -5140364,
+            "max": -5138884
+          }
+        },
+        {
+          "stage": "before-pending-teardown",
+          "unit": "bytes",
+          "samples": [
+            {
+              "round": 0,
+              "before": 33630572,
+              "after": 28491552,
+              "difference": -5139020,
+              "beforeReceipt": {
+                "path": "/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/started-teardown-1/006-before-10000-stage-05.json",
+                "sha256": "2a2462fe497e8f27535882be13e5d0f4443244cda54c7890be50368762b4c0e8"
+              },
+              "afterReceipt": {
+                "path": "/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/started-teardown-1/007-after-10000-stage-05.json",
+                "sha256": "5a8118b48a13203e6a1c2dbe7b284ad8d5fece8418bbbe48845da986c63ef891"
+              }
+            },
+            {
+              "round": 1,
+              "before": 33633308,
+              "after": 28490020,
+              "difference": -5143288,
+              "beforeReceipt": {
+                "path": "/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/started-teardown-1/009-before-10000-stage-05.json",
+                "sha256": "f9d700ed1eefb253c1f70d535487a25266d71ad887b932f055b7051653ec8f79"
+              },
+              "afterReceipt": {
+                "path": "/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/started-teardown-1/008-after-10000-stage-05.json",
+                "sha256": "f5dfda80950fd22b2794400666099c03687afe9ba8187dc68a74db164adf6cb3"
+              }
+            },
+            {
+              "round": 2,
+              "before": 33633972,
+              "after": 28493692,
+              "difference": -5140280,
+              "beforeReceipt": {
+                "path": "/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/started-teardown-1/010-before-10000-stage-05.json",
+                "sha256": "2610b115a53c2cf32af1db8a75a260b237006e8c9731f4e74aa2541a1970b27d"
+              },
+              "afterReceipt": {
+                "path": "/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/started-teardown-1/011-after-10000-stage-05.json",
+                "sha256": "a3a77847b00f3022d332a2faaaabbbfd479023cfe71b49e56eddd21ec7e24570"
+              }
+            }
+          ],
+          "before": {
+            "n": 3,
+            "min": 33630572,
+            "median": 33633308,
+            "max": 33633972
+          },
+          "after": {
+            "n": 3,
+            "min": 28490020,
+            "median": 28491552,
+            "max": 28493692
+          },
+          "difference": {
+            "n": 3,
+            "min": -5143288,
+            "median": -5140280,
+            "max": -5139020
+          }
+        },
+        {
+          "stage": "after-destroy-before-late",
+          "unit": "bytes",
+          "samples": [
+            {
+              "round": 0,
+              "before": 31810364,
+              "after": 21549484,
+              "difference": -10260880,
+              "beforeReceipt": {
+                "path": "/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/started-teardown-1/006-before-10000-stage-07.json",
+                "sha256": "51754991aa88fd81be81602023e434f464bc9acd34f6571cc64f0421cbc97b90"
+              },
+              "afterReceipt": {
+                "path": "/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/started-teardown-1/007-after-10000-stage-07.json",
+                "sha256": "0beddcfa8f23165dfb80a44a6d87770e509c4103b37e030d46d34ffa208dadeb"
+              }
+            },
+            {
+              "round": 1,
+              "before": 31813100,
+              "after": 21547888,
+              "difference": -10265212,
+              "beforeReceipt": {
+                "path": "/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/started-teardown-1/009-before-10000-stage-07.json",
+                "sha256": "e549b086ba7b93b0256a1a8555b16e96bb798f1bc2e2131165e7b27a70ae3f7b"
+              },
+              "afterReceipt": {
+                "path": "/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/started-teardown-1/008-after-10000-stage-07.json",
+                "sha256": "59d8daa5416d76f2407d7ab3fbc5bb6c61283318dc088e845bd501d3c13d3b3c"
+              }
+            },
+            {
+              "round": 2,
+              "before": 31813764,
+              "after": 21551560,
+              "difference": -10262204,
+              "beforeReceipt": {
+                "path": "/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/started-teardown-1/010-before-10000-stage-07.json",
+                "sha256": "54e8e097dbc3095e9d2bb47d2bfb86902aaacc26d26d800e320a5043ea11daa4"
+              },
+              "afterReceipt": {
+                "path": "/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/started-teardown-1/011-after-10000-stage-07.json",
+                "sha256": "37f763045d4e38e7359f28adebfd7a49a532d2bd3de91d078b65e63c07bf50c5"
+              }
+            }
+          ],
+          "before": {
+            "n": 3,
+            "min": 31810364,
+            "median": 31813100,
+            "max": 31813764
+          },
+          "after": {
+            "n": 3,
+            "min": 21547888,
+            "median": 21549484,
+            "max": 21551560
+          },
+          "difference": {
+            "n": 3,
+            "min": -10265212,
+            "median": -10262204,
+            "max": -10260880
+          }
+        },
+        {
+          "stage": "after-destroy-after-late",
+          "unit": "bytes",
+          "samples": [
+            {
+              "round": 0,
+              "before": 3833784,
+              "after": 3823124,
+              "difference": -10660,
+              "beforeReceipt": {
+                "path": "/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/started-teardown-1/006-before-10000-stage-09.json",
+                "sha256": "0c7046685ccf8ec0dba4cc3aea7d6d0ba1c44d0a5eff1164da7563066d36ea21"
+              },
+              "afterReceipt": {
+                "path": "/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/started-teardown-1/007-after-10000-stage-09.json",
+                "sha256": "8b4ca07b9dce205844610dc0d53ba879cb0dcbe3f3d43977d92ebac2fafbd69b"
+              }
+            },
+            {
+              "round": 1,
+              "before": 3835728,
+              "after": 3822372,
+              "difference": -13356,
+              "beforeReceipt": {
+                "path": "/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/started-teardown-1/009-before-10000-stage-09.json",
+                "sha256": "c0ca15375cf529ed4bdaf686da0de5558a5c17c7398d29b253b7937bc2188200"
+              },
+              "afterReceipt": {
+                "path": "/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/started-teardown-1/008-after-10000-stage-09.json",
+                "sha256": "95e4f2b1041c9306d913c5ab0bbd072a738a35f321d6b3bc4017fd2e37b3caab"
+              }
+            },
+            {
+              "round": 2,
+              "before": 3834376,
+              "after": 3822256,
+              "difference": -12120,
+              "beforeReceipt": {
+                "path": "/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/started-teardown-1/010-before-10000-stage-09.json",
+                "sha256": "0214abfcfd67270b4705601c956e57305acbc43622764ae33103fd639319c7b2"
+              },
+              "afterReceipt": {
+                "path": "/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/started-teardown-1/011-after-10000-stage-09.json",
+                "sha256": "b3597fc0f7f4464e4385d64b29eacf4816f8c54bffb761cd12f10f7254fa66fb"
+              }
+            }
+          ],
+          "before": {
+            "n": 3,
+            "min": 3833784,
+            "median": 3834376,
+            "max": 3835728
+          },
+          "after": {
+            "n": 3,
+            "min": 3822256,
+            "median": 3822372,
+            "max": 3823124
+          },
+          "difference": {
+            "n": 3,
+            "min": -13356,
+            "median": -12120,
+            "max": -10660
+          }
+        }
+      ]
+    }
+  ],
+  "limits": [
+    "Memory/lifetime diagnostic only; three pairs per size, no A/A, timing, significance, byte threshold or universal leak claim.",
+    "Eight full plans remain started and unacknowledged at destruction. A ninth intent waits for one owner command; its late delivery must produce one backend application and no ninth publication.",
+    "Only weak references and primitive digests/labels persist in the probe. Whole heap includes those diagnostic objects and the backend, including eight common payload copies, until the backend reference is released.",
+    "Weak-reference liveness follows three forced collections with host-task boundaries. Heap is read immediately before liveness inspection. Current getter reads can materialize objects; public identities do not measure all internal allocations.",
+    "Late command response is tested while acknowledgements remain outstanding. No late acknowledgement is delivered because the frozen bridge has no retired-acknowledgement API.",
+    "Final sampled survivors trigger one heap snapshot per child for retaining-path attribution. Survival alone is not a leak verdict. A 512MiB snapshot cap and bounded stage/cleanup waits are execution limits, not acceptance budgets."
+  ],
+  "children": [
+    {
+      "index": 0,
+      "rows": 1000,
+      "round": 0,
+      "variant": "before",
+      "passed": true,
+      "process": {
+        "browserPid": 76299,
+        "harnessPid": 76297,
+        "identity": "f092f934-6cf2-46a8-8354-ad4ca63b78b3",
+        "browserVersion": "141.0.7390.37"
+      },
+      "finalWeakCounts": {
+        "trackedUnique": 8,
+        "alive": 0,
+        "collected": 8
+      },
+      "weakCheckpoints": {
+        "populated": {
+          "trackedUnique": 0,
+          "alive": 0,
+          "collected": 0,
+          "stillCurrent": 0,
+          "transportIdentity": 0,
+          "currentIdentityChecksAvailable": true,
+          "survivors": []
+        },
+        "eight-started-unacknowledged": {
+          "trackedUnique": 8,
+          "alive": 8,
+          "collected": 0,
+          "stillCurrent": 8,
+          "transportIdentity": 0,
+          "currentIdentityChecksAvailable": true,
+          "survivors": [
+            {
+              "key": 0,
+              "id": "held-plan-0",
+              "phase": "start-observation",
+              "stillCurrent": true,
+              "transportIdentity": false
+            },
+            {
+              "key": 1,
+              "id": "held-plan-1",
+              "phase": "start-observation",
+              "stillCurrent": true,
+              "transportIdentity": false
+            },
+            {
+              "key": 2,
+              "id": "held-plan-2",
+              "phase": "start-observation",
+              "stillCurrent": true,
+              "transportIdentity": false
+            },
+            {
+              "key": 3,
+              "id": "held-plan-3",
+              "phase": "start-observation",
+              "stillCurrent": true,
+              "transportIdentity": false
+            },
+            {
+              "key": 4,
+              "id": "held-plan-4",
+              "phase": "start-observation",
+              "stillCurrent": true,
+              "transportIdentity": false
+            },
+            {
+              "key": 5,
+              "id": "held-plan-5",
+              "phase": "start-observation",
+              "stillCurrent": true,
+              "transportIdentity": false
+            },
+            {
+              "key": 6,
+              "id": "held-plan-6",
+              "phase": "start-observation",
+              "stillCurrent": true,
+              "transportIdentity": false
+            },
+            {
+              "key": 7,
+              "id": "held-plan-7",
+              "phase": "start-observation",
+              "stillCurrent": true,
+              "transportIdentity": false
+            }
+          ]
+        },
+        "before-pending-teardown": {
+          "trackedUnique": 8,
+          "alive": 8,
+          "collected": 0,
+          "stillCurrent": 8,
+          "transportIdentity": 0,
+          "currentIdentityChecksAvailable": true,
+          "survivors": [
+            {
+              "key": 0,
+              "id": "held-plan-0",
+              "phase": "start-observation",
+              "stillCurrent": true,
+              "transportIdentity": false
+            },
+            {
+              "key": 1,
+              "id": "held-plan-1",
+              "phase": "start-observation",
+              "stillCurrent": true,
+              "transportIdentity": false
+            },
+            {
+              "key": 2,
+              "id": "held-plan-2",
+              "phase": "start-observation",
+              "stillCurrent": true,
+              "transportIdentity": false
+            },
+            {
+              "key": 3,
+              "id": "held-plan-3",
+              "phase": "start-observation",
+              "stillCurrent": true,
+              "transportIdentity": false
+            },
+            {
+              "key": 4,
+              "id": "held-plan-4",
+              "phase": "start-observation",
+              "stillCurrent": true,
+              "transportIdentity": false
+            },
+            {
+              "key": 5,
+              "id": "held-plan-5",
+              "phase": "start-observation",
+              "stillCurrent": true,
+              "transportIdentity": false
+            },
+            {
+              "key": 6,
+              "id": "held-plan-6",
+              "phase": "start-observation",
+              "stillCurrent": true,
+              "transportIdentity": false
+            },
+            {
+              "key": 7,
+              "id": "held-plan-7",
+              "phase": "start-observation",
+              "stillCurrent": true,
+              "transportIdentity": false
+            }
+          ]
+        },
+        "after-destroy-before-late": {
+          "trackedUnique": 8,
+          "alive": 8,
+          "collected": 0,
+          "stillCurrent": 0,
+          "transportIdentity": 0,
+          "currentIdentityChecksAvailable": false,
+          "survivors": [
+            {
+              "key": 0,
+              "id": "held-plan-0",
+              "phase": "start-observation",
+              "stillCurrent": false,
+              "transportIdentity": false
+            },
+            {
+              "key": 1,
+              "id": "held-plan-1",
+              "phase": "start-observation",
+              "stillCurrent": false,
+              "transportIdentity": false
+            },
+            {
+              "key": 2,
+              "id": "held-plan-2",
+              "phase": "start-observation",
+              "stillCurrent": false,
+              "transportIdentity": false
+            },
+            {
+              "key": 3,
+              "id": "held-plan-3",
+              "phase": "start-observation",
+              "stillCurrent": false,
+              "transportIdentity": false
+            },
+            {
+              "key": 4,
+              "id": "held-plan-4",
+              "phase": "start-observation",
+              "stillCurrent": false,
+              "transportIdentity": false
+            },
+            {
+              "key": 5,
+              "id": "held-plan-5",
+              "phase": "start-observation",
+              "stillCurrent": false,
+              "transportIdentity": false
+            },
+            {
+              "key": 6,
+              "id": "held-plan-6",
+              "phase": "start-observation",
+              "stillCurrent": false,
+              "transportIdentity": false
+            },
+            {
+              "key": 7,
+              "id": "held-plan-7",
+              "phase": "start-observation",
+              "stillCurrent": false,
+              "transportIdentity": false
+            }
+          ]
+        },
+        "after-destroy-after-late": {
+          "trackedUnique": 8,
+          "alive": 0,
+          "collected": 8,
+          "stillCurrent": 0,
+          "transportIdentity": 0,
+          "currentIdentityChecksAvailable": false,
+          "survivors": []
+        }
+      },
+      "receipt": {
+        "path": "/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/started-teardown-1/000-before-1000.json",
+        "sha256": "de7095fc8313ef0484c380105a87a5ae34a5ce197b7e15f303b8f8a2f2d6f8f6"
+      }
+    },
+    {
+      "index": 1,
+      "rows": 1000,
+      "round": 0,
+      "variant": "after",
+      "passed": true,
+      "process": {
+        "browserPid": 76303,
+        "harnessPid": 76297,
+        "identity": "b838cb2f-01d4-4075-958e-b1f3c4ebbe45",
+        "browserVersion": "141.0.7390.37"
+      },
+      "finalWeakCounts": {
+        "trackedUnique": 8,
+        "alive": 0,
+        "collected": 8
+      },
+      "weakCheckpoints": {
+        "populated": {
+          "trackedUnique": 0,
+          "alive": 0,
+          "collected": 0,
+          "stillCurrent": 0,
+          "transportIdentity": 0,
+          "currentIdentityChecksAvailable": true,
+          "survivors": []
+        },
+        "eight-started-unacknowledged": {
+          "trackedUnique": 8,
+          "alive": 8,
+          "collected": 0,
+          "stillCurrent": 8,
+          "transportIdentity": 0,
+          "currentIdentityChecksAvailable": true,
+          "survivors": [
+            {
+              "key": 0,
+              "id": "held-plan-0",
+              "phase": "start-observation",
+              "stillCurrent": true,
+              "transportIdentity": false
+            },
+            {
+              "key": 1,
+              "id": "held-plan-1",
+              "phase": "start-observation",
+              "stillCurrent": true,
+              "transportIdentity": false
+            },
+            {
+              "key": 2,
+              "id": "held-plan-2",
+              "phase": "start-observation",
+              "stillCurrent": true,
+              "transportIdentity": false
+            },
+            {
+              "key": 3,
+              "id": "held-plan-3",
+              "phase": "start-observation",
+              "stillCurrent": true,
+              "transportIdentity": false
+            },
+            {
+              "key": 4,
+              "id": "held-plan-4",
+              "phase": "start-observation",
+              "stillCurrent": true,
+              "transportIdentity": false
+            },
+            {
+              "key": 5,
+              "id": "held-plan-5",
+              "phase": "start-observation",
+              "stillCurrent": true,
+              "transportIdentity": false
+            },
+            {
+              "key": 6,
+              "id": "held-plan-6",
+              "phase": "start-observation",
+              "stillCurrent": true,
+              "transportIdentity": false
+            },
+            {
+              "key": 7,
+              "id": "held-plan-7",
+              "phase": "start-observation",
+              "stillCurrent": true,
+              "transportIdentity": false
+            }
+          ]
+        },
+        "before-pending-teardown": {
+          "trackedUnique": 8,
+          "alive": 8,
+          "collected": 0,
+          "stillCurrent": 8,
+          "transportIdentity": 0,
+          "currentIdentityChecksAvailable": true,
+          "survivors": [
+            {
+              "key": 0,
+              "id": "held-plan-0",
+              "phase": "start-observation",
+              "stillCurrent": true,
+              "transportIdentity": false
+            },
+            {
+              "key": 1,
+              "id": "held-plan-1",
+              "phase": "start-observation",
+              "stillCurrent": true,
+              "transportIdentity": false
+            },
+            {
+              "key": 2,
+              "id": "held-plan-2",
+              "phase": "start-observation",
+              "stillCurrent": true,
+              "transportIdentity": false
+            },
+            {
+              "key": 3,
+              "id": "held-plan-3",
+              "phase": "start-observation",
+              "stillCurrent": true,
+              "transportIdentity": false
+            },
+            {
+              "key": 4,
+              "id": "held-plan-4",
+              "phase": "start-observation",
+              "stillCurrent": true,
+              "transportIdentity": false
+            },
+            {
+              "key": 5,
+              "id": "held-plan-5",
+              "phase": "start-observation",
+              "stillCurrent": true,
+              "transportIdentity": false
+            },
+            {
+              "key": 6,
+              "id": "held-plan-6",
+              "phase": "start-observation",
+              "stillCurrent": true,
+              "transportIdentity": false
+            },
+            {
+              "key": 7,
+              "id": "held-plan-7",
+              "phase": "start-observation",
+              "stillCurrent": true,
+              "transportIdentity": false
+            }
+          ]
+        },
+        "after-destroy-before-late": {
+          "trackedUnique": 8,
+          "alive": 0,
+          "collected": 8,
+          "stillCurrent": 0,
+          "transportIdentity": 0,
+          "currentIdentityChecksAvailable": false,
+          "survivors": []
+        },
+        "after-destroy-after-late": {
+          "trackedUnique": 8,
+          "alive": 0,
+          "collected": 8,
+          "stillCurrent": 0,
+          "transportIdentity": 0,
+          "currentIdentityChecksAvailable": false,
+          "survivors": []
+        }
+      },
+      "receipt": {
+        "path": "/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/started-teardown-1/001-after-1000.json",
+        "sha256": "c52b9e580feac15a0e7e4493e5a1c4118fe0679af844148f256b5b035818c48e"
+      }
+    },
+    {
+      "index": 2,
+      "rows": 1000,
+      "round": 1,
+      "variant": "after",
+      "passed": true,
+      "process": {
+        "browserPid": 76307,
+        "harnessPid": 76297,
+        "identity": "4b1d534d-ef18-4260-93bc-18f25704755d",
+        "browserVersion": "141.0.7390.37"
+      },
+      "finalWeakCounts": {
+        "trackedUnique": 8,
+        "alive": 0,
+        "collected": 8
+      },
+      "weakCheckpoints": {
+        "populated": {
+          "trackedUnique": 0,
+          "alive": 0,
+          "collected": 0,
+          "stillCurrent": 0,
+          "transportIdentity": 0,
+          "currentIdentityChecksAvailable": true,
+          "survivors": []
+        },
+        "eight-started-unacknowledged": {
+          "trackedUnique": 8,
+          "alive": 8,
+          "collected": 0,
+          "stillCurrent": 8,
+          "transportIdentity": 0,
+          "currentIdentityChecksAvailable": true,
+          "survivors": [
+            {
+              "key": 0,
+              "id": "held-plan-0",
+              "phase": "start-observation",
+              "stillCurrent": true,
+              "transportIdentity": false
+            },
+            {
+              "key": 1,
+              "id": "held-plan-1",
+              "phase": "start-observation",
+              "stillCurrent": true,
+              "transportIdentity": false
+            },
+            {
+              "key": 2,
+              "id": "held-plan-2",
+              "phase": "start-observation",
+              "stillCurrent": true,
+              "transportIdentity": false
+            },
+            {
+              "key": 3,
+              "id": "held-plan-3",
+              "phase": "start-observation",
+              "stillCurrent": true,
+              "transportIdentity": false
+            },
+            {
+              "key": 4,
+              "id": "held-plan-4",
+              "phase": "start-observation",
+              "stillCurrent": true,
+              "transportIdentity": false
+            },
+            {
+              "key": 5,
+              "id": "held-plan-5",
+              "phase": "start-observation",
+              "stillCurrent": true,
+              "transportIdentity": false
+            },
+            {
+              "key": 6,
+              "id": "held-plan-6",
+              "phase": "start-observation",
+              "stillCurrent": true,
+              "transportIdentity": false
+            },
+            {
+              "key": 7,
+              "id": "held-plan-7",
+              "phase": "start-observation",
+              "stillCurrent": true,
+              "transportIdentity": false
+            }
+          ]
+        },
+        "before-pending-teardown": {
+          "trackedUnique": 8,
+          "alive": 8,
+          "collected": 0,
+          "stillCurrent": 8,
+          "transportIdentity": 0,
+          "currentIdentityChecksAvailable": true,
+          "survivors": [
+            {
+              "key": 0,
+              "id": "held-plan-0",
+              "phase": "start-observation",
+              "stillCurrent": true,
+              "transportIdentity": false
+            },
+            {
+              "key": 1,
+              "id": "held-plan-1",
+              "phase": "start-observation",
+              "stillCurrent": true,
+              "transportIdentity": false
+            },
+            {
+              "key": 2,
+              "id": "held-plan-2",
+              "phase": "start-observation",
+              "stillCurrent": true,
+              "transportIdentity": false
+            },
+            {
+              "key": 3,
+              "id": "held-plan-3",
+              "phase": "start-observation",
+              "stillCurrent": true,
+              "transportIdentity": false
+            },
+            {
+              "key": 4,
+              "id": "held-plan-4",
+              "phase": "start-observation",
+              "stillCurrent": true,
+              "transportIdentity": false
+            },
+            {
+              "key": 5,
+              "id": "held-plan-5",
+              "phase": "start-observation",
+              "stillCurrent": true,
+              "transportIdentity": false
+            },
+            {
+              "key": 6,
+              "id": "held-plan-6",
+              "phase": "start-observation",
+              "stillCurrent": true,
+              "transportIdentity": false
+            },
+            {
+              "key": 7,
+              "id": "held-plan-7",
+              "phase": "start-observation",
+              "stillCurrent": true,
+              "transportIdentity": false
+            }
+          ]
+        },
+        "after-destroy-before-late": {
+          "trackedUnique": 8,
+          "alive": 0,
+          "collected": 8,
+          "stillCurrent": 0,
+          "transportIdentity": 0,
+          "currentIdentityChecksAvailable": false,
+          "survivors": []
+        },
+        "after-destroy-after-late": {
+          "trackedUnique": 8,
+          "alive": 0,
+          "collected": 8,
+          "stillCurrent": 0,
+          "transportIdentity": 0,
+          "currentIdentityChecksAvailable": false,
+          "survivors": []
+        }
+      },
+      "receipt": {
+        "path": "/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/started-teardown-1/002-after-1000.json",
+        "sha256": "811ab86c21d301d481afdf1625a75e6df227de7f52708e8e7951a9f9a4f0cb6b"
+      }
+    },
+    {
+      "index": 3,
+      "rows": 1000,
+      "round": 1,
+      "variant": "before",
+      "passed": true,
+      "process": {
+        "browserPid": 76311,
+        "harnessPid": 76297,
+        "identity": "ee477813-c3d8-4777-ab29-723a58baed48",
+        "browserVersion": "141.0.7390.37"
+      },
+      "finalWeakCounts": {
+        "trackedUnique": 8,
+        "alive": 0,
+        "collected": 8
+      },
+      "weakCheckpoints": {
+        "populated": {
+          "trackedUnique": 0,
+          "alive": 0,
+          "collected": 0,
+          "stillCurrent": 0,
+          "transportIdentity": 0,
+          "currentIdentityChecksAvailable": true,
+          "survivors": []
+        },
+        "eight-started-unacknowledged": {
+          "trackedUnique": 8,
+          "alive": 8,
+          "collected": 0,
+          "stillCurrent": 8,
+          "transportIdentity": 0,
+          "currentIdentityChecksAvailable": true,
+          "survivors": [
+            {
+              "key": 0,
+              "id": "held-plan-0",
+              "phase": "start-observation",
+              "stillCurrent": true,
+              "transportIdentity": false
+            },
+            {
+              "key": 1,
+              "id": "held-plan-1",
+              "phase": "start-observation",
+              "stillCurrent": true,
+              "transportIdentity": false
+            },
+            {
+              "key": 2,
+              "id": "held-plan-2",
+              "phase": "start-observation",
+              "stillCurrent": true,
+              "transportIdentity": false
+            },
+            {
+              "key": 3,
+              "id": "held-plan-3",
+              "phase": "start-observation",
+              "stillCurrent": true,
+              "transportIdentity": false
+            },
+            {
+              "key": 4,
+              "id": "held-plan-4",
+              "phase": "start-observation",
+              "stillCurrent": true,
+              "transportIdentity": false
+            },
+            {
+              "key": 5,
+              "id": "held-plan-5",
+              "phase": "start-observation",
+              "stillCurrent": true,
+              "transportIdentity": false
+            },
+            {
+              "key": 6,
+              "id": "held-plan-6",
+              "phase": "start-observation",
+              "stillCurrent": true,
+              "transportIdentity": false
+            },
+            {
+              "key": 7,
+              "id": "held-plan-7",
+              "phase": "start-observation",
+              "stillCurrent": true,
+              "transportIdentity": false
+            }
+          ]
+        },
+        "before-pending-teardown": {
+          "trackedUnique": 8,
+          "alive": 8,
+          "collected": 0,
+          "stillCurrent": 8,
+          "transportIdentity": 0,
+          "currentIdentityChecksAvailable": true,
+          "survivors": [
+            {
+              "key": 0,
+              "id": "held-plan-0",
+              "phase": "start-observation",
+              "stillCurrent": true,
+              "transportIdentity": false
+            },
+            {
+              "key": 1,
+              "id": "held-plan-1",
+              "phase": "start-observation",
+              "stillCurrent": true,
+              "transportIdentity": false
+            },
+            {
+              "key": 2,
+              "id": "held-plan-2",
+              "phase": "start-observation",
+              "stillCurrent": true,
+              "transportIdentity": false
+            },
+            {
+              "key": 3,
+              "id": "held-plan-3",
+              "phase": "start-observation",
+              "stillCurrent": true,
+              "transportIdentity": false
+            },
+            {
+              "key": 4,
+              "id": "held-plan-4",
+              "phase": "start-observation",
+              "stillCurrent": true,
+              "transportIdentity": false
+            },
+            {
+              "key": 5,
+              "id": "held-plan-5",
+              "phase": "start-observation",
+              "stillCurrent": true,
+              "transportIdentity": false
+            },
+            {
+              "key": 6,
+              "id": "held-plan-6",
+              "phase": "start-observation",
+              "stillCurrent": true,
+              "transportIdentity": false
+            },
+            {
+              "key": 7,
+              "id": "held-plan-7",
+              "phase": "start-observation",
+              "stillCurrent": true,
+              "transportIdentity": false
+            }
+          ]
+        },
+        "after-destroy-before-late": {
+          "trackedUnique": 8,
+          "alive": 8,
+          "collected": 0,
+          "stillCurrent": 0,
+          "transportIdentity": 0,
+          "currentIdentityChecksAvailable": false,
+          "survivors": [
+            {
+              "key": 0,
+              "id": "held-plan-0",
+              "phase": "start-observation",
+              "stillCurrent": false,
+              "transportIdentity": false
+            },
+            {
+              "key": 1,
+              "id": "held-plan-1",
+              "phase": "start-observation",
+              "stillCurrent": false,
+              "transportIdentity": false
+            },
+            {
+              "key": 2,
+              "id": "held-plan-2",
+              "phase": "start-observation",
+              "stillCurrent": false,
+              "transportIdentity": false
+            },
+            {
+              "key": 3,
+              "id": "held-plan-3",
+              "phase": "start-observation",
+              "stillCurrent": false,
+              "transportIdentity": false
+            },
+            {
+              "key": 4,
+              "id": "held-plan-4",
+              "phase": "start-observation",
+              "stillCurrent": false,
+              "transportIdentity": false
+            },
+            {
+              "key": 5,
+              "id": "held-plan-5",
+              "phase": "start-observation",
+              "stillCurrent": false,
+              "transportIdentity": false
+            },
+            {
+              "key": 6,
+              "id": "held-plan-6",
+              "phase": "start-observation",
+              "stillCurrent": false,
+              "transportIdentity": false
+            },
+            {
+              "key": 7,
+              "id": "held-plan-7",
+              "phase": "start-observation",
+              "stillCurrent": false,
+              "transportIdentity": false
+            }
+          ]
+        },
+        "after-destroy-after-late": {
+          "trackedUnique": 8,
+          "alive": 0,
+          "collected": 8,
+          "stillCurrent": 0,
+          "transportIdentity": 0,
+          "currentIdentityChecksAvailable": false,
+          "survivors": []
+        }
+      },
+      "receipt": {
+        "path": "/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/started-teardown-1/003-before-1000.json",
+        "sha256": "3e56095b2d40a0ae5e556ef2a7d4e75e08b9900af4177e1b707c45943cdd765a"
+      }
+    },
+    {
+      "index": 4,
+      "rows": 1000,
+      "round": 2,
+      "variant": "before",
+      "passed": true,
+      "process": {
+        "browserPid": 76315,
+        "harnessPid": 76297,
+        "identity": "e2bfab6d-2175-400d-8b36-fe4b21a49b87",
+        "browserVersion": "141.0.7390.37"
+      },
+      "finalWeakCounts": {
+        "trackedUnique": 8,
+        "alive": 0,
+        "collected": 8
+      },
+      "weakCheckpoints": {
+        "populated": {
+          "trackedUnique": 0,
+          "alive": 0,
+          "collected": 0,
+          "stillCurrent": 0,
+          "transportIdentity": 0,
+          "currentIdentityChecksAvailable": true,
+          "survivors": []
+        },
+        "eight-started-unacknowledged": {
+          "trackedUnique": 8,
+          "alive": 8,
+          "collected": 0,
+          "stillCurrent": 8,
+          "transportIdentity": 0,
+          "currentIdentityChecksAvailable": true,
+          "survivors": [
+            {
+              "key": 0,
+              "id": "held-plan-0",
+              "phase": "start-observation",
+              "stillCurrent": true,
+              "transportIdentity": false
+            },
+            {
+              "key": 1,
+              "id": "held-plan-1",
+              "phase": "start-observation",
+              "stillCurrent": true,
+              "transportIdentity": false
+            },
+            {
+              "key": 2,
+              "id": "held-plan-2",
+              "phase": "start-observation",
+              "stillCurrent": true,
+              "transportIdentity": false
+            },
+            {
+              "key": 3,
+              "id": "held-plan-3",
+              "phase": "start-observation",
+              "stillCurrent": true,
+              "transportIdentity": false
+            },
+            {
+              "key": 4,
+              "id": "held-plan-4",
+              "phase": "start-observation",
+              "stillCurrent": true,
+              "transportIdentity": false
+            },
+            {
+              "key": 5,
+              "id": "held-plan-5",
+              "phase": "start-observation",
+              "stillCurrent": true,
+              "transportIdentity": false
+            },
+            {
+              "key": 6,
+              "id": "held-plan-6",
+              "phase": "start-observation",
+              "stillCurrent": true,
+              "transportIdentity": false
+            },
+            {
+              "key": 7,
+              "id": "held-plan-7",
+              "phase": "start-observation",
+              "stillCurrent": true,
+              "transportIdentity": false
+            }
+          ]
+        },
+        "before-pending-teardown": {
+          "trackedUnique": 8,
+          "alive": 8,
+          "collected": 0,
+          "stillCurrent": 8,
+          "transportIdentity": 0,
+          "currentIdentityChecksAvailable": true,
+          "survivors": [
+            {
+              "key": 0,
+              "id": "held-plan-0",
+              "phase": "start-observation",
+              "stillCurrent": true,
+              "transportIdentity": false
+            },
+            {
+              "key": 1,
+              "id": "held-plan-1",
+              "phase": "start-observation",
+              "stillCurrent": true,
+              "transportIdentity": false
+            },
+            {
+              "key": 2,
+              "id": "held-plan-2",
+              "phase": "start-observation",
+              "stillCurrent": true,
+              "transportIdentity": false
+            },
+            {
+              "key": 3,
+              "id": "held-plan-3",
+              "phase": "start-observation",
+              "stillCurrent": true,
+              "transportIdentity": false
+            },
+            {
+              "key": 4,
+              "id": "held-plan-4",
+              "phase": "start-observation",
+              "stillCurrent": true,
+              "transportIdentity": false
+            },
+            {
+              "key": 5,
+              "id": "held-plan-5",
+              "phase": "start-observation",
+              "stillCurrent": true,
+              "transportIdentity": false
+            },
+            {
+              "key": 6,
+              "id": "held-plan-6",
+              "phase": "start-observation",
+              "stillCurrent": true,
+              "transportIdentity": false
+            },
+            {
+              "key": 7,
+              "id": "held-plan-7",
+              "phase": "start-observation",
+              "stillCurrent": true,
+              "transportIdentity": false
+            }
+          ]
+        },
+        "after-destroy-before-late": {
+          "trackedUnique": 8,
+          "alive": 8,
+          "collected": 0,
+          "stillCurrent": 0,
+          "transportIdentity": 0,
+          "currentIdentityChecksAvailable": false,
+          "survivors": [
+            {
+              "key": 0,
+              "id": "held-plan-0",
+              "phase": "start-observation",
+              "stillCurrent": false,
+              "transportIdentity": false
+            },
+            {
+              "key": 1,
+              "id": "held-plan-1",
+              "phase": "start-observation",
+              "stillCurrent": false,
+              "transportIdentity": false
+            },
+            {
+              "key": 2,
+              "id": "held-plan-2",
+              "phase": "start-observation",
+              "stillCurrent": false,
+              "transportIdentity": false
+            },
+            {
+              "key": 3,
+              "id": "held-plan-3",
+              "phase": "start-observation",
+              "stillCurrent": false,
+              "transportIdentity": false
+            },
+            {
+              "key": 4,
+              "id": "held-plan-4",
+              "phase": "start-observation",
+              "stillCurrent": false,
+              "transportIdentity": false
+            },
+            {
+              "key": 5,
+              "id": "held-plan-5",
+              "phase": "start-observation",
+              "stillCurrent": false,
+              "transportIdentity": false
+            },
+            {
+              "key": 6,
+              "id": "held-plan-6",
+              "phase": "start-observation",
+              "stillCurrent": false,
+              "transportIdentity": false
+            },
+            {
+              "key": 7,
+              "id": "held-plan-7",
+              "phase": "start-observation",
+              "stillCurrent": false,
+              "transportIdentity": false
+            }
+          ]
+        },
+        "after-destroy-after-late": {
+          "trackedUnique": 8,
+          "alive": 0,
+          "collected": 8,
+          "stillCurrent": 0,
+          "transportIdentity": 0,
+          "currentIdentityChecksAvailable": false,
+          "survivors": []
+        }
+      },
+      "receipt": {
+        "path": "/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/started-teardown-1/004-before-1000.json",
+        "sha256": "bb261bebd088dddedf328446f5ad8264c8d2124c03bd4be9952a084ddb2ed709"
+      }
+    },
+    {
+      "index": 5,
+      "rows": 1000,
+      "round": 2,
+      "variant": "after",
+      "passed": true,
+      "process": {
+        "browserPid": 76319,
+        "harnessPid": 76297,
+        "identity": "40ab3346-7da8-4633-9087-0aa264f5f854",
+        "browserVersion": "141.0.7390.37"
+      },
+      "finalWeakCounts": {
+        "trackedUnique": 8,
+        "alive": 0,
+        "collected": 8
+      },
+      "weakCheckpoints": {
+        "populated": {
+          "trackedUnique": 0,
+          "alive": 0,
+          "collected": 0,
+          "stillCurrent": 0,
+          "transportIdentity": 0,
+          "currentIdentityChecksAvailable": true,
+          "survivors": []
+        },
+        "eight-started-unacknowledged": {
+          "trackedUnique": 8,
+          "alive": 8,
+          "collected": 0,
+          "stillCurrent": 8,
+          "transportIdentity": 0,
+          "currentIdentityChecksAvailable": true,
+          "survivors": [
+            {
+              "key": 0,
+              "id": "held-plan-0",
+              "phase": "start-observation",
+              "stillCurrent": true,
+              "transportIdentity": false
+            },
+            {
+              "key": 1,
+              "id": "held-plan-1",
+              "phase": "start-observation",
+              "stillCurrent": true,
+              "transportIdentity": false
+            },
+            {
+              "key": 2,
+              "id": "held-plan-2",
+              "phase": "start-observation",
+              "stillCurrent": true,
+              "transportIdentity": false
+            },
+            {
+              "key": 3,
+              "id": "held-plan-3",
+              "phase": "start-observation",
+              "stillCurrent": true,
+              "transportIdentity": false
+            },
+            {
+              "key": 4,
+              "id": "held-plan-4",
+              "phase": "start-observation",
+              "stillCurrent": true,
+              "transportIdentity": false
+            },
+            {
+              "key": 5,
+              "id": "held-plan-5",
+              "phase": "start-observation",
+              "stillCurrent": true,
+              "transportIdentity": false
+            },
+            {
+              "key": 6,
+              "id": "held-plan-6",
+              "phase": "start-observation",
+              "stillCurrent": true,
+              "transportIdentity": false
+            },
+            {
+              "key": 7,
+              "id": "held-plan-7",
+              "phase": "start-observation",
+              "stillCurrent": true,
+              "transportIdentity": false
+            }
+          ]
+        },
+        "before-pending-teardown": {
+          "trackedUnique": 8,
+          "alive": 8,
+          "collected": 0,
+          "stillCurrent": 8,
+          "transportIdentity": 0,
+          "currentIdentityChecksAvailable": true,
+          "survivors": [
+            {
+              "key": 0,
+              "id": "held-plan-0",
+              "phase": "start-observation",
+              "stillCurrent": true,
+              "transportIdentity": false
+            },
+            {
+              "key": 1,
+              "id": "held-plan-1",
+              "phase": "start-observation",
+              "stillCurrent": true,
+              "transportIdentity": false
+            },
+            {
+              "key": 2,
+              "id": "held-plan-2",
+              "phase": "start-observation",
+              "stillCurrent": true,
+              "transportIdentity": false
+            },
+            {
+              "key": 3,
+              "id": "held-plan-3",
+              "phase": "start-observation",
+              "stillCurrent": true,
+              "transportIdentity": false
+            },
+            {
+              "key": 4,
+              "id": "held-plan-4",
+              "phase": "start-observation",
+              "stillCurrent": true,
+              "transportIdentity": false
+            },
+            {
+              "key": 5,
+              "id": "held-plan-5",
+              "phase": "start-observation",
+              "stillCurrent": true,
+              "transportIdentity": false
+            },
+            {
+              "key": 6,
+              "id": "held-plan-6",
+              "phase": "start-observation",
+              "stillCurrent": true,
+              "transportIdentity": false
+            },
+            {
+              "key": 7,
+              "id": "held-plan-7",
+              "phase": "start-observation",
+              "stillCurrent": true,
+              "transportIdentity": false
+            }
+          ]
+        },
+        "after-destroy-before-late": {
+          "trackedUnique": 8,
+          "alive": 0,
+          "collected": 8,
+          "stillCurrent": 0,
+          "transportIdentity": 0,
+          "currentIdentityChecksAvailable": false,
+          "survivors": []
+        },
+        "after-destroy-after-late": {
+          "trackedUnique": 8,
+          "alive": 0,
+          "collected": 8,
+          "stillCurrent": 0,
+          "transportIdentity": 0,
+          "currentIdentityChecksAvailable": false,
+          "survivors": []
+        }
+      },
+      "receipt": {
+        "path": "/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/started-teardown-1/005-after-1000.json",
+        "sha256": "22156415e4fc0ac96314f54808cd00c61042782b557731c76568b9a207ff88a7"
+      }
+    },
+    {
+      "index": 6,
+      "rows": 10000,
+      "round": 0,
+      "variant": "before",
+      "passed": true,
+      "process": {
+        "browserPid": 76323,
+        "harnessPid": 76297,
+        "identity": "a848912a-3c58-4e37-bbc3-6c92fee105a9",
+        "browserVersion": "141.0.7390.37"
+      },
+      "finalWeakCounts": {
+        "trackedUnique": 8,
+        "alive": 0,
+        "collected": 8
+      },
+      "weakCheckpoints": {
+        "populated": {
+          "trackedUnique": 0,
+          "alive": 0,
+          "collected": 0,
+          "stillCurrent": 0,
+          "transportIdentity": 0,
+          "currentIdentityChecksAvailable": true,
+          "survivors": []
+        },
+        "eight-started-unacknowledged": {
+          "trackedUnique": 8,
+          "alive": 8,
+          "collected": 0,
+          "stillCurrent": 8,
+          "transportIdentity": 0,
+          "currentIdentityChecksAvailable": true,
+          "survivors": [
+            {
+              "key": 0,
+              "id": "held-plan-0",
+              "phase": "start-observation",
+              "stillCurrent": true,
+              "transportIdentity": false
+            },
+            {
+              "key": 1,
+              "id": "held-plan-1",
+              "phase": "start-observation",
+              "stillCurrent": true,
+              "transportIdentity": false
+            },
+            {
+              "key": 2,
+              "id": "held-plan-2",
+              "phase": "start-observation",
+              "stillCurrent": true,
+              "transportIdentity": false
+            },
+            {
+              "key": 3,
+              "id": "held-plan-3",
+              "phase": "start-observation",
+              "stillCurrent": true,
+              "transportIdentity": false
+            },
+            {
+              "key": 4,
+              "id": "held-plan-4",
+              "phase": "start-observation",
+              "stillCurrent": true,
+              "transportIdentity": false
+            },
+            {
+              "key": 5,
+              "id": "held-plan-5",
+              "phase": "start-observation",
+              "stillCurrent": true,
+              "transportIdentity": false
+            },
+            {
+              "key": 6,
+              "id": "held-plan-6",
+              "phase": "start-observation",
+              "stillCurrent": true,
+              "transportIdentity": false
+            },
+            {
+              "key": 7,
+              "id": "held-plan-7",
+              "phase": "start-observation",
+              "stillCurrent": true,
+              "transportIdentity": false
+            }
+          ]
+        },
+        "before-pending-teardown": {
+          "trackedUnique": 8,
+          "alive": 8,
+          "collected": 0,
+          "stillCurrent": 8,
+          "transportIdentity": 0,
+          "currentIdentityChecksAvailable": true,
+          "survivors": [
+            {
+              "key": 0,
+              "id": "held-plan-0",
+              "phase": "start-observation",
+              "stillCurrent": true,
+              "transportIdentity": false
+            },
+            {
+              "key": 1,
+              "id": "held-plan-1",
+              "phase": "start-observation",
+              "stillCurrent": true,
+              "transportIdentity": false
+            },
+            {
+              "key": 2,
+              "id": "held-plan-2",
+              "phase": "start-observation",
+              "stillCurrent": true,
+              "transportIdentity": false
+            },
+            {
+              "key": 3,
+              "id": "held-plan-3",
+              "phase": "start-observation",
+              "stillCurrent": true,
+              "transportIdentity": false
+            },
+            {
+              "key": 4,
+              "id": "held-plan-4",
+              "phase": "start-observation",
+              "stillCurrent": true,
+              "transportIdentity": false
+            },
+            {
+              "key": 5,
+              "id": "held-plan-5",
+              "phase": "start-observation",
+              "stillCurrent": true,
+              "transportIdentity": false
+            },
+            {
+              "key": 6,
+              "id": "held-plan-6",
+              "phase": "start-observation",
+              "stillCurrent": true,
+              "transportIdentity": false
+            },
+            {
+              "key": 7,
+              "id": "held-plan-7",
+              "phase": "start-observation",
+              "stillCurrent": true,
+              "transportIdentity": false
+            }
+          ]
+        },
+        "after-destroy-before-late": {
+          "trackedUnique": 8,
+          "alive": 8,
+          "collected": 0,
+          "stillCurrent": 0,
+          "transportIdentity": 0,
+          "currentIdentityChecksAvailable": false,
+          "survivors": [
+            {
+              "key": 0,
+              "id": "held-plan-0",
+              "phase": "start-observation",
+              "stillCurrent": false,
+              "transportIdentity": false
+            },
+            {
+              "key": 1,
+              "id": "held-plan-1",
+              "phase": "start-observation",
+              "stillCurrent": false,
+              "transportIdentity": false
+            },
+            {
+              "key": 2,
+              "id": "held-plan-2",
+              "phase": "start-observation",
+              "stillCurrent": false,
+              "transportIdentity": false
+            },
+            {
+              "key": 3,
+              "id": "held-plan-3",
+              "phase": "start-observation",
+              "stillCurrent": false,
+              "transportIdentity": false
+            },
+            {
+              "key": 4,
+              "id": "held-plan-4",
+              "phase": "start-observation",
+              "stillCurrent": false,
+              "transportIdentity": false
+            },
+            {
+              "key": 5,
+              "id": "held-plan-5",
+              "phase": "start-observation",
+              "stillCurrent": false,
+              "transportIdentity": false
+            },
+            {
+              "key": 6,
+              "id": "held-plan-6",
+              "phase": "start-observation",
+              "stillCurrent": false,
+              "transportIdentity": false
+            },
+            {
+              "key": 7,
+              "id": "held-plan-7",
+              "phase": "start-observation",
+              "stillCurrent": false,
+              "transportIdentity": false
+            }
+          ]
+        },
+        "after-destroy-after-late": {
+          "trackedUnique": 8,
+          "alive": 0,
+          "collected": 8,
+          "stillCurrent": 0,
+          "transportIdentity": 0,
+          "currentIdentityChecksAvailable": false,
+          "survivors": []
+        }
+      },
+      "receipt": {
+        "path": "/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/started-teardown-1/006-before-10000.json",
+        "sha256": "c303fa5ec1ef2843d62d9441b751b76de5e47eec1226865eb3f6be340942efb5"
+      }
+    },
+    {
+      "index": 7,
+      "rows": 10000,
+      "round": 0,
+      "variant": "after",
+      "passed": true,
+      "process": {
+        "browserPid": 76358,
+        "harnessPid": 76297,
+        "identity": "74cb45b8-3ea5-4893-a638-640f98477a17",
+        "browserVersion": "141.0.7390.37"
+      },
+      "finalWeakCounts": {
+        "trackedUnique": 8,
+        "alive": 0,
+        "collected": 8
+      },
+      "weakCheckpoints": {
+        "populated": {
+          "trackedUnique": 0,
+          "alive": 0,
+          "collected": 0,
+          "stillCurrent": 0,
+          "transportIdentity": 0,
+          "currentIdentityChecksAvailable": true,
+          "survivors": []
+        },
+        "eight-started-unacknowledged": {
+          "trackedUnique": 8,
+          "alive": 8,
+          "collected": 0,
+          "stillCurrent": 8,
+          "transportIdentity": 0,
+          "currentIdentityChecksAvailable": true,
+          "survivors": [
+            {
+              "key": 0,
+              "id": "held-plan-0",
+              "phase": "start-observation",
+              "stillCurrent": true,
+              "transportIdentity": false
+            },
+            {
+              "key": 1,
+              "id": "held-plan-1",
+              "phase": "start-observation",
+              "stillCurrent": true,
+              "transportIdentity": false
+            },
+            {
+              "key": 2,
+              "id": "held-plan-2",
+              "phase": "start-observation",
+              "stillCurrent": true,
+              "transportIdentity": false
+            },
+            {
+              "key": 3,
+              "id": "held-plan-3",
+              "phase": "start-observation",
+              "stillCurrent": true,
+              "transportIdentity": false
+            },
+            {
+              "key": 4,
+              "id": "held-plan-4",
+              "phase": "start-observation",
+              "stillCurrent": true,
+              "transportIdentity": false
+            },
+            {
+              "key": 5,
+              "id": "held-plan-5",
+              "phase": "start-observation",
+              "stillCurrent": true,
+              "transportIdentity": false
+            },
+            {
+              "key": 6,
+              "id": "held-plan-6",
+              "phase": "start-observation",
+              "stillCurrent": true,
+              "transportIdentity": false
+            },
+            {
+              "key": 7,
+              "id": "held-plan-7",
+              "phase": "start-observation",
+              "stillCurrent": true,
+              "transportIdentity": false
+            }
+          ]
+        },
+        "before-pending-teardown": {
+          "trackedUnique": 8,
+          "alive": 8,
+          "collected": 0,
+          "stillCurrent": 8,
+          "transportIdentity": 0,
+          "currentIdentityChecksAvailable": true,
+          "survivors": [
+            {
+              "key": 0,
+              "id": "held-plan-0",
+              "phase": "start-observation",
+              "stillCurrent": true,
+              "transportIdentity": false
+            },
+            {
+              "key": 1,
+              "id": "held-plan-1",
+              "phase": "start-observation",
+              "stillCurrent": true,
+              "transportIdentity": false
+            },
+            {
+              "key": 2,
+              "id": "held-plan-2",
+              "phase": "start-observation",
+              "stillCurrent": true,
+              "transportIdentity": false
+            },
+            {
+              "key": 3,
+              "id": "held-plan-3",
+              "phase": "start-observation",
+              "stillCurrent": true,
+              "transportIdentity": false
+            },
+            {
+              "key": 4,
+              "id": "held-plan-4",
+              "phase": "start-observation",
+              "stillCurrent": true,
+              "transportIdentity": false
+            },
+            {
+              "key": 5,
+              "id": "held-plan-5",
+              "phase": "start-observation",
+              "stillCurrent": true,
+              "transportIdentity": false
+            },
+            {
+              "key": 6,
+              "id": "held-plan-6",
+              "phase": "start-observation",
+              "stillCurrent": true,
+              "transportIdentity": false
+            },
+            {
+              "key": 7,
+              "id": "held-plan-7",
+              "phase": "start-observation",
+              "stillCurrent": true,
+              "transportIdentity": false
+            }
+          ]
+        },
+        "after-destroy-before-late": {
+          "trackedUnique": 8,
+          "alive": 0,
+          "collected": 8,
+          "stillCurrent": 0,
+          "transportIdentity": 0,
+          "currentIdentityChecksAvailable": false,
+          "survivors": []
+        },
+        "after-destroy-after-late": {
+          "trackedUnique": 8,
+          "alive": 0,
+          "collected": 8,
+          "stillCurrent": 0,
+          "transportIdentity": 0,
+          "currentIdentityChecksAvailable": false,
+          "survivors": []
+        }
+      },
+      "receipt": {
+        "path": "/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/started-teardown-1/007-after-10000.json",
+        "sha256": "ef0945230599cbecdc765f86fbf55586b95b52b4d50473f67e8af1882d304719"
+      }
+    },
+    {
+      "index": 8,
+      "rows": 10000,
+      "round": 1,
+      "variant": "after",
+      "passed": true,
+      "process": {
+        "browserPid": 76362,
+        "harnessPid": 76297,
+        "identity": "12d93fde-79db-414a-8715-1888ce87465d",
+        "browserVersion": "141.0.7390.37"
+      },
+      "finalWeakCounts": {
+        "trackedUnique": 8,
+        "alive": 0,
+        "collected": 8
+      },
+      "weakCheckpoints": {
+        "populated": {
+          "trackedUnique": 0,
+          "alive": 0,
+          "collected": 0,
+          "stillCurrent": 0,
+          "transportIdentity": 0,
+          "currentIdentityChecksAvailable": true,
+          "survivors": []
+        },
+        "eight-started-unacknowledged": {
+          "trackedUnique": 8,
+          "alive": 8,
+          "collected": 0,
+          "stillCurrent": 8,
+          "transportIdentity": 0,
+          "currentIdentityChecksAvailable": true,
+          "survivors": [
+            {
+              "key": 0,
+              "id": "held-plan-0",
+              "phase": "start-observation",
+              "stillCurrent": true,
+              "transportIdentity": false
+            },
+            {
+              "key": 1,
+              "id": "held-plan-1",
+              "phase": "start-observation",
+              "stillCurrent": true,
+              "transportIdentity": false
+            },
+            {
+              "key": 2,
+              "id": "held-plan-2",
+              "phase": "start-observation",
+              "stillCurrent": true,
+              "transportIdentity": false
+            },
+            {
+              "key": 3,
+              "id": "held-plan-3",
+              "phase": "start-observation",
+              "stillCurrent": true,
+              "transportIdentity": false
+            },
+            {
+              "key": 4,
+              "id": "held-plan-4",
+              "phase": "start-observation",
+              "stillCurrent": true,
+              "transportIdentity": false
+            },
+            {
+              "key": 5,
+              "id": "held-plan-5",
+              "phase": "start-observation",
+              "stillCurrent": true,
+              "transportIdentity": false
+            },
+            {
+              "key": 6,
+              "id": "held-plan-6",
+              "phase": "start-observation",
+              "stillCurrent": true,
+              "transportIdentity": false
+            },
+            {
+              "key": 7,
+              "id": "held-plan-7",
+              "phase": "start-observation",
+              "stillCurrent": true,
+              "transportIdentity": false
+            }
+          ]
+        },
+        "before-pending-teardown": {
+          "trackedUnique": 8,
+          "alive": 8,
+          "collected": 0,
+          "stillCurrent": 8,
+          "transportIdentity": 0,
+          "currentIdentityChecksAvailable": true,
+          "survivors": [
+            {
+              "key": 0,
+              "id": "held-plan-0",
+              "phase": "start-observation",
+              "stillCurrent": true,
+              "transportIdentity": false
+            },
+            {
+              "key": 1,
+              "id": "held-plan-1",
+              "phase": "start-observation",
+              "stillCurrent": true,
+              "transportIdentity": false
+            },
+            {
+              "key": 2,
+              "id": "held-plan-2",
+              "phase": "start-observation",
+              "stillCurrent": true,
+              "transportIdentity": false
+            },
+            {
+              "key": 3,
+              "id": "held-plan-3",
+              "phase": "start-observation",
+              "stillCurrent": true,
+              "transportIdentity": false
+            },
+            {
+              "key": 4,
+              "id": "held-plan-4",
+              "phase": "start-observation",
+              "stillCurrent": true,
+              "transportIdentity": false
+            },
+            {
+              "key": 5,
+              "id": "held-plan-5",
+              "phase": "start-observation",
+              "stillCurrent": true,
+              "transportIdentity": false
+            },
+            {
+              "key": 6,
+              "id": "held-plan-6",
+              "phase": "start-observation",
+              "stillCurrent": true,
+              "transportIdentity": false
+            },
+            {
+              "key": 7,
+              "id": "held-plan-7",
+              "phase": "start-observation",
+              "stillCurrent": true,
+              "transportIdentity": false
+            }
+          ]
+        },
+        "after-destroy-before-late": {
+          "trackedUnique": 8,
+          "alive": 0,
+          "collected": 8,
+          "stillCurrent": 0,
+          "transportIdentity": 0,
+          "currentIdentityChecksAvailable": false,
+          "survivors": []
+        },
+        "after-destroy-after-late": {
+          "trackedUnique": 8,
+          "alive": 0,
+          "collected": 8,
+          "stillCurrent": 0,
+          "transportIdentity": 0,
+          "currentIdentityChecksAvailable": false,
+          "survivors": []
+        }
+      },
+      "receipt": {
+        "path": "/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/started-teardown-1/008-after-10000.json",
+        "sha256": "4feb9cd5a06d160fccb79c2ed7cb68fe85216e3cddfe10dbe37a7f64daa2d14f"
+      }
+    },
+    {
+      "index": 9,
+      "rows": 10000,
+      "round": 1,
+      "variant": "before",
+      "passed": true,
+      "process": {
+        "browserPid": 76371,
+        "harnessPid": 76297,
+        "identity": "2f51b2b6-0047-4ae2-8322-405bd484bac7",
+        "browserVersion": "141.0.7390.37"
+      },
+      "finalWeakCounts": {
+        "trackedUnique": 8,
+        "alive": 0,
+        "collected": 8
+      },
+      "weakCheckpoints": {
+        "populated": {
+          "trackedUnique": 0,
+          "alive": 0,
+          "collected": 0,
+          "stillCurrent": 0,
+          "transportIdentity": 0,
+          "currentIdentityChecksAvailable": true,
+          "survivors": []
+        },
+        "eight-started-unacknowledged": {
+          "trackedUnique": 8,
+          "alive": 8,
+          "collected": 0,
+          "stillCurrent": 8,
+          "transportIdentity": 0,
+          "currentIdentityChecksAvailable": true,
+          "survivors": [
+            {
+              "key": 0,
+              "id": "held-plan-0",
+              "phase": "start-observation",
+              "stillCurrent": true,
+              "transportIdentity": false
+            },
+            {
+              "key": 1,
+              "id": "held-plan-1",
+              "phase": "start-observation",
+              "stillCurrent": true,
+              "transportIdentity": false
+            },
+            {
+              "key": 2,
+              "id": "held-plan-2",
+              "phase": "start-observation",
+              "stillCurrent": true,
+              "transportIdentity": false
+            },
+            {
+              "key": 3,
+              "id": "held-plan-3",
+              "phase": "start-observation",
+              "stillCurrent": true,
+              "transportIdentity": false
+            },
+            {
+              "key": 4,
+              "id": "held-plan-4",
+              "phase": "start-observation",
+              "stillCurrent": true,
+              "transportIdentity": false
+            },
+            {
+              "key": 5,
+              "id": "held-plan-5",
+              "phase": "start-observation",
+              "stillCurrent": true,
+              "transportIdentity": false
+            },
+            {
+              "key": 6,
+              "id": "held-plan-6",
+              "phase": "start-observation",
+              "stillCurrent": true,
+              "transportIdentity": false
+            },
+            {
+              "key": 7,
+              "id": "held-plan-7",
+              "phase": "start-observation",
+              "stillCurrent": true,
+              "transportIdentity": false
+            }
+          ]
+        },
+        "before-pending-teardown": {
+          "trackedUnique": 8,
+          "alive": 8,
+          "collected": 0,
+          "stillCurrent": 8,
+          "transportIdentity": 0,
+          "currentIdentityChecksAvailable": true,
+          "survivors": [
+            {
+              "key": 0,
+              "id": "held-plan-0",
+              "phase": "start-observation",
+              "stillCurrent": true,
+              "transportIdentity": false
+            },
+            {
+              "key": 1,
+              "id": "held-plan-1",
+              "phase": "start-observation",
+              "stillCurrent": true,
+              "transportIdentity": false
+            },
+            {
+              "key": 2,
+              "id": "held-plan-2",
+              "phase": "start-observation",
+              "stillCurrent": true,
+              "transportIdentity": false
+            },
+            {
+              "key": 3,
+              "id": "held-plan-3",
+              "phase": "start-observation",
+              "stillCurrent": true,
+              "transportIdentity": false
+            },
+            {
+              "key": 4,
+              "id": "held-plan-4",
+              "phase": "start-observation",
+              "stillCurrent": true,
+              "transportIdentity": false
+            },
+            {
+              "key": 5,
+              "id": "held-plan-5",
+              "phase": "start-observation",
+              "stillCurrent": true,
+              "transportIdentity": false
+            },
+            {
+              "key": 6,
+              "id": "held-plan-6",
+              "phase": "start-observation",
+              "stillCurrent": true,
+              "transportIdentity": false
+            },
+            {
+              "key": 7,
+              "id": "held-plan-7",
+              "phase": "start-observation",
+              "stillCurrent": true,
+              "transportIdentity": false
+            }
+          ]
+        },
+        "after-destroy-before-late": {
+          "trackedUnique": 8,
+          "alive": 8,
+          "collected": 0,
+          "stillCurrent": 0,
+          "transportIdentity": 0,
+          "currentIdentityChecksAvailable": false,
+          "survivors": [
+            {
+              "key": 0,
+              "id": "held-plan-0",
+              "phase": "start-observation",
+              "stillCurrent": false,
+              "transportIdentity": false
+            },
+            {
+              "key": 1,
+              "id": "held-plan-1",
+              "phase": "start-observation",
+              "stillCurrent": false,
+              "transportIdentity": false
+            },
+            {
+              "key": 2,
+              "id": "held-plan-2",
+              "phase": "start-observation",
+              "stillCurrent": false,
+              "transportIdentity": false
+            },
+            {
+              "key": 3,
+              "id": "held-plan-3",
+              "phase": "start-observation",
+              "stillCurrent": false,
+              "transportIdentity": false
+            },
+            {
+              "key": 4,
+              "id": "held-plan-4",
+              "phase": "start-observation",
+              "stillCurrent": false,
+              "transportIdentity": false
+            },
+            {
+              "key": 5,
+              "id": "held-plan-5",
+              "phase": "start-observation",
+              "stillCurrent": false,
+              "transportIdentity": false
+            },
+            {
+              "key": 6,
+              "id": "held-plan-6",
+              "phase": "start-observation",
+              "stillCurrent": false,
+              "transportIdentity": false
+            },
+            {
+              "key": 7,
+              "id": "held-plan-7",
+              "phase": "start-observation",
+              "stillCurrent": false,
+              "transportIdentity": false
+            }
+          ]
+        },
+        "after-destroy-after-late": {
+          "trackedUnique": 8,
+          "alive": 0,
+          "collected": 8,
+          "stillCurrent": 0,
+          "transportIdentity": 0,
+          "currentIdentityChecksAvailable": false,
+          "survivors": []
+        }
+      },
+      "receipt": {
+        "path": "/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/started-teardown-1/009-before-10000.json",
+        "sha256": "93b2a9be7bc04131196323c663bd5fe47842dd7160a52257429c62d3adc26b74"
+      }
+    },
+    {
+      "index": 10,
+      "rows": 10000,
+      "round": 2,
+      "variant": "before",
+      "passed": true,
+      "process": {
+        "browserPid": 76377,
+        "harnessPid": 76297,
+        "identity": "dc5fc744-d377-4df4-8090-33f1f54e71fc",
+        "browserVersion": "141.0.7390.37"
+      },
+      "finalWeakCounts": {
+        "trackedUnique": 8,
+        "alive": 0,
+        "collected": 8
+      },
+      "weakCheckpoints": {
+        "populated": {
+          "trackedUnique": 0,
+          "alive": 0,
+          "collected": 0,
+          "stillCurrent": 0,
+          "transportIdentity": 0,
+          "currentIdentityChecksAvailable": true,
+          "survivors": []
+        },
+        "eight-started-unacknowledged": {
+          "trackedUnique": 8,
+          "alive": 8,
+          "collected": 0,
+          "stillCurrent": 8,
+          "transportIdentity": 0,
+          "currentIdentityChecksAvailable": true,
+          "survivors": [
+            {
+              "key": 0,
+              "id": "held-plan-0",
+              "phase": "start-observation",
+              "stillCurrent": true,
+              "transportIdentity": false
+            },
+            {
+              "key": 1,
+              "id": "held-plan-1",
+              "phase": "start-observation",
+              "stillCurrent": true,
+              "transportIdentity": false
+            },
+            {
+              "key": 2,
+              "id": "held-plan-2",
+              "phase": "start-observation",
+              "stillCurrent": true,
+              "transportIdentity": false
+            },
+            {
+              "key": 3,
+              "id": "held-plan-3",
+              "phase": "start-observation",
+              "stillCurrent": true,
+              "transportIdentity": false
+            },
+            {
+              "key": 4,
+              "id": "held-plan-4",
+              "phase": "start-observation",
+              "stillCurrent": true,
+              "transportIdentity": false
+            },
+            {
+              "key": 5,
+              "id": "held-plan-5",
+              "phase": "start-observation",
+              "stillCurrent": true,
+              "transportIdentity": false
+            },
+            {
+              "key": 6,
+              "id": "held-plan-6",
+              "phase": "start-observation",
+              "stillCurrent": true,
+              "transportIdentity": false
+            },
+            {
+              "key": 7,
+              "id": "held-plan-7",
+              "phase": "start-observation",
+              "stillCurrent": true,
+              "transportIdentity": false
+            }
+          ]
+        },
+        "before-pending-teardown": {
+          "trackedUnique": 8,
+          "alive": 8,
+          "collected": 0,
+          "stillCurrent": 8,
+          "transportIdentity": 0,
+          "currentIdentityChecksAvailable": true,
+          "survivors": [
+            {
+              "key": 0,
+              "id": "held-plan-0",
+              "phase": "start-observation",
+              "stillCurrent": true,
+              "transportIdentity": false
+            },
+            {
+              "key": 1,
+              "id": "held-plan-1",
+              "phase": "start-observation",
+              "stillCurrent": true,
+              "transportIdentity": false
+            },
+            {
+              "key": 2,
+              "id": "held-plan-2",
+              "phase": "start-observation",
+              "stillCurrent": true,
+              "transportIdentity": false
+            },
+            {
+              "key": 3,
+              "id": "held-plan-3",
+              "phase": "start-observation",
+              "stillCurrent": true,
+              "transportIdentity": false
+            },
+            {
+              "key": 4,
+              "id": "held-plan-4",
+              "phase": "start-observation",
+              "stillCurrent": true,
+              "transportIdentity": false
+            },
+            {
+              "key": 5,
+              "id": "held-plan-5",
+              "phase": "start-observation",
+              "stillCurrent": true,
+              "transportIdentity": false
+            },
+            {
+              "key": 6,
+              "id": "held-plan-6",
+              "phase": "start-observation",
+              "stillCurrent": true,
+              "transportIdentity": false
+            },
+            {
+              "key": 7,
+              "id": "held-plan-7",
+              "phase": "start-observation",
+              "stillCurrent": true,
+              "transportIdentity": false
+            }
+          ]
+        },
+        "after-destroy-before-late": {
+          "trackedUnique": 8,
+          "alive": 8,
+          "collected": 0,
+          "stillCurrent": 0,
+          "transportIdentity": 0,
+          "currentIdentityChecksAvailable": false,
+          "survivors": [
+            {
+              "key": 0,
+              "id": "held-plan-0",
+              "phase": "start-observation",
+              "stillCurrent": false,
+              "transportIdentity": false
+            },
+            {
+              "key": 1,
+              "id": "held-plan-1",
+              "phase": "start-observation",
+              "stillCurrent": false,
+              "transportIdentity": false
+            },
+            {
+              "key": 2,
+              "id": "held-plan-2",
+              "phase": "start-observation",
+              "stillCurrent": false,
+              "transportIdentity": false
+            },
+            {
+              "key": 3,
+              "id": "held-plan-3",
+              "phase": "start-observation",
+              "stillCurrent": false,
+              "transportIdentity": false
+            },
+            {
+              "key": 4,
+              "id": "held-plan-4",
+              "phase": "start-observation",
+              "stillCurrent": false,
+              "transportIdentity": false
+            },
+            {
+              "key": 5,
+              "id": "held-plan-5",
+              "phase": "start-observation",
+              "stillCurrent": false,
+              "transportIdentity": false
+            },
+            {
+              "key": 6,
+              "id": "held-plan-6",
+              "phase": "start-observation",
+              "stillCurrent": false,
+              "transportIdentity": false
+            },
+            {
+              "key": 7,
+              "id": "held-plan-7",
+              "phase": "start-observation",
+              "stillCurrent": false,
+              "transportIdentity": false
+            }
+          ]
+        },
+        "after-destroy-after-late": {
+          "trackedUnique": 8,
+          "alive": 0,
+          "collected": 8,
+          "stillCurrent": 0,
+          "transportIdentity": 0,
+          "currentIdentityChecksAvailable": false,
+          "survivors": []
+        }
+      },
+      "receipt": {
+        "path": "/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/started-teardown-1/010-before-10000.json",
+        "sha256": "d68c409002e6624abfd6365a74418fec8a18fc7f4f65d0d8f7e2d381a76afddf"
+      }
+    },
+    {
+      "index": 11,
+      "rows": 10000,
+      "round": 2,
+      "variant": "after",
+      "passed": true,
+      "process": {
+        "browserPid": 76383,
+        "harnessPid": 76297,
+        "identity": "79b847ea-fb18-4ee2-9c17-8a7ff402ed9a",
+        "browserVersion": "141.0.7390.37"
+      },
+      "finalWeakCounts": {
+        "trackedUnique": 8,
+        "alive": 0,
+        "collected": 8
+      },
+      "weakCheckpoints": {
+        "populated": {
+          "trackedUnique": 0,
+          "alive": 0,
+          "collected": 0,
+          "stillCurrent": 0,
+          "transportIdentity": 0,
+          "currentIdentityChecksAvailable": true,
+          "survivors": []
+        },
+        "eight-started-unacknowledged": {
+          "trackedUnique": 8,
+          "alive": 8,
+          "collected": 0,
+          "stillCurrent": 8,
+          "transportIdentity": 0,
+          "currentIdentityChecksAvailable": true,
+          "survivors": [
+            {
+              "key": 0,
+              "id": "held-plan-0",
+              "phase": "start-observation",
+              "stillCurrent": true,
+              "transportIdentity": false
+            },
+            {
+              "key": 1,
+              "id": "held-plan-1",
+              "phase": "start-observation",
+              "stillCurrent": true,
+              "transportIdentity": false
+            },
+            {
+              "key": 2,
+              "id": "held-plan-2",
+              "phase": "start-observation",
+              "stillCurrent": true,
+              "transportIdentity": false
+            },
+            {
+              "key": 3,
+              "id": "held-plan-3",
+              "phase": "start-observation",
+              "stillCurrent": true,
+              "transportIdentity": false
+            },
+            {
+              "key": 4,
+              "id": "held-plan-4",
+              "phase": "start-observation",
+              "stillCurrent": true,
+              "transportIdentity": false
+            },
+            {
+              "key": 5,
+              "id": "held-plan-5",
+              "phase": "start-observation",
+              "stillCurrent": true,
+              "transportIdentity": false
+            },
+            {
+              "key": 6,
+              "id": "held-plan-6",
+              "phase": "start-observation",
+              "stillCurrent": true,
+              "transportIdentity": false
+            },
+            {
+              "key": 7,
+              "id": "held-plan-7",
+              "phase": "start-observation",
+              "stillCurrent": true,
+              "transportIdentity": false
+            }
+          ]
+        },
+        "before-pending-teardown": {
+          "trackedUnique": 8,
+          "alive": 8,
+          "collected": 0,
+          "stillCurrent": 8,
+          "transportIdentity": 0,
+          "currentIdentityChecksAvailable": true,
+          "survivors": [
+            {
+              "key": 0,
+              "id": "held-plan-0",
+              "phase": "start-observation",
+              "stillCurrent": true,
+              "transportIdentity": false
+            },
+            {
+              "key": 1,
+              "id": "held-plan-1",
+              "phase": "start-observation",
+              "stillCurrent": true,
+              "transportIdentity": false
+            },
+            {
+              "key": 2,
+              "id": "held-plan-2",
+              "phase": "start-observation",
+              "stillCurrent": true,
+              "transportIdentity": false
+            },
+            {
+              "key": 3,
+              "id": "held-plan-3",
+              "phase": "start-observation",
+              "stillCurrent": true,
+              "transportIdentity": false
+            },
+            {
+              "key": 4,
+              "id": "held-plan-4",
+              "phase": "start-observation",
+              "stillCurrent": true,
+              "transportIdentity": false
+            },
+            {
+              "key": 5,
+              "id": "held-plan-5",
+              "phase": "start-observation",
+              "stillCurrent": true,
+              "transportIdentity": false
+            },
+            {
+              "key": 6,
+              "id": "held-plan-6",
+              "phase": "start-observation",
+              "stillCurrent": true,
+              "transportIdentity": false
+            },
+            {
+              "key": 7,
+              "id": "held-plan-7",
+              "phase": "start-observation",
+              "stillCurrent": true,
+              "transportIdentity": false
+            }
+          ]
+        },
+        "after-destroy-before-late": {
+          "trackedUnique": 8,
+          "alive": 0,
+          "collected": 8,
+          "stillCurrent": 0,
+          "transportIdentity": 0,
+          "currentIdentityChecksAvailable": false,
+          "survivors": []
+        },
+        "after-destroy-after-late": {
+          "trackedUnique": 8,
+          "alive": 0,
+          "collected": 8,
+          "stillCurrent": 0,
+          "transportIdentity": 0,
+          "currentIdentityChecksAvailable": false,
+          "survivors": []
+        }
+      },
+      "receipt": {
+        "path": "/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/started-teardown-1/011-after-10000.json",
+        "sha256": "0f755a84140dfcbf31b7c1908e9501b5817fb10e60acfd6f079ee3154225495c"
+      }
+    }
+  ]
+}

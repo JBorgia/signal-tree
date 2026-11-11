@@ -1,0 +1,13 @@
+{
+  "command": [
+    "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+    "/Users/jonathanborgia/code/signaltree/.worktrees/application-comparison/tools/application-lab/analyze-variants.mjs",
+    "/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/application-baseline-4",
+    "/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/application-variant-1",
+    "/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/paired-inventory-1",
+    "/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/paired-inventory-analysis-1"
+  ],
+  "analyzerSha256": "798532f2593605046e28279033056a964bdd4ee1e23d6644ded67f1ad0b98a19",
+  "summarySha256": "2e388daffdd74b2ec574128dac97759da8351cad9d3dea6c7303c5eca33b9ff8",
+  "markdownSha256": "b803e323aed1459478b81712108c7e15bd6fccb91e2ef8ade40088c2e8232c16"
+}

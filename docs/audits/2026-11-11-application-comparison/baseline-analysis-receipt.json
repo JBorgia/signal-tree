@@ -1,0 +1,13 @@
+{
+  "summarySha256": "aa858d61775503d20e24a611ec85624f9bdbe98ebc7f70083621c3dd3d7255bd",
+  "markdownSha256": "303750bbc97807a2a3c0e9003c7aa7e1ed2fdbdbd647dca43774d245881fdf9e",
+  "analyzerSha256": "8839cea2c25fd27c5ecc20e5a870f0b9ae34d36e8154b213effe0cb66d33365e",
+  "command": [
+    "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+    "/Users/jonathanborgia/code/signaltree/.worktrees/application-comparison/tools/application-lab/analyze.mjs",
+    "/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/application-baseline-4",
+    "/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/inventory-comparison-1",
+    "/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/dispatch-comparison-1",
+    "/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/baseline-comparison-analysis-1"
+  ]
+}

@@ -1,0 +1,147 @@
+{
+  "command": [
+    "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+    "/Users/jonathanborgia/code/signaltree/.worktrees/application-comparison/tools/application-lab/source-inventory.mjs",
+    "/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/application-baseline-4",
+    "/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/baseline-4-source-inventory.json"
+  ],
+  "runnerSha256": "3b60aef86614c1627886e5e368567d0142fad79ef8ccdb55ba132ee9b5318e28",
+  "planSha256": "720f65f90e00fd88f4d6449128bd81544bfd60bc150eb2bbac7375e340fc714f",
+  "method": "UTF-8 bytes; physical newline-separated lines excluding terminal empty line; nonblank after trim. Includes comments, types and imports.",
+  "limits": "Count shared v15/v16 arm source once. Common UI/backend/model files are excluded from arm totals. Excludes dependencies, generated forwarding exports/HTML, tests, drivers and notes. Not productivity or served JavaScript.",
+  "arms": {
+    "native": {
+      "inventory": {
+        "path": "/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/application-baseline-4/native/src/arms/selected.ts",
+        "sha256": "67f062ad4fa04acffb242c2e72b3404e6dd1b8f849abb35a1aa7c0d21bc5ee92",
+        "utf8Bytes": 3913,
+        "physicalLines": 140,
+        "nonblankLines": 134
+      },
+      "dispatch": {
+        "path": "/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/application-baseline-4/native/src/arms/selected-dispatch.ts",
+        "sha256": "9f0629e0f2adeae4e7408ccfd2ed1ead78f6c331d6ede9d2340ecc778dadda15",
+        "utf8Bytes": 15421,
+        "physicalLines": 492,
+        "nonblankLines": 475
+      }
+    },
+    "ngrx": {
+      "inventory": {
+        "path": "/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/application-baseline-4/ngrx/src/arms/selected.ts",
+        "sha256": "a8ba4e8d201f295463ac62628865c0b79ac4bf0706e5e5d06b2d8afa89985aa5",
+        "utf8Bytes": 5436,
+        "physicalLines": 196,
+        "nonblankLines": 190
+      },
+      "dispatch": {
+        "path": "/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/application-baseline-4/ngrx/src/arms/selected-dispatch.ts",
+        "sha256": "d46436a90069398c3d63876715f06520f23aee2cf03a30171eff951821f43181",
+        "utf8Bytes": 18118,
+        "physicalLines": 590,
+        "nonblankLines": 573
+      }
+    },
+    "tanstack": {
+      "inventory": {
+        "path": "/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/application-baseline-4/tanstack/src/arms/selected.ts",
+        "sha256": "c9190dab07b4d3a53cbbe1f4175a2a8b8c399097caebf89b1747ef061afa03e0",
+        "utf8Bytes": 6643,
+        "physicalLines": 220,
+        "nonblankLines": 208
+      },
+      "dispatch": {
+        "path": "/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/application-baseline-4/tanstack/src/arms/selected-dispatch.ts",
+        "sha256": "9c40ff9eecf1f9b85daad84129a8775e96df94f8ffee0433916a9d34ab97803c",
+        "utf8Bytes": 18991,
+        "physicalLines": 606,
+        "nonblankLines": 582
+      }
+    },
+    "v15": {
+      "inventory": {
+        "path": "/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/application-baseline-4/v15/src/arms/selected.ts",
+        "sha256": "b44ec1ef60dc71217c83b20f3b23d8f53dcb1f771114993935e2ddd5fccb6807",
+        "utf8Bytes": 3277,
+        "physicalLines": 103,
+        "nonblankLines": 102
+      },
+      "dispatch": {
+        "path": "/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/application-baseline-4/v15/src/arms/selected-dispatch.ts",
+        "sha256": "3574dfe0f89c32c573b5975a0e8863212ea9f8a8c402f05d7e00af3669f9d91b",
+        "utf8Bytes": 17314,
+        "physicalLines": 551,
+        "nonblankLines": 527
+      }
+    },
+    "v16": {
+      "inventory": {
+        "path": "/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/application-baseline-4/v16/src/arms/selected.ts",
+        "sha256": "b44ec1ef60dc71217c83b20f3b23d8f53dcb1f771114993935e2ddd5fccb6807",
+        "utf8Bytes": 3277,
+        "physicalLines": 103,
+        "nonblankLines": 102
+      },
+      "dispatch": {
+        "path": "/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/application-baseline-4/v16/src/arms/selected-dispatch.ts",
+        "sha256": "3574dfe0f89c32c573b5975a0e8863212ea9f8a8c402f05d7e00af3669f9d91b",
+        "utf8Bytes": 17314,
+        "physicalLines": 551,
+        "nonblankLines": 527
+      }
+    }
+  },
+  "commonExcluded": [
+    {
+      "path": "/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/application-baseline-4/native/src/main.ts",
+      "sha256": "158789b17e09313deeafb96621ee364b83b6715034fc827cec445e47554876b1",
+      "utf8Bytes": 9151,
+      "physicalLines": 322,
+      "nonblankLines": 312
+    },
+    {
+      "path": "/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/application-baseline-4/native/src/dispatch-main.ts",
+      "sha256": "68a3e761d15b64f74adf8f8b0eabffe577a990ba301858ee182bb22728bf8bb6",
+      "utf8Bytes": 15957,
+      "physicalLines": 546,
+      "nonblankLines": 540
+    },
+    {
+      "path": "/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/application-baseline-4/native/src/model.ts",
+      "sha256": "128a5fb3e1be006b4a7b72d518aa7ca204d24f91cc70fd18dc3851fa009a2e6c",
+      "utf8Bytes": 2193,
+      "physicalLines": 72,
+      "nonblankLines": 66
+    },
+    {
+      "path": "/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/application-baseline-4/native/src/dispatch-model.ts",
+      "sha256": "f39b9fcf1870dcd7df89d6ade26c672e931840261c1d38a9c0d0c75ecf428a64",
+      "utf8Bytes": 3384,
+      "physicalLines": 121,
+      "nonblankLines": 120
+    },
+    {
+      "path": "/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/application-baseline-4/native/src/dispatch-backend.ts",
+      "sha256": "5344c6239a95a25ebf0d2cceaa77efd4979bc1a97bb2509e4fdc052d041c256e",
+      "utf8Bytes": 6961,
+      "physicalLines": 202,
+      "nonblankLines": 200
+    }
+  ],
+  "signaltreeShims": {
+    "v15": {
+      "path": "/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/application-baseline-4/v15/src/st-open.ts",
+      "sha256": "734b0b32c7b5359fc52abf7efa20e86b677816a5187d13cb8703747ccc885d2a",
+      "utf8Bytes": 219,
+      "physicalLines": 2,
+      "nonblankLines": 2
+    },
+    "v16": {
+      "path": "/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/application-baseline-4/v16/src/st-open.ts",
+      "sha256": "2138a2e6f2597af2d9f3f8cdfd15212c9023a265f559f8be8bf6aecdde0653d5",
+      "utf8Bytes": 213,
+      "physicalLines": 2,
+      "nonblankLines": 2
+    }
+  }
+}

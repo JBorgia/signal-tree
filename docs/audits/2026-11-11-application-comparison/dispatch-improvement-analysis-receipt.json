@@ -1,0 +1,14 @@
+{
+  "command": [
+    "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+    "/Users/jonathanborgia/code/signaltree/.worktrees/application-comparison/tools/application-lab/analyze-variants.mjs",
+    "/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/application-baseline-4",
+    "/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/application-variant-1",
+    "/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/paired-dispatch-1",
+    "/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/paired-dispatch-analysis-1",
+    "dispatch"
+  ],
+  "analyzerSha256": "798532f2593605046e28279033056a964bdd4ee1e23d6644ded67f1ad0b98a19",
+  "summarySha256": "423fc8b25e54c3ed2f4f3737d1769d266fab8fb8ff82bb9b9949d3dcee375d6e",
+  "markdownSha256": "c10f58ee968e9b7a83a5a8ba40df3e8c8ab620f2e82ef92fe42682f9d4b75b94"
+}
