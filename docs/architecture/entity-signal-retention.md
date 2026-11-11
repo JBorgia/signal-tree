@@ -132,3 +132,31 @@ were true and both were irrelevant, because the guarantee at stake is only
 observable under garbage collection and nothing in 1,791 tests forces one. The
 acceptance criterion for any future change here is the forced-GC consumer probe,
 not the suite.
+
+## November 10: defer unacquired field carriers
+
+The earlier weak-interning rejection remains binding. The follow-through at
+`2826cc94185b4cccc3717ea1e6370d7bc27cbf27` changes a different allocation boundary:
+acquiring a row preserves its creation-time field keys and accessor descriptors,
+but each field carrier is constructed only when that field is first acquired.
+Its getter remains stable and memoizes only a completely initialized carrier.
+Subject epochs, lifetime identity and intrinsic mutation registration are retained.
+
+Every exposed carrier still receives the existing publication, ownership and
+write bindings. Delayed acquisition reads current subject truth, including a
+removed or restored original lifetime. It cannot follow a fresh entity that
+reuses the same key. A failed factory can be retried; recursive acquisition of
+the same unfinished field rejects rather than exposing a partial carrier.
+
+Physical inventory inspects property descriptors against a WeakSet of successfully
+materialized getters. It neither invokes getters nor keeps a deleted getter or
+carrier alive. Inventory expectations now describe actual allocation; the
+existing state, revision, backing and reclamation assertions remain intact.
+
+The registered demand experiment explicitly proceeds from whole-row use through
+one field and then every field. It establishes a conditional saving, not removal
+of the cost when fields are used: fully materialized rows retain a small amount
+of additional getter/cache bookkeeping. The experiment and separate wider aging,
+native/lifecycle tests and qualification belong to the current release controller.
+Neither these results nor absent subscribers justify weakening lifetime epochs
+or removing the mutation source from an exposed field.

@@ -1,0 +1,23 @@
+{
+  "authority": "Owner said do it all after recommendation to backport both v15 retention fixes, replay final-v16 aging, compare three builds, pursue attributed improvements, characterize Angular and reconcile release docs.",
+  "baselineV15": "published15.4.4; source2bdf2ec54622e41b607242c8345b3389ce4ffb6c",
+  "baselineV16": "qualified83b8fe19e924e87dd66f28ef1b1c2756a4e4cfd9; runtime5dca0e457",
+  "aging": {
+    "operations": "Unchanged aging.mjs from the sealed packed-field-aging audit; six512-row stores, all row handles held; widths8/32 with6rounds per phase, width3 steady/promote with12rounds per phase. Retain actual row assertions, quiescence, collection sentinels and all phases.",
+    "arms": ["packed", "v16"],
+    "profiles": ["wide-8", "wide-32", "steady", "promote"],
+    "schedule": "Each profile has two packed A/A then three alternating pairs;32fresh serial children; no retries or pooling with prior results.",
+    "primary": "Second-phase live heap above baseline; CPU/wall and other heap endpoints descriptive. Investigate large remaining live growth before selecting optimization.",
+    "limits": "Held-store working set is not a leak proof; tree collection does not prove every individual object collected. Finite edit rounds do not establish an unlimited-time plateau."
+  },
+  "ordinary": {
+    "operations": "Actual app bodies, model/oracles and route/action counts from existing release-economics policy;1,000jobs,1,000products and mixed eight-store heap after9,600actions.",
+    "arms": ["v15", "v15-repaired", "v16"],
+    "schedule": "Each profile has two originalv15 A/A then five balanced three-arm rounds;51fresh serial children. All inputs checked around every child. Originalv15 actual-resource retention failure is retained and may continue; repaired-arm failure aborts.",
+    "limits": "Common ordinary outcomes, not full semantic capability parity. Baseline collection failure remains a failure and is not converted to a pass."
+  },
+  "direction": "Comparison ranges must be disjoint and median gap exceed the largest observed A/A or arm range. Descriptive host evidence, not a confidence interval or population percentile.",
+  "binding": "Exact package bytes, executed harness/helpers/app bodies, policy, Node/toolchain and host/load metadata.",
+  "optimization": "Only implement a concrete attributed mechanism; preserve supported APIs, late acquisition, captured evidence, reentry, entity lifetime, live-subscriber behavior and original strict point bound. Keep each diagnostic/prototype cohort separate. Report regressions and feasible alternatives; no automatic v15 parity requirement or new threshold fitted to results.",
+  "heavyWork": "Tests, builds, browser measurements, CPU/heap runs and mutation campaigns are serialized; source-only work may proceed except during mutation campaigns."
+}

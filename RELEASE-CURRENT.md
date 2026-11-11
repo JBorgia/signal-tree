@@ -5,6 +5,43 @@ first failures and sealed predecessors remain evidence, not competing queues.
 
 ## Active owner instruction
 
+### November 10 follow-through — authorized and active
+
+The owner accepted the recommendation to do all of: backport both demonstrated
+retention repairs to v15; repeat wide-row aging on qualified v16; compare released
+v15, repaired v15 and v16 directly; pursue measured ordinary-state improvements
+and inspect removable overhead; characterize an actual Angular application;
+and reconcile release documentation and metadata readiness.
+
+Work is isolated on `codex/v16-followthrough` from `83b8fe19e` and
+`codex/v15-retention-backport` from published `v15.4.4`. The qualified v16 artifact
+below remains the baseline. Preserve v15 APIs/settlement and v16 frozen semantics.
+Run heavy tests, builds and measurements serially; retain first failures and exact
+artifacts. Independent review precedes consequential representation decisions and
+closes each release candidate. No speculative subsystem deletion is authorized
+by an absence of current subscribers or demo usage. Branch sharing is authorized;
+no merge, tag or registry publication has been selected for this follow-through.
+
+- [x] Both v15 retention repairs and original-source regression controls.
+- [x] Qualified v16 narrow/wide/promoted-row aging and attribution if needed.
+- [x] Direct released/repaired-v15/v16 application cost comparison.
+- [x] Evidence-led optimization/removal disposition with preserved semantics.
+- [x] Actual production Angular app measurements, including clearly labeled CPU
+  throttling; no claim that emulation is a physical target-device measurement.
+- [ ] Reconciled release-facing documents and metadata, complete affected
+  qualification, independent closure and review-branch pushes.
+
+The prior GO remains evidence for its exact artifact. New candidate changes need
+their own relevant checks and artifact qualification before inheriting it.
+
+The [follow-through record](docs/audits/2026-11-10-v15-v16-followthrough/README.md)
+binds runtime `2826cc941` and v15 port `ef806bef2`, exact package copies, registered
+comparisons and actual Angular results. Deferred field creation retains all
+existing lifetime, mutation and publication bindings. Its large savings for
+whole-row/sparse-field use and small fully materialized heap cost are explicit.
+No wholesale deletion of supported v15 machinery is justified. Full successor
+qualification and final branch sharing are the remaining execution checkpoint.
+
 **GO: v16 candidate release-qualified.** The
 [completed readiness audit](docs/audits/2026-11-10-release-readiness/README.md)
 supersedes the rejected packed artifact below. Runtime `5dca0e457` fixes derived

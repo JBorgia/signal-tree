@@ -55,11 +55,17 @@ Current candidate identities and remaining execution gates live only in
 scope rather than providing a second chronological work queue.
 
 - Research and independent premise/interpretation reviews complete; no algorithm superiority established.
-- P0 recorded. P1 reference prototype implemented. P2 installed kernel/Angular consumers and settlement workflows pass. P4 protocol/HTTP and Angular DOM reference pass bounded independent reviews. P5 common-outcome comparison passes without demonstrating a unique capability advantage. P3 native recurrence repair and P6 remain open; broader native equivalence is not established. See [implementation evidence](IMPLEMENTATION.md).
-- Conservative production Link remains unchanged. Subsequent isolated native
-  candidates have bounded passing evidence; none has final integration/release
-  acceptance. Consult the current controller rather than treating every historical
-  rejection as the latest candidate disposition.
-- Exact review/commit binding, entity collectibility, final cost and release qualification are not assumed complete.
+- P0 is recorded. P1/P2/P4/P5 have bounded operation, installed-consumer,
+  Angular/HTTP and common-outcome evidence. They establish neither a production
+  authentication/durability service nor a unique common-workflow speed advantage.
+  See [implementation evidence](IMPLEMENTATION.md) for those limits.
+- P3 native integration and P6 library qualification reached GO for the exact
+  artifact in the [readiness audit](../../audits/2026-11-10-release-readiness/README.md).
+  It binds semantics, resource collection, costs, installed consumers and browser
+  checks. Accepted numerical size and economic costs remain explicit.
+- The owner subsequently authorized v15 backports, wider aging/comparison work,
+  targeted optimizations and application characterization. The current controller
+  owns that follow-through. A successor must qualify its changed artifacts; the
+  earlier GO does not establish every backend or application-platform objective.
 
 Update this section and link executable results as work lands. Do not append an unbounded chain of optional research tasks. A concrete counterexample changes the relevant mechanism or produces an explicit disposition; it does not erase the product objective.
