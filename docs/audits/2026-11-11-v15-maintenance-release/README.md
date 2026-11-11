@@ -1,4 +1,4 @@
-# v15.4.8 published and registry-verified
+# v15.4.8 published, registry-verified and deployed
 
 Signed tag `v15.4.8` identifies `37ef1788f6bac61678fc312f391b180bd7a6bbd7`.
 All five packages are on npm `latest`; their downloaded SHA-512 integrities
@@ -23,10 +23,15 @@ updated, and exact archive/consumer verification then passed. The original 404
 and stale metadata remain evidence. This establishes observed visibility delay,
 not a proven internal npm cache mechanism.
 
-The exact-commit demo preview serves 15.4.8 and passes edit/server-update/undo.
-**Production-demo promotion remains pending Vercel email identity verification.**
-The email connector masks the one-time code; the owner has been asked to complete
-Vercel's challenge. npm release completion is separate from live-site completion.
+The exact signed commit now serves [signaltree.io](https://signaltree.io) from
+[production deployment 2YdHyspNM](https://vercel.com/jonathan-d-borgias-projects/signaltree/2YdHyspNMoEW3Q1Tiscrt88us1Bp).
+The final live check displays v15.4.8: Rush/Packing becomes Rush/Shipped, then
+undo restores Standard/Shipped while the other order stays Standard/Ready.
+The owner completed Vercel's email challenge. A stale login page concealed
+accepted promotion and caused two builds of the same signed commit; both finished
+successfully. Automatic approval review rejected cancelling the duplicate, so
+no cancellation occurred. The final receipt includes source identity, production
+domain, behavior trace and screenshot hashes. npm and demo closure are complete.
 
 The release is the v15 retention and lazy entity-field maintenance update.
 Transaction, observer-delivery and settlement behavior remain v15's. Fully

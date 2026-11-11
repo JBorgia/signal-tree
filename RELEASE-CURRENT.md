@@ -1,4 +1,4 @@
-# v15.4.8 published — npm closure complete
+# v15.4.8 published — npm and production demo complete
 
 November 11, 2026: signed `v15.4.8` at `37ef1788f6bac61678fc312f391b180bd7a6bbd7`
 is published on all five npm `latest` tags. Exact archive integrity, provenance,
@@ -6,9 +6,9 @@ signatures and fresh registry runtime/type/AOT consumers pass. Local and tagged
 Linux normal/mutation qualification passed; clean rebuilt archives match the
 signed candidate. [Release receipt](docs/audits/2026-11-11-v15-maintenance-release/v15.4.8-receipt.json).
 
-The exact-commit demo preview passes its visible behavior check. Production
-promotion awaits the owner's Vercel email identity verification; do not report
-the live demo updated until its version and behavior are verified. The separately
+The exact signed commit is deployed to [signaltree.io](https://signaltree.io).
+The final production deployment is `dpl_2YdHyspNMoEW3Q1Tiscrt88us1Bp`; visible
+v15.4.8 and edit/server-update/undo checks pass after deployment. The separately
 authorized automated application comparison continues on `codex/application-comparison`
 using these verified registry artifacts and the qualified v16 baseline. No v16
 registry publication is authorized.
