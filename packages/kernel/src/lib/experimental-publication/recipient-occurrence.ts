@@ -29,8 +29,8 @@ function contribution(proof:Proof,unresolved:boolean):Contribution {
   return rolelessContributions[key]??=(Object.freeze({flags,rejected,unresolved:Number(unresolved)}));
  }
  const result:Partial<Record<typeof roles[number],readonly lifecycle.OwnerCell[]>>&{flags:number;rejected:number;unresolved:number}={flags,rejected,unresolved:Number(unresolved)};
- for(const role of roles)if(proof[role]?.length)result[role]=[...proof[role]];
- return result;
+ for(const role of roles)if(proof[role]?.length)result[role]=Object.freeze([...proof[role]]);
+ return Object.freeze(result);
 }
 function addContribution(target:Counts,source:Contribution,direction:number):void {
  for(const role of roles)for(const owner of source[role]??[])count(target[role],owner,direction);
@@ -39,6 +39,32 @@ function addContribution(target:Counts,source:Contribution,direction:number):voi
  target.unresolved+=source.unresolved*direction;if(target.unresolved<0)throw Error('Negative occurrence readiness');
 }
 type Entry={counts:Contribution;release?:()=>void;onProof?:(proof:Proof)=>void};
+// Roleless entries have a fixed flag domain and retain no owner identities.
+const rolelessReadyEntries:(Entry|undefined)[]=new Array(256);
+// Consecutive bulk facts share one exact ready entry. Weak references keep this
+// bounded one-item cache from owning a disposed slot or a mutated old proof.
+let lastReadyProof:WeakRef<Proof>|undefined,lastReadyEntry:WeakRef<Entry>|undefined;
+function readyEntry(proof:Proof):Entry {
+ const prior=lastReadyProof?.deref()===proof?lastReadyEntry?.deref():undefined;
+ if(prior){
+  let flags=0;for(let i=0;i<flagKeys.length;i++)if(proof[flagKeys[i]])flags|=1<<i;
+  const saved=prior.counts;
+  // Proof objects may change in place. Identity is only a candidate lookup;
+  // every role, duplicate, flag and rejected bit must still match the snapshot.
+  if(saved.flags===flags&&saved.rejected===((proof.terminalRejectedRoles??0)&15)&&roles.every(role=>{
+   const current=proof[role]??[],before=saved[role]??[];
+   return current.length===before.length&&current.every((cell,index)=>cell===before[index]);
+  }))return prior;
+ }
+ const counts=contribution(proof,false);
+ if(roles.every(role=>!counts[role]?.length)){
+  const key=counts.flags|(counts.rejected<<4);
+  return rolelessReadyEntries[key]??=(Object.freeze({counts}));
+ }
+ const entry=Object.freeze({counts});
+ lastReadyProof=new WeakRef(proof);lastReadyEntry=new WeakRef(entry);
+ return entry;
+}
 export interface OccurrenceHandle { readonly identity:object }
 type Group=OccurrenceHandle & {parent?:Group;edge?:NativeOccurrenceEdge;guard:object;present:boolean;entries:Map<unknown,Entry>;children:Set<Group>;summary:Counts};
 
@@ -84,7 +110,9 @@ export class RecipientOccurrences {
   const old=group.entries.get(key);if(old){this.cancel(old);this.propagateContribution(group,old.counts,-1);group.entries.delete(key);}
   if(!requirement)return;
   const proof=lifecycle.nativeProof(requirement),unresolved=!lifecycle.nativeRequirementReady(requirement);
-  const entry:Entry={counts:contribution(proof,unresolved),onProof};group.entries.set(key,entry);this.propagateContribution(group,entry.counts,1);onProof?.(proof);
+  // Pending readiness and callbacks remain owned by their exact address. A
+  // ready callback-free entry has no mutable lifecycle and can be shared.
+  const entry:Entry=unresolved||onProof?{counts:contribution(proof,unresolved),onProof}:readyEntry(proof);group.entries.set(key,entry);this.propagateContribution(group,entry.counts,1);onProof?.(proof);
   if(unresolved){
    this.counters.subscriptions++;
    entry.release=lifecycle.onNativeRequirementReady(requirement,()=>{
