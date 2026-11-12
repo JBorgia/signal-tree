@@ -1,0 +1,1260 @@
+{
+  "source": "/private/tmp/st-terminal-deep-history-separate-interpretation.json",
+  "sha256": "23c5fcafdb46cb7b515c29b34f53f1ea95b3c2c6b515a01c8f17fdaf893f32d8",
+  "result": {
+    "review": "Separate deep-history interpretation and raw verification",
+    "reviewer": "/root/v15_release_review",
+    "scope": "Read-only source/log review and light offline arithmetic. No runtime, tests, builds or benchmarks executed. Author recomputation was treated as a claim and independently recalculated.",
+    "verificationReceipt": "/private/tmp/st-terminal-deep-history-separate-verification.json",
+    "verificationSha256": "2cace43ebf736f5c69a7314f87c1ab2c3a28d77a90a1873380eead699c743ee6",
+    "reviewedRuntime": "5d04ff65d2eaab1986ed1b420cbc013edc01542b",
+    "frozenRunnerSha256": "54e6ad42bdd38bbf8a955aa5945a6a03132ed1a0b15831ea373cbf6e583e93c7",
+    "frozenProtocolSha256": "c6c6e607400cc296c36c2abe02874685f326d3bc21729c9e63497a47a4f43fe8",
+    "premise": {
+      "revision": "18e2eed330629900b5e519168785591c0ab751dc",
+      "source": "docs/performance/measurement-contract.md",
+      "quote": "Give competing arms the same observable task and meaningful success checks.\n  Validate intermediate results when timing intermediate operations. Endpoint\n  agreement does not certify every timed write."
+    },
+    "disposition": "No semantic or evidence-admission blocker demonstrated in this completed bounded cohort. A repeatable explicit whole-source expansion regression is an actual adoption cost and must remain visible; lower retained heap is not a universal speedup.",
+    "findings": [
+      {
+        "topic": "Preserved first failure and correction",
+        "evidence": "Pilot1 remains failed: three homogeneous children passed, first distinct a35 child failed the all-ID/retirement-offer equality. Collection __subjectIds returns lastSubjectIds (entity-signal.ts:5302), not an active collection inventory. Corrected source records each addOne footprint, validates256unique IDs and their exact keys; it does not alter runtime, late-oracle semantics or limits. New pilot6/6, three intended faults detected, and comparison30/30 all have verified raw/invocation/source hashes."
+      },
+      {
+        "topic": "Non-vacuous historical fact coverage",
+        "evidence": "Homogeneous children check all10000aged IDs/50000facets, then11000/55000 after newbulk;10 distinct owner cells become11. Distinct children check256IDs/1280facets, then1256/6280;256 exacttuples/257requirements but onlyone transaction owner become257tuples/259requirements withtwoowners afternewbulk. Every arm/profile has identical primitive coverage summaries/digests. Source oracles verify aging requirement reference identity across drain, all ready roles/flags, actual pending D cell laterrolledback, and physical member+placement capture union.",
+        "limit": "Fresh bulk reference baseline is postdrain-only; it cannot establish predrain identity for those newIDs. Distinct tuples withoneowner do not stand for arbitrary many-owner histories."
+      },
+      {
+        "topic": "Cached reads and actual expansion are different measurements",
+        "evidence": "All30children report0 input visits for20 tree.$ reads, explicitly labeled cached.20 explicit source.captureInput calls visit400000physical views in homogeneous or10240 in distinct; complete union checks pass. Sourcecapture is a private diagnostic path, not an app-rendering operation."
+      },
+      {
+        "topic": "Measured homogeneous expansion cost shift",
+        "evidence": "20-capture CPU medians a35/source145/final=7.652/20.713/17.954ms; final/a35 matched ratios2.269\u20132.936, median2.428. Elapsed medians6.939/12.216/9.914ms; matched ratios1.412\u20132.071, median1.456. Allfive final batches are higher. Immediate heap delta a35 approximately18.93MiB versus final55.38\u201359.13MiB.",
+        "limit": "CPU is process user+system time and can exceed elapsed; GC/background process work may contribute. Immediate heap delta across20calls is neither allocatedbytes nor peak. Cause is not fully allocation-attributed by this study."
+      },
+      {
+        "topic": "Retained heap savings are genuine in the selected compact history",
+        "evidence": "Homogeneous aged heap above pre-store baseline has medians16.894MiB a35,13.479MiB source145,11.068MiB final; matched final/a35 ratios0.644\u20130.665. Empty-store-relative medians for those same raw children are16.372/12.956/10.545MiB. Final10000subjects pack into10 exactruns, then11000into11runs.",
+        "limit": "Both heap references are valid but must be labeled. Wholeheap includes retained before snapshot, heldhandles, primitive coverage tables and runtime state; it is not per-feature retained bytes."
+      },
+      {
+        "topic": "Distinct public workload exercised actual bounded fallback",
+        "evidence": "All15distinct comparison children observed retirement offers exactly256down to1. Source145/final each pack only1subject in1run and retain1275unpacked facets (255subjects\u00d75). Afterfreshbulk they have1001packedsubjects/2runs plus unchanged1275unpackedfacets. Aged pre-store-relative median4.257MiB final versus4.220MiB a35; there is no broad distinct-history compression claim."
+      },
+      {
+        "topic": "Other costs do not support one blanket performance verdict",
+        "evidence": "Homogeneous freshbulk final/a35 matched CPU ratio medians0.842prepare and0.862rollback+drain, but rangescross1. Homogeneous5late-Link construction median CPU66.493 versus71.688ms while elapsed42.788 versus42.559ms; paired rangeswide. Distinct5late-Link construction elapsed2.422 versus2.107ms, paired final/a35 ratio1.074\u20131.215 (median1.171); absolute median batchdifference~0.315ms. Distinctfreshbulk CPU medians91.573versus80.507ms prepare and124.271versus114.494ms rollback+drain; elapsed45.860versus44.869ms and63.499versus63.645ms.",
+        "limit": "Report CPU and elapsed separately; do not call CPU ratios UI latency, or omit small regressions merely because absolute costs are modest. Five child distributions are descriptive, not a significance test or universal bound."
+      },
+      {
+        "topic": "Late native input, delivery and teardown remain meaningful",
+        "evidence": "Allsix before/after/current\u00d7independent/unknown declarations perchild execute one callback, deliver exact targetvalue, and preserve contradiction versus started/surviving outcomes. Two additional untimed late Links install/deliver one exact literalrow each, clear/reseed, and preserve oldfacts. Heldoldrow/field remainundefined aftersamekey replacement/rekey. All30samples collecttree/held/field/connection atoriginal3GC checkpoint with0extraGC."
+      }
+    ],
+    "adoptionInterpretation": "Packing and lexical sharing purchase lower retained homogeneous-history memory at a measured whole-source expansion cost; the safe fallback preserves distinct-address facts without promising compression. These results support a cost-exchange decision, not the claim that overhead was eliminated. Price the additional expanded-capture work against actual consumer frequency and memory constraints; the current app rerun is separate evidence. Further optimization, if pursued, must preserve exact facts, native-input roles and the full capture contract rather than omit required work.",
+    "limits": [
+      "30fresh comparison processes, five perarm/profile, deterministic rotated/reversed trios; no discarded outliers or pooled operations.",
+      "Aging includes ID/proof/oracle diagnostics and is not primitive runtime CPU.",
+      "Source-only stage145 and final5d are distinct artifacts; rejecteda431cache is excluded, not relabeled.",
+      "No universal leak freedom, constant memory, minimum guarantee price or v15/rival semantic equivalence is established.",
+      "Author output filename independent-review denotes its own recomputation; this receipt is the separate interpretation."
+    ],
+    "selectedRecomputedDistributions": {
+      "homogeneous": {
+        "explicit-whole-source-capture-20.cpuMs": {
+          "armDistributions": {
+            "a35": {
+              "values": [
+                7.347,
+                7.958,
+                7.652,
+                7.679,
+                7.517
+              ],
+              "median": 7.652,
+              "minimum": 7.347,
+              "maximum": 7.958
+            },
+            "source145": {
+              "values": [
+                19.014,
+                20.713,
+                19.603,
+                25.75,
+                21.969
+              ],
+              "median": 20.713,
+              "minimum": 19.014,
+              "maximum": 25.75
+            },
+            "final": {
+              "values": [
+                17.954,
+                23.361,
+                17.364,
+                18.642,
+                17.45
+              ],
+              "median": 17.954,
+              "minimum": 17.364,
+              "maximum": 23.361
+            }
+          },
+          "matchedFinalOverA35": {
+            "difference": {
+              "values": [
+                10.607,
+                15.403,
+                9.712,
+                10.963,
+                9.933
+              ],
+              "median": 10.607,
+              "minimum": 9.712,
+              "maximum": 15.403
+            },
+            "ratio": {
+              "values": [
+                2.4437185245678505,
+                2.9355365669766273,
+                2.2692106638787246,
+                2.4276598515431695,
+                2.3214048157509644
+              ],
+              "median": 2.4276598515431695,
+              "minimum": 2.2692106638787246,
+              "maximum": 2.9355365669766273
+            }
+          }
+        },
+        "explicit-whole-source-capture-20.elapsedMs": {
+          "armDistributions": {
+            "a35": {
+              "values": [
+                6.810917000000018,
+                6.938957999999957,
+                6.959542000000056,
+                6.974249999999984,
+                6.839249999999993
+              ],
+              "median": 6.938957999999957,
+              "minimum": 6.810917000000018,
+              "maximum": 6.974249999999984
+            },
+            "source145": {
+              "values": [
+                10.212125000000015,
+                12.946500000000015,
+                11.080874999999878,
+                20.952375000000075,
+                12.215583000000152
+              ],
+              "median": 12.215583000000152,
+              "minimum": 10.212125000000015,
+              "maximum": 20.952375000000075
+            },
+            "final": {
+              "values": [
+                9.914291999999932,
+                14.367791000000125,
+                9.826792000000069,
+                10.543249999999944,
+                9.869167000000061
+              ],
+              "median": 9.914291999999932,
+              "minimum": 9.826792000000069,
+              "maximum": 14.367791000000125
+            }
+          },
+          "matchedFinalOverA35": {
+            "difference": {
+              "values": [
+                3.1033749999999145,
+                7.428833000000168,
+                2.8672500000000127,
+                3.56899999999996,
+                3.0299170000000686
+              ],
+              "median": 3.1033749999999145,
+              "minimum": 2.8672500000000127,
+              "maximum": 7.428833000000168
+            },
+            "ratio": {
+              "values": [
+                1.4556471617551507,
+                2.070597775631473,
+                1.411988317622049,
+                1.5117396135785164,
+                1.4430188982710197
+              ],
+              "median": 1.4556471617551507,
+              "minimum": 1.411988317622049,
+              "maximum": 2.070597775631473
+            }
+          }
+        },
+        "new-bulk-prepare-install.cpuMs": {
+          "armDistributions": {
+            "a35": {
+              "values": [
+                91.87,
+                98.169,
+                82.168,
+                88.329,
+                85.643
+              ],
+              "median": 88.329,
+              "minimum": 82.168,
+              "maximum": 98.169
+            },
+            "source145": {
+              "values": [
+                95.686,
+                100.045,
+                85.672,
+                117.934,
+                96.52
+              ],
+              "median": 96.52,
+              "minimum": 85.672,
+              "maximum": 117.934
+            },
+            "final": {
+              "values": [
+                73.515,
+                95.872,
+                90.987,
+                72.153,
+                72.131
+              ],
+              "median": 73.515,
+              "minimum": 72.131,
+              "maximum": 95.872
+            }
+          },
+          "matchedFinalOverA35": {
+            "difference": {
+              "values": [
+                -18.355000000000004,
+                -2.296999999999997,
+                8.818999999999988,
+                -16.175999999999988,
+                -13.512
+              ],
+              "median": -13.512,
+              "minimum": -18.355000000000004,
+              "maximum": 8.818999999999988
+            },
+            "ratio": {
+              "values": [
+                0.8002068139762708,
+                0.9766015748352331,
+                1.1073288871580176,
+                0.8168664877899672,
+                0.8422287869411393
+              ],
+              "median": 0.8422287869411393,
+              "minimum": 0.8002068139762708,
+              "maximum": 1.1073288871580176
+            }
+          }
+        },
+        "new-bulk-prepare-install.elapsedMs": {
+          "armDistributions": {
+            "a35": {
+              "values": [
+                51.82754100000011,
+                56.537459000000126,
+                45.96333300000015,
+                53.27991599999996,
+                49.08674999999994
+              ],
+              "median": 51.82754100000011,
+              "minimum": 45.96333300000015,
+              "maximum": 56.537459000000126
+            },
+            "source145": {
+              "values": [
+                55.134457999999995,
+                61.030125,
+                48.9787080000001,
+                68.92787500000009,
+                49.32058300000017
+              ],
+              "median": 55.134457999999995,
+              "minimum": 48.9787080000001,
+              "maximum": 68.92787500000009
+            },
+            "final": {
+              "values": [
+                44.837833000000046,
+                58.563624999999774,
+                57.15979100000004,
+                44.25779200000011,
+                43.91758400000003
+              ],
+              "median": 44.837833000000046,
+              "minimum": 43.91758400000003,
+              "maximum": 58.563624999999774
+            }
+          },
+          "matchedFinalOverA35": {
+            "difference": {
+              "values": [
+                -6.989708000000064,
+                2.026165999999648,
+                11.196457999999893,
+                -9.022123999999849,
+                -5.169165999999905
+              ],
+              "median": -5.169165999999905,
+              "minimum": -9.022123999999849,
+              "maximum": 11.196457999999893
+            },
+            "ratio": {
+              "values": [
+                0.8651352569476517,
+                1.035837585130942,
+                1.2435954329073537,
+                0.8306655738721537,
+                0.8946932522523917
+              ],
+              "median": 0.8946932522523917,
+              "minimum": 0.8306655738721537,
+              "maximum": 1.2435954329073537
+            }
+          }
+        },
+        "new-bulk-rollback-full-drain.cpuMs": {
+          "armDistributions": {
+            "a35": {
+              "values": [
+                115.205,
+                109.49,
+                99.833,
+                115.636,
+                108.524
+              ],
+              "median": 109.49,
+              "minimum": 99.833,
+              "maximum": 115.636
+            },
+            "source145": {
+              "values": [
+                120.479,
+                124.575,
+                116.1,
+                143.28,
+                119.428
+              ],
+              "median": 120.479,
+              "minimum": 116.1,
+              "maximum": 143.28
+            },
+            "final": {
+              "values": [
+                99.263,
+                121.531,
+                116.633,
+                98.757,
+                91.082
+              ],
+              "median": 99.263,
+              "minimum": 91.082,
+              "maximum": 121.531
+            }
+          },
+          "matchedFinalOverA35": {
+            "difference": {
+              "values": [
+                -15.941999999999993,
+                12.041000000000011,
+                16.799999999999997,
+                -16.87899999999999,
+                -17.442000000000007
+              ],
+              "median": -15.941999999999993,
+              "minimum": -17.442000000000007,
+              "maximum": 16.799999999999997
+            },
+            "ratio": {
+              "values": [
+                0.8616205893841413,
+                1.1099735135628825,
+                1.1682810293189627,
+                0.8540333460168115,
+                0.8392797906453872
+              ],
+              "median": 0.8616205893841413,
+              "minimum": 0.8392797906453872,
+              "maximum": 1.1682810293189627
+            }
+          }
+        },
+        "new-bulk-rollback-full-drain.elapsedMs": {
+          "armDistributions": {
+            "a35": {
+              "values": [
+                67.65858299999991,
+                68.50995899999998,
+                62.6360830000001,
+                74.2985000000001,
+                66.09275000000002
+              ],
+              "median": 67.65858299999991,
+              "minimum": 62.6360830000001,
+              "maximum": 74.2985000000001
+            },
+            "source145": {
+              "values": [
+                75.20349999999985,
+                80.42975000000001,
+                69.44908299999997,
+                88.68158300000005,
+                69.79074999999989
+              ],
+              "median": 75.20349999999985,
+              "minimum": 69.44908299999997,
+              "maximum": 88.68158300000005
+            },
+            "final": {
+              "values": [
+                60.465124999999944,
+                78.9178750000001,
+                78.89304200000015,
+                61.56399999999985,
+                60.79666700000007
+              ],
+              "median": 61.56399999999985,
+              "minimum": 60.465124999999944,
+              "maximum": 78.9178750000001
+            }
+          },
+          "matchedFinalOverA35": {
+            "difference": {
+              "values": [
+                -7.193457999999964,
+                10.407916000000114,
+                16.25695900000005,
+                -12.734500000000253,
+                -5.296082999999953
+              ],
+              "median": -5.296082999999953,
+              "minimum": -12.734500000000253,
+              "maximum": 16.25695900000005
+            },
+            "ratio": {
+              "values": [
+                0.8936800376088282,
+                1.1519182926383027,
+                1.2595462267332398,
+                0.8286035384294402,
+                0.9198689266220583
+              ],
+              "median": 0.9198689266220583,
+              "minimum": 0.8286035384294402,
+              "maximum": 1.2595462267332398
+            }
+          }
+        },
+        "late-link-five-construct.cpuMs": {
+          "armDistributions": {
+            "a35": {
+              "values": [
+                73.487,
+                71.688,
+                67.21,
+                65.85300000000001,
+                76.042
+              ],
+              "median": 71.688,
+              "minimum": 65.85300000000001,
+              "maximum": 76.042
+            },
+            "source145": {
+              "values": [
+                71.467,
+                63.207,
+                73.63,
+                105.174,
+                79.878
+              ],
+              "median": 73.63,
+              "minimum": 63.207,
+              "maximum": 105.174
+            },
+            "final": {
+              "values": [
+                64.576,
+                103.815,
+                66.493,
+                71.313,
+                64.417
+              ],
+              "median": 66.493,
+              "minimum": 64.417,
+              "maximum": 103.815
+            }
+          },
+          "matchedFinalOverA35": {
+            "difference": {
+              "values": [
+                -8.911000000000001,
+                32.126999999999995,
+                -0.7169999999999987,
+                5.459999999999994,
+                -11.625
+              ],
+              "median": -0.7169999999999987,
+              "minimum": -11.625,
+              "maximum": 32.126999999999995
+            },
+            "ratio": {
+              "values": [
+                0.8787404574958836,
+                1.448150318044861,
+                0.9893319446510936,
+                1.0829119402305134,
+                0.8471239578127877
+              ],
+              "median": 0.9893319446510936,
+              "minimum": 0.8471239578127877,
+              "maximum": 1.448150318044861
+            }
+          }
+        },
+        "late-link-five-construct.elapsedMs": {
+          "armDistributions": {
+            "a35": {
+              "values": [
+                42.55899999999997,
+                42.7103340000001,
+                39.857708999999886,
+                38.76416700000027,
+                44.166458999999804
+              ],
+              "median": 42.55899999999997,
+              "minimum": 38.76416700000027,
+              "maximum": 44.166458999999804
+            },
+            "source145": {
+              "values": [
+                39.49216799999999,
+                39.910832999999684,
+                40.580623999999716,
+                76.27991700000052,
+                45.70229300000028
+              ],
+              "median": 40.580623999999716,
+              "minimum": 39.49216799999999,
+              "maximum": 76.27991700000052
+            },
+            "final": {
+              "values": [
+                41.96253999999999,
+                75.08291699999995,
+                42.78799999999978,
+                46.818042000000105,
+                41.64908300000002
+              ],
+              "median": 42.78799999999978,
+              "minimum": 41.64908300000002,
+              "maximum": 75.08291699999995
+            }
+          },
+          "matchedFinalOverA35": {
+            "difference": {
+              "values": [
+                -0.5964599999999791,
+                32.37258299999985,
+                2.9302909999998974,
+                8.053874999999834,
+                -2.5173759999997856
+              ],
+              "median": 2.9302909999998974,
+              "minimum": -2.5173759999997856,
+              "maximum": 32.37258299999985
+            },
+            "ratio": {
+              "values": [
+                0.9859851030334364,
+                1.7579566809287834,
+                1.0735188015949413,
+                1.207765976242951,
+                0.9430025395515679
+              ],
+              "median": 1.0735188015949413,
+              "minimum": 0.9430025395515679,
+              "maximum": 1.7579566809287834
+            }
+          }
+        },
+        "aged.heapDeltaMiB": {
+          "armDistributions": {
+            "a35": {
+              "values": [
+                17.155235290527344,
+                16.78270721435547,
+                16.829864501953125,
+                16.89379119873047,
+                16.8956298828125
+              ],
+              "median": 16.89379119873047,
+              "minimum": 16.78270721435547,
+              "maximum": 17.155235290527344
+            },
+            "source145": {
+              "values": [
+                13.306129455566406,
+                13.928413391113281,
+                13.388259887695312,
+                13.478950500488281,
+                13.551986694335938
+              ],
+              "median": 13.478950500488281,
+              "minimum": 13.306129455566406,
+              "maximum": 13.928413391113281
+            },
+            "final": {
+              "values": [
+                11.053695678710938,
+                11.080245971679688,
+                11.194099426269531,
+                10.936897277832031,
+                11.067962646484375
+              ],
+              "median": 11.067962646484375,
+              "minimum": 10.936897277832031,
+              "maximum": 11.194099426269531
+            }
+          },
+          "matchedFinalOverA35": {
+            "difference": {
+              "values": [
+                -6.101539611816406,
+                -5.702461242675781,
+                -5.635765075683594,
+                -5.9568939208984375,
+                -5.827667236328125
+              ],
+              "median": -5.827667236328125,
+              "minimum": -6.101539611816406,
+              "maximum": -5.635765075683594
+            },
+            "ratio": {
+              "values": [
+                0.644333667916201,
+                0.6602180345613101,
+                0.6651330689543248,
+                0.6473915268145326,
+                0.6550784269809045
+              ],
+              "median": 0.6550784269809045,
+              "minimum": 0.644333667916201,
+              "maximum": 0.6651330689543248
+            }
+          }
+        }
+      },
+      "distinct-batch": {
+        "explicit-whole-source-capture-20.cpuMs": {
+          "armDistributions": {
+            "a35": {
+              "values": [
+                1.545,
+                1.361,
+                0.405,
+                1.421,
+                1.461
+              ],
+              "median": 1.421,
+              "minimum": 0.405,
+              "maximum": 1.545
+            },
+            "source145": {
+              "values": [
+                1.56,
+                0.558,
+                1.511,
+                1.42,
+                0.37
+              ],
+              "median": 1.42,
+              "minimum": 0.37,
+              "maximum": 1.56
+            },
+            "final": {
+              "values": [
+                1.826,
+                1.552,
+                0.422,
+                1.479,
+                1.534
+              ],
+              "median": 1.534,
+              "minimum": 0.422,
+              "maximum": 1.826
+            }
+          },
+          "matchedFinalOverA35": {
+            "difference": {
+              "values": [
+                0.28100000000000014,
+                0.19100000000000006,
+                0.01699999999999996,
+                0.05800000000000005,
+                0.07299999999999995
+              ],
+              "median": 0.07299999999999995,
+              "minimum": 0.01699999999999996,
+              "maximum": 0.28100000000000014
+            },
+            "ratio": {
+              "values": [
+                1.1818770226537219,
+                1.1403379867744305,
+                1.0419753086419752,
+                1.0408163265306123,
+                1.049965776865161
+              ],
+              "median": 1.049965776865161,
+              "minimum": 1.0408163265306123,
+              "maximum": 1.1818770226537219
+            }
+          }
+        },
+        "explicit-whole-source-capture-20.elapsedMs": {
+          "armDistributions": {
+            "a35": {
+              "values": [
+                0.25654199999999605,
+                0.26729199999999764,
+                0.26445799999999053,
+                0.24733299999999758,
+                0.2489169999999774
+              ],
+              "median": 0.25654199999999605,
+              "minimum": 0.24733299999999758,
+              "maximum": 0.26729199999999764
+            },
+            "source145": {
+              "values": [
+                0.2684590000000071,
+                0.2833750000000066,
+                0.2578330000000051,
+                0.2778329999999869,
+                0.277499999999975
+              ],
+              "median": 0.277499999999975,
+              "minimum": 0.2578330000000051,
+              "maximum": 0.2833750000000066
+            },
+            "final": {
+              "values": [
+                0.31904199999999605,
+                0.26754199999999173,
+                0.26866699999999355,
+                0.2684590000000071,
+                0.27062499999999545
+              ],
+              "median": 0.26866699999999355,
+              "minimum": 0.26754199999999173,
+              "maximum": 0.31904199999999605
+            }
+          },
+          "matchedFinalOverA35": {
+            "difference": {
+              "values": [
+                0.0625,
+                0.0002499999999940883,
+                0.004209000000003016,
+                0.021126000000009526,
+                0.021708000000018046
+              ],
+              "median": 0.021126000000009526,
+              "minimum": 0.0002499999999940883,
+              "maximum": 0.0625
+            },
+            "ratio": {
+              "values": [
+                1.2436248255646287,
+                1.000935306705753,
+                1.0159155707144543,
+                1.0854152094544995,
+                1.0872097928225875
+              ],
+              "median": 1.0854152094544995,
+              "minimum": 1.000935306705753,
+              "maximum": 1.2436248255646287
+            }
+          }
+        },
+        "new-bulk-prepare-install.cpuMs": {
+          "armDistributions": {
+            "a35": {
+              "values": [
+                80.507,
+                81.465,
+                76.785,
+                77.38,
+                80.559
+              ],
+              "median": 80.507,
+              "minimum": 76.785,
+              "maximum": 81.465
+            },
+            "source145": {
+              "values": [
+                93.534,
+                108.149,
+                92.303,
+                75.938,
+                123.587
+              ],
+              "median": 93.534,
+              "minimum": 75.938,
+              "maximum": 123.587
+            },
+            "final": {
+              "values": [
+                91.573,
+                74.247,
+                92.673,
+                96.926,
+                73.311
+              ],
+              "median": 91.573,
+              "minimum": 73.311,
+              "maximum": 96.926
+            }
+          },
+          "matchedFinalOverA35": {
+            "difference": {
+              "values": [
+                11.065999999999988,
+                -7.2180000000000035,
+                15.888000000000005,
+                19.546000000000006,
+                -7.2479999999999905
+              ],
+              "median": 11.065999999999988,
+              "minimum": -7.2479999999999905,
+              "maximum": 19.546000000000006
+            },
+            "ratio": {
+              "values": [
+                1.1374538859974908,
+                0.9113975326827471,
+                1.2069154131666342,
+                1.252597570431636,
+                0.9100286746359812
+              ],
+              "median": 1.1374538859974908,
+              "minimum": 0.9100286746359812,
+              "maximum": 1.252597570431636
+            }
+          }
+        },
+        "new-bulk-prepare-install.elapsedMs": {
+          "armDistributions": {
+            "a35": {
+              "values": [
+                44.86854100000002,
+                46.88679099999996,
+                44.75558400000003,
+                44.47233299999999,
+                46.70558300000002
+              ],
+              "median": 44.86854100000002,
+              "minimum": 44.47233299999999,
+              "maximum": 46.88679099999996
+            },
+            "source145": {
+              "values": [
+                44.55533300000002,
+                46.07525000000001,
+                45.41575,
+                44.54104200000003,
+                53.59341699999999
+              ],
+              "median": 45.41575,
+              "minimum": 44.54104200000003,
+              "maximum": 53.59341699999999
+            },
+            "final": {
+              "values": [
+                45.860333,
+                44.79975000000002,
+                47.13700000000003,
+                48.35749999999999,
+                44.05041600000001
+              ],
+              "median": 45.860333,
+              "minimum": 44.05041600000001,
+              "maximum": 48.35749999999999
+            }
+          },
+          "matchedFinalOverA35": {
+            "difference": {
+              "values": [
+                0.9917919999999754,
+                -2.0870409999999424,
+                2.3814160000000015,
+                3.8851669999999956,
+                -2.655167000000006
+              ],
+              "median": 0.9917919999999754,
+              "minimum": -2.655167000000006,
+              "maximum": 3.8851669999999956
+            },
+            "ratio": {
+              "values": [
+                1.0221043960399776,
+                0.9554876553611881,
+                1.053209360423048,
+                1.087361438852331,
+                0.9431509719084332
+              ],
+              "median": 1.0221043960399776,
+              "minimum": 0.9431509719084332,
+              "maximum": 1.087361438852331
+            }
+          }
+        },
+        "new-bulk-rollback-full-drain.cpuMs": {
+          "armDistributions": {
+            "a35": {
+              "values": [
+                114.494,
+                122.798,
+                117.662,
+                112.993,
+                113.677
+              ],
+              "median": 114.494,
+              "minimum": 112.993,
+              "maximum": 122.798
+            },
+            "source145": {
+              "values": [
+                144.553,
+                130.015,
+                135.113,
+                115.5,
+                135.57
+              ],
+              "median": 135.113,
+              "minimum": 115.5,
+              "maximum": 144.553
+            },
+            "final": {
+              "values": [
+                124.271,
+                117.975,
+                128.723,
+                126.789,
+                114.021
+              ],
+              "median": 124.271,
+              "minimum": 114.021,
+              "maximum": 128.723
+            }
+          },
+          "matchedFinalOverA35": {
+            "difference": {
+              "values": [
+                9.777000000000001,
+                -4.8230000000000075,
+                11.061000000000007,
+                13.796000000000006,
+                0.3439999999999941
+              ],
+              "median": 9.777000000000001,
+              "minimum": -4.8230000000000075,
+              "maximum": 13.796000000000006
+            },
+            "ratio": {
+              "values": [
+                1.0853931210369103,
+                0.9607241160279483,
+                1.0940065611667318,
+                1.1220960590479057,
+                1.003026117860253
+              ],
+              "median": 1.0853931210369103,
+              "minimum": 0.9607241160279483,
+              "maximum": 1.1220960590479057
+            }
+          }
+        },
+        "new-bulk-rollback-full-drain.elapsedMs": {
+          "armDistributions": {
+            "a35": {
+              "values": [
+                61.94241600000004,
+                67.63991699999997,
+                63.645083,
+                62.25079099999999,
+                64.046042
+              ],
+              "median": 63.645083,
+              "minimum": 61.94241600000004,
+              "maximum": 67.63991699999997
+            },
+            "source145": {
+              "values": [
+                74.85116699999998,
+                67.03479199999998,
+                69.57287500000001,
+                62.00987500000002,
+                71.54775000000001
+              ],
+              "median": 69.57287500000001,
+              "minimum": 62.00987500000002,
+              "maximum": 74.85116699999998
+            },
+            "final": {
+              "values": [
+                63.49891600000001,
+                62.203457999999955,
+                64.51770800000003,
+                65.83462499999996,
+                61.95999999999998
+              ],
+              "median": 63.49891600000001,
+              "minimum": 61.95999999999998,
+              "maximum": 65.83462499999996
+            }
+          },
+          "matchedFinalOverA35": {
+            "difference": {
+              "values": [
+                1.5564999999999714,
+                -5.4364590000000135,
+                0.8726250000000277,
+                3.5838339999999675,
+                -2.0860420000000204
+              ],
+              "median": 0.8726250000000277,
+              "minimum": -5.4364590000000135,
+              "maximum": 3.5838339999999675
+            },
+            "ratio": {
+              "values": [
+                1.0251281771121097,
+                0.9196264684949271,
+                1.0137107999372084,
+                1.0575708989786166,
+                0.9674290255126144
+              ],
+              "median": 1.0137107999372084,
+              "minimum": 0.9196264684949271,
+              "maximum": 1.0575708989786166
+            }
+          }
+        },
+        "late-link-five-construct.cpuMs": {
+          "armDistributions": {
+            "a35": {
+              "values": [
+                3.02,
+                3.022,
+                3.355,
+                2.953,
+                2.927
+              ],
+              "median": 3.02,
+              "minimum": 2.927,
+              "maximum": 3.355
+            },
+            "source145": {
+              "values": [
+                3.297,
+                3.064,
+                3.153,
+                3.101,
+                4.814
+              ],
+              "median": 3.153,
+              "minimum": 3.064,
+              "maximum": 4.814
+            },
+            "final": {
+              "values": [
+                3.538,
+                3.442,
+                3.335,
+                3.323,
+                3.424
+              ],
+              "median": 3.424,
+              "minimum": 3.323,
+              "maximum": 3.538
+            }
+          },
+          "matchedFinalOverA35": {
+            "difference": {
+              "values": [
+                0.5179999999999998,
+                0.4200000000000004,
+                -0.020000000000000018,
+                0.3700000000000001,
+                0.4969999999999999
+              ],
+              "median": 0.4200000000000004,
+              "minimum": -0.020000000000000018,
+              "maximum": 0.5179999999999998
+            },
+            "ratio": {
+              "values": [
+                1.171523178807947,
+                1.1389808074123098,
+                0.9940387481371088,
+                1.1252963088384693,
+                1.1697984284250085
+              ],
+              "median": 1.1389808074123098,
+              "minimum": 0.9940387481371088,
+              "maximum": 1.171523178807947
+            }
+          }
+        },
+        "late-link-five-construct.elapsedMs": {
+          "armDistributions": {
+            "a35": {
+              "values": [
+                2.1067930000000104,
+                2.1287920000000042,
+                2.237459000000001,
+                2.082166000000001,
+                2.067583999999954
+              ],
+              "median": 2.1067930000000104,
+              "minimum": 2.067583999999954,
+              "maximum": 2.237459000000001
+            },
+            "source145": {
+              "values": [
+                2.3399179999999546,
+                2.1117920000000083,
+                2.187291999999985,
+                2.087001000000015,
+                3.065249999999992
+              ],
+              "median": 2.187291999999985,
+              "minimum": 2.087001000000015,
+              "maximum": 3.065249999999992
+            },
+            "final": {
+              "values": [
+                2.5603320000000167,
+                2.4945830000000058,
+                2.4021270000000357,
+                2.371249999999975,
+                2.421541000000019
+              ],
+              "median": 2.421541000000019,
+              "minimum": 2.371249999999975,
+              "maximum": 2.5603320000000167
+            }
+          },
+          "matchedFinalOverA35": {
+            "difference": {
+              "values": [
+                0.45353900000000635,
+                0.36579100000000153,
+                0.16466800000003445,
+                0.28908399999997414,
+                0.35395700000006514
+              ],
+              "median": 0.35395700000006514,
+              "minimum": 0.16466800000003445,
+              "maximum": 0.45353900000000635
+            },
+            "ratio": {
+              "values": [
+                1.2152745903370687,
+                1.171830315033127,
+                1.0735959854460058,
+                1.1388381137718961,
+                1.1711935282919934
+              ],
+              "median": 1.1711935282919934,
+              "minimum": 1.0735959854460058,
+              "maximum": 1.2152745903370687
+            }
+          }
+        },
+        "aged.heapDeltaMiB": {
+          "armDistributions": {
+            "a35": {
+              "values": [
+                4.216896057128906,
+                4.2230377197265625,
+                4.255439758300781,
+                4.220367431640625,
+                4.2204132080078125
+              ],
+              "median": 4.2204132080078125,
+              "minimum": 4.216896057128906,
+              "maximum": 4.255439758300781
+            },
+            "source145": {
+              "values": [
+                4.131034851074219,
+                4.324028015136719,
+                4.16119384765625,
+                4.2885589599609375,
+                4.124488830566406
+              ],
+              "median": 4.16119384765625,
+              "minimum": 4.124488830566406,
+              "maximum": 4.324028015136719
+            },
+            "final": {
+              "values": [
+                4.331062316894531,
+                4.272926330566406,
+                4.116340637207031,
+                4.113861083984375,
+                4.256591796875
+              ],
+              "median": 4.256591796875,
+              "minimum": 4.113861083984375,
+              "maximum": 4.331062316894531
+            }
+          },
+          "matchedFinalOverA35": {
+            "difference": {
+              "values": [
+                0.114166259765625,
+                0.04988861083984375,
+                -0.13909912109375,
+                -0.10650634765625,
+                0.0361785888671875
+              ],
+              "median": 0.0361785888671875,
+              "minimum": -0.13909912109375,
+              "maximum": 0.114166259765625
+            },
+            "ratio": {
+              "values": [
+                1.0270735294915843,
+                1.0118134419228142,
+                0.9673126330075712,
+                0.9747637262912802,
+                1.0085722859549728
+              ],
+              "median": 1.0085722859549728,
+              "minimum": 0.9673126330075712,
+              "maximum": 1.0270735294915843
+            }
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,6187 @@
+{
+  "source": "/private/tmp/st-v15-residual-heap-final/results.json",
+  "sha256": "bdb56e8be5b8a896ae0bd119e54656007ceec0865a2862a7162fd1b99902c063",
+  "result": {
+    "passed": true,
+    "mode": "compare",
+    "bindings": {
+      "/Users/jonathanborgia/code/signaltree/.worktrees/v15-retirement-reclamation/tools/reclamation-lab/v15-residual-heap.mjs": "c30d96b2abba79f433a4ca512fa02ff35204b802284a833b9444fa9d50caf18c",
+      "/Users/jonathanborgia/code/signaltree/.worktrees/v15-retirement-reclamation/tools/reclamation-lab/v15-residual-heap-protocol.md": "bb05f7e768f0c4d110047e849f41da477729a143a0863887c8f5d0e99804dd7e",
+      "/private/tmp/st-v15-activation-wrapper-aging-bundles/bundles.json": "00c41c903af6df4504833743060abaeb3565d45e4ddeac3eaf10d9f7aba0da47",
+      "/private/tmp/st-v15-activation-wrapper-aging-bundles/lazy.production.mjs": "173f2b4382d9d407c75a335eae61438498741cdf372346d726da8ef824b6e8d2",
+      "/private/tmp/st-v15-activation-wrapper-aging-bundles/lazy.entry.mjs": "dadbbf0e2e8cf0de3b873836ff473aee28089249b4dd2835e1b53c2a7e70a621",
+      "/private/tmp/st-v15-activation-wrapper-aging-bundles/lazy.plan.json": "458e9d264e1987c05863916accaed18dde40319d974b69a43ece33dca3fdf75f",
+      "/private/tmp/st-v15-activation-wrapper-aging-bundles/lazy.tgz": "dc0f3775426a984f5002b72189f8954751310bdceb667d12f69c86f328a77184"
+    },
+    "results": [
+      {
+        "sample": {
+          "recipient": true,
+          "cumulativeIds": true,
+          "repeat": 0
+        },
+        "pid": 94724,
+        "node": "v24.15.0",
+        "bundleSha256": "173f2b4382d9d407c75a335eae61438498741cdf372346d726da8ef824b6e8d2",
+        "hostLoad": [
+          10.0830078125,
+          13.69775390625,
+          12.34130859375
+        ],
+        "cycles": [
+          {
+            "cycle": 1,
+            "heapBytes": 7151216,
+            "oracleIds": 1000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 1,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 2,
+            "heapBytes": 7272584,
+            "oracleIds": 2000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 1,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 3,
+            "heapBytes": 7279848,
+            "oracleIds": 3000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 1,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 4,
+            "heapBytes": 7359272,
+            "oracleIds": 4000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 1,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 5,
+            "heapBytes": 7426360,
+            "oracleIds": 5000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 1,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 6,
+            "heapBytes": 7486384,
+            "oracleIds": 6000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 1,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 7,
+            "heapBytes": 7503096,
+            "oracleIds": 7000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 1,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 8,
+            "heapBytes": 7520008,
+            "oracleIds": 8000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 1,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 9,
+            "heapBytes": 7661128,
+            "oracleIds": 9000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 1,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 10,
+            "heapBytes": 7664688,
+            "oracleIds": 10000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 1,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 11,
+            "heapBytes": 7766856,
+            "oracleIds": 11000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 1,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 12,
+            "heapBytes": 7802016,
+            "oracleIds": 12000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 1,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 13,
+            "heapBytes": 7738544,
+            "oracleIds": 13000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 1,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 14,
+            "heapBytes": 7749872,
+            "oracleIds": 14000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 1,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 15,
+            "heapBytes": 7747992,
+            "oracleIds": 15000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 1,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 16,
+            "heapBytes": 7811680,
+            "oracleIds": 16000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 1,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 17,
+            "heapBytes": 7822536,
+            "oracleIds": 17000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 1,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 18,
+            "heapBytes": 7848936,
+            "oracleIds": 18000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 1,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 19,
+            "heapBytes": 7894200,
+            "oracleIds": 19000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 1,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 20,
+            "heapBytes": 7901872,
+            "oracleIds": 20000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 1,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 21,
+            "heapBytes": 7853768,
+            "oracleIds": 21000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 1,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 22,
+            "heapBytes": 7874488,
+            "oracleIds": 22000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 1,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 23,
+            "heapBytes": 7876528,
+            "oracleIds": 23000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 1,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 24,
+            "heapBytes": 7977304,
+            "oracleIds": 24000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 1,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 25,
+            "heapBytes": 7982976,
+            "oracleIds": 25000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 1,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 26,
+            "heapBytes": 7961768,
+            "oracleIds": 26000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 1,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 27,
+            "heapBytes": 7968744,
+            "oracleIds": 27000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 1,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 28,
+            "heapBytes": 8011624,
+            "oracleIds": 28000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 1,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 29,
+            "heapBytes": 7957712,
+            "oracleIds": 29000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 1,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 30,
+            "heapBytes": 7959968,
+            "oracleIds": 30000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 1,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          }
+        ],
+        "passed": true,
+        "beforeHeapBytes": 5180288,
+        "emptyHeapBytes": 5481296,
+        "afterHelperHeapBytes": 7242688
+      },
+      {
+        "sample": {
+          "recipient": false,
+          "cumulativeIds": false,
+          "repeat": 0
+        },
+        "pid": 94725,
+        "node": "v24.15.0",
+        "bundleSha256": "173f2b4382d9d407c75a335eae61438498741cdf372346d726da8ef824b6e8d2",
+        "hostLoad": [
+          10.0830078125,
+          13.69775390625,
+          12.34130859375
+        ],
+        "cycles": [
+          {
+            "cycle": 1,
+            "heapBytes": 6979208,
+            "oracleIds": 1000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 0,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 2,
+            "heapBytes": 7009168,
+            "oracleIds": 1000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 0,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 3,
+            "heapBytes": 7112328,
+            "oracleIds": 1000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 0,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 4,
+            "heapBytes": 7117088,
+            "oracleIds": 1000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 0,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 5,
+            "heapBytes": 7198736,
+            "oracleIds": 1000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 0,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 6,
+            "heapBytes": 7223840,
+            "oracleIds": 1000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 0,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 7,
+            "heapBytes": 7239632,
+            "oracleIds": 1000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 0,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 8,
+            "heapBytes": 7251704,
+            "oracleIds": 1000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 0,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 9,
+            "heapBytes": 7386696,
+            "oracleIds": 1000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 0,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 10,
+            "heapBytes": 7386808,
+            "oracleIds": 1000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 0,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 11,
+            "heapBytes": 7482720,
+            "oracleIds": 1000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 0,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 12,
+            "heapBytes": 7528792,
+            "oracleIds": 1000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 0,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 13,
+            "heapBytes": 7443032,
+            "oracleIds": 1000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 0,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 14,
+            "heapBytes": 7455376,
+            "oracleIds": 1000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 0,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 15,
+            "heapBytes": 7454888,
+            "oracleIds": 1000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 0,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 16,
+            "heapBytes": 7464816,
+            "oracleIds": 1000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 0,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 17,
+            "heapBytes": 7480864,
+            "oracleIds": 1000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 0,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 18,
+            "heapBytes": 7493072,
+            "oracleIds": 1000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 0,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 19,
+            "heapBytes": 7506624,
+            "oracleIds": 1000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 0,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 20,
+            "heapBytes": 7536720,
+            "oracleIds": 1000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 0,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 21,
+            "heapBytes": 7495040,
+            "oracleIds": 1000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 0,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 22,
+            "heapBytes": 7507096,
+            "oracleIds": 1000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 0,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 23,
+            "heapBytes": 7507256,
+            "oracleIds": 1000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 0,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 24,
+            "heapBytes": 7523672,
+            "oracleIds": 1000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 0,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 25,
+            "heapBytes": 7507624,
+            "oracleIds": 1000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 0,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 26,
+            "heapBytes": 7498664,
+            "oracleIds": 1000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 0,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 27,
+            "heapBytes": 7506896,
+            "oracleIds": 1000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 0,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 28,
+            "heapBytes": 7513392,
+            "oracleIds": 1000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 0,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 29,
+            "heapBytes": 7508392,
+            "oracleIds": 1000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 0,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 30,
+            "heapBytes": 7511240,
+            "oracleIds": 1000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 0,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          }
+        ],
+        "passed": true,
+        "beforeHeapBytes": 5180288,
+        "emptyHeapBytes": 5431560,
+        "afterHelperHeapBytes": 7097184
+      },
+      {
+        "sample": {
+          "recipient": true,
+          "cumulativeIds": false,
+          "repeat": 0
+        },
+        "pid": 94726,
+        "node": "v24.15.0",
+        "bundleSha256": "173f2b4382d9d407c75a335eae61438498741cdf372346d726da8ef824b6e8d2",
+        "hostLoad": [
+          10.0830078125,
+          13.69775390625,
+          12.34130859375
+        ],
+        "cycles": [
+          {
+            "cycle": 1,
+            "heapBytes": 7141208,
+            "oracleIds": 1000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 1,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 2,
+            "heapBytes": 7248008,
+            "oracleIds": 1000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 1,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 3,
+            "heapBytes": 7377464,
+            "oracleIds": 1000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 1,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 4,
+            "heapBytes": 7303560,
+            "oracleIds": 1000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 1,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 5,
+            "heapBytes": 7375064,
+            "oracleIds": 1000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 1,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 6,
+            "heapBytes": 7415784,
+            "oracleIds": 1000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 1,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 7,
+            "heapBytes": 7424696,
+            "oracleIds": 1000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 1,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 8,
+            "heapBytes": 7456536,
+            "oracleIds": 1000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 1,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 9,
+            "heapBytes": 7581880,
+            "oracleIds": 1000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 1,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 10,
+            "heapBytes": 7582656,
+            "oracleIds": 1000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 1,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 11,
+            "heapBytes": 7650056,
+            "oracleIds": 1000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 1,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 12,
+            "heapBytes": 7654632,
+            "oracleIds": 1000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 1,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 13,
+            "heapBytes": 7696536,
+            "oracleIds": 1000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 1,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 14,
+            "heapBytes": 7643008,
+            "oracleIds": 1000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 1,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 15,
+            "heapBytes": 7641856,
+            "oracleIds": 1000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 1,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 16,
+            "heapBytes": 7640536,
+            "oracleIds": 1000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 1,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 17,
+            "heapBytes": 7654720,
+            "oracleIds": 1000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 1,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 18,
+            "heapBytes": 7665560,
+            "oracleIds": 1000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 1,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 19,
+            "heapBytes": 7713592,
+            "oracleIds": 1000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 1,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 20,
+            "heapBytes": 7670528,
+            "oracleIds": 1000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 1,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 21,
+            "heapBytes": 7668752,
+            "oracleIds": 1000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 1,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 22,
+            "heapBytes": 7697896,
+            "oracleIds": 1000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 1,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 23,
+            "heapBytes": 7703192,
+            "oracleIds": 1000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 1,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 24,
+            "heapBytes": 7698472,
+            "oracleIds": 1000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 1,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 25,
+            "heapBytes": 7688528,
+            "oracleIds": 1000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 1,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 26,
+            "heapBytes": 7694984,
+            "oracleIds": 1000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 1,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 27,
+            "heapBytes": 7692784,
+            "oracleIds": 1000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 1,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 28,
+            "heapBytes": 7698376,
+            "oracleIds": 1000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 1,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 29,
+            "heapBytes": 7695272,
+            "oracleIds": 1000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 1,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 30,
+            "heapBytes": 7699160,
+            "oracleIds": 1000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 1,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          }
+        ],
+        "passed": true,
+        "beforeHeapBytes": 5180288,
+        "emptyHeapBytes": 5481296,
+        "afterHelperHeapBytes": 7246320
+      },
+      {
+        "sample": {
+          "recipient": false,
+          "cumulativeIds": true,
+          "repeat": 0
+        },
+        "pid": 94730,
+        "node": "v24.15.0",
+        "bundleSha256": "173f2b4382d9d407c75a335eae61438498741cdf372346d726da8ef824b6e8d2",
+        "hostLoad": [
+          10.0830078125,
+          13.69775390625,
+          12.34130859375
+        ],
+        "cycles": [
+          {
+            "cycle": 1,
+            "heapBytes": 6981944,
+            "oracleIds": 1000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 0,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 2,
+            "heapBytes": 7033016,
+            "oracleIds": 2000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 0,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 3,
+            "heapBytes": 7136200,
+            "oracleIds": 3000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 0,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 4,
+            "heapBytes": 7186464,
+            "oracleIds": 4000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 0,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 5,
+            "heapBytes": 7264928,
+            "oracleIds": 5000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 0,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 6,
+            "heapBytes": 7309096,
+            "oracleIds": 6000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 0,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 7,
+            "heapBytes": 7324344,
+            "oracleIds": 7000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 0,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 8,
+            "heapBytes": 7336976,
+            "oracleIds": 8000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 0,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 9,
+            "heapBytes": 7471608,
+            "oracleIds": 9000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 0,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 10,
+            "heapBytes": 7468680,
+            "oracleIds": 10000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 0,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 11,
+            "heapBytes": 7545008,
+            "oracleIds": 11000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 0,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 12,
+            "heapBytes": 7599480,
+            "oracleIds": 12000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 0,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 13,
+            "heapBytes": 7548248,
+            "oracleIds": 13000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 0,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 14,
+            "heapBytes": 7560312,
+            "oracleIds": 14000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 0,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 15,
+            "heapBytes": 7559744,
+            "oracleIds": 15000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 0,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 16,
+            "heapBytes": 7633888,
+            "oracleIds": 16000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 0,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 17,
+            "heapBytes": 7649160,
+            "oracleIds": 17000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 0,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 18,
+            "heapBytes": 7670816,
+            "oracleIds": 18000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 0,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 19,
+            "heapBytes": 7701816,
+            "oracleIds": 19000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 0,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 20,
+            "heapBytes": 7731384,
+            "oracleIds": 20000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 0,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 21,
+            "heapBytes": 7673872,
+            "oracleIds": 21000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 0,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 22,
+            "heapBytes": 7685664,
+            "oracleIds": 22000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 0,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 23,
+            "heapBytes": 7686072,
+            "oracleIds": 23000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 0,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 24,
+            "heapBytes": 7796496,
+            "oracleIds": 24000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 0,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 25,
+            "heapBytes": 7761048,
+            "oracleIds": 25000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 0,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 26,
+            "heapBytes": 7761152,
+            "oracleIds": 26000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 0,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 27,
+            "heapBytes": 7766480,
+            "oracleIds": 27000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 0,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 28,
+            "heapBytes": 7790200,
+            "oracleIds": 28000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 0,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 29,
+            "heapBytes": 7753280,
+            "oracleIds": 29000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 0,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 30,
+            "heapBytes": 7771840,
+            "oracleIds": 30000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 0,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          }
+        ],
+        "passed": true,
+        "beforeHeapBytes": 5180288,
+        "emptyHeapBytes": 5431560,
+        "afterHelperHeapBytes": 7090424
+      },
+      {
+        "sample": {
+          "recipient": false,
+          "cumulativeIds": true,
+          "repeat": 1
+        },
+        "pid": 94733,
+        "node": "v24.15.0",
+        "bundleSha256": "173f2b4382d9d407c75a335eae61438498741cdf372346d726da8ef824b6e8d2",
+        "hostLoad": [
+          10.0830078125,
+          13.69775390625,
+          12.34130859375
+        ],
+        "cycles": [
+          {
+            "cycle": 1,
+            "heapBytes": 6991120,
+            "oracleIds": 1000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 0,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 2,
+            "heapBytes": 7107448,
+            "oracleIds": 2000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 0,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 3,
+            "heapBytes": 7136824,
+            "oracleIds": 3000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 0,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 4,
+            "heapBytes": 7208960,
+            "oracleIds": 4000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 0,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 5,
+            "heapBytes": 7271208,
+            "oracleIds": 5000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 0,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 6,
+            "heapBytes": 7323504,
+            "oracleIds": 6000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 0,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 7,
+            "heapBytes": 7349312,
+            "oracleIds": 7000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 0,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 8,
+            "heapBytes": 7358176,
+            "oracleIds": 8000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 0,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 9,
+            "heapBytes": 7498160,
+            "oracleIds": 9000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 0,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 10,
+            "heapBytes": 7499376,
+            "oracleIds": 10000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 0,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 11,
+            "heapBytes": 7571928,
+            "oracleIds": 11000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 0,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 12,
+            "heapBytes": 7563216,
+            "oracleIds": 12000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 0,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 13,
+            "heapBytes": 7585680,
+            "oracleIds": 13000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 0,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 14,
+            "heapBytes": 7578176,
+            "oracleIds": 14000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 0,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 15,
+            "heapBytes": 7589344,
+            "oracleIds": 15000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 0,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 16,
+            "heapBytes": 7653880,
+            "oracleIds": 16000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 0,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 17,
+            "heapBytes": 7669112,
+            "oracleIds": 17000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 0,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 18,
+            "heapBytes": 7683648,
+            "oracleIds": 18000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 0,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 19,
+            "heapBytes": 7734360,
+            "oracleIds": 19000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 0,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 20,
+            "heapBytes": 7748160,
+            "oracleIds": 20000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 0,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 21,
+            "heapBytes": 7693248,
+            "oracleIds": 21000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 0,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 22,
+            "heapBytes": 7698736,
+            "oracleIds": 22000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 0,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 23,
+            "heapBytes": 7704568,
+            "oracleIds": 23000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 0,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 24,
+            "heapBytes": 7806496,
+            "oracleIds": 24000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 0,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 25,
+            "heapBytes": 7822336,
+            "oracleIds": 25000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 0,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 26,
+            "heapBytes": 7775616,
+            "oracleIds": 26000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 0,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 27,
+            "heapBytes": 7779488,
+            "oracleIds": 27000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 0,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 28,
+            "heapBytes": 7811088,
+            "oracleIds": 28000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 0,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 29,
+            "heapBytes": 7759816,
+            "oracleIds": 29000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 0,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 30,
+            "heapBytes": 7758120,
+            "oracleIds": 30000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 0,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          }
+        ],
+        "passed": true,
+        "beforeHeapBytes": 5180360,
+        "emptyHeapBytes": 5431632,
+        "afterHelperHeapBytes": 7092296
+      },
+      {
+        "sample": {
+          "recipient": true,
+          "cumulativeIds": false,
+          "repeat": 1
+        },
+        "pid": 94735,
+        "node": "v24.15.0",
+        "bundleSha256": "173f2b4382d9d407c75a335eae61438498741cdf372346d726da8ef824b6e8d2",
+        "hostLoad": [
+          11.1171875,
+          13.85205078125,
+          12.4033203125
+        ],
+        "cycles": [
+          {
+            "cycle": 1,
+            "heapBytes": 7239496,
+            "oracleIds": 1000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 1,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 2,
+            "heapBytes": 7165496,
+            "oracleIds": 1000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 1,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 3,
+            "heapBytes": 7277288,
+            "oracleIds": 1000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 1,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 4,
+            "heapBytes": 7311192,
+            "oracleIds": 1000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 1,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 5,
+            "heapBytes": 7380896,
+            "oracleIds": 1000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 1,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 6,
+            "heapBytes": 7432952,
+            "oracleIds": 1000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 1,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 7,
+            "heapBytes": 7460456,
+            "oracleIds": 1000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 1,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 8,
+            "heapBytes": 7440120,
+            "oracleIds": 1000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 1,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 9,
+            "heapBytes": 7579456,
+            "oracleIds": 1000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 1,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 10,
+            "heapBytes": 7619832,
+            "oracleIds": 1000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 1,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 11,
+            "heapBytes": 7658072,
+            "oracleIds": 1000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 1,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 12,
+            "heapBytes": 7721896,
+            "oracleIds": 1000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 1,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 13,
+            "heapBytes": 7642960,
+            "oracleIds": 1000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 1,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 14,
+            "heapBytes": 7662136,
+            "oracleIds": 1000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 1,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 15,
+            "heapBytes": 7659320,
+            "oracleIds": 1000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 1,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 16,
+            "heapBytes": 7659880,
+            "oracleIds": 1000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 1,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 17,
+            "heapBytes": 7662560,
+            "oracleIds": 1000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 1,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 18,
+            "heapBytes": 7661896,
+            "oracleIds": 1000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 1,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 19,
+            "heapBytes": 7712712,
+            "oracleIds": 1000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 1,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 20,
+            "heapBytes": 7660440,
+            "oracleIds": 1000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 1,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 21,
+            "heapBytes": 7659712,
+            "oracleIds": 1000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 1,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 22,
+            "heapBytes": 7682368,
+            "oracleIds": 1000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 1,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 23,
+            "heapBytes": 7687024,
+            "oracleIds": 1000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 1,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 24,
+            "heapBytes": 7687584,
+            "oracleIds": 1000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 1,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 25,
+            "heapBytes": 7679296,
+            "oracleIds": 1000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 1,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 26,
+            "heapBytes": 7682296,
+            "oracleIds": 1000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 1,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 27,
+            "heapBytes": 7690168,
+            "oracleIds": 1000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 1,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 28,
+            "heapBytes": 7702056,
+            "oracleIds": 1000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 1,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 29,
+            "heapBytes": 7758888,
+            "oracleIds": 1000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 1,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 30,
+            "heapBytes": 7697424,
+            "oracleIds": 1000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 1,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          }
+        ],
+        "passed": true,
+        "beforeHeapBytes": 5180288,
+        "emptyHeapBytes": 5481368,
+        "afterHelperHeapBytes": 7240632
+      },
+      {
+        "sample": {
+          "recipient": false,
+          "cumulativeIds": false,
+          "repeat": 1
+        },
+        "pid": 94740,
+        "node": "v24.15.0",
+        "bundleSha256": "173f2b4382d9d407c75a335eae61438498741cdf372346d726da8ef824b6e8d2",
+        "hostLoad": [
+          11.1171875,
+          13.85205078125,
+          12.4033203125
+        ],
+        "cycles": [
+          {
+            "cycle": 1,
+            "heapBytes": 6973488,
+            "oracleIds": 1000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 0,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 2,
+            "heapBytes": 7080488,
+            "oracleIds": 1000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 0,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 3,
+            "heapBytes": 7184048,
+            "oracleIds": 1000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 0,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 4,
+            "heapBytes": 7119696,
+            "oracleIds": 1000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 0,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 5,
+            "heapBytes": 7181976,
+            "oracleIds": 1000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 0,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 6,
+            "heapBytes": 7210088,
+            "oracleIds": 1000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 0,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 7,
+            "heapBytes": 7235648,
+            "oracleIds": 1000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 0,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 8,
+            "heapBytes": 7239696,
+            "oracleIds": 1000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 0,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 9,
+            "heapBytes": 7388520,
+            "oracleIds": 1000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 0,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 10,
+            "heapBytes": 7408904,
+            "oracleIds": 1000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 0,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 11,
+            "heapBytes": 7483888,
+            "oracleIds": 1000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 0,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 12,
+            "heapBytes": 7511360,
+            "oracleIds": 1000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 0,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 13,
+            "heapBytes": 7536720,
+            "oracleIds": 1000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 0,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 14,
+            "heapBytes": 7457488,
+            "oracleIds": 1000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 0,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 15,
+            "heapBytes": 7458120,
+            "oracleIds": 1000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 0,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 16,
+            "heapBytes": 7456480,
+            "oracleIds": 1000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 0,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 17,
+            "heapBytes": 7469280,
+            "oracleIds": 1000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 0,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 18,
+            "heapBytes": 7481672,
+            "oracleIds": 1000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 0,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 19,
+            "heapBytes": 7506176,
+            "oracleIds": 1000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 0,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 20,
+            "heapBytes": 7539744,
+            "oracleIds": 1000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 0,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 21,
+            "heapBytes": 7536760,
+            "oracleIds": 1000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 0,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 22,
+            "heapBytes": 7495128,
+            "oracleIds": 1000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 0,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 23,
+            "heapBytes": 7495232,
+            "oracleIds": 1000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 0,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 24,
+            "heapBytes": 7497792,
+            "oracleIds": 1000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 0,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 25,
+            "heapBytes": 7515888,
+            "oracleIds": 1000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 0,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 26,
+            "heapBytes": 7471808,
+            "oracleIds": 1000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 0,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 27,
+            "heapBytes": 7476768,
+            "oracleIds": 1000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 0,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 28,
+            "heapBytes": 7477288,
+            "oracleIds": 1000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 0,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 29,
+            "heapBytes": 7519584,
+            "oracleIds": 1000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 0,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 30,
+            "heapBytes": 7479232,
+            "oracleIds": 1000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 0,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          }
+        ],
+        "passed": true,
+        "beforeHeapBytes": 5180360,
+        "emptyHeapBytes": 5431704,
+        "afterHelperHeapBytes": 7083984
+      },
+      {
+        "sample": {
+          "recipient": true,
+          "cumulativeIds": true,
+          "repeat": 1
+        },
+        "pid": 94742,
+        "node": "v24.15.0",
+        "bundleSha256": "173f2b4382d9d407c75a335eae61438498741cdf372346d726da8ef824b6e8d2",
+        "hostLoad": [
+          11.1171875,
+          13.85205078125,
+          12.4033203125
+        ],
+        "cycles": [
+          {
+            "cycle": 1,
+            "heapBytes": 7150728,
+            "oracleIds": 1000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 1,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 2,
+            "heapBytes": 7183072,
+            "oracleIds": 2000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 1,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 3,
+            "heapBytes": 7311472,
+            "oracleIds": 3000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 1,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 4,
+            "heapBytes": 7350176,
+            "oracleIds": 4000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 1,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 5,
+            "heapBytes": 7427816,
+            "oracleIds": 5000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 1,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 6,
+            "heapBytes": 7487384,
+            "oracleIds": 6000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 1,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 7,
+            "heapBytes": 7503184,
+            "oracleIds": 7000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 1,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 8,
+            "heapBytes": 7526376,
+            "oracleIds": 8000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 1,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 9,
+            "heapBytes": 7656656,
+            "oracleIds": 9000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 1,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 10,
+            "heapBytes": 7661240,
+            "oracleIds": 10000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 1,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 11,
+            "heapBytes": 7776984,
+            "oracleIds": 11000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 1,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 12,
+            "heapBytes": 7755664,
+            "oracleIds": 12000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 1,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 13,
+            "heapBytes": 7738704,
+            "oracleIds": 13000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 1,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 14,
+            "heapBytes": 7746480,
+            "oracleIds": 14000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 1,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 15,
+            "heapBytes": 7746592,
+            "oracleIds": 15000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 1,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 16,
+            "heapBytes": 7808352,
+            "oracleIds": 16000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 1,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 17,
+            "heapBytes": 7818688,
+            "oracleIds": 17000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 1,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 18,
+            "heapBytes": 7834456,
+            "oracleIds": 18000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 1,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 19,
+            "heapBytes": 7901456,
+            "oracleIds": 19000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 1,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 20,
+            "heapBytes": 7844832,
+            "oracleIds": 20000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 1,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 21,
+            "heapBytes": 7852184,
+            "oracleIds": 21000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 1,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 22,
+            "heapBytes": 7873344,
+            "oracleIds": 22000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 1,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 23,
+            "heapBytes": 7875400,
+            "oracleIds": 23000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 1,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 24,
+            "heapBytes": 7973448,
+            "oracleIds": 24000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 1,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 25,
+            "heapBytes": 7968224,
+            "oracleIds": 25000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 1,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 26,
+            "heapBytes": 7955240,
+            "oracleIds": 26000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 1,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 27,
+            "heapBytes": 7961640,
+            "oracleIds": 27000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 1,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 28,
+            "heapBytes": 7991736,
+            "oracleIds": 28000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 1,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 29,
+            "heapBytes": 7944768,
+            "oracleIds": 29000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 1,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          },
+          {
+            "cycle": 30,
+            "heapBytes": 7952520,
+            "oracleIds": 30000,
+            "payloadsAlive": 0,
+            "transactionsAlive": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "deliveries": 1,
+            "registries": {
+              "descriptors": 0,
+              "structuralEffects": 0,
+              "structuralEffectBySubject": 0,
+              "subjectDescriptors": 0,
+              "claims": {
+                "owners": 0,
+                "claimedSubjects": 0
+              },
+              "positions": {
+                "parents": 2,
+                "addresses": 2,
+                "collectionPaths": 1
+              }
+            }
+          }
+        ],
+        "passed": true,
+        "beforeHeapBytes": 5180288,
+        "emptyHeapBytes": 5481296,
+        "afterHelperHeapBytes": 7244440
+      }
+    ]
+  }
+}

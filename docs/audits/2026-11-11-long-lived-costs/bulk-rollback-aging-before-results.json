@@ -1,0 +1,5531 @@
+{
+  "source": "/private/tmp/st-bulk-rollback-aging-1/results.json",
+  "sha256": "19953dbf1dfef852e8983dea9d48e148101e17de5798ad77be0e6e37fc68a31f",
+  "result": {
+    "passed": true,
+    "mode": "compare",
+    "scheduleSha256": "80538bb2e3b5d71b4bb4382427eb820e3291aa7e5517581a4772bf0c01de3237",
+    "groups": [
+      {
+        "arm": "baseline",
+        "keys": "reused",
+        "cycles": [
+          {
+            "cycle": 1,
+            "settledHeapDelta": {
+              "median": 5139856,
+              "min": 5136448,
+              "max": 5403704,
+              "values": [
+                5403704,
+                5136448,
+                5139856
+              ]
+            },
+            "retainedLifetimes": {
+              "median": 1000,
+              "min": 1000,
+              "max": 1000,
+              "values": [
+                1000,
+                1000,
+                1000
+              ]
+            },
+            "retainedValueBackings": {
+              "median": 1000,
+              "min": 1000,
+              "max": 1000,
+              "values": [
+                1000,
+                1000,
+                1000
+              ]
+            },
+            "valueBackedCandidates": {
+              "median": 1000,
+              "min": 1000,
+              "max": 1000,
+              "values": [
+                1000,
+                1000,
+                1000
+              ]
+            },
+            "sampledPayloadsAlive": {
+              "median": 1,
+              "min": 1,
+              "max": 1,
+              "values": [
+                1,
+                1,
+                1
+              ]
+            }
+          },
+          {
+            "cycle": 2,
+            "settledHeapDelta": {
+              "median": 7232144,
+              "min": 7219752,
+              "max": 7445896,
+              "values": [
+                7232144,
+                7445896,
+                7219752
+              ]
+            },
+            "retainedLifetimes": {
+              "median": 2000,
+              "min": 2000,
+              "max": 2000,
+              "values": [
+                2000,
+                2000,
+                2000
+              ]
+            },
+            "retainedValueBackings": {
+              "median": 2000,
+              "min": 2000,
+              "max": 2000,
+              "values": [
+                2000,
+                2000,
+                2000
+              ]
+            },
+            "valueBackedCandidates": {
+              "median": 2000,
+              "min": 2000,
+              "max": 2000,
+              "values": [
+                2000,
+                2000,
+                2000
+              ]
+            },
+            "sampledPayloadsAlive": {
+              "median": 2,
+              "min": 2,
+              "max": 2,
+              "values": [
+                2,
+                2,
+                2
+              ]
+            }
+          },
+          {
+            "cycle": 3,
+            "settledHeapDelta": {
+              "median": 9845456,
+              "min": 9842840,
+              "max": 10040864,
+              "values": [
+                9845456,
+                10040864,
+                9842840
+              ]
+            },
+            "retainedLifetimes": {
+              "median": 3000,
+              "min": 3000,
+              "max": 3000,
+              "values": [
+                3000,
+                3000,
+                3000
+              ]
+            },
+            "retainedValueBackings": {
+              "median": 3000,
+              "min": 3000,
+              "max": 3000,
+              "values": [
+                3000,
+                3000,
+                3000
+              ]
+            },
+            "valueBackedCandidates": {
+              "median": 3000,
+              "min": 3000,
+              "max": 3000,
+              "values": [
+                3000,
+                3000,
+                3000
+              ]
+            },
+            "sampledPayloadsAlive": {
+              "median": 3,
+              "min": 3,
+              "max": 3,
+              "values": [
+                3,
+                3,
+                3
+              ]
+            }
+          },
+          {
+            "cycle": 4,
+            "settledHeapDelta": {
+              "median": 11582040,
+              "min": 11542256,
+              "max": 11603432,
+              "values": [
+                11603432,
+                11582040,
+                11542256
+              ]
+            },
+            "retainedLifetimes": {
+              "median": 4000,
+              "min": 4000,
+              "max": 4000,
+              "values": [
+                4000,
+                4000,
+                4000
+              ]
+            },
+            "retainedValueBackings": {
+              "median": 4000,
+              "min": 4000,
+              "max": 4000,
+              "values": [
+                4000,
+                4000,
+                4000
+              ]
+            },
+            "valueBackedCandidates": {
+              "median": 4000,
+              "min": 4000,
+              "max": 4000,
+              "values": [
+                4000,
+                4000,
+                4000
+              ]
+            },
+            "sampledPayloadsAlive": {
+              "median": 4,
+              "min": 4,
+              "max": 4,
+              "values": [
+                4,
+                4,
+                4
+              ]
+            }
+          },
+          {
+            "cycle": 5,
+            "settledHeapDelta": {
+              "median": 13486336,
+              "min": 13485224,
+              "max": 13489104,
+              "values": [
+                13485224,
+                13486336,
+                13489104
+              ]
+            },
+            "retainedLifetimes": {
+              "median": 5000,
+              "min": 5000,
+              "max": 5000,
+              "values": [
+                5000,
+                5000,
+                5000
+              ]
+            },
+            "retainedValueBackings": {
+              "median": 5000,
+              "min": 5000,
+              "max": 5000,
+              "values": [
+                5000,
+                5000,
+                5000
+              ]
+            },
+            "valueBackedCandidates": {
+              "median": 5000,
+              "min": 5000,
+              "max": 5000,
+              "values": [
+                5000,
+                5000,
+                5000
+              ]
+            },
+            "sampledPayloadsAlive": {
+              "median": 5,
+              "min": 5,
+              "max": 5,
+              "values": [
+                5,
+                5,
+                5
+              ]
+            }
+          },
+          {
+            "cycle": 6,
+            "settledHeapDelta": {
+              "median": 15453984,
+              "min": 15449672,
+              "max": 15456400,
+              "values": [
+                15453984,
+                15449672,
+                15456400
+              ]
+            },
+            "retainedLifetimes": {
+              "median": 6000,
+              "min": 6000,
+              "max": 6000,
+              "values": [
+                6000,
+                6000,
+                6000
+              ]
+            },
+            "retainedValueBackings": {
+              "median": 6000,
+              "min": 6000,
+              "max": 6000,
+              "values": [
+                6000,
+                6000,
+                6000
+              ]
+            },
+            "valueBackedCandidates": {
+              "median": 6000,
+              "min": 6000,
+              "max": 6000,
+              "values": [
+                6000,
+                6000,
+                6000
+              ]
+            },
+            "sampledPayloadsAlive": {
+              "median": 6,
+              "min": 6,
+              "max": 6,
+              "values": [
+                6,
+                6,
+                6
+              ]
+            }
+          },
+          {
+            "cycle": 7,
+            "settledHeapDelta": {
+              "median": 17079024,
+              "min": 17075120,
+              "max": 17083232,
+              "values": [
+                17075120,
+                17083232,
+                17079024
+              ]
+            },
+            "retainedLifetimes": {
+              "median": 7000,
+              "min": 7000,
+              "max": 7000,
+              "values": [
+                7000,
+                7000,
+                7000
+              ]
+            },
+            "retainedValueBackings": {
+              "median": 7000,
+              "min": 7000,
+              "max": 7000,
+              "values": [
+                7000,
+                7000,
+                7000
+              ]
+            },
+            "valueBackedCandidates": {
+              "median": 7000,
+              "min": 7000,
+              "max": 7000,
+              "values": [
+                7000,
+                7000,
+                7000
+              ]
+            },
+            "sampledPayloadsAlive": {
+              "median": 7,
+              "min": 7,
+              "max": 7,
+              "values": [
+                7,
+                7,
+                7
+              ]
+            }
+          },
+          {
+            "cycle": 8,
+            "settledHeapDelta": {
+              "median": 18654760,
+              "min": 18652968,
+              "max": 18656912,
+              "values": [
+                18652968,
+                18656912,
+                18654760
+              ]
+            },
+            "retainedLifetimes": {
+              "median": 8000,
+              "min": 8000,
+              "max": 8000,
+              "values": [
+                8000,
+                8000,
+                8000
+              ]
+            },
+            "retainedValueBackings": {
+              "median": 8000,
+              "min": 8000,
+              "max": 8000,
+              "values": [
+                8000,
+                8000,
+                8000
+              ]
+            },
+            "valueBackedCandidates": {
+              "median": 8000,
+              "min": 8000,
+              "max": 8000,
+              "values": [
+                8000,
+                8000,
+                8000
+              ]
+            },
+            "sampledPayloadsAlive": {
+              "median": 8,
+              "min": 8,
+              "max": 8,
+              "values": [
+                8,
+                8,
+                8
+              ]
+            }
+          },
+          {
+            "cycle": 9,
+            "settledHeapDelta": {
+              "median": 23118072,
+              "min": 23106720,
+              "max": 23119312,
+              "values": [
+                23118072,
+                23106720,
+                23119312
+              ]
+            },
+            "retainedLifetimes": {
+              "median": 9000,
+              "min": 9000,
+              "max": 9000,
+              "values": [
+                9000,
+                9000,
+                9000
+              ]
+            },
+            "retainedValueBackings": {
+              "median": 9000,
+              "min": 9000,
+              "max": 9000,
+              "values": [
+                9000,
+                9000,
+                9000
+              ]
+            },
+            "valueBackedCandidates": {
+              "median": 9000,
+              "min": 9000,
+              "max": 9000,
+              "values": [
+                9000,
+                9000,
+                9000
+              ]
+            },
+            "sampledPayloadsAlive": {
+              "median": 9,
+              "min": 9,
+              "max": 9,
+              "values": [
+                9,
+                9,
+                9
+              ]
+            }
+          },
+          {
+            "cycle": 10,
+            "settledHeapDelta": {
+              "median": 24682368,
+              "min": 24675080,
+              "max": 24685400,
+              "values": [
+                24682368,
+                24675080,
+                24685400
+              ]
+            },
+            "retainedLifetimes": {
+              "median": 10000,
+              "min": 10000,
+              "max": 10000,
+              "values": [
+                10000,
+                10000,
+                10000
+              ]
+            },
+            "retainedValueBackings": {
+              "median": 10000,
+              "min": 10000,
+              "max": 10000,
+              "values": [
+                10000,
+                10000,
+                10000
+              ]
+            },
+            "valueBackedCandidates": {
+              "median": 10000,
+              "min": 10000,
+              "max": 10000,
+              "values": [
+                10000,
+                10000,
+                10000
+              ]
+            },
+            "sampledPayloadsAlive": {
+              "median": 10,
+              "min": 10,
+              "max": 10,
+              "values": [
+                10,
+                10,
+                10
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "arm": "lazy",
+        "keys": "reused",
+        "cycles": [
+          {
+            "cycle": 1,
+            "settledHeapDelta": {
+              "median": 5167024,
+              "min": 5166312,
+              "max": 5168200,
+              "values": [
+                5167024,
+                5166312,
+                5168200
+              ]
+            },
+            "retainedLifetimes": {
+              "median": 1000,
+              "min": 1000,
+              "max": 1000,
+              "values": [
+                1000,
+                1000,
+                1000
+              ]
+            },
+            "retainedValueBackings": {
+              "median": 1000,
+              "min": 1000,
+              "max": 1000,
+              "values": [
+                1000,
+                1000,
+                1000
+              ]
+            },
+            "valueBackedCandidates": {
+              "median": 1000,
+              "min": 1000,
+              "max": 1000,
+              "values": [
+                1000,
+                1000,
+                1000
+              ]
+            },
+            "sampledPayloadsAlive": {
+              "median": 1,
+              "min": 1,
+              "max": 1,
+              "values": [
+                1,
+                1,
+                1
+              ]
+            }
+          },
+          {
+            "cycle": 2,
+            "settledHeapDelta": {
+              "median": 7263616,
+              "min": 7263144,
+              "max": 7264360,
+              "values": [
+                7264360,
+                7263144,
+                7263616
+              ]
+            },
+            "retainedLifetimes": {
+              "median": 2000,
+              "min": 2000,
+              "max": 2000,
+              "values": [
+                2000,
+                2000,
+                2000
+              ]
+            },
+            "retainedValueBackings": {
+              "median": 2000,
+              "min": 2000,
+              "max": 2000,
+              "values": [
+                2000,
+                2000,
+                2000
+              ]
+            },
+            "valueBackedCandidates": {
+              "median": 2000,
+              "min": 2000,
+              "max": 2000,
+              "values": [
+                2000,
+                2000,
+                2000
+              ]
+            },
+            "sampledPayloadsAlive": {
+              "median": 2,
+              "min": 2,
+              "max": 2,
+              "values": [
+                2,
+                2,
+                2
+              ]
+            }
+          },
+          {
+            "cycle": 3,
+            "settledHeapDelta": {
+              "median": 9883096,
+              "min": 9880760,
+              "max": 9890016,
+              "values": [
+                9883096,
+                9880760,
+                9890016
+              ]
+            },
+            "retainedLifetimes": {
+              "median": 3000,
+              "min": 3000,
+              "max": 3000,
+              "values": [
+                3000,
+                3000,
+                3000
+              ]
+            },
+            "retainedValueBackings": {
+              "median": 3000,
+              "min": 3000,
+              "max": 3000,
+              "values": [
+                3000,
+                3000,
+                3000
+              ]
+            },
+            "valueBackedCandidates": {
+              "median": 3000,
+              "min": 3000,
+              "max": 3000,
+              "values": [
+                3000,
+                3000,
+                3000
+              ]
+            },
+            "sampledPayloadsAlive": {
+              "median": 3,
+              "min": 3,
+              "max": 3,
+              "values": [
+                3,
+                3,
+                3
+              ]
+            }
+          },
+          {
+            "cycle": 4,
+            "settledHeapDelta": {
+              "median": 11642224,
+              "min": 11584280,
+              "max": 11649144,
+              "values": [
+                11642224,
+                11584280,
+                11649144
+              ]
+            },
+            "retainedLifetimes": {
+              "median": 4000,
+              "min": 4000,
+              "max": 4000,
+              "values": [
+                4000,
+                4000,
+                4000
+              ]
+            },
+            "retainedValueBackings": {
+              "median": 4000,
+              "min": 4000,
+              "max": 4000,
+              "values": [
+                4000,
+                4000,
+                4000
+              ]
+            },
+            "valueBackedCandidates": {
+              "median": 4000,
+              "min": 4000,
+              "max": 4000,
+              "values": [
+                4000,
+                4000,
+                4000
+              ]
+            },
+            "sampledPayloadsAlive": {
+              "median": 4,
+              "min": 4,
+              "max": 4,
+              "values": [
+                4,
+                4,
+                4
+              ]
+            }
+          },
+          {
+            "cycle": 5,
+            "settledHeapDelta": {
+              "median": 14621688,
+              "min": 14621064,
+              "max": 14622168,
+              "values": [
+                14622168,
+                14621064,
+                14621688
+              ]
+            },
+            "retainedLifetimes": {
+              "median": 5000,
+              "min": 5000,
+              "max": 5000,
+              "values": [
+                5000,
+                5000,
+                5000
+              ]
+            },
+            "retainedValueBackings": {
+              "median": 5000,
+              "min": 5000,
+              "max": 5000,
+              "values": [
+                5000,
+                5000,
+                5000
+              ]
+            },
+            "valueBackedCandidates": {
+              "median": 5000,
+              "min": 5000,
+              "max": 5000,
+              "values": [
+                5000,
+                5000,
+                5000
+              ]
+            },
+            "sampledPayloadsAlive": {
+              "median": 5,
+              "min": 5,
+              "max": 5,
+              "values": [
+                5,
+                5,
+                5
+              ]
+            }
+          },
+          {
+            "cycle": 6,
+            "settledHeapDelta": {
+              "median": 16600192,
+              "min": 16599816,
+              "max": 16600464,
+              "values": [
+                16599816,
+                16600464,
+                16600192
+              ]
+            },
+            "retainedLifetimes": {
+              "median": 6000,
+              "min": 6000,
+              "max": 6000,
+              "values": [
+                6000,
+                6000,
+                6000
+              ]
+            },
+            "retainedValueBackings": {
+              "median": 6000,
+              "min": 6000,
+              "max": 6000,
+              "values": [
+                6000,
+                6000,
+                6000
+              ]
+            },
+            "valueBackedCandidates": {
+              "median": 6000,
+              "min": 6000,
+              "max": 6000,
+              "values": [
+                6000,
+                6000,
+                6000
+              ]
+            },
+            "sampledPayloadsAlive": {
+              "median": 6,
+              "min": 6,
+              "max": 6,
+              "values": [
+                6,
+                6,
+                6
+              ]
+            }
+          },
+          {
+            "cycle": 7,
+            "settledHeapDelta": {
+              "median": 18219576,
+              "min": 18216552,
+              "max": 18220832,
+              "values": [
+                18219576,
+                18216552,
+                18220832
+              ]
+            },
+            "retainedLifetimes": {
+              "median": 7000,
+              "min": 7000,
+              "max": 7000,
+              "values": [
+                7000,
+                7000,
+                7000
+              ]
+            },
+            "retainedValueBackings": {
+              "median": 7000,
+              "min": 7000,
+              "max": 7000,
+              "values": [
+                7000,
+                7000,
+                7000
+              ]
+            },
+            "valueBackedCandidates": {
+              "median": 7000,
+              "min": 7000,
+              "max": 7000,
+              "values": [
+                7000,
+                7000,
+                7000
+              ]
+            },
+            "sampledPayloadsAlive": {
+              "median": 7,
+              "min": 7,
+              "max": 7,
+              "values": [
+                7,
+                7,
+                7
+              ]
+            }
+          },
+          {
+            "cycle": 8,
+            "settledHeapDelta": {
+              "median": 19798440,
+              "min": 19793416,
+              "max": 19799984,
+              "values": [
+                19799984,
+                19798440,
+                19793416
+              ]
+            },
+            "retainedLifetimes": {
+              "median": 8000,
+              "min": 8000,
+              "max": 8000,
+              "values": [
+                8000,
+                8000,
+                8000
+              ]
+            },
+            "retainedValueBackings": {
+              "median": 8000,
+              "min": 8000,
+              "max": 8000,
+              "values": [
+                8000,
+                8000,
+                8000
+              ]
+            },
+            "valueBackedCandidates": {
+              "median": 8000,
+              "min": 8000,
+              "max": 8000,
+              "values": [
+                8000,
+                8000,
+                8000
+              ]
+            },
+            "sampledPayloadsAlive": {
+              "median": 8,
+              "min": 8,
+              "max": 8,
+              "values": [
+                8,
+                8,
+                8
+              ]
+            }
+          },
+          {
+            "cycle": 9,
+            "settledHeapDelta": {
+              "median": 24262376,
+              "min": 24260856,
+              "max": 24266088,
+              "values": [
+                24262376,
+                24260856,
+                24266088
+              ]
+            },
+            "retainedLifetimes": {
+              "median": 9000,
+              "min": 9000,
+              "max": 9000,
+              "values": [
+                9000,
+                9000,
+                9000
+              ]
+            },
+            "retainedValueBackings": {
+              "median": 9000,
+              "min": 9000,
+              "max": 9000,
+              "values": [
+                9000,
+                9000,
+                9000
+              ]
+            },
+            "valueBackedCandidates": {
+              "median": 9000,
+              "min": 9000,
+              "max": 9000,
+              "values": [
+                9000,
+                9000,
+                9000
+              ]
+            },
+            "sampledPayloadsAlive": {
+              "median": 9,
+              "min": 9,
+              "max": 9,
+              "values": [
+                9,
+                9,
+                9
+              ]
+            }
+          },
+          {
+            "cycle": 10,
+            "settledHeapDelta": {
+              "median": 25826280,
+              "min": 25824976,
+              "max": 25831536,
+              "values": [
+                25826280,
+                25824976,
+                25831536
+              ]
+            },
+            "retainedLifetimes": {
+              "median": 10000,
+              "min": 10000,
+              "max": 10000,
+              "values": [
+                10000,
+                10000,
+                10000
+              ]
+            },
+            "retainedValueBackings": {
+              "median": 10000,
+              "min": 10000,
+              "max": 10000,
+              "values": [
+                10000,
+                10000,
+                10000
+              ]
+            },
+            "valueBackedCandidates": {
+              "median": 10000,
+              "min": 10000,
+              "max": 10000,
+              "values": [
+                10000,
+                10000,
+                10000
+              ]
+            },
+            "sampledPayloadsAlive": {
+              "median": 10,
+              "min": 10,
+              "max": 10,
+              "values": [
+                10,
+                10,
+                10
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "arm": "baseline",
+        "keys": "fresh",
+        "cycles": [
+          {
+            "cycle": 1,
+            "settledHeapDelta": {
+              "median": 5155296,
+              "min": 5112456,
+              "max": 5160768,
+              "values": [
+                5112456,
+                5160768,
+                5155296
+              ]
+            },
+            "retainedLifetimes": {
+              "median": 1000,
+              "min": 1000,
+              "max": 1000,
+              "values": [
+                1000,
+                1000,
+                1000
+              ]
+            },
+            "retainedValueBackings": {
+              "median": 1000,
+              "min": 1000,
+              "max": 1000,
+              "values": [
+                1000,
+                1000,
+                1000
+              ]
+            },
+            "valueBackedCandidates": {
+              "median": 1000,
+              "min": 1000,
+              "max": 1000,
+              "values": [
+                1000,
+                1000,
+                1000
+              ]
+            },
+            "sampledPayloadsAlive": {
+              "median": 1,
+              "min": 1,
+              "max": 1,
+              "values": [
+                1,
+                1,
+                1
+              ]
+            }
+          },
+          {
+            "cycle": 2,
+            "settledHeapDelta": {
+              "median": 7450320,
+              "min": 7220960,
+              "max": 7452920,
+              "values": [
+                7452920,
+                7220960,
+                7450320
+              ]
+            },
+            "retainedLifetimes": {
+              "median": 2000,
+              "min": 2000,
+              "max": 2000,
+              "values": [
+                2000,
+                2000,
+                2000
+              ]
+            },
+            "retainedValueBackings": {
+              "median": 2000,
+              "min": 2000,
+              "max": 2000,
+              "values": [
+                2000,
+                2000,
+                2000
+              ]
+            },
+            "valueBackedCandidates": {
+              "median": 2000,
+              "min": 2000,
+              "max": 2000,
+              "values": [
+                2000,
+                2000,
+                2000
+              ]
+            },
+            "sampledPayloadsAlive": {
+              "median": 2,
+              "min": 2,
+              "max": 2,
+              "values": [
+                2,
+                2,
+                2
+              ]
+            }
+          },
+          {
+            "cycle": 3,
+            "settledHeapDelta": {
+              "median": 9774544,
+              "min": 9771864,
+              "max": 9843808,
+              "values": [
+                9774544,
+                9843808,
+                9771864
+              ]
+            },
+            "retainedLifetimes": {
+              "median": 3000,
+              "min": 3000,
+              "max": 3000,
+              "values": [
+                3000,
+                3000,
+                3000
+              ]
+            },
+            "retainedValueBackings": {
+              "median": 3000,
+              "min": 3000,
+              "max": 3000,
+              "values": [
+                3000,
+                3000,
+                3000
+              ]
+            },
+            "valueBackedCandidates": {
+              "median": 3000,
+              "min": 3000,
+              "max": 3000,
+              "values": [
+                3000,
+                3000,
+                3000
+              ]
+            },
+            "sampledPayloadsAlive": {
+              "median": 3,
+              "min": 3,
+              "max": 3,
+              "values": [
+                3,
+                3,
+                3
+              ]
+            }
+          },
+          {
+            "cycle": 4,
+            "settledHeapDelta": {
+              "median": 11583160,
+              "min": 11542520,
+              "max": 11583224,
+              "values": [
+                11583224,
+                11542520,
+                11583160
+              ]
+            },
+            "retainedLifetimes": {
+              "median": 4000,
+              "min": 4000,
+              "max": 4000,
+              "values": [
+                4000,
+                4000,
+                4000
+              ]
+            },
+            "retainedValueBackings": {
+              "median": 4000,
+              "min": 4000,
+              "max": 4000,
+              "values": [
+                4000,
+                4000,
+                4000
+              ]
+            },
+            "valueBackedCandidates": {
+              "median": 4000,
+              "min": 4000,
+              "max": 4000,
+              "values": [
+                4000,
+                4000,
+                4000
+              ]
+            },
+            "sampledPayloadsAlive": {
+              "median": 4,
+              "min": 4,
+              "max": 4,
+              "values": [
+                4,
+                4,
+                4
+              ]
+            }
+          },
+          {
+            "cycle": 5,
+            "settledHeapDelta": {
+              "median": 13488936,
+              "min": 13487672,
+              "max": 14576664,
+              "values": [
+                14576664,
+                13488936,
+                13487672
+              ]
+            },
+            "retainedLifetimes": {
+              "median": 5000,
+              "min": 5000,
+              "max": 5000,
+              "values": [
+                5000,
+                5000,
+                5000
+              ]
+            },
+            "retainedValueBackings": {
+              "median": 5000,
+              "min": 5000,
+              "max": 5000,
+              "values": [
+                5000,
+                5000,
+                5000
+              ]
+            },
+            "valueBackedCandidates": {
+              "median": 5000,
+              "min": 5000,
+              "max": 5000,
+              "values": [
+                5000,
+                5000,
+                5000
+              ]
+            },
+            "sampledPayloadsAlive": {
+              "median": 5,
+              "min": 5,
+              "max": 5,
+              "values": [
+                5,
+                5,
+                5
+              ]
+            }
+          },
+          {
+            "cycle": 6,
+            "settledHeapDelta": {
+              "median": 15457664,
+              "min": 15451592,
+              "max": 16549840,
+              "values": [
+                16549840,
+                15457664,
+                15451592
+              ]
+            },
+            "retainedLifetimes": {
+              "median": 6000,
+              "min": 6000,
+              "max": 6000,
+              "values": [
+                6000,
+                6000,
+                6000
+              ]
+            },
+            "retainedValueBackings": {
+              "median": 6000,
+              "min": 6000,
+              "max": 6000,
+              "values": [
+                6000,
+                6000,
+                6000
+              ]
+            },
+            "valueBackedCandidates": {
+              "median": 6000,
+              "min": 6000,
+              "max": 6000,
+              "values": [
+                6000,
+                6000,
+                6000
+              ]
+            },
+            "sampledPayloadsAlive": {
+              "median": 6,
+              "min": 6,
+              "max": 6,
+              "values": [
+                6,
+                6,
+                6
+              ]
+            }
+          },
+          {
+            "cycle": 7,
+            "settledHeapDelta": {
+              "median": 17085008,
+              "min": 17079128,
+              "max": 18186184,
+              "values": [
+                18186184,
+                17079128,
+                17085008
+              ]
+            },
+            "retainedLifetimes": {
+              "median": 7000,
+              "min": 7000,
+              "max": 7000,
+              "values": [
+                7000,
+                7000,
+                7000
+              ]
+            },
+            "retainedValueBackings": {
+              "median": 7000,
+              "min": 7000,
+              "max": 7000,
+              "values": [
+                7000,
+                7000,
+                7000
+              ]
+            },
+            "valueBackedCandidates": {
+              "median": 7000,
+              "min": 7000,
+              "max": 7000,
+              "values": [
+                7000,
+                7000,
+                7000
+              ]
+            },
+            "sampledPayloadsAlive": {
+              "median": 7,
+              "min": 7,
+              "max": 7,
+              "values": [
+                7,
+                7,
+                7
+              ]
+            }
+          },
+          {
+            "cycle": 8,
+            "settledHeapDelta": {
+              "median": 18658040,
+              "min": 18656888,
+              "max": 18668496,
+              "values": [
+                18668496,
+                18656888,
+                18658040
+              ]
+            },
+            "retainedLifetimes": {
+              "median": 8000,
+              "min": 8000,
+              "max": 8000,
+              "values": [
+                8000,
+                8000,
+                8000
+              ]
+            },
+            "retainedValueBackings": {
+              "median": 8000,
+              "min": 8000,
+              "max": 8000,
+              "values": [
+                8000,
+                8000,
+                8000
+              ]
+            },
+            "valueBackedCandidates": {
+              "median": 8000,
+              "min": 8000,
+              "max": 8000,
+              "values": [
+                8000,
+                8000,
+                8000
+              ]
+            },
+            "sampledPayloadsAlive": {
+              "median": 8,
+              "min": 8,
+              "max": 8,
+              "values": [
+                8,
+                8,
+                8
+              ]
+            }
+          },
+          {
+            "cycle": 9,
+            "settledHeapDelta": {
+              "median": 23112440,
+              "min": 23106344,
+              "max": 23120744,
+              "values": [
+                23112440,
+                23120744,
+                23106344
+              ]
+            },
+            "retainedLifetimes": {
+              "median": 9000,
+              "min": 9000,
+              "max": 9000,
+              "values": [
+                9000,
+                9000,
+                9000
+              ]
+            },
+            "retainedValueBackings": {
+              "median": 9000,
+              "min": 9000,
+              "max": 9000,
+              "values": [
+                9000,
+                9000,
+                9000
+              ]
+            },
+            "valueBackedCandidates": {
+              "median": 9000,
+              "min": 9000,
+              "max": 9000,
+              "values": [
+                9000,
+                9000,
+                9000
+              ]
+            },
+            "sampledPayloadsAlive": {
+              "median": 9,
+              "min": 9,
+              "max": 9,
+              "values": [
+                9,
+                9,
+                9
+              ]
+            }
+          },
+          {
+            "cycle": 10,
+            "settledHeapDelta": {
+              "median": 24677848,
+              "min": 24675040,
+              "max": 24684264,
+              "values": [
+                24677848,
+                24684264,
+                24675040
+              ]
+            },
+            "retainedLifetimes": {
+              "median": 10000,
+              "min": 10000,
+              "max": 10000,
+              "values": [
+                10000,
+                10000,
+                10000
+              ]
+            },
+            "retainedValueBackings": {
+              "median": 10000,
+              "min": 10000,
+              "max": 10000,
+              "values": [
+                10000,
+                10000,
+                10000
+              ]
+            },
+            "valueBackedCandidates": {
+              "median": 10000,
+              "min": 10000,
+              "max": 10000,
+              "values": [
+                10000,
+                10000,
+                10000
+              ]
+            },
+            "sampledPayloadsAlive": {
+              "median": 10,
+              "min": 10,
+              "max": 10,
+              "values": [
+                10,
+                10,
+                10
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "arm": "lazy",
+        "keys": "fresh",
+        "cycles": [
+          {
+            "cycle": 1,
+            "settledHeapDelta": {
+              "median": 5172240,
+              "min": 5171488,
+              "max": 5270496,
+              "values": [
+                5171488,
+                5270496,
+                5172240
+              ]
+            },
+            "retainedLifetimes": {
+              "median": 1000,
+              "min": 1000,
+              "max": 1000,
+              "values": [
+                1000,
+                1000,
+                1000
+              ]
+            },
+            "retainedValueBackings": {
+              "median": 1000,
+              "min": 1000,
+              "max": 1000,
+              "values": [
+                1000,
+                1000,
+                1000
+              ]
+            },
+            "valueBackedCandidates": {
+              "median": 1000,
+              "min": 1000,
+              "max": 1000,
+              "values": [
+                1000,
+                1000,
+                1000
+              ]
+            },
+            "sampledPayloadsAlive": {
+              "median": 1,
+              "min": 1,
+              "max": 1,
+              "values": [
+                1,
+                1,
+                1
+              ]
+            }
+          },
+          {
+            "cycle": 2,
+            "settledHeapDelta": {
+              "median": 7261888,
+              "min": 7261352,
+              "max": 7495096,
+              "values": [
+                7261888,
+                7495096,
+                7261352
+              ]
+            },
+            "retainedLifetimes": {
+              "median": 2000,
+              "min": 2000,
+              "max": 2000,
+              "values": [
+                2000,
+                2000,
+                2000
+              ]
+            },
+            "retainedValueBackings": {
+              "median": 2000,
+              "min": 2000,
+              "max": 2000,
+              "values": [
+                2000,
+                2000,
+                2000
+              ]
+            },
+            "valueBackedCandidates": {
+              "median": 2000,
+              "min": 2000,
+              "max": 2000,
+              "values": [
+                2000,
+                2000,
+                2000
+              ]
+            },
+            "sampledPayloadsAlive": {
+              "median": 2,
+              "min": 2,
+              "max": 2,
+              "values": [
+                2,
+                2,
+                2
+              ]
+            }
+          },
+          {
+            "cycle": 3,
+            "settledHeapDelta": {
+              "median": 9881800,
+              "min": 9816808,
+              "max": 9887176,
+              "values": [
+                9881800,
+                9816808,
+                9887176
+              ]
+            },
+            "retainedLifetimes": {
+              "median": 3000,
+              "min": 3000,
+              "max": 3000,
+              "values": [
+                3000,
+                3000,
+                3000
+              ]
+            },
+            "retainedValueBackings": {
+              "median": 3000,
+              "min": 3000,
+              "max": 3000,
+              "values": [
+                3000,
+                3000,
+                3000
+              ]
+            },
+            "valueBackedCandidates": {
+              "median": 3000,
+              "min": 3000,
+              "max": 3000,
+              "values": [
+                3000,
+                3000,
+                3000
+              ]
+            },
+            "sampledPayloadsAlive": {
+              "median": 3,
+              "min": 3,
+              "max": 3,
+              "values": [
+                3,
+                3,
+                3
+              ]
+            }
+          },
+          {
+            "cycle": 4,
+            "settledHeapDelta": {
+              "median": 11630184,
+              "min": 11585032,
+              "max": 11648488,
+              "values": [
+                11585032,
+                11630184,
+                11648488
+              ]
+            },
+            "retainedLifetimes": {
+              "median": 4000,
+              "min": 4000,
+              "max": 4000,
+              "values": [
+                4000,
+                4000,
+                4000
+              ]
+            },
+            "retainedValueBackings": {
+              "median": 4000,
+              "min": 4000,
+              "max": 4000,
+              "values": [
+                4000,
+                4000,
+                4000
+              ]
+            },
+            "valueBackedCandidates": {
+              "median": 4000,
+              "min": 4000,
+              "max": 4000,
+              "values": [
+                4000,
+                4000,
+                4000
+              ]
+            },
+            "sampledPayloadsAlive": {
+              "median": 4,
+              "min": 4,
+              "max": 4,
+              "values": [
+                4,
+                4,
+                4
+              ]
+            }
+          },
+          {
+            "cycle": 5,
+            "settledHeapDelta": {
+              "median": 14621904,
+              "min": 14620352,
+              "max": 14625552,
+              "values": [
+                14621904,
+                14625552,
+                14620352
+              ]
+            },
+            "retainedLifetimes": {
+              "median": 5000,
+              "min": 5000,
+              "max": 5000,
+              "values": [
+                5000,
+                5000,
+                5000
+              ]
+            },
+            "retainedValueBackings": {
+              "median": 5000,
+              "min": 5000,
+              "max": 5000,
+              "values": [
+                5000,
+                5000,
+                5000
+              ]
+            },
+            "valueBackedCandidates": {
+              "median": 5000,
+              "min": 5000,
+              "max": 5000,
+              "values": [
+                5000,
+                5000,
+                5000
+              ]
+            },
+            "sampledPayloadsAlive": {
+              "median": 5,
+              "min": 5,
+              "max": 5,
+              "values": [
+                5,
+                5,
+                5
+              ]
+            }
+          },
+          {
+            "cycle": 6,
+            "settledHeapDelta": {
+              "median": 16598800,
+              "min": 16598376,
+              "max": 16598904,
+              "values": [
+                16598904,
+                16598376,
+                16598800
+              ]
+            },
+            "retainedLifetimes": {
+              "median": 6000,
+              "min": 6000,
+              "max": 6000,
+              "values": [
+                6000,
+                6000,
+                6000
+              ]
+            },
+            "retainedValueBackings": {
+              "median": 6000,
+              "min": 6000,
+              "max": 6000,
+              "values": [
+                6000,
+                6000,
+                6000
+              ]
+            },
+            "valueBackedCandidates": {
+              "median": 6000,
+              "min": 6000,
+              "max": 6000,
+              "values": [
+                6000,
+                6000,
+                6000
+              ]
+            },
+            "sampledPayloadsAlive": {
+              "median": 6,
+              "min": 6,
+              "max": 6,
+              "values": [
+                6,
+                6,
+                6
+              ]
+            }
+          },
+          {
+            "cycle": 7,
+            "settledHeapDelta": {
+              "median": 18220040,
+              "min": 18218448,
+              "max": 18232280,
+              "values": [
+                18218448,
+                18232280,
+                18220040
+              ]
+            },
+            "retainedLifetimes": {
+              "median": 7000,
+              "min": 7000,
+              "max": 7000,
+              "values": [
+                7000,
+                7000,
+                7000
+              ]
+            },
+            "retainedValueBackings": {
+              "median": 7000,
+              "min": 7000,
+              "max": 7000,
+              "values": [
+                7000,
+                7000,
+                7000
+              ]
+            },
+            "valueBackedCandidates": {
+              "median": 7000,
+              "min": 7000,
+              "max": 7000,
+              "values": [
+                7000,
+                7000,
+                7000
+              ]
+            },
+            "sampledPayloadsAlive": {
+              "median": 7,
+              "min": 7,
+              "max": 7,
+              "values": [
+                7,
+                7,
+                7
+              ]
+            }
+          },
+          {
+            "cycle": 8,
+            "settledHeapDelta": {
+              "median": 19798336,
+              "min": 19794040,
+              "max": 19807200,
+              "values": [
+                19794040,
+                19807200,
+                19798336
+              ]
+            },
+            "retainedLifetimes": {
+              "median": 8000,
+              "min": 8000,
+              "max": 8000,
+              "values": [
+                8000,
+                8000,
+                8000
+              ]
+            },
+            "retainedValueBackings": {
+              "median": 8000,
+              "min": 8000,
+              "max": 8000,
+              "values": [
+                8000,
+                8000,
+                8000
+              ]
+            },
+            "valueBackedCandidates": {
+              "median": 8000,
+              "min": 8000,
+              "max": 8000,
+              "values": [
+                8000,
+                8000,
+                8000
+              ]
+            },
+            "sampledPayloadsAlive": {
+              "median": 8,
+              "min": 8,
+              "max": 8,
+              "values": [
+                8,
+                8,
+                8
+              ]
+            }
+          },
+          {
+            "cycle": 9,
+            "settledHeapDelta": {
+              "median": 24261336,
+              "min": 24255216,
+              "max": 24267544,
+              "values": [
+                24267544,
+                24255216,
+                24261336
+              ]
+            },
+            "retainedLifetimes": {
+              "median": 9000,
+              "min": 9000,
+              "max": 9000,
+              "values": [
+                9000,
+                9000,
+                9000
+              ]
+            },
+            "retainedValueBackings": {
+              "median": 9000,
+              "min": 9000,
+              "max": 9000,
+              "values": [
+                9000,
+                9000,
+                9000
+              ]
+            },
+            "valueBackedCandidates": {
+              "median": 9000,
+              "min": 9000,
+              "max": 9000,
+              "values": [
+                9000,
+                9000,
+                9000
+              ]
+            },
+            "sampledPayloadsAlive": {
+              "median": 9,
+              "min": 9,
+              "max": 9,
+              "values": [
+                9,
+                9,
+                9
+              ]
+            }
+          },
+          {
+            "cycle": 10,
+            "settledHeapDelta": {
+              "median": 25826424,
+              "min": 25824216,
+              "max": 25828288,
+              "values": [
+                25826424,
+                25824216,
+                25828288
+              ]
+            },
+            "retainedLifetimes": {
+              "median": 10000,
+              "min": 10000,
+              "max": 10000,
+              "values": [
+                10000,
+                10000,
+                10000
+              ]
+            },
+            "retainedValueBackings": {
+              "median": 10000,
+              "min": 10000,
+              "max": 10000,
+              "values": [
+                10000,
+                10000,
+                10000
+              ]
+            },
+            "valueBackedCandidates": {
+              "median": 10000,
+              "min": 10000,
+              "max": 10000,
+              "values": [
+                10000,
+                10000,
+                10000
+              ]
+            },
+            "sampledPayloadsAlive": {
+              "median": 10,
+              "min": 10,
+              "max": 10,
+              "values": [
+                10,
+                10,
+                10
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "results": [
+      {
+        "sample": {
+          "arm": "baseline",
+          "keys": "reused",
+          "round": 0,
+          "pinned": false
+        },
+        "node": "v24.15.0",
+        "pid": 79051,
+        "bundleSha256": "719951bc5328bc94d3a0fa819afe6271d17fbc4e27514b734c58473cc42f002f",
+        "host": {
+          "cpu": "Apple M4",
+          "load": [
+            7.42529296875,
+            7.43603515625,
+            7.93115234375
+          ],
+          "freeBytes": 91701248
+        },
+        "cycles": [
+          {
+            "cycle": 1,
+            "settledHeapBytes": 11361544,
+            "resources": {
+              "observedLifetimes": 1000,
+              "retainedLifetimes": 1000,
+              "retainedValueBackings": 1000,
+              "valueBackedCandidates": 1000,
+              "active": 0,
+              "facades": 0
+            },
+            "sampledPayloadsAlive": 1,
+            "sampledTransactionsAlive": 0,
+            "deliveries": 1
+          },
+          {
+            "cycle": 2,
+            "settledHeapBytes": 13189984,
+            "resources": {
+              "observedLifetimes": 2000,
+              "retainedLifetimes": 2000,
+              "retainedValueBackings": 2000,
+              "valueBackedCandidates": 2000,
+              "active": 0,
+              "facades": 0
+            },
+            "sampledPayloadsAlive": 2,
+            "sampledTransactionsAlive": 0,
+            "deliveries": 0
+          },
+          {
+            "cycle": 3,
+            "settledHeapBytes": 15803296,
+            "resources": {
+              "observedLifetimes": 3000,
+              "retainedLifetimes": 3000,
+              "retainedValueBackings": 3000,
+              "valueBackedCandidates": 3000,
+              "active": 0,
+              "facades": 0
+            },
+            "sampledPayloadsAlive": 3,
+            "sampledTransactionsAlive": 0,
+            "deliveries": 0
+          },
+          {
+            "cycle": 4,
+            "settledHeapBytes": 17561272,
+            "resources": {
+              "observedLifetimes": 4000,
+              "retainedLifetimes": 4000,
+              "retainedValueBackings": 4000,
+              "valueBackedCandidates": 4000,
+              "active": 0,
+              "facades": 0
+            },
+            "sampledPayloadsAlive": 4,
+            "sampledTransactionsAlive": 0,
+            "deliveries": 0
+          },
+          {
+            "cycle": 5,
+            "settledHeapBytes": 19443064,
+            "resources": {
+              "observedLifetimes": 5000,
+              "retainedLifetimes": 5000,
+              "retainedValueBackings": 5000,
+              "valueBackedCandidates": 5000,
+              "active": 0,
+              "facades": 0
+            },
+            "sampledPayloadsAlive": 5,
+            "sampledTransactionsAlive": 0,
+            "deliveries": 0
+          },
+          {
+            "cycle": 6,
+            "settledHeapBytes": 21411824,
+            "resources": {
+              "observedLifetimes": 6000,
+              "retainedLifetimes": 6000,
+              "retainedValueBackings": 6000,
+              "valueBackedCandidates": 6000,
+              "active": 0,
+              "facades": 0
+            },
+            "sampledPayloadsAlive": 6,
+            "sampledTransactionsAlive": 0,
+            "deliveries": 0
+          },
+          {
+            "cycle": 7,
+            "settledHeapBytes": 23032960,
+            "resources": {
+              "observedLifetimes": 7000,
+              "retainedLifetimes": 7000,
+              "retainedValueBackings": 7000,
+              "valueBackedCandidates": 7000,
+              "active": 0,
+              "facades": 0
+            },
+            "sampledPayloadsAlive": 7,
+            "sampledTransactionsAlive": 0,
+            "deliveries": 0
+          },
+          {
+            "cycle": 8,
+            "settledHeapBytes": 24610808,
+            "resources": {
+              "observedLifetimes": 8000,
+              "retainedLifetimes": 8000,
+              "retainedValueBackings": 8000,
+              "valueBackedCandidates": 8000,
+              "active": 0,
+              "facades": 0
+            },
+            "sampledPayloadsAlive": 8,
+            "sampledTransactionsAlive": 0,
+            "deliveries": 0
+          },
+          {
+            "cycle": 9,
+            "settledHeapBytes": 29075912,
+            "resources": {
+              "observedLifetimes": 9000,
+              "retainedLifetimes": 9000,
+              "retainedValueBackings": 9000,
+              "valueBackedCandidates": 9000,
+              "active": 0,
+              "facades": 0
+            },
+            "sampledPayloadsAlive": 9,
+            "sampledTransactionsAlive": 0,
+            "deliveries": 0
+          },
+          {
+            "cycle": 10,
+            "settledHeapBytes": 30640208,
+            "resources": {
+              "observedLifetimes": 10000,
+              "retainedLifetimes": 10000,
+              "retainedValueBackings": 10000,
+              "valueBackedCandidates": 10000,
+              "active": 0,
+              "facades": 0
+            },
+            "sampledPayloadsAlive": 10,
+            "sampledTransactionsAlive": 0,
+            "deliveries": 0
+          }
+        ],
+        "passed": true,
+        "beforeHeapBytes": 5552192,
+        "emptyHeapBytes": 5957840,
+        "deliveries": 1,
+        "badPayloads": 0,
+        "postHelper": [
+          {
+            "pass": 1,
+            "alive": {
+              "tree": false,
+              "connection": false,
+              "payloads": 0,
+              "transactions": 0
+            },
+            "heapBytes": 7912640
+          },
+          {
+            "pass": 2,
+            "alive": {
+              "tree": false,
+              "connection": false,
+              "payloads": 0,
+              "transactions": 0
+            },
+            "heapBytes": 7765560
+          },
+          {
+            "pass": 3,
+            "alive": {
+              "tree": false,
+              "connection": false,
+              "payloads": 0,
+              "transactions": 0
+            },
+            "heapBytes": 7765744
+          }
+        ],
+        "afterPinRelease": [
+          {
+            "pass": 1,
+            "alive": {
+              "tree": false,
+              "connection": false,
+              "payloads": 0,
+              "transactions": 0
+            },
+            "heapBytes": 7912640
+          },
+          {
+            "pass": 2,
+            "alive": {
+              "tree": false,
+              "connection": false,
+              "payloads": 0,
+              "transactions": 0
+            },
+            "heapBytes": 7765560
+          },
+          {
+            "pass": 3,
+            "alive": {
+              "tree": false,
+              "connection": false,
+              "payloads": 0,
+              "transactions": 0
+            },
+            "heapBytes": 7765744
+          }
+        ]
+      },
+      {
+        "sample": {
+          "arm": "lazy",
+          "keys": "reused",
+          "round": 0,
+          "pinned": false
+        },
+        "node": "v24.15.0",
+        "pid": 79052,
+        "bundleSha256": "88c9c9f6086978341f98d3a0cbb0d39eccb001a5787afe8331999e06c8f09991",
+        "host": {
+          "cpu": "Apple M4",
+          "load": [
+            7.23095703125,
+            7.3955078125,
+            7.91357421875
+          ],
+          "freeBytes": 357662720
+        },
+        "cycles": [
+          {
+            "cycle": 1,
+            "settledHeapBytes": 11134112,
+            "resources": {
+              "observedLifetimes": 1000,
+              "retainedLifetimes": 1000,
+              "retainedValueBackings": 1000,
+              "valueBackedCandidates": 1000,
+              "active": 0,
+              "facades": 0
+            },
+            "sampledPayloadsAlive": 1,
+            "sampledTransactionsAlive": 0,
+            "deliveries": 1
+          },
+          {
+            "cycle": 2,
+            "settledHeapBytes": 13231448,
+            "resources": {
+              "observedLifetimes": 2000,
+              "retainedLifetimes": 2000,
+              "retainedValueBackings": 2000,
+              "valueBackedCandidates": 2000,
+              "active": 0,
+              "facades": 0
+            },
+            "sampledPayloadsAlive": 2,
+            "sampledTransactionsAlive": 0,
+            "deliveries": 0
+          },
+          {
+            "cycle": 3,
+            "settledHeapBytes": 15850184,
+            "resources": {
+              "observedLifetimes": 3000,
+              "retainedLifetimes": 3000,
+              "retainedValueBackings": 3000,
+              "valueBackedCandidates": 3000,
+              "active": 0,
+              "facades": 0
+            },
+            "sampledPayloadsAlive": 3,
+            "sampledTransactionsAlive": 0,
+            "deliveries": 0
+          },
+          {
+            "cycle": 4,
+            "settledHeapBytes": 17609312,
+            "resources": {
+              "observedLifetimes": 4000,
+              "retainedLifetimes": 4000,
+              "retainedValueBackings": 4000,
+              "valueBackedCandidates": 4000,
+              "active": 0,
+              "facades": 0
+            },
+            "sampledPayloadsAlive": 4,
+            "sampledTransactionsAlive": 0,
+            "deliveries": 0
+          },
+          {
+            "cycle": 5,
+            "settledHeapBytes": 20589256,
+            "resources": {
+              "observedLifetimes": 5000,
+              "retainedLifetimes": 5000,
+              "retainedValueBackings": 5000,
+              "valueBackedCandidates": 5000,
+              "active": 0,
+              "facades": 0
+            },
+            "sampledPayloadsAlive": 5,
+            "sampledTransactionsAlive": 0,
+            "deliveries": 0
+          },
+          {
+            "cycle": 6,
+            "settledHeapBytes": 22566904,
+            "resources": {
+              "observedLifetimes": 6000,
+              "retainedLifetimes": 6000,
+              "retainedValueBackings": 6000,
+              "valueBackedCandidates": 6000,
+              "active": 0,
+              "facades": 0
+            },
+            "sampledPayloadsAlive": 6,
+            "sampledTransactionsAlive": 0,
+            "deliveries": 0
+          },
+          {
+            "cycle": 7,
+            "settledHeapBytes": 24186664,
+            "resources": {
+              "observedLifetimes": 7000,
+              "retainedLifetimes": 7000,
+              "retainedValueBackings": 7000,
+              "valueBackedCandidates": 7000,
+              "active": 0,
+              "facades": 0
+            },
+            "sampledPayloadsAlive": 7,
+            "sampledTransactionsAlive": 0,
+            "deliveries": 0
+          },
+          {
+            "cycle": 8,
+            "settledHeapBytes": 25767072,
+            "resources": {
+              "observedLifetimes": 8000,
+              "retainedLifetimes": 8000,
+              "retainedValueBackings": 8000,
+              "valueBackedCandidates": 8000,
+              "active": 0,
+              "facades": 0
+            },
+            "sampledPayloadsAlive": 8,
+            "sampledTransactionsAlive": 0,
+            "deliveries": 0
+          },
+          {
+            "cycle": 9,
+            "settledHeapBytes": 30229464,
+            "resources": {
+              "observedLifetimes": 9000,
+              "retainedLifetimes": 9000,
+              "retainedValueBackings": 9000,
+              "valueBackedCandidates": 9000,
+              "active": 0,
+              "facades": 0
+            },
+            "sampledPayloadsAlive": 9,
+            "sampledTransactionsAlive": 0,
+            "deliveries": 0
+          },
+          {
+            "cycle": 10,
+            "settledHeapBytes": 31793368,
+            "resources": {
+              "observedLifetimes": 10000,
+              "retainedLifetimes": 10000,
+              "retainedValueBackings": 10000,
+              "valueBackedCandidates": 10000,
+              "active": 0,
+              "facades": 0
+            },
+            "sampledPayloadsAlive": 10,
+            "sampledTransactionsAlive": 0,
+            "deliveries": 0
+          }
+        ],
+        "passed": true,
+        "beforeHeapBytes": 5559296,
+        "emptyHeapBytes": 5967088,
+        "deliveries": 1,
+        "badPayloads": 0,
+        "postHelper": [
+          {
+            "pass": 1,
+            "alive": {
+              "tree": false,
+              "connection": false,
+              "payloads": 0,
+              "transactions": 0
+            },
+            "heapBytes": 9104920
+          },
+          {
+            "pass": 2,
+            "alive": {
+              "tree": false,
+              "connection": false,
+              "payloads": 0,
+              "transactions": 0
+            },
+            "heapBytes": 8937392
+          },
+          {
+            "pass": 3,
+            "alive": {
+              "tree": false,
+              "connection": false,
+              "payloads": 0,
+              "transactions": 0
+            },
+            "heapBytes": 8937576
+          }
+        ],
+        "afterPinRelease": [
+          {
+            "pass": 1,
+            "alive": {
+              "tree": false,
+              "connection": false,
+              "payloads": 0,
+              "transactions": 0
+            },
+            "heapBytes": 9104920
+          },
+          {
+            "pass": 2,
+            "alive": {
+              "tree": false,
+              "connection": false,
+              "payloads": 0,
+              "transactions": 0
+            },
+            "heapBytes": 8937392
+          },
+          {
+            "pass": 3,
+            "alive": {
+              "tree": false,
+              "connection": false,
+              "payloads": 0,
+              "transactions": 0
+            },
+            "heapBytes": 8937576
+          }
+        ]
+      },
+      {
+        "sample": {
+          "arm": "lazy",
+          "keys": "reused",
+          "round": 1,
+          "pinned": false
+        },
+        "node": "v24.15.0",
+        "pid": 79063,
+        "bundleSha256": "88c9c9f6086978341f98d3a0cbb0d39eccb001a5787afe8331999e06c8f09991",
+        "host": {
+          "cpu": "Apple M4",
+          "load": [
+            7.23095703125,
+            7.3955078125,
+            7.91357421875
+          ],
+          "freeBytes": 326828032
+        },
+        "cycles": [
+          {
+            "cycle": 1,
+            "settledHeapBytes": 11133328,
+            "resources": {
+              "observedLifetimes": 1000,
+              "retainedLifetimes": 1000,
+              "retainedValueBackings": 1000,
+              "valueBackedCandidates": 1000,
+              "active": 0,
+              "facades": 0
+            },
+            "sampledPayloadsAlive": 1,
+            "sampledTransactionsAlive": 0,
+            "deliveries": 1
+          },
+          {
+            "cycle": 2,
+            "settledHeapBytes": 13230160,
+            "resources": {
+              "observedLifetimes": 2000,
+              "retainedLifetimes": 2000,
+              "retainedValueBackings": 2000,
+              "valueBackedCandidates": 2000,
+              "active": 0,
+              "facades": 0
+            },
+            "sampledPayloadsAlive": 2,
+            "sampledTransactionsAlive": 0,
+            "deliveries": 0
+          },
+          {
+            "cycle": 3,
+            "settledHeapBytes": 15847776,
+            "resources": {
+              "observedLifetimes": 3000,
+              "retainedLifetimes": 3000,
+              "retainedValueBackings": 3000,
+              "valueBackedCandidates": 3000,
+              "active": 0,
+              "facades": 0
+            },
+            "sampledPayloadsAlive": 3,
+            "sampledTransactionsAlive": 0,
+            "deliveries": 0
+          },
+          {
+            "cycle": 4,
+            "settledHeapBytes": 17551296,
+            "resources": {
+              "observedLifetimes": 4000,
+              "retainedLifetimes": 4000,
+              "retainedValueBackings": 4000,
+              "valueBackedCandidates": 4000,
+              "active": 0,
+              "facades": 0
+            },
+            "sampledPayloadsAlive": 4,
+            "sampledTransactionsAlive": 0,
+            "deliveries": 0
+          },
+          {
+            "cycle": 5,
+            "settledHeapBytes": 20588080,
+            "resources": {
+              "observedLifetimes": 5000,
+              "retainedLifetimes": 5000,
+              "retainedValueBackings": 5000,
+              "valueBackedCandidates": 5000,
+              "active": 0,
+              "facades": 0
+            },
+            "sampledPayloadsAlive": 5,
+            "sampledTransactionsAlive": 0,
+            "deliveries": 0
+          },
+          {
+            "cycle": 6,
+            "settledHeapBytes": 22567480,
+            "resources": {
+              "observedLifetimes": 6000,
+              "retainedLifetimes": 6000,
+              "retainedValueBackings": 6000,
+              "valueBackedCandidates": 6000,
+              "active": 0,
+              "facades": 0
+            },
+            "sampledPayloadsAlive": 6,
+            "sampledTransactionsAlive": 0,
+            "deliveries": 0
+          },
+          {
+            "cycle": 7,
+            "settledHeapBytes": 24183568,
+            "resources": {
+              "observedLifetimes": 7000,
+              "retainedLifetimes": 7000,
+              "retainedValueBackings": 7000,
+              "valueBackedCandidates": 7000,
+              "active": 0,
+              "facades": 0
+            },
+            "sampledPayloadsAlive": 7,
+            "sampledTransactionsAlive": 0,
+            "deliveries": 0
+          },
+          {
+            "cycle": 8,
+            "settledHeapBytes": 25765456,
+            "resources": {
+              "observedLifetimes": 8000,
+              "retainedLifetimes": 8000,
+              "retainedValueBackings": 8000,
+              "valueBackedCandidates": 8000,
+              "active": 0,
+              "facades": 0
+            },
+            "sampledPayloadsAlive": 8,
+            "sampledTransactionsAlive": 0,
+            "deliveries": 0
+          },
+          {
+            "cycle": 9,
+            "settledHeapBytes": 30227872,
+            "resources": {
+              "observedLifetimes": 9000,
+              "retainedLifetimes": 9000,
+              "retainedValueBackings": 9000,
+              "valueBackedCandidates": 9000,
+              "active": 0,
+              "facades": 0
+            },
+            "sampledPayloadsAlive": 9,
+            "sampledTransactionsAlive": 0,
+            "deliveries": 0
+          },
+          {
+            "cycle": 10,
+            "settledHeapBytes": 31791992,
+            "resources": {
+              "observedLifetimes": 10000,
+              "retainedLifetimes": 10000,
+              "retainedValueBackings": 10000,
+              "valueBackedCandidates": 10000,
+              "active": 0,
+              "facades": 0
+            },
+            "sampledPayloadsAlive": 10,
+            "sampledTransactionsAlive": 0,
+            "deliveries": 0
+          }
+        ],
+        "passed": true,
+        "beforeHeapBytes": 5559224,
+        "emptyHeapBytes": 5967016,
+        "deliveries": 1,
+        "badPayloads": 0,
+        "postHelper": [
+          {
+            "pass": 1,
+            "alive": {
+              "tree": false,
+              "connection": false,
+              "payloads": 0,
+              "transactions": 0
+            },
+            "heapBytes": 9103536
+          },
+          {
+            "pass": 2,
+            "alive": {
+              "tree": false,
+              "connection": false,
+              "payloads": 0,
+              "transactions": 0
+            },
+            "heapBytes": 8936008
+          },
+          {
+            "pass": 3,
+            "alive": {
+              "tree": false,
+              "connection": false,
+              "payloads": 0,
+              "transactions": 0
+            },
+            "heapBytes": 8936192
+          }
+        ],
+        "afterPinRelease": [
+          {
+            "pass": 1,
+            "alive": {
+              "tree": false,
+              "connection": false,
+              "payloads": 0,
+              "transactions": 0
+            },
+            "heapBytes": 9103536
+          },
+          {
+            "pass": 2,
+            "alive": {
+              "tree": false,
+              "connection": false,
+              "payloads": 0,
+              "transactions": 0
+            },
+            "heapBytes": 8936008
+          },
+          {
+            "pass": 3,
+            "alive": {
+              "tree": false,
+              "connection": false,
+              "payloads": 0,
+              "transactions": 0
+            },
+            "heapBytes": 8936192
+          }
+        ]
+      },
+      {
+        "sample": {
+          "arm": "baseline",
+          "keys": "reused",
+          "round": 1,
+          "pinned": false
+        },
+        "node": "v24.15.0",
+        "pid": 79065,
+        "bundleSha256": "719951bc5328bc94d3a0fa819afe6271d17fbc4e27514b734c58473cc42f002f",
+        "host": {
+          "cpu": "Apple M4",
+          "load": [
+            7.23095703125,
+            7.3955078125,
+            7.91357421875
+          ],
+          "freeBytes": 326336512
+        },
+        "cycles": [
+          {
+            "cycle": 1,
+            "settledHeapBytes": 11094288,
+            "resources": {
+              "observedLifetimes": 1000,
+              "retainedLifetimes": 1000,
+              "retainedValueBackings": 1000,
+              "valueBackedCandidates": 1000,
+              "active": 0,
+              "facades": 0
+            },
+            "sampledPayloadsAlive": 1,
+            "sampledTransactionsAlive": 0,
+            "deliveries": 1
+          },
+          {
+            "cycle": 2,
+            "settledHeapBytes": 13403736,
+            "resources": {
+              "observedLifetimes": 2000,
+              "retainedLifetimes": 2000,
+              "retainedValueBackings": 2000,
+              "valueBackedCandidates": 2000,
+              "active": 0,
+              "facades": 0
+            },
+            "sampledPayloadsAlive": 2,
+            "sampledTransactionsAlive": 0,
+            "deliveries": 0
+          },
+          {
+            "cycle": 3,
+            "settledHeapBytes": 15998704,
+            "resources": {
+              "observedLifetimes": 3000,
+              "retainedLifetimes": 3000,
+              "retainedValueBackings": 3000,
+              "valueBackedCandidates": 3000,
+              "active": 0,
+              "facades": 0
+            },
+            "sampledPayloadsAlive": 3,
+            "sampledTransactionsAlive": 0,
+            "deliveries": 0
+          },
+          {
+            "cycle": 4,
+            "settledHeapBytes": 17539880,
+            "resources": {
+              "observedLifetimes": 4000,
+              "retainedLifetimes": 4000,
+              "retainedValueBackings": 4000,
+              "valueBackedCandidates": 4000,
+              "active": 0,
+              "facades": 0
+            },
+            "sampledPayloadsAlive": 4,
+            "sampledTransactionsAlive": 0,
+            "deliveries": 0
+          },
+          {
+            "cycle": 5,
+            "settledHeapBytes": 19444176,
+            "resources": {
+              "observedLifetimes": 5000,
+              "retainedLifetimes": 5000,
+              "retainedValueBackings": 5000,
+              "valueBackedCandidates": 5000,
+              "active": 0,
+              "facades": 0
+            },
+            "sampledPayloadsAlive": 5,
+            "sampledTransactionsAlive": 0,
+            "deliveries": 0
+          },
+          {
+            "cycle": 6,
+            "settledHeapBytes": 21407512,
+            "resources": {
+              "observedLifetimes": 6000,
+              "retainedLifetimes": 6000,
+              "retainedValueBackings": 6000,
+              "valueBackedCandidates": 6000,
+              "active": 0,
+              "facades": 0
+            },
+            "sampledPayloadsAlive": 6,
+            "sampledTransactionsAlive": 0,
+            "deliveries": 0
+          },
+          {
+            "cycle": 7,
+            "settledHeapBytes": 23041072,
+            "resources": {
+              "observedLifetimes": 7000,
+              "retainedLifetimes": 7000,
+              "retainedValueBackings": 7000,
+              "valueBackedCandidates": 7000,
+              "active": 0,
+              "facades": 0
+            },
+            "sampledPayloadsAlive": 7,
+            "sampledTransactionsAlive": 0,
+            "deliveries": 0
+          },
+          {
+            "cycle": 8,
+            "settledHeapBytes": 24614752,
+            "resources": {
+              "observedLifetimes": 8000,
+              "retainedLifetimes": 8000,
+              "retainedValueBackings": 8000,
+              "valueBackedCandidates": 8000,
+              "active": 0,
+              "facades": 0
+            },
+            "sampledPayloadsAlive": 8,
+            "sampledTransactionsAlive": 0,
+            "deliveries": 0
+          },
+          {
+            "cycle": 9,
+            "settledHeapBytes": 29064560,
+            "resources": {
+              "observedLifetimes": 9000,
+              "retainedLifetimes": 9000,
+              "retainedValueBackings": 9000,
+              "valueBackedCandidates": 9000,
+              "active": 0,
+              "facades": 0
+            },
+            "sampledPayloadsAlive": 9,
+            "sampledTransactionsAlive": 0,
+            "deliveries": 0
+          },
+          {
+            "cycle": 10,
+            "settledHeapBytes": 30632920,
+            "resources": {
+              "observedLifetimes": 10000,
+              "retainedLifetimes": 10000,
+              "retainedValueBackings": 10000,
+              "valueBackedCandidates": 10000,
+              "active": 0,
+              "facades": 0
+            },
+            "sampledPayloadsAlive": 10,
+            "sampledTransactionsAlive": 0,
+            "deliveries": 0
+          }
+        ],
+        "passed": true,
+        "beforeHeapBytes": 5552192,
+        "emptyHeapBytes": 5957840,
+        "deliveries": 1,
+        "badPayloads": 0,
+        "postHelper": [
+          {
+            "pass": 1,
+            "alive": {
+              "tree": false,
+              "connection": false,
+              "payloads": 0,
+              "transactions": 0
+            },
+            "heapBytes": 7914752
+          },
+          {
+            "pass": 2,
+            "alive": {
+              "tree": false,
+              "connection": false,
+              "payloads": 0,
+              "transactions": 0
+            },
+            "heapBytes": 7767856
+          },
+          {
+            "pass": 3,
+            "alive": {
+              "tree": false,
+              "connection": false,
+              "payloads": 0,
+              "transactions": 0
+            },
+            "heapBytes": 7768040
+          }
+        ],
+        "afterPinRelease": [
+          {
+            "pass": 1,
+            "alive": {
+              "tree": false,
+              "connection": false,
+              "payloads": 0,
+              "transactions": 0
+            },
+            "heapBytes": 7914752
+          },
+          {
+            "pass": 2,
+            "alive": {
+              "tree": false,
+              "connection": false,
+              "payloads": 0,
+              "transactions": 0
+            },
+            "heapBytes": 7767856
+          },
+          {
+            "pass": 3,
+            "alive": {
+              "tree": false,
+              "connection": false,
+              "payloads": 0,
+              "transactions": 0
+            },
+            "heapBytes": 7768040
+          }
+        ]
+      },
+      {
+        "sample": {
+          "arm": "baseline",
+          "keys": "reused",
+          "round": 2,
+          "pinned": false
+        },
+        "node": "v24.15.0",
+        "pid": 79096,
+        "bundleSha256": "719951bc5328bc94d3a0fa819afe6271d17fbc4e27514b734c58473cc42f002f",
+        "host": {
+          "cpu": "Apple M4",
+          "load": [
+            7.29248046875,
+            7.4052734375,
+            7.9140625
+          ],
+          "freeBytes": 364085248
+        },
+        "cycles": [
+          {
+            "cycle": 1,
+            "settledHeapBytes": 11097696,
+            "resources": {
+              "observedLifetimes": 1000,
+              "retainedLifetimes": 1000,
+              "retainedValueBackings": 1000,
+              "valueBackedCandidates": 1000,
+              "active": 0,
+              "facades": 0
+            },
+            "sampledPayloadsAlive": 1,
+            "sampledTransactionsAlive": 0,
+            "deliveries": 1
+          },
+          {
+            "cycle": 2,
+            "settledHeapBytes": 13177592,
+            "resources": {
+              "observedLifetimes": 2000,
+              "retainedLifetimes": 2000,
+              "retainedValueBackings": 2000,
+              "valueBackedCandidates": 2000,
+              "active": 0,
+              "facades": 0
+            },
+            "sampledPayloadsAlive": 2,
+            "sampledTransactionsAlive": 0,
+            "deliveries": 0
+          },
+          {
+            "cycle": 3,
+            "settledHeapBytes": 15800680,
+            "resources": {
+              "observedLifetimes": 3000,
+              "retainedLifetimes": 3000,
+              "retainedValueBackings": 3000,
+              "valueBackedCandidates": 3000,
+              "active": 0,
+              "facades": 0
+            },
+            "sampledPayloadsAlive": 3,
+            "sampledTransactionsAlive": 0,
+            "deliveries": 0
+          },
+          {
+            "cycle": 4,
+            "settledHeapBytes": 17500096,
+            "resources": {
+              "observedLifetimes": 4000,
+              "retainedLifetimes": 4000,
+              "retainedValueBackings": 4000,
+              "valueBackedCandidates": 4000,
+              "active": 0,
+              "facades": 0
+            },
+            "sampledPayloadsAlive": 4,
+            "sampledTransactionsAlive": 0,
+            "deliveries": 0
+          },
+          {
+            "cycle": 5,
+            "settledHeapBytes": 19446944,
+            "resources": {
+              "observedLifetimes": 5000,
+              "retainedLifetimes": 5000,
+              "retainedValueBackings": 5000,
+              "valueBackedCandidates": 5000,
+              "active": 0,
+              "facades": 0
+            },
+            "sampledPayloadsAlive": 5,
+            "sampledTransactionsAlive": 0,
+            "deliveries": 0
+          },
+          {
+            "cycle": 6,
+            "settledHeapBytes": 21414240,
+            "resources": {
+              "observedLifetimes": 6000,
+              "retainedLifetimes": 6000,
+              "retainedValueBackings": 6000,
+              "valueBackedCandidates": 6000,
+              "active": 0,
+              "facades": 0
+            },
+            "sampledPayloadsAlive": 6,
+            "sampledTransactionsAlive": 0,
+            "deliveries": 0
+          },
+          {
+            "cycle": 7,
+            "settledHeapBytes": 23036864,
+            "resources": {
+              "observedLifetimes": 7000,
+              "retainedLifetimes": 7000,
+              "retainedValueBackings": 7000,
+              "valueBackedCandidates": 7000,
+              "active": 0,
+              "facades": 0
+            },
+            "sampledPayloadsAlive": 7,
+            "sampledTransactionsAlive": 0,
+            "deliveries": 0
+          },
+          {
+            "cycle": 8,
+            "settledHeapBytes": 24612600,
+            "resources": {
+              "observedLifetimes": 8000,
+              "retainedLifetimes": 8000,
+              "retainedValueBackings": 8000,
+              "valueBackedCandidates": 8000,
+              "active": 0,
+              "facades": 0
+            },
+            "sampledPayloadsAlive": 8,
+            "sampledTransactionsAlive": 0,
+            "deliveries": 0
+          },
+          {
+            "cycle": 9,
+            "settledHeapBytes": 29077152,
+            "resources": {
+              "observedLifetimes": 9000,
+              "retainedLifetimes": 9000,
+              "retainedValueBackings": 9000,
+              "valueBackedCandidates": 9000,
+              "active": 0,
+              "facades": 0
+            },
+            "sampledPayloadsAlive": 9,
+            "sampledTransactionsAlive": 0,
+            "deliveries": 0
+          },
+          {
+            "cycle": 10,
+            "settledHeapBytes": 30643240,
+            "resources": {
+              "observedLifetimes": 10000,
+              "retainedLifetimes": 10000,
+              "retainedValueBackings": 10000,
+              "valueBackedCandidates": 10000,
+              "active": 0,
+              "facades": 0
+            },
+            "sampledPayloadsAlive": 10,
+            "sampledTransactionsAlive": 0,
+            "deliveries": 0
+          }
+        ],
+        "passed": true,
+        "beforeHeapBytes": 5552192,
+        "emptyHeapBytes": 5957840,
+        "deliveries": 1,
+        "badPayloads": 0,
+        "postHelper": [
+          {
+            "pass": 1,
+            "alive": {
+              "tree": false,
+              "connection": false,
+              "payloads": 0,
+              "transactions": 0
+            },
+            "heapBytes": 7913664
+          },
+          {
+            "pass": 2,
+            "alive": {
+              "tree": false,
+              "connection": false,
+              "payloads": 0,
+              "transactions": 0
+            },
+            "heapBytes": 7766768
+          },
+          {
+            "pass": 3,
+            "alive": {
+              "tree": false,
+              "connection": false,
+              "payloads": 0,
+              "transactions": 0
+            },
+            "heapBytes": 7766952
+          }
+        ],
+        "afterPinRelease": [
+          {
+            "pass": 1,
+            "alive": {
+              "tree": false,
+              "connection": false,
+              "payloads": 0,
+              "transactions": 0
+            },
+            "heapBytes": 7913664
+          },
+          {
+            "pass": 2,
+            "alive": {
+              "tree": false,
+              "connection": false,
+              "payloads": 0,
+              "transactions": 0
+            },
+            "heapBytes": 7766768
+          },
+          {
+            "pass": 3,
+            "alive": {
+              "tree": false,
+              "connection": false,
+              "payloads": 0,
+              "transactions": 0
+            },
+            "heapBytes": 7766952
+          }
+        ]
+      },
+      {
+        "sample": {
+          "arm": "lazy",
+          "keys": "reused",
+          "round": 2,
+          "pinned": false
+        },
+        "node": "v24.15.0",
+        "pid": 79102,
+        "bundleSha256": "88c9c9f6086978341f98d3a0cbb0d39eccb001a5787afe8331999e06c8f09991",
+        "host": {
+          "cpu": "Apple M4",
+          "load": [
+            7.90966796875,
+            7.53125,
+            7.95556640625
+          ],
+          "freeBytes": 338018304
+        },
+        "cycles": [
+          {
+            "cycle": 1,
+            "settledHeapBytes": 11135216,
+            "resources": {
+              "observedLifetimes": 1000,
+              "retainedLifetimes": 1000,
+              "retainedValueBackings": 1000,
+              "valueBackedCandidates": 1000,
+              "active": 0,
+              "facades": 0
+            },
+            "sampledPayloadsAlive": 1,
+            "sampledTransactionsAlive": 0,
+            "deliveries": 1
+          },
+          {
+            "cycle": 2,
+            "settledHeapBytes": 13230632,
+            "resources": {
+              "observedLifetimes": 2000,
+              "retainedLifetimes": 2000,
+              "retainedValueBackings": 2000,
+              "valueBackedCandidates": 2000,
+              "active": 0,
+              "facades": 0
+            },
+            "sampledPayloadsAlive": 2,
+            "sampledTransactionsAlive": 0,
+            "deliveries": 0
+          },
+          {
+            "cycle": 3,
+            "settledHeapBytes": 15857032,
+            "resources": {
+              "observedLifetimes": 3000,
+              "retainedLifetimes": 3000,
+              "retainedValueBackings": 3000,
+              "valueBackedCandidates": 3000,
+              "active": 0,
+              "facades": 0
+            },
+            "sampledPayloadsAlive": 3,
+            "sampledTransactionsAlive": 0,
+            "deliveries": 0
+          },
+          {
+            "cycle": 4,
+            "settledHeapBytes": 17616160,
+            "resources": {
+              "observedLifetimes": 4000,
+              "retainedLifetimes": 4000,
+              "retainedValueBackings": 4000,
+              "valueBackedCandidates": 4000,
+              "active": 0,
+              "facades": 0
+            },
+            "sampledPayloadsAlive": 4,
+            "sampledTransactionsAlive": 0,
+            "deliveries": 0
+          },
+          {
+            "cycle": 5,
+            "settledHeapBytes": 20588704,
+            "resources": {
+              "observedLifetimes": 5000,
+              "retainedLifetimes": 5000,
+              "retainedValueBackings": 5000,
+              "valueBackedCandidates": 5000,
+              "active": 0,
+              "facades": 0
+            },
+            "sampledPayloadsAlive": 5,
+            "sampledTransactionsAlive": 0,
+            "deliveries": 0
+          },
+          {
+            "cycle": 6,
+            "settledHeapBytes": 22567208,
+            "resources": {
+              "observedLifetimes": 6000,
+              "retainedLifetimes": 6000,
+              "retainedValueBackings": 6000,
+              "valueBackedCandidates": 6000,
+              "active": 0,
+              "facades": 0
+            },
+            "sampledPayloadsAlive": 6,
+            "sampledTransactionsAlive": 0,
+            "deliveries": 0
+          },
+          {
+            "cycle": 7,
+            "settledHeapBytes": 24187848,
+            "resources": {
+              "observedLifetimes": 7000,
+              "retainedLifetimes": 7000,
+              "retainedValueBackings": 7000,
+              "valueBackedCandidates": 7000,
+              "active": 0,
+              "facades": 0
+            },
+            "sampledPayloadsAlive": 7,
+            "sampledTransactionsAlive": 0,
+            "deliveries": 0
+          },
+          {
+            "cycle": 8,
+            "settledHeapBytes": 25760432,
+            "resources": {
+              "observedLifetimes": 8000,
+              "retainedLifetimes": 8000,
+              "retainedValueBackings": 8000,
+              "valueBackedCandidates": 8000,
+              "active": 0,
+              "facades": 0
+            },
+            "sampledPayloadsAlive": 8,
+            "sampledTransactionsAlive": 0,
+            "deliveries": 0
+          },
+          {
+            "cycle": 9,
+            "settledHeapBytes": 30233104,
+            "resources": {
+              "observedLifetimes": 9000,
+              "retainedLifetimes": 9000,
+              "retainedValueBackings": 9000,
+              "valueBackedCandidates": 9000,
+              "active": 0,
+              "facades": 0
+            },
+            "sampledPayloadsAlive": 9,
+            "sampledTransactionsAlive": 0,
+            "deliveries": 0
+          },
+          {
+            "cycle": 10,
+            "settledHeapBytes": 31798552,
+            "resources": {
+              "observedLifetimes": 10000,
+              "retainedLifetimes": 10000,
+              "retainedValueBackings": 10000,
+              "valueBackedCandidates": 10000,
+              "active": 0,
+              "facades": 0
+            },
+            "sampledPayloadsAlive": 10,
+            "sampledTransactionsAlive": 0,
+            "deliveries": 0
+          }
+        ],
+        "passed": true,
+        "beforeHeapBytes": 5559224,
+        "emptyHeapBytes": 5967016,
+        "deliveries": 1,
+        "badPayloads": 0,
+        "postHelper": [
+          {
+            "pass": 1,
+            "alive": {
+              "tree": false,
+              "connection": false,
+              "payloads": 0,
+              "transactions": 0
+            },
+            "heapBytes": 9108096
+          },
+          {
+            "pass": 2,
+            "alive": {
+              "tree": false,
+              "connection": false,
+              "payloads": 0,
+              "transactions": 0
+            },
+            "heapBytes": 8940568
+          },
+          {
+            "pass": 3,
+            "alive": {
+              "tree": false,
+              "connection": false,
+              "payloads": 0,
+              "transactions": 0
+            },
+            "heapBytes": 8940752
+          }
+        ],
+        "afterPinRelease": [
+          {
+            "pass": 1,
+            "alive": {
+              "tree": false,
+              "connection": false,
+              "payloads": 0,
+              "transactions": 0
+            },
+            "heapBytes": 9108096
+          },
+          {
+            "pass": 2,
+            "alive": {
+              "tree": false,
+              "connection": false,
+              "payloads": 0,
+              "transactions": 0
+            },
+            "heapBytes": 8940568
+          },
+          {
+            "pass": 3,
+            "alive": {
+              "tree": false,
+              "connection": false,
+              "payloads": 0,
+              "transactions": 0
+            },
+            "heapBytes": 8940752
+          }
+        ]
+      },
+      {
+        "sample": {
+          "arm": "baseline",
+          "keys": "fresh",
+          "round": 0,
+          "pinned": false
+        },
+        "node": "v24.15.0",
+        "pid": 79135,
+        "bundleSha256": "719951bc5328bc94d3a0fa819afe6271d17fbc4e27514b734c58473cc42f002f",
+        "host": {
+          "cpu": "Apple M4",
+          "load": [
+            7.90966796875,
+            7.53125,
+            7.95556640625
+          ],
+          "freeBytes": 396394496
+        },
+        "cycles": [
+          {
+            "cycle": 1,
+            "settledHeapBytes": 11070368,
+            "resources": {
+              "observedLifetimes": 1000,
+              "retainedLifetimes": 1000,
+              "retainedValueBackings": 1000,
+              "valueBackedCandidates": 1000,
+              "active": 0,
+              "facades": 0
+            },
+            "sampledPayloadsAlive": 1,
+            "sampledTransactionsAlive": 0,
+            "deliveries": 1
+          },
+          {
+            "cycle": 2,
+            "settledHeapBytes": 13410832,
+            "resources": {
+              "observedLifetimes": 2000,
+              "retainedLifetimes": 2000,
+              "retainedValueBackings": 2000,
+              "valueBackedCandidates": 2000,
+              "active": 0,
+              "facades": 0
+            },
+            "sampledPayloadsAlive": 2,
+            "sampledTransactionsAlive": 0,
+            "deliveries": 0
+          },
+          {
+            "cycle": 3,
+            "settledHeapBytes": 15732456,
+            "resources": {
+              "observedLifetimes": 3000,
+              "retainedLifetimes": 3000,
+              "retainedValueBackings": 3000,
+              "valueBackedCandidates": 3000,
+              "active": 0,
+              "facades": 0
+            },
+            "sampledPayloadsAlive": 3,
+            "sampledTransactionsAlive": 0,
+            "deliveries": 0
+          },
+          {
+            "cycle": 4,
+            "settledHeapBytes": 17541136,
+            "resources": {
+              "observedLifetimes": 4000,
+              "retainedLifetimes": 4000,
+              "retainedValueBackings": 4000,
+              "valueBackedCandidates": 4000,
+              "active": 0,
+              "facades": 0
+            },
+            "sampledPayloadsAlive": 4,
+            "sampledTransactionsAlive": 0,
+            "deliveries": 0
+          },
+          {
+            "cycle": 5,
+            "settledHeapBytes": 20534576,
+            "resources": {
+              "observedLifetimes": 5000,
+              "retainedLifetimes": 5000,
+              "retainedValueBackings": 5000,
+              "valueBackedCandidates": 5000,
+              "active": 0,
+              "facades": 0
+            },
+            "sampledPayloadsAlive": 5,
+            "sampledTransactionsAlive": 0,
+            "deliveries": 0
+          },
+          {
+            "cycle": 6,
+            "settledHeapBytes": 22507752,
+            "resources": {
+              "observedLifetimes": 6000,
+              "retainedLifetimes": 6000,
+              "retainedValueBackings": 6000,
+              "valueBackedCandidates": 6000,
+              "active": 0,
+              "facades": 0
+            },
+            "sampledPayloadsAlive": 6,
+            "sampledTransactionsAlive": 0,
+            "deliveries": 0
+          },
+          {
+            "cycle": 7,
+            "settledHeapBytes": 24144096,
+            "resources": {
+              "observedLifetimes": 7000,
+              "retainedLifetimes": 7000,
+              "retainedValueBackings": 7000,
+              "valueBackedCandidates": 7000,
+              "active": 0,
+              "facades": 0
+            },
+            "sampledPayloadsAlive": 7,
+            "sampledTransactionsAlive": 0,
+            "deliveries": 0
+          },
+          {
+            "cycle": 8,
+            "settledHeapBytes": 24626408,
+            "resources": {
+              "observedLifetimes": 8000,
+              "retainedLifetimes": 8000,
+              "retainedValueBackings": 8000,
+              "valueBackedCandidates": 8000,
+              "active": 0,
+              "facades": 0
+            },
+            "sampledPayloadsAlive": 8,
+            "sampledTransactionsAlive": 0,
+            "deliveries": 0
+          },
+          {
+            "cycle": 9,
+            "settledHeapBytes": 29070352,
+            "resources": {
+              "observedLifetimes": 9000,
+              "retainedLifetimes": 9000,
+              "retainedValueBackings": 9000,
+              "valueBackedCandidates": 9000,
+              "active": 0,
+              "facades": 0
+            },
+            "sampledPayloadsAlive": 9,
+            "sampledTransactionsAlive": 0,
+            "deliveries": 0
+          },
+          {
+            "cycle": 10,
+            "settledHeapBytes": 30635760,
+            "resources": {
+              "observedLifetimes": 10000,
+              "retainedLifetimes": 10000,
+              "retainedValueBackings": 10000,
+              "valueBackedCandidates": 10000,
+              "active": 0,
+              "facades": 0
+            },
+            "sampledPayloadsAlive": 10,
+            "sampledTransactionsAlive": 0,
+            "deliveries": 0
+          }
+        ],
+        "passed": true,
+        "beforeHeapBytes": 5552192,
+        "emptyHeapBytes": 5957912,
+        "deliveries": 1,
+        "badPayloads": 0,
+        "postHelper": [
+          {
+            "pass": 1,
+            "alive": {
+              "tree": false,
+              "connection": false,
+              "payloads": 0,
+              "transactions": 0
+            },
+            "heapBytes": 7914736
+          },
+          {
+            "pass": 2,
+            "alive": {
+              "tree": false,
+              "connection": false,
+              "payloads": 0,
+              "transactions": 0
+            },
+            "heapBytes": 7769240
+          },
+          {
+            "pass": 3,
+            "alive": {
+              "tree": false,
+              "connection": false,
+              "payloads": 0,
+              "transactions": 0
+            },
+            "heapBytes": 7769424
+          }
+        ],
+        "afterPinRelease": [
+          {
+            "pass": 1,
+            "alive": {
+              "tree": false,
+              "connection": false,
+              "payloads": 0,
+              "transactions": 0
+            },
+            "heapBytes": 7914736
+          },
+          {
+            "pass": 2,
+            "alive": {
+              "tree": false,
+              "connection": false,
+              "payloads": 0,
+              "transactions": 0
+            },
+            "heapBytes": 7769240
+          },
+          {
+            "pass": 3,
+            "alive": {
+              "tree": false,
+              "connection": false,
+              "payloads": 0,
+              "transactions": 0
+            },
+            "heapBytes": 7769424
+          }
+        ]
+      },
+      {
+        "sample": {
+          "arm": "lazy",
+          "keys": "fresh",
+          "round": 0,
+          "pinned": false
+        },
+        "node": "v24.15.0",
+        "pid": 79145,
+        "bundleSha256": "88c9c9f6086978341f98d3a0cbb0d39eccb001a5787afe8331999e06c8f09991",
+        "host": {
+          "cpu": "Apple M4",
+          "load": [
+            7.67626953125,
+            7.48876953125,
+            7.93798828125
+          ],
+          "freeBytes": 410517504
+        },
+        "cycles": [
+          {
+            "cycle": 1,
+            "settledHeapBytes": 11138504,
+            "resources": {
+              "observedLifetimes": 1000,
+              "retainedLifetimes": 1000,
+              "retainedValueBackings": 1000,
+              "valueBackedCandidates": 1000,
+              "active": 0,
+              "facades": 0
+            },
+            "sampledPayloadsAlive": 1,
+            "sampledTransactionsAlive": 0,
+            "deliveries": 1
+          },
+          {
+            "cycle": 2,
+            "settledHeapBytes": 13228904,
+            "resources": {
+              "observedLifetimes": 2000,
+              "retainedLifetimes": 2000,
+              "retainedValueBackings": 2000,
+              "valueBackedCandidates": 2000,
+              "active": 0,
+              "facades": 0
+            },
+            "sampledPayloadsAlive": 2,
+            "sampledTransactionsAlive": 0,
+            "deliveries": 0
+          },
+          {
+            "cycle": 3,
+            "settledHeapBytes": 15848816,
+            "resources": {
+              "observedLifetimes": 3000,
+              "retainedLifetimes": 3000,
+              "retainedValueBackings": 3000,
+              "valueBackedCandidates": 3000,
+              "active": 0,
+              "facades": 0
+            },
+            "sampledPayloadsAlive": 3,
+            "sampledTransactionsAlive": 0,
+            "deliveries": 0
+          },
+          {
+            "cycle": 4,
+            "settledHeapBytes": 17552048,
+            "resources": {
+              "observedLifetimes": 4000,
+              "retainedLifetimes": 4000,
+              "retainedValueBackings": 4000,
+              "valueBackedCandidates": 4000,
+              "active": 0,
+              "facades": 0
+            },
+            "sampledPayloadsAlive": 4,
+            "sampledTransactionsAlive": 0,
+            "deliveries": 0
+          },
+          {
+            "cycle": 5,
+            "settledHeapBytes": 20588920,
+            "resources": {
+              "observedLifetimes": 5000,
+              "retainedLifetimes": 5000,
+              "retainedValueBackings": 5000,
+              "valueBackedCandidates": 5000,
+              "active": 0,
+              "facades": 0
+            },
+            "sampledPayloadsAlive": 5,
+            "sampledTransactionsAlive": 0,
+            "deliveries": 0
+          },
+          {
+            "cycle": 6,
+            "settledHeapBytes": 22565920,
+            "resources": {
+              "observedLifetimes": 6000,
+              "retainedLifetimes": 6000,
+              "retainedValueBackings": 6000,
+              "valueBackedCandidates": 6000,
+              "active": 0,
+              "facades": 0
+            },
+            "sampledPayloadsAlive": 6,
+            "sampledTransactionsAlive": 0,
+            "deliveries": 0
+          },
+          {
+            "cycle": 7,
+            "settledHeapBytes": 24185464,
+            "resources": {
+              "observedLifetimes": 7000,
+              "retainedLifetimes": 7000,
+              "retainedValueBackings": 7000,
+              "valueBackedCandidates": 7000,
+              "active": 0,
+              "facades": 0
+            },
+            "sampledPayloadsAlive": 7,
+            "sampledTransactionsAlive": 0,
+            "deliveries": 0
+          },
+          {
+            "cycle": 8,
+            "settledHeapBytes": 25761056,
+            "resources": {
+              "observedLifetimes": 8000,
+              "retainedLifetimes": 8000,
+              "retainedValueBackings": 8000,
+              "valueBackedCandidates": 8000,
+              "active": 0,
+              "facades": 0
+            },
+            "sampledPayloadsAlive": 8,
+            "sampledTransactionsAlive": 0,
+            "deliveries": 0
+          },
+          {
+            "cycle": 9,
+            "settledHeapBytes": 30234560,
+            "resources": {
+              "observedLifetimes": 9000,
+              "retainedLifetimes": 9000,
+              "retainedValueBackings": 9000,
+              "valueBackedCandidates": 9000,
+              "active": 0,
+              "facades": 0
+            },
+            "sampledPayloadsAlive": 9,
+            "sampledTransactionsAlive": 0,
+            "deliveries": 0
+          },
+          {
+            "cycle": 10,
+            "settledHeapBytes": 31793440,
+            "resources": {
+              "observedLifetimes": 10000,
+              "retainedLifetimes": 10000,
+              "retainedValueBackings": 10000,
+              "valueBackedCandidates": 10000,
+              "active": 0,
+              "facades": 0
+            },
+            "sampledPayloadsAlive": 10,
+            "sampledTransactionsAlive": 0,
+            "deliveries": 0
+          }
+        ],
+        "passed": true,
+        "beforeHeapBytes": 5559224,
+        "emptyHeapBytes": 5967016,
+        "deliveries": 1,
+        "badPayloads": 0,
+        "postHelper": [
+          {
+            "pass": 1,
+            "alive": {
+              "tree": false,
+              "connection": false,
+              "payloads": 0,
+              "transactions": 0
+            },
+            "heapBytes": 9105008
+          },
+          {
+            "pass": 2,
+            "alive": {
+              "tree": false,
+              "connection": false,
+              "payloads": 0,
+              "transactions": 0
+            },
+            "heapBytes": 8937480
+          },
+          {
+            "pass": 3,
+            "alive": {
+              "tree": false,
+              "connection": false,
+              "payloads": 0,
+              "transactions": 0
+            },
+            "heapBytes": 8937664
+          }
+        ],
+        "afterPinRelease": [
+          {
+            "pass": 1,
+            "alive": {
+              "tree": false,
+              "connection": false,
+              "payloads": 0,
+              "transactions": 0
+            },
+            "heapBytes": 9105008
+          },
+          {
+            "pass": 2,
+            "alive": {
+              "tree": false,
+              "connection": false,
+              "payloads": 0,
+              "transactions": 0
+            },
+            "heapBytes": 8937480
+          },
+          {
+            "pass": 3,
+            "alive": {
+              "tree": false,
+              "connection": false,
+              "payloads": 0,
+              "transactions": 0
+            },
+            "heapBytes": 8937664
+          }
+        ]
+      },
+      {
+        "sample": {
+          "arm": "lazy",
+          "keys": "fresh",
+          "round": 1,
+          "pinned": false
+        },
+        "node": "v24.15.0",
+        "pid": 79146,
+        "bundleSha256": "88c9c9f6086978341f98d3a0cbb0d39eccb001a5787afe8331999e06c8f09991",
+        "host": {
+          "cpu": "Apple M4",
+          "load": [
+            7.67626953125,
+            7.48876953125,
+            7.93798828125
+          ],
+          "freeBytes": 393101312
+        },
+        "cycles": [
+          {
+            "cycle": 1,
+            "settledHeapBytes": 11237584,
+            "resources": {
+              "observedLifetimes": 1000,
+              "retainedLifetimes": 1000,
+              "retainedValueBackings": 1000,
+              "valueBackedCandidates": 1000,
+              "active": 0,
+              "facades": 0
+            },
+            "sampledPayloadsAlive": 1,
+            "sampledTransactionsAlive": 0,
+            "deliveries": 1
+          },
+          {
+            "cycle": 2,
+            "settledHeapBytes": 13462184,
+            "resources": {
+              "observedLifetimes": 2000,
+              "retainedLifetimes": 2000,
+              "retainedValueBackings": 2000,
+              "valueBackedCandidates": 2000,
+              "active": 0,
+              "facades": 0
+            },
+            "sampledPayloadsAlive": 2,
+            "sampledTransactionsAlive": 0,
+            "deliveries": 0
+          },
+          {
+            "cycle": 3,
+            "settledHeapBytes": 15783896,
+            "resources": {
+              "observedLifetimes": 3000,
+              "retainedLifetimes": 3000,
+              "retainedValueBackings": 3000,
+              "valueBackedCandidates": 3000,
+              "active": 0,
+              "facades": 0
+            },
+            "sampledPayloadsAlive": 3,
+            "sampledTransactionsAlive": 0,
+            "deliveries": 0
+          },
+          {
+            "cycle": 4,
+            "settledHeapBytes": 17597272,
+            "resources": {
+              "observedLifetimes": 4000,
+              "retainedLifetimes": 4000,
+              "retainedValueBackings": 4000,
+              "valueBackedCandidates": 4000,
+              "active": 0,
+              "facades": 0
+            },
+            "sampledPayloadsAlive": 4,
+            "sampledTransactionsAlive": 0,
+            "deliveries": 0
+          },
+          {
+            "cycle": 5,
+            "settledHeapBytes": 20592640,
+            "resources": {
+              "observedLifetimes": 5000,
+              "retainedLifetimes": 5000,
+              "retainedValueBackings": 5000,
+              "valueBackedCandidates": 5000,
+              "active": 0,
+              "facades": 0
+            },
+            "sampledPayloadsAlive": 5,
+            "sampledTransactionsAlive": 0,
+            "deliveries": 0
+          },
+          {
+            "cycle": 6,
+            "settledHeapBytes": 22565464,
+            "resources": {
+              "observedLifetimes": 6000,
+              "retainedLifetimes": 6000,
+              "retainedValueBackings": 6000,
+              "valueBackedCandidates": 6000,
+              "active": 0,
+              "facades": 0
+            },
+            "sampledPayloadsAlive": 6,
+            "sampledTransactionsAlive": 0,
+            "deliveries": 0
+          },
+          {
+            "cycle": 7,
+            "settledHeapBytes": 24199368,
+            "resources": {
+              "observedLifetimes": 7000,
+              "retainedLifetimes": 7000,
+              "retainedValueBackings": 7000,
+              "valueBackedCandidates": 7000,
+              "active": 0,
+              "facades": 0
+            },
+            "sampledPayloadsAlive": 7,
+            "sampledTransactionsAlive": 0,
+            "deliveries": 0
+          },
+          {
+            "cycle": 8,
+            "settledHeapBytes": 25774288,
+            "resources": {
+              "observedLifetimes": 8000,
+              "retainedLifetimes": 8000,
+              "retainedValueBackings": 8000,
+              "valueBackedCandidates": 8000,
+              "active": 0,
+              "facades": 0
+            },
+            "sampledPayloadsAlive": 8,
+            "sampledTransactionsAlive": 0,
+            "deliveries": 0
+          },
+          {
+            "cycle": 9,
+            "settledHeapBytes": 30222304,
+            "resources": {
+              "observedLifetimes": 9000,
+              "retainedLifetimes": 9000,
+              "retainedValueBackings": 9000,
+              "valueBackedCandidates": 9000,
+              "active": 0,
+              "facades": 0
+            },
+            "sampledPayloadsAlive": 9,
+            "sampledTransactionsAlive": 0,
+            "deliveries": 0
+          },
+          {
+            "cycle": 10,
+            "settledHeapBytes": 31791304,
+            "resources": {
+              "observedLifetimes": 10000,
+              "retainedLifetimes": 10000,
+              "retainedValueBackings": 10000,
+              "valueBackedCandidates": 10000,
+              "active": 0,
+              "facades": 0
+            },
+            "sampledPayloadsAlive": 10,
+            "sampledTransactionsAlive": 0,
+            "deliveries": 0
+          }
+        ],
+        "passed": true,
+        "beforeHeapBytes": 5559224,
+        "emptyHeapBytes": 5967088,
+        "deliveries": 1,
+        "badPayloads": 0,
+        "postHelper": [
+          {
+            "pass": 1,
+            "alive": {
+              "tree": false,
+              "connection": false,
+              "payloads": 0,
+              "transactions": 0
+            },
+            "heapBytes": 9107560
+          },
+          {
+            "pass": 2,
+            "alive": {
+              "tree": false,
+              "connection": false,
+              "payloads": 0,
+              "transactions": 0
+            },
+            "heapBytes": 8940112
+          },
+          {
+            "pass": 3,
+            "alive": {
+              "tree": false,
+              "connection": false,
+              "payloads": 0,
+              "transactions": 0
+            },
+            "heapBytes": 8940296
+          }
+        ],
+        "afterPinRelease": [
+          {
+            "pass": 1,
+            "alive": {
+              "tree": false,
+              "connection": false,
+              "payloads": 0,
+              "transactions": 0
+            },
+            "heapBytes": 9107560
+          },
+          {
+            "pass": 2,
+            "alive": {
+              "tree": false,
+              "connection": false,
+              "payloads": 0,
+              "transactions": 0
+            },
+            "heapBytes": 8940112
+          },
+          {
+            "pass": 3,
+            "alive": {
+              "tree": false,
+              "connection": false,
+              "payloads": 0,
+              "transactions": 0
+            },
+            "heapBytes": 8940296
+          }
+        ]
+      },
+      {
+        "sample": {
+          "arm": "baseline",
+          "keys": "fresh",
+          "round": 1,
+          "pinned": false
+        },
+        "node": "v24.15.0",
+        "pid": 79149,
+        "bundleSha256": "719951bc5328bc94d3a0fa819afe6271d17fbc4e27514b734c58473cc42f002f",
+        "host": {
+          "cpu": "Apple M4",
+          "load": [
+            7.67626953125,
+            7.48876953125,
+            7.93798828125
+          ],
+          "freeBytes": 300482560
+        },
+        "cycles": [
+          {
+            "cycle": 1,
+            "settledHeapBytes": 11118608,
+            "resources": {
+              "observedLifetimes": 1000,
+              "retainedLifetimes": 1000,
+              "retainedValueBackings": 1000,
+              "valueBackedCandidates": 1000,
+              "active": 0,
+              "facades": 0
+            },
+            "sampledPayloadsAlive": 1,
+            "sampledTransactionsAlive": 0,
+            "deliveries": 1
+          },
+          {
+            "cycle": 2,
+            "settledHeapBytes": 13178800,
+            "resources": {
+              "observedLifetimes": 2000,
+              "retainedLifetimes": 2000,
+              "retainedValueBackings": 2000,
+              "valueBackedCandidates": 2000,
+              "active": 0,
+              "facades": 0
+            },
+            "sampledPayloadsAlive": 2,
+            "sampledTransactionsAlive": 0,
+            "deliveries": 0
+          },
+          {
+            "cycle": 3,
+            "settledHeapBytes": 15801648,
+            "resources": {
+              "observedLifetimes": 3000,
+              "retainedLifetimes": 3000,
+              "retainedValueBackings": 3000,
+              "valueBackedCandidates": 3000,
+              "active": 0,
+              "facades": 0
+            },
+            "sampledPayloadsAlive": 3,
+            "sampledTransactionsAlive": 0,
+            "deliveries": 0
+          },
+          {
+            "cycle": 4,
+            "settledHeapBytes": 17500360,
+            "resources": {
+              "observedLifetimes": 4000,
+              "retainedLifetimes": 4000,
+              "retainedValueBackings": 4000,
+              "valueBackedCandidates": 4000,
+              "active": 0,
+              "facades": 0
+            },
+            "sampledPayloadsAlive": 4,
+            "sampledTransactionsAlive": 0,
+            "deliveries": 0
+          },
+          {
+            "cycle": 5,
+            "settledHeapBytes": 19446776,
+            "resources": {
+              "observedLifetimes": 5000,
+              "retainedLifetimes": 5000,
+              "retainedValueBackings": 5000,
+              "valueBackedCandidates": 5000,
+              "active": 0,
+              "facades": 0
+            },
+            "sampledPayloadsAlive": 5,
+            "sampledTransactionsAlive": 0,
+            "deliveries": 0
+          },
+          {
+            "cycle": 6,
+            "settledHeapBytes": 21415504,
+            "resources": {
+              "observedLifetimes": 6000,
+              "retainedLifetimes": 6000,
+              "retainedValueBackings": 6000,
+              "valueBackedCandidates": 6000,
+              "active": 0,
+              "facades": 0
+            },
+            "sampledPayloadsAlive": 6,
+            "sampledTransactionsAlive": 0,
+            "deliveries": 0
+          },
+          {
+            "cycle": 7,
+            "settledHeapBytes": 23036968,
+            "resources": {
+              "observedLifetimes": 7000,
+              "retainedLifetimes": 7000,
+              "retainedValueBackings": 7000,
+              "valueBackedCandidates": 7000,
+              "active": 0,
+              "facades": 0
+            },
+            "sampledPayloadsAlive": 7,
+            "sampledTransactionsAlive": 0,
+            "deliveries": 0
+          },
+          {
+            "cycle": 8,
+            "settledHeapBytes": 24614728,
+            "resources": {
+              "observedLifetimes": 8000,
+              "retainedLifetimes": 8000,
+              "retainedValueBackings": 8000,
+              "valueBackedCandidates": 8000,
+              "active": 0,
+              "facades": 0
+            },
+            "sampledPayloadsAlive": 8,
+            "sampledTransactionsAlive": 0,
+            "deliveries": 0
+          },
+          {
+            "cycle": 9,
+            "settledHeapBytes": 29078584,
+            "resources": {
+              "observedLifetimes": 9000,
+              "retainedLifetimes": 9000,
+              "retainedValueBackings": 9000,
+              "valueBackedCandidates": 9000,
+              "active": 0,
+              "facades": 0
+            },
+            "sampledPayloadsAlive": 9,
+            "sampledTransactionsAlive": 0,
+            "deliveries": 0
+          },
+          {
+            "cycle": 10,
+            "settledHeapBytes": 30642104,
+            "resources": {
+              "observedLifetimes": 10000,
+              "retainedLifetimes": 10000,
+              "retainedValueBackings": 10000,
+              "valueBackedCandidates": 10000,
+              "active": 0,
+              "facades": 0
+            },
+            "sampledPayloadsAlive": 10,
+            "sampledTransactionsAlive": 0,
+            "deliveries": 0
+          }
+        ],
+        "passed": true,
+        "beforeHeapBytes": 5552192,
+        "emptyHeapBytes": 5957840,
+        "deliveries": 1,
+        "badPayloads": 0,
+        "postHelper": [
+          {
+            "pass": 1,
+            "alive": {
+              "tree": false,
+              "connection": false,
+              "payloads": 0,
+              "transactions": 0
+            },
+            "heapBytes": 7916144
+          },
+          {
+            "pass": 2,
+            "alive": {
+              "tree": false,
+              "connection": false,
+              "payloads": 0,
+              "transactions": 0
+            },
+            "heapBytes": 7769248
+          },
+          {
+            "pass": 3,
+            "alive": {
+              "tree": false,
+              "connection": false,
+              "payloads": 0,
+              "transactions": 0
+            },
+            "heapBytes": 7769432
+          }
+        ],
+        "afterPinRelease": [
+          {
+            "pass": 1,
+            "alive": {
+              "tree": false,
+              "connection": false,
+              "payloads": 0,
+              "transactions": 0
+            },
+            "heapBytes": 7916144
+          },
+          {
+            "pass": 2,
+            "alive": {
+              "tree": false,
+              "connection": false,
+              "payloads": 0,
+              "transactions": 0
+            },
+            "heapBytes": 7769248
+          },
+          {
+            "pass": 3,
+            "alive": {
+              "tree": false,
+              "connection": false,
+              "payloads": 0,
+              "transactions": 0
+            },
+            "heapBytes": 7769432
+          }
+        ]
+      },
+      {
+        "sample": {
+          "arm": "baseline",
+          "keys": "fresh",
+          "round": 2,
+          "pinned": false
+        },
+        "node": "v24.15.0",
+        "pid": 79152,
+        "bundleSha256": "719951bc5328bc94d3a0fa819afe6271d17fbc4e27514b734c58473cc42f002f",
+        "host": {
+          "cpu": "Apple M4",
+          "load": [
+            8.1826171875,
+            7.5966796875,
+            7.97314453125
+          ],
+          "freeBytes": 310476800
+        },
+        "cycles": [
+          {
+            "cycle": 1,
+            "settledHeapBytes": 11113136,
+            "resources": {
+              "observedLifetimes": 1000,
+              "retainedLifetimes": 1000,
+              "retainedValueBackings": 1000,
+              "valueBackedCandidates": 1000,
+              "active": 0,
+              "facades": 0
+            },
+            "sampledPayloadsAlive": 1,
+            "sampledTransactionsAlive": 0,
+            "deliveries": 1
+          },
+          {
+            "cycle": 2,
+            "settledHeapBytes": 13408160,
+            "resources": {
+              "observedLifetimes": 2000,
+              "retainedLifetimes": 2000,
+              "retainedValueBackings": 2000,
+              "valueBackedCandidates": 2000,
+              "active": 0,
+              "facades": 0
+            },
+            "sampledPayloadsAlive": 2,
+            "sampledTransactionsAlive": 0,
+            "deliveries": 0
+          },
+          {
+            "cycle": 3,
+            "settledHeapBytes": 15729704,
+            "resources": {
+              "observedLifetimes": 3000,
+              "retainedLifetimes": 3000,
+              "retainedValueBackings": 3000,
+              "valueBackedCandidates": 3000,
+              "active": 0,
+              "facades": 0
+            },
+            "sampledPayloadsAlive": 3,
+            "sampledTransactionsAlive": 0,
+            "deliveries": 0
+          },
+          {
+            "cycle": 4,
+            "settledHeapBytes": 17541000,
+            "resources": {
+              "observedLifetimes": 4000,
+              "retainedLifetimes": 4000,
+              "retainedValueBackings": 4000,
+              "valueBackedCandidates": 4000,
+              "active": 0,
+              "facades": 0
+            },
+            "sampledPayloadsAlive": 4,
+            "sampledTransactionsAlive": 0,
+            "deliveries": 0
+          },
+          {
+            "cycle": 5,
+            "settledHeapBytes": 19445512,
+            "resources": {
+              "observedLifetimes": 5000,
+              "retainedLifetimes": 5000,
+              "retainedValueBackings": 5000,
+              "valueBackedCandidates": 5000,
+              "active": 0,
+              "facades": 0
+            },
+            "sampledPayloadsAlive": 5,
+            "sampledTransactionsAlive": 0,
+            "deliveries": 0
+          },
+          {
+            "cycle": 6,
+            "settledHeapBytes": 21409432,
+            "resources": {
+              "observedLifetimes": 6000,
+              "retainedLifetimes": 6000,
+              "retainedValueBackings": 6000,
+              "valueBackedCandidates": 6000,
+              "active": 0,
+              "facades": 0
+            },
+            "sampledPayloadsAlive": 6,
+            "sampledTransactionsAlive": 0,
+            "deliveries": 0
+          },
+          {
+            "cycle": 7,
+            "settledHeapBytes": 23042848,
+            "resources": {
+              "observedLifetimes": 7000,
+              "retainedLifetimes": 7000,
+              "retainedValueBackings": 7000,
+              "valueBackedCandidates": 7000,
+              "active": 0,
+              "facades": 0
+            },
+            "sampledPayloadsAlive": 7,
+            "sampledTransactionsAlive": 0,
+            "deliveries": 0
+          },
+          {
+            "cycle": 8,
+            "settledHeapBytes": 24615880,
+            "resources": {
+              "observedLifetimes": 8000,
+              "retainedLifetimes": 8000,
+              "retainedValueBackings": 8000,
+              "valueBackedCandidates": 8000,
+              "active": 0,
+              "facades": 0
+            },
+            "sampledPayloadsAlive": 8,
+            "sampledTransactionsAlive": 0,
+            "deliveries": 0
+          },
+          {
+            "cycle": 9,
+            "settledHeapBytes": 29064184,
+            "resources": {
+              "observedLifetimes": 9000,
+              "retainedLifetimes": 9000,
+              "retainedValueBackings": 9000,
+              "valueBackedCandidates": 9000,
+              "active": 0,
+              "facades": 0
+            },
+            "sampledPayloadsAlive": 9,
+            "sampledTransactionsAlive": 0,
+            "deliveries": 0
+          },
+          {
+            "cycle": 10,
+            "settledHeapBytes": 30632880,
+            "resources": {
+              "observedLifetimes": 10000,
+              "retainedLifetimes": 10000,
+              "retainedValueBackings": 10000,
+              "valueBackedCandidates": 10000,
+              "active": 0,
+              "facades": 0
+            },
+            "sampledPayloadsAlive": 10,
+            "sampledTransactionsAlive": 0,
+            "deliveries": 0
+          }
+        ],
+        "passed": true,
+        "beforeHeapBytes": 5552192,
+        "emptyHeapBytes": 5957840,
+        "deliveries": 1,
+        "badPayloads": 0,
+        "postHelper": [
+          {
+            "pass": 1,
+            "alive": {
+              "tree": false,
+              "connection": false,
+              "payloads": 0,
+              "transactions": 0
+            },
+            "heapBytes": 7914368
+          },
+          {
+            "pass": 2,
+            "alive": {
+              "tree": false,
+              "connection": false,
+              "payloads": 0,
+              "transactions": 0
+            },
+            "heapBytes": 7768688
+          },
+          {
+            "pass": 3,
+            "alive": {
+              "tree": false,
+              "connection": false,
+              "payloads": 0,
+              "transactions": 0
+            },
+            "heapBytes": 7768808
+          }
+        ],
+        "afterPinRelease": [
+          {
+            "pass": 1,
+            "alive": {
+              "tree": false,
+              "connection": false,
+              "payloads": 0,
+              "transactions": 0
+            },
+            "heapBytes": 7914368
+          },
+          {
+            "pass": 2,
+            "alive": {
+              "tree": false,
+              "connection": false,
+              "payloads": 0,
+              "transactions": 0
+            },
+            "heapBytes": 7768688
+          },
+          {
+            "pass": 3,
+            "alive": {
+              "tree": false,
+              "connection": false,
+              "payloads": 0,
+              "transactions": 0
+            },
+            "heapBytes": 7768808
+          }
+        ]
+      },
+      {
+        "sample": {
+          "arm": "lazy",
+          "keys": "fresh",
+          "round": 2,
+          "pinned": false
+        },
+        "node": "v24.15.0",
+        "pid": 79161,
+        "bundleSha256": "88c9c9f6086978341f98d3a0cbb0d39eccb001a5787afe8331999e06c8f09991",
+        "host": {
+          "cpu": "Apple M4",
+          "load": [
+            8.328125,
+            7.63623046875,
+            7.98486328125
+          ],
+          "freeBytes": 356089856
+        },
+        "cycles": [
+          {
+            "cycle": 1,
+            "settledHeapBytes": 11139328,
+            "resources": {
+              "observedLifetimes": 1000,
+              "retainedLifetimes": 1000,
+              "retainedValueBackings": 1000,
+              "valueBackedCandidates": 1000,
+              "active": 0,
+              "facades": 0
+            },
+            "sampledPayloadsAlive": 1,
+            "sampledTransactionsAlive": 0,
+            "deliveries": 1
+          },
+          {
+            "cycle": 2,
+            "settledHeapBytes": 13228440,
+            "resources": {
+              "observedLifetimes": 2000,
+              "retainedLifetimes": 2000,
+              "retainedValueBackings": 2000,
+              "valueBackedCandidates": 2000,
+              "active": 0,
+              "facades": 0
+            },
+            "sampledPayloadsAlive": 2,
+            "sampledTransactionsAlive": 0,
+            "deliveries": 0
+          },
+          {
+            "cycle": 3,
+            "settledHeapBytes": 15854264,
+            "resources": {
+              "observedLifetimes": 3000,
+              "retainedLifetimes": 3000,
+              "retainedValueBackings": 3000,
+              "valueBackedCandidates": 3000,
+              "active": 0,
+              "facades": 0
+            },
+            "sampledPayloadsAlive": 3,
+            "sampledTransactionsAlive": 0,
+            "deliveries": 0
+          },
+          {
+            "cycle": 4,
+            "settledHeapBytes": 17615576,
+            "resources": {
+              "observedLifetimes": 4000,
+              "retainedLifetimes": 4000,
+              "retainedValueBackings": 4000,
+              "valueBackedCandidates": 4000,
+              "active": 0,
+              "facades": 0
+            },
+            "sampledPayloadsAlive": 4,
+            "sampledTransactionsAlive": 0,
+            "deliveries": 0
+          },
+          {
+            "cycle": 5,
+            "settledHeapBytes": 20587440,
+            "resources": {
+              "observedLifetimes": 5000,
+              "retainedLifetimes": 5000,
+              "retainedValueBackings": 5000,
+              "valueBackedCandidates": 5000,
+              "active": 0,
+              "facades": 0
+            },
+            "sampledPayloadsAlive": 5,
+            "sampledTransactionsAlive": 0,
+            "deliveries": 0
+          },
+          {
+            "cycle": 6,
+            "settledHeapBytes": 22565888,
+            "resources": {
+              "observedLifetimes": 6000,
+              "retainedLifetimes": 6000,
+              "retainedValueBackings": 6000,
+              "valueBackedCandidates": 6000,
+              "active": 0,
+              "facades": 0
+            },
+            "sampledPayloadsAlive": 6,
+            "sampledTransactionsAlive": 0,
+            "deliveries": 0
+          },
+          {
+            "cycle": 7,
+            "settledHeapBytes": 24187128,
+            "resources": {
+              "observedLifetimes": 7000,
+              "retainedLifetimes": 7000,
+              "retainedValueBackings": 7000,
+              "valueBackedCandidates": 7000,
+              "active": 0,
+              "facades": 0
+            },
+            "sampledPayloadsAlive": 7,
+            "sampledTransactionsAlive": 0,
+            "deliveries": 0
+          },
+          {
+            "cycle": 8,
+            "settledHeapBytes": 25765424,
+            "resources": {
+              "observedLifetimes": 8000,
+              "retainedLifetimes": 8000,
+              "retainedValueBackings": 8000,
+              "valueBackedCandidates": 8000,
+              "active": 0,
+              "facades": 0
+            },
+            "sampledPayloadsAlive": 8,
+            "sampledTransactionsAlive": 0,
+            "deliveries": 0
+          },
+          {
+            "cycle": 9,
+            "settledHeapBytes": 30228424,
+            "resources": {
+              "observedLifetimes": 9000,
+              "retainedLifetimes": 9000,
+              "retainedValueBackings": 9000,
+              "valueBackedCandidates": 9000,
+              "active": 0,
+              "facades": 0
+            },
+            "sampledPayloadsAlive": 9,
+            "sampledTransactionsAlive": 0,
+            "deliveries": 0
+          },
+          {
+            "cycle": 10,
+            "settledHeapBytes": 31795376,
+            "resources": {
+              "observedLifetimes": 10000,
+              "retainedLifetimes": 10000,
+              "retainedValueBackings": 10000,
+              "valueBackedCandidates": 10000,
+              "active": 0,
+              "facades": 0
+            },
+            "sampledPayloadsAlive": 10,
+            "sampledTransactionsAlive": 0,
+            "deliveries": 0
+          }
+        ],
+        "passed": true,
+        "beforeHeapBytes": 5559296,
+        "emptyHeapBytes": 5967088,
+        "deliveries": 1,
+        "badPayloads": 0,
+        "postHelper": [
+          {
+            "pass": 1,
+            "alive": {
+              "tree": false,
+              "connection": false,
+              "payloads": 0,
+              "transactions": 0
+            },
+            "heapBytes": 9102976
+          },
+          {
+            "pass": 2,
+            "alive": {
+              "tree": false,
+              "connection": false,
+              "payloads": 0,
+              "transactions": 0
+            },
+            "heapBytes": 8935264
+          },
+          {
+            "pass": 3,
+            "alive": {
+              "tree": false,
+              "connection": false,
+              "payloads": 0,
+              "transactions": 0
+            },
+            "heapBytes": 8935448
+          }
+        ],
+        "afterPinRelease": [
+          {
+            "pass": 1,
+            "alive": {
+              "tree": false,
+              "connection": false,
+              "payloads": 0,
+              "transactions": 0
+            },
+            "heapBytes": 9102976
+          },
+          {
+            "pass": 2,
+            "alive": {
+              "tree": false,
+              "connection": false,
+              "payloads": 0,
+              "transactions": 0
+            },
+            "heapBytes": 8935264
+          },
+          {
+            "pass": 3,
+            "alive": {
+              "tree": false,
+              "connection": false,
+              "payloads": 0,
+              "transactions": 0
+            },
+            "heapBytes": 8935448
+          }
+        ]
+      },
+      {
+        "sample": {
+          "arm": "baseline",
+          "keys": "reused",
+          "round": 0,
+          "pinned": true
+        },
+        "node": "v24.15.0",
+        "pid": 79164,
+        "bundleSha256": "719951bc5328bc94d3a0fa819afe6271d17fbc4e27514b734c58473cc42f002f",
+        "host": {
+          "cpu": "Apple M4",
+          "load": [
+            8.328125,
+            7.63623046875,
+            7.98486328125
+          ],
+          "freeBytes": 334135296
+        },
+        "cycles": [
+          {
+            "cycle": 1,
+            "settledHeapBytes": 11130192,
+            "resources": {
+              "observedLifetimes": 1000,
+              "retainedLifetimes": 1000,
+              "retainedValueBackings": 1000,
+              "valueBackedCandidates": 1000,
+              "active": 0,
+              "facades": 0
+            },
+            "sampledPayloadsAlive": 1,
+            "sampledTransactionsAlive": 0,
+            "deliveries": 1
+          },
+          {
+            "cycle": 2,
+            "settledHeapBytes": 13419800,
+            "resources": {
+              "observedLifetimes": 2000,
+              "retainedLifetimes": 2000,
+              "retainedValueBackings": 2000,
+              "valueBackedCandidates": 2000,
+              "active": 0,
+              "facades": 0
+            },
+            "sampledPayloadsAlive": 2,
+            "sampledTransactionsAlive": 0,
+            "deliveries": 0
+          },
+          {
+            "cycle": 3,
+            "settledHeapBytes": 15730272,
+            "resources": {
+              "observedLifetimes": 3000,
+              "retainedLifetimes": 3000,
+              "retainedValueBackings": 3000,
+              "valueBackedCandidates": 3000,
+              "active": 0,
+              "facades": 0
+            },
+            "sampledPayloadsAlive": 3,
+            "sampledTransactionsAlive": 0,
+            "deliveries": 0
+          },
+          {
+            "cycle": 4,
+            "settledHeapBytes": 17541136,
+            "resources": {
+              "observedLifetimes": 4000,
+              "retainedLifetimes": 4000,
+              "retainedValueBackings": 4000,
+              "valueBackedCandidates": 4000,
+              "active": 0,
+              "facades": 0
+            },
+            "sampledPayloadsAlive": 4,
+            "sampledTransactionsAlive": 0,
+            "deliveries": 0
+          },
+          {
+            "cycle": 5,
+            "settledHeapBytes": 19445680,
+            "resources": {
+              "observedLifetimes": 5000,
+              "retainedLifetimes": 5000,
+              "retainedValueBackings": 5000,
+              "valueBackedCandidates": 5000,
+              "active": 0,
+              "facades": 0
+            },
+            "sampledPayloadsAlive": 5,
+            "sampledTransactionsAlive": 0,
+            "deliveries": 0
+          },
+          {
+            "cycle": 6,
+            "settledHeapBytes": 21410024,
+            "resources": {
+              "observedLifetimes": 6000,
+              "retainedLifetimes": 6000,
+              "retainedValueBackings": 6000,
+              "valueBackedCandidates": 6000,
+              "active": 0,
+              "facades": 0
+            },
+            "sampledPayloadsAlive": 6,
+            "sampledTransactionsAlive": 0,
+            "deliveries": 0
+          },
+          {
+            "cycle": 7,
+            "settledHeapBytes": 23043144,
+            "resources": {
+              "observedLifetimes": 7000,
+              "retainedLifetimes": 7000,
+              "retainedValueBackings": 7000,
+              "valueBackedCandidates": 7000,
+              "active": 0,
+              "facades": 0
+            },
+            "sampledPayloadsAlive": 7,
+            "sampledTransactionsAlive": 0,
+            "deliveries": 0
+          },
+          {
+            "cycle": 8,
+            "settledHeapBytes": 24616216,
+            "resources": {
+              "observedLifetimes": 8000,
+              "retainedLifetimes": 8000,
+              "retainedValueBackings": 8000,
+              "valueBackedCandidates": 8000,
+              "active": 0,
+              "facades": 0
+            },
+            "sampledPayloadsAlive": 8,
+            "sampledTransactionsAlive": 0,
+            "deliveries": 0
+          },
+          {
+            "cycle": 9,
+            "settledHeapBytes": 29065560,
+            "resources": {
+              "observedLifetimes": 9000,
+              "retainedLifetimes": 9000,
+              "retainedValueBackings": 9000,
+              "valueBackedCandidates": 9000,
+              "active": 0,
+              "facades": 0
+            },
+            "sampledPayloadsAlive": 9,
+            "sampledTransactionsAlive": 0,
+            "deliveries": 0
+          },
+          {
+            "cycle": 10,
+            "settledHeapBytes": 30633496,
+            "resources": {
+              "observedLifetimes": 10000,
+              "retainedLifetimes": 10000,
+              "retainedValueBackings": 10000,
+              "valueBackedCandidates": 10000,
+              "active": 0,
+              "facades": 0
+            },
+            "sampledPayloadsAlive": 10,
+            "sampledTransactionsAlive": 0,
+            "deliveries": 0
+          }
+        ],
+        "passed": true,
+        "beforeHeapBytes": 5552192,
+        "emptyHeapBytes": 5957840,
+        "deliveries": 1,
+        "badPayloads": 0,
+        "postHelper": [
+          {
+            "pass": 1,
+            "alive": {
+              "tree": true,
+              "connection": false,
+              "payloads": 10,
+              "transactions": 0
+            },
+            "heapBytes": 26170816
+          },
+          {
+            "pass": 2,
+            "alive": {
+              "tree": true,
+              "connection": false,
+              "payloads": 10,
+              "transactions": 0
+            },
+            "heapBytes": 26139816
+          },
+          {
+            "pass": 3,
+            "alive": {
+              "tree": true,
+              "connection": false,
+              "payloads": 10,
+              "transactions": 0
+            },
+            "heapBytes": 26139936
+          }
+        ],
+        "afterPinRelease": [
+          {
+            "pass": 1,
+            "alive": {
+              "tree": false,
+              "connection": false,
+              "payloads": 0,
+              "transactions": 0
+            },
+            "heapBytes": 7883896
+          },
+          {
+            "pass": 2,
+            "alive": {
+              "tree": false,
+              "connection": false,
+              "payloads": 0,
+              "transactions": 0
+            },
+            "heapBytes": 7768568
+          },
+          {
+            "pass": 3,
+            "alive": {
+              "tree": false,
+              "connection": false,
+              "payloads": 0,
+              "transactions": 0
+            },
+            "heapBytes": 7768752
+          }
+        ]
+      },
+      {
+        "sample": {
+          "arm": "lazy",
+          "keys": "reused",
+          "round": 0,
+          "pinned": true
+        },
+        "node": "v24.15.0",
+        "pid": 79166,
+        "bundleSha256": "88c9c9f6086978341f98d3a0cbb0d39eccb001a5787afe8331999e06c8f09991",
+        "host": {
+          "cpu": "Apple M4",
+          "load": [
+            8.5419921875,
+            7.69189453125,
+            8.00244140625
+          ],
+          "freeBytes": 344489984
+        },
+        "cycles": [
+          {
+            "cycle": 1,
+            "settledHeapBytes": 11132200,
+            "resources": {
+              "observedLifetimes": 1000,
+              "retainedLifetimes": 1000,
+              "retainedValueBackings": 1000,
+              "valueBackedCandidates": 1000,
+              "active": 0,
+              "facades": 0
+            },
+            "sampledPayloadsAlive": 1,
+            "sampledTransactionsAlive": 0,
+            "deliveries": 1
+          },
+          {
+            "cycle": 2,
+            "settledHeapBytes": 13230704,
+            "resources": {
+              "observedLifetimes": 2000,
+              "retainedLifetimes": 2000,
+              "retainedValueBackings": 2000,
+              "valueBackedCandidates": 2000,
+              "active": 0,
+              "facades": 0
+            },
+            "sampledPayloadsAlive": 2,
+            "sampledTransactionsAlive": 0,
+            "deliveries": 0
+          },
+          {
+            "cycle": 3,
+            "settledHeapBytes": 15848296,
+            "resources": {
+              "observedLifetimes": 3000,
+              "retainedLifetimes": 3000,
+              "retainedValueBackings": 3000,
+              "valueBackedCandidates": 3000,
+              "active": 0,
+              "facades": 0
+            },
+            "sampledPayloadsAlive": 3,
+            "sampledTransactionsAlive": 0,
+            "deliveries": 0
+          },
+          {
+            "cycle": 4,
+            "settledHeapBytes": 17551672,
+            "resources": {
+              "observedLifetimes": 4000,
+              "retainedLifetimes": 4000,
+              "retainedValueBackings": 4000,
+              "valueBackedCandidates": 4000,
+              "active": 0,
+              "facades": 0
+            },
+            "sampledPayloadsAlive": 4,
+            "sampledTransactionsAlive": 0,
+            "deliveries": 0
+          },
+          {
+            "cycle": 5,
+            "settledHeapBytes": 20588544,
+            "resources": {
+              "observedLifetimes": 5000,
+              "retainedLifetimes": 5000,
+              "retainedValueBackings": 5000,
+              "valueBackedCandidates": 5000,
+              "active": 0,
+              "facades": 0
+            },
+            "sampledPayloadsAlive": 5,
+            "sampledTransactionsAlive": 0,
+            "deliveries": 0
+          },
+          {
+            "cycle": 6,
+            "settledHeapBytes": 22566024,
+            "resources": {
+              "observedLifetimes": 6000,
+              "retainedLifetimes": 6000,
+              "retainedValueBackings": 6000,
+              "valueBackedCandidates": 6000,
+              "active": 0,
+              "facades": 0
+            },
+            "sampledPayloadsAlive": 6,
+            "sampledTransactionsAlive": 0,
+            "deliveries": 0
+          },
+          {
+            "cycle": 7,
+            "settledHeapBytes": 24185832,
+            "resources": {
+              "observedLifetimes": 7000,
+              "retainedLifetimes": 7000,
+              "retainedValueBackings": 7000,
+              "valueBackedCandidates": 7000,
+              "active": 0,
+              "facades": 0
+            },
+            "sampledPayloadsAlive": 7,
+            "sampledTransactionsAlive": 0,
+            "deliveries": 0
+          },
+          {
+            "cycle": 8,
+            "settledHeapBytes": 25766088,
+            "resources": {
+              "observedLifetimes": 8000,
+              "retainedLifetimes": 8000,
+              "retainedValueBackings": 8000,
+              "valueBackedCandidates": 8000,
+              "active": 0,
+              "facades": 0
+            },
+            "sampledPayloadsAlive": 8,
+            "sampledTransactionsAlive": 0,
+            "deliveries": 0
+          },
+          {
+            "cycle": 9,
+            "settledHeapBytes": 30228512,
+            "resources": {
+              "observedLifetimes": 9000,
+              "retainedLifetimes": 9000,
+              "retainedValueBackings": 9000,
+              "valueBackedCandidates": 9000,
+              "active": 0,
+              "facades": 0
+            },
+            "sampledPayloadsAlive": 9,
+            "sampledTransactionsAlive": 0,
+            "deliveries": 0
+          },
+          {
+            "cycle": 10,
+            "settledHeapBytes": 31794576,
+            "resources": {
+              "observedLifetimes": 10000,
+              "retainedLifetimes": 10000,
+              "retainedValueBackings": 10000,
+              "valueBackedCandidates": 10000,
+              "active": 0,
+              "facades": 0
+            },
+            "sampledPayloadsAlive": 10,
+            "sampledTransactionsAlive": 0,
+            "deliveries": 0
+          }
+        ],
+        "passed": true,
+        "beforeHeapBytes": 5559296,
+        "emptyHeapBytes": 5967088,
+        "deliveries": 1,
+        "badPayloads": 0,
+        "postHelper": [
+          {
+            "pass": 1,
+            "alive": {
+              "tree": true,
+              "connection": false,
+              "payloads": 10,
+              "transactions": 0
+            },
+            "heapBytes": 27328600
+          },
+          {
+            "pass": 2,
+            "alive": {
+              "tree": true,
+              "connection": false,
+              "payloads": 10,
+              "transactions": 0
+            },
+            "heapBytes": 27276040
+          },
+          {
+            "pass": 3,
+            "alive": {
+              "tree": true,
+              "connection": false,
+              "payloads": 10,
+              "transactions": 0
+            },
+            "heapBytes": 27276240
+          }
+        ],
+        "afterPinRelease": [
+          {
+            "pass": 1,
+            "alive": {
+              "tree": false,
+              "connection": false,
+              "payloads": 0,
+              "transactions": 0
+            },
+            "heapBytes": 9051960
+          },
+          {
+            "pass": 2,
+            "alive": {
+              "tree": false,
+              "connection": false,
+              "payloads": 0,
+              "transactions": 0
+            },
+            "heapBytes": 8937056
+          },
+          {
+            "pass": 3,
+            "alive": {
+              "tree": false,
+              "connection": false,
+              "payloads": 0,
+              "transactions": 0
+            },
+            "heapBytes": 8937240
+          }
+        ]
+      }
+    ]
+  }
+}

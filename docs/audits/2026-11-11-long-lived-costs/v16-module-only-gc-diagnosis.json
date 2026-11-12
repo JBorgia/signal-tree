@@ -1,0 +1,1650 @@
+{
+  "source": "/private/tmp/st-v16-module-only-extra-gc-analysis.json",
+  "sha256": "bd21a5f3cd82859979bb5ea8e2a5830947034195a17b9937c7a5f25387f611fc",
+  "result": {
+    "sourceSha256": "d461cd0bde9eb539d164eb0bb9ec2feaa38cfde5aca0480b5ea8b18f29411487",
+    "resultsSha256": "8648b1ef53273905830de7343f4e13e49b7ab60a3689f751a909eebbb9c10fcf",
+    "passed": true,
+    "children": [
+      {
+        "sample": {
+          "arm": "baseline",
+          "repeat": 0,
+          "pin": false
+        },
+        "checkpoints": {
+          "emptyAfterActivation": [
+            {
+              "additionalGcJobs": 0,
+              "heapBytes": 5578408,
+              "treeAlive": true,
+              "payloadAlive": false,
+              "deltaFromInputBaselineMiB": 0.0988006591796875
+            },
+            {
+              "additionalGcJobs": 1,
+              "heapBytes": 5577680,
+              "treeAlive": true,
+              "payloadAlive": false,
+              "deltaFromInputBaselineMiB": 0.09810638427734375
+            },
+            {
+              "additionalGcJobs": 3,
+              "heapBytes": 5988904,
+              "treeAlive": true,
+              "payloadAlive": false,
+              "deltaFromInputBaselineMiB": 0.4902801513671875
+            },
+            {
+              "additionalGcJobs": 6,
+              "heapBytes": 5588664,
+              "treeAlive": true,
+              "payloadAlive": false,
+              "deltaFromInputBaselineMiB": 0.10858154296875
+            },
+            {
+              "additionalGcJobs": 12,
+              "heapBytes": 5588840,
+              "treeAlive": true,
+              "payloadAlive": false,
+              "deltaFromInputBaselineMiB": 0.1087493896484375
+            }
+          ],
+          "populated": [
+            {
+              "additionalGcJobs": 0,
+              "heapBytes": 11281472,
+              "treeAlive": true,
+              "payloadAlive": true,
+              "deltaFromInputBaselineMiB": 5.537666320800781
+            },
+            {
+              "additionalGcJobs": 1,
+              "heapBytes": 11281952,
+              "treeAlive": true,
+              "payloadAlive": true,
+              "deltaFromInputBaselineMiB": 5.538124084472656
+            },
+            {
+              "additionalGcJobs": 3,
+              "heapBytes": 11282120,
+              "treeAlive": true,
+              "payloadAlive": true,
+              "deltaFromInputBaselineMiB": 5.5382843017578125
+            },
+            {
+              "additionalGcJobs": 6,
+              "heapBytes": 11282472,
+              "treeAlive": true,
+              "payloadAlive": true,
+              "deltaFromInputBaselineMiB": 5.5386199951171875
+            },
+            {
+              "additionalGcJobs": 12,
+              "heapBytes": 11352496,
+              "treeAlive": true,
+              "payloadAlive": true,
+              "deltaFromInputBaselineMiB": 5.605400085449219
+            }
+          ],
+          "edited": [
+            {
+              "additionalGcJobs": 0,
+              "heapBytes": 9616848,
+              "treeAlive": true,
+              "payloadAlive": true,
+              "deltaFromInputBaselineMiB": 3.9501571655273438
+            },
+            {
+              "additionalGcJobs": 1,
+              "heapBytes": 9607744,
+              "treeAlive": true,
+              "payloadAlive": true,
+              "deltaFromInputBaselineMiB": 3.9414749145507812
+            },
+            {
+              "additionalGcJobs": 3,
+              "heapBytes": 9607816,
+              "treeAlive": true,
+              "payloadAlive": true,
+              "deltaFromInputBaselineMiB": 3.9415435791015625
+            },
+            {
+              "additionalGcJobs": 6,
+              "heapBytes": 9607888,
+              "treeAlive": true,
+              "payloadAlive": true,
+              "deltaFromInputBaselineMiB": 3.9416122436523438
+            },
+            {
+              "additionalGcJobs": 12,
+              "heapBytes": 9607960,
+              "treeAlive": true,
+              "payloadAlive": true,
+              "deltaFromInputBaselineMiB": 3.941680908203125
+            }
+          ],
+          "destroyedInsideHelper": [
+            {
+              "additionalGcJobs": 0,
+              "heapBytes": 6596440,
+              "treeAlive": false,
+              "payloadAlive": false,
+              "deltaFromInputBaselineMiB": 1.069671630859375
+            },
+            {
+              "additionalGcJobs": 1,
+              "heapBytes": 6596664,
+              "treeAlive": false,
+              "payloadAlive": false,
+              "deltaFromInputBaselineMiB": 1.06988525390625
+            },
+            {
+              "additionalGcJobs": 3,
+              "heapBytes": 6596736,
+              "treeAlive": false,
+              "payloadAlive": false,
+              "deltaFromInputBaselineMiB": 1.0699539184570312
+            },
+            {
+              "additionalGcJobs": 6,
+              "heapBytes": 6596808,
+              "treeAlive": false,
+              "payloadAlive": false,
+              "deltaFromInputBaselineMiB": 1.0700225830078125
+            },
+            {
+              "additionalGcJobs": 12,
+              "heapBytes": 6596880,
+              "treeAlive": false,
+              "payloadAlive": false,
+              "deltaFromInputBaselineMiB": 1.0700912475585938
+            }
+          ],
+          "destroyedAfterHelper": [
+            {
+              "additionalGcJobs": 0,
+              "heapBytes": 6596568,
+              "treeAlive": false,
+              "payloadAlive": false,
+              "deltaFromInputBaselineMiB": 1.069793701171875
+            },
+            {
+              "additionalGcJobs": 1,
+              "heapBytes": 6596792,
+              "treeAlive": false,
+              "payloadAlive": false,
+              "deltaFromInputBaselineMiB": 1.07000732421875
+            },
+            {
+              "additionalGcJobs": 3,
+              "heapBytes": 6596864,
+              "treeAlive": false,
+              "payloadAlive": false,
+              "deltaFromInputBaselineMiB": 1.0700759887695312
+            },
+            {
+              "additionalGcJobs": 6,
+              "heapBytes": 6596936,
+              "treeAlive": false,
+              "payloadAlive": false,
+              "deltaFromInputBaselineMiB": 1.0701446533203125
+            },
+            {
+              "additionalGcJobs": 12,
+              "heapBytes": 6597008,
+              "treeAlive": false,
+              "payloadAlive": false,
+              "deltaFromInputBaselineMiB": 1.0702133178710938
+            }
+          ]
+        }
+      },
+      {
+        "sample": {
+          "arm": "final",
+          "repeat": 0,
+          "pin": false
+        },
+        "checkpoints": {
+          "emptyAfterActivation": [
+            {
+              "additionalGcJobs": 0,
+              "heapBytes": 5595024,
+              "treeAlive": true,
+              "payloadAlive": false,
+              "deltaFromInputBaselineMiB": 0.0990142822265625
+            },
+            {
+              "additionalGcJobs": 1,
+              "heapBytes": 5594296,
+              "treeAlive": true,
+              "payloadAlive": false,
+              "deltaFromInputBaselineMiB": 0.09832000732421875
+            },
+            {
+              "additionalGcJobs": 3,
+              "heapBytes": 6094432,
+              "treeAlive": true,
+              "payloadAlive": false,
+              "deltaFromInputBaselineMiB": 0.575286865234375
+            },
+            {
+              "additionalGcJobs": 6,
+              "heapBytes": 5605280,
+              "treeAlive": true,
+              "payloadAlive": false,
+              "deltaFromInputBaselineMiB": 0.108795166015625
+            },
+            {
+              "additionalGcJobs": 12,
+              "heapBytes": 5605456,
+              "treeAlive": true,
+              "payloadAlive": false,
+              "deltaFromInputBaselineMiB": 0.1089630126953125
+            }
+          ],
+          "populated": [
+            {
+              "additionalGcJobs": 0,
+              "heapBytes": 11310072,
+              "treeAlive": true,
+              "payloadAlive": true,
+              "deltaFromInputBaselineMiB": 5.549308776855469
+            },
+            {
+              "additionalGcJobs": 1,
+              "heapBytes": 11310552,
+              "treeAlive": true,
+              "payloadAlive": true,
+              "deltaFromInputBaselineMiB": 5.549766540527344
+            },
+            {
+              "additionalGcJobs": 3,
+              "heapBytes": 11310720,
+              "treeAlive": true,
+              "payloadAlive": true,
+              "deltaFromInputBaselineMiB": 5.5499267578125
+            },
+            {
+              "additionalGcJobs": 6,
+              "heapBytes": 11311072,
+              "treeAlive": true,
+              "payloadAlive": true,
+              "deltaFromInputBaselineMiB": 5.550262451171875
+            },
+            {
+              "additionalGcJobs": 12,
+              "heapBytes": 9251808,
+              "treeAlive": true,
+              "payloadAlive": true,
+              "deltaFromInputBaselineMiB": 3.586395263671875
+            }
+          ],
+          "edited": [
+            {
+              "additionalGcJobs": 0,
+              "heapBytes": 9638704,
+              "treeAlive": true,
+              "payloadAlive": true,
+              "deltaFromInputBaselineMiB": 3.9553680419921875
+            },
+            {
+              "additionalGcJobs": 1,
+              "heapBytes": 9639008,
+              "treeAlive": true,
+              "payloadAlive": true,
+              "deltaFromInputBaselineMiB": 3.955657958984375
+            },
+            {
+              "additionalGcJobs": 3,
+              "heapBytes": 9639080,
+              "treeAlive": true,
+              "payloadAlive": true,
+              "deltaFromInputBaselineMiB": 3.9557266235351562
+            },
+            {
+              "additionalGcJobs": 6,
+              "heapBytes": 9639152,
+              "treeAlive": true,
+              "payloadAlive": true,
+              "deltaFromInputBaselineMiB": 3.9557952880859375
+            },
+            {
+              "additionalGcJobs": 12,
+              "heapBytes": 9639224,
+              "treeAlive": true,
+              "payloadAlive": true,
+              "deltaFromInputBaselineMiB": 3.9558639526367188
+            }
+          ],
+          "destroyedInsideHelper": [
+            {
+              "additionalGcJobs": 0,
+              "heapBytes": 6623392,
+              "treeAlive": false,
+              "payloadAlive": false,
+              "deltaFromInputBaselineMiB": 1.079742431640625
+            },
+            {
+              "additionalGcJobs": 1,
+              "heapBytes": 6623664,
+              "treeAlive": false,
+              "payloadAlive": false,
+              "deltaFromInputBaselineMiB": 1.0800018310546875
+            },
+            {
+              "additionalGcJobs": 3,
+              "heapBytes": 6623688,
+              "treeAlive": false,
+              "payloadAlive": false,
+              "deltaFromInputBaselineMiB": 1.0800247192382812
+            },
+            {
+              "additionalGcJobs": 6,
+              "heapBytes": 6623760,
+              "treeAlive": false,
+              "payloadAlive": false,
+              "deltaFromInputBaselineMiB": 1.0800933837890625
+            },
+            {
+              "additionalGcJobs": 12,
+              "heapBytes": 6623832,
+              "treeAlive": false,
+              "payloadAlive": false,
+              "deltaFromInputBaselineMiB": 1.0801620483398438
+            }
+          ],
+          "destroyedAfterHelper": [
+            {
+              "additionalGcJobs": 0,
+              "heapBytes": 6623520,
+              "treeAlive": false,
+              "payloadAlive": false,
+              "deltaFromInputBaselineMiB": 1.079864501953125
+            },
+            {
+              "additionalGcJobs": 1,
+              "heapBytes": 6623744,
+              "treeAlive": false,
+              "payloadAlive": false,
+              "deltaFromInputBaselineMiB": 1.080078125
+            },
+            {
+              "additionalGcJobs": 3,
+              "heapBytes": 6623816,
+              "treeAlive": false,
+              "payloadAlive": false,
+              "deltaFromInputBaselineMiB": 1.0801467895507812
+            },
+            {
+              "additionalGcJobs": 6,
+              "heapBytes": 6623888,
+              "treeAlive": false,
+              "payloadAlive": false,
+              "deltaFromInputBaselineMiB": 1.0802154541015625
+            },
+            {
+              "additionalGcJobs": 12,
+              "heapBytes": 6623960,
+              "treeAlive": false,
+              "payloadAlive": false,
+              "deltaFromInputBaselineMiB": 1.0802841186523438
+            }
+          ]
+        }
+      },
+      {
+        "sample": {
+          "arm": "final",
+          "repeat": 1,
+          "pin": false
+        },
+        "checkpoints": {
+          "emptyAfterActivation": [
+            {
+              "additionalGcJobs": 0,
+              "heapBytes": 5595024,
+              "treeAlive": true,
+              "payloadAlive": false,
+              "deltaFromInputBaselineMiB": 0.0990142822265625
+            },
+            {
+              "additionalGcJobs": 1,
+              "heapBytes": 5594296,
+              "treeAlive": true,
+              "payloadAlive": false,
+              "deltaFromInputBaselineMiB": 0.09832000732421875
+            },
+            {
+              "additionalGcJobs": 3,
+              "heapBytes": 5603888,
+              "treeAlive": true,
+              "payloadAlive": false,
+              "deltaFromInputBaselineMiB": 0.1074676513671875
+            },
+            {
+              "additionalGcJobs": 6,
+              "heapBytes": 5605280,
+              "treeAlive": true,
+              "payloadAlive": false,
+              "deltaFromInputBaselineMiB": 0.108795166015625
+            },
+            {
+              "additionalGcJobs": 12,
+              "heapBytes": 5605456,
+              "treeAlive": true,
+              "payloadAlive": false,
+              "deltaFromInputBaselineMiB": 0.1089630126953125
+            }
+          ],
+          "populated": [
+            {
+              "additionalGcJobs": 0,
+              "heapBytes": 11308192,
+              "treeAlive": true,
+              "payloadAlive": true,
+              "deltaFromInputBaselineMiB": 5.547515869140625
+            },
+            {
+              "additionalGcJobs": 1,
+              "heapBytes": 11308720,
+              "treeAlive": true,
+              "payloadAlive": true,
+              "deltaFromInputBaselineMiB": 5.5480194091796875
+            },
+            {
+              "additionalGcJobs": 3,
+              "heapBytes": 11308840,
+              "treeAlive": true,
+              "payloadAlive": true,
+              "deltaFromInputBaselineMiB": 5.548133850097656
+            },
+            {
+              "additionalGcJobs": 6,
+              "heapBytes": 11309192,
+              "treeAlive": true,
+              "payloadAlive": true,
+              "deltaFromInputBaselineMiB": 5.548469543457031
+            },
+            {
+              "additionalGcJobs": 12,
+              "heapBytes": 11325416,
+              "treeAlive": true,
+              "payloadAlive": true,
+              "deltaFromInputBaselineMiB": 5.563941955566406
+            }
+          ],
+          "edited": [
+            {
+              "additionalGcJobs": 0,
+              "heapBytes": 9646152,
+              "treeAlive": true,
+              "payloadAlive": true,
+              "deltaFromInputBaselineMiB": 3.9624710083007812
+            },
+            {
+              "additionalGcJobs": 1,
+              "heapBytes": 9637048,
+              "treeAlive": true,
+              "payloadAlive": true,
+              "deltaFromInputBaselineMiB": 3.9537887573242188
+            },
+            {
+              "additionalGcJobs": 3,
+              "heapBytes": 9637120,
+              "treeAlive": true,
+              "payloadAlive": true,
+              "deltaFromInputBaselineMiB": 3.953857421875
+            },
+            {
+              "additionalGcJobs": 6,
+              "heapBytes": 9637192,
+              "treeAlive": true,
+              "payloadAlive": true,
+              "deltaFromInputBaselineMiB": 3.9539260864257812
+            },
+            {
+              "additionalGcJobs": 12,
+              "heapBytes": 9637264,
+              "treeAlive": true,
+              "payloadAlive": true,
+              "deltaFromInputBaselineMiB": 3.9539947509765625
+            }
+          ],
+          "destroyedInsideHelper": [
+            {
+              "additionalGcJobs": 0,
+              "heapBytes": 6621640,
+              "treeAlive": false,
+              "payloadAlive": false,
+              "deltaFromInputBaselineMiB": 1.0780715942382812
+            },
+            {
+              "additionalGcJobs": 1,
+              "heapBytes": 6621864,
+              "treeAlive": false,
+              "payloadAlive": false,
+              "deltaFromInputBaselineMiB": 1.0782852172851562
+            },
+            {
+              "additionalGcJobs": 3,
+              "heapBytes": 6621936,
+              "treeAlive": false,
+              "payloadAlive": false,
+              "deltaFromInputBaselineMiB": 1.0783538818359375
+            },
+            {
+              "additionalGcJobs": 6,
+              "heapBytes": 6622008,
+              "treeAlive": false,
+              "payloadAlive": false,
+              "deltaFromInputBaselineMiB": 1.0784225463867188
+            },
+            {
+              "additionalGcJobs": 12,
+              "heapBytes": 6622080,
+              "treeAlive": false,
+              "payloadAlive": false,
+              "deltaFromInputBaselineMiB": 1.0784912109375
+            }
+          ],
+          "destroyedAfterHelper": [
+            {
+              "additionalGcJobs": 0,
+              "heapBytes": 6621768,
+              "treeAlive": false,
+              "payloadAlive": false,
+              "deltaFromInputBaselineMiB": 1.0781936645507812
+            },
+            {
+              "additionalGcJobs": 1,
+              "heapBytes": 6621992,
+              "treeAlive": false,
+              "payloadAlive": false,
+              "deltaFromInputBaselineMiB": 1.0784072875976562
+            },
+            {
+              "additionalGcJobs": 3,
+              "heapBytes": 6622064,
+              "treeAlive": false,
+              "payloadAlive": false,
+              "deltaFromInputBaselineMiB": 1.0784759521484375
+            },
+            {
+              "additionalGcJobs": 6,
+              "heapBytes": 6622136,
+              "treeAlive": false,
+              "payloadAlive": false,
+              "deltaFromInputBaselineMiB": 1.0785446166992188
+            },
+            {
+              "additionalGcJobs": 12,
+              "heapBytes": 6622208,
+              "treeAlive": false,
+              "payloadAlive": false,
+              "deltaFromInputBaselineMiB": 1.07861328125
+            }
+          ]
+        }
+      },
+      {
+        "sample": {
+          "arm": "baseline",
+          "repeat": 1,
+          "pin": false
+        },
+        "checkpoints": {
+          "emptyAfterActivation": [
+            {
+              "additionalGcJobs": 0,
+              "heapBytes": 5578408,
+              "treeAlive": true,
+              "payloadAlive": false,
+              "deltaFromInputBaselineMiB": 0.0988006591796875
+            },
+            {
+              "additionalGcJobs": 1,
+              "heapBytes": 5577680,
+              "treeAlive": true,
+              "payloadAlive": false,
+              "deltaFromInputBaselineMiB": 0.09810638427734375
+            },
+            {
+              "additionalGcJobs": 3,
+              "heapBytes": 5850144,
+              "treeAlive": true,
+              "payloadAlive": false,
+              "deltaFromInputBaselineMiB": 0.35794830322265625
+            },
+            {
+              "additionalGcJobs": 6,
+              "heapBytes": 5588664,
+              "treeAlive": true,
+              "payloadAlive": false,
+              "deltaFromInputBaselineMiB": 0.10858154296875
+            },
+            {
+              "additionalGcJobs": 12,
+              "heapBytes": 5588840,
+              "treeAlive": true,
+              "payloadAlive": false,
+              "deltaFromInputBaselineMiB": 0.1087493896484375
+            }
+          ],
+          "populated": [
+            {
+              "additionalGcJobs": 0,
+              "heapBytes": 11281352,
+              "treeAlive": true,
+              "payloadAlive": true,
+              "deltaFromInputBaselineMiB": 5.5375518798828125
+            },
+            {
+              "additionalGcJobs": 1,
+              "heapBytes": 11281880,
+              "treeAlive": true,
+              "payloadAlive": true,
+              "deltaFromInputBaselineMiB": 5.538055419921875
+            },
+            {
+              "additionalGcJobs": 3,
+              "heapBytes": 11282000,
+              "treeAlive": true,
+              "payloadAlive": true,
+              "deltaFromInputBaselineMiB": 5.538169860839844
+            },
+            {
+              "additionalGcJobs": 6,
+              "heapBytes": 11282352,
+              "treeAlive": true,
+              "payloadAlive": true,
+              "deltaFromInputBaselineMiB": 5.538505554199219
+            },
+            {
+              "additionalGcJobs": 12,
+              "heapBytes": 9237240,
+              "treeAlive": true,
+              "payloadAlive": true,
+              "deltaFromInputBaselineMiB": 3.588134765625
+            }
+          ],
+          "edited": [
+            {
+              "additionalGcJobs": 0,
+              "heapBytes": 9607336,
+              "treeAlive": true,
+              "payloadAlive": true,
+              "deltaFromInputBaselineMiB": 3.9410858154296875
+            },
+            {
+              "additionalGcJobs": 1,
+              "heapBytes": 9607640,
+              "treeAlive": true,
+              "payloadAlive": true,
+              "deltaFromInputBaselineMiB": 3.941375732421875
+            },
+            {
+              "additionalGcJobs": 3,
+              "heapBytes": 9607712,
+              "treeAlive": true,
+              "payloadAlive": true,
+              "deltaFromInputBaselineMiB": 3.9414443969726562
+            },
+            {
+              "additionalGcJobs": 6,
+              "heapBytes": 9607784,
+              "treeAlive": true,
+              "payloadAlive": true,
+              "deltaFromInputBaselineMiB": 3.9415130615234375
+            },
+            {
+              "additionalGcJobs": 12,
+              "heapBytes": 9607856,
+              "treeAlive": true,
+              "payloadAlive": true,
+              "deltaFromInputBaselineMiB": 3.9415817260742188
+            }
+          ],
+          "destroyedInsideHelper": [
+            {
+              "additionalGcJobs": 0,
+              "heapBytes": 6596456,
+              "treeAlive": false,
+              "payloadAlive": false,
+              "deltaFromInputBaselineMiB": 1.0696868896484375
+            },
+            {
+              "additionalGcJobs": 1,
+              "heapBytes": 6596728,
+              "treeAlive": false,
+              "payloadAlive": false,
+              "deltaFromInputBaselineMiB": 1.0699462890625
+            },
+            {
+              "additionalGcJobs": 3,
+              "heapBytes": 6596752,
+              "treeAlive": false,
+              "payloadAlive": false,
+              "deltaFromInputBaselineMiB": 1.0699691772460938
+            },
+            {
+              "additionalGcJobs": 6,
+              "heapBytes": 6596824,
+              "treeAlive": false,
+              "payloadAlive": false,
+              "deltaFromInputBaselineMiB": 1.070037841796875
+            },
+            {
+              "additionalGcJobs": 12,
+              "heapBytes": 6596896,
+              "treeAlive": false,
+              "payloadAlive": false,
+              "deltaFromInputBaselineMiB": 1.0701065063476562
+            }
+          ],
+          "destroyedAfterHelper": [
+            {
+              "additionalGcJobs": 0,
+              "heapBytes": 6596584,
+              "treeAlive": false,
+              "payloadAlive": false,
+              "deltaFromInputBaselineMiB": 1.0698089599609375
+            },
+            {
+              "additionalGcJobs": 1,
+              "heapBytes": 6596808,
+              "treeAlive": false,
+              "payloadAlive": false,
+              "deltaFromInputBaselineMiB": 1.0700225830078125
+            },
+            {
+              "additionalGcJobs": 3,
+              "heapBytes": 6596880,
+              "treeAlive": false,
+              "payloadAlive": false,
+              "deltaFromInputBaselineMiB": 1.0700912475585938
+            },
+            {
+              "additionalGcJobs": 6,
+              "heapBytes": 6596952,
+              "treeAlive": false,
+              "payloadAlive": false,
+              "deltaFromInputBaselineMiB": 1.070159912109375
+            },
+            {
+              "additionalGcJobs": 12,
+              "heapBytes": 6597024,
+              "treeAlive": false,
+              "payloadAlive": false,
+              "deltaFromInputBaselineMiB": 1.0702285766601562
+            }
+          ]
+        }
+      },
+      {
+        "sample": {
+          "arm": "baseline",
+          "repeat": 2,
+          "pin": false
+        },
+        "checkpoints": {
+          "emptyAfterActivation": [
+            {
+              "additionalGcJobs": 0,
+              "heapBytes": 5578408,
+              "treeAlive": true,
+              "payloadAlive": false,
+              "deltaFromInputBaselineMiB": 0.0988006591796875
+            },
+            {
+              "additionalGcJobs": 1,
+              "heapBytes": 5577680,
+              "treeAlive": true,
+              "payloadAlive": false,
+              "deltaFromInputBaselineMiB": 0.09810638427734375
+            },
+            {
+              "additionalGcJobs": 3,
+              "heapBytes": 5587376,
+              "treeAlive": true,
+              "payloadAlive": false,
+              "deltaFromInputBaselineMiB": 0.10735321044921875
+            },
+            {
+              "additionalGcJobs": 6,
+              "heapBytes": 5588664,
+              "treeAlive": true,
+              "payloadAlive": false,
+              "deltaFromInputBaselineMiB": 0.10858154296875
+            },
+            {
+              "additionalGcJobs": 12,
+              "heapBytes": 5588840,
+              "treeAlive": true,
+              "payloadAlive": false,
+              "deltaFromInputBaselineMiB": 0.1087493896484375
+            }
+          ],
+          "populated": [
+            {
+              "additionalGcJobs": 0,
+              "heapBytes": 11281352,
+              "treeAlive": true,
+              "payloadAlive": true,
+              "deltaFromInputBaselineMiB": 5.5375518798828125
+            },
+            {
+              "additionalGcJobs": 1,
+              "heapBytes": 11281832,
+              "treeAlive": true,
+              "payloadAlive": true,
+              "deltaFromInputBaselineMiB": 5.5380096435546875
+            },
+            {
+              "additionalGcJobs": 3,
+              "heapBytes": 11282000,
+              "treeAlive": true,
+              "payloadAlive": true,
+              "deltaFromInputBaselineMiB": 5.538169860839844
+            },
+            {
+              "additionalGcJobs": 6,
+              "heapBytes": 11282352,
+              "treeAlive": true,
+              "payloadAlive": true,
+              "deltaFromInputBaselineMiB": 5.538505554199219
+            },
+            {
+              "additionalGcJobs": 12,
+              "heapBytes": 11298576,
+              "treeAlive": true,
+              "payloadAlive": true,
+              "deltaFromInputBaselineMiB": 5.553977966308594
+            }
+          ],
+          "edited": [
+            {
+              "additionalGcJobs": 0,
+              "heapBytes": 9616776,
+              "treeAlive": true,
+              "payloadAlive": true,
+              "deltaFromInputBaselineMiB": 3.9500885009765625
+            },
+            {
+              "additionalGcJobs": 1,
+              "heapBytes": 9607744,
+              "treeAlive": true,
+              "payloadAlive": true,
+              "deltaFromInputBaselineMiB": 3.9414749145507812
+            },
+            {
+              "additionalGcJobs": 3,
+              "heapBytes": 9607816,
+              "treeAlive": true,
+              "payloadAlive": true,
+              "deltaFromInputBaselineMiB": 3.9415435791015625
+            },
+            {
+              "additionalGcJobs": 6,
+              "heapBytes": 9607888,
+              "treeAlive": true,
+              "payloadAlive": true,
+              "deltaFromInputBaselineMiB": 3.9416122436523438
+            },
+            {
+              "additionalGcJobs": 12,
+              "heapBytes": 9607960,
+              "treeAlive": true,
+              "payloadAlive": true,
+              "deltaFromInputBaselineMiB": 3.941680908203125
+            }
+          ],
+          "destroyedInsideHelper": [
+            {
+              "additionalGcJobs": 0,
+              "heapBytes": 6596440,
+              "treeAlive": false,
+              "payloadAlive": false,
+              "deltaFromInputBaselineMiB": 1.069671630859375
+            },
+            {
+              "additionalGcJobs": 1,
+              "heapBytes": 6596712,
+              "treeAlive": false,
+              "payloadAlive": false,
+              "deltaFromInputBaselineMiB": 1.0699310302734375
+            },
+            {
+              "additionalGcJobs": 3,
+              "heapBytes": 6596736,
+              "treeAlive": false,
+              "payloadAlive": false,
+              "deltaFromInputBaselineMiB": 1.0699539184570312
+            },
+            {
+              "additionalGcJobs": 6,
+              "heapBytes": 6596808,
+              "treeAlive": false,
+              "payloadAlive": false,
+              "deltaFromInputBaselineMiB": 1.0700225830078125
+            },
+            {
+              "additionalGcJobs": 12,
+              "heapBytes": 6596880,
+              "treeAlive": false,
+              "payloadAlive": false,
+              "deltaFromInputBaselineMiB": 1.0700912475585938
+            }
+          ],
+          "destroyedAfterHelper": [
+            {
+              "additionalGcJobs": 0,
+              "heapBytes": 6596568,
+              "treeAlive": false,
+              "payloadAlive": false,
+              "deltaFromInputBaselineMiB": 1.069793701171875
+            },
+            {
+              "additionalGcJobs": 1,
+              "heapBytes": 6596792,
+              "treeAlive": false,
+              "payloadAlive": false,
+              "deltaFromInputBaselineMiB": 1.07000732421875
+            },
+            {
+              "additionalGcJobs": 3,
+              "heapBytes": 6596864,
+              "treeAlive": false,
+              "payloadAlive": false,
+              "deltaFromInputBaselineMiB": 1.0700759887695312
+            },
+            {
+              "additionalGcJobs": 6,
+              "heapBytes": 6596936,
+              "treeAlive": false,
+              "payloadAlive": false,
+              "deltaFromInputBaselineMiB": 1.0701446533203125
+            },
+            {
+              "additionalGcJobs": 12,
+              "heapBytes": 6597008,
+              "treeAlive": false,
+              "payloadAlive": false,
+              "deltaFromInputBaselineMiB": 1.0702133178710938
+            }
+          ]
+        }
+      },
+      {
+        "sample": {
+          "arm": "final",
+          "repeat": 2,
+          "pin": false
+        },
+        "checkpoints": {
+          "emptyAfterActivation": [
+            {
+              "additionalGcJobs": 0,
+              "heapBytes": 5594952,
+              "treeAlive": true,
+              "payloadAlive": false,
+              "deltaFromInputBaselineMiB": 0.0990142822265625
+            },
+            {
+              "additionalGcJobs": 1,
+              "heapBytes": 5594224,
+              "treeAlive": true,
+              "payloadAlive": false,
+              "deltaFromInputBaselineMiB": 0.09832000732421875
+            },
+            {
+              "additionalGcJobs": 3,
+              "heapBytes": 5602528,
+              "treeAlive": true,
+              "payloadAlive": false,
+              "deltaFromInputBaselineMiB": 0.10623931884765625
+            },
+            {
+              "additionalGcJobs": 6,
+              "heapBytes": 5605208,
+              "treeAlive": true,
+              "payloadAlive": false,
+              "deltaFromInputBaselineMiB": 0.108795166015625
+            },
+            {
+              "additionalGcJobs": 12,
+              "heapBytes": 5605384,
+              "treeAlive": true,
+              "payloadAlive": false,
+              "deltaFromInputBaselineMiB": 0.1089630126953125
+            }
+          ],
+          "populated": [
+            {
+              "additionalGcJobs": 0,
+              "heapBytes": 11309880,
+              "treeAlive": true,
+              "payloadAlive": true,
+              "deltaFromInputBaselineMiB": 5.5491943359375
+            },
+            {
+              "additionalGcJobs": 1,
+              "heapBytes": 11310360,
+              "treeAlive": true,
+              "payloadAlive": true,
+              "deltaFromInputBaselineMiB": 5.549652099609375
+            },
+            {
+              "additionalGcJobs": 3,
+              "heapBytes": 11310528,
+              "treeAlive": true,
+              "payloadAlive": true,
+              "deltaFromInputBaselineMiB": 5.549812316894531
+            },
+            {
+              "additionalGcJobs": 6,
+              "heapBytes": 11310880,
+              "treeAlive": true,
+              "payloadAlive": true,
+              "deltaFromInputBaselineMiB": 5.550148010253906
+            },
+            {
+              "additionalGcJobs": 12,
+              "heapBytes": 11327104,
+              "treeAlive": true,
+              "payloadAlive": true,
+              "deltaFromInputBaselineMiB": 5.565620422363281
+            }
+          ],
+          "edited": [
+            {
+              "additionalGcJobs": 0,
+              "heapBytes": 11772136,
+              "treeAlive": true,
+              "payloadAlive": true,
+              "deltaFromInputBaselineMiB": 5.9900360107421875
+            },
+            {
+              "additionalGcJobs": 1,
+              "heapBytes": 9653128,
+              "treeAlive": true,
+              "payloadAlive": true,
+              "deltaFromInputBaselineMiB": 3.9691925048828125
+            },
+            {
+              "additionalGcJobs": 3,
+              "heapBytes": 9648240,
+              "treeAlive": true,
+              "payloadAlive": true,
+              "deltaFromInputBaselineMiB": 3.9645309448242188
+            },
+            {
+              "additionalGcJobs": 6,
+              "heapBytes": 9638904,
+              "treeAlive": true,
+              "payloadAlive": true,
+              "deltaFromInputBaselineMiB": 3.95562744140625
+            },
+            {
+              "additionalGcJobs": 12,
+              "heapBytes": 9638976,
+              "treeAlive": true,
+              "payloadAlive": true,
+              "deltaFromInputBaselineMiB": 3.9556961059570312
+            }
+          ],
+          "destroyedInsideHelper": [
+            {
+              "additionalGcJobs": 0,
+              "heapBytes": 6623352,
+              "treeAlive": false,
+              "payloadAlive": false,
+              "deltaFromInputBaselineMiB": 1.07977294921875
+            },
+            {
+              "additionalGcJobs": 1,
+              "heapBytes": 6623624,
+              "treeAlive": false,
+              "payloadAlive": false,
+              "deltaFromInputBaselineMiB": 1.0800323486328125
+            },
+            {
+              "additionalGcJobs": 3,
+              "heapBytes": 6623648,
+              "treeAlive": false,
+              "payloadAlive": false,
+              "deltaFromInputBaselineMiB": 1.0800552368164062
+            },
+            {
+              "additionalGcJobs": 6,
+              "heapBytes": 6623720,
+              "treeAlive": false,
+              "payloadAlive": false,
+              "deltaFromInputBaselineMiB": 1.0801239013671875
+            },
+            {
+              "additionalGcJobs": 12,
+              "heapBytes": 6623792,
+              "treeAlive": false,
+              "payloadAlive": false,
+              "deltaFromInputBaselineMiB": 1.0801925659179688
+            }
+          ],
+          "destroyedAfterHelper": [
+            {
+              "additionalGcJobs": 0,
+              "heapBytes": 6623480,
+              "treeAlive": false,
+              "payloadAlive": false,
+              "deltaFromInputBaselineMiB": 1.07989501953125
+            },
+            {
+              "additionalGcJobs": 1,
+              "heapBytes": 6623704,
+              "treeAlive": false,
+              "payloadAlive": false,
+              "deltaFromInputBaselineMiB": 1.080108642578125
+            },
+            {
+              "additionalGcJobs": 3,
+              "heapBytes": 6623776,
+              "treeAlive": false,
+              "payloadAlive": false,
+              "deltaFromInputBaselineMiB": 1.0801773071289062
+            },
+            {
+              "additionalGcJobs": 6,
+              "heapBytes": 6623848,
+              "treeAlive": false,
+              "payloadAlive": false,
+              "deltaFromInputBaselineMiB": 1.0802459716796875
+            },
+            {
+              "additionalGcJobs": 12,
+              "heapBytes": 6623920,
+              "treeAlive": false,
+              "payloadAlive": false,
+              "deltaFromInputBaselineMiB": 1.0803146362304688
+            }
+          ]
+        }
+      },
+      {
+        "sample": {
+          "arm": "baseline",
+          "repeat": 0,
+          "pin": true
+        },
+        "checkpoints": {
+          "emptyAfterActivation": [
+            {
+              "additionalGcJobs": 0,
+              "heapBytes": 5578400,
+              "treeAlive": true,
+              "payloadAlive": false,
+              "deltaFromInputBaselineMiB": 0.0988006591796875
+            },
+            {
+              "additionalGcJobs": 1,
+              "heapBytes": 5577672,
+              "treeAlive": true,
+              "payloadAlive": false,
+              "deltaFromInputBaselineMiB": 0.09810638427734375
+            },
+            {
+              "additionalGcJobs": 3,
+              "heapBytes": 5588416,
+              "treeAlive": true,
+              "payloadAlive": false,
+              "deltaFromInputBaselineMiB": 0.1083526611328125
+            },
+            {
+              "additionalGcJobs": 6,
+              "heapBytes": 5588656,
+              "treeAlive": true,
+              "payloadAlive": false,
+              "deltaFromInputBaselineMiB": 0.10858154296875
+            },
+            {
+              "additionalGcJobs": 12,
+              "heapBytes": 5588832,
+              "treeAlive": true,
+              "payloadAlive": false,
+              "deltaFromInputBaselineMiB": 0.1087493896484375
+            }
+          ],
+          "populated": [
+            {
+              "additionalGcJobs": 0,
+              "heapBytes": 11282520,
+              "treeAlive": true,
+              "payloadAlive": true,
+              "deltaFromInputBaselineMiB": 5.538673400878906
+            },
+            {
+              "additionalGcJobs": 1,
+              "heapBytes": 11283000,
+              "treeAlive": true,
+              "payloadAlive": true,
+              "deltaFromInputBaselineMiB": 5.539131164550781
+            },
+            {
+              "additionalGcJobs": 3,
+              "heapBytes": 11283168,
+              "treeAlive": true,
+              "payloadAlive": true,
+              "deltaFromInputBaselineMiB": 5.5392913818359375
+            },
+            {
+              "additionalGcJobs": 6,
+              "heapBytes": 11283520,
+              "treeAlive": true,
+              "payloadAlive": true,
+              "deltaFromInputBaselineMiB": 5.5396270751953125
+            },
+            {
+              "additionalGcJobs": 12,
+              "heapBytes": 11353544,
+              "treeAlive": true,
+              "payloadAlive": true,
+              "deltaFromInputBaselineMiB": 5.606407165527344
+            }
+          ],
+          "edited": [
+            {
+              "additionalGcJobs": 0,
+              "heapBytes": 9617840,
+              "treeAlive": true,
+              "payloadAlive": true,
+              "deltaFromInputBaselineMiB": 3.95111083984375
+            },
+            {
+              "additionalGcJobs": 1,
+              "heapBytes": 9608736,
+              "treeAlive": true,
+              "payloadAlive": true,
+              "deltaFromInputBaselineMiB": 3.9424285888671875
+            },
+            {
+              "additionalGcJobs": 3,
+              "heapBytes": 9608808,
+              "treeAlive": true,
+              "payloadAlive": true,
+              "deltaFromInputBaselineMiB": 3.9424972534179688
+            },
+            {
+              "additionalGcJobs": 6,
+              "heapBytes": 9608880,
+              "treeAlive": true,
+              "payloadAlive": true,
+              "deltaFromInputBaselineMiB": 3.94256591796875
+            },
+            {
+              "additionalGcJobs": 12,
+              "heapBytes": 9608952,
+              "treeAlive": true,
+              "payloadAlive": true,
+              "deltaFromInputBaselineMiB": 3.9426345825195312
+            }
+          ],
+          "destroyedInsideHelper": [
+            {
+              "additionalGcJobs": 0,
+              "heapBytes": 9614928,
+              "treeAlive": true,
+              "payloadAlive": true,
+              "deltaFromInputBaselineMiB": 3.948333740234375
+            },
+            {
+              "additionalGcJobs": 1,
+              "heapBytes": 9615152,
+              "treeAlive": true,
+              "payloadAlive": true,
+              "deltaFromInputBaselineMiB": 3.94854736328125
+            },
+            {
+              "additionalGcJobs": 3,
+              "heapBytes": 9615224,
+              "treeAlive": true,
+              "payloadAlive": true,
+              "deltaFromInputBaselineMiB": 3.9486160278320312
+            },
+            {
+              "additionalGcJobs": 6,
+              "heapBytes": 9615296,
+              "treeAlive": true,
+              "payloadAlive": true,
+              "deltaFromInputBaselineMiB": 3.9486846923828125
+            },
+            {
+              "additionalGcJobs": 12,
+              "heapBytes": 9615368,
+              "treeAlive": true,
+              "payloadAlive": true,
+              "deltaFromInputBaselineMiB": 3.9487533569335938
+            }
+          ],
+          "destroyedAfterHelper": [
+            {
+              "additionalGcJobs": 0,
+              "heapBytes": 9615056,
+              "treeAlive": true,
+              "payloadAlive": true,
+              "deltaFromInputBaselineMiB": 3.948455810546875
+            },
+            {
+              "additionalGcJobs": 1,
+              "heapBytes": 9615280,
+              "treeAlive": true,
+              "payloadAlive": true,
+              "deltaFromInputBaselineMiB": 3.94866943359375
+            },
+            {
+              "additionalGcJobs": 3,
+              "heapBytes": 9615352,
+              "treeAlive": true,
+              "payloadAlive": true,
+              "deltaFromInputBaselineMiB": 3.9487380981445312
+            },
+            {
+              "additionalGcJobs": 6,
+              "heapBytes": 9615424,
+              "treeAlive": true,
+              "payloadAlive": true,
+              "deltaFromInputBaselineMiB": 3.9488067626953125
+            },
+            {
+              "additionalGcJobs": 12,
+              "heapBytes": 9615496,
+              "treeAlive": true,
+              "payloadAlive": true,
+              "deltaFromInputBaselineMiB": 3.9488754272460938
+            }
+          ],
+          "afterPinRelease": [
+            {
+              "additionalGcJobs": 0,
+              "heapBytes": 6598240,
+              "treeAlive": false,
+              "payloadAlive": false,
+              "deltaFromInputBaselineMiB": 1.0713958740234375
+            },
+            {
+              "additionalGcJobs": 1,
+              "heapBytes": 6598464,
+              "treeAlive": false,
+              "payloadAlive": false,
+              "deltaFromInputBaselineMiB": 1.0716094970703125
+            },
+            {
+              "additionalGcJobs": 3,
+              "heapBytes": 6598536,
+              "treeAlive": false,
+              "payloadAlive": false,
+              "deltaFromInputBaselineMiB": 1.0716781616210938
+            },
+            {
+              "additionalGcJobs": 6,
+              "heapBytes": 6598608,
+              "treeAlive": false,
+              "payloadAlive": false,
+              "deltaFromInputBaselineMiB": 1.071746826171875
+            },
+            {
+              "additionalGcJobs": 12,
+              "heapBytes": 6598680,
+              "treeAlive": false,
+              "payloadAlive": false,
+              "deltaFromInputBaselineMiB": 1.0718154907226562
+            }
+          ]
+        }
+      },
+      {
+        "sample": {
+          "arm": "final",
+          "repeat": 0,
+          "pin": true
+        },
+        "checkpoints": {
+          "emptyAfterActivation": [
+            {
+              "additionalGcJobs": 0,
+              "heapBytes": 5594952,
+              "treeAlive": true,
+              "payloadAlive": false,
+              "deltaFromInputBaselineMiB": 0.0990142822265625
+            },
+            {
+              "additionalGcJobs": 1,
+              "heapBytes": 5594224,
+              "treeAlive": true,
+              "payloadAlive": false,
+              "deltaFromInputBaselineMiB": 0.09832000732421875
+            },
+            {
+              "additionalGcJobs": 3,
+              "heapBytes": 5603920,
+              "treeAlive": true,
+              "payloadAlive": false,
+              "deltaFromInputBaselineMiB": 0.10756683349609375
+            },
+            {
+              "additionalGcJobs": 6,
+              "heapBytes": 5605208,
+              "treeAlive": true,
+              "payloadAlive": false,
+              "deltaFromInputBaselineMiB": 0.108795166015625
+            },
+            {
+              "additionalGcJobs": 12,
+              "heapBytes": 5605384,
+              "treeAlive": true,
+              "payloadAlive": false,
+              "deltaFromInputBaselineMiB": 0.1089630126953125
+            }
+          ],
+          "populated": [
+            {
+              "additionalGcJobs": 0,
+              "heapBytes": 11310000,
+              "treeAlive": true,
+              "payloadAlive": true,
+              "deltaFromInputBaselineMiB": 5.549308776855469
+            },
+            {
+              "additionalGcJobs": 1,
+              "heapBytes": 11310528,
+              "treeAlive": true,
+              "payloadAlive": true,
+              "deltaFromInputBaselineMiB": 5.549812316894531
+            },
+            {
+              "additionalGcJobs": 3,
+              "heapBytes": 11310648,
+              "treeAlive": true,
+              "payloadAlive": true,
+              "deltaFromInputBaselineMiB": 5.5499267578125
+            },
+            {
+              "additionalGcJobs": 6,
+              "heapBytes": 11311000,
+              "treeAlive": true,
+              "payloadAlive": true,
+              "deltaFromInputBaselineMiB": 5.550262451171875
+            },
+            {
+              "additionalGcJobs": 12,
+              "heapBytes": 11327224,
+              "treeAlive": true,
+              "payloadAlive": true,
+              "deltaFromInputBaselineMiB": 5.56573486328125
+            }
+          ],
+          "edited": [
+            {
+              "additionalGcJobs": 0,
+              "heapBytes": 9647888,
+              "treeAlive": true,
+              "payloadAlive": true,
+              "deltaFromInputBaselineMiB": 3.9641952514648438
+            },
+            {
+              "additionalGcJobs": 1,
+              "heapBytes": 9638800,
+              "treeAlive": true,
+              "payloadAlive": true,
+              "deltaFromInputBaselineMiB": 3.9555282592773438
+            },
+            {
+              "additionalGcJobs": 3,
+              "heapBytes": 9638872,
+              "treeAlive": true,
+              "payloadAlive": true,
+              "deltaFromInputBaselineMiB": 3.955596923828125
+            },
+            {
+              "additionalGcJobs": 6,
+              "heapBytes": 9638944,
+              "treeAlive": true,
+              "payloadAlive": true,
+              "deltaFromInputBaselineMiB": 3.9556655883789062
+            },
+            {
+              "additionalGcJobs": 12,
+              "heapBytes": 9639016,
+              "treeAlive": true,
+              "payloadAlive": true,
+              "deltaFromInputBaselineMiB": 3.9557342529296875
+            }
+          ],
+          "destroyedInsideHelper": [
+            {
+              "additionalGcJobs": 0,
+              "heapBytes": 9644992,
+              "treeAlive": true,
+              "payloadAlive": true,
+              "deltaFromInputBaselineMiB": 3.9614334106445312
+            },
+            {
+              "additionalGcJobs": 1,
+              "heapBytes": 9645216,
+              "treeAlive": true,
+              "payloadAlive": true,
+              "deltaFromInputBaselineMiB": 3.9616470336914062
+            },
+            {
+              "additionalGcJobs": 3,
+              "heapBytes": 9645288,
+              "treeAlive": true,
+              "payloadAlive": true,
+              "deltaFromInputBaselineMiB": 3.9617156982421875
+            },
+            {
+              "additionalGcJobs": 6,
+              "heapBytes": 9645360,
+              "treeAlive": true,
+              "payloadAlive": true,
+              "deltaFromInputBaselineMiB": 3.9617843627929688
+            },
+            {
+              "additionalGcJobs": 12,
+              "heapBytes": 9645432,
+              "treeAlive": true,
+              "payloadAlive": true,
+              "deltaFromInputBaselineMiB": 3.96185302734375
+            }
+          ],
+          "destroyedAfterHelper": [
+            {
+              "additionalGcJobs": 0,
+              "heapBytes": 9645120,
+              "treeAlive": true,
+              "payloadAlive": true,
+              "deltaFromInputBaselineMiB": 3.9615554809570312
+            },
+            {
+              "additionalGcJobs": 1,
+              "heapBytes": 9645344,
+              "treeAlive": true,
+              "payloadAlive": true,
+              "deltaFromInputBaselineMiB": 3.9617691040039062
+            },
+            {
+              "additionalGcJobs": 3,
+              "heapBytes": 9645416,
+              "treeAlive": true,
+              "payloadAlive": true,
+              "deltaFromInputBaselineMiB": 3.9618377685546875
+            },
+            {
+              "additionalGcJobs": 6,
+              "heapBytes": 9645488,
+              "treeAlive": true,
+              "payloadAlive": true,
+              "deltaFromInputBaselineMiB": 3.9619064331054688
+            },
+            {
+              "additionalGcJobs": 12,
+              "heapBytes": 9645560,
+              "treeAlive": true,
+              "payloadAlive": true,
+              "deltaFromInputBaselineMiB": 3.96197509765625
+            }
+          ],
+          "afterPinRelease": [
+            {
+              "additionalGcJobs": 0,
+              "heapBytes": 6624200,
+              "treeAlive": false,
+              "payloadAlive": false,
+              "deltaFromInputBaselineMiB": 1.0805816650390625
+            },
+            {
+              "additionalGcJobs": 1,
+              "heapBytes": 6624472,
+              "treeAlive": false,
+              "payloadAlive": false,
+              "deltaFromInputBaselineMiB": 1.080841064453125
+            },
+            {
+              "additionalGcJobs": 3,
+              "heapBytes": 6624496,
+              "treeAlive": false,
+              "payloadAlive": false,
+              "deltaFromInputBaselineMiB": 1.0808639526367188
+            },
+            {
+              "additionalGcJobs": 6,
+              "heapBytes": 6624568,
+              "treeAlive": false,
+              "payloadAlive": false,
+              "deltaFromInputBaselineMiB": 1.0809326171875
+            },
+            {
+              "additionalGcJobs": 12,
+              "heapBytes": 6624640,
+              "treeAlive": false,
+              "payloadAlive": false,
+              "deltaFromInputBaselineMiB": 1.0810012817382812
+            }
+          ]
+        }
+      }
+    ],
+    "findings": [
+      "All six normal sampled trees/actual stored rows collected already at first destroyed-inside-helper3GC checkpoint; helper-return was not necessary in this intervention.",
+      "Both explicit pins preserved tree and actual stored row through helper-return; release allowed collection at first3GC checkpoint.",
+      "One normal child in each arm fell from~5.54 to~3.59MiB populated delta only at+12GC while tree/row remained alive; other populated high states persisted through+12GC.",
+      "One final edited sample fell~5.99\u21923.97MiB afteroneextraGC; originalthreeGC is not a stable whole-heap endpoint.",
+      "Normal destroyed deltas~1.07baseline/~1.08final stayedflat acrossadditionalGC/helper-return."
+    ],
+    "limits": [
+      "No revised timing/CPU claims from recorded workload stage timings.",
+      "Additional earlier GCs and helper scope are interventions; originalhighdestroyedclass was not reproduced.",
+      "No causal identification of JIT, stack retention or a particular runtime allocation; no universal collection guarantee.",
+      "Observed tree/row collection does not identify every remaining process heap owner."
+    ]
+  }
+}

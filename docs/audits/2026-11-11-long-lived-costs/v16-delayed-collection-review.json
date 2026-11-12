@@ -1,0 +1,755 @@
+{
+  "source": "/private/tmp/st-v16-payload-independent-review.json",
+  "sha256": "45cfa3142c4208d7f0ff4617eb9fb581adac0ddcb3dccb59f6188e0d90c3e894",
+  "result": {
+    "command": "python3 /private/tmp/st-v16-payload-independent-analyze.py",
+    "verifiedBindings": true,
+    "sourceFrozen": "/private/tmp/st-v16-payload-source-frozen",
+    "bundleSha256": "0a316728445750fb90561fc6c62e1d2ffa45361e6b07cab5607171a985ee6b8b",
+    "results": [
+      {
+        "root": "/private/tmp/st-v16-payload-retention-diagnostic",
+        "resultSha256": "ec4b5b823dd0980b3b54ef39daf13d5e0f7f2c80a988ab02f48564496b39c5a4",
+        "sourceSha256": "bc0a6a88e4006aedbe75f7de1de3b251f933c4e52d9b3ca414b01e1798946a87",
+        "naturalOriginalPasses": 5,
+        "cases": [
+          {
+            "index": 0,
+            "sample": {
+              "recipient": false,
+              "cumulativeIds": true,
+              "repeat": 0
+            },
+            "pid": 64793,
+            "originalPassed": true,
+            "classification": "original predicates passed",
+            "payloadObservations": [
+              {
+                "cycle": 1,
+                "phase": "original-three-gc",
+                "payloadsAlive": 0,
+                "transactionsAlive": 0,
+                "identities": []
+              }
+            ],
+            "treeObservations": []
+          },
+          {
+            "index": 1,
+            "sample": {
+              "recipient": false,
+              "cumulativeIds": true,
+              "repeat": 1
+            },
+            "pid": 64851,
+            "originalPassed": false,
+            "classification": "payload initially alive; absent by extra GC 2; original assertion remains failed",
+            "payloadObservations": [
+              {
+                "cycle": 1,
+                "phase": "original-three-gc",
+                "payloadsAlive": 1,
+                "transactionsAlive": 0,
+                "identities": [
+                  {
+                    "index": 0,
+                    "id": "R-0",
+                    "v0": 100000
+                  }
+                ]
+              },
+              {
+                "cycle": 1,
+                "phase": "extra-gc",
+                "extra": 1,
+                "identities": [
+                  {
+                    "index": 0,
+                    "id": "R-0",
+                    "v0": 100000
+                  }
+                ]
+              },
+              {
+                "cycle": 1,
+                "phase": "extra-gc",
+                "extra": 2,
+                "identities": []
+              },
+              {
+                "cycle": 1,
+                "phase": "extra-gc",
+                "extra": 5,
+                "identities": []
+              },
+              {
+                "cycle": 1,
+                "phase": "extra-gc",
+                "extra": 10,
+                "identities": []
+              },
+              {
+                "cycle": 1,
+                "phase": "extra-gc",
+                "extra": 20,
+                "identities": []
+              }
+            ],
+            "treeObservations": []
+          },
+          {
+            "index": 2,
+            "sample": {
+              "recipient": false,
+              "cumulativeIds": true,
+              "repeat": 2
+            },
+            "pid": 64856,
+            "originalPassed": true,
+            "classification": "original predicates passed",
+            "payloadObservations": [
+              {
+                "cycle": 1,
+                "phase": "original-three-gc",
+                "payloadsAlive": 0,
+                "transactionsAlive": 0,
+                "identities": []
+              }
+            ],
+            "treeObservations": []
+          },
+          {
+            "index": 3,
+            "sample": {
+              "recipient": false,
+              "cumulativeIds": true,
+              "repeat": 3
+            },
+            "pid": 64857,
+            "originalPassed": false,
+            "classification": "original destroyed-tree collection failure; no extra-GC observation in this earlier generator",
+            "payloadObservations": [
+              {
+                "cycle": 1,
+                "phase": "original-three-gc",
+                "payloadsAlive": 0,
+                "transactionsAlive": 0,
+                "identities": []
+              }
+            ],
+            "treeObservations": []
+          },
+          {
+            "index": 4,
+            "sample": {
+              "recipient": false,
+              "cumulativeIds": true,
+              "repeat": 4
+            },
+            "pid": 65101,
+            "originalPassed": true,
+            "classification": "original predicates passed",
+            "payloadObservations": [
+              {
+                "cycle": 1,
+                "phase": "original-three-gc",
+                "payloadsAlive": 0,
+                "transactionsAlive": 0,
+                "identities": []
+              }
+            ],
+            "treeObservations": []
+          },
+          {
+            "index": 5,
+            "sample": {
+              "recipient": false,
+              "cumulativeIds": true,
+              "repeat": 5
+            },
+            "pid": 65103,
+            "originalPassed": true,
+            "classification": "original predicates passed",
+            "payloadObservations": [
+              {
+                "cycle": 1,
+                "phase": "original-three-gc",
+                "payloadsAlive": 0,
+                "transactionsAlive": 0,
+                "identities": []
+              }
+            ],
+            "treeObservations": []
+          },
+          {
+            "index": 6,
+            "sample": {
+              "recipient": false,
+              "cumulativeIds": true,
+              "repeat": 6
+            },
+            "pid": 65106,
+            "originalPassed": false,
+            "classification": "payload initially alive; absent by extra GC 5; original assertion remains failed",
+            "payloadObservations": [
+              {
+                "cycle": 1,
+                "phase": "original-three-gc",
+                "payloadsAlive": 1,
+                "transactionsAlive": 0,
+                "identities": [
+                  {
+                    "index": 0,
+                    "id": "R-0",
+                    "v0": 100000
+                  }
+                ]
+              },
+              {
+                "cycle": 1,
+                "phase": "extra-gc",
+                "extra": 1,
+                "identities": [
+                  {
+                    "index": 0,
+                    "id": "R-0",
+                    "v0": 100000
+                  }
+                ]
+              },
+              {
+                "cycle": 1,
+                "phase": "extra-gc",
+                "extra": 2,
+                "identities": [
+                  {
+                    "index": 0,
+                    "id": "R-0",
+                    "v0": 100000
+                  }
+                ]
+              },
+              {
+                "cycle": 1,
+                "phase": "extra-gc",
+                "extra": 5,
+                "identities": []
+              },
+              {
+                "cycle": 1,
+                "phase": "extra-gc",
+                "extra": 10,
+                "identities": []
+              },
+              {
+                "cycle": 1,
+                "phase": "extra-gc",
+                "extra": 20,
+                "identities": []
+              }
+            ],
+            "treeObservations": []
+          },
+          {
+            "index": 7,
+            "sample": {
+              "recipient": false,
+              "cumulativeIds": true,
+              "repeat": 7
+            },
+            "pid": 65107,
+            "originalPassed": true,
+            "classification": "original predicates passed",
+            "payloadObservations": [
+              {
+                "cycle": 1,
+                "phase": "original-three-gc",
+                "payloadsAlive": 0,
+                "transactionsAlive": 0,
+                "identities": []
+              }
+            ],
+            "treeObservations": []
+          },
+          {
+            "index": 8,
+            "sample": {
+              "recipient": false,
+              "cumulativeIds": true,
+              "repeat": 0,
+              "pin": true
+            },
+            "pid": 65109,
+            "originalPassed": false,
+            "classification": "payload pin sensitivity: persists through extra20, collects after release+6",
+            "payloadObservations": [
+              {
+                "cycle": 1,
+                "phase": "original-three-gc",
+                "payloadsAlive": 1,
+                "transactionsAlive": 0,
+                "identities": [
+                  {
+                    "index": 0,
+                    "id": "R-0",
+                    "v0": 100000
+                  }
+                ]
+              },
+              {
+                "cycle": 1,
+                "phase": "extra-gc",
+                "extra": 1,
+                "identities": [
+                  {
+                    "index": 0,
+                    "id": "R-0",
+                    "v0": 100000
+                  }
+                ]
+              },
+              {
+                "cycle": 1,
+                "phase": "extra-gc",
+                "extra": 2,
+                "identities": [
+                  {
+                    "index": 0,
+                    "id": "R-0",
+                    "v0": 100000
+                  }
+                ]
+              },
+              {
+                "cycle": 1,
+                "phase": "extra-gc",
+                "extra": 5,
+                "identities": [
+                  {
+                    "index": 0,
+                    "id": "R-0",
+                    "v0": 100000
+                  }
+                ]
+              },
+              {
+                "cycle": 1,
+                "phase": "extra-gc",
+                "extra": 10,
+                "identities": [
+                  {
+                    "index": 0,
+                    "id": "R-0",
+                    "v0": 100000
+                  }
+                ]
+              },
+              {
+                "cycle": 1,
+                "phase": "extra-gc",
+                "extra": 20,
+                "identities": [
+                  {
+                    "index": 0,
+                    "id": "R-0",
+                    "v0": 100000
+                  }
+                ]
+              },
+              {
+                "cycle": 1,
+                "phase": "pin-released-six-gc",
+                "identities": []
+              }
+            ],
+            "treeObservations": []
+          }
+        ]
+      },
+      {
+        "root": "/private/tmp/st-v16-payload-retention-followup",
+        "resultSha256": "5f6c090d86d3afdd146b577f3fe5d2a5269b1901a9bb0fbbe6dac01ecdb74649",
+        "sourceSha256": "b295b13861e25a83ef74765c2201b1e4cf6eb97a01c3cf3fe6e9c0c122e16ce1",
+        "naturalOriginalPasses": 5,
+        "cases": [
+          {
+            "index": 0,
+            "sample": {
+              "recipient": false,
+              "cumulativeIds": true,
+              "repeat": 0
+            },
+            "pid": 65210,
+            "originalPassed": true,
+            "classification": "original predicates passed",
+            "payloadObservations": [
+              {
+                "cycle": 1,
+                "phase": "original-three-gc",
+                "payloadsAlive": 0,
+                "transactionsAlive": 0,
+                "identities": []
+              }
+            ],
+            "treeObservations": [
+              {
+                "phase": "original-three-gc",
+                "tree": false,
+                "connection": false
+              }
+            ]
+          },
+          {
+            "index": 1,
+            "sample": {
+              "recipient": false,
+              "cumulativeIds": true,
+              "repeat": 1
+            },
+            "pid": 65211,
+            "originalPassed": true,
+            "classification": "original predicates passed",
+            "payloadObservations": [
+              {
+                "cycle": 1,
+                "phase": "original-three-gc",
+                "payloadsAlive": 0,
+                "transactionsAlive": 0,
+                "identities": []
+              }
+            ],
+            "treeObservations": [
+              {
+                "phase": "original-three-gc",
+                "tree": false,
+                "connection": false
+              }
+            ]
+          },
+          {
+            "index": 2,
+            "sample": {
+              "recipient": false,
+              "cumulativeIds": true,
+              "repeat": 2
+            },
+            "pid": 65214,
+            "originalPassed": true,
+            "classification": "original predicates passed",
+            "payloadObservations": [
+              {
+                "cycle": 1,
+                "phase": "original-three-gc",
+                "payloadsAlive": 0,
+                "transactionsAlive": 0,
+                "identities": []
+              }
+            ],
+            "treeObservations": [
+              {
+                "phase": "original-three-gc",
+                "tree": false,
+                "connection": false
+              }
+            ]
+          },
+          {
+            "index": 3,
+            "sample": {
+              "recipient": false,
+              "cumulativeIds": true,
+              "repeat": 3
+            },
+            "pid": 65215,
+            "originalPassed": true,
+            "classification": "original predicates passed",
+            "payloadObservations": [
+              {
+                "cycle": 1,
+                "phase": "original-three-gc",
+                "payloadsAlive": 0,
+                "transactionsAlive": 0,
+                "identities": []
+              }
+            ],
+            "treeObservations": [
+              {
+                "phase": "original-three-gc",
+                "tree": false,
+                "connection": false
+              }
+            ]
+          },
+          {
+            "index": 4,
+            "sample": {
+              "recipient": false,
+              "cumulativeIds": true,
+              "repeat": 4
+            },
+            "pid": 65216,
+            "originalPassed": false,
+            "classification": "destroyed tree initially alive; absent by extra GC 2; original assertion remains failed",
+            "payloadObservations": [
+              {
+                "cycle": 1,
+                "phase": "original-three-gc",
+                "payloadsAlive": 0,
+                "transactionsAlive": 0,
+                "identities": []
+              }
+            ],
+            "treeObservations": [
+              {
+                "phase": "original-three-gc",
+                "tree": true,
+                "connection": false
+              },
+              {
+                "phase": "extra-gc",
+                "extra": 1,
+                "tree": true,
+                "connection": false
+              },
+              {
+                "phase": "extra-gc",
+                "extra": 2,
+                "tree": false,
+                "connection": false
+              },
+              {
+                "phase": "extra-gc",
+                "extra": 5,
+                "tree": false,
+                "connection": false
+              },
+              {
+                "phase": "extra-gc",
+                "extra": 10,
+                "tree": false,
+                "connection": false
+              },
+              {
+                "phase": "extra-gc",
+                "extra": 20,
+                "tree": false,
+                "connection": false
+              }
+            ]
+          },
+          {
+            "index": 5,
+            "sample": {
+              "recipient": false,
+              "cumulativeIds": true,
+              "repeat": 5
+            },
+            "pid": 65217,
+            "originalPassed": true,
+            "classification": "original predicates passed",
+            "payloadObservations": [
+              {
+                "cycle": 1,
+                "phase": "original-three-gc",
+                "payloadsAlive": 0,
+                "transactionsAlive": 0,
+                "identities": []
+              }
+            ],
+            "treeObservations": [
+              {
+                "phase": "original-three-gc",
+                "tree": false,
+                "connection": false
+              }
+            ]
+          },
+          {
+            "index": 6,
+            "sample": {
+              "recipient": false,
+              "cumulativeIds": true,
+              "repeat": 6
+            },
+            "pid": 65226,
+            "originalPassed": false,
+            "classification": "payload initially alive; absent by extra GC 1; original assertion remains failed",
+            "payloadObservations": [
+              {
+                "cycle": 1,
+                "phase": "original-three-gc",
+                "payloadsAlive": 1,
+                "transactionsAlive": 0,
+                "identities": [
+                  {
+                    "index": 0,
+                    "id": "R-0",
+                    "v0": 100000
+                  }
+                ]
+              },
+              {
+                "cycle": 1,
+                "phase": "extra-gc",
+                "extra": 1,
+                "identities": []
+              },
+              {
+                "cycle": 1,
+                "phase": "extra-gc",
+                "extra": 2,
+                "identities": []
+              },
+              {
+                "cycle": 1,
+                "phase": "extra-gc",
+                "extra": 5,
+                "identities": []
+              },
+              {
+                "cycle": 1,
+                "phase": "extra-gc",
+                "extra": 10,
+                "identities": []
+              },
+              {
+                "cycle": 1,
+                "phase": "extra-gc",
+                "extra": 20,
+                "identities": []
+              }
+            ],
+            "treeObservations": []
+          },
+          {
+            "index": 7,
+            "sample": {
+              "recipient": false,
+              "cumulativeIds": true,
+              "repeat": 7
+            },
+            "pid": 65227,
+            "originalPassed": false,
+            "classification": "payload initially alive; absent by extra GC 1; original assertion remains failed",
+            "payloadObservations": [
+              {
+                "cycle": 1,
+                "phase": "original-three-gc",
+                "payloadsAlive": 1,
+                "transactionsAlive": 0,
+                "identities": [
+                  {
+                    "index": 0,
+                    "id": "R-0",
+                    "v0": 100000
+                  }
+                ]
+              },
+              {
+                "cycle": 1,
+                "phase": "extra-gc",
+                "extra": 1,
+                "identities": []
+              },
+              {
+                "cycle": 1,
+                "phase": "extra-gc",
+                "extra": 2,
+                "identities": []
+              },
+              {
+                "cycle": 1,
+                "phase": "extra-gc",
+                "extra": 5,
+                "identities": []
+              },
+              {
+                "cycle": 1,
+                "phase": "extra-gc",
+                "extra": 10,
+                "identities": []
+              },
+              {
+                "cycle": 1,
+                "phase": "extra-gc",
+                "extra": 20,
+                "identities": []
+              }
+            ],
+            "treeObservations": []
+          },
+          {
+            "index": 8,
+            "sample": {
+              "recipient": false,
+              "cumulativeIds": true,
+              "repeat": 0,
+              "pinTree": true
+            },
+            "pid": 65228,
+            "originalPassed": false,
+            "classification": "tree pin sensitivity: persists through extra20, collects after release+6",
+            "payloadObservations": [
+              {
+                "cycle": 1,
+                "phase": "original-three-gc",
+                "payloadsAlive": 0,
+                "transactionsAlive": 0,
+                "identities": []
+              }
+            ],
+            "treeObservations": [
+              {
+                "phase": "original-three-gc",
+                "tree": true,
+                "connection": false
+              },
+              {
+                "phase": "extra-gc",
+                "extra": 1,
+                "tree": true,
+                "connection": false
+              },
+              {
+                "phase": "extra-gc",
+                "extra": 2,
+                "tree": true,
+                "connection": false
+              },
+              {
+                "phase": "extra-gc",
+                "extra": 5,
+                "tree": true,
+                "connection": false
+              },
+              {
+                "phase": "extra-gc",
+                "extra": 10,
+                "tree": true,
+                "connection": false
+              },
+              {
+                "phase": "extra-gc",
+                "extra": 20,
+                "tree": true,
+                "connection": false
+              },
+              {
+                "phase": "pin-released-six-gc",
+                "tree": false,
+                "connection": false
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "interpretation": "Four natural payload observations (two first generator, two followup) clear after additional job-separated collections while the tree remains alive and unchanged. One reproduced destroyed-tree observation clears after two additional collections. Both planted strong roots persist until explicit release. These are collection-delay observations, not stable-owner evidence; exact engine roots and the original factorial failure cause remain unproven. Original failed assertions remain failed.",
+    "limits": [
+      "First-cycle only.",
+      "No timing or heap magnitude interpretation.",
+      "No alteration of original factorial or aging verdict.",
+      "Publication maps retain independently verified per-lifetime growth."
+    ]
+  }
+}

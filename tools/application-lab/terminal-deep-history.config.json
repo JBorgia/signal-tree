@@ -1,0 +1,35 @@
+{
+  "arms": [
+    {
+      "name": "a35",
+      "sourceCommit": "a35ed7534996a80a77d0038ac61cb374fa5a1403",
+      "pendingBundles": "/private/tmp/st-v16-final-pending-bundles",
+      "archiveIntegrity": "sha512-YFvEzDFjzGxmPftKO3peXL5cPQzeGM4oZ6IVtF7zkhJjmRI2hvF70ooi5KQ6Ohi2PICBjRFlqWxBv+c4QPxPLg==",
+      "sourceSeal": "sha256-9f16e11ffe45f0db5af01b37e455146e021aec9ec485a52aeb52eaa166017f6f"
+    },
+    {
+      "name": "source145",
+      "sourceCommit": "145e2a19cfe208c70f30ff64006fa6929fd092fb",
+      "pendingBundles": "/private/tmp/st-v16-terminal-source-stage1-pending-bundles",
+      "archiveIntegrity": "sha512-uWxU5Gyae5qrfXFAr/g+egO0NwgWtdeW+ap7qf3nQP8LtPsUAXKnrvINjTRen+lUjjSFhXdeU5GvlHFHNQS3og==",
+      "sourceSeal": "sha256-9e7d260e03066199821a4b6dfe0dd532746dd10b0ea053036ab56913249762d7"
+    },
+    {
+      "name": "final",
+      "sourceCommit": "5d04ff65d2eaab1986ed1b420cbc013edc01542b",
+      "pendingBundles": "/private/tmp/st-v16-terminal-final-pending-bundles",
+      "archiveIntegrity": "sha512-mUyZihWJvooHHVGs+3NL909vQSeQRTf7EmCZDP0tA7+6gMylb873Ez+7BrVTufJITAvQlUqo94ohokrXGhKMJQ==",
+      "sourceSeal": "sha256-a8220c572802aae475bf647e2c3c5c572477d56da90764f9defa941d5bd1f744"
+    }
+  ],
+  "excluded": [
+    {
+      "sourceCommit": "a4316e1229d4c54d3af8044c44dee2d56a8ec043",
+      "reason": "Rejected predecessor cache-cost experiment; not relabeled as final. Root supplies its preserved exact receipt separately."
+    }
+  ],
+  "independentReview": {
+    "path": "/private/tmp/st-terminal-deep-history-corrected-independent-review.json",
+    "sha256": "bcd24079d2832b374370734991189080c8b252c285d8318d81069a05b228764d"
+  }
+}

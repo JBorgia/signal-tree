@@ -1,0 +1,3 @@
+Checked 76 imported symbol(s) across 444 README(s) against 7 built entry point(s).
+✓ every SignalTree package and symbol imported in current docs exists.
+✓ no live doc example teaches any of the 22 retired or 0 withdrawn API(s).

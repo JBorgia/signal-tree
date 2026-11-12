@@ -1,0 +1,49 @@
+{
+  "source": "/private/tmp/st-activation-index-independent-review.json",
+  "sha256": "bfcff62e3e762a602539e6046369907be4787b95f4fecdcf8b6e1fbdb02eb65d",
+  "result": {
+    "concreteBlockers": [],
+    "commits": {
+      "v15": "0d2b9619206ab9e7a7af998944e744f6d2b6e492",
+      "v16": "c75a0e8ba4e9f9a6958e9033d9ef8d6f284b6959"
+    },
+    "bindings": {
+      "/Users/jonathanborgia/code/signaltree/.worktrees/v15-retirement-reclamation/packages/kernel/src/lib/entity-signal.ts": "9e706230440e08f9ea6180490958414df8b258b26054c1c22333ae4c926adf0f",
+      "/Users/jonathanborgia/code/signaltree/.worktrees/v15-retirement-reclamation/packages/kernel/src/lib/activation-wrapper-retirement.spec.ts": "1d8b6b42c061d4f462d68aaedba929aa40aa1237b4b9a7aec1b51a88368959eb",
+      "/Users/jonathanborgia/code/signaltree/.worktrees/v16-rollback-reclamation/packages/kernel/src/lib/entity-signal.ts": "ae086117f7b2ce276548c42594fbdb378cafecfbe9a97c7bb3ae0230050675cd",
+      "/Users/jonathanborgia/code/signaltree/.worktrees/v16-rollback-reclamation/packages/kernel/src/lib/activation-wrapper-retirement.spec.ts": "a34f4456df3f280f41a10bd9a528b12f8e802c283bcec4cf50ebd78b5a310c34",
+      "/private/tmp/st-v15-residual-map-census.mjs": "8381d30e43cdac1471d153f80d89bc83cdb0568b13611ea7d69def41ad940cf6",
+      "/private/tmp/st-v15-residual-map-census.json": "ca0804460c38e1db3ca4346267e8b792d2e3b960ac029199ccc73223759ea09c",
+      "/private/tmp/st-v15-activation-wrapper-baseline.log": "0f5269088967ac27c062c7acd952aa427d708112d01d836d97ca5d7ebe26c86e",
+      "/private/tmp/st-v16-activation-wrapper-baseline.log": "c476b1815142e9c47d5ddf81e7b70c14562846d78dffba9f297ceb49dccc2e0f",
+      "/private/tmp/st-v15-activation-wrapper-focused-2.log": "33ae06393e737b263db8553d6fc1586b5fd0af675ef8ff29b29954f77aadb3e9",
+      "/private/tmp/st-v16-activation-wrapper-focused-2.log": "a6e0c799bb1ecdb0a78c2b4f4ae25ce5cbc369c5fc5efcc478dc9568d47b3693",
+      "/private/tmp/st-v16-activation-wrapper-final-focused.log": "15b07937e17f697b446b3b33acf3d93db4c5c479f29f87311cc6c373726fea6d"
+    },
+    "snapshots": "/private/tmp/st-activation-index-independent-review",
+    "premise": "Census holds only WeakRefs to maps, so does not manufacture map survival. Frozen production bundle and runner hashes verified; minified stack location matches creation/indexing of WeakRef activation carrier. Weak values do not retire strong numeric keys or wrapper objects. Historical v15 zero-owner fix and late-read guard inspected.",
+    "sourceReview": [
+      "Owned cleanup deletes activation map entry only when forgetLifetime and actual lifetime state is absent, in finally after commit attempt. Value-only retirement does not delete it.",
+      "Finally uses actual state rather than physicallyChangedSubjectIds, which omits value-less retirement when hadBacking is false. Preinstall failures preserve entry; installed completion failures still clean.",
+      "v16 bare path receives equivalent postattempt absent-state cleanup. Existing ordinaryTopology ownership guard remains before staging and before owned preparation.",
+      "v16 registration checks lifetime state after createCell, matching existing v15 behavior: reentrant creation/first late read cannot re-index an already-forgotten subject. Retained tombstones still register for rollback/undo.",
+      "Held nodes keep activation carrier in their own closure. Irreversibly forgotten subject IDs are not reused, so deleting collection index does not redirect old handles to same-key replacements.",
+      "No public API/export/semantic policy change. v15 existing zero-owner cleanup unchanged; new owned cleanup supplies missing mirror."
+    ],
+    "testsInspected": {
+      "baselineV15": "3failed/1passed",
+      "baselineV16": "4failed",
+      "patchedV15": "4files/84tests passed",
+      "patchedV16": "4files/87tests passed, final formatted direct map suite5passed",
+      "falsifier": "Exact real activation map discovered while reading already-acquired nodes; nonempty and unique map required. Map intentionally strongly held, so zero-entry result is direct cleanup evidence independent of GC. Refused publication preparation checks same WeakRef object remains, then successful retry removes it."
+    },
+    "freshReviewerCommands": [
+      "hash checks of original census bundle/generator",
+      "git diff --check in both worktrees"
+    ],
+    "limits": [
+      "No fresh Nx/native framework suite or timing/heap cohort run by reviewer. Saved tests/source inspected.",
+      "Direct-map tests establish index cleanup, not universal heap boundedness or absence of all other owners. Final integrated native checks/aging remain required."
+    ]
+  }
+}

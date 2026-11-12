@@ -1,0 +1,388 @@
+{
+  "source": "/private/tmp/st-final-comparison-independent-interpretation.json",
+  "sha256": "df2a6d8a78c0c09d80d72c404ca7eb5b78b2cfb08322741c93a3854a05c4c279",
+  "result": {
+    "review": "Independent final ordinary/browser/private-variant interpretation",
+    "createdUTC": "2026-11-12T01:07:33.660938+00:00",
+    "sourceHead": "18e2eed330629900b5e519168785591c0ab751dc",
+    "scope": "Bounded application comparison evidence and refreshed README claims only. No release authorization, package publication claim, architecture edits, tests, builds or performance jobs by reviewer.",
+    "verdict": "No material admission, artifact-identity, arithmetic or observable-work blocker demonstrated. One narrow protocol execution-description correction identified and sent to root; it does not invalidate measured inventory dependency closure.",
+    "independentlyVerified": [
+      "All 4,917 unique bindings collected from main/full/private summaries, pair outputs, sequence and derivation/control receipts matched actual file bytes at verification time; no conflicting hashes.",
+      "140 ordinary, 132 inventory, 264 dispatch, 42 private inventory children all report useful checks passed. Exact schedule/raw joins and distinct process IDs checked in all four cohorts.",
+      "Ordinary per-stage cumulative arithmetic, raw invocations, full browser child p95 and workflow array values, matched profile/round ratios and deltas, main distributions and private before/after/A-A statistics independently recomputed.",
+      "All132 memory children preserve expected pending/preview/settled/teardown intermediate state and retired delivery applications265, starts0, attempts0. These memory phases contain no started publication payload work.",
+      "Original analyzer source transformed by exactly the two declared registration/path substitutions equals derived bytes. Self-test and analysis logs have zero-exit receipts and matching hashes.",
+      "Wrong-packet control fails specifically at Cohort does not bind supplied packet plan and produces no report; skipped-write control fails at sparse-100/write receipt. These controls were inspected, not rerun.",
+      "Containment receipt preserves the old wrapper mutation failure and all7 corrected rejecting cases with unchanged input files; source-equals cases refer to preexisting input directories.",
+      "Draft current-application table values, 578 count, p95/wholeheap labels, exact old/final identity separation and explicit v16 startup regression agree with raw results."
+    ],
+    "supportedInterpretation": [
+      "Final v15 materially improves this checked aggregate/filter operation mix: 10k32 matched elapsed ratio median0.623 with range0.566\u20130.656. This does not establish a sparse-write or general UI speedup; sparse cumulative medianratio1.024 lies amid wider observed A/A variation.",
+      "Ordinary v16 remains substantially more expensive to populate than v15/native/NgRx; final versus earlier ordinary results do not show a broad startup reduction or v16-over-v15 amortization crossover. This ordinary bundle excludes reachable Link; its cost cannot be assigned wholesale to active publication guarantees.",
+      "Current rendered inventory filter medians cluster around2ms for final SignalTree/NgRx/native/privateTanStack, but finalv16 startup remains180.7ms at10k versus30.9v15/25.8native/25.4NgRx. No significance or universal device claim follows.",
+      "10k dispatch finalv16 navigation is higher in every matched sample: final/before median1.071, range1.004\u20131.223. Preserve as an observed regression; the expensive startup is not cancelled by the distinct retention/coordination wins.",
+      "Private TanStack inventory stable-query strategy strongly improves filtering but shifts work to updates: separate membership trace10k p95 filter53.7\u21922.3ms, toggle1.3\u21927.6ms, rename1.0\u21924.3ms; populated wholeheap risesabout0.914MiB, aged+400 fallsabout0.895MiB. Suitable only as an application-specific tradeoff, not a free default win.",
+      "Private TanStack dispatch acknowledgement-processing p95 falls15.1\u21920.5ms at10k. Its empty-publication memory scenario does not establish populated transport payload memory savings.",
+      "NgRx standard entity-update copy cost explains its expensive checked5000-write loop for this adapter, while its actual rendered application remains competitive. This does not rank custom NgRx batch/entity strategies.",
+      "Finite browser teardown checkpoints, including about1.2\u20131.3percent higher successor heap at1k dispatch, neither isolate a store leak nor prove universal leak freedom. Specific exact-object lifetime studies remain separate evidence."
+    ],
+    "fairnessAndLimits": [
+      "Five independently launched children per main cell, two browser A/A pairs per profile and five ordinary A/A repeats; rotated ordering provides both before/after directions but incomplete positional balance across6/8arms. A/A ranges are descriptive controls, not confidence intervals.",
+      "CDP4x is not a calibrated device; sharedAppleM4 host and Chrome141/Playwright1.56.1 results are local synthetic state/layout workflows, not real-user INP/network/SSR/mobile outcomes.",
+      "Node state CPU/elapsed, browser navigation/layout latency, operation p95, and wholeprocess/wholebrowser heap are distinct. Startup stages overlap, operation tails are not pooled, and dispatch timing/memory use separate children.",
+      "Finalv15 development package still labels15.4.8 but exact unpublished0d2b96192 payload differs from released37ef1788; finalv165d04 differs from before2826. The truthful archive/payload aliases, unchanged same-line16facade members and selected production bundles are essential.",
+      "Rival adapters perform the registered useful task with explicit application lifetime guards; they do not implement every v16 declaration/restoration/pre-enrollment/publication guarantee. Full-contract benefits require separate coordination evidence; no economic ROI or inevitable minimum guarantee-cost is measured.",
+      "Combined finalpatchset comparisons cannot attribute each timing delta to a single internal cleanup or representation mechanism.",
+      "Private42 membership-changing trace is a different operation mix from main132inventory; do not pool their latency or heap samples."
+    ],
+    "findings": [
+      {
+        "severity": "execution-description correction, not measured-result blocker",
+        "anchor": "tools/application-lab/final-comparison-rerun-protocol.md: Production application comparison, private packet paragraph",
+        "finding": "Original protocol says only originaltanstack inventorysource replaced. Actual private preparation also replaces selected-dispatch.ts. Inventory build dependency closure omits selected-dispatch.ts, so42 inventorychildren still isolate consumed inventorystrategy.",
+        "cheapestFalsifier": "Compare private planreplacements with both packets inventory build source closure; inspected actual sources/receipts. No performance rerun needed for factual description correction.",
+        "run": "Read-only inspection done; root acknowledged correction with measured protocol bytes preserved."
+      }
+    ],
+    "selectedPairedEvidence": {
+      "v15_10k32_aggregate_elapsed": {
+        "differences": {
+          "n": 5,
+          "values": [
+            -21.268209,
+            -25.312126000000006,
+            -24.57837399999999,
+            -29.553625000000004,
+            -23.50175
+          ],
+          "min": -29.553625000000004,
+          "median": -24.57837399999999,
+          "max": -21.268209
+        },
+        "ratios": {
+          "n": 5,
+          "values": [
+            0.6563498191321981,
+            0.6322197118268642,
+            0.6180155712002361,
+            0.5658403832769888,
+            0.6230786965107304
+          ],
+          "min": 0.5658403832769888,
+          "median": 0.6230786965107304,
+          "max": 0.6563498191321981
+        }
+      },
+      "v15_10k32_sparse_cumulative": {
+        "differences": {
+          "n": 5,
+          "values": [
+            0.5381689999999999,
+            -0.19133100000000525,
+            0.6677940000000007,
+            -0.4656649999999978,
+            1.6282500000000013
+          ],
+          "min": -0.4656649999999978,
+          "median": 0.5381689999999999,
+          "max": 1.6282500000000013
+        },
+        "ratios": {
+          "n": 5,
+          "values": [
+            1.0242377537234815,
+            0.9913917454320315,
+            1.0302738886724183,
+            0.979811845437028,
+            1.0719663196298177
+          ],
+          "min": 0.979811845437028,
+          "median": 1.0242377537234815,
+          "max": 1.0719663196298177
+        }
+      },
+      "v16_10k_dispatch_navigation": {
+        "differences": {
+          "n": 5,
+          "values": [
+            15.199999809265137,
+            2.299999952316284,
+            0.7000000476837158,
+            13.199999809265137,
+            44.00000023841858
+          ],
+          "min": 0.7000000476837158,
+          "median": 13.199999809265137,
+          "max": 44.00000023841858
+        },
+        "ratios": {
+          "n": 5,
+          "values": [
+            1.0801265145252736,
+            1.0119047616550136,
+            1.0035587191070792,
+            1.0707774788700544,
+            1.2230106449521163
+          ],
+          "min": 1.0035587191070792,
+          "median": 1.0707774788700544,
+          "max": 1.2230106449521163
+        }
+      },
+      "tanstack_10k_dispatch_ack": {
+        "differences": {
+          "n": 5,
+          "values": [
+            -15.400000095367432,
+            -16.200000047683716,
+            -14.600000143051147,
+            -13.799999952316284,
+            -13.700000047683716
+          ],
+          "min": -16.200000047683716,
+          "median": -14.600000143051147,
+          "max": -13.700000047683716
+        },
+        "ratios": {
+          "n": 5,
+          "values": [
+            0.03144654069188831,
+            0.029940119674990648,
+            0.03311258246776206,
+            0.04166666045784944,
+            0.03521126748739408
+          ],
+          "min": 0.029940119674990648,
+          "median": 0.03311258246776206,
+          "max": 0.04166666045784944
+        }
+      },
+      "private_10k_latency.filter.withinChildP95": {
+        "before": {
+          "n": 5,
+          "min": 46.5,
+          "median": 53.700000047683716,
+          "max": 56.59999990463257
+        },
+        "after": {
+          "n": 5,
+          "min": 2,
+          "median": 2.299999952316284,
+          "max": 4.1000001430511475
+        },
+        "difference": {
+          "n": 5,
+          "min": -53.09999990463257,
+          "median": -51.40000009536743,
+          "max": -44.5
+        },
+        "ratio": {
+          "n": 5,
+          "min": 0.03802281358480595,
+          "median": 0.043010752688172046,
+          "max": 0.07269503818174212
+        }
+      },
+      "private_10k_latency.toggle.withinChildP95": {
+        "before": {
+          "n": 5,
+          "min": 1.2000000476837158,
+          "median": 1.2999999523162842,
+          "max": 1.7000000476837158
+        },
+        "after": {
+          "n": 5,
+          "min": 5.1000001430511475,
+          "median": 7.6000001430511475,
+          "max": 8.799999952316284
+        },
+        "difference": {
+          "n": 5,
+          "min": 3.5,
+          "median": 6.400000095367432,
+          "max": 7.099999904632568
+        },
+        "ratio": {
+          "n": 5,
+          "min": 3.1874998044222767,
+          "median": 5.176470414989964,
+          "max": 6.833333101537502
+        }
+      },
+      "private_10k_latency.membershipRename.withinChildP95": {
+        "before": {
+          "n": 5,
+          "min": 0.7000000476837158,
+          "median": 1,
+          "max": 1.2000000476837158
+        },
+        "after": {
+          "n": 5,
+          "min": 4.1000001430511475,
+          "median": 4.299999952316284,
+          "max": 8.799999952316284
+        },
+        "difference": {
+          "n": 5,
+          "min": 3.299999952316284,
+          "median": 3.5,
+          "max": 7.799999952316284
+        },
+        "ratio": {
+          "n": 5,
+          "min": 4.299999952316284,
+          "median": 5.999999659402053,
+          "max": 8.799999952316284
+        }
+      },
+      "private_10k_heap.populated.postGC": {
+        "before": {
+          "n": 5,
+          "min": 11004724,
+          "median": 11012328,
+          "max": 11013204
+        },
+        "after": {
+          "n": 5,
+          "min": 11969228,
+          "median": 11970604,
+          "max": 11972856
+        },
+        "difference": {
+          "n": 5,
+          "min": 956024,
+          "median": 958276,
+          "max": 968040
+        },
+        "ratio": {
+          "n": 5,
+          "min": 1.086807072673856,
+          "median": 1.0870184760206925,
+          "max": 1.0879651236331438
+        }
+      },
+      "private_10k_heap.aging-plus-400.postGC": {
+        "before": {
+          "n": 5,
+          "min": 14993964,
+          "median": 14999000,
+          "max": 15019368
+        },
+        "after": {
+          "n": 5,
+          "min": 14058348,
+          "median": 14060936,
+          "max": 14061276
+        },
+        "difference": {
+          "n": 5,
+          "min": -961020,
+          "median": -938064,
+          "max": -932688
+        },
+        "ratio": {
+          "n": 5,
+          "min": 0.9360146179253348,
+          "median": 0.9374582305487033,
+          "max": 0.9377957690174527
+        }
+      }
+    },
+    "rawMedianTables": {
+      "inventory/combined": {
+        "tanstack": {
+          "startup.navigationToLayout": 145.09999990463257,
+          "latency.filter.withinChildP95": 51.200000047683716,
+          "heap.populated.postGC": 11008008
+        },
+        "v15": {
+          "startup.navigationToLayout": 30.90000009536743,
+          "latency.filter.withinChildP95": 2,
+          "heap.populated.postGC": 6339320
+        },
+        "v16": {
+          "startup.navigationToLayout": 180.70000004768372,
+          "latency.filter.withinChildP95": 2,
+          "heap.populated.postGC": 7338908
+        },
+        "tanstack-variant": {
+          "startup.navigationToLayout": 133.40000009536743,
+          "latency.filter.withinChildP95": 2,
+          "heap.populated.postGC": 11970272
+        },
+        "native": {
+          "startup.navigationToLayout": 25.799999952316284,
+          "latency.filter.withinChildP95": 2.700000047683716,
+          "heap.populated.postGC": 6625348
+        },
+        "ngrx": {
+          "startup.navigationToLayout": 25.40000009536743,
+          "latency.filter.withinChildP95": 2.3000001907348633,
+          "heap.populated.postGC": 4366352
+        }
+      },
+      "dispatch/timing": {
+        "tanstack": {
+          "startup.navigationToLayout": 66.70000004768372,
+          "latency.acceptOwner.withinChildP95": 19
+        },
+        "v15": {
+          "startup.navigationToLayout": 42.700000047683716,
+          "latency.acceptOwner.withinChildP95": 9.400000095367432
+        },
+        "v16": {
+          "startup.navigationToLayout": 199.69999980926514,
+          "latency.acceptOwner.withinChildP95": 9.899999856948853
+        },
+        "tanstack-variant": {
+          "startup.navigationToLayout": 70.29999995231628,
+          "latency.acceptOwner.withinChildP95": 14.099999904632568
+        },
+        "native": {
+          "startup.navigationToLayout": 34.200000047683716,
+          "latency.acceptOwner.withinChildP95": 8.700000047683716
+        },
+        "ngrx": {
+          "startup.navigationToLayout": 31.600000143051147,
+          "latency.acceptOwner.withinChildP95": 11.599999904632568
+        }
+      },
+      "dispatch/memory": {
+        "tanstack": {
+          "heap.populated.postGC": 8175336
+        },
+        "v15": {
+          "heap.populated.postGC": 7816688
+        },
+        "v16": {
+          "heap.populated.postGC": 8492900
+        },
+        "tanstack-variant": {
+          "heap.populated.postGC": 8175408
+        },
+        "native": {
+          "heap.populated.postGC": 11382860
+        },
+        "ngrx": {
+          "heap.populated.postGC": 5731964
+        }
+      }
+    },
+    "notRun": [
+      "No fresh benchmark, browser, runtime test, build, publication or analyzer execution. Offline review scripts only. No unregistered workload claims."
+    ],
+    "bindings": {
+      "/private/tmp/st-final-comparison-independent-verification.json": "5ed4e2a5a376f49b4e7f2bbadc7b2bfe54822e7424b7ce94efb83861fa8f9866",
+      "/private/tmp/st-final-comparison-independent-supplement.json": "c677f67f6c21bce149303eb1f8fcdc6a8b0e4f842a22aa33be4b26b743835eff",
+      "/private/tmp/st-final-comparison-independent-first-attempt.txt": "60515b67779fd3f5e92f57ad760c9c3f554f634f288d50432cd16e5f1c9e3e0d",
+      "/private/tmp/st-final-comparison-independent-verify.py.first-attempt": "c7b56bdfee88d7631c0c1ee266bedc802bd400309cf1edf5fa3101df56a05e8a",
+      "/Users/jonathanborgia/code/signaltree/.worktrees/application-comparison/docs/audits/2026-11-11-long-lived-costs/README.md": "2a462f0aa92c3c4c723adfe61c4cd926c5a9743c355674d0bd425f7908b5e9bd",
+      "/Users/jonathanborgia/code/signaltree/.worktrees/application-comparison/tools/application-lab/final-comparison-rerun-protocol.md": "9ac9bab55262961c07fd1df3192a8f4c1722d772ca22fe1d5cfe838df3df2fc7",
+      "/Users/jonathanborgia/code/signaltree/.worktrees/application-comparison/docs/review-contract.md": "b9b2f633a6d8dda9b1955cd01f92e3b1e8aabe8f3e110e806bbaa57c0a43e4e9",
+      "/Users/jonathanborgia/code/signaltree/.worktrees/application-comparison/docs/performance/measurement-contract.md": "f92c245ffd2c46f5258d0d9899e6c163e9dcfa1072ae9d071d6fc7e087b2db6b",
+      "/private/tmp/st-final-comparison-source-1/final-comparison-rerun-protocol.md": "51c3c4d57618d1bb2c0fdd8449af91afe221759b58ca332e58616ba188a8c078",
+      "/private/tmp/st-final-comparison-source-2/final-comparison-rerun-protocol.md": "51c3c4d57618d1bb2c0fdd8449af91afe221759b58ca332e58616ba188a8c078"
+    }
+  }
+}

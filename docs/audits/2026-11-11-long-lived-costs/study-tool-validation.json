@@ -1,0 +1,399 @@
+{
+  "scope": "Final study-tool and documentation checks; runtime validation bound separately.",
+  "checks": {
+    "cwd": "/Users/jonathanborgia/code/signaltree/.worktrees/application-comparison",
+    "steps": [
+      {
+        "label": "syntax-bulk-rollback-aging",
+        "command": [
+          "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+          "--check",
+          "tools/application-lab/bulk-rollback-aging.mjs"
+        ],
+        "exitCode": 0,
+        "elapsedSeconds": 0.032527923583984375,
+        "log": "/private/tmp/st-long-lived-study-validation-final/syntax-bulk-rollback-aging.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "label": "syntax-coordination-aging",
+        "command": [
+          "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+          "--check",
+          "tools/application-lab/coordination-aging.mjs"
+        ],
+        "exitCode": 0,
+        "elapsedSeconds": 0.025921106338500977,
+        "log": "/private/tmp/st-long-lived-study-validation-final/syntax-coordination-aging.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "label": "syntax-field-demand-analyze",
+        "command": [
+          "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+          "--check",
+          "tools/application-lab/field-demand-analyze.mjs"
+        ],
+        "exitCode": 0,
+        "elapsedSeconds": 0.02828216552734375,
+        "log": "/private/tmp/st-long-lived-study-validation-final/syntax-field-demand-analyze.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "label": "syntax-field-demand-cleanup",
+        "command": [
+          "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+          "--check",
+          "tools/application-lab/field-demand-cleanup.mjs"
+        ],
+        "exitCode": 0,
+        "elapsedSeconds": 0.03517794609069824,
+        "log": "/private/tmp/st-long-lived-study-validation-final/syntax-field-demand-cleanup.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "label": "syntax-field-demand",
+        "command": [
+          "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+          "--check",
+          "tools/application-lab/field-demand.mjs"
+        ],
+        "exitCode": 0,
+        "elapsedSeconds": 0.028354167938232422,
+        "log": "/private/tmp/st-long-lived-study-validation-final/syntax-field-demand.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "label": "syntax-final-comparison-packet",
+        "command": [
+          "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+          "--check",
+          "tools/application-lab/final-comparison-packet.mjs"
+        ],
+        "exitCode": 0,
+        "elapsedSeconds": 0.025863170623779297,
+        "log": "/private/tmp/st-long-lived-study-validation-final/syntax-final-comparison-packet.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "label": "syntax-final-comparison-pairs-control",
+        "command": [
+          "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+          "--check",
+          "tools/application-lab/final-comparison-pairs-control.mjs"
+        ],
+        "exitCode": 0,
+        "elapsedSeconds": 0.022918224334716797,
+        "log": "/private/tmp/st-long-lived-study-validation-final/syntax-final-comparison-pairs-control.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "label": "syntax-final-comparison-pairs",
+        "command": [
+          "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+          "--check",
+          "tools/application-lab/final-comparison-pairs.mjs"
+        ],
+        "exitCode": 0,
+        "elapsedSeconds": 0.026850223541259766,
+        "log": "/private/tmp/st-long-lived-study-validation-final/syntax-final-comparison-pairs.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "label": "syntax-final-long-lived",
+        "command": [
+          "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+          "--check",
+          "tools/application-lab/final-long-lived.mjs"
+        ],
+        "exitCode": 0,
+        "elapsedSeconds": 0.023796796798706055,
+        "log": "/private/tmp/st-long-lived-study-validation-final/syntax-final-long-lived.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "label": "syntax-final-variants-analyze",
+        "command": [
+          "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+          "--check",
+          "tools/application-lab/final-variants-analyze.mjs"
+        ],
+        "exitCode": 0,
+        "elapsedSeconds": 0.026546001434326172,
+        "log": "/private/tmp/st-long-lived-study-validation-final/syntax-final-variants-analyze.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "label": "syntax-long-lived-analyze",
+        "command": [
+          "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+          "--check",
+          "tools/application-lab/long-lived-analyze.mjs"
+        ],
+        "exitCode": 0,
+        "elapsedSeconds": 0.03307700157165527,
+        "log": "/private/tmp/st-long-lived-study-validation-final/syntax-long-lived-analyze.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "label": "syntax-long-lived-variants-analyze",
+        "command": [
+          "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+          "--check",
+          "tools/application-lab/long-lived-variants-analyze.mjs"
+        ],
+        "exitCode": 0,
+        "elapsedSeconds": 0.03235816955566406,
+        "log": "/private/tmp/st-long-lived-study-validation-final/syntax-long-lived-variants-analyze.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "label": "syntax-long-lived-variants",
+        "command": [
+          "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+          "--check",
+          "tools/application-lab/long-lived-variants.mjs"
+        ],
+        "exitCode": 0,
+        "elapsedSeconds": 0.033223867416381836,
+        "log": "/private/tmp/st-long-lived-study-validation-final/syntax-long-lived-variants.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "label": "syntax-long-lived",
+        "command": [
+          "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+          "--check",
+          "tools/application-lab/long-lived.mjs"
+        ],
+        "exitCode": 0,
+        "elapsedSeconds": 0.025809049606323242,
+        "log": "/private/tmp/st-long-lived-study-validation-final/syntax-long-lived.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "label": "syntax-optional-seam",
+        "command": [
+          "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+          "--check",
+          "tools/application-lab/optional-seam.mjs"
+        ],
+        "exitCode": 0,
+        "elapsedSeconds": 0.025341033935546875,
+        "log": "/private/tmp/st-long-lived-study-validation-final/syntax-optional-seam.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "label": "syntax-pending-lifetime-costs",
+        "command": [
+          "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+          "--check",
+          "tools/application-lab/pending-lifetime-costs.mjs"
+        ],
+        "exitCode": 0,
+        "elapsedSeconds": 0.023873090744018555,
+        "log": "/private/tmp/st-long-lived-study-validation-final/syntax-pending-lifetime-costs.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "label": "syntax-terminal-deep-history",
+        "command": [
+          "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+          "--check",
+          "tools/application-lab/terminal-deep-history.mjs"
+        ],
+        "exitCode": 0,
+        "elapsedSeconds": 0.024168968200683594,
+        "log": "/private/tmp/st-long-lived-study-validation-final/syntax-terminal-deep-history.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "label": "syntax-v16-payload-retention-followup",
+        "command": [
+          "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+          "--check",
+          "tools/application-lab/v16-payload-retention-followup.mjs"
+        ],
+        "exitCode": 0,
+        "elapsedSeconds": 0.0245208740234375,
+        "log": "/private/tmp/st-long-lived-study-validation-final/syntax-v16-payload-retention-followup.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "label": "syntax-v16-payload-retention",
+        "command": [
+          "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+          "--check",
+          "tools/application-lab/v16-payload-retention.mjs"
+        ],
+        "exitCode": 0,
+        "elapsedSeconds": 0.02569103240966797,
+        "log": "/private/tmp/st-long-lived-study-validation-final/syntax-v16-payload-retention.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "label": "syntax-v16-residual-census",
+        "command": [
+          "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+          "--check",
+          "tools/application-lab/v16-residual-census.mjs"
+        ],
+        "exitCode": 0,
+        "elapsedSeconds": 0.024502992630004883,
+        "log": "/private/tmp/st-long-lived-study-validation-final/syntax-v16-residual-census.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "label": "syntax-v16-residual-heap",
+        "command": [
+          "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+          "--check",
+          "tools/application-lab/v16-residual-heap.mjs"
+        ],
+        "exitCode": 0,
+        "elapsedSeconds": 0.03086090087890625,
+        "log": "/private/tmp/st-long-lived-study-validation-final/syntax-v16-residual-heap.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "label": "focused-eslint",
+        "command": [
+          "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+          "node_modules/eslint/bin/eslint.js",
+          "--max-warnings=0",
+          "--format=json",
+          "tools/application-lab/bulk-rollback-aging.mjs",
+          "tools/application-lab/coordination-aging.mjs",
+          "tools/application-lab/field-demand-analyze.mjs",
+          "tools/application-lab/field-demand-cleanup.mjs",
+          "tools/application-lab/field-demand.mjs",
+          "tools/application-lab/final-comparison-packet.mjs",
+          "tools/application-lab/final-comparison-pairs-control.mjs",
+          "tools/application-lab/final-comparison-pairs.mjs",
+          "tools/application-lab/final-long-lived.mjs",
+          "tools/application-lab/final-variants-analyze.mjs",
+          "tools/application-lab/long-lived-analyze.mjs",
+          "tools/application-lab/long-lived-variants-analyze.mjs",
+          "tools/application-lab/long-lived-variants.mjs",
+          "tools/application-lab/long-lived.mjs",
+          "tools/application-lab/optional-seam.mjs",
+          "tools/application-lab/pending-lifetime-costs.mjs",
+          "tools/application-lab/terminal-deep-history.mjs",
+          "tools/application-lab/v16-payload-retention-followup.mjs",
+          "tools/application-lab/v16-payload-retention.mjs",
+          "tools/application-lab/v16-residual-census.mjs",
+          "tools/application-lab/v16-residual-heap.mjs"
+        ],
+        "exitCode": 0,
+        "elapsedSeconds": 1.7816698551177979,
+        "log": "/private/tmp/st-long-lived-study-validation-final/focused-eslint.log",
+        "sha256": "8a745989eb22544eb171e058cdfe993744da6401fa79dc701526854aa46de8e0"
+      },
+      {
+        "label": "readme-api",
+        "command": [
+          "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+          "scripts/lint-readme-apis.mjs"
+        ],
+        "exitCode": 1,
+        "elapsedSeconds": 0.1423649787902832,
+        "log": "/private/tmp/st-long-lived-study-validation-final/readme-api.log",
+        "sha256": "7febd61b0309960f7468db4525be96b31bf66dbe91a9c6dc55070a16555f0eb7"
+      },
+      {
+        "label": "docs-consistency",
+        "command": [
+          "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+          "tools/check-doc-consistency.mjs"
+        ],
+        "exitCode": 1,
+        "elapsedSeconds": 0.026369094848632812,
+        "log": "/private/tmp/st-long-lived-study-validation-final/docs-consistency.log",
+        "sha256": "effaacebb22a3a6d1453bccee45ef68deb326598c7c62683814604720fa30c41"
+      },
+      {
+        "label": "source-controls",
+        "command": [
+          "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+          "tools/check-source-controls.mjs",
+          "--verify-classification"
+        ],
+        "exitCode": 0,
+        "elapsedSeconds": 2.1237738132476807,
+        "log": "/private/tmp/st-long-lived-study-validation-final/source-controls.log",
+        "sha256": "f79b7b2fe138f20385a09cfdb1455614f6baa0235ada6b5c8fee427c195330bf"
+      },
+      {
+        "label": "archive-self-test",
+        "command": [
+          "python3",
+          "tools/application-lab/archive-evidence.py",
+          "self-test"
+        ],
+        "exitCode": 0,
+        "elapsedSeconds": 0.08510303497314453,
+        "log": "/private/tmp/st-long-lived-study-validation-final/archive-self-test.log",
+        "sha256": "07330cec148a2c399c8fd48eb0b728ed88db0f448d5686da47c425fcbeff66b7"
+      }
+    ],
+    "tools": {
+      "/Users/jonathanborgia/code/signaltree/.worktrees/application-comparison/tools/application-lab/bulk-rollback-aging.mjs": "124039d515da715c71093a0a55f8160b0477031758f6824599e44a8cede0ff9c",
+      "/Users/jonathanborgia/code/signaltree/.worktrees/application-comparison/tools/application-lab/coordination-aging.mjs": "d1211c3eb3f71b16f1b4983de873efdfcbf4553dc7a087615ceae1ad47c7527d",
+      "/Users/jonathanborgia/code/signaltree/.worktrees/application-comparison/tools/application-lab/field-demand-analyze.mjs": "7d27a84a43aa1154f3f27a9b2efbd267c9ba2b3613b87af87acd76b91938f668",
+      "/Users/jonathanborgia/code/signaltree/.worktrees/application-comparison/tools/application-lab/field-demand-cleanup.mjs": "777bb5b8ae1c4866b03ae25e06a1458c5bc9637cef2b1d5af682194ab2582cbb",
+      "/Users/jonathanborgia/code/signaltree/.worktrees/application-comparison/tools/application-lab/field-demand.mjs": "a74247b34f90135a4b4e401e31e3ab859f687335a0b5e4d29a7b87c436c6ab58",
+      "/Users/jonathanborgia/code/signaltree/.worktrees/application-comparison/tools/application-lab/final-comparison-packet.mjs": "f4b39d2226aa4ec4a11d3e991ff599b9510231976c6711bf0a5a796d3644626f",
+      "/Users/jonathanborgia/code/signaltree/.worktrees/application-comparison/tools/application-lab/final-comparison-pairs-control.mjs": "17ff6ddb565397450a85328517aa411a06bb933f8f3f392331bc55ca4656de4c",
+      "/Users/jonathanborgia/code/signaltree/.worktrees/application-comparison/tools/application-lab/final-comparison-pairs.mjs": "904de68aa30d70394aede2b432e75edc5fd97623d109dc86bbc6721d27b1cfe2",
+      "/Users/jonathanborgia/code/signaltree/.worktrees/application-comparison/tools/application-lab/final-long-lived.mjs": "fb430408de0e645fbac3a61267880b6739bff1149862795e650f0aa89c73b7a6",
+      "/Users/jonathanborgia/code/signaltree/.worktrees/application-comparison/tools/application-lab/final-variants-analyze.mjs": "2053fb4dc1ccab094a0e4fa9225e4a6561c25613eb245c374536577460394651",
+      "/Users/jonathanborgia/code/signaltree/.worktrees/application-comparison/tools/application-lab/long-lived-analyze.mjs": "44c43e7135871f86f1e9e66ed816251a1b111d23bfbe58029370510bc9f96f6e",
+      "/Users/jonathanborgia/code/signaltree/.worktrees/application-comparison/tools/application-lab/long-lived-variants-analyze.mjs": "f27ca8ef486e6844fa59ca8caaee5b57cb494a290900ead7f6626dcde98d745e",
+      "/Users/jonathanborgia/code/signaltree/.worktrees/application-comparison/tools/application-lab/long-lived-variants.mjs": "17dc1a9e6f5d0410554e6721263fabf5d84ba01f54bd0751918f410f91394171",
+      "/Users/jonathanborgia/code/signaltree/.worktrees/application-comparison/tools/application-lab/long-lived.mjs": "4477d58679a6f6afa57e71aaf8612df52a332e16757e8f285a871acf3d6fdc65",
+      "/Users/jonathanborgia/code/signaltree/.worktrees/application-comparison/tools/application-lab/optional-seam.mjs": "01f340f6047e7f572cc1bbee03be0f4cd7db3f9bae7d4e6e3492457d6a3199b5",
+      "/Users/jonathanborgia/code/signaltree/.worktrees/application-comparison/tools/application-lab/pending-lifetime-costs.mjs": "a5ff05f01f2e6e1aed5ffe95e0ae6fa39c7a70e7167866ded1f12c447a23274a",
+      "/Users/jonathanborgia/code/signaltree/.worktrees/application-comparison/tools/application-lab/terminal-deep-history.mjs": "54e6ad42bdd38bbf8a955aa5945a6a03132ed1a0b15831ea373cbf6e583e93c7",
+      "/Users/jonathanborgia/code/signaltree/.worktrees/application-comparison/tools/application-lab/v16-payload-retention-followup.mjs": "b295b13861e25a83ef74765c2201b1e4cf6eb97a01c3cf3fe6e9c0c122e16ce1",
+      "/Users/jonathanborgia/code/signaltree/.worktrees/application-comparison/tools/application-lab/v16-payload-retention.mjs": "bc0a6a88e4006aedbe75f7de1de3b251f933c4e52d9b3ca414b01e1798946a87",
+      "/Users/jonathanborgia/code/signaltree/.worktrees/application-comparison/tools/application-lab/v16-residual-census.mjs": "0b634808ccd66bb46ccdd6980a845a47b575417de1ca0cd8ec111b54c456a62e",
+      "/Users/jonathanborgia/code/signaltree/.worktrees/application-comparison/tools/application-lab/v16-residual-heap.mjs": "f209060b9163a6d8982a9f9e4ac2c0603b5c2596299a51b80864c2a3998e00ee"
+    },
+    "passed": false
+  },
+  "correction": {
+    "cwd": "/Users/jonathanborgia/code/signaltree/.worktrees/application-comparison",
+    "firstAttempt": "receipt.json",
+    "corrections": "Restore the existing Nx package outputs for README API inspection; use the actual registered doc-links checker instead of a nonexistent command. No source or checker changed.",
+    "steps": [
+      {
+        "label": "readme-api-built",
+        "command": [
+          "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+          "scripts/lint-readme-apis.mjs"
+        ],
+        "exitCode": 0,
+        "elapsedSeconds": 0.4229769706726074,
+        "log": "/private/tmp/st-long-lived-study-validation-final/readme-api-built.log",
+        "sha256": "1520e810dc2a9395fa089fa57cfbfff30687bf2e08b3a7c394a2b540fd13be62"
+      },
+      {
+        "label": "doc-links",
+        "command": [
+          "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+          "tools/check-doc-links.mjs"
+        ],
+        "exitCode": 0,
+        "elapsedSeconds": 0.4770700931549072,
+        "log": "/private/tmp/st-long-lived-study-validation-final/doc-links.log",
+        "sha256": "d415bd2dd1a7100c2d13471ac9e1e9c3617ce3dfbb05f62d8926b8e72c194599"
+      }
+    ]
+  },
+  "buildOutput": {
+    "path": "/private/tmp/st-long-lived-study-validation-final/build-all.log",
+    "sha256": "9e8721269a9f2c15782196afabb62cc69c39191d142883c671fbf6c99f299e4b",
+    "result": "Five canonical Nx package outputs restored from cache; not presented as fresh runtime builds."
+  },
+  "terminalStatus": "21 syntax checks, focused ESLint with zero warnings, source controls, archive self-test, built README API and actual registered doc links pass. First setup/command failures are retained above."
+}

@@ -1,0 +1,11 @@
+{
+  "source": "/private/tmp/st-final-comparison-protocol-clarification.json",
+  "sha256": "8fd51cc5b50c6d5a61fd6b4652328627d97f4af01e24164cdf5a050aa2f677f8",
+  "result": {
+    "path": "/Users/jonathanborgia/code/signaltree/.worktrees/application-comparison/tools/application-lab/final-comparison-rerun-protocol.md",
+    "beforeSha256": "51c3c4d57618d1bb2c0fdd8449af91afe221759b58ca332e58616ba188a8c078",
+    "afterSha256": "9ac9bab55262961c07fd1df3192a8f4c1722d772ca22fe1d5cfe838df3df2fc7",
+    "beforePayload": "/private/tmp/st-long-lived-source-history-recovered/51c3c4d57618d1bb2c0fdd8449af91afe221759b58ca332e58616ba188a8c078",
+    "reason": "Independent raw review identified inaccurate only-inventory wording. Record actual two-source packet preparation and inventory reachability. No source/runtime/cohort/analyzer/result changes."
+  }
+}

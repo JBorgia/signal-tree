@@ -1,0 +1,105 @@
+{
+  "source": "/private/tmp/st-final-comparison-focused-validation.json",
+  "sha256": "5b68d7ac69b3d355a4174fbb21f172b2ce95448fdab53aafb1e5ce4947195308",
+  "result": {
+    "passed": true,
+    "node": "v24.15.0",
+    "cwd": "/Users/jonathanborgia/code/signaltree/.worktrees/application-comparison",
+    "command": [
+      "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+      "/private/tmp/st-final-comparison-focused-validate.mjs"
+    ],
+    "bindings": {
+      "/Users/jonathanborgia/code/signaltree/.worktrees/application-comparison/tools/application-lab/final-comparison-packet.mjs": "f4b39d2226aa4ec4a11d3e991ff599b9510231976c6711bf0a5a796d3644626f",
+      "/Users/jonathanborgia/code/signaltree/.worktrees/application-comparison/tools/application-lab/final-comparison-pairs.mjs": "904de68aa30d70394aede2b432e75edc5fd97623d109dc86bbc6721d27b1cfe2",
+      "/Users/jonathanborgia/code/signaltree/.worktrees/application-comparison/tools/application-lab/final-comparison-pairs-control.mjs": "17ff6ddb565397450a85328517aa411a06bb933f8f3f392331bc55ca4656de4c",
+      "/Users/jonathanborgia/code/signaltree/.worktrees/application-comparison/tools/application-lab/final-long-lived.mjs": "fb430408de0e645fbac3a61267880b6739bff1149862795e650f0aa89c73b7a6",
+      "/Users/jonathanborgia/code/signaltree/.worktrees/application-comparison/tools/application-lab/final-variants-analyze.mjs": "2053fb4dc1ccab094a0e4fa9225e4a6561c25613eb245c374536577460394651",
+      "/private/tmp/st-final-comparison-focused-validate.mjs": "375629a9958cf64682d351d0790e26a5cd47cc3eae8b52c715136c66754d2623"
+    },
+    "commands": [
+      {
+        "name": "syntax-0",
+        "command": [
+          "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+          "--check",
+          "/Users/jonathanborgia/code/signaltree/.worktrees/application-comparison/tools/application-lab/final-comparison-packet.mjs"
+        ],
+        "status": 0,
+        "signal": null,
+        "log": "/private/tmp/st-final-validation-syntax-0.log",
+        "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "name": "syntax-1",
+        "command": [
+          "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+          "--check",
+          "/Users/jonathanborgia/code/signaltree/.worktrees/application-comparison/tools/application-lab/final-comparison-pairs.mjs"
+        ],
+        "status": 0,
+        "signal": null,
+        "log": "/private/tmp/st-final-validation-syntax-1.log",
+        "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "name": "syntax-2",
+        "command": [
+          "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+          "--check",
+          "/Users/jonathanborgia/code/signaltree/.worktrees/application-comparison/tools/application-lab/final-comparison-pairs-control.mjs"
+        ],
+        "status": 0,
+        "signal": null,
+        "log": "/private/tmp/st-final-validation-syntax-2.log",
+        "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "name": "syntax-3",
+        "command": [
+          "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+          "--check",
+          "/Users/jonathanborgia/code/signaltree/.worktrees/application-comparison/tools/application-lab/final-long-lived.mjs"
+        ],
+        "status": 0,
+        "signal": null,
+        "log": "/private/tmp/st-final-validation-syntax-3.log",
+        "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "name": "syntax-4",
+        "command": [
+          "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+          "--check",
+          "/Users/jonathanborgia/code/signaltree/.worktrees/application-comparison/tools/application-lab/final-variants-analyze.mjs"
+        ],
+        "status": 0,
+        "signal": null,
+        "log": "/private/tmp/st-final-validation-syntax-4.log",
+        "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "name": "eslint",
+        "command": [
+          "pnpm",
+          "exec",
+          "eslint",
+          "/Users/jonathanborgia/code/signaltree/.worktrees/application-comparison/tools/application-lab/final-comparison-packet.mjs",
+          "/Users/jonathanborgia/code/signaltree/.worktrees/application-comparison/tools/application-lab/final-comparison-pairs.mjs",
+          "/Users/jonathanborgia/code/signaltree/.worktrees/application-comparison/tools/application-lab/final-comparison-pairs-control.mjs",
+          "/Users/jonathanborgia/code/signaltree/.worktrees/application-comparison/tools/application-lab/final-long-lived.mjs",
+          "/Users/jonathanborgia/code/signaltree/.worktrees/application-comparison/tools/application-lab/final-variants-analyze.mjs"
+        ],
+        "status": 0,
+        "signal": null,
+        "log": "/private/tmp/st-final-validation-eslint.log",
+        "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    ],
+    "additionalBehavioralControls": {
+      "wrongValidPacket": "/private/tmp/st-final-packet-pair-control-1/receipt.json",
+      "containment": "/private/tmp/st-final-variants-containment-control/receipt.json",
+      "derivedSelfTests": "/private/tmp/st-final-inventory-private-variant-analysis-source/derivation.json"
+    }
+  }
+}

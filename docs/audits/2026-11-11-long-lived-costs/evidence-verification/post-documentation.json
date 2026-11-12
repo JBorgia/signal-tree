@@ -1,0 +1,26 @@
+{
+  "checks": [
+    {
+      "command": [
+        "node",
+        "tools/check-doc-links.mjs"
+      ],
+      "cwd": "/Users/jonathanborgia/code/signaltree/.worktrees/application-comparison",
+      "exitCode": 0,
+      "log": "evidence-verification/post-doc-links.log",
+      "sha256": "a79eadfad4617387f4f9c99b9434a8dd6016ccf4cf6f4cc85bd7d722a0fcd7ab"
+    },
+    {
+      "command": [
+        "node",
+        "scripts/lint-readme-apis.mjs"
+      ],
+      "cwd": "/Users/jonathanborgia/code/signaltree/.worktrees/application-comparison",
+      "exitCode": 0,
+      "log": "evidence-verification/post-readme-api.log",
+      "sha256": "1520e810dc2a9395fa089fa57cfbfff30687bf2e08b3a7c394a2b540fd13be62"
+    }
+  ],
+  "stagedDiffCheck": "git diff --cached --check passed; all 124 initial staged paths belong to the owned controller, study audit or lab tools.",
+  "sourceContinuity": "All 21 linted JavaScript tool hashes still match their validation receipt. Both runtime package trees have zero git diff from the cited runtime commits after measurements and archival."
+}

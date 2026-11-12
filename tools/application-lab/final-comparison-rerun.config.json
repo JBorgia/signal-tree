@@ -1,0 +1,86 @@
+{
+  "baselinePacket": "/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/application-baseline-4",
+  "baselineVariantPacket": "/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/application-variant-1",
+  "pinnedDependencies": {
+    "@angular/core": "22.0.7",
+    "@angular/common": "22.0.7",
+    "@angular/compiler": "22.0.7",
+    "@angular/compiler-cli": "22.0.7",
+    "@angular/platform-browser": "22.0.7",
+    "@angular/build": "22.0.7",
+    "@angular/cli": "22.0.7",
+    "@ngrx/signals": "22.0.1",
+    "@tanstack/angular-db": "0.2.12",
+    "@tanstack/db": "0.15.2",
+    "@tanstack/query-db-collection": "1.4.8",
+    "@tanstack/query-core": "5.107.1",
+    "typescript": "6.0.3",
+    "rxjs": "7.8.2",
+    "tslib": "2.8.1",
+    "playwright": "1.56.1"
+  },
+  "finalKernels": {
+    "v15": {
+      "packageRoot": "/Users/jonathanborgia/code/signaltree/.worktrees/v15-retirement-reclamation/dist/packages/kernel",
+      "sourceCommit": "0d2b9619206ab9e7a7af998944e744f6d2b6e492",
+      "receipt": "/private/tmp/st-v15-final-validation-receipt.json",
+      "receiptSha256": "9901af84a3bbc97d467e924a71ae0b10ee0140762115b9f82a0f465cde35d480",
+      "payloadKeys": [
+        "package",
+        "files"
+      ]
+    },
+    "v16": {
+      "packageRoot": "/private/tmp/st-v16-recipient-batch-lint-final-package/package",
+      "sourceCommit": "5d04ff65d2eaab1986ed1b420cbc013edc01542b",
+      "receipt": "/private/tmp/st-v16-recipient-batch-lint-final-package/bindings.json",
+      "receiptSha256": "65ef8caf68f5729d528a4ce07a701999cd94ec9eaf0efcb6caac51f8edabc9b2",
+      "payloadKeys": [
+        "package"
+      ],
+      "keyPrefix": "/private/tmp/st-v16-recipient-batch-lint-final-package/package/"
+    }
+  },
+  "facades": {
+    "v15": {
+      "currentBuiltRoot": "/Users/jonathanborgia/code/signaltree/.worktrees/v15-retirement-reclamation/dist/packages/angular",
+      "sourceRoot": "/Users/jonathanborgia/code/signaltree/.worktrees/v15-retirement-reclamation",
+      "sourceBaseline": "37ef1788f6bac61678fc312f391b180bd7a6bbd7"
+    },
+    "v16": {
+      "currentBuiltRoot": "/Users/jonathanborgia/code/signaltree/.worktrees/v16-egress-support-scan/dist/packages/angular",
+      "sourceRoot": "/Users/jonathanborgia/code/signaltree/.worktrees/v16-egress-support-scan",
+      "sourceBaseline": "2826cc94185b4cccc3717ea1e6370d7bc27cbf27"
+    }
+  },
+  "outputs": {
+    "packet": "/private/tmp/st-final-application-packet",
+    "ordinaryComparison": "/private/tmp/st-final-ordinary-comparison",
+    "inventoryComparison": "/private/tmp/st-final-inventory-comparison",
+    "dispatchComparison": "/private/tmp/st-final-dispatch-comparison",
+    "inventoryVariantComparison": "/private/tmp/st-final-inventory-private-variant-comparison"
+  },
+  "baselineRuntimes": {
+    "v15": "37ef1788f6bac61678fc312f391b180bd7a6bbd7",
+    "v16": "2826cc94185b4cccc3717ea1e6370d7bc27cbf27"
+  },
+  "plannedSamples": {
+    "ordinary": 140,
+    "browserInventory": 132,
+    "browserDispatch": 264,
+    "privateInventoryRename": 42
+  },
+  "privateInventorySelection": {
+    "replacements": [
+      {
+        "arm": "tanstack",
+        "scenario": "inventory",
+        "source": "/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/application-variant-1/tanstack/src/arms/selected.ts"
+      }
+    ]
+  },
+  "facadeInspection": {
+    "path": "/private/tmp/st-final-comparison-facade-compatibility-inspection-2.json",
+    "sha256": "c79880aaa732208f8c924cb69ae2aff044d4079ab82f080fc398ebe6660896e4"
+  }
+}

@@ -1,0 +1,141 @@
+{
+  "source": "/private/tmp/st-final-comparison-sequence-receipt.json",
+  "sha256": "49b21ac7deffd55ae9c4fdcac963e16c161a1bd60f26da198d180acfbd454621",
+  "result": {
+    "passed": true,
+    "bindings": {
+      "/private/tmp/st-final-comparison-sequence.json": "a46ccf518725c19767250fcb18fbc125ecb7692104df3be4ad22d937cfc42021",
+      "/private/tmp/st-final-comparison-run.mjs": "29874e84f9faf7bc0ba8e3d76faafe46f03f1a3b95016115647944d11c2ebfb5",
+      "/private/tmp/st-final-comparison-sequence.mjs": "8caf74cbb7b99ff27594c5dd0a1d814151eaeedc976751b08ff6923a8c8fef6d"
+    },
+    "results": [
+      {
+        "name": "st-final-ordinary-comparison-run",
+        "command": [
+          "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+          "/private/tmp/st-final-comparison-run.mjs",
+          "st-final-ordinary-comparison-run",
+          "tools/application-lab/final-long-lived.mjs",
+          "compare",
+          "/private/tmp/st-final-application-packet",
+          "/private/tmp/st-final-ordinary-comparison",
+          "/private/tmp/st-final-ordinary-bundles/implementations.json"
+        ],
+        "status": 0,
+        "signal": null,
+        "receipt": "/private/tmp/st-final-ordinary-comparison-run.receipt.json"
+      },
+      {
+        "name": "st-final-ordinary-pair-analysis",
+        "command": [
+          "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+          "/private/tmp/st-final-comparison-run.mjs",
+          "st-final-ordinary-pair-analysis",
+          "tools/application-lab/final-comparison-pairs.mjs",
+          "ordinary",
+          "/private/tmp/st-final-application-packet",
+          "/private/tmp/st-final-ordinary-comparison",
+          "/private/tmp/st-final-ordinary-pairs.json"
+        ],
+        "status": 0,
+        "signal": null,
+        "receipt": "/private/tmp/st-final-ordinary-pair-analysis.receipt.json"
+      },
+      {
+        "name": "st-final-inventory-comparison-run",
+        "command": [
+          "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+          "/private/tmp/st-final-comparison-run.mjs",
+          "st-final-inventory-comparison-run",
+          "tools/application-lab/measure.mjs",
+          "compare",
+          "/private/tmp/st-final-application-packet",
+          "/private/tmp/st-final-inventory-comparison"
+        ],
+        "status": 0,
+        "signal": null,
+        "receipt": "/private/tmp/st-final-inventory-comparison-run.receipt.json"
+      },
+      {
+        "name": "st-final-dispatch-comparison-run",
+        "command": [
+          "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+          "/private/tmp/st-final-comparison-run.mjs",
+          "st-final-dispatch-comparison-run",
+          "tools/application-lab/dispatch-measure.mjs",
+          "compare",
+          "/private/tmp/st-final-application-packet",
+          "/private/tmp/st-final-dispatch-comparison"
+        ],
+        "status": 0,
+        "signal": null,
+        "receipt": "/private/tmp/st-final-dispatch-comparison-run.receipt.json"
+      },
+      {
+        "name": "st-final-browser-analysis-run",
+        "command": [
+          "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+          "/private/tmp/st-final-comparison-run.mjs",
+          "st-final-browser-analysis-run",
+          "tools/application-lab/analyze.mjs",
+          "/private/tmp/st-final-application-packet",
+          "/private/tmp/st-final-inventory-comparison",
+          "/private/tmp/st-final-dispatch-comparison",
+          "/private/tmp/st-final-browser-analysis"
+        ],
+        "status": 0,
+        "signal": null,
+        "receipt": "/private/tmp/st-final-browser-analysis-run.receipt.json"
+      },
+      {
+        "name": "st-final-inventory-pair-analysis",
+        "command": [
+          "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+          "/private/tmp/st-final-comparison-run.mjs",
+          "st-final-inventory-pair-analysis",
+          "tools/application-lab/final-comparison-pairs.mjs",
+          "inventory",
+          "/private/tmp/st-final-application-packet",
+          "/private/tmp/st-final-inventory-comparison",
+          "/private/tmp/st-final-inventory-pairs.json",
+          "/private/tmp/st-final-browser-analysis/receipt.json"
+        ],
+        "status": 0,
+        "signal": null,
+        "receipt": "/private/tmp/st-final-inventory-pair-analysis.receipt.json"
+      },
+      {
+        "name": "st-final-dispatch-pair-analysis",
+        "command": [
+          "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+          "/private/tmp/st-final-comparison-run.mjs",
+          "st-final-dispatch-pair-analysis",
+          "tools/application-lab/final-comparison-pairs.mjs",
+          "dispatch",
+          "/private/tmp/st-final-application-packet",
+          "/private/tmp/st-final-dispatch-comparison",
+          "/private/tmp/st-final-dispatch-pairs.json",
+          "/private/tmp/st-final-browser-analysis/receipt.json"
+        ],
+        "status": 0,
+        "signal": null,
+        "receipt": "/private/tmp/st-final-dispatch-pair-analysis.receipt.json"
+      },
+      {
+        "name": "st-final-inventory-private-variant-run",
+        "command": [
+          "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+          "/private/tmp/st-final-comparison-run.mjs",
+          "st-final-inventory-private-variant-run",
+          "tools/application-lab/measure-variants.mjs",
+          "/private/tmp/st-final-application-packet",
+          "/private/tmp/st-final-application-variant-packet",
+          "/private/tmp/st-final-inventory-private-variant-comparison"
+        ],
+        "status": 0,
+        "signal": null,
+        "receipt": "/private/tmp/st-final-inventory-private-variant-run.receipt.json"
+      }
+    ]
+  }
+}

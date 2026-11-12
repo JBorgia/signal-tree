@@ -1,0 +1,139 @@
+{
+  "source": "/private/tmp/st-v15-activation-wrapper-budget.json",
+  "sha256": "7f2d57b7c0e9f9e9c0238f4982ae4265883e3f211ef3cac3b5c8f53434eacf32",
+  "result": {
+    "command": [
+      "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+      "/Users/jonathanborgia/code/signaltree/.worktrees/v15-retirement-reclamation/tools/reclamation-lab/budget-bytes.mjs",
+      "/private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/application-baseline-4/v15/node_modules/@signal-tree/kernel",
+      "../v15-long-lived-projection/dist/packages/kernel",
+      "dist/packages/kernel",
+      "/private/tmp/st-v15-activation-wrapper-budget.json"
+    ],
+    "esbuild": "0.25.12",
+    "gateSha256": "06cf36285b825d34e4bfe2e406fc816e78a01305acc8fecbe906df2955076eeb",
+    "generatorSha256": "22944e469fa3143cca72130a75efc3195b8d8b5893ab1ecc3033fd1aaaf5d025",
+    "rows": [
+      {
+        "arm": "frozen",
+        "root": "/private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/application-baseline-4/v15/node_modules/@signal-tree/kernel",
+        "target": "signaltree-bare",
+        "mode": "prod",
+        "gzipBytes": 11011,
+        "budgetBytes": 11059.2,
+        "schedulerBytes": 0,
+        "bundleSha256": "a6ee2c24364d715495a64167240c1c1a2442ba0835a940890597fe8f643b08d8"
+      },
+      {
+        "arm": "frozen",
+        "root": "/private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/application-baseline-4/v15/node_modules/@signal-tree/kernel",
+        "target": "signaltree-bare",
+        "mode": "dev",
+        "gzipBytes": 13159,
+        "budgetBytes": 13209.6,
+        "schedulerBytes": 0,
+        "bundleSha256": "2cd72a8bb263d43f7c73edda8cde6c4f2ac7e08b0e78d44d381c1d313bc7e6ee"
+      },
+      {
+        "arm": "frozen",
+        "root": "/private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/application-baseline-4/v15/node_modules/@signal-tree/kernel",
+        "target": "signaltree-entities",
+        "mode": "prod",
+        "gzipBytes": 25222,
+        "budgetBytes": 25292.8,
+        "schedulerBytes": 0,
+        "bundleSha256": "e63d8140d9f314fd67c937692ee0b11c39ca45142a1b03a8b9167da84406bd1c"
+      },
+      {
+        "arm": "frozen",
+        "root": "/private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/application-baseline-4/v15/node_modules/@signal-tree/kernel",
+        "target": "signaltree-entities",
+        "mode": "dev",
+        "gzipBytes": 28147,
+        "budgetBytes": 28160,
+        "schedulerBytes": 0,
+        "bundleSha256": "abde69b319c117210ec056c30917b3cec1d5ef875ccfe5f07873223d9474337d"
+      },
+      {
+        "arm": "projection",
+        "root": "/Users/jonathanborgia/code/signaltree/.worktrees/v15-long-lived-projection/dist/packages/kernel",
+        "target": "signaltree-bare",
+        "mode": "prod",
+        "gzipBytes": 11011,
+        "budgetBytes": 11059.2,
+        "schedulerBytes": 0,
+        "bundleSha256": "a6ee2c24364d715495a64167240c1c1a2442ba0835a940890597fe8f643b08d8"
+      },
+      {
+        "arm": "projection",
+        "root": "/Users/jonathanborgia/code/signaltree/.worktrees/v15-long-lived-projection/dist/packages/kernel",
+        "target": "signaltree-bare",
+        "mode": "dev",
+        "gzipBytes": 13159,
+        "budgetBytes": 13209.6,
+        "schedulerBytes": 0,
+        "bundleSha256": "2cd72a8bb263d43f7c73edda8cde6c4f2ac7e08b0e78d44d381c1d313bc7e6ee"
+      },
+      {
+        "arm": "projection",
+        "root": "/Users/jonathanborgia/code/signaltree/.worktrees/v15-long-lived-projection/dist/packages/kernel",
+        "target": "signaltree-entities",
+        "mode": "prod",
+        "gzipBytes": 25269,
+        "budgetBytes": 25292.8,
+        "schedulerBytes": 0,
+        "bundleSha256": "b9dc3e673b9e37a86194ad069e26fa055412dc560d1c0122732d54a240af6c4a"
+      },
+      {
+        "arm": "projection",
+        "root": "/Users/jonathanborgia/code/signaltree/.worktrees/v15-long-lived-projection/dist/packages/kernel",
+        "target": "signaltree-entities",
+        "mode": "dev",
+        "gzipBytes": 28194,
+        "budgetBytes": 28160,
+        "schedulerBytes": 0,
+        "bundleSha256": "f6f79321c8f7fd55a6d18749c807c026f3c451320dd8cc54c0b344fa517e32cc"
+      },
+      {
+        "arm": "candidate",
+        "root": "/Users/jonathanborgia/code/signaltree/.worktrees/v15-retirement-reclamation/dist/packages/kernel",
+        "target": "signaltree-bare",
+        "mode": "prod",
+        "gzipBytes": 11011,
+        "budgetBytes": 11059.2,
+        "schedulerBytes": 0,
+        "bundleSha256": "a6ee2c24364d715495a64167240c1c1a2442ba0835a940890597fe8f643b08d8"
+      },
+      {
+        "arm": "candidate",
+        "root": "/Users/jonathanborgia/code/signaltree/.worktrees/v15-retirement-reclamation/dist/packages/kernel",
+        "target": "signaltree-bare",
+        "mode": "dev",
+        "gzipBytes": 13159,
+        "budgetBytes": 13209.6,
+        "schedulerBytes": 0,
+        "bundleSha256": "2cd72a8bb263d43f7c73edda8cde6c4f2ac7e08b0e78d44d381c1d313bc7e6ee"
+      },
+      {
+        "arm": "candidate",
+        "root": "/Users/jonathanborgia/code/signaltree/.worktrees/v15-retirement-reclamation/dist/packages/kernel",
+        "target": "signaltree-entities",
+        "mode": "prod",
+        "gzipBytes": 25333,
+        "budgetBytes": 25292.8,
+        "schedulerBytes": 0,
+        "bundleSha256": "6d91f97d756e2ef4a1885b337cb7400f154b241bbb9c271053309469bd20544f"
+      },
+      {
+        "arm": "candidate",
+        "root": "/Users/jonathanborgia/code/signaltree/.worktrees/v15-retirement-reclamation/dist/packages/kernel",
+        "target": "signaltree-entities",
+        "mode": "dev",
+        "gzipBytes": 28273,
+        "budgetBytes": 28160,
+        "schedulerBytes": 0,
+        "bundleSha256": "e0e5bb4076236a5cd10ea57d1688ea25a38a1fc3f7fe574cac9e99cd7b6b2e42"
+      }
+    ]
+  }
+}

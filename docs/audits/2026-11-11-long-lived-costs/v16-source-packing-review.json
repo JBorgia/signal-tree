@@ -1,0 +1,77 @@
+{
+  "source": "/private/tmp/st-terminal-source-stage1-independent-review-145e2a19.json",
+  "sha256": "d34d689cc2be2055c47d2477bf78f8f4f8e20620530f3680c9d08d8c6806ac81",
+  "result": {
+    "head": "145e2a19cfe208c70f30ff64006fa6929fd092fb",
+    "parent": "a35ed7534996a80a77d0038ac61cb374fa5a1403",
+    "status": "No concrete semantic blocker demonstrated in source stage1; bounded qualification only.",
+    "frozen_premise": "Retain exact rejected destination/input/validation and uncertainty evidence; no terminal-proof normalization or deletion amnesty. Source/currentness and ordinary-lifetime authority remain unchanged.",
+    "bindings": {
+      "/private/tmp/st-v16-terminal-source-stage1-package/bindings.json": "5d4e0e9791e6276b6e79a7b888e3f958ce8855932c7baab408e020b9852777c9",
+      "/private/tmp/st-v16-terminal-source-point-witness-1/receipt.json": "9697f75f978d987946d6629565309aae6315fa51f5f077a4ebb1054c340295e0",
+      "/private/tmp/st-v16-terminal-source-point-witness-1/stdout.json": "c8002c9949bcdf354a7566d075f357dfbd2c0b0cd391b3407136638ebc4a4b81",
+      "/private/tmp/st-v16-terminal-trace-baseline/active.json": "898bf431d20ace20806c6bc37fc864d8b86fdb1341aae10fd8a4db08b1071b11",
+      "/private/tmp/st-v16-terminal-trace-baseline/disposed.json": "d12466f1ccbbeb1e6b4dac25a1ced9465ab306bb0adc310ffaa87f47e98e0bc4",
+      "/private/tmp/st-v16-terminal-trace-baseline/late.json": "668bd10df52f05cdc7af90fd7c60e547a04c71775f18aca8b1800efe3d0d58d2",
+      "/private/tmp/st-v16-terminal-trace-baseline/none.json": "14777f631e2845e547a2c1818ff54ae520af33da21b95ec57192d371bdc6d481",
+      "/private/tmp/st-v16-terminal-trace-source-final/active.json": "898bf431d20ace20806c6bc37fc864d8b86fdb1341aae10fd8a4db08b1071b11",
+      "/private/tmp/st-v16-terminal-trace-source-final/disposed.json": "d12466f1ccbbeb1e6b4dac25a1ced9465ab306bb0adc310ffaa87f47e98e0bc4",
+      "/private/tmp/st-v16-terminal-trace-source-final/late.json": "668bd10df52f05cdc7af90fd7c60e547a04c71775f18aca8b1800efe3d0d58d2",
+      "/private/tmp/st-v16-terminal-trace-source-final/none.json": "14777f631e2845e547a2c1818ff54ae520af33da21b95ec57192d371bdc6d481"
+    },
+    "verified": {
+      "package_group_files": 146,
+      "actual_extracted_package_file_payloads": 144,
+      "source_files": 899,
+      "logs": 6,
+      "point_bindings": 141,
+      "hash_mismatches": 0,
+      "public_trace_cells_equal": 24,
+      "recorded_focused_tests": 44,
+      "recorded_test_files": 6,
+      "point_work": [
+        {
+          "rows": 2000,
+          "count": 1800,
+          "bound": 2000,
+          "width_control": 4000
+        },
+        {
+          "rows": 20000,
+          "count": 1800,
+          "bound": 2000,
+          "width_control": 40000
+        }
+      ],
+      "planted_charge": 7
+    },
+    "source_conclusions": [
+      "All five exact facet fallbacks, whole physical capture, exclusions and generic/point selected-support closures include packed identities. Active values take regular Map lookup first.",
+      "Compaction only after installed-forget eligible callback, ready proof, no releasable class, exact five-facet negative shape and exact current snapshots. Own-window waiting subscriptions remain unchanged. Missing shapes stay in ordinary Maps.",
+      "Exact reference tuples share wrappers only where requirement references match; escaped requirements are not mutated. Compaction updates source/retirement revisions, invalidating stale prepared units. Repeated requests do not duplicate or erase packed facts.",
+      "Append-only interval admission accepts ascending or equal-tuple adjacent descending batches; adverse distinct reverse addresses remain ordinary Map entries. No growing-array insertion in compaction. Delete remains O(runs), not a new ordinary point step.",
+      "Source indexes alone changed; recipient support reset/keyed lifecycle remains unchanged."
+    ],
+    "factual_correction": "146 counts bound group entries including archive and pack.log;144 are actual extracted payload files.",
+    "run_records": [
+      "Focused log records44/44 success; build and type logs success; spec-types passes ratchet without new regressions; naive-retire mutation log records targeted foreign omission assertion failure.",
+      "Point witness exit0 and141boundfiles/outputs verified; emitted1800<=2000 at2k/20k plus width/planted controls.",
+      "Four enrollment traces with6cells each equal original baseline JSON including callback values/errors/receipts/outbound traces."
+    ],
+    "limits": [
+      "Reviewer ran only read/hash/schema/equality checks; no tests/builds/benchmarks/mutations.",
+      "No fullsuite or release qualification. Recorded logs were inspected, not independently rerun.",
+      "Whole-source capture/exclusions still enumerate logical retired IDs. Active-row witness does not price deep retired-history CPU.",
+      "Worstcase distinct tuples or adverse ordering remain linear storage; homogeneous packing benefits and package/startup costs still need measured."
+    ],
+    "falsifiers_run_by_reviewer": [
+      "Hash validation of bound artifacts/source/logs and point files",
+      "24cell JSON trace equality",
+      "CleanHEAD/diff inspection"
+    ],
+    "falsifiers_not_run_by_reviewer": [
+      "Runtimefocusedchecks,mutation,witness (storedauthoroutputs inspected only)",
+      "Large-retired-history pointtiming,aging andworstcasecost (root owns measurements)"
+    ]
+  }
+}

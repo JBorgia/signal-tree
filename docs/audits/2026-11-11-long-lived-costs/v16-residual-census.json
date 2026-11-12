@@ -1,0 +1,1401 @@
+{
+  "source": "/private/tmp/st-v16-residual-independent-review.json",
+  "sha256": "dea459a1506cd247aec23fd939a1b9fe7e3a1ea4015672a5201e1ae54c5726b9",
+  "result": {
+    "command": "python3 /private/tmp/st-v16-residual-independent-analyze.py",
+    "verifiedBindings": true,
+    "heapVerdict": "7/8; failed sample preserved, no complete-cohort pass",
+    "heapRows": [
+      {
+        "sample": {
+          "recipient": true,
+          "cumulativeIds": true,
+          "repeat": 0
+        },
+        "passed": true,
+        "pid": 27469,
+        "heapDeltasMiB": {
+          "1": 4.2202301025390625,
+          "10": 11.895965576171875,
+          "20": 19.837249755859375,
+          "30": 25.026565551757812
+        }
+      },
+      {
+        "sample": {
+          "recipient": false,
+          "cumulativeIds": false,
+          "repeat": 0
+        },
+        "passed": true,
+        "pid": 28419,
+        "heapDeltasMiB": {
+          "1": 3.3882369995117188,
+          "10": 7.0569915771484375,
+          "20": 10.774894714355469,
+          "30": 13.009689331054688
+        }
+      },
+      {
+        "sample": {
+          "recipient": true,
+          "cumulativeIds": false,
+          "repeat": 0
+        },
+        "passed": true,
+        "pid": 28421,
+        "heapDeltasMiB": {
+          "1": 4.517463684082031,
+          "10": 11.881942749023438,
+          "20": 19.619468688964844,
+          "30": 24.756729125976562
+        }
+      },
+      {
+        "sample": {
+          "recipient": false,
+          "cumulativeIds": true,
+          "repeat": 0
+        },
+        "passed": false,
+        "pid": 28422,
+        "error": "AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n\n1 !== 0\n\n    at retainedStore (file:///Users/jonathanborgia/code/signaltree/.worktrees/application-comparison/tools/application-lab/v16-residual-heap.mjs:141:16)\n    at async file:///Users/jonathanborgia/code/signaltree/.worktrees/application-comparison/tools/application-lab/v16-residual-heap.mjs:151:18"
+      },
+      {
+        "sample": {
+          "recipient": false,
+          "cumulativeIds": true,
+          "repeat": 1
+        },
+        "passed": true,
+        "pid": 34024,
+        "heapDeltasMiB": {
+          "1": 3.2381439208984375,
+          "10": 7.122215270996094,
+          "20": 10.951324462890625,
+          "30": 13.389266967773438
+        }
+      },
+      {
+        "sample": {
+          "recipient": true,
+          "cumulativeIds": false,
+          "repeat": 1
+        },
+        "passed": true,
+        "pid": 34026,
+        "heapDeltasMiB": {
+          "1": 4.272529602050781,
+          "10": 11.891067504882812,
+          "20": 19.715431213378906,
+          "30": 24.750396728515625
+        }
+      },
+      {
+        "sample": {
+          "recipient": false,
+          "cumulativeIds": false,
+          "repeat": 1
+        },
+        "passed": true,
+        "pid": 34030,
+        "heapDeltasMiB": {
+          "1": 3.25311279296875,
+          "10": 7.072517395019531,
+          "20": 10.791015625,
+          "30": 13.047943115234375
+        }
+      },
+      {
+        "sample": {
+          "recipient": true,
+          "cumulativeIds": true,
+          "repeat": 1
+        },
+        "passed": true,
+        "pid": 34031,
+        "heapDeltasMiB": {
+          "1": 4.24420166015625,
+          "10": 11.904647827148438,
+          "20": 19.812530517578125,
+          "30": 25.01203155517578
+        }
+      }
+    ],
+    "censusVerdict": "2/2; source and recipient maps accumulate per lifetime",
+    "census": [
+      {
+        "sample": {
+          "recipient": false
+        },
+        "checkpoints": [
+          {
+            "cycle": 1,
+            "publication": {
+              "rows": 0,
+              "fields": 0,
+              "presence": 1000,
+              "negativePresence": 1000,
+              "placements": 0,
+              "viewRows": 0,
+              "viewFields": 0,
+              "negativeViewFields": 0,
+              "visible": 1000,
+              "negativeVisible": 1000,
+              "placementViews": 1000,
+              "mappings": 1000,
+              "mappingViews": 1000,
+              "preparedFieldEdits": 9000,
+              "retireCalls": 0,
+              "inputFactVisits": 0,
+              "recipients": 0,
+              "native": 1,
+              "retirementRequests": 0
+            },
+            "mapSizes": []
+          },
+          {
+            "cycle": 2,
+            "publication": {
+              "rows": 0,
+              "fields": 0,
+              "presence": 2000,
+              "negativePresence": 2000,
+              "placements": 0,
+              "viewRows": 0,
+              "viewFields": 0,
+              "negativeViewFields": 0,
+              "visible": 2000,
+              "negativeVisible": 2000,
+              "placementViews": 2000,
+              "mappings": 2000,
+              "mappingViews": 2000,
+              "preparedFieldEdits": 18000,
+              "retireCalls": 0,
+              "inputFactVisits": 0,
+              "recipients": 0,
+              "native": 1,
+              "retirementRequests": 0
+            },
+            "mapSizes": [
+              2000,
+              2000,
+              2000,
+              2000,
+              2000
+            ]
+          },
+          {
+            "cycle": 10,
+            "publication": {
+              "rows": 0,
+              "fields": 0,
+              "presence": 10000,
+              "negativePresence": 10000,
+              "placements": 0,
+              "viewRows": 0,
+              "viewFields": 0,
+              "negativeViewFields": 0,
+              "visible": 10000,
+              "negativeVisible": 10000,
+              "placementViews": 10000,
+              "mappings": 10000,
+              "mappingViews": 10000,
+              "preparedFieldEdits": 90000,
+              "retireCalls": 0,
+              "inputFactVisits": 0,
+              "recipients": 0,
+              "native": 1,
+              "retirementRequests": 0
+            },
+            "mapSizes": [
+              10000,
+              10000,
+              10000,
+              10000,
+              10000
+            ]
+          },
+          {
+            "cycle": 20,
+            "publication": {
+              "rows": 0,
+              "fields": 0,
+              "presence": 20000,
+              "negativePresence": 20000,
+              "placements": 0,
+              "viewRows": 0,
+              "viewFields": 0,
+              "negativeViewFields": 0,
+              "visible": 20000,
+              "negativeVisible": 20000,
+              "placementViews": 20000,
+              "mappings": 20000,
+              "mappingViews": 20000,
+              "preparedFieldEdits": 180000,
+              "retireCalls": 0,
+              "inputFactVisits": 0,
+              "recipients": 0,
+              "native": 1,
+              "retirementRequests": 0
+            },
+            "mapSizes": [
+              20000,
+              20000,
+              20000,
+              20000,
+              20000
+            ]
+          },
+          {
+            "cycle": 30,
+            "publication": {
+              "rows": 0,
+              "fields": 0,
+              "presence": 30000,
+              "negativePresence": 30000,
+              "placements": 0,
+              "viewRows": 0,
+              "viewFields": 0,
+              "negativeViewFields": 0,
+              "visible": 30000,
+              "negativeVisible": 30000,
+              "placementViews": 30000,
+              "mappings": 30000,
+              "mappingViews": 30000,
+              "preparedFieldEdits": 270000,
+              "retireCalls": 0,
+              "inputFactVisits": 0,
+              "recipients": 0,
+              "native": 1,
+              "retirementRequests": 0
+            },
+            "mapSizes": [
+              30000,
+              30000,
+              30000,
+              30000,
+              30000
+            ]
+          }
+        ],
+        "lastEvidence": {
+          "memberOrdinary": {
+            "ownWindowOnly": false,
+            "unknown": true,
+            "captureWindow": true,
+            "known": {},
+            "possible": {},
+            "inputs": 0,
+            "frames": 0,
+            "components": 0,
+            "proof": {
+              "owners": {
+                "rolled-back": 1
+              },
+              "destination": {
+                "rolled-back": 1
+              },
+              "input": {},
+              "validation": {},
+              "possible": {},
+              "unknown": true,
+              "invalid": false,
+              "terminalRejectedRoles": 0,
+              "unavailableInput": false
+            }
+          },
+          "memberPhysical": {
+            "ownWindowOnly": false,
+            "unknown": true,
+            "captureWindow": true,
+            "known": {},
+            "possible": {},
+            "inputs": 0,
+            "frames": 0,
+            "components": 0,
+            "proof": {
+              "owners": {
+                "rolled-back": 1
+              },
+              "destination": {
+                "rolled-back": 1
+              },
+              "input": {},
+              "validation": {},
+              "possible": {},
+              "unknown": true,
+              "invalid": false,
+              "terminalRejectedRoles": 0,
+              "unavailableInput": false
+            }
+          },
+          "keyOrdinary": {
+            "ownWindowOnly": false,
+            "unknown": false,
+            "captureWindow": true,
+            "known": {},
+            "possible": {},
+            "inputs": 0,
+            "frames": 0,
+            "components": 0,
+            "proof": {
+              "owners": {
+                "rolled-back": 1
+              },
+              "destination": {
+                "rolled-back": 1
+              },
+              "input": {},
+              "validation": {},
+              "possible": {},
+              "unknown": false,
+              "invalid": false,
+              "terminalRejectedRoles": 0,
+              "unavailableInput": false
+            }
+          },
+          "keyPhysical": {
+            "ownWindowOnly": false,
+            "unknown": true,
+            "captureWindow": true,
+            "known": {},
+            "possible": {},
+            "inputs": 0,
+            "frames": 0,
+            "components": 0,
+            "proof": {
+              "owners": {
+                "rolled-back": 1
+              },
+              "destination": {
+                "rolled-back": 1
+              },
+              "input": {},
+              "validation": {},
+              "possible": {},
+              "unknown": true,
+              "invalid": false,
+              "terminalRejectedRoles": 0,
+              "unavailableInput": false
+            }
+          },
+          "placementOrdinary": {
+            "ownWindowOnly": null,
+            "unknown": true,
+            "captureWindow": false,
+            "known": {},
+            "possible": {},
+            "inputs": 0,
+            "frames": 0,
+            "components": 0,
+            "proof": {
+              "owners": {},
+              "destination": {},
+              "input": {},
+              "validation": {},
+              "possible": {},
+              "unknown": true,
+              "invalid": false,
+              "terminalRejectedRoles": 0,
+              "unavailableInput": true
+            }
+          },
+          "placementPhysical": {
+            "ownWindowOnly": false,
+            "unknown": true,
+            "captureWindow": true,
+            "known": {},
+            "possible": {},
+            "inputs": 0,
+            "frames": 0,
+            "components": 0,
+            "proof": {
+              "owners": {
+                "rolled-back": 1
+              },
+              "destination": {
+                "rolled-back": 1
+              },
+              "input": {},
+              "validation": {},
+              "possible": {},
+              "unknown": true,
+              "invalid": false,
+              "terminalRejectedRoles": 0,
+              "unavailableInput": false
+            }
+          }
+        },
+        "lastMaps": [
+          {
+            "size": 30000,
+            "stack": "Error\n    at Map.value (file:///Users/jonathanborgia/code/signaltree/.worktrees/application-comparison/tools/application-lab/v16-residual-census.mjs:25:240)\n    at Object.set (file:///private/tmp/st-v16-final-pending-bundles/lazy.production.mjs:1:12766)\n    at Zt (file:///private/tmp/st-v16-final-pending-bundles/lazy.production.mjs:1:2274)\n    at file:///private/tmp/st-v16-final-pending-bundles/lazy.production.mjs:3:319839\n    at Qa.commit (file:///private/tmp/st-v16-final-pending-bundles/lazy.production.mjs:3:285406)\n    at Object.install (file:///private/tmp/st-v16-final-pending-bundles/lazy.production.mjs:3:319754)\n    at se (file:///private/tmp/st-v16-final-pending-bundles/lazy.production.mjs:3:314267)\n    at setAll (file:///private/tmp/st-v16-final-pending-bundles/lazy.production.mjs:3:351984)\n    at tt.<computed> (file:///private/tmp/st-v16-final-pending-bundles/lazy.production.mjs:3:354377)\n    at d.<computed> (file:///private/tmp/st-v16-final-pending-bundles/lazy.production.mjs:3:156911)",
+            "keyType": "number",
+            "valueType": "object",
+            "first": [
+              {
+                "key": {
+                  "type": "number",
+                  "value": 1
+                },
+                "value": {
+                  "type": "Object",
+                  "weakRef": false,
+                  "keys": [
+                    "requirement",
+                    "present"
+                  ]
+                }
+              },
+              {
+                "key": {
+                  "type": "number",
+                  "value": 2
+                },
+                "value": {
+                  "type": "Object",
+                  "weakRef": false,
+                  "keys": [
+                    "requirement",
+                    "present"
+                  ]
+                }
+              },
+              {
+                "key": {
+                  "type": "number",
+                  "value": 3
+                },
+                "value": {
+                  "type": "Object",
+                  "weakRef": false,
+                  "keys": [
+                    "requirement",
+                    "present"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "size": 30000,
+            "stack": "Error\n    at Map.value (file:///Users/jonathanborgia/code/signaltree/.worktrees/application-comparison/tools/application-lab/v16-residual-census.mjs:25:240)\n    at Object.set (file:///private/tmp/st-v16-final-pending-bundles/lazy.production.mjs:1:12766)\n    at Zt (file:///private/tmp/st-v16-final-pending-bundles/lazy.production.mjs:1:2274)\n    at file:///private/tmp/st-v16-final-pending-bundles/lazy.production.mjs:3:319839\n    at Qa.commit (file:///private/tmp/st-v16-final-pending-bundles/lazy.production.mjs:3:285406)\n    at Object.install (file:///private/tmp/st-v16-final-pending-bundles/lazy.production.mjs:3:319754)\n    at se (file:///private/tmp/st-v16-final-pending-bundles/lazy.production.mjs:3:314267)\n    at setAll (file:///private/tmp/st-v16-final-pending-bundles/lazy.production.mjs:3:351984)\n    at tt.<computed> (file:///private/tmp/st-v16-final-pending-bundles/lazy.production.mjs:3:354377)\n    at d.<computed> (file:///private/tmp/st-v16-final-pending-bundles/lazy.production.mjs:3:156911)",
+            "keyType": "number",
+            "valueType": "object",
+            "first": [
+              {
+                "key": {
+                  "type": "number",
+                  "value": 1000
+                },
+                "value": {
+                  "type": "Object",
+                  "weakRef": false,
+                  "keys": [
+                    "requirement"
+                  ]
+                }
+              },
+              {
+                "key": {
+                  "type": "number",
+                  "value": 999
+                },
+                "value": {
+                  "type": "Object",
+                  "weakRef": false,
+                  "keys": [
+                    "requirement"
+                  ]
+                }
+              },
+              {
+                "key": {
+                  "type": "number",
+                  "value": 998
+                },
+                "value": {
+                  "type": "Object",
+                  "weakRef": false,
+                  "keys": [
+                    "requirement"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "size": 30000,
+            "stack": "Error\n    at Map.value (file:///Users/jonathanborgia/code/signaltree/.worktrees/application-comparison/tools/application-lab/v16-residual-census.mjs:25:240)\n    at Object.set (file:///private/tmp/st-v16-final-pending-bundles/lazy.production.mjs:1:12766)\n    at Zt (file:///private/tmp/st-v16-final-pending-bundles/lazy.production.mjs:1:2274)\n    at file:///private/tmp/st-v16-final-pending-bundles/lazy.production.mjs:3:319839\n    at Qa.commit (file:///private/tmp/st-v16-final-pending-bundles/lazy.production.mjs:3:285406)\n    at Object.install (file:///private/tmp/st-v16-final-pending-bundles/lazy.production.mjs:3:319754)\n    at se (file:///private/tmp/st-v16-final-pending-bundles/lazy.production.mjs:3:314267)\n    at setAll (file:///private/tmp/st-v16-final-pending-bundles/lazy.production.mjs:3:351984)\n    at tt.<computed> (file:///private/tmp/st-v16-final-pending-bundles/lazy.production.mjs:3:354377)\n    at d.<computed> (file:///private/tmp/st-v16-final-pending-bundles/lazy.production.mjs:3:156911)",
+            "keyType": "number",
+            "valueType": "object",
+            "first": [
+              {
+                "key": {
+                  "type": "number",
+                  "value": 1
+                },
+                "value": {
+                  "type": "Object",
+                  "weakRef": false,
+                  "keys": [
+                    "present",
+                    "requirement"
+                  ]
+                }
+              },
+              {
+                "key": {
+                  "type": "number",
+                  "value": 2
+                },
+                "value": {
+                  "type": "Object",
+                  "weakRef": false,
+                  "keys": [
+                    "present",
+                    "requirement"
+                  ]
+                }
+              },
+              {
+                "key": {
+                  "type": "number",
+                  "value": 3
+                },
+                "value": {
+                  "type": "Object",
+                  "weakRef": false,
+                  "keys": [
+                    "present",
+                    "requirement"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "size": 30000,
+            "stack": "Error\n    at Map.value (file:///Users/jonathanborgia/code/signaltree/.worktrees/application-comparison/tools/application-lab/v16-residual-census.mjs:25:240)\n    at Object.set (file:///private/tmp/st-v16-final-pending-bundles/lazy.production.mjs:1:12766)\n    at Zt (file:///private/tmp/st-v16-final-pending-bundles/lazy.production.mjs:1:2274)\n    at file:///private/tmp/st-v16-final-pending-bundles/lazy.production.mjs:3:319839\n    at Qa.commit (file:///private/tmp/st-v16-final-pending-bundles/lazy.production.mjs:3:285406)\n    at Object.install (file:///private/tmp/st-v16-final-pending-bundles/lazy.production.mjs:3:319754)\n    at se (file:///private/tmp/st-v16-final-pending-bundles/lazy.production.mjs:3:314267)\n    at setAll (file:///private/tmp/st-v16-final-pending-bundles/lazy.production.mjs:3:351984)\n    at tt.<computed> (file:///private/tmp/st-v16-final-pending-bundles/lazy.production.mjs:3:354377)\n    at d.<computed> (file:///private/tmp/st-v16-final-pending-bundles/lazy.production.mjs:3:156911)",
+            "keyType": "number",
+            "valueType": "object",
+            "first": [
+              {
+                "key": {
+                  "type": "number",
+                  "value": 1
+                },
+                "value": {
+                  "type": "Object",
+                  "weakRef": false,
+                  "keys": [
+                    "retirementOwnWindowOnly",
+                    "known",
+                    "unknown",
+                    "inputs",
+                    "frames",
+                    "possible",
+                    "captureWindow",
+                    "proof"
+                  ]
+                }
+              },
+              {
+                "key": {
+                  "type": "number",
+                  "value": 2
+                },
+                "value": {
+                  "type": "Object",
+                  "weakRef": false,
+                  "keys": [
+                    "retirementOwnWindowOnly",
+                    "known",
+                    "unknown",
+                    "inputs",
+                    "frames",
+                    "possible",
+                    "captureWindow",
+                    "proof"
+                  ]
+                }
+              },
+              {
+                "key": {
+                  "type": "number",
+                  "value": 3
+                },
+                "value": {
+                  "type": "Object",
+                  "weakRef": false,
+                  "keys": [
+                    "retirementOwnWindowOnly",
+                    "known",
+                    "unknown",
+                    "inputs",
+                    "frames",
+                    "possible",
+                    "captureWindow",
+                    "proof"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "size": 30000,
+            "stack": "Error\n    at Map.value (file:///Users/jonathanborgia/code/signaltree/.worktrees/application-comparison/tools/application-lab/v16-residual-census.mjs:25:240)\n    at Object.set (file:///private/tmp/st-v16-final-pending-bundles/lazy.production.mjs:1:12766)\n    at Zt (file:///private/tmp/st-v16-final-pending-bundles/lazy.production.mjs:1:2274)\n    at file:///private/tmp/st-v16-final-pending-bundles/lazy.production.mjs:3:319839\n    at Qa.commit (file:///private/tmp/st-v16-final-pending-bundles/lazy.production.mjs:3:285406)\n    at Object.install (file:///private/tmp/st-v16-final-pending-bundles/lazy.production.mjs:3:319754)\n    at se (file:///private/tmp/st-v16-final-pending-bundles/lazy.production.mjs:3:314267)\n    at setAll (file:///private/tmp/st-v16-final-pending-bundles/lazy.production.mjs:3:351984)\n    at tt.<computed> (file:///private/tmp/st-v16-final-pending-bundles/lazy.production.mjs:3:354377)\n    at d.<computed> (file:///private/tmp/st-v16-final-pending-bundles/lazy.production.mjs:3:156911)",
+            "keyType": "number",
+            "valueType": "object",
+            "first": [
+              {
+                "key": {
+                  "type": "number",
+                  "value": 1
+                },
+                "value": {
+                  "type": "Object",
+                  "weakRef": false,
+                  "keys": [
+                    "requirement"
+                  ]
+                }
+              },
+              {
+                "key": {
+                  "type": "number",
+                  "value": 2
+                },
+                "value": {
+                  "type": "Object",
+                  "weakRef": false,
+                  "keys": [
+                    "requirement"
+                  ]
+                }
+              },
+              {
+                "key": {
+                  "type": "number",
+                  "value": 3
+                },
+                "value": {
+                  "type": "Object",
+                  "weakRef": false,
+                  "keys": [
+                    "requirement"
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "sample": {
+          "recipient": true
+        },
+        "checkpoints": [
+          {
+            "cycle": 1,
+            "publication": {
+              "rows": 0,
+              "fields": 0,
+              "presence": 1000,
+              "negativePresence": 1000,
+              "placements": 0,
+              "viewRows": 0,
+              "viewFields": 0,
+              "negativeViewFields": 0,
+              "visible": 1000,
+              "negativeVisible": 1000,
+              "placementViews": 1000,
+              "mappings": 1000,
+              "mappingViews": 1000,
+              "preparedFieldEdits": 9000,
+              "retireCalls": 0,
+              "inputFactVisits": 0,
+              "recipients": 1,
+              "native": 1,
+              "retirementRequests": 0
+            },
+            "mapSizes": [
+              1000,
+              1000
+            ]
+          },
+          {
+            "cycle": 2,
+            "publication": {
+              "rows": 0,
+              "fields": 0,
+              "presence": 2000,
+              "negativePresence": 2000,
+              "placements": 0,
+              "viewRows": 0,
+              "viewFields": 0,
+              "negativeViewFields": 0,
+              "visible": 2000,
+              "negativeVisible": 2000,
+              "placementViews": 2000,
+              "mappings": 2000,
+              "mappingViews": 2000,
+              "preparedFieldEdits": 18000,
+              "retireCalls": 0,
+              "inputFactVisits": 0,
+              "recipients": 1,
+              "native": 1,
+              "retirementRequests": 0
+            },
+            "mapSizes": [
+              2000,
+              2000,
+              2000,
+              2000,
+              2000,
+              2000,
+              2000
+            ]
+          },
+          {
+            "cycle": 10,
+            "publication": {
+              "rows": 0,
+              "fields": 0,
+              "presence": 10000,
+              "negativePresence": 10000,
+              "placements": 0,
+              "viewRows": 0,
+              "viewFields": 0,
+              "negativeViewFields": 0,
+              "visible": 10000,
+              "negativeVisible": 10000,
+              "placementViews": 10000,
+              "mappings": 10000,
+              "mappingViews": 10000,
+              "preparedFieldEdits": 90000,
+              "retireCalls": 0,
+              "inputFactVisits": 0,
+              "recipients": 1,
+              "native": 1,
+              "retirementRequests": 0
+            },
+            "mapSizes": [
+              10000,
+              10000,
+              10000,
+              10000,
+              10000,
+              10000,
+              10000
+            ]
+          },
+          {
+            "cycle": 20,
+            "publication": {
+              "rows": 0,
+              "fields": 0,
+              "presence": 20000,
+              "negativePresence": 20000,
+              "placements": 0,
+              "viewRows": 0,
+              "viewFields": 0,
+              "negativeViewFields": 0,
+              "visible": 20000,
+              "negativeVisible": 20000,
+              "placementViews": 20000,
+              "mappings": 20000,
+              "mappingViews": 20000,
+              "preparedFieldEdits": 180000,
+              "retireCalls": 0,
+              "inputFactVisits": 0,
+              "recipients": 1,
+              "native": 1,
+              "retirementRequests": 0
+            },
+            "mapSizes": [
+              20000,
+              20000,
+              20000,
+              20000,
+              20000,
+              20000,
+              20000
+            ]
+          },
+          {
+            "cycle": 30,
+            "publication": {
+              "rows": 0,
+              "fields": 0,
+              "presence": 30000,
+              "negativePresence": 30000,
+              "placements": 0,
+              "viewRows": 0,
+              "viewFields": 0,
+              "negativeViewFields": 0,
+              "visible": 30000,
+              "negativeVisible": 30000,
+              "placementViews": 30000,
+              "mappings": 30000,
+              "mappingViews": 30000,
+              "preparedFieldEdits": 270000,
+              "retireCalls": 0,
+              "inputFactVisits": 0,
+              "recipients": 1,
+              "native": 1,
+              "retirementRequests": 0
+            },
+            "mapSizes": [
+              30000,
+              30000,
+              30000,
+              30000,
+              30000,
+              30000,
+              30000
+            ]
+          }
+        ],
+        "lastEvidence": {
+          "memberOrdinary": {
+            "ownWindowOnly": false,
+            "unknown": true,
+            "captureWindow": true,
+            "known": {},
+            "possible": {},
+            "inputs": 0,
+            "frames": 0,
+            "components": 0,
+            "proof": {
+              "owners": {
+                "rolled-back": 1
+              },
+              "destination": {
+                "rolled-back": 1
+              },
+              "input": {},
+              "validation": {},
+              "possible": {},
+              "unknown": true,
+              "invalid": false,
+              "terminalRejectedRoles": 0,
+              "unavailableInput": false
+            }
+          },
+          "memberPhysical": {
+            "ownWindowOnly": false,
+            "unknown": true,
+            "captureWindow": true,
+            "known": {},
+            "possible": {},
+            "inputs": 0,
+            "frames": 0,
+            "components": 0,
+            "proof": {
+              "owners": {
+                "rolled-back": 1
+              },
+              "destination": {
+                "rolled-back": 1
+              },
+              "input": {},
+              "validation": {},
+              "possible": {},
+              "unknown": true,
+              "invalid": false,
+              "terminalRejectedRoles": 0,
+              "unavailableInput": false
+            }
+          },
+          "keyOrdinary": {
+            "ownWindowOnly": false,
+            "unknown": false,
+            "captureWindow": true,
+            "known": {},
+            "possible": {},
+            "inputs": 0,
+            "frames": 0,
+            "components": 0,
+            "proof": {
+              "owners": {
+                "rolled-back": 1
+              },
+              "destination": {
+                "rolled-back": 1
+              },
+              "input": {},
+              "validation": {},
+              "possible": {},
+              "unknown": false,
+              "invalid": false,
+              "terminalRejectedRoles": 0,
+              "unavailableInput": false
+            }
+          },
+          "keyPhysical": {
+            "ownWindowOnly": false,
+            "unknown": true,
+            "captureWindow": true,
+            "known": {},
+            "possible": {},
+            "inputs": 0,
+            "frames": 0,
+            "components": 0,
+            "proof": {
+              "owners": {
+                "rolled-back": 1
+              },
+              "destination": {
+                "rolled-back": 1
+              },
+              "input": {},
+              "validation": {},
+              "possible": {},
+              "unknown": true,
+              "invalid": false,
+              "terminalRejectedRoles": 0,
+              "unavailableInput": false
+            }
+          },
+          "placementOrdinary": {
+            "ownWindowOnly": null,
+            "unknown": true,
+            "captureWindow": false,
+            "known": {},
+            "possible": {},
+            "inputs": 0,
+            "frames": 0,
+            "components": 0,
+            "proof": {
+              "owners": {},
+              "destination": {},
+              "input": {},
+              "validation": {},
+              "possible": {},
+              "unknown": true,
+              "invalid": false,
+              "terminalRejectedRoles": 0,
+              "unavailableInput": true
+            }
+          },
+          "placementPhysical": {
+            "ownWindowOnly": false,
+            "unknown": true,
+            "captureWindow": true,
+            "known": {},
+            "possible": {},
+            "inputs": 0,
+            "frames": 0,
+            "components": 0,
+            "proof": {
+              "owners": {
+                "rolled-back": 1
+              },
+              "destination": {
+                "rolled-back": 1
+              },
+              "input": {},
+              "validation": {},
+              "possible": {},
+              "unknown": true,
+              "invalid": false,
+              "terminalRejectedRoles": 0,
+              "unavailableInput": false
+            }
+          }
+        },
+        "lastMaps": [
+          {
+            "size": 30000,
+            "stack": "Error\n    at Ta.value (file:///Users/jonathanborgia/code/signaltree/.worktrees/application-comparison/tools/application-lab/v16-residual-census.mjs:25:240)\n    at Ta.set (file:///private/tmp/st-v16-final-pending-bundles/lazy.production.mjs:3:125464)\n    at Object.set (file:///private/tmp/st-v16-final-pending-bundles/lazy.production.mjs:3:130219)\n    at Zt (file:///private/tmp/st-v16-final-pending-bundles/lazy.production.mjs:1:2274)\n    at file:///private/tmp/st-v16-final-pending-bundles/lazy.production.mjs:3:319839\n    at Qa.commit (file:///private/tmp/st-v16-final-pending-bundles/lazy.production.mjs:3:285406)\n    at Object.install (file:///private/tmp/st-v16-final-pending-bundles/lazy.production.mjs:3:319754)\n    at se (file:///private/tmp/st-v16-final-pending-bundles/lazy.production.mjs:3:314267)\n    at setAll (file:///private/tmp/st-v16-final-pending-bundles/lazy.production.mjs:3:351984)\n    at tt.<computed> (file:///private/tmp/st-v16-final-pending-bundles/lazy.production.mjs:3:354377)",
+            "keyType": "string",
+            "valueType": "object",
+            "first": [
+              {
+                "key": {
+                  "type": "string",
+                  "value": "1000:m"
+                },
+                "value": {
+                  "type": "Object",
+                  "weakRef": false,
+                  "keys": [
+                    "retirementOwnWindowOnly",
+                    "known",
+                    "unknown",
+                    "inputs",
+                    "frames",
+                    "possible",
+                    "captureWindow",
+                    "proof"
+                  ]
+                }
+              },
+              {
+                "key": {
+                  "type": "string",
+                  "value": "999:m"
+                },
+                "value": {
+                  "type": "Object",
+                  "weakRef": false,
+                  "keys": [
+                    "retirementOwnWindowOnly",
+                    "known",
+                    "unknown",
+                    "inputs",
+                    "frames",
+                    "possible",
+                    "captureWindow",
+                    "proof"
+                  ]
+                }
+              },
+              {
+                "key": {
+                  "type": "string",
+                  "value": "998:m"
+                },
+                "value": {
+                  "type": "Object",
+                  "weakRef": false,
+                  "keys": [
+                    "retirementOwnWindowOnly",
+                    "known",
+                    "unknown",
+                    "inputs",
+                    "frames",
+                    "possible",
+                    "captureWindow",
+                    "proof"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "size": 30000,
+            "stack": "Error\n    at Map.value (file:///Users/jonathanborgia/code/signaltree/.worktrees/application-comparison/tools/application-lab/v16-residual-census.mjs:25:240)\n    at wa.replaceEntry (file:///private/tmp/st-v16-final-pending-bundles/lazy.production.mjs:3:73707)\n    at wa.replace (file:///private/tmp/st-v16-final-pending-bundles/lazy.production.mjs:3:74079)\n    at Hp (file:///private/tmp/st-v16-final-pending-bundles/lazy.production.mjs:3:85293)\n    at Pa (file:///private/tmp/st-v16-final-pending-bundles/lazy.production.mjs:3:89907)\n    at uh (file:///private/tmp/st-v16-final-pending-bundles/lazy.production.mjs:3:100664)\n    at N (file:///private/tmp/st-v16-final-pending-bundles/lazy.production.mjs:3:140759)\n    at file:///private/tmp/st-v16-final-pending-bundles/lazy.production.mjs:3:140797\n    at Hi (file:///private/tmp/st-v16-final-pending-bundles/lazy.production.mjs:3:116468)\n    at t.flush (file:///private/tmp/st-v16-final-pending-bundles/lazy.production.mjs:3:120305)",
+            "keyType": "string",
+            "valueType": "object",
+            "first": [
+              {
+                "key": {
+                  "type": "string",
+                  "value": "1:m"
+                },
+                "value": {
+                  "type": "Object",
+                  "weakRef": false,
+                  "keys": [
+                    "counts",
+                    "onProof"
+                  ]
+                }
+              },
+              {
+                "key": {
+                  "type": "string",
+                  "value": "2:m"
+                },
+                "value": {
+                  "type": "Object",
+                  "weakRef": false,
+                  "keys": [
+                    "counts",
+                    "onProof"
+                  ]
+                }
+              },
+              {
+                "key": {
+                  "type": "string",
+                  "value": "3:m"
+                },
+                "value": {
+                  "type": "Object",
+                  "weakRef": false,
+                  "keys": [
+                    "counts",
+                    "onProof"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "size": 30000,
+            "stack": "Error\n    at Map.value (file:///Users/jonathanborgia/code/signaltree/.worktrees/application-comparison/tools/application-lab/v16-residual-census.mjs:25:240)\n    at Zt (file:///private/tmp/st-v16-final-pending-bundles/lazy.production.mjs:1:2274)\n    at file:///private/tmp/st-v16-final-pending-bundles/lazy.production.mjs:3:319839\n    at Qa.commit (file:///private/tmp/st-v16-final-pending-bundles/lazy.production.mjs:3:285406)\n    at Object.install (file:///private/tmp/st-v16-final-pending-bundles/lazy.production.mjs:3:319754)\n    at se (file:///private/tmp/st-v16-final-pending-bundles/lazy.production.mjs:3:314267)\n    at setAll (file:///private/tmp/st-v16-final-pending-bundles/lazy.production.mjs:3:351984)\n    at tt.<computed> (file:///private/tmp/st-v16-final-pending-bundles/lazy.production.mjs:3:354377)\n    at d.<computed> (file:///private/tmp/st-v16-final-pending-bundles/lazy.production.mjs:3:156911)\n    at Module.DP (file:///private/tmp/st-v16-final-pending-bundles/lazy.production.mjs:3:362797)",
+            "keyType": "number",
+            "valueType": "object",
+            "first": [
+              {
+                "key": {
+                  "type": "number",
+                  "value": 1
+                },
+                "value": {
+                  "type": "Object",
+                  "weakRef": false,
+                  "keys": [
+                    "requirement",
+                    "present"
+                  ]
+                }
+              },
+              {
+                "key": {
+                  "type": "number",
+                  "value": 2
+                },
+                "value": {
+                  "type": "Object",
+                  "weakRef": false,
+                  "keys": [
+                    "requirement",
+                    "present"
+                  ]
+                }
+              },
+              {
+                "key": {
+                  "type": "number",
+                  "value": 3
+                },
+                "value": {
+                  "type": "Object",
+                  "weakRef": false,
+                  "keys": [
+                    "requirement",
+                    "present"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "size": 30000,
+            "stack": "Error\n    at Map.value (file:///Users/jonathanborgia/code/signaltree/.worktrees/application-comparison/tools/application-lab/v16-residual-census.mjs:25:240)\n    at Zt (file:///private/tmp/st-v16-final-pending-bundles/lazy.production.mjs:1:2274)\n    at file:///private/tmp/st-v16-final-pending-bundles/lazy.production.mjs:3:319839\n    at Qa.commit (file:///private/tmp/st-v16-final-pending-bundles/lazy.production.mjs:3:285406)\n    at Object.install (file:///private/tmp/st-v16-final-pending-bundles/lazy.production.mjs:3:319754)\n    at se (file:///private/tmp/st-v16-final-pending-bundles/lazy.production.mjs:3:314267)\n    at setAll (file:///private/tmp/st-v16-final-pending-bundles/lazy.production.mjs:3:351984)\n    at tt.<computed> (file:///private/tmp/st-v16-final-pending-bundles/lazy.production.mjs:3:354377)\n    at d.<computed> (file:///private/tmp/st-v16-final-pending-bundles/lazy.production.mjs:3:156911)\n    at Module.DP (file:///private/tmp/st-v16-final-pending-bundles/lazy.production.mjs:3:362797)",
+            "keyType": "number",
+            "valueType": "object",
+            "first": [
+              {
+                "key": {
+                  "type": "number",
+                  "value": 1000
+                },
+                "value": {
+                  "type": "Object",
+                  "weakRef": false,
+                  "keys": [
+                    "requirement"
+                  ]
+                }
+              },
+              {
+                "key": {
+                  "type": "number",
+                  "value": 999
+                },
+                "value": {
+                  "type": "Object",
+                  "weakRef": false,
+                  "keys": [
+                    "requirement"
+                  ]
+                }
+              },
+              {
+                "key": {
+                  "type": "number",
+                  "value": 998
+                },
+                "value": {
+                  "type": "Object",
+                  "weakRef": false,
+                  "keys": [
+                    "requirement"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "size": 30000,
+            "stack": "Error\n    at Map.value (file:///Users/jonathanborgia/code/signaltree/.worktrees/application-comparison/tools/application-lab/v16-residual-census.mjs:25:240)\n    at Zt (file:///private/tmp/st-v16-final-pending-bundles/lazy.production.mjs:1:2274)\n    at file:///private/tmp/st-v16-final-pending-bundles/lazy.production.mjs:3:319839\n    at Qa.commit (file:///private/tmp/st-v16-final-pending-bundles/lazy.production.mjs:3:285406)\n    at Object.install (file:///private/tmp/st-v16-final-pending-bundles/lazy.production.mjs:3:319754)\n    at se (file:///private/tmp/st-v16-final-pending-bundles/lazy.production.mjs:3:314267)\n    at setAll (file:///private/tmp/st-v16-final-pending-bundles/lazy.production.mjs:3:351984)\n    at tt.<computed> (file:///private/tmp/st-v16-final-pending-bundles/lazy.production.mjs:3:354377)\n    at d.<computed> (file:///private/tmp/st-v16-final-pending-bundles/lazy.production.mjs:3:156911)\n    at Module.DP (file:///private/tmp/st-v16-final-pending-bundles/lazy.production.mjs:3:362797)",
+            "keyType": "number",
+            "valueType": "object",
+            "first": [
+              {
+                "key": {
+                  "type": "number",
+                  "value": 1
+                },
+                "value": {
+                  "type": "Object",
+                  "weakRef": false,
+                  "keys": [
+                    "present",
+                    "requirement"
+                  ]
+                }
+              },
+              {
+                "key": {
+                  "type": "number",
+                  "value": 2
+                },
+                "value": {
+                  "type": "Object",
+                  "weakRef": false,
+                  "keys": [
+                    "present",
+                    "requirement"
+                  ]
+                }
+              },
+              {
+                "key": {
+                  "type": "number",
+                  "value": 3
+                },
+                "value": {
+                  "type": "Object",
+                  "weakRef": false,
+                  "keys": [
+                    "present",
+                    "requirement"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "size": 30000,
+            "stack": "Error\n    at Map.value (file:///Users/jonathanborgia/code/signaltree/.worktrees/application-comparison/tools/application-lab/v16-residual-census.mjs:25:240)\n    at Zt (file:///private/tmp/st-v16-final-pending-bundles/lazy.production.mjs:1:2274)\n    at file:///private/tmp/st-v16-final-pending-bundles/lazy.production.mjs:3:319839\n    at Qa.commit (file:///private/tmp/st-v16-final-pending-bundles/lazy.production.mjs:3:285406)\n    at Object.install (file:///private/tmp/st-v16-final-pending-bundles/lazy.production.mjs:3:319754)\n    at se (file:///private/tmp/st-v16-final-pending-bundles/lazy.production.mjs:3:314267)\n    at setAll (file:///private/tmp/st-v16-final-pending-bundles/lazy.production.mjs:3:351984)\n    at tt.<computed> (file:///private/tmp/st-v16-final-pending-bundles/lazy.production.mjs:3:354377)\n    at d.<computed> (file:///private/tmp/st-v16-final-pending-bundles/lazy.production.mjs:3:156911)\n    at Module.DP (file:///private/tmp/st-v16-final-pending-bundles/lazy.production.mjs:3:362797)",
+            "keyType": "number",
+            "valueType": "object",
+            "first": [
+              {
+                "key": {
+                  "type": "number",
+                  "value": 1
+                },
+                "value": {
+                  "type": "Object",
+                  "weakRef": false,
+                  "keys": [
+                    "retirementOwnWindowOnly",
+                    "known",
+                    "unknown",
+                    "inputs",
+                    "frames",
+                    "possible",
+                    "captureWindow",
+                    "proof"
+                  ]
+                }
+              },
+              {
+                "key": {
+                  "type": "number",
+                  "value": 2
+                },
+                "value": {
+                  "type": "Object",
+                  "weakRef": false,
+                  "keys": [
+                    "retirementOwnWindowOnly",
+                    "known",
+                    "unknown",
+                    "inputs",
+                    "frames",
+                    "possible",
+                    "captureWindow",
+                    "proof"
+                  ]
+                }
+              },
+              {
+                "key": {
+                  "type": "number",
+                  "value": 3
+                },
+                "value": {
+                  "type": "Object",
+                  "weakRef": false,
+                  "keys": [
+                    "retirementOwnWindowOnly",
+                    "known",
+                    "unknown",
+                    "inputs",
+                    "frames",
+                    "possible",
+                    "captureWindow",
+                    "proof"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "size": 30000,
+            "stack": "Error\n    at Map.value (file:///Users/jonathanborgia/code/signaltree/.worktrees/application-comparison/tools/application-lab/v16-residual-census.mjs:25:240)\n    at Zt (file:///private/tmp/st-v16-final-pending-bundles/lazy.production.mjs:1:2274)\n    at file:///private/tmp/st-v16-final-pending-bundles/lazy.production.mjs:3:319839\n    at Qa.commit (file:///private/tmp/st-v16-final-pending-bundles/lazy.production.mjs:3:285406)\n    at Object.install (file:///private/tmp/st-v16-final-pending-bundles/lazy.production.mjs:3:319754)\n    at se (file:///private/tmp/st-v16-final-pending-bundles/lazy.production.mjs:3:314267)\n    at setAll (file:///private/tmp/st-v16-final-pending-bundles/lazy.production.mjs:3:351984)\n    at tt.<computed> (file:///private/tmp/st-v16-final-pending-bundles/lazy.production.mjs:3:354377)\n    at d.<computed> (file:///private/tmp/st-v16-final-pending-bundles/lazy.production.mjs:3:156911)\n    at Module.DP (file:///private/tmp/st-v16-final-pending-bundles/lazy.production.mjs:3:362797)",
+            "keyType": "number",
+            "valueType": "object",
+            "first": [
+              {
+                "key": {
+                  "type": "number",
+                  "value": 1
+                },
+                "value": {
+                  "type": "Object",
+                  "weakRef": false,
+                  "keys": [
+                    "requirement"
+                  ]
+                }
+              },
+              {
+                "key": {
+                  "type": "number",
+                  "value": 2
+                },
+                "value": {
+                  "type": "Object",
+                  "weakRef": false,
+                  "keys": [
+                    "requirement"
+                  ]
+                }
+              },
+              {
+                "key": {
+                  "type": "number",
+                  "value": 3
+                },
+                "value": {
+                  "type": "Object",
+                  "weakRef": false,
+                  "keys": [
+                    "requirement"
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "limits": [
+      "Whole-process heap is not bytes per feature.",
+      "Current-ID no-recipient arm still imports same Link-capable production bundle; it tests runtime attachment only.",
+      "Map interception is diagnostic and cannot support timing or heap figures.",
+      "Failed first-cycle payload oracle remains unresolved; other passing samples do not erase it."
+    ],
+    "sourcesFrozenAt": "/private/tmp/st-v16-residual-source-frozen"
+  }
+}

@@ -1,0 +1,139 @@
+{
+  "source": "/private/tmp/st-v16-terminal-final-budget-bytes.json",
+  "sha256": "dc0eedfd3e3720fc0d51ab26255c8437f9218cbd7f70f2caedc54ddffaf3ece6",
+  "result": {
+    "command": [
+      "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+      "/Users/jonathanborgia/code/signaltree/.worktrees/v15-retirement-reclamation/tools/reclamation-lab/budget-bytes.mjs",
+      "/private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/application-baseline-4/v16/node_modules/@signal-tree/kernel",
+      "/private/tmp/st-v16-terminal-source-stage1-package/package",
+      "/private/tmp/st-v16-terminal-final-activation-comparison/prototype-packet/v16/node_modules/@signal-tree/kernel",
+      "/private/tmp/st-v16-terminal-final-budget-bytes.json"
+    ],
+    "esbuild": "0.25.12",
+    "gateSha256": "df55eac6244aa92a4972358fda41b8cbe809caf3c97745a814e9aa8aa8c7215a",
+    "generatorSha256": "22944e469fa3143cca72130a75efc3195b8d8b5893ab1ecc3033fd1aaaf5d025",
+    "rows": [
+      {
+        "arm": "frozen",
+        "root": "/private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/application-baseline-4/v16/node_modules/@signal-tree/kernel",
+        "target": "signaltree-bare",
+        "mode": "prod",
+        "gzipBytes": 18409,
+        "budgetBytes": 12707.84,
+        "schedulerBytes": 0,
+        "bundleSha256": "7037d9b10d2f08cbfec5cc3c3b5311e4d9f420d57a3e42004b91619449de57e2"
+      },
+      {
+        "arm": "frozen",
+        "root": "/private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/application-baseline-4/v16/node_modules/@signal-tree/kernel",
+        "target": "signaltree-bare",
+        "mode": "dev",
+        "gzipBytes": 20785,
+        "budgetBytes": 15144.96,
+        "schedulerBytes": 0,
+        "bundleSha256": "9ab74b45d2d0ddb9c9a12ffdc714c55c74a3a80badb50fdce103db25324b9c49"
+      },
+      {
+        "arm": "frozen",
+        "root": "/private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/application-baseline-4/v16/node_modules/@signal-tree/kernel",
+        "target": "signaltree-entities",
+        "mode": "prod",
+        "gzipBytes": 45013,
+        "budgetBytes": 26787.84,
+        "schedulerBytes": 0,
+        "bundleSha256": "f08d363f6ed7f10e5030ea2e312dad98dbe7788c42efe0b4324c01e7f5067e63"
+      },
+      {
+        "arm": "frozen",
+        "root": "/private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/application-baseline-4/v16/node_modules/@signal-tree/kernel",
+        "target": "signaltree-entities",
+        "mode": "dev",
+        "gzipBytes": 48746,
+        "budgetBytes": 29675.52,
+        "schedulerBytes": 0,
+        "bundleSha256": "6418bdc41a45de10b4cb8e4f2463c60441ad9216790bdad6b9f39e89d69cace3"
+      },
+      {
+        "arm": "projection",
+        "root": "/private/tmp/st-v16-terminal-source-stage1-package/package",
+        "target": "signaltree-bare",
+        "mode": "prod",
+        "gzipBytes": 18409,
+        "budgetBytes": 12707.84,
+        "schedulerBytes": 0,
+        "bundleSha256": "7037d9b10d2f08cbfec5cc3c3b5311e4d9f420d57a3e42004b91619449de57e2"
+      },
+      {
+        "arm": "projection",
+        "root": "/private/tmp/st-v16-terminal-source-stage1-package/package",
+        "target": "signaltree-bare",
+        "mode": "dev",
+        "gzipBytes": 20785,
+        "budgetBytes": 15144.96,
+        "schedulerBytes": 0,
+        "bundleSha256": "9ab74b45d2d0ddb9c9a12ffdc714c55c74a3a80badb50fdce103db25324b9c49"
+      },
+      {
+        "arm": "projection",
+        "root": "/private/tmp/st-v16-terminal-source-stage1-package/package",
+        "target": "signaltree-entities",
+        "mode": "prod",
+        "gzipBytes": 45187,
+        "budgetBytes": 26787.84,
+        "schedulerBytes": 0,
+        "bundleSha256": "85a57f273e507641a508747b6004f10a02ff498d474c1e3c0e8681d3bf46e9f1"
+      },
+      {
+        "arm": "projection",
+        "root": "/private/tmp/st-v16-terminal-source-stage1-package/package",
+        "target": "signaltree-entities",
+        "mode": "dev",
+        "gzipBytes": 48948,
+        "budgetBytes": 29675.52,
+        "schedulerBytes": 0,
+        "bundleSha256": "4344b8be5919d0f8bdb548ea6a21891fa0798500f86279b5feba4d652815d331"
+      },
+      {
+        "arm": "candidate",
+        "root": "/private/tmp/st-v16-terminal-final-activation-comparison/prototype-packet/v16/node_modules/@signal-tree/kernel",
+        "target": "signaltree-bare",
+        "mode": "prod",
+        "gzipBytes": 18409,
+        "budgetBytes": 12707.84,
+        "schedulerBytes": 0,
+        "bundleSha256": "7037d9b10d2f08cbfec5cc3c3b5311e4d9f420d57a3e42004b91619449de57e2"
+      },
+      {
+        "arm": "candidate",
+        "root": "/private/tmp/st-v16-terminal-final-activation-comparison/prototype-packet/v16/node_modules/@signal-tree/kernel",
+        "target": "signaltree-bare",
+        "mode": "dev",
+        "gzipBytes": 20785,
+        "budgetBytes": 15144.96,
+        "schedulerBytes": 0,
+        "bundleSha256": "9ab74b45d2d0ddb9c9a12ffdc714c55c74a3a80badb50fdce103db25324b9c49"
+      },
+      {
+        "arm": "candidate",
+        "root": "/private/tmp/st-v16-terminal-final-activation-comparison/prototype-packet/v16/node_modules/@signal-tree/kernel",
+        "target": "signaltree-entities",
+        "mode": "prod",
+        "gzipBytes": 45187,
+        "budgetBytes": 26787.84,
+        "schedulerBytes": 0,
+        "bundleSha256": "85a57f273e507641a508747b6004f10a02ff498d474c1e3c0e8681d3bf46e9f1"
+      },
+      {
+        "arm": "candidate",
+        "root": "/private/tmp/st-v16-terminal-final-activation-comparison/prototype-packet/v16/node_modules/@signal-tree/kernel",
+        "target": "signaltree-entities",
+        "mode": "dev",
+        "gzipBytes": 48948,
+        "budgetBytes": 29675.52,
+        "schedulerBytes": 0,
+        "bundleSha256": "4344b8be5919d0f8bdb548ea6a21891fa0798500f86279b5feba4d652815d331"
+      }
+    ]
+  }
+}

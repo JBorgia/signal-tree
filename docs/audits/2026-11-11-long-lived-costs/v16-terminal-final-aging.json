@@ -1,0 +1,53 @@
+{
+  "source": "/private/tmp/st-v16-terminal-final-aging-receipt.json",
+  "sha256": "a351faeb73dff2d4a2157d79c4b3669ce5a1c29a1e61802a92e27ef4f3e8c66c",
+  "result": {
+    "created": "2026-11-12T00:08:50.323676+00:00",
+    "runtime": "5d04ff65d2eaab1986ed1b420cbc013edc01542b",
+    "studyToolsEdited": false,
+    "runtimeEdited": false,
+    "commands": {
+      "main": "python3 /private/tmp/st-v16-terminal-final-aging-run.py --execute",
+      "mainAnalysis": "python3 /private/tmp/st-v16-terminal-final-aging-analyze.py",
+      "relativeAnalysis": "python3 /private/tmp/st-v16-terminal-final-relative-analyze.py",
+      "extraGc": "node /private/tmp/st-v16-module-only-extra-gc.mjs compare /private/tmp/st-v16-module-only-extra-gc-1",
+      "extraGcAnalysis": "python3 /private/tmp/st-v16-module-only-extra-gc-analyze.py"
+    },
+    "passCounts": {
+      "aging": 14,
+      "agingEarlySendFault": 1,
+      "residual": 8,
+      "residualFaults": 2,
+      "census": 2,
+      "extraGcNormal": 6,
+      "extraGcPinRelease": 2
+    },
+    "references": {
+      "/private/tmp/st-v16-terminal-final-aging-plan.json": "26022ba1a466956c60641ce61448cce5b64e63388256c33df825a835d9ac8e32",
+      "/private/tmp/st-v16-terminal-final-aging-run.py": "2d431a9fc658960be48fce9825c103bc054c14d29af0747faa9444d08a4224e1",
+      "/private/tmp/st-v16-terminal-final-aging-orchestration.json": "c7574544686ca36145fc54f7af1ac730e4865eef858ea3671f5128f98e72ba5d",
+      "/private/tmp/st-v16-terminal-final-aging-input-verification.json": "37e5684fd7ebb2cebd1ab76e4201a12bb8d9603c2864c883b5f23fb45c5413c6",
+      "/private/tmp/st-v16-terminal-final-aging-prepared-inputs-first-failure.json": "f4289acb9705bbb0b9724af0b5fe58b5e2b61b42da010bb500970cbfe2a05b61",
+      "/private/tmp/st-v16-terminal-final-aging-prepared-inputs.json": "9ed69600bbd00e0ee7e9163bd5c59722c7e0242e1d24ac06371f7e73363a77f8",
+      "/private/tmp/st-v16-terminal-final-aging-analysis.json": "750a21cf482d43db5913f9109684c10c8f1bc08bdf43ed5f23b0c408a0ef9947",
+      "/private/tmp/st-v16-terminal-final-relative-analysis.json": "bcf22134696cd86cb4988e02ab92581c98dce51f133bad419b1c24e987916757",
+      "/private/tmp/st-v16-module-only-extra-gc-analysis.json": "bd21a5f3cd82859979bb5ea8e2a5830947034195a17b9937c7a5f25387f611fc"
+    },
+    "inputDistinction": "Every non-manifest kernel payload matches frozen5d04; packet package.json adds exactly one trailing newline. Both archives/manifests retain exact original hashes; they are not byte-identical.",
+    "findings": [
+      "Candidate settled lifetime/backing/candidate counts0; sampled payload/transaction refs collect whiletreealive.",
+      "At30k source logicalsubjects30000, packedSubjects30000, packedRuns30,unpackedSubjectFacets0; no source Mapabove1024.",
+      "Active recipient still has two30000entry exact-address Maps; semantic source facts were not erased.",
+      "All sampled sixmode native proof summaries atfivecheckpoints match a35and145.",
+      "Current-ID c30 EMPTY-STORE-RELATIVE medians: noRecipient final3.761MiB versus1453.755/a3513.029; activefinal7.530 versus14515.453/a3524.754.",
+      "ExtraGC8/8: sampled owner/store row live whileowned; allnormal samples collect atfirstdestroyed-inside-helper3GC; explicitpins survive untilrelease.",
+      "Some highheapstates drop withadditionalGC,others persist through12jobs. Cause notattributed toJIT/noise/leak; highdestroyedoriginalclass not reproduced underthisintervention."
+    ],
+    "limits": [
+      "Finite workloads, whole-process heaps, no universalspacebound or leakfreedom claim.",
+      "Linear address-count growth persists; finite heapgrowth has capacity/VM steps and is not a fixedperentitybyte price.",
+      "AdditionalGC/helper scope is an intervention; no replacement CPU/timing ranking.",
+      "Root/sibling owns broader deep-history/application comparisons and final qualification."
+    ]
+  }
+}

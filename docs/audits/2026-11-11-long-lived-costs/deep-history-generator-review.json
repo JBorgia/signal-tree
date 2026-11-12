@@ -1,0 +1,85 @@
+{
+  "source": "/private/tmp/st-terminal-deep-history-corrected-independent-review.json",
+  "sha256": "bcd24079d2832b374370734991189080c8b252c285d8318d81069a05b228764d",
+  "result": {
+    "review": "Corrected deep-history source admission and measurement-boundary review",
+    "reviewer": "/root/v15_release_review",
+    "scope": "Read-only source/hash review. No builds, pilot, controls, benchmarks or runtime tests executed.",
+    "applicationHEAD": "18e2eed330629900b5e519168785591c0ab751dc",
+    "runtimeInspectionHEAD": "5d04ff65d2eaab1986ed1b420cbc013edc01542b",
+    "bindings": {
+      "/Users/jonathanborgia/code/signaltree/.worktrees/application-comparison/tools/application-lab/terminal-deep-history.mjs": "32f3343e131f69d2ee07dc6e37cec1eaa4f11fef7ec37d1fe6d104441219e960",
+      "/Users/jonathanborgia/code/signaltree/.worktrees/application-comparison/tools/application-lab/terminal-deep-history-protocol.md": "1a3269cd015fca5efbcfb9616c64863c8e0560476db65ea4ed7d8271b9de885e",
+      "/Users/jonathanborgia/code/signaltree/.worktrees/application-comparison/docs/review-contract.md": "b9b2f633a6d8dda9b1955cd01f92e3b1e8aabe8f3e110e806bbaa57c0a43e4e9",
+      "/Users/jonathanborgia/code/signaltree/.worktrees/application-comparison/docs/performance/measurement-contract.md": "f92c245ffd2c46f5258d0d9899e6c163e9dcfa1072ae9d071d6fc7e087b2db6b",
+      "/Users/jonathanborgia/code/signaltree/.worktrees/application-comparison/.github/skills/adversarial-confirmation/references/protocol.md": "d6331155e2d0e8fa421244f0845c1efcd96d7970afa96a8bacf32805ff029d84",
+      "/Users/jonathanborgia/code/signaltree/.worktrees/v16-egress-support-scan/packages/kernel/src/lib/signal-tree.ts": "93881483e8cc501885150a001b1b8449184de5859778e592f2ed52e3f1278fb5",
+      "/Users/jonathanborgia/code/signaltree/.worktrees/v16-egress-support-scan/packages/kernel/src/lib/terminal-entity-fact-representation.spec.ts": "f58959dbbbb765b938d8fee906afe8bf71a0a40c338774e8a966c3a489047adf",
+      "/Users/jonathanborgia/code/signaltree/.worktrees/v16-egress-support-scan/packages/kernel/src/lib/internals/transaction-lifecycle-view.ts": "20d7cc34a54f0b6546ae93c01375b3687d4c5c6b45b0a72962ab8829b2062cdb"
+    },
+    "frozenSourceDirectory": "/private/tmp/st-deep-history-reviewed-source-1",
+    "frozenCopyBindingsVerified": true,
+    "premise": {
+      "revision": "18e2eed330629900b5e519168785591c0ab751dc",
+      "path": "docs/performance/measurement-contract.md",
+      "quote": "Give competing arms the same observable task and meaningful success checks.\n  Validate intermediate results when timing intermediate operations. Endpoint\n  agreement does not certify every timed write."
+    },
+    "closedCorrections": [
+      {
+        "lines": "25-32, 44-48, 52, 80",
+        "finding": "Individual valid hashes could mix a plan with another package or mutable config.",
+        "correction": "Archive integrity and source seal now join the exact plan artifact; config commit joins plan.sourceHead; consumed installed bytes match archive; config hash is rechecked at controller and child admission."
+      },
+      {
+        "lines": "96-109, 120-124, 134-135",
+        "finding": "A first-subject identity sample and endpoint contradiction did not certify all historical facets.",
+        "correction": "Every aging ID receives five exact weak identity tokens before first drain, full primitive ready role/cell/flag snapshots afterward, and exact pending transaction cell identity/outcome checks. Complete history is rechecked around later work."
+      },
+      {
+        "lines": "144-152",
+        "finding": "Repeated cached public snapshots did not establish whole-source capture cost.",
+        "correction": "Public snapshot path is labeled using observed visits; a separately named actual source.captureInput phase requires two physical views per retired ID per call and complete role union."
+      },
+      {
+        "lines": "177-181",
+        "finding": "Fresh timed bulk omitted new terminal facts from later coverage.",
+        "correction": "Every fresh ID receives five postdrain ready facts, actual prior pending destination with rolled-back outcome, and complete generic capture coverage. New reference baseline is explicitly postdrain-only."
+      },
+      {
+        "lines": "182-196",
+        "finding": "Silent late Link construction alone could be vacuous behavior evidence.",
+        "correction": "Two untimed late Links perform literal row installations inside current-native-input scope, require receipt/contradiction plus exact delivery, clear/reseed and recheck prior facts."
+      }
+    ],
+    "sourceAssessment": [
+      "No further source blocker demonstrated to the registered pilot and controls.",
+      "Same-source late updater does not erase its nested row installation via its empty partial return: updateAndReport consumes native input around updater invocation and applies only supplied partial keys afterward (signal-tree.ts 2134-2161). This supports plausibility, not execution of the new oracle.",
+      "Each measured sample is a fresh process, arms rotate/reverse within profile trios, phases have explicit boundaries, and failures stop the cohort while preserving raw output.",
+      "Primitive oracle tables, held handles and before snapshots contribute to whole heap; aging includes diagnostics. The protocol states these limitations and transient deltas are not peak/allocation metrics."
+    ],
+    "remainingFalsifiers": [
+      {
+        "test": "Registered baseline pilot must execute the same-source late updater and establish exactly one installed/delivered row with independent contradiction and unknown surviving receipt.",
+        "run": false
+      },
+      {
+        "test": "Registered three semantic controls must reject skipped population, early output and bypassed native input at their exact intended oracles.",
+        "run": false
+      },
+      {
+        "test": "Admission controls can substitute a valid wrong-arm plan/archive pair or change the frozen config; new equality checks must reject before measurement.",
+        "run": false
+      },
+      {
+        "test": "Final comparisons must complete every preregistered cell and preserve first failures before any performance interpretation.",
+        "run": false
+      }
+    ],
+    "limits": [
+      "This is permission-independent review, not release qualification or an adoption verdict.",
+      "No timing, memory reduction, cross-arm equality or late-oracle runtime result is established by this receipt.",
+      "Fresh bulk reference identity is checked only after drain; aging references are checked across drain.",
+      "Five samples per arm/profile support bounded distributions only."
+    ]
+  }
+}

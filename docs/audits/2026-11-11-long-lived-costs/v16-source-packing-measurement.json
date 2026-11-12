@@ -1,0 +1,314 @@
+{
+  "source": "/private/tmp/st-v16-terminal-source-stage1-independent-review.json",
+  "sha256": "ed76714b23863c675b318dad2356dd724445d32ded2f29512776e0d7ffdc76a0",
+  "result": {
+    "command": "python3 /private/tmp/st-v16-terminal-source-stage1-analyze.py",
+    "verifiedBindings": true,
+    "sourceCommit": "145e2a19",
+    "bundleSha256": "f2e89ae3895346b802846d5372814a43293aac14a2638c702a459b91fcbf2597",
+    "kernelSeal": "9e7d260e03066199821a4b6dfe0dd532746dd10b0ea053036ab56913249762d7",
+    "residualPasses": 8,
+    "controls": 2,
+    "censusPasses": 2,
+    "checkpointPredicatesVerified": 240,
+    "sourceInspection": "At30cycles logicalSubjects30000, packedSubjects30000, packedRuns30, unpackedSubjectFacets0, retireCalls0; five source numeric Maps absent from surviving >1024 census. Both active recipient Maps remain30000. All10 sampled requirement summaries equal a35.",
+    "comparisons": [
+      {
+        "recipient": false,
+        "cumulativeIds": false,
+        "a35": {
+          "originalPasses": 2,
+          "scheduled": 2,
+          "checkpoints": {
+            "1": {
+              "samplesMiB": [
+                3.3882369995117188,
+                3.25311279296875
+              ],
+              "medianMiB": 3.3206748962402344
+            },
+            "10": {
+              "samplesMiB": [
+                7.0569915771484375,
+                7.072517395019531
+              ],
+              "medianMiB": 7.064754486083984
+            },
+            "20": {
+              "samplesMiB": [
+                10.774894714355469,
+                10.791015625
+              ],
+              "medianMiB": 10.782955169677734
+            },
+            "30": {
+              "samplesMiB": [
+                13.009689331054688,
+                13.047943115234375
+              ],
+              "medianMiB": 13.028816223144531
+            }
+          }
+        },
+        "stage1": {
+          "originalPasses": 2,
+          "scheduled": 2,
+          "checkpoints": {
+            "1": {
+              "samplesMiB": [
+                3.2105712890625,
+                3.0114212036132812
+              ],
+              "medianMiB": 3.1109962463378906
+            },
+            "10": {
+              "samplesMiB": [
+                3.5689544677734375,
+                3.5419540405273438
+              ],
+              "medianMiB": 3.5554542541503906
+            },
+            "20": {
+              "samplesMiB": [
+                3.7193374633789062,
+                3.7164764404296875
+              ],
+              "medianMiB": 3.717906951904297
+            },
+            "30": {
+              "samplesMiB": [
+                3.7593002319335938,
+                3.7516860961914062
+              ],
+              "medianMiB": 3.7554931640625
+            }
+          }
+        },
+        "stage1MinusA35Cycle30MiB": -9.273323059082031
+      },
+      {
+        "recipient": false,
+        "cumulativeIds": true,
+        "a35": {
+          "originalPasses": 1,
+          "scheduled": 2,
+          "checkpoints": {
+            "1": {
+              "samplesMiB": [
+                3.2381439208984375
+              ],
+              "medianMiB": 3.2381439208984375
+            },
+            "10": {
+              "samplesMiB": [
+                7.122215270996094
+              ],
+              "medianMiB": 7.122215270996094
+            },
+            "20": {
+              "samplesMiB": [
+                10.951324462890625
+              ],
+              "medianMiB": 10.951324462890625
+            },
+            "30": {
+              "samplesMiB": [
+                13.389266967773438
+              ],
+              "medianMiB": 13.389266967773438
+            }
+          }
+        },
+        "stage1": {
+          "originalPasses": 2,
+          "scheduled": 2,
+          "checkpoints": {
+            "1": {
+              "samplesMiB": [
+                3.0251541137695312,
+                3.0400772094726562
+              ],
+              "medianMiB": 3.0326156616210938
+            },
+            "10": {
+              "samplesMiB": [
+                3.6225204467773438,
+                3.6323928833007812
+              ],
+              "medianMiB": 3.6274566650390625
+            },
+            "20": {
+              "samplesMiB": [
+                3.8895263671875,
+                3.89703369140625
+              ],
+              "medianMiB": 3.893280029296875
+            },
+            "30": {
+              "samplesMiB": [
+                4.030914306640625,
+                4.021797180175781
+              ],
+              "medianMiB": 4.026355743408203
+            }
+          }
+        },
+        "stage1MinusA35Cycle30MiB": -9.362911224365234
+      },
+      {
+        "recipient": true,
+        "cumulativeIds": false,
+        "a35": {
+          "originalPasses": 2,
+          "scheduled": 2,
+          "checkpoints": {
+            "1": {
+              "samplesMiB": [
+                4.517463684082031,
+                4.272529602050781
+              ],
+              "medianMiB": 4.394996643066406
+            },
+            "10": {
+              "samplesMiB": [
+                11.881942749023438,
+                11.891067504882812
+              ],
+              "medianMiB": 11.886505126953125
+            },
+            "20": {
+              "samplesMiB": [
+                19.619468688964844,
+                19.715431213378906
+              ],
+              "medianMiB": 19.667449951171875
+            },
+            "30": {
+              "samplesMiB": [
+                24.756729125976562,
+                24.750396728515625
+              ],
+              "medianMiB": 24.753562927246094
+            }
+          }
+        },
+        "stage1": {
+          "originalPasses": 2,
+          "scheduled": 2,
+          "checkpoints": {
+            "1": {
+              "samplesMiB": [
+                3.9429473876953125,
+                3.9637832641601562
+              ],
+              "medianMiB": 3.9533653259277344
+            },
+            "10": {
+              "samplesMiB": [
+                8.39556884765625,
+                8.363273620605469
+              ],
+              "medianMiB": 8.37942123413086
+            },
+            "20": {
+              "samplesMiB": [
+                12.588180541992188,
+                12.588897705078125
+              ],
+              "medianMiB": 12.588539123535156
+            },
+            "30": {
+              "samplesMiB": [
+                15.452896118164062,
+                15.45355224609375
+              ],
+              "medianMiB": 15.453224182128906
+            }
+          }
+        },
+        "stage1MinusA35Cycle30MiB": -9.300338745117188
+      },
+      {
+        "recipient": true,
+        "cumulativeIds": true,
+        "a35": {
+          "originalPasses": 2,
+          "scheduled": 2,
+          "checkpoints": {
+            "1": {
+              "samplesMiB": [
+                4.2202301025390625,
+                4.24420166015625
+              ],
+              "medianMiB": 4.232215881347656
+            },
+            "10": {
+              "samplesMiB": [
+                11.895965576171875,
+                11.904647827148438
+              ],
+              "medianMiB": 11.900306701660156
+            },
+            "20": {
+              "samplesMiB": [
+                19.837249755859375,
+                19.812530517578125
+              ],
+              "medianMiB": 19.82489013671875
+            },
+            "30": {
+              "samplesMiB": [
+                25.026565551757812,
+                25.01203155517578
+              ],
+              "medianMiB": 25.019298553466797
+            }
+          }
+        },
+        "stage1": {
+          "originalPasses": 2,
+          "scheduled": 2,
+          "checkpoints": {
+            "1": {
+              "samplesMiB": [
+                3.9998779296875,
+                3.9697265625
+              ],
+              "medianMiB": 3.98480224609375
+            },
+            "10": {
+              "samplesMiB": [
+                8.445648193359375,
+                8.426994323730469
+              ],
+              "medianMiB": 8.436321258544922
+            },
+            "20": {
+              "samplesMiB": [
+                12.764328002929688,
+                12.761940002441406
+              ],
+              "medianMiB": 12.763134002685547
+            },
+            "30": {
+              "samplesMiB": [
+                15.7576904296875,
+                15.747344970703125
+              ],
+              "medianMiB": 15.752517700195312
+            }
+          }
+        },
+        "stage1MinusA35Cycle30MiB": -9.266780853271484
+      }
+    ],
+    "frozenSources": "/private/tmp/st-v16-terminal-source-stage1-measurement-source",
+    "limits": [
+      "Descriptive separated-in-time cohorts; no CPU claim.",
+      "Whole-process heap, not bytes assigned to individual features.",
+      "Prior a35 no-recipient cumulative cell has one passing sample and one preserved original collection failure.",
+      "Source logical evidence preserved and still scales with distinct terminal proof runs; this is not universal bounded-memory proof.",
+      "Active Link remains per-lifetime in this source-only stage."
+    ]
+  }
+}

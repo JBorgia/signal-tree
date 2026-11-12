@@ -1,5 +1,19 @@
 # TODO
 
+The November 11 long-lived cost follow-through is complete under
+[the current controller](RELEASE-CURRENT.md#active-owner-instruction). v15.4.8 is
+released and deployed; this follow-through creates separately identified successor
+candidates. The [study record](docs/audits/2026-11-11-long-lived-costs/README.md)
+tracks v15 collection and cleanup improvements, v16 publication preparation and
+retained-fact representation, combined validation, and all 578 children in the
+requested final rerun against pinned competing libraries and application
+implementations. Independent interpretation and evidence closure are complete.
+The selected improvements retain full checked semantics and explicit residual
+startup/history costs. Existing enhancer and demand choices remain; no new
+public configuration, merge, tag, npm release or deployment is selected.
+
+The entries below describe the earlier completed November 10 qualification.
+
 The completed v16 repair and qualification decision is in
 [RELEASE-CURRENT.md](RELEASE-CURRENT.md#active-owner-instruction).
 The [readiness audit](docs/audits/2026-11-10-release-readiness/README.md)

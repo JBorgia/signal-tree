@@ -1,0 +1,140 @@
+{
+  "source": "/private/tmp/st-final-variants-containment-control/receipt.json",
+  "sha256": "a0d06c9301d2258292dc3cc5022898432f32d0b518c80910ceba20e8acb3c788",
+  "result": {
+    "passed": true,
+    "command": [
+      "python3",
+      "/private/tmp/st-final-variants-containment-control.py"
+    ],
+    "bindings": {
+      "/private/tmp/st-final-variants-containment-control.py": "e965e3b4228fe9605ea574b54b7900d957a1e4208ec53f012b05b4c682acfbb0",
+      "/Users/jonathanborgia/code/signaltree/.worktrees/application-comparison/tools/application-lab/final-variants-analyze.mjs": "2053fb4dc1ccab094a0e4fa9225e4a6561c25613eb245c374536577460394651",
+      "/private/tmp/st-final-variants-analyze-before-containment.mjs": "2d19850b0584fd4d2cb8c4ecf2ff2f269ff1ffc449182895b9220d4194ab6330",
+      "/Users/jonathanborgia/code/signaltree/.worktrees/application-comparison/tools/application-lab/analyze-variants.mjs": "798532f2593605046e28279033056a964bdd4ee1e23d6644ded67f1ad0b98a19"
+    },
+    "cases": [
+      {
+        "case": "old-side-effect",
+        "command": [
+          "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+          "/private/tmp/st-final-variants-containment-control/old-side-effect/repository/tools/application-lab/final-variants-analyze.mjs",
+          "/private/tmp/st-final-variants-containment-control/old-side-effect/before",
+          "/private/tmp/st-final-variants-containment-control/old-side-effect/after",
+          "/private/tmp/st-final-variants-containment-control/old-side-effect/cohort",
+          "/private/tmp/st-final-variants-containment-control/old-side-effect/before/nested/report"
+        ],
+        "exit": 1,
+        "inputFilesUnchanged": false,
+        "generatedSourceDirectoryExists": true,
+        "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "case": "nested-before",
+        "command": [
+          "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+          "/private/tmp/st-final-variants-containment-control/nested-before/repository/tools/application-lab/final-variants-analyze.mjs",
+          "/private/tmp/st-final-variants-containment-control/nested-before/before",
+          "/private/tmp/st-final-variants-containment-control/nested-before/after",
+          "/private/tmp/st-final-variants-containment-control/nested-before/cohort",
+          "/private/tmp/st-final-variants-containment-control/nested-before/before/nested/report"
+        ],
+        "exit": 1,
+        "inputFilesUnchanged": true,
+        "generatedSourceDirectoryExists": false,
+        "logSha256": "e370c443ec4d57f5ca20e98fad4d9609beda7389a57867609a03330e8d082cad"
+      },
+      {
+        "case": "nested-after",
+        "command": [
+          "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+          "/private/tmp/st-final-variants-containment-control/nested-after/repository/tools/application-lab/final-variants-analyze.mjs",
+          "/private/tmp/st-final-variants-containment-control/nested-after/before",
+          "/private/tmp/st-final-variants-containment-control/nested-after/after",
+          "/private/tmp/st-final-variants-containment-control/nested-after/cohort",
+          "/private/tmp/st-final-variants-containment-control/nested-after/after/nested/report"
+        ],
+        "exit": 1,
+        "inputFilesUnchanged": true,
+        "generatedSourceDirectoryExists": false,
+        "logSha256": "6ab87e81ce4836324209978a9cb9454cd699ef8b26f09339cc6464ca05cbf1a4"
+      },
+      {
+        "case": "nested-cohort",
+        "command": [
+          "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+          "/private/tmp/st-final-variants-containment-control/nested-cohort/repository/tools/application-lab/final-variants-analyze.mjs",
+          "/private/tmp/st-final-variants-containment-control/nested-cohort/before",
+          "/private/tmp/st-final-variants-containment-control/nested-cohort/after",
+          "/private/tmp/st-final-variants-containment-control/nested-cohort/cohort",
+          "/private/tmp/st-final-variants-containment-control/nested-cohort/cohort/nested/report"
+        ],
+        "exit": 1,
+        "inputFilesUnchanged": true,
+        "generatedSourceDirectoryExists": false,
+        "logSha256": "8137cbda669ee49f0c0cd6e80e0218f0d0f72962cc3ceea20deb04ddca87133e"
+      },
+      {
+        "case": "nested-source",
+        "command": [
+          "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+          "/private/tmp/st-final-variants-containment-control/nested-source/repository/tools/application-lab/final-variants-analyze.mjs",
+          "/private/tmp/st-final-variants-containment-control/nested-source/before",
+          "/private/tmp/st-final-variants-containment-control/nested-source/after",
+          "/private/tmp/st-final-variants-containment-control/nested-source/cohort",
+          "/private/tmp/st-final-variants-containment-control/nested-source/repository/nested/report"
+        ],
+        "exit": 1,
+        "inputFilesUnchanged": true,
+        "generatedSourceDirectoryExists": false,
+        "logSha256": "a062853189e71c14045505db93ebf1a7aa805dd72021b5d436e9db6a054158f0"
+      },
+      {
+        "case": "source-equals-before",
+        "command": [
+          "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+          "/private/tmp/st-final-variants-containment-control/source-equals-before/repository/tools/application-lab/final-variants-analyze.mjs",
+          "/private/tmp/st-final-variants-containment-control/source-equals-before/before-source",
+          "/private/tmp/st-final-variants-containment-control/source-equals-before/after",
+          "/private/tmp/st-final-variants-containment-control/source-equals-before/cohort",
+          "/private/tmp/st-final-variants-containment-control/source-equals-before/before"
+        ],
+        "exit": 1,
+        "inputFilesUnchanged": true,
+        "generatedSourceDirectoryExists": true,
+        "logSha256": "5747c4bce0e6fca4071b966048a4394e92106ecb2cbdcf005544b744de2ac18d"
+      },
+      {
+        "case": "source-equals-after",
+        "command": [
+          "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+          "/private/tmp/st-final-variants-containment-control/source-equals-after/repository/tools/application-lab/final-variants-analyze.mjs",
+          "/private/tmp/st-final-variants-containment-control/source-equals-after/before",
+          "/private/tmp/st-final-variants-containment-control/source-equals-after/after-source",
+          "/private/tmp/st-final-variants-containment-control/source-equals-after/cohort",
+          "/private/tmp/st-final-variants-containment-control/source-equals-after/after"
+        ],
+        "exit": 1,
+        "inputFilesUnchanged": true,
+        "generatedSourceDirectoryExists": true,
+        "logSha256": "9a42da1bf9d7eeae08ea4236d659e44d731d657db086d509bb180ef3de67553e"
+      },
+      {
+        "case": "source-equals-cohort",
+        "command": [
+          "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+          "/private/tmp/st-final-variants-containment-control/source-equals-cohort/repository/tools/application-lab/final-variants-analyze.mjs",
+          "/private/tmp/st-final-variants-containment-control/source-equals-cohort/before",
+          "/private/tmp/st-final-variants-containment-control/source-equals-cohort/after",
+          "/private/tmp/st-final-variants-containment-control/source-equals-cohort/cohort-source",
+          "/private/tmp/st-final-variants-containment-control/source-equals-cohort/cohort"
+        ],
+        "exit": 1,
+        "inputFilesUnchanged": true,
+        "generatedSourceDirectoryExists": true,
+        "logSha256": "9c99ed3b96f1ff520b38b6d9883ae72f87bada579892a1c2e160e3856e0c91fa"
+      }
+    ],
+    "limits": "Disposable minimal admission fixtures only; no real packet/source mutation. Old-wrapper control must create a nested source directory; corrected wrapper must reject all output/source-directory containment cases before writing any file."
+  }
+}
