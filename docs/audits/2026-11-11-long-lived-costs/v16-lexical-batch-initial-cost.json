@@ -1,0 +1,303 @@
+{
+  "source": "/private/tmp/st-v16-ready-batch-cost-1/analysis.json",
+  "sha256": "accd1d1a105d4617c261da33a8412af7f11d7e05cdfc9d22196892fc45d0f8c3",
+  "result": {
+    "resultsSha256": "c561bae19ec3a9dbcc2130761610a4ab3035fd4119dacbe6944a52192acd4d27",
+    "passed": true,
+    "children": 40,
+    "profiles": {
+      "batch-shared": {
+        "populate": {
+          "baseline": {
+            "cpuMsMedian": 24.393,
+            "elapsedMsMedian": 12.124417
+          },
+          "candidate": {
+            "cpuMsMedian": 23.568,
+            "elapsedMsMedian": 12.498417
+          },
+          "pairedCpuRatios": [
+            0.922927100723428,
+            0.9914319681875948,
+            0.9490570761014686,
+            1.0136774193548388,
+            1.0134964835968943
+          ]
+        },
+        "replace": {
+          "baseline": {
+            "cpuMsMedian": 22.307,
+            "elapsedMsMedian": 12.784084
+          },
+          "candidate": {
+            "cpuMsMedian": 22.798,
+            "elapsedMsMedian": 15.318125
+          },
+          "pairedCpuRatios": [
+            1.0220110279284529,
+            1.0109497108040089,
+            1.0372992734508768,
+            1.0007358013336398,
+            1.0053722504230118
+          ]
+        },
+        "remove": {
+          "baseline": {
+            "cpuMsMedian": 12.57,
+            "elapsedMsMedian": 6.00925
+          },
+          "candidate": {
+            "cpuMsMedian": 12.759,
+            "elapsedMsMedian": 6.06
+          },
+          "pairedCpuRatios": [
+            1.0104216388225935,
+            0.9122607272468511,
+            1.0246546739479603,
+            1.0557179987004548,
+            0.9538114907998497
+          ]
+        },
+        "heapDeltaBytes": {
+          "baseline": 5739056,
+          "candidate": 958456
+        },
+        "uniqueEntries": {
+          "baseline": [
+            20000,
+            20000,
+            20000,
+            20000,
+            20000
+          ],
+          "candidate": [
+            1,
+            1,
+            1,
+            1,
+            1
+          ]
+        }
+      },
+      "batch-alternating": {
+        "populate": {
+          "baseline": {
+            "cpuMsMedian": 27.314,
+            "elapsedMsMedian": 13.600583
+          },
+          "candidate": {
+            "cpuMsMedian": 33.615,
+            "elapsedMsMedian": 15.348334
+          },
+          "pairedCpuRatios": [
+            1.3393223398145868,
+            1.403783486393838,
+            1.2690927729369554,
+            1.123158140933543,
+            1.164806325161119
+          ]
+        },
+        "replace": {
+          "baseline": {
+            "cpuMsMedian": 23.098,
+            "elapsedMsMedian": 13.386708
+          },
+          "candidate": {
+            "cpuMsMedian": 26.094,
+            "elapsedMsMedian": 16.604584
+          },
+          "pairedCpuRatios": [
+            1.1020399305555555,
+            1.15644992967013,
+            1.1297081998441425,
+            1.128102699348433,
+            1.0199852507374632
+          ]
+        },
+        "remove": {
+          "baseline": {
+            "cpuMsMedian": 13.441,
+            "elapsedMsMedian": 6.409167
+          },
+          "candidate": {
+            "cpuMsMedian": 13.31,
+            "elapsedMsMedian": 6.169209
+          },
+          "pairedCpuRatios": [
+            1.0021044427123929,
+            1.0617770120600543,
+            0.9902537013615058,
+            1.0214145240002914,
+            1.0098377505322664
+          ]
+        },
+        "heapDeltaBytes": {
+          "baseline": 5739176,
+          "candidate": 5596488
+        },
+        "uniqueEntries": {
+          "baseline": [
+            20000,
+            20000,
+            20000,
+            20000,
+            20000
+          ],
+          "candidate": [
+            20000,
+            20000,
+            20000,
+            20000,
+            20000
+          ]
+        }
+      },
+      "batch-unique": {
+        "populate": {
+          "baseline": {
+            "cpuMsMedian": 40.209,
+            "elapsedMsMedian": 19.953792
+          },
+          "candidate": {
+            "cpuMsMedian": 40.478,
+            "elapsedMsMedian": 19.850625
+          },
+          "pairedCpuRatios": [
+            1.0619977942334962,
+            1.1411889596602973,
+            0.8295846124929515,
+            0.979101156209182,
+            1.1202467109353627
+          ]
+        },
+        "replace": {
+          "baseline": {
+            "cpuMsMedian": 24.114,
+            "elapsedMsMedian": 18.6455
+          },
+          "candidate": {
+            "cpuMsMedian": 32.888,
+            "elapsedMsMedian": 22.789459
+          },
+          "pairedCpuRatios": [
+            1.3233287287035875,
+            1.350170025711205,
+            1.4265637199618288,
+            1.319106719060032,
+            1.2990560428125464
+          ]
+        },
+        "remove": {
+          "baseline": {
+            "cpuMsMedian": 3.713,
+            "elapsedMsMedian": 3.852458
+          },
+          "candidate": {
+            "cpuMsMedian": 9.069,
+            "elapsedMsMedian": 5.240666
+          },
+          "pairedCpuRatios": [
+            2.430277777777778,
+            2.4126043630487475,
+            2.562362030905077,
+            2.0002205558006176,
+            2.4367845331976596
+          ]
+        },
+        "heapDeltaBytes": {
+          "baseline": 9429008,
+          "candidate": 9284992
+        },
+        "uniqueEntries": {
+          "baseline": [
+            20000,
+            20000,
+            20000,
+            20000,
+            20000
+          ],
+          "candidate": [
+            20000,
+            20000,
+            20000,
+            20000,
+            20000
+          ]
+        }
+      },
+      "direct-unique": {
+        "populate": {
+          "baseline": {
+            "cpuMsMedian": 33.883,
+            "elapsedMsMedian": 16.512875
+          },
+          "candidate": {
+            "cpuMsMedian": 34.338,
+            "elapsedMsMedian": 16.635917
+          },
+          "pairedCpuRatios": [
+            1.0144165435745938,
+            0.9818181818181819,
+            1.0316973113360681,
+            1.0352585627938216,
+            1.002730537500371
+          ]
+        },
+        "replace": {
+          "baseline": {
+            "cpuMsMedian": 23.603,
+            "elapsedMsMedian": 17.740583
+          },
+          "candidate": {
+            "cpuMsMedian": 23.567,
+            "elapsedMsMedian": 17.551834
+          },
+          "pairedCpuRatios": [
+            0.9702746099057186,
+            0.9801806934722449,
+            0.9898318010422403,
+            1.011173421701079,
+            1.018672558703752
+          ]
+        },
+        "remove": {
+          "baseline": {
+            "cpuMsMedian": 3.398,
+            "elapsedMsMedian": 3.406083
+          },
+          "candidate": {
+            "cpuMsMedian": 3.748,
+            "elapsedMsMedian": 3.721375
+          },
+          "pairedCpuRatios": [
+            1.0235644637053087,
+            1.114319738017267,
+            1.1153614457831325,
+            0.9989339019189767,
+            1.144496762801648
+          ]
+        },
+        "heapDeltaBytes": {
+          "baseline": 9429104,
+          "candidate": 9429360
+        },
+        "uniqueEntries": {
+          "baseline": [
+            20000,
+            20000,
+            20000,
+            20000,
+            20000
+          ],
+          "candidate": [
+            20000,
+            20000,
+            20000,
+            20000,
+            20000
+          ]
+        }
+      }
+    }
+  }
+}

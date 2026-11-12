@@ -1,0 +1,3519 @@
+{
+  "source": "/private/tmp/st-field-demand-summary-1.json",
+  "sha256": "e6774c5ead5746ba07328644e4c2a2f4c34faba45ea42b3a35d83d3da3a70018",
+  "result": {
+    "passed": true,
+    "childCount": 80,
+    "limits": "Whole Node heap across demand transitions on selective production bundles. Fixture oracle/code/arrays included. No timing, per-feature byte attribution, universal no-leak claim, or full semantics equivalence. Native/NgRx use application field wrappers, not NgRx deep-signal property access.",
+    "source": {
+      "schedulePath": "/private/tmp/st-field-demand-comparison-1/schedule.json",
+      "scheduleSha256": "35933b5373fdf516f45460f5f665dad0d8c0c9a2d6e6cfdfd87bb872e0d7514d",
+      "resultsPath": "/private/tmp/st-field-demand-comparison-1/results.json",
+      "resultsSha256": "0e76dc92590fd41d9863e22e0fccb6d752b316f5eef27ad996b84dc344aa8d5a"
+    },
+    "command": [
+      "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+      "/Users/jonathanborgia/code/signaltree/.worktrees/application-comparison/tools/application-lab/field-demand-analyze.mjs",
+      "/private/tmp/st-field-demand-comparison-1",
+      "/private/tmp/st-field-demand-summary-1.json"
+    ],
+    "groups": [
+      {
+        "rows": 1000,
+        "fields": 8,
+        "arm": "native",
+        "counts": {
+          "firstAcquiredFields": 200,
+          "allAcquiredFields": 1600,
+          "uniqueAcquiredFields": 1600
+        },
+        "heapBytes": {
+          "fixtureBeforeStore": {
+            "median": 19381160,
+            "min": 19381080,
+            "max": 19381192,
+            "values": [
+              19381080,
+              19381160,
+              19381160,
+              19381192,
+              19381080
+            ]
+          },
+          "populated": {
+            "median": 19927344,
+            "min": 19927312,
+            "max": 19931104,
+            "values": [
+              19931104,
+              19927312,
+              19927344,
+              19927344,
+              19927384
+            ]
+          },
+          "heldRowsOnly": {
+            "median": 19945824,
+            "min": 19941960,
+            "max": 20166336,
+            "values": [
+              19945824,
+              19945704,
+              19947304,
+              19941960,
+              20166336
+            ]
+          },
+          "readRows": {
+            "median": 20017712,
+            "min": 20017680,
+            "max": 20021472,
+            "values": [
+              20021472,
+              20017680,
+              20017712,
+              20017712,
+              20017752
+            ]
+          },
+          "acquireFirstField": {
+            "median": 20100608,
+            "min": 20100576,
+            "max": 20104368,
+            "values": [
+              20104368,
+              20100576,
+              20100608,
+              20100608,
+              20100648
+            ]
+          },
+          "readFirstField": {
+            "median": 20220592,
+            "min": 20220560,
+            "max": 20224392,
+            "values": [
+              20224392,
+              20220560,
+              20220592,
+              20220592,
+              20220632
+            ]
+          },
+          "acquireAllFields": {
+            "median": 20836856,
+            "min": 20836824,
+            "max": 20840720,
+            "values": [
+              20840720,
+              20836824,
+              20836856,
+              20836856,
+              20836896
+            ]
+          },
+          "readAllFields": {
+            "median": 21180872,
+            "min": 21178128,
+            "max": 21184744,
+            "values": [
+              21184744,
+              21180840,
+              21178128,
+              21180872,
+              21180912
+            ]
+          },
+          "afterDestroy": {
+            "median": 19409088,
+            "min": 19409056,
+            "max": 19409192,
+            "values": [
+              19409192,
+              19409056,
+              19409088,
+              19409088,
+              19409128
+            ]
+          }
+        },
+        "transitions": {
+          "fixtureBeforeStore->populated": {
+            "median": 546184,
+            "min": 546152,
+            "max": 550024,
+            "values": [
+              550024,
+              546152,
+              546184,
+              546152,
+              546304
+            ]
+          },
+          "populated->heldRowsOnly": {
+            "median": 18392,
+            "min": 14616,
+            "max": 238952,
+            "values": [
+              14720,
+              18392,
+              19960,
+              14616,
+              238952
+            ]
+          },
+          "heldRowsOnly->readRows": {
+            "median": 71976,
+            "min": -148584,
+            "max": 75752,
+            "values": [
+              75648,
+              71976,
+              70408,
+              75752,
+              -148584
+            ]
+          },
+          "readRows->acquireFirstField": {
+            "median": 82896,
+            "min": 82896,
+            "max": 82896,
+            "values": [
+              82896,
+              82896,
+              82896,
+              82896,
+              82896
+            ]
+          },
+          "acquireFirstField->readFirstField": {
+            "median": 119984,
+            "min": 119984,
+            "max": 120024,
+            "values": [
+              120024,
+              119984,
+              119984,
+              119984,
+              119984
+            ]
+          },
+          "readFirstField->acquireAllFields": {
+            "median": 616264,
+            "min": 616264,
+            "max": 616328,
+            "values": [
+              616328,
+              616264,
+              616264,
+              616264,
+              616264
+            ]
+          },
+          "acquireAllFields->readAllFields": {
+            "median": 344016,
+            "min": 341272,
+            "max": 344024,
+            "values": [
+              344024,
+              344016,
+              341272,
+              344016,
+              344016
+            ]
+          },
+          "readAllFields->afterDestroy": {
+            "median": -1771784,
+            "min": -1775552,
+            "max": -1769040,
+            "values": [
+              -1775552,
+              -1771784,
+              -1769040,
+              -1771784,
+              -1771784
+            ]
+          }
+        }
+      },
+      {
+        "rows": 1000,
+        "fields": 8,
+        "arm": "ngrx",
+        "counts": {
+          "firstAcquiredFields": 200,
+          "allAcquiredFields": 1600,
+          "uniqueAcquiredFields": 1600
+        },
+        "heapBytes": {
+          "fixtureBeforeStore": {
+            "median": 19404080,
+            "min": 19398568,
+            "max": 19404496,
+            "values": [
+              19404496,
+              19403928,
+              19404080,
+              19398568,
+              19404272
+            ]
+          },
+          "populated": {
+            "median": 19722240,
+            "min": 19716728,
+            "max": 19722656,
+            "values": [
+              19722656,
+              19722240,
+              19722240,
+              19716728,
+              19722584
+            ]
+          },
+          "heldRowsOnly": {
+            "median": 19769456,
+            "min": 19757776,
+            "max": 19771304,
+            "values": [
+              19769456,
+              19770960,
+              19769392,
+              19757776,
+              19771304
+            ]
+          },
+          "readRows": {
+            "median": 19840232,
+            "min": 19834720,
+            "max": 19840648,
+            "values": [
+              19840648,
+              19840232,
+              19840232,
+              19834720,
+              19840576
+            ]
+          },
+          "acquireFirstField": {
+            "median": 19929344,
+            "min": 19923832,
+            "max": 19929760,
+            "values": [
+              19929760,
+              19929344,
+              19929344,
+              19923832,
+              19929688
+            ]
+          },
+          "readFirstField": {
+            "median": 20029256,
+            "min": 20023744,
+            "max": 20029672,
+            "values": [
+              20029672,
+              20029256,
+              20029256,
+              20023744,
+              20029600
+            ]
+          },
+          "acquireAllFields": {
+            "median": 20646280,
+            "min": 20640768,
+            "max": 20646696,
+            "values": [
+              20646696,
+              20646280,
+              20646280,
+              20640768,
+              20646624
+            ]
+          },
+          "readAllFields": {
+            "median": 20881592,
+            "min": 20876152,
+            "max": 20881648,
+            "values": [
+              20881648,
+              20881592,
+              20881592,
+              20876152,
+              20881576
+            ]
+          },
+          "afterDestroy": {
+            "median": 19570600,
+            "min": 19562280,
+            "max": 19570672,
+            "values": [
+              19570672,
+              19570616,
+              19562280,
+              19565176,
+              19570600
+            ]
+          }
+        },
+        "transitions": {
+          "fixtureBeforeStore->populated": {
+            "median": 318160,
+            "min": 318160,
+            "max": 318312,
+            "values": [
+              318160,
+              318312,
+              318160,
+              318160,
+              318312
+            ]
+          },
+          "populated->heldRowsOnly": {
+            "median": 47152,
+            "min": 41048,
+            "max": 48720,
+            "values": [
+              46800,
+              48720,
+              47152,
+              41048,
+              48720
+            ]
+          },
+          "heldRowsOnly->readRows": {
+            "median": 70840,
+            "min": 69272,
+            "max": 76944,
+            "values": [
+              71192,
+              69272,
+              70840,
+              76944,
+              69272
+            ]
+          },
+          "readRows->acquireFirstField": {
+            "median": 89112,
+            "min": 89112,
+            "max": 89112,
+            "values": [
+              89112,
+              89112,
+              89112,
+              89112,
+              89112
+            ]
+          },
+          "acquireFirstField->readFirstField": {
+            "median": 99912,
+            "min": 99912,
+            "max": 99912,
+            "values": [
+              99912,
+              99912,
+              99912,
+              99912,
+              99912
+            ]
+          },
+          "readFirstField->acquireAllFields": {
+            "median": 617024,
+            "min": 617024,
+            "max": 617024,
+            "values": [
+              617024,
+              617024,
+              617024,
+              617024,
+              617024
+            ]
+          },
+          "acquireAllFields->readAllFields": {
+            "median": 235312,
+            "min": 234952,
+            "max": 235384,
+            "values": [
+              234952,
+              235312,
+              235312,
+              235384,
+              234952
+            ]
+          },
+          "readAllFields->afterDestroy": {
+            "median": -1310976,
+            "min": -1319312,
+            "max": -1310976,
+            "values": [
+              -1310976,
+              -1310976,
+              -1319312,
+              -1310976,
+              -1310976
+            ]
+          }
+        }
+      },
+      {
+        "rows": 1000,
+        "fields": 8,
+        "arm": "v15",
+        "counts": {
+          "enumerableFieldGetters": 1800,
+          "firstAcquiredFields": 200,
+          "allAcquiredFields": 1600,
+          "uniqueAcquiredFields": 1600
+        },
+        "heapBytes": {
+          "fixtureBeforeStore": {
+            "median": 19597896,
+            "min": 19592456,
+            "max": 19598312,
+            "values": [
+              19597792,
+              19598000,
+              19592456,
+              19598312,
+              19597896
+            ]
+          },
+          "populated": {
+            "median": 20242152,
+            "min": 20236664,
+            "max": 20242520,
+            "values": [
+              20242152,
+              20242208,
+              20236664,
+              20242520,
+              20242104
+            ]
+          },
+          "heldRowsOnly": {
+            "median": 21140360,
+            "min": 20893720,
+            "max": 21620704,
+            "values": [
+              21620704,
+              20893720,
+              21201280,
+              21140360,
+              21135128
+            ]
+          },
+          "readRows": {
+            "median": 21300944,
+            "min": 21295144,
+            "max": 21301176,
+            "values": [
+              21300632,
+              21301176,
+              21295144,
+              21301000,
+              21300944
+            ]
+          },
+          "acquireFirstField": {
+            "median": 21576608,
+            "min": 21570808,
+            "max": 21576840,
+            "values": [
+              21576296,
+              21576840,
+              21570808,
+              21576664,
+              21576608
+            ]
+          },
+          "readFirstField": {
+            "median": 21709416,
+            "min": 21703448,
+            "max": 21709640,
+            "values": [
+              21709432,
+              21709640,
+              21703560,
+              21709416,
+              21703448
+            ]
+          },
+          "acquireAllFields": {
+            "median": 23545576,
+            "min": 23539592,
+            "max": 23546144,
+            "values": [
+              23545576,
+              23546144,
+              23540208,
+              23546064,
+              23539592
+            ]
+          },
+          "readAllFields": {
+            "median": 23904720,
+            "min": 23900056,
+            "max": 23908216,
+            "values": [
+              23907528,
+              23908216,
+              23900056,
+              23904720,
+              23902768
+            ]
+          },
+          "afterDestroy": {
+            "median": 20750496,
+            "min": 20745832,
+            "max": 20753992,
+            "values": [
+              20753304,
+              20753992,
+              20745832,
+              20750496,
+              20748544
+            ]
+          }
+        },
+        "transitions": {
+          "fixtureBeforeStore->populated": {
+            "median": 644208,
+            "min": 644208,
+            "max": 644360,
+            "values": [
+              644360,
+              644208,
+              644208,
+              644208,
+              644208
+            ]
+          },
+          "populated->heldRowsOnly": {
+            "median": 897840,
+            "min": 651512,
+            "max": 1378552,
+            "values": [
+              1378552,
+              651512,
+              964616,
+              897840,
+              893024
+            ]
+          },
+          "heldRowsOnly->readRows": {
+            "median": 160640,
+            "min": -320072,
+            "max": 407456,
+            "values": [
+              -320072,
+              407456,
+              93864,
+              160640,
+              165816
+            ]
+          },
+          "readRows->acquireFirstField": {
+            "median": 275664,
+            "min": 275664,
+            "max": 275664,
+            "values": [
+              275664,
+              275664,
+              275664,
+              275664,
+              275664
+            ]
+          },
+          "acquireFirstField->readFirstField": {
+            "median": 132752,
+            "min": 126840,
+            "max": 133136,
+            "values": [
+              133136,
+              132800,
+              132752,
+              132752,
+              126840
+            ]
+          },
+          "readFirstField->acquireAllFields": {
+            "median": 1836504,
+            "min": 1836144,
+            "max": 1836648,
+            "values": [
+              1836144,
+              1836504,
+              1836648,
+              1836648,
+              1836144
+            ]
+          },
+          "acquireAllFields->readAllFields": {
+            "median": 361952,
+            "min": 358656,
+            "max": 363176,
+            "values": [
+              361952,
+              362072,
+              359848,
+              358656,
+              363176
+            ]
+          },
+          "readAllFields->afterDestroy": {
+            "median": -3154224,
+            "min": -3154224,
+            "max": -3154224,
+            "values": [
+              -3154224,
+              -3154224,
+              -3154224,
+              -3154224,
+              -3154224
+            ]
+          }
+        }
+      },
+      {
+        "rows": 1000,
+        "fields": 8,
+        "arm": "v16",
+        "counts": {
+          "enumerableFieldGetters": 1800,
+          "firstAcquiredFields": 200,
+          "allAcquiredFields": 1600,
+          "uniqueAcquiredFields": 1600
+        },
+        "heapBytes": {
+          "fixtureBeforeStore": {
+            "median": 19738784,
+            "min": 19733352,
+            "max": 19738928,
+            "values": [
+              19733352,
+              19738928,
+              19738784,
+              19733736,
+              19738800
+            ]
+          },
+          "populated": {
+            "median": 20859736,
+            "min": 20854872,
+            "max": 20861488,
+            "values": [
+              20855064,
+              20859736,
+              20860432,
+              20854872,
+              20861488
+            ]
+          },
+          "heldRowsOnly": {
+            "median": 21641208,
+            "min": 21635840,
+            "max": 21648192,
+            "values": [
+              21635840,
+              21645392,
+              21641208,
+              21636856,
+              21648192
+            ]
+          },
+          "readRows": {
+            "median": 22000792,
+            "min": 21995928,
+            "max": 22002568,
+            "values": [
+              21996120,
+              22000792,
+              22002568,
+              21995928,
+              22002024
+            ]
+          },
+          "acquireFirstField": {
+            "median": 22276272,
+            "min": 22271408,
+            "max": 22278048,
+            "values": [
+              22271600,
+              22276272,
+              22278048,
+              22271408,
+              22277504
+            ]
+          },
+          "readFirstField": {
+            "median": 22405272,
+            "min": 22400576,
+            "max": 22407216,
+            "values": [
+              22400768,
+              22405272,
+              22407216,
+              22400576,
+              22406432
+            ]
+          },
+          "acquireAllFields": {
+            "median": 24221976,
+            "min": 24217280,
+            "max": 24223920,
+            "values": [
+              24217488,
+              24221976,
+              24223920,
+              24217280,
+              24223224
+            ]
+          },
+          "readAllFields": {
+            "median": 24582144,
+            "min": 24577992,
+            "max": 24585560,
+            "values": [
+              24580256,
+              24582144,
+              24584632,
+              24577992,
+              24585560
+            ]
+          },
+          "afterDestroy": {
+            "median": 21383944,
+            "min": 21379792,
+            "max": 21387360,
+            "values": [
+              21382056,
+              21383944,
+              21385352,
+              21379792,
+              21387360
+            ]
+          }
+        },
+        "transitions": {
+          "fixtureBeforeStore->populated": {
+            "median": 1121648,
+            "min": 1120808,
+            "max": 1122688,
+            "values": [
+              1121712,
+              1120808,
+              1121648,
+              1121136,
+              1122688
+            ]
+          },
+          "populated->heldRowsOnly": {
+            "median": 781984,
+            "min": 780776,
+            "max": 786704,
+            "values": [
+              780776,
+              785656,
+              780776,
+              781984,
+              786704
+            ]
+          },
+          "heldRowsOnly->readRows": {
+            "median": 359072,
+            "min": 353832,
+            "max": 361360,
+            "values": [
+              360280,
+              355400,
+              361360,
+              359072,
+              353832
+            ]
+          },
+          "readRows->acquireFirstField": {
+            "median": 275480,
+            "min": 275480,
+            "max": 275480,
+            "values": [
+              275480,
+              275480,
+              275480,
+              275480,
+              275480
+            ]
+          },
+          "acquireFirstField->readFirstField": {
+            "median": 129168,
+            "min": 128928,
+            "max": 129168,
+            "values": [
+              129168,
+              129000,
+              129168,
+              129168,
+              128928
+            ]
+          },
+          "readFirstField->acquireAllFields": {
+            "median": 1816704,
+            "min": 1816704,
+            "max": 1816792,
+            "values": [
+              1816720,
+              1816704,
+              1816704,
+              1816704,
+              1816792
+            ]
+          },
+          "acquireAllFields->readAllFields": {
+            "median": 360712,
+            "min": 360168,
+            "max": 362768,
+            "values": [
+              362768,
+              360168,
+              360712,
+              360712,
+              362336
+            ]
+          },
+          "readAllFields->afterDestroy": {
+            "median": -3198200,
+            "min": -3199280,
+            "max": -3198200,
+            "values": [
+              -3198200,
+              -3198200,
+              -3199280,
+              -3198200,
+              -3198200
+            ]
+          }
+        }
+      },
+      {
+        "rows": 1000,
+        "fields": 32,
+        "arm": "native",
+        "counts": {
+          "firstAcquiredFields": 200,
+          "allAcquiredFields": 6400,
+          "uniqueAcquiredFields": 6400
+        },
+        "heapBytes": {
+          "fixtureBeforeStore": {
+            "median": 19561264,
+            "min": 19561096,
+            "max": 19561280,
+            "values": [
+              19561248,
+              19561280,
+              19561264,
+              19561096,
+              19561280
+            ]
+          },
+          "populated": {
+            "median": 20299400,
+            "min": 20299288,
+            "max": 20303152,
+            "values": [
+              20299288,
+              20303152,
+              20299304,
+              20299400,
+              20299432
+            ]
+          },
+          "heldRowsOnly": {
+            "median": 20315512,
+            "min": 20314024,
+            "max": 20415448,
+            "values": [
+              20415448,
+              20314952,
+              20314024,
+              20315512,
+              20319392
+            ]
+          },
+          "readRows": {
+            "median": 20394648,
+            "min": 20394536,
+            "max": 20398400,
+            "values": [
+              20394536,
+              20398400,
+              20394552,
+              20394648,
+              20394680
+            ]
+          },
+          "acquireFirstField": {
+            "median": 20477544,
+            "min": 20477432,
+            "max": 20481296,
+            "values": [
+              20477432,
+              20481296,
+              20477448,
+              20477544,
+              20477576
+            ]
+          },
+          "readFirstField": {
+            "median": 20597528,
+            "min": 20597416,
+            "max": 20601320,
+            "values": [
+              20597416,
+              20601320,
+              20597432,
+              20597528,
+              20597560
+            ]
+          },
+          "acquireAllFields": {
+            "median": 23248992,
+            "min": 23248904,
+            "max": 23252824,
+            "values": [
+              23248904,
+              23252824,
+              23248920,
+              23248992,
+              23249024
+            ]
+          },
+          "readAllFields": {
+            "median": 24674640,
+            "min": 24674576,
+            "max": 24681664,
+            "values": [
+              24674576,
+              24678520,
+              24674592,
+              24681664,
+              24674640
+            ]
+          },
+          "afterDestroy": {
+            "median": 19399576,
+            "min": 19399512,
+            "max": 19420648,
+            "values": [
+              19399512,
+              19399736,
+              19399528,
+              19420648,
+              19399576
+            ]
+          }
+        },
+        "transitions": {
+          "fixtureBeforeStore->populated": {
+            "median": 738152,
+            "min": 738040,
+            "max": 741872,
+            "values": [
+              738040,
+              741872,
+              738040,
+              738304,
+              738152
+            ]
+          },
+          "populated->heldRowsOnly": {
+            "median": 16112,
+            "min": 11800,
+            "max": 116160,
+            "values": [
+              116160,
+              11800,
+              14720,
+              16112,
+              19960
+            ]
+          },
+          "heldRowsOnly->readRows": {
+            "median": 79136,
+            "min": -20912,
+            "max": 83448,
+            "values": [
+              -20912,
+              83448,
+              80528,
+              79136,
+              75288
+            ]
+          },
+          "readRows->acquireFirstField": {
+            "median": 82896,
+            "min": 82896,
+            "max": 82896,
+            "values": [
+              82896,
+              82896,
+              82896,
+              82896,
+              82896
+            ]
+          },
+          "acquireFirstField->readFirstField": {
+            "median": 119984,
+            "min": 119984,
+            "max": 120024,
+            "values": [
+              119984,
+              120024,
+              119984,
+              119984,
+              119984
+            ]
+          },
+          "readFirstField->acquireAllFields": {
+            "median": 2651488,
+            "min": 2651464,
+            "max": 2651504,
+            "values": [
+              2651488,
+              2651504,
+              2651488,
+              2651464,
+              2651464
+            ]
+          },
+          "acquireAllFields->readAllFields": {
+            "median": 1425672,
+            "min": 1425616,
+            "max": 1432672,
+            "values": [
+              1425672,
+              1425696,
+              1425672,
+              1432672,
+              1425616
+            ]
+          },
+          "readAllFields->afterDestroy": {
+            "median": -5275064,
+            "min": -5278784,
+            "max": -5261016,
+            "values": [
+              -5275064,
+              -5278784,
+              -5275064,
+              -5261016,
+              -5275064
+            ]
+          }
+        }
+      },
+      {
+        "rows": 1000,
+        "fields": 32,
+        "arm": "ngrx",
+        "counts": {
+          "firstAcquiredFields": 200,
+          "allAcquiredFields": 6400,
+          "uniqueAcquiredFields": 6400
+        },
+        "heapBytes": {
+          "fixtureBeforeStore": {
+            "median": 19584080,
+            "min": 19578104,
+            "max": 19584216,
+            "values": [
+              19584216,
+              19584104,
+              19584080,
+              19578104,
+              19578552
+            ]
+          },
+          "populated": {
+            "median": 20094240,
+            "min": 20088416,
+            "max": 20094376,
+            "values": [
+              20094376,
+              20094264,
+              20094240,
+              20088416,
+              20088712
+            ]
+          },
+          "heldRowsOnly": {
+            "median": 20143096,
+            "min": 20128520,
+            "max": 20391080,
+            "values": [
+              20143096,
+              20360360,
+              20138592,
+              20128520,
+              20391080
+            ]
+          },
+          "readRows": {
+            "median": 20217112,
+            "min": 20211288,
+            "max": 20217248,
+            "values": [
+              20217248,
+              20217136,
+              20217112,
+              20211288,
+              20211584
+            ]
+          },
+          "acquireFirstField": {
+            "median": 20306224,
+            "min": 20300400,
+            "max": 20306360,
+            "values": [
+              20306360,
+              20306248,
+              20306224,
+              20300400,
+              20300696
+            ]
+          },
+          "readFirstField": {
+            "median": 20406136,
+            "min": 20400312,
+            "max": 20406272,
+            "values": [
+              20406272,
+              20406160,
+              20406136,
+              20400312,
+              20400608
+            ]
+          },
+          "acquireAllFields": {
+            "median": 23058360,
+            "min": 23052536,
+            "max": 23058496,
+            "values": [
+              23058496,
+              23058384,
+              23058360,
+              23052536,
+              23052832
+            ]
+          },
+          "readAllFields": {
+            "median": 23986624,
+            "min": 23980800,
+            "max": 23986760,
+            "values": [
+              23986760,
+              23986648,
+              23986624,
+              23980800,
+              23981096
+            ]
+          },
+          "afterDestroy": {
+            "median": 19555856,
+            "min": 19546120,
+            "max": 19555992,
+            "values": [
+              19555992,
+              19555880,
+              19555856,
+              19546120,
+              19546416
+            ]
+          }
+        },
+        "transitions": {
+          "fixtureBeforeStore->populated": {
+            "median": 510160,
+            "min": 510160,
+            "max": 510312,
+            "values": [
+              510160,
+              510160,
+              510160,
+              510312,
+              510160
+            ]
+          },
+          "populated->heldRowsOnly": {
+            "median": 48720,
+            "min": 40104,
+            "max": 302368,
+            "values": [
+              48720,
+              266096,
+              44352,
+              40104,
+              302368
+            ]
+          },
+          "heldRowsOnly->readRows": {
+            "median": 74152,
+            "min": -179496,
+            "max": 82768,
+            "values": [
+              74152,
+              -143224,
+              78520,
+              82768,
+              -179496
+            ]
+          },
+          "readRows->acquireFirstField": {
+            "median": 89112,
+            "min": 89112,
+            "max": 89112,
+            "values": [
+              89112,
+              89112,
+              89112,
+              89112,
+              89112
+            ]
+          },
+          "acquireFirstField->readFirstField": {
+            "median": 99912,
+            "min": 99912,
+            "max": 99912,
+            "values": [
+              99912,
+              99912,
+              99912,
+              99912,
+              99912
+            ]
+          },
+          "readFirstField->acquireAllFields": {
+            "median": 2652224,
+            "min": 2652224,
+            "max": 2652224,
+            "values": [
+              2652224,
+              2652224,
+              2652224,
+              2652224,
+              2652224
+            ]
+          },
+          "acquireAllFields->readAllFields": {
+            "median": 928264,
+            "min": 928264,
+            "max": 928264,
+            "values": [
+              928264,
+              928264,
+              928264,
+              928264,
+              928264
+            ]
+          },
+          "readAllFields->afterDestroy": {
+            "median": -4430768,
+            "min": -4434680,
+            "max": -4430768,
+            "values": [
+              -4430768,
+              -4430768,
+              -4430768,
+              -4434680,
+              -4434680
+            ]
+          }
+        }
+      },
+      {
+        "rows": 1000,
+        "fields": 32,
+        "arm": "v15",
+        "counts": {
+          "enumerableFieldGetters": 6600,
+          "firstAcquiredFields": 200,
+          "allAcquiredFields": 6400,
+          "uniqueAcquiredFields": 6400
+        },
+        "heapBytes": {
+          "fixtureBeforeStore": {
+            "median": 19778056,
+            "min": 19772648,
+            "max": 19778192,
+            "values": [
+              19778192,
+              19777888,
+              19778056,
+              19772648,
+              19778168
+            ]
+          },
+          "populated": {
+            "median": 20614264,
+            "min": 20608856,
+            "max": 20614552,
+            "values": [
+              20614552,
+              20614096,
+              20614264,
+              20608856,
+              20614376
+            ]
+          },
+          "heldRowsOnly": {
+            "median": 22387560,
+            "min": 22382976,
+            "max": 22643112,
+            "values": [
+              22643112,
+              22382976,
+              22603760,
+              22384176,
+              22387560
+            ]
+          },
+          "readRows": {
+            "median": 22799968,
+            "min": 22792640,
+            "max": 22800568,
+            "values": [
+              22799968,
+              22800288,
+              22792640,
+              22795048,
+              22800568
+            ]
+          },
+          "acquireFirstField": {
+            "median": 23075632,
+            "min": 23068304,
+            "max": 23076232,
+            "values": [
+              23075632,
+              23075952,
+              23068304,
+              23070712,
+              23076232
+            ]
+          },
+          "readFirstField": {
+            "median": 23203128,
+            "min": 23197504,
+            "max": 23208936,
+            "values": [
+              23208384,
+              23203128,
+              23201368,
+              23197504,
+              23208936
+            ]
+          },
+          "acquireAllFields": {
+            "median": 31197096,
+            "min": 31191976,
+            "max": 31203408,
+            "values": [
+              31202856,
+              31197096,
+              31195336,
+              31191976,
+              31203408
+            ]
+          },
+          "readAllFields": {
+            "median": 32637680,
+            "min": 32632008,
+            "max": 32642216,
+            "values": [
+              32641648,
+              32637680,
+              32634720,
+              32632008,
+              32642216
+            ]
+          },
+          "afterDestroy": {
+            "median": 21529472,
+            "min": 21523800,
+            "max": 21534008,
+            "values": [
+              21533440,
+              21529472,
+              21526512,
+              21523800,
+              21534008
+            ]
+          }
+        },
+        "transitions": {
+          "fixtureBeforeStore->populated": {
+            "median": 836208,
+            "min": 836208,
+            "max": 836360,
+            "values": [
+              836360,
+              836208,
+              836208,
+              836208,
+              836208
+            ]
+          },
+          "populated->heldRowsOnly": {
+            "median": 1775320,
+            "min": 1768880,
+            "max": 2028560,
+            "values": [
+              2028560,
+              1768880,
+              1989496,
+              1775320,
+              1773184
+            ]
+          },
+          "heldRowsOnly->readRows": {
+            "median": 410872,
+            "min": 156856,
+            "max": 417312,
+            "values": [
+              156856,
+              417312,
+              188880,
+              410872,
+              413008
+            ]
+          },
+          "readRows->acquireFirstField": {
+            "median": 275664,
+            "min": 275664,
+            "max": 275664,
+            "values": [
+              275664,
+              275664,
+              275664,
+              275664,
+              275664
+            ]
+          },
+          "acquireFirstField->readFirstField": {
+            "median": 132704,
+            "min": 126792,
+            "max": 133064,
+            "values": [
+              132752,
+              127176,
+              133064,
+              126792,
+              132704
+            ]
+          },
+          "readFirstField->acquireAllFields": {
+            "median": 7994472,
+            "min": 7993968,
+            "max": 7994472,
+            "values": [
+              7994472,
+              7993968,
+              7993968,
+              7994472,
+              7994472
+            ]
+          },
+          "acquireAllFields->readAllFields": {
+            "median": 1439384,
+            "min": 1438792,
+            "max": 1440584,
+            "values": [
+              1438792,
+              1440584,
+              1439384,
+              1440032,
+              1438808
+            ]
+          },
+          "readAllFields->afterDestroy": {
+            "median": -11108208,
+            "min": -11108208,
+            "max": -11108208,
+            "values": [
+              -11108208,
+              -11108208,
+              -11108208,
+              -11108208,
+              -11108208
+            ]
+          }
+        }
+      },
+      {
+        "rows": 1000,
+        "fields": 32,
+        "arm": "v16",
+        "counts": {
+          "enumerableFieldGetters": 6600,
+          "firstAcquiredFields": 200,
+          "allAcquiredFields": 6400,
+          "uniqueAcquiredFields": 6400
+        },
+        "heapBytes": {
+          "fixtureBeforeStore": {
+            "median": 19918816,
+            "min": 19913448,
+            "max": 19919224,
+            "values": [
+              19919040,
+              19918816,
+              19919224,
+              19913480,
+              19913448
+            ]
+          },
+          "populated": {
+            "median": 21229272,
+            "min": 21226840,
+            "max": 21232752,
+            "values": [
+              21232752,
+              21232320,
+              21229272,
+              21228064,
+              21226840
+            ]
+          },
+          "heldRowsOnly": {
+            "median": 23459008,
+            "min": 23059672,
+            "max": 23712848,
+            "values": [
+              23059672,
+              23459008,
+              23060128,
+              23603560,
+              23712848
+            ]
+          },
+          "readRows": {
+            "median": 23426568,
+            "min": 23411352,
+            "max": 23427488,
+            "values": [
+              23427488,
+              23427056,
+              23426568,
+              23412576,
+              23411352
+            ]
+          },
+          "acquireFirstField": {
+            "median": 23702048,
+            "min": 23686832,
+            "max": 23702968,
+            "values": [
+              23702968,
+              23702536,
+              23702048,
+              23688056,
+              23686832
+            ]
+          },
+          "readFirstField": {
+            "median": 23827528,
+            "min": 23815832,
+            "max": 23831128,
+            "values": [
+              23827528,
+              23831128,
+              23831048,
+              23817224,
+              23815832
+            ]
+          },
+          "acquireAllFields": {
+            "median": 31725272,
+            "min": 31713560,
+            "max": 31728872,
+            "values": [
+              31725272,
+              31728872,
+              31728792,
+              31714968,
+              31713560
+            ]
+          },
+          "readAllFields": {
+            "median": 33165008,
+            "min": 33152136,
+            "max": 33167392,
+            "values": [
+              33165008,
+              33167304,
+              33167392,
+              33152312,
+              33152136
+            ]
+          },
+          "afterDestroy": {
+            "median": 22166112,
+            "min": 22153240,
+            "max": 22168496,
+            "values": [
+              22166112,
+              22168408,
+              22168496,
+              22153416,
+              22153240
+            ]
+          }
+        },
+        "transitions": {
+          "fixtureBeforeStore->populated": {
+            "median": 1313504,
+            "min": 1310048,
+            "max": 1314584,
+            "values": [
+              1313712,
+              1313504,
+              1310048,
+              1314584,
+              1313392
+            ]
+          },
+          "populated->heldRowsOnly": {
+            "median": 2226688,
+            "min": 1826920,
+            "max": 2486008,
+            "values": [
+              1826920,
+              2226688,
+              1830856,
+              2375496,
+              2486008
+            ]
+          },
+          "heldRowsOnly->readRows": {
+            "median": -31952,
+            "min": -301496,
+            "max": 367816,
+            "values": [
+              367816,
+              -31952,
+              366440,
+              -190984,
+              -301496
+            ]
+          },
+          "readRows->acquireFirstField": {
+            "median": 275480,
+            "min": 275480,
+            "max": 275480,
+            "values": [
+              275480,
+              275480,
+              275480,
+              275480,
+              275480
+            ]
+          },
+          "acquireFirstField->readFirstField": {
+            "median": 129000,
+            "min": 124560,
+            "max": 129168,
+            "values": [
+              124560,
+              128592,
+              129000,
+              129168,
+              129000
+            ]
+          },
+          "readFirstField->acquireAllFields": {
+            "median": 7897744,
+            "min": 7897728,
+            "max": 7897744,
+            "values": [
+              7897744,
+              7897744,
+              7897744,
+              7897744,
+              7897728
+            ]
+          },
+          "acquireAllFields->readAllFields": {
+            "median": 1438576,
+            "min": 1437344,
+            "max": 1439736,
+            "values": [
+              1439736,
+              1438432,
+              1438600,
+              1437344,
+              1438576
+            ]
+          },
+          "readAllFields->afterDestroy": {
+            "median": -10998896,
+            "min": -10998896,
+            "max": -10998896,
+            "values": [
+              -10998896,
+              -10998896,
+              -10998896,
+              -10998896,
+              -10998896
+            ]
+          }
+        }
+      },
+      {
+        "rows": 10000,
+        "fields": 8,
+        "arm": "native",
+        "counts": {
+          "firstAcquiredFields": 200,
+          "allAcquiredFields": 1600,
+          "uniqueAcquiredFields": 1600
+        },
+        "heapBytes": {
+          "fixtureBeforeStore": {
+            "median": 20734416,
+            "min": 20734376,
+            "max": 20734496,
+            "values": [
+              20734496,
+              20734416,
+              20734408,
+              20734472,
+              20734376
+            ]
+          },
+          "populated": {
+            "median": 26246936,
+            "min": 26246896,
+            "max": 26247016,
+            "values": [
+              26247016,
+              26246936,
+              26246928,
+              26246992,
+              26246896
+            ]
+          },
+          "heldRowsOnly": {
+            "median": 26261616,
+            "min": 26257920,
+            "max": 26266976,
+            "values": [
+              26266976,
+              26257920,
+              26260440,
+              26263104,
+              26261616
+            ]
+          },
+          "readRows": {
+            "median": 26337304,
+            "min": 26337264,
+            "max": 26337384,
+            "values": [
+              26337384,
+              26337304,
+              26337296,
+              26337360,
+              26337264
+            ]
+          },
+          "acquireFirstField": {
+            "median": 26420200,
+            "min": 26420160,
+            "max": 26420280,
+            "values": [
+              26420280,
+              26420200,
+              26420192,
+              26420256,
+              26420160
+            ]
+          },
+          "readFirstField": {
+            "median": 26540184,
+            "min": 26540144,
+            "max": 26540264,
+            "values": [
+              26540264,
+              26540184,
+              26540176,
+              26540240,
+              26540144
+            ]
+          },
+          "acquireAllFields": {
+            "median": 27156448,
+            "min": 27156408,
+            "max": 27156528,
+            "values": [
+              27156528,
+              27156448,
+              27156440,
+              27156504,
+              27156408
+            ]
+          },
+          "readAllFields": {
+            "median": 27500464,
+            "min": 27500424,
+            "max": 27500544,
+            "values": [
+              27500544,
+              27500464,
+              27500456,
+              27500520,
+              27500424
+            ]
+          },
+          "afterDestroy": {
+            "median": 19394600,
+            "min": 19394560,
+            "max": 19394680,
+            "values": [
+              19394680,
+              19394600,
+              19394592,
+              19394656,
+              19394560
+            ]
+          }
+        },
+        "transitions": {
+          "fixtureBeforeStore->populated": {
+            "median": 5512520,
+            "min": 5512520,
+            "max": 5512520,
+            "values": [
+              5512520,
+              5512520,
+              5512520,
+              5512520,
+              5512520
+            ]
+          },
+          "populated->heldRowsOnly": {
+            "median": 14720,
+            "min": 10984,
+            "max": 19960,
+            "values": [
+              19960,
+              10984,
+              13512,
+              16112,
+              14720
+            ]
+          },
+          "heldRowsOnly->readRows": {
+            "median": 75648,
+            "min": 70408,
+            "max": 79384,
+            "values": [
+              70408,
+              79384,
+              76856,
+              74256,
+              75648
+            ]
+          },
+          "readRows->acquireFirstField": {
+            "median": 82896,
+            "min": 82896,
+            "max": 82896,
+            "values": [
+              82896,
+              82896,
+              82896,
+              82896,
+              82896
+            ]
+          },
+          "acquireFirstField->readFirstField": {
+            "median": 119984,
+            "min": 119984,
+            "max": 119984,
+            "values": [
+              119984,
+              119984,
+              119984,
+              119984,
+              119984
+            ]
+          },
+          "readFirstField->acquireAllFields": {
+            "median": 616264,
+            "min": 616264,
+            "max": 616264,
+            "values": [
+              616264,
+              616264,
+              616264,
+              616264,
+              616264
+            ]
+          },
+          "acquireAllFields->readAllFields": {
+            "median": 344016,
+            "min": 344016,
+            "max": 344016,
+            "values": [
+              344016,
+              344016,
+              344016,
+              344016,
+              344016
+            ]
+          },
+          "readAllFields->afterDestroy": {
+            "median": -8105864,
+            "min": -8105864,
+            "max": -8105864,
+            "values": [
+              -8105864,
+              -8105864,
+              -8105864,
+              -8105864,
+              -8105864
+            ]
+          }
+        }
+      },
+      {
+        "rows": 10000,
+        "fields": 8,
+        "arm": "ngrx",
+        "counts": {
+          "firstAcquiredFields": 200,
+          "allAcquiredFields": 1600,
+          "uniqueAcquiredFields": 1600
+        },
+        "heapBytes": {
+          "fixtureBeforeStore": {
+            "median": 20757200,
+            "min": 20757128,
+            "max": 20757552,
+            "values": [
+              20757128,
+              20757200,
+              20757552,
+              20757344,
+              20757200
+            ]
+          },
+          "populated": {
+            "median": 22569632,
+            "min": 22569552,
+            "max": 22569904,
+            "values": [
+              22569632,
+              22569552,
+              22569904,
+              22569696,
+              22569552
+            ]
+          },
+          "heldRowsOnly": {
+            "median": 22614424,
+            "min": 22609656,
+            "max": 23241936,
+            "values": [
+              22936936,
+              22614424,
+              22612752,
+              23241936,
+              22609656
+            ]
+          },
+          "readRows": {
+            "median": 22687624,
+            "min": 22687544,
+            "max": 22687896,
+            "values": [
+              22687624,
+              22687544,
+              22687896,
+              22687688,
+              22687544
+            ]
+          },
+          "acquireFirstField": {
+            "median": 22776736,
+            "min": 22776656,
+            "max": 22777008,
+            "values": [
+              22776736,
+              22776656,
+              22777008,
+              22776800,
+              22776656
+            ]
+          },
+          "readFirstField": {
+            "median": 22876648,
+            "min": 22876568,
+            "max": 22876920,
+            "values": [
+              22876648,
+              22876568,
+              22876920,
+              22876712,
+              22876568
+            ]
+          },
+          "acquireAllFields": {
+            "median": 23493672,
+            "min": 23493592,
+            "max": 23493944,
+            "values": [
+              23493672,
+              23493592,
+              23493944,
+              23493736,
+              23493592
+            ]
+          },
+          "readAllFields": {
+            "median": 23729288,
+            "min": 23729280,
+            "max": 23729432,
+            "values": [
+              23729416,
+              23729288,
+              23729280,
+              23729432,
+              23729288
+            ]
+          },
+          "afterDestroy": {
+            "median": 19556368,
+            "min": 19551696,
+            "max": 19556520,
+            "values": [
+              19551696,
+              19552848,
+              19556368,
+              19556520,
+              19556376
+            ]
+          }
+        },
+        "transitions": {
+          "fixtureBeforeStore->populated": {
+            "median": 1812352,
+            "min": 1812352,
+            "max": 1812504,
+            "values": [
+              1812504,
+              1812352,
+              1812352,
+              1812352,
+              1812352
+            ]
+          },
+          "populated->heldRowsOnly": {
+            "median": 44872,
+            "min": 40104,
+            "max": 672240,
+            "values": [
+              367304,
+              44872,
+              42848,
+              672240,
+              40104
+            ]
+          },
+          "heldRowsOnly->readRows": {
+            "median": 73120,
+            "min": -554248,
+            "max": 77888,
+            "values": [
+              -249312,
+              73120,
+              75144,
+              -554248,
+              77888
+            ]
+          },
+          "readRows->acquireFirstField": {
+            "median": 89112,
+            "min": 89112,
+            "max": 89112,
+            "values": [
+              89112,
+              89112,
+              89112,
+              89112,
+              89112
+            ]
+          },
+          "acquireFirstField->readFirstField": {
+            "median": 99912,
+            "min": 99912,
+            "max": 99912,
+            "values": [
+              99912,
+              99912,
+              99912,
+              99912,
+              99912
+            ]
+          },
+          "readFirstField->acquireAllFields": {
+            "median": 617024,
+            "min": 617024,
+            "max": 617024,
+            "values": [
+              617024,
+              617024,
+              617024,
+              617024,
+              617024
+            ]
+          },
+          "acquireAllFields->readAllFields": {
+            "median": 235696,
+            "min": 235336,
+            "max": 235744,
+            "values": [
+              235744,
+              235696,
+              235336,
+              235696,
+              235696
+            ]
+          },
+          "readAllFields->afterDestroy": {
+            "median": -4172912,
+            "min": -4177720,
+            "max": -4172912,
+            "values": [
+              -4177720,
+              -4176440,
+              -4172912,
+              -4172912,
+              -4172912
+            ]
+          }
+        }
+      },
+      {
+        "rows": 10000,
+        "fields": 8,
+        "arm": "v15",
+        "counts": {
+          "enumerableFieldGetters": 1800,
+          "firstAcquiredFields": 200,
+          "allAcquiredFields": 1600,
+          "uniqueAcquiredFields": 1600
+        },
+        "heapBytes": {
+          "fixtureBeforeStore": {
+            "median": 20951016,
+            "min": 20950984,
+            "max": 20951464,
+            "values": [
+              20951032,
+              20951016,
+              20951000,
+              20950984,
+              20951464
+            ]
+          },
+          "populated": {
+            "median": 26192344,
+            "min": 26191928,
+            "max": 26195984,
+            "values": [
+              26195984,
+              26191944,
+              26191928,
+              26195936,
+              26192344
+            ]
+          },
+          "heldRowsOnly": {
+            "median": 27013672,
+            "min": 26844520,
+            "max": 27338912,
+            "values": [
+              26847440,
+              27013672,
+              27338912,
+              26844520,
+              27015096
+            ]
+          },
+          "readRows": {
+            "median": 27250568,
+            "min": 27249848,
+            "max": 27251016,
+            "values": [
+              27249848,
+              27250568,
+              27250504,
+              27250896,
+              27251016
+            ]
+          },
+          "acquireFirstField": {
+            "median": 27526232,
+            "min": 27525512,
+            "max": 27526680,
+            "values": [
+              27525512,
+              27526232,
+              27526168,
+              27526560,
+              27526680
+            ]
+          },
+          "readFirstField": {
+            "median": 27659312,
+            "min": 27658312,
+            "max": 27659432,
+            "values": [
+              27658312,
+              27659368,
+              27659304,
+              27659312,
+              27659432
+            ]
+          },
+          "acquireAllFields": {
+            "median": 29495456,
+            "min": 29494816,
+            "max": 29496080,
+            "values": [
+              29494816,
+              29495512,
+              29495448,
+              29495456,
+              29496080
+            ]
+          },
+          "readAllFields": {
+            "median": 29855920,
+            "min": 29854640,
+            "max": 29857464,
+            "values": [
+              29855336,
+              29857464,
+              29855920,
+              29854640,
+              29855928
+            ]
+          },
+          "afterDestroy": {
+            "median": 25549696,
+            "min": 25548416,
+            "max": 25551240,
+            "values": [
+              25549112,
+              25551240,
+              25549696,
+              25548416,
+              25549704
+            ]
+          }
+        },
+        "transitions": {
+          "fixtureBeforeStore->populated": {
+            "median": 5240928,
+            "min": 5240880,
+            "max": 5244952,
+            "values": [
+              5244952,
+              5240928,
+              5240928,
+              5244952,
+              5240880
+            ]
+          },
+          "populated->heldRowsOnly": {
+            "median": 821728,
+            "min": 648584,
+            "max": 1146984,
+            "values": [
+              651456,
+              821728,
+              1146984,
+              648584,
+              822752
+            ]
+          },
+          "heldRowsOnly->readRows": {
+            "median": 236896,
+            "min": -88408,
+            "max": 406376,
+            "values": [
+              402408,
+              236896,
+              -88408,
+              406376,
+              235920
+            ]
+          },
+          "readRows->acquireFirstField": {
+            "median": 275664,
+            "min": 275664,
+            "max": 275664,
+            "values": [
+              275664,
+              275664,
+              275664,
+              275664,
+              275664
+            ]
+          },
+          "acquireFirstField->readFirstField": {
+            "median": 132800,
+            "min": 132752,
+            "max": 133136,
+            "values": [
+              132800,
+              133136,
+              133136,
+              132752,
+              132752
+            ]
+          },
+          "readFirstField->acquireAllFields": {
+            "median": 1836144,
+            "min": 1836144,
+            "max": 1836648,
+            "values": [
+              1836504,
+              1836144,
+              1836144,
+              1836144,
+              1836648
+            ]
+          },
+          "acquireAllFields->readAllFields": {
+            "median": 360472,
+            "min": 359184,
+            "max": 361952,
+            "values": [
+              360520,
+              361952,
+              360472,
+              359184,
+              359848
+            ]
+          },
+          "readAllFields->afterDestroy": {
+            "median": -4306224,
+            "min": -4306224,
+            "max": -4306224,
+            "values": [
+              -4306224,
+              -4306224,
+              -4306224,
+              -4306224,
+              -4306224
+            ]
+          }
+        }
+      },
+      {
+        "rows": 10000,
+        "fields": 8,
+        "arm": "v16",
+        "counts": {
+          "enumerableFieldGetters": 1800,
+          "firstAcquiredFields": 200,
+          "allAcquiredFields": 1600,
+          "uniqueAcquiredFields": 1600
+        },
+        "heapBytes": {
+          "fixtureBeforeStore": {
+            "median": 21092192,
+            "min": 21086768,
+            "max": 21092440,
+            "values": [
+              21086768,
+              21092368,
+              21092192,
+              21086888,
+              21092440
+            ]
+          },
+          "populated": {
+            "median": 27812224,
+            "min": 27805952,
+            "max": 27813936,
+            "values": [
+              27805952,
+              27812224,
+              27812928,
+              27808208,
+              27813936
+            ]
+          },
+          "heldRowsOnly": {
+            "median": 28749896,
+            "min": 28586104,
+            "max": 28886720,
+            "values": [
+              28586104,
+              28848848,
+              28749896,
+              28886720,
+              28589816
+            ]
+          },
+          "readRows": {
+            "median": 28949768,
+            "min": 28943608,
+            "max": 28951008,
+            "values": [
+              28943608,
+              28949768,
+              28950536,
+              28946392,
+              28951008
+            ]
+          },
+          "acquireFirstField": {
+            "median": 29225248,
+            "min": 29219088,
+            "max": 29226488,
+            "values": [
+              29219088,
+              29225248,
+              29226016,
+              29221872,
+              29226488
+            ]
+          },
+          "readFirstField": {
+            "median": 29354704,
+            "min": 29348544,
+            "max": 29355944,
+            "values": [
+              29348544,
+              29354704,
+              29355472,
+              29350752,
+              29355944
+            ]
+          },
+          "acquireAllFields": {
+            "median": 31172696,
+            "min": 31167328,
+            "max": 31173296,
+            "values": [
+              31167328,
+              31172696,
+              31173296,
+              31168744,
+              31173072
+            ]
+          },
+          "readAllFields": {
+            "median": 31534592,
+            "min": 31528032,
+            "max": 31535784,
+            "values": [
+              31528336,
+              31534832,
+              31534592,
+              31528032,
+              31535784
+            ]
+          },
+          "afterDestroy": {
+            "median": 27184392,
+            "min": 27177832,
+            "max": 27185584,
+            "values": [
+              27178136,
+              27184632,
+              27184392,
+              27177832,
+              27185584
+            ]
+          }
+        },
+        "transitions": {
+          "fixtureBeforeStore->populated": {
+            "median": 6720736,
+            "min": 6719184,
+            "max": 6721496,
+            "values": [
+              6719184,
+              6719856,
+              6720736,
+              6721320,
+              6721496
+            ]
+          },
+          "populated->heldRowsOnly": {
+            "median": 936968,
+            "min": 775880,
+            "max": 1078512,
+            "values": [
+              780152,
+              1036624,
+              936968,
+              1078512,
+              775880
+            ]
+          },
+          "heldRowsOnly->readRows": {
+            "median": 200640,
+            "min": 59672,
+            "max": 361192,
+            "values": [
+              357504,
+              100920,
+              200640,
+              59672,
+              361192
+            ]
+          },
+          "readRows->acquireFirstField": {
+            "median": 275480,
+            "min": 275480,
+            "max": 275480,
+            "values": [
+              275480,
+              275480,
+              275480,
+              275480,
+              275480
+            ]
+          },
+          "acquireFirstField->readFirstField": {
+            "median": 129456,
+            "min": 128880,
+            "max": 129456,
+            "values": [
+              129456,
+              129456,
+              129456,
+              128880,
+              129456
+            ]
+          },
+          "readFirstField->acquireAllFields": {
+            "median": 1817992,
+            "min": 1817128,
+            "max": 1818784,
+            "values": [
+              1818784,
+              1817992,
+              1817824,
+              1817992,
+              1817128
+            ]
+          },
+          "acquireAllFields->readAllFields": {
+            "median": 361296,
+            "min": 359288,
+            "max": 362712,
+            "values": [
+              361008,
+              362136,
+              361296,
+              359288,
+              362712
+            ]
+          },
+          "readAllFields->afterDestroy": {
+            "median": -4350200,
+            "min": -4350200,
+            "max": -4350200,
+            "values": [
+              -4350200,
+              -4350200,
+              -4350200,
+              -4350200,
+              -4350200
+            ]
+          }
+        }
+      },
+      {
+        "rows": 10000,
+        "fields": 32,
+        "arm": "native",
+        "counts": {
+          "firstAcquiredFields": 200,
+          "allAcquiredFields": 6400,
+          "uniqueAcquiredFields": 6400
+        },
+        "heapBytes": {
+          "fixtureBeforeStore": {
+            "median": 22657336,
+            "min": 22651800,
+            "max": 22657640,
+            "values": [
+              22657336,
+              22657640,
+              22657368,
+              22651800,
+              22657248
+            ]
+          },
+          "populated": {
+            "median": 30089856,
+            "min": 30084320,
+            "max": 30090160,
+            "values": [
+              30089856,
+              30090160,
+              30089888,
+              30084320,
+              30089768
+            ]
+          },
+          "heldRowsOnly": {
+            "median": 30108248,
+            "min": 30095664,
+            "max": 30615200,
+            "values": [
+              30108248,
+              30615200,
+              30101232,
+              30095664,
+              30353616
+            ]
+          },
+          "readRows": {
+            "median": 30185104,
+            "min": 30179568,
+            "max": 30185408,
+            "values": [
+              30185104,
+              30185408,
+              30185136,
+              30179568,
+              30185016
+            ]
+          },
+          "acquireFirstField": {
+            "median": 30268000,
+            "min": 30262464,
+            "max": 30268304,
+            "values": [
+              30268000,
+              30268304,
+              30268032,
+              30262464,
+              30267912
+            ]
+          },
+          "readFirstField": {
+            "median": 30387984,
+            "min": 30382448,
+            "max": 30388288,
+            "values": [
+              30387984,
+              30388288,
+              30388016,
+              30382448,
+              30387896
+            ]
+          },
+          "acquireAllFields": {
+            "median": 33039392,
+            "min": 33033912,
+            "max": 33039480,
+            "values": [
+              33039448,
+              33039392,
+              33039480,
+              33033912,
+              33039360
+            ]
+          },
+          "readAllFields": {
+            "median": 34465008,
+            "min": 34461688,
+            "max": 34470424,
+            "values": [
+              34470424,
+              34465008,
+              34466488,
+              34461688,
+              34464976
+            ]
+          },
+          "afterDestroy": {
+            "median": 19415208,
+            "min": 19399832,
+            "max": 19421024,
+            "values": [
+              19421024,
+              19399864,
+              19420776,
+              19415208,
+              19399832
+            ]
+          }
+        },
+        "transitions": {
+          "fixtureBeforeStore->populated": {
+            "median": 7432520,
+            "min": 7432520,
+            "max": 7432520,
+            "values": [
+              7432520,
+              7432520,
+              7432520,
+              7432520,
+              7432520
+            ]
+          },
+          "populated->heldRowsOnly": {
+            "median": 18392,
+            "min": 11344,
+            "max": 525040,
+            "values": [
+              18392,
+              525040,
+              11344,
+              11344,
+              263848
+            ]
+          },
+          "heldRowsOnly->readRows": {
+            "median": 76856,
+            "min": -429792,
+            "max": 83904,
+            "values": [
+              76856,
+              -429792,
+              83904,
+              83904,
+              -168600
+            ]
+          },
+          "readRows->acquireFirstField": {
+            "median": 82896,
+            "min": 82896,
+            "max": 82896,
+            "values": [
+              82896,
+              82896,
+              82896,
+              82896,
+              82896
+            ]
+          },
+          "acquireFirstField->readFirstField": {
+            "median": 119984,
+            "min": 119984,
+            "max": 119984,
+            "values": [
+              119984,
+              119984,
+              119984,
+              119984,
+              119984
+            ]
+          },
+          "readFirstField->acquireAllFields": {
+            "median": 2651464,
+            "min": 2651104,
+            "max": 2651464,
+            "values": [
+              2651464,
+              2651104,
+              2651464,
+              2651464,
+              2651464
+            ]
+          },
+          "acquireAllFields->readAllFields": {
+            "median": 1427008,
+            "min": 1425616,
+            "max": 1430976,
+            "values": [
+              1430976,
+              1425616,
+              1427008,
+              1427776,
+              1425616
+            ]
+          },
+          "readAllFields->afterDestroy": {
+            "median": -15049400,
+            "min": -15065144,
+            "max": -15045712,
+            "values": [
+              -15049400,
+              -15065144,
+              -15045712,
+              -15046480,
+              -15065144
+            ]
+          }
+        }
+      },
+      {
+        "rows": 10000,
+        "fields": 32,
+        "arm": "ngrx",
+        "counts": {
+          "firstAcquiredFields": 200,
+          "allAcquiredFields": 6400,
+          "uniqueAcquiredFields": 6400
+        },
+        "heapBytes": {
+          "fixtureBeforeStore": {
+            "median": 22680096,
+            "min": 22679896,
+            "max": 22680464,
+            "values": [
+              22680096,
+              22680200,
+              22679992,
+              22680464,
+              22679896
+            ]
+          },
+          "populated": {
+            "median": 26412496,
+            "min": 26412400,
+            "max": 26412816,
+            "values": [
+              26412448,
+              26412552,
+              26412496,
+              26412816,
+              26412400
+            ]
+          },
+          "heldRowsOnly": {
+            "median": 26460152,
+            "min": 26452096,
+            "max": 26947072,
+            "values": [
+              26460152,
+              26452096,
+              26461216,
+              26459968,
+              26947072
+            ]
+          },
+          "readRows": {
+            "median": 26535368,
+            "min": 26535272,
+            "max": 26535688,
+            "values": [
+              26535320,
+              26535424,
+              26535368,
+              26535688,
+              26535272
+            ]
+          },
+          "acquireFirstField": {
+            "median": 26624480,
+            "min": 26624384,
+            "max": 26624800,
+            "values": [
+              26624432,
+              26624536,
+              26624480,
+              26624800,
+              26624384
+            ]
+          },
+          "readFirstField": {
+            "median": 26724392,
+            "min": 26724296,
+            "max": 26724712,
+            "values": [
+              26724344,
+              26724448,
+              26724392,
+              26724712,
+              26724296
+            ]
+          },
+          "acquireAllFields": {
+            "median": 29376616,
+            "min": 29376520,
+            "max": 29376936,
+            "values": [
+              29376568,
+              29376672,
+              29376616,
+              29376936,
+              29376520
+            ]
+          },
+          "readAllFields": {
+            "median": 30305216,
+            "min": 30305168,
+            "max": 30305320,
+            "values": [
+              30305216,
+              30305320,
+              30305264,
+              30305200,
+              30305168
+            ]
+          },
+          "afterDestroy": {
+            "median": 19556128,
+            "min": 19552552,
+            "max": 19556328,
+            "values": [
+              19556128,
+              19556328,
+              19556176,
+              19556112,
+              19552552
+            ]
+          }
+        },
+        "transitions": {
+          "fixtureBeforeStore->populated": {
+            "median": 3732352,
+            "min": 3732352,
+            "max": 3732504,
+            "values": [
+              3732352,
+              3732352,
+              3732504,
+              3732352,
+              3732504
+            ]
+          },
+          "populated->heldRowsOnly": {
+            "median": 47704,
+            "min": 39544,
+            "max": 534672,
+            "values": [
+              47704,
+              39544,
+              48720,
+              47152,
+              534672
+            ]
+          },
+          "heldRowsOnly->readRows": {
+            "median": 75168,
+            "min": -411800,
+            "max": 83328,
+            "values": [
+              75168,
+              83328,
+              74152,
+              75720,
+              -411800
+            ]
+          },
+          "readRows->acquireFirstField": {
+            "median": 89112,
+            "min": 89112,
+            "max": 89112,
+            "values": [
+              89112,
+              89112,
+              89112,
+              89112,
+              89112
+            ]
+          },
+          "acquireFirstField->readFirstField": {
+            "median": 99912,
+            "min": 99912,
+            "max": 99912,
+            "values": [
+              99912,
+              99912,
+              99912,
+              99912,
+              99912
+            ]
+          },
+          "readFirstField->acquireAllFields": {
+            "median": 2652224,
+            "min": 2652224,
+            "max": 2652224,
+            "values": [
+              2652224,
+              2652224,
+              2652224,
+              2652224,
+              2652224
+            ]
+          },
+          "acquireAllFields->readAllFields": {
+            "median": 928648,
+            "min": 928264,
+            "max": 928648,
+            "values": [
+              928648,
+              928648,
+              928648,
+              928264,
+              928648
+            ]
+          },
+          "readAllFields->afterDestroy": {
+            "median": -10749088,
+            "min": -10752616,
+            "max": -10748992,
+            "values": [
+              -10749088,
+              -10748992,
+              -10749088,
+              -10749088,
+              -10752616
+            ]
+          }
+        }
+      },
+      {
+        "rows": 10000,
+        "fields": 32,
+        "arm": "v15",
+        "counts": {
+          "enumerableFieldGetters": 6600,
+          "firstAcquiredFields": 200,
+          "allAcquiredFields": 6400,
+          "uniqueAcquiredFields": 6400
+        },
+        "heapBytes": {
+          "fixtureBeforeStore": {
+            "median": 22873760,
+            "min": 22868336,
+            "max": 22873928,
+            "values": [
+              22873792,
+              22873760,
+              22868352,
+              22868336,
+              22873928
+            ]
+          },
+          "populated": {
+            "median": 30034856,
+            "min": 30029264,
+            "max": 30038864,
+            "values": [
+              30034872,
+              30038864,
+              30029280,
+              30029264,
+              30034856
+            ]
+          },
+          "heldRowsOnly": {
+            "median": 31810320,
+            "min": 31795832,
+            "max": 32289856,
+            "values": [
+              32289856,
+              31802536,
+              31795832,
+              32009520,
+              31810320
+            ]
+          },
+          "readRows": {
+            "median": 32215616,
+            "min": 32213408,
+            "max": 32221192,
+            "values": [
+              32213440,
+              32213408,
+              32215616,
+              32216704,
+              32221192
+            ]
+          },
+          "acquireFirstField": {
+            "median": 32491280,
+            "min": 32489072,
+            "max": 32496856,
+            "values": [
+              32489104,
+              32489072,
+              32491280,
+              32492368,
+              32496856
+            ]
+          },
+          "readFirstField": {
+            "median": 32624368,
+            "min": 32622192,
+            "max": 32629944,
+            "values": [
+              32622192,
+              32622208,
+              32624368,
+              32624472,
+              32629944
+            ]
+          },
+          "acquireAllFields": {
+            "median": 40618336,
+            "min": 40616160,
+            "max": 40623912,
+            "values": [
+              40616160,
+              40616176,
+              40618336,
+              40618440,
+              40623912
+            ]
+          },
+          "readAllFields": {
+            "median": 42057696,
+            "min": 42055216,
+            "max": 42063272,
+            "values": [
+              42055520,
+              42055216,
+              42057696,
+              42058600,
+              42063272
+            ]
+          },
+          "afterDestroy": {
+            "median": 28069488,
+            "min": 28067008,
+            "max": 28075064,
+            "values": [
+              28067312,
+              28067008,
+              28069488,
+              28070392,
+              28075064
+            ]
+          }
+        },
+        "transitions": {
+          "fixtureBeforeStore->populated": {
+            "median": 7160928,
+            "min": 7160928,
+            "max": 7165104,
+            "values": [
+              7161080,
+              7165104,
+              7160928,
+              7160928,
+              7160928
+            ]
+          },
+          "populated->heldRowsOnly": {
+            "median": 1775464,
+            "min": 1763672,
+            "max": 2254984,
+            "values": [
+              2254984,
+              1763672,
+              1766552,
+              1980256,
+              1775464
+            ]
+          },
+          "heldRowsOnly->readRows": {
+            "median": 410872,
+            "min": -76416,
+            "max": 419784,
+            "values": [
+              -76416,
+              410872,
+              419784,
+              207184,
+              410872
+            ]
+          },
+          "readRows->acquireFirstField": {
+            "median": 275664,
+            "min": 275664,
+            "max": 275664,
+            "values": [
+              275664,
+              275664,
+              275664,
+              275664,
+              275664
+            ]
+          },
+          "acquireFirstField->readFirstField": {
+            "median": 133088,
+            "min": 132104,
+            "max": 133136,
+            "values": [
+              133088,
+              133136,
+              133088,
+              132104,
+              133088
+            ]
+          },
+          "readFirstField->acquireAllFields": {
+            "median": 7993968,
+            "min": 7993968,
+            "max": 7993968,
+            "values": [
+              7993968,
+              7993968,
+              7993968,
+              7993968,
+              7993968
+            ]
+          },
+          "acquireAllFields->readAllFields": {
+            "median": 1439360,
+            "min": 1439040,
+            "max": 1440160,
+            "values": [
+              1439360,
+              1439040,
+              1439360,
+              1440160,
+              1439360
+            ]
+          },
+          "readAllFields->afterDestroy": {
+            "median": -13988208,
+            "min": -13988208,
+            "max": -13988208,
+            "values": [
+              -13988208,
+              -13988208,
+              -13988208,
+              -13988208,
+              -13988208
+            ]
+          }
+        }
+      },
+      {
+        "rows": 10000,
+        "fields": 32,
+        "arm": "v16",
+        "counts": {
+          "enumerableFieldGetters": 6600,
+          "firstAcquiredFields": 200,
+          "allAcquiredFields": 6400,
+          "uniqueAcquiredFields": 6400
+        },
+        "heapBytes": {
+          "fixtureBeforeStore": {
+            "median": 23014880,
+            "min": 23009408,
+            "max": 23015032,
+            "values": [
+              23014824,
+              23014944,
+              23014880,
+              23009408,
+              23015032
+            ]
+          },
+          "populated": {
+            "median": 31647352,
+            "min": 31642928,
+            "max": 31648352,
+            "values": [
+              31648352,
+              31648280,
+              31647352,
+              31642928,
+              31646760
+            ]
+          },
+          "heldRowsOnly": {
+            "median": 33480048,
+            "min": 33462616,
+            "max": 33815760,
+            "values": [
+              33815760,
+              33477616,
+              33738648,
+              33462616,
+              33480048
+            ]
+          },
+          "readRows": {
+            "median": 33838088,
+            "min": 33823992,
+            "max": 33839064,
+            "values": [
+              33839064,
+              33838992,
+              33838088,
+              33823992,
+              33837576
+            ]
+          },
+          "acquireFirstField": {
+            "median": 34113568,
+            "min": 34099472,
+            "max": 34114544,
+            "values": [
+              34114544,
+              34114472,
+              34113568,
+              34099472,
+              34113056
+            ]
+          },
+          "readFirstField": {
+            "median": 34243024,
+            "min": 34228352,
+            "max": 34243928,
+            "values": [
+              34243424,
+              34243928,
+              34243024,
+              34228352,
+              34241936
+            ]
+          },
+          "acquireAllFields": {
+            "median": 42141688,
+            "min": 42127200,
+            "max": 42142896,
+            "values": [
+              42142272,
+              42142896,
+              42141688,
+              42127200,
+              42140600
+            ]
+          },
+          "readAllFields": {
+            "median": 43578912,
+            "min": 43564832,
+            "max": 43579904,
+            "values": [
+              43579904,
+              43579728,
+              43578912,
+              43564832,
+              43578400
+            ]
+          },
+          "afterDestroy": {
+            "median": 29700016,
+            "min": 29685936,
+            "max": 29701008,
+            "values": [
+              29701008,
+              29700832,
+              29700016,
+              29685936,
+              29699504
+            ]
+          }
+        },
+        "transitions": {
+          "fixtureBeforeStore->populated": {
+            "median": 8633336,
+            "min": 8631728,
+            "max": 8633528,
+            "values": [
+              8633528,
+              8633336,
+              8632472,
+              8633520,
+              8631728
+            ]
+          },
+          "populated->heldRowsOnly": {
+            "median": 1833288,
+            "min": 1819688,
+            "max": 2167408,
+            "values": [
+              2167408,
+              1829336,
+              2091296,
+              1819688,
+              1833288
+            ]
+          },
+          "heldRowsOnly->readRows": {
+            "median": 357528,
+            "min": 23304,
+            "max": 361376,
+            "values": [
+              23304,
+              361376,
+              99440,
+              361376,
+              357528
+            ]
+          },
+          "readRows->acquireFirstField": {
+            "median": 275480,
+            "min": 275480,
+            "max": 275480,
+            "values": [
+              275480,
+              275480,
+              275480,
+              275480,
+              275480
+            ]
+          },
+          "acquireFirstField->readFirstField": {
+            "median": 128880,
+            "min": 128880,
+            "max": 129456,
+            "values": [
+              128880,
+              129456,
+              129456,
+              128880,
+              128880
+            ]
+          },
+          "readFirstField->acquireAllFields": {
+            "median": 7898848,
+            "min": 7898664,
+            "max": 7898968,
+            "values": [
+              7898848,
+              7898968,
+              7898664,
+              7898848,
+              7898664
+            ]
+          },
+          "acquireAllFields->readAllFields": {
+            "median": 1437632,
+            "min": 1436832,
+            "max": 1437800,
+            "values": [
+              1437632,
+              1436832,
+              1437224,
+              1437632,
+              1437800
+            ]
+          },
+          "readAllFields->afterDestroy": {
+            "median": -13878896,
+            "min": -13878896,
+            "max": -13878896,
+            "values": [
+              -13878896,
+              -13878896,
+              -13878896,
+              -13878896,
+              -13878896
+            ]
+          }
+        }
+      }
+    ]
+  }
+}

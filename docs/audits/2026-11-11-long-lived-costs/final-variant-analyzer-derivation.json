@@ -1,0 +1,61 @@
+{
+  "source": "/private/tmp/st-final-inventory-private-variant-analysis-source/derivation.json",
+  "sha256": "d96f3d5b0a13b81062a3f165c8e41cf1ce3650ce2cfec62deb8e95f55dcaad33",
+  "result": {
+    "passed": true,
+    "command": [
+      "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+      "/Users/jonathanborgia/code/signaltree/.worktrees/application-comparison/tools/application-lab/final-variants-analyze.mjs",
+      "/private/tmp/st-final-application-packet",
+      "/private/tmp/st-final-application-variant-packet",
+      "/private/tmp/st-final-inventory-private-variant-comparison",
+      "/private/tmp/st-final-inventory-private-variant-analysis"
+    ],
+    "bindings": {
+      "/Users/jonathanborgia/code/signaltree/.worktrees/application-comparison/tools/application-lab/final-variants-analyze.mjs": "2053fb4dc1ccab094a0e4fa9225e4a6561c25613eb245c374536577460394651",
+      "/Users/jonathanborgia/code/signaltree/.worktrees/application-comparison/tools/application-lab/analyze-variants.mjs": "798532f2593605046e28279033056a964bdd4ee1e23d6644ded67f1ad0b98a19",
+      "/private/tmp/st-final-inventory-private-variant-analysis-source/derived-analyzer.mjs": "ff1a98fd76e3162657b69b9d62eb5e7f1db6bfad34735813e73f5dd5b5ee470d"
+    },
+    "replacements": [
+      [
+        "const registeredArms = ['native', 'ngrx', 'tanstack', 'v15', 'v16'];",
+        "const registeredArms = [\"v15-before\",\"v16-before\",\"tanstack\",\"v15\",\"v16\",\"tanstack-variant\",\"native\",\"ngrx\"];"
+      ],
+      [
+        "const here = dirname(self);",
+        "const here = \"/Users/jonathanborgia/code/signaltree/.worktrees/application-comparison/tools/application-lab\";"
+      ]
+    ],
+    "commands": [
+      {
+        "name": "self-test",
+        "command": [
+          "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+          "/private/tmp/st-final-inventory-private-variant-analysis-source/derived-analyzer.mjs",
+          "--self-test"
+        ],
+        "status": 0,
+        "signal": null,
+        "log": "/private/tmp/st-final-inventory-private-variant-analysis-source/self-test.log",
+        "logSha256": "a2ad0c7714d35cbdb7012c71bae5897b097e75f55580d3ff69ad8012be5a5442"
+      },
+      {
+        "name": "analysis",
+        "command": [
+          "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+          "/private/tmp/st-final-inventory-private-variant-analysis-source/derived-analyzer.mjs",
+          "/private/tmp/st-final-application-packet",
+          "/private/tmp/st-final-application-variant-packet",
+          "/private/tmp/st-final-inventory-private-variant-comparison",
+          "/private/tmp/st-final-inventory-private-variant-analysis",
+          "inventory"
+        ],
+        "status": 0,
+        "signal": null,
+        "log": "/private/tmp/st-final-inventory-private-variant-analysis-source/analysis.log",
+        "logSha256": "64f244f5eb23d383932a3d9f7a2a93925b0ba455ae6e711d516f755b215538db"
+      }
+    ],
+    "limit": "Only explicit eight-arm cohort registration and original sibling-tool resolution differ. All workload, metrics, source/build/conformance admission and42-child completeness checks remain the original implementation."
+  }
+}

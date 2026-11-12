@@ -1,0 +1,60 @@
+{
+  "source": "/private/tmp/st-v15-residual-map-census-after.json",
+  "sha256": "4088d77f466c74149b4cc915d71a68ecc366ed23d5ddc8e8026b89bb00f16520",
+  "result": {
+    "command": [
+      "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+      "/private/tmp/st-v15-residual-map-census-after.mjs"
+    ],
+    "bundle": "/private/tmp/st-v15-activation-wrapper-aging-bundles/lazy.production.mjs",
+    "sha256": "173f2b4382d9d407c75a335eae61438498741cdf372346d726da8ef824b6e8d2",
+    "runnerSha256": "6575749023c724b3a97fc864b02dfd9d03e57b7f583c07025f77ae175960a441",
+    "limits": "Instrumented identity/count diagnostic only; no CPU/heap inference. Method restored after workload.",
+    "cycles": [
+      {
+        "cycle": 1,
+        "maps": []
+      },
+      {
+        "cycle": 2,
+        "maps": []
+      },
+      {
+        "cycle": 10,
+        "maps": [
+          {
+            "size": 0,
+            "stack": "Error\n    at Map.set (file:///private/tmp/st-v15-residual-map-census-after.mjs:9:100)\n    at Pu (file:///private/tmp/st-v15-activation-wrapper-aging-bundles/lazy.production.mjs:3:178663)\n    at Object.byId (file:///private/tmp/st-v15-activation-wrapper-aging-bundles/lazy.production.mjs:3:181188)\n    at Proxy.byIdOrFail (file:///private/tmp/st-v15-activation-wrapper-aging-bundles/lazy.production.mjs:3:181232)\n    at vd (file:///private/tmp/st-v15-activation-wrapper-aging-bundles/lazy.production.mjs:3:99512)\n    at Za (file:///private/tmp/st-v15-activation-wrapper-aging-bundles/lazy.production.mjs:3:100254)\n    at eu (file:///private/tmp/st-v15-activation-wrapper-aging-bundles/lazy.production.mjs:3:100482)\n    at Object.validateEffects (file:///private/tmp/st-v15-activation-wrapper-aging-bundles/lazy.production.mjs:3:90813)\n    at Ca (file:///private/tmp/st-v15-activation-wrapper-aging-bundles/lazy.production.mjs:3:77425)\n    at file:///private/tmp/st-v15-activation-wrapper-aging-bundles/lazy.production.mjs:3:141134",
+            "keyType": "number",
+            "valueType": "object",
+            "firstEntries": []
+          }
+        ]
+      },
+      {
+        "cycle": 20,
+        "maps": [
+          {
+            "size": 0,
+            "stack": "Error\n    at Map.set (file:///private/tmp/st-v15-residual-map-census-after.mjs:9:100)\n    at Pu (file:///private/tmp/st-v15-activation-wrapper-aging-bundles/lazy.production.mjs:3:178663)\n    at Object.byId (file:///private/tmp/st-v15-activation-wrapper-aging-bundles/lazy.production.mjs:3:181188)\n    at Proxy.byIdOrFail (file:///private/tmp/st-v15-activation-wrapper-aging-bundles/lazy.production.mjs:3:181232)\n    at vd (file:///private/tmp/st-v15-activation-wrapper-aging-bundles/lazy.production.mjs:3:99512)\n    at Za (file:///private/tmp/st-v15-activation-wrapper-aging-bundles/lazy.production.mjs:3:100254)\n    at eu (file:///private/tmp/st-v15-activation-wrapper-aging-bundles/lazy.production.mjs:3:100482)\n    at Object.validateEffects (file:///private/tmp/st-v15-activation-wrapper-aging-bundles/lazy.production.mjs:3:90813)\n    at Ca (file:///private/tmp/st-v15-activation-wrapper-aging-bundles/lazy.production.mjs:3:77425)\n    at file:///private/tmp/st-v15-activation-wrapper-aging-bundles/lazy.production.mjs:3:141134",
+            "keyType": "number",
+            "valueType": "object",
+            "firstEntries": []
+          }
+        ]
+      },
+      {
+        "cycle": 30,
+        "maps": [
+          {
+            "size": 0,
+            "stack": "Error\n    at Map.set (file:///private/tmp/st-v15-residual-map-census-after.mjs:9:100)\n    at Pu (file:///private/tmp/st-v15-activation-wrapper-aging-bundles/lazy.production.mjs:3:178663)\n    at Object.byId (file:///private/tmp/st-v15-activation-wrapper-aging-bundles/lazy.production.mjs:3:181188)\n    at Proxy.byIdOrFail (file:///private/tmp/st-v15-activation-wrapper-aging-bundles/lazy.production.mjs:3:181232)\n    at vd (file:///private/tmp/st-v15-activation-wrapper-aging-bundles/lazy.production.mjs:3:99512)\n    at Za (file:///private/tmp/st-v15-activation-wrapper-aging-bundles/lazy.production.mjs:3:100254)\n    at eu (file:///private/tmp/st-v15-activation-wrapper-aging-bundles/lazy.production.mjs:3:100482)\n    at Object.validateEffects (file:///private/tmp/st-v15-activation-wrapper-aging-bundles/lazy.production.mjs:3:90813)\n    at Ca (file:///private/tmp/st-v15-activation-wrapper-aging-bundles/lazy.production.mjs:3:77425)\n    at file:///private/tmp/st-v15-activation-wrapper-aging-bundles/lazy.production.mjs:3:141134",
+            "keyType": "number",
+            "valueType": "object",
+            "firstEntries": []
+          }
+        ]
+      }
+    ]
+  }
+}

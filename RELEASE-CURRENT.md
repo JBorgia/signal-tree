@@ -1,9 +1,49 @@
-# Current release — v16 candidate qualified
+# Current release — v15.4.8 released; long-lived follow-through complete
 
 Updated November 11, 2026. This is the single active acceptance ledger. Historical
 first failures and sealed predecessors remain evidence, not competing queues.
 
 ## Active owner instruction
+
+### November 11 long-lived cost and optionality follow-through — complete
+
+The owner authorized cumulative retained-store comparisons including v16's full
+guarantees, evidence-led v15 optimization, and a measured assessment of built-in
+versus optional costs and configuration overhead. Follow the
+[registered investigation](docs/audits/2026-11-11-long-lived-costs/PROTOCOL.md).
+Preserve the released v15 and sealed v16 baselines. Runtime prototypes live in
+isolated checkouts; no new public configuration or weakened guarantee is selected.
+No new version, tag, publication or deployment is authorized by this study.
+
+- [x] Run production-selected long-lived ordinary comparisons and activation probes.
+- [x] Exercise retained-store coordination and rerun kernel/Angular contracts.
+- [x] Validate and assess the isolated v15 collection-projection optimization.
+- [x] Resolve the active-Link bulk-population cost exposed by activation probes.
+- [x] Repair settled bulk-rollback backing growth on retained transaction trees,
+      preserving pending capture and restoration ownership on both release lines.
+- [x] Finish exact retained-fact representation and combined successor validation.
+- [x] Rerun the competing-library and implementation comparisons on the settled
+      builds, preserving pinned rivals, equivalent observable work and first failures.
+- [x] Complete independent interpretation, exact evidence and adoption disposition.
+
+The measured successor sources are v15 `0d2b96192` and v16 `5d04ff65`.
+Final v16 source/framework/demo suites, types, built witnesses and 18/19 affected
+gates pass; the existing numerical size failure remains explicit. The matched
+activation/pending cohorts, original point bound, repeated aging, exact native
+fact census and deep-history checks are complete. Retained and pending memory
+improve substantially; full historical source expansion and some mixed-proof
+operations retain priced CPU costs. The settled-build rerun completes all 578
+comparative children, including the production Angular inventory/dispatch apps
+and private TanStack implementations. Independent review verifies raw bindings,
+intermediate outcomes and matched arithmetic. v15 aggregate time improves about
+38% at 10,000 × 32; sparse work and ordinary heap are largely unchanged. v16
+ordinary startup remains costly, with a measured 7.1% paired increase in large
+dispatch navigation. The publication/rollback and pending/retained-memory gains
+are retained with those explicit tradeoffs, not presented as a universal speedup.
+No new public configuration is adopted. The [completed study](docs/audits/2026-11-11-long-lived-costs/README.md)
+records exact source/artifacts, controls, recovered historical versions and the
+verified evidence archive. Both runtime branches and the study remain separate
+from merge, version/tag preparation, publication and deployment.
 
 ### November 11 release and automated application study — complete
 

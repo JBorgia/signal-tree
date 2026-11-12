@@ -1,0 +1,444 @@
+{
+  "source": "/private/tmp/st-never-claimed-churn.json",
+  "sha256": "f3718971ab8791eb5d10588fbde6b332043dd8771688ac5722fcd77d30cbd230",
+  "result": {
+    "passed": true,
+    "command": [
+      "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+      "/private/tmp/st-never-claimed-churn.mjs"
+    ],
+    "bindings": {
+      "/private/tmp/st-never-claimed-churn-protocol.json": "c2a1759696ad2ebc205683e4e807ab0d8449c679b76c2ac2df6eda0a9cdbac80",
+      "/private/tmp/st-never-claimed-churn.mjs": "af2de43431e4295917898d5c60f049bd647f27b8a6e95d932a8861cb6b2aefb8",
+      "/private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/application-baseline-4/v16/node_modules/@signal-tree/kernel/LICENSE": "f5dcb3330332339856c5d061d659c2e6852aae553c6a5482d46818229b5db90d",
+      "/private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/application-baseline-4/v16/node_modules/@signal-tree/kernel/NOTICE": "89a5615d0d1f1ed80ae82acafd648f21e086f98ddf01496af2cbafead0eeedb6",
+      "/private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/application-baseline-4/v16/node_modules/@signal-tree/kernel/README.md": "bd17cf3ff2c17cba9a70318c8d1013f34d3595cb2252ebe1f3ff8c9f5e700f2b",
+      "/private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/application-baseline-4/v16/node_modules/@signal-tree/kernel/dist/_adapter-Cp5WVkcj.d.ts": "9cd8c8d32fdee02184e04bb0a38274ad0ec6cdb42151effe97d935d6cbad4d1e",
+      "/private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/application-baseline-4/v16/node_modules/@signal-tree/kernel/dist/_position-registry-D8dCXLAS.d.ts": "5fa73d43d0525919b2731e54adbe1a2cb1adaafc6fe014c536b4dc75a69bfab6",
+      "/private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/application-baseline-4/v16/node_modules/@signal-tree/kernel/dist/adapter.d.ts": "6bf35e1e1860606f6c777788bea636ac44ed781e3b4b0e064102a53eb25e9683",
+      "/private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/application-baseline-4/v16/node_modules/@signal-tree/kernel/dist/adapter.js": "7d92f397a047983c78ae21b1e0eb759332297fb515acf8078df6e90d1eada4d1",
+      "/private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/application-baseline-4/v16/node_modules/@signal-tree/kernel/dist/enhancers/batching/batching.js": "f266af789c5f4212b90bacb20657c4fc6a10da3200d7be6246b701946106ffce",
+      "/private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/application-baseline-4/v16/node_modules/@signal-tree/kernel/dist/enhancers/devtools/devtools-impl.js": "6db65cd985bc1116b11d9ebb3f99ac6117b743ad10f20f33da705e001ce4e64c",
+      "/private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/application-baseline-4/v16/node_modules/@signal-tree/kernel/dist/enhancers/devtools/devtools.js": "b3c05a3a89706751807e85bf96c184c0f26a82a399d980966301162572fbe678",
+      "/private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/application-baseline-4/v16/node_modules/@signal-tree/kernel/dist/enhancers/index.js": "2101af7fc02fd5d38b59084e760d5b51bff5128eb854e14081f4912873da1425",
+      "/private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/application-baseline-4/v16/node_modules/@signal-tree/kernel/dist/enhancers/restoration/order-boundary-evidence.js": "7d914140e91edcecea26ffb2be8b6b487777a8a939affaf217e9a37189069d44",
+      "/private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/application-baseline-4/v16/node_modules/@signal-tree/kernel/dist/enhancers/restoration/restoration.js": "95269eb7c63de657b9ca6e1e1deca6554b94305f0350b455f7cc19b5e7efe90e",
+      "/private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/application-baseline-4/v16/node_modules/@signal-tree/kernel/dist/enhancers/transactions/occupancy-composition.js": "4021671e1f2ff5eeba117b279e17a605a9664dddfbd0e22446e5376496a76f50",
+      "/private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/application-baseline-4/v16/node_modules/@signal-tree/kernel/dist/enhancers/transactions/transactions.js": "d7d62ae976cebabdf67c059631ac04a67557906e4d350fbceecac0fe39a27056",
+      "/private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/application-baseline-4/v16/node_modules/@signal-tree/kernel/dist/index.d.ts": "d6718f35d6cd5179dcf54cae33b02f578a8a74954b7f6495fb821a69293a0418",
+      "/private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/application-baseline-4/v16/node_modules/@signal-tree/kernel/dist/index.js": "77ecf6d8f685069a3620b8f54119dd33df27d417782c40ca79fb2145ae1f0559",
+      "/private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/application-baseline-4/v16/node_modules/@signal-tree/kernel/dist/internals.d.ts": "75ea10e60200a72de95e7df66acc71f6139ad0a8236bb7818eb21ab027d24f4a",
+      "/private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/application-baseline-4/v16/node_modules/@signal-tree/kernel/dist/internals.js": "f0bd6c8036404f0e202eed089fa0d70224e430eb032b6dcc44560709b8d95415",
+      "/private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/application-baseline-4/v16/node_modules/@signal-tree/kernel/dist/lib/constants.js": "9e550635ca6aa3ec4e977b312ddc30af682ed5eb6f1d960df828b2528054fed3",
+      "/private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/application-baseline-4/v16/node_modules/@signal-tree/kernel/dist/lib/enhancer-types.js": "38a55eaafc23f76cda0cc9eb313aa3fda1ebfa01237f815f54e2cb1fafaf5bbe",
+      "/private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/application-baseline-4/v16/node_modules/@signal-tree/kernel/dist/lib/entity-signal.js": "7e3cbd13fa4c8188ab263f50756af490c22b3cb34f4f1a0a101bd0642ad0a87a",
+      "/private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/application-baseline-4/v16/node_modules/@signal-tree/kernel/dist/lib/experimental-publication/entity.js": "921e74fe56e705aa46b249d61dd2577617dca7ce53ab157726a749d095baae83",
+      "/private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/application-baseline-4/v16/node_modules/@signal-tree/kernel/dist/lib/experimental-publication/lifecycle.js": "4794a8a63973201857864d6589225fe4589f04f1623ea3dc0127b8e69fc2fda1",
+      "/private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/application-baseline-4/v16/node_modules/@signal-tree/kernel/dist/lib/experimental-publication/packed-field-row.js": "74e6513a84331fbebc6e604d65b52cd3c52791f59ee064e4679b593564cc0bfe",
+      "/private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/application-baseline-4/v16/node_modules/@signal-tree/kernel/dist/lib/experimental-publication/private.js": "1449553b0ebd37624eb763429c4d672ea39678d8ff8d3fc35a571b601d0cc2f8",
+      "/private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/application-baseline-4/v16/node_modules/@signal-tree/kernel/dist/lib/experimental-publication/projection.js": "5821c9ff89122ef56f9ed9563f4aad4c7df3129de9fedb52899aa37b8cc6c8e0",
+      "/private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/application-baseline-4/v16/node_modules/@signal-tree/kernel/dist/lib/experimental-publication/recipient-occurrence.js": "4582bc8ce929896b6eeef41b4bf638a3e7b73365e3541f15af09f03623d78be2",
+      "/private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/application-baseline-4/v16/node_modules/@signal-tree/kernel/dist/lib/external.js": "a43be60d2a89d982209a55ce20246ecd7b65e869c908178683a0b12a95351081",
+      "/private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/application-baseline-4/v16/node_modules/@signal-tree/kernel/dist/lib/internals/canonical-snapshot.js": "4ccacb2bc2e4c73b5daad34987c21628d8a8fe267c70f0faf16863234ce4b119",
+      "/private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/application-baseline-4/v16/node_modules/@signal-tree/kernel/dist/lib/internals/causal-runtime/applied-turn-projection.js": "c52212b5f2cabac82911f05e341eeb02e405b67e0d680aa4442df2bb9a97abd9",
+      "/private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/application-baseline-4/v16/node_modules/@signal-tree/kernel/dist/lib/internals/causal-runtime/ordinary-realization.js": "a735745e968627526ed958f596ab3f5a8918079d5d131c40a8ddf81018ca367d",
+      "/private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/application-baseline-4/v16/node_modules/@signal-tree/kernel/dist/lib/internals/causal-runtime/pending-rollback.js": "50863a86f1ca0cf81a29f633937089ca08c335c38bdeeacba94cbfa744dfa3e9",
+      "/private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/application-baseline-4/v16/node_modules/@signal-tree/kernel/dist/lib/internals/causal-runtime/post-application-failure.js": "9b85af135f97a976e5cc3e6ef33661db2873f987078c14599074e8a38a3df240",
+      "/private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/application-baseline-4/v16/node_modules/@signal-tree/kernel/dist/lib/internals/causal-runtime/realization-context.js": "6dbd74416fe572ebc63bc74bf81eddf86d570b9f53309dfdc77c6fc8f2a90208",
+      "/private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/application-baseline-4/v16/node_modules/@signal-tree/kernel/dist/lib/internals/causal-runtime/scoped-value-addressing.js": "0c8a4d03b88f7dc0cc845c22b731fc8f8de86c10e247334ea0b9dac00c5f91f8",
+      "/private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/application-baseline-4/v16/node_modules/@signal-tree/kernel/dist/lib/internals/causal-runtime/target-transition.js": "a1af1a8014b4b951a0ff6bbbd9a56a3eacf26e2ffdcc7f6f2e90aaa40dc118f5",
+      "/private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/application-baseline-4/v16/node_modules/@signal-tree/kernel/dist/lib/internals/causal-runtime/transaction-lifecycle.js": "e6830837e4288560926c39edc188c66f994348eb8bda2e4482ee8b8c394f1cd1",
+      "/private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/application-baseline-4/v16/node_modules/@signal-tree/kernel/dist/lib/internals/causal-runtime/transient-rows.js": "d705adc9d4269f8ca577e796071f30c13ff2a5241af43bb9c2d4781a888fae87",
+      "/private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/application-baseline-4/v16/node_modules/@signal-tree/kernel/dist/lib/internals/causal-runtime/tree-realization-adapter.js": "81147696330715b2229aece93fd31a99f39011011a7d09b6d0daaf1187cd3708",
+      "/private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/application-baseline-4/v16/node_modules/@signal-tree/kernel/dist/lib/internals/causal-runtime/turn-store.js": "9c0692505988d4276c5bfe0355a055b90a276ff4dc08f2fb0bad5cf74f2955df",
+      "/private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/application-baseline-4/v16/node_modules/@signal-tree/kernel/dist/lib/internals/cell-identity.js": "2b1845cdfc9a5428490df81fedb26fa3acff824379c833384959942b9843b83b",
+      "/private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/application-baseline-4/v16/node_modules/@signal-tree/kernel/dist/lib/internals/commit-consequence.js": "0cef50047fc80e20c5d93b98222d14a365d433ce0dfd1cf35642c22b321b3bad",
+      "/private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/application-baseline-4/v16/node_modules/@signal-tree/kernel/dist/lib/internals/confirmed-turn-view.js": "f67861a6ea9a88888d8dbaf88a71561705063f24f73bfa0126667eaa2fc36067",
+      "/private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/application-baseline-4/v16/node_modules/@signal-tree/kernel/dist/lib/internals/construction-allocation.js": "9ef45cf16700e2a0b6a6acd829e0927f7fd25575d87812057d929ace4bd3d946",
+      "/private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/application-baseline-4/v16/node_modules/@signal-tree/kernel/dist/lib/internals/construction-branch.js": "fb6491c0318fae2b08f9274e3a648c1675ca71ccfdb2fdb2770402f0a89cd4c3",
+      "/private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/application-baseline-4/v16/node_modules/@signal-tree/kernel/dist/lib/internals/entity-egress-projection.js": "54227ae9f28098cf8a361c8b55d41f9fb24b47826a9475f5ccbe79462abc04a1",
+      "/private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/application-baseline-4/v16/node_modules/@signal-tree/kernel/dist/lib/internals/entity-membership-inventory.js": "b694227478a492f0f6c3e8ca8e71d6094fb7011b34b36ea6da63dcc7774d7b49",
+      "/private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/application-baseline-4/v16/node_modules/@signal-tree/kernel/dist/lib/internals/entity-membership-source.js": "f484bc5ab09ccbc02c984e12992195099dd5b9ab8ec48c9deae445c626190546",
+      "/private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/application-baseline-4/v16/node_modules/@signal-tree/kernel/dist/lib/internals/entity-membership-view.js": "efa8c0cc14ff6826d6702e2bbbfdfd2bd9c6e974d89c974772c9311d53f178d8",
+      "/private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/application-baseline-4/v16/node_modules/@signal-tree/kernel/dist/lib/internals/entity-preparation-reader.js": "932b78bdb57aa8c357bdc6b715cc847d6f76fd9d5a0fd9fa28802899cc0275fc",
+      "/private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/application-baseline-4/v16/node_modules/@signal-tree/kernel/dist/lib/internals/entity-projection-seed.js": "6f91549be085973cac62227e01d2d9a1aed16552da11e45b3be7cc7d11f46234",
+      "/private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/application-baseline-4/v16/node_modules/@signal-tree/kernel/dist/lib/internals/entity-publication.js": "81e25224af0ee16ea7b5d5f45ba3a6895fcf2526c2315eaa98fd023bee134e7c",
+      "/private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/application-baseline-4/v16/node_modules/@signal-tree/kernel/dist/lib/internals/entity-value-transition.js": "66c80a46f5a2839c72aef505c284eee26a4b2f319c3a86b002425c1fd4b39133",
+      "/private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/application-baseline-4/v16/node_modules/@signal-tree/kernel/dist/lib/internals/error-reporter.js": "4e3df8672ad2fc6c94b0aec0bc95edca2fcfe5bb192afc36f5e18d8e9a866cff",
+      "/private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/application-baseline-4/v16/node_modules/@signal-tree/kernel/dist/lib/internals/exposed-publication.js": "ec41990873df8ce007d38c385a22c13c02adf57a79fde81ed0252d5b75929a75",
+      "/private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/application-baseline-4/v16/node_modules/@signal-tree/kernel/dist/lib/internals/intercept-leaf-signals.js": "b831beda28185623972e3b5de0581751ee76479d5397097c938f92ea81e25253",
+      "/private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/application-baseline-4/v16/node_modules/@signal-tree/kernel/dist/lib/internals/intrinsic-mutation.js": "4b1f5ef7501a4e6d108ca67dc05917fb3e76b8bac33df2770b91f90f2fdd6373",
+      "/private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/application-baseline-4/v16/node_modules/@signal-tree/kernel/dist/lib/internals/link-state-source.js": "e1703ca459b2b5d8a68e4e5d43edd0c7b2c52120b011920b686195a4efcd9a7e",
+      "/private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/application-baseline-4/v16/node_modules/@signal-tree/kernel/dist/lib/internals/link-state-view.js": "09decebd532286f9dd857cdda811e63538696ba5f04447b8106daa472a21a3b2",
+      "/private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/application-baseline-4/v16/node_modules/@signal-tree/kernel/dist/lib/internals/location-runtime.js": "b74ec8726e2aefc65b7644369ffb74a97f37e3b88d7592bea852494bbb1ab3b0",
+      "/private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/application-baseline-4/v16/node_modules/@signal-tree/kernel/dist/lib/internals/materialize-markers.js": "55c32943ca582f95327db4f9e8f14b315d8f408bedaef8f85c91869afd35216a",
+      "/private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/application-baseline-4/v16/node_modules/@signal-tree/kernel/dist/lib/internals/member-membership.js": "b79d421680674816b00e19b08a8c212dee9c1fdae5b1e89cd00736a9570e5f60",
+      "/private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/application-baseline-4/v16/node_modules/@signal-tree/kernel/dist/lib/internals/merge-derived.js": "125abd6c055f48c05797b8a9323e62f838e210bcd2aa1e744b7b1e60c7869643",
+      "/private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/application-baseline-4/v16/node_modules/@signal-tree/kernel/dist/lib/internals/mutation-capture-runtime.js": "25661669ac4fb0a2cca48e8f946da7099aec79c2fa44d6f393a6c89ecf7ffe95",
+      "/private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/application-baseline-4/v16/node_modules/@signal-tree/kernel/dist/lib/internals/native-field-selection.js": "e8fc38c7d664bdb2c20486482c42d218cc7d3fabfad9c701394df5b4318856b7",
+      "/private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/application-baseline-4/v16/node_modules/@signal-tree/kernel/dist/lib/internals/native-location-realization.js": "8781641e30c49b9ba465754ad24b6c2807e547a2b1d8366254280ada46aa9dc5",
+      "/private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/application-baseline-4/v16/node_modules/@signal-tree/kernel/dist/lib/internals/native-occurrence.js": "bd4ad75effd644313888ef79eafe3f84921692dc2aa99e3a1c8bee9bcc4d97e3",
+      "/private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/application-baseline-4/v16/node_modules/@signal-tree/kernel/dist/lib/internals/native-scalar-selection.js": "38656d2be8648ae49928e42b187b1744c16a7ef3cdace12c8066e0c73d336c75",
+      "/private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/application-baseline-4/v16/node_modules/@signal-tree/kernel/dist/lib/internals/native-tree-scalar-leaf-runtime.js": "9a957cd5492c20fcf87fd926902a633da956628bdff5f07944dd028967d94da6",
+      "/private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/application-baseline-4/v16/node_modules/@signal-tree/kernel/dist/lib/internals/node-shape.js": "a59d861653779f6e7e6580b709badce8e7803be5f5cfb607828cb179a53d39a8",
+      "/private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/application-baseline-4/v16/node_modules/@signal-tree/kernel/dist/lib/internals/observation-adapter.js": "1907fca8d5bd4ba4c847ccc375de01b0921752185d8f491efffa8e12befcee7e",
+      "/private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/application-baseline-4/v16/node_modules/@signal-tree/kernel/dist/lib/internals/observation-substrate.js": "e0d816f966b68122b2b8aac25d2ebbc46167cab3ef991c0b6b26604107bd21f6",
+      "/private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/application-baseline-4/v16/node_modules/@signal-tree/kernel/dist/lib/internals/ordinary-entity-entries.js": "5df1c2683c5b4f13002faae6a885d1ee69172d73eb7a4073aaadf477997a894b",
+      "/private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/application-baseline-4/v16/node_modules/@signal-tree/kernel/dist/lib/internals/owned-metadata.js": "66dd3a5beb7db830728ec11a01064a6cf8db5c818ddbd8e0c63ac67411dab301",
+      "/private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/application-baseline-4/v16/node_modules/@signal-tree/kernel/dist/lib/internals/owned-mutation.js": "40bc80042af7c68ffc1e5b710fbbe0bdeeed9d4c238460f6f632d9cba238a6f8",
+      "/private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/application-baseline-4/v16/node_modules/@signal-tree/kernel/dist/lib/internals/owner-invalidation-port.js": "ca1a7cb729f0f6a270e5de59a590aab755645c6a218abba9163be09a37132957",
+      "/private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/application-baseline-4/v16/node_modules/@signal-tree/kernel/dist/lib/internals/owner-invalidation.js": "867aebe08f2dc3bcf70ae4ab1cd332d8ece089e9e6e2ed22d460ebda6b111e37",
+      "/private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/application-baseline-4/v16/node_modules/@signal-tree/kernel/dist/lib/internals/path-observation-port.js": "d243c91aa1c394a94d1f0ec1e692ba5b641ed0b54acb4a06411a85621d988ec9",
+      "/private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/application-baseline-4/v16/node_modules/@signal-tree/kernel/dist/lib/internals/physical-commit-clock.js": "e549fe6fc4b6f0bae4d956d4656cda037150f3571bbb991fa66e0d539bcb4755",
+      "/private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/application-baseline-4/v16/node_modules/@signal-tree/kernel/dist/lib/internals/physical-rows.js": "af313f1b250cb2d02dd094e231e52969bceadfa95e0c437a5a0ef000740ed86d",
+      "/private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/application-baseline-4/v16/node_modules/@signal-tree/kernel/dist/lib/internals/plain-branch-membership.js": "1e46bf1c573d976c8637fa2b7fe2cbdba71342a690c7fb63ed7ac2da960a6e65",
+      "/private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/application-baseline-4/v16/node_modules/@signal-tree/kernel/dist/lib/internals/position-registry.js": "052b686674ccf0866b0bf4f37111eb038f7f7c115e5da9ed8f15e1952c047e16",
+      "/private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/application-baseline-4/v16/node_modules/@signal-tree/kernel/dist/lib/internals/predicate-churn-warning.js": "403104a70d67efa686f82aec462f330df03e5f240f3224613bd0d463c0d7337a",
+      "/private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/application-baseline-4/v16/node_modules/@signal-tree/kernel/dist/lib/internals/production-substrate-stats.prod.js": "750a59ce80f35e04900b1dfc90b18d4caf3dc5b84d4ab93301c338971bc7648c",
+      "/private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/application-baseline-4/v16/node_modules/@signal-tree/kernel/dist/lib/internals/publication-preparation.js": "5fb75d5b2075da0044417e8e5146e7dfc9bb52b1db42900e90527a06127db03e",
+      "/private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/application-baseline-4/v16/node_modules/@signal-tree/kernel/dist/lib/internals/restoration-eligibility.js": "a16e07468f9bb68d5ac56c5cd42476bbc10b310b02c0aa0b07e02f6b1fc6b739",
+      "/private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/application-baseline-4/v16/node_modules/@signal-tree/kernel/dist/lib/internals/restoration-reader.js": "6a970c19cb257042282e5d1ce46d47e7053b3bb93fcb3868a5eea500abeb4204",
+      "/private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/application-baseline-4/v16/node_modules/@signal-tree/kernel/dist/lib/internals/restoration-source.js": "5263d1feb5fc9456bd5522104a471dc7ba2fb1007cd19fa33ca183a4576f5df6",
+      "/private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/application-baseline-4/v16/node_modules/@signal-tree/kernel/dist/lib/internals/root-source.js": "fd3f6454a5b4d80c2912604e68e95e7cff15d7ccd598130c1b6a191f1f533106",
+      "/private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/application-baseline-4/v16/node_modules/@signal-tree/kernel/dist/lib/internals/runtime-tree-plan.js": "05d31fdf6efa5ef49f08ff271c87b74f541cf62098a028015045dc9a4cab703e",
+      "/private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/application-baseline-4/v16/node_modules/@signal-tree/kernel/dist/lib/internals/scalar-admission-metadata.js": "69b93055612a170ddc1628bb413177f692f2206266b4bd7c2cc9193d014b53b1",
+      "/private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/application-baseline-4/v16/node_modules/@signal-tree/kernel/dist/lib/internals/scalar-publication-coverage.js": "8902f08cb466fc541fa8256c9f6cc1b89e18071075a636e618aa7021b888eae4",
+      "/private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/application-baseline-4/v16/node_modules/@signal-tree/kernel/dist/lib/internals/scalar-responsibility-attachment.js": "006b1b22aaf665979e78a3dc018baa178b5211199bf5164e93fd0b24c9d219d0",
+      "/private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/application-baseline-4/v16/node_modules/@signal-tree/kernel/dist/lib/internals/selected-entity-disposition.js": "1ab8014533eb432bc4e3d3a4f59d4523f1ae0c2ec9a890629da4b332e17560ad",
+      "/private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/application-baseline-4/v16/node_modules/@signal-tree/kernel/dist/lib/internals/selected-write-operation.js": "1142b166b55e0ff046ef4e12b78cd19c3cb02430a77b2d192a063a08cc633487",
+      "/private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/application-baseline-4/v16/node_modules/@signal-tree/kernel/dist/lib/internals/snapshot-authority.js": "7592bdbd308acec391b11d139195d19fa83f9037ca97d8eda5696ac4d24c12c8",
+      "/private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/application-baseline-4/v16/node_modules/@signal-tree/kernel/dist/lib/internals/snapshot-installation.js": "d0a8ee96c181d849cd45ea821f44e5fd0a0e9d0a94c4ae5ca3cd78d4bc42dc89",
+      "/private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/application-baseline-4/v16/node_modules/@signal-tree/kernel/dist/lib/internals/source-mutation.js": "8942be662428ec984e1ac56f3317c5ed29fab6c1e41a1f58a0532b62c1ae1377",
+      "/private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/application-baseline-4/v16/node_modules/@signal-tree/kernel/dist/lib/internals/state-location-view.js": "1d5639f0ac110ceb7bb6d3e9f12171f79fa1203e9bab2bfe68f04fc3db47b7b7",
+      "/private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/application-baseline-4/v16/node_modules/@signal-tree/kernel/dist/lib/internals/subject-reclamation-sink.js": "2699a32e3cdcf80f201f503a1f6dbba6b56bcd12d04326ad958c23845ea43960",
+      "/private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/application-baseline-4/v16/node_modules/@signal-tree/kernel/dist/lib/internals/subject-restoration-claims.js": "821f04b20d744b9469134fb0ee079cdfda567c25cd6113eecc8d2f4f026c6a3b",
+      "/private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/application-baseline-4/v16/node_modules/@signal-tree/kernel/dist/lib/internals/tooling-tree.js": "7c5d2da645e0586f5aee8b9681dda818e32944375a4acd7fa05616718d2e5d33",
+      "/private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/application-baseline-4/v16/node_modules/@signal-tree/kernel/dist/lib/internals/transaction-lifecycle-source.js": "c1267d31cdbc6053f8dc8b07a7b3c3cbb5b9ba91dfd1c773b8b825f73b4bc58e",
+      "/private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/application-baseline-4/v16/node_modules/@signal-tree/kernel/dist/lib/internals/transaction-lifecycle-view.js": "3d7e04e96dce625ab6148bfd827501e00df72333b35d5aff94f3afd4a10b959a",
+      "/private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/application-baseline-4/v16/node_modules/@signal-tree/kernel/dist/lib/internals/tree-capabilities.js": "05c762d6f35f3bc7918cd708a5f1c4ce4570a48c2c877b479c67606b22eb2dbf",
+      "/private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/application-baseline-4/v16/node_modules/@signal-tree/kernel/dist/lib/internals/tree-scalar-leaf-runtime.js": "1ee4c3fbed751adac26ce46cdd0d97f498095b60430e1d0e94094a7b8e88f2be",
+      "/private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/application-baseline-4/v16/node_modules/@signal-tree/kernel/dist/lib/internals/tree-scalar-slot-port.js": "1c16b191969ecb579f55c789f1480065853609251822bf44f982737c739bfd52",
+      "/private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/application-baseline-4/v16/node_modules/@signal-tree/kernel/dist/lib/internals/tree-scalar-slot-runtime.js": "5987058cd43d33ae6a00d92ffffa0bc798750d7bf7749a377725d1f7398560ab",
+      "/private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/application-baseline-4/v16/node_modules/@signal-tree/kernel/dist/lib/internals/utilities/append-all.js": "dc3bb31df5084ca8675c9fd73ffd807622fd09a0a16c322acb3a651f68cc6257",
+      "/private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/application-baseline-4/v16/node_modules/@signal-tree/kernel/dist/lib/internals/utilities/deep-clone.js": "db45f96fa0d840c58321c217c953f8a08a4157df055fd28a9c8e75a79a081e5f",
+      "/private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/application-baseline-4/v16/node_modules/@signal-tree/kernel/dist/lib/internals/utilities/deep-equal.js": "bf31d23598305cbf68909395a8eef505d73807e1af01078d0bb7aca888c2cc67",
+      "/private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/application-baseline-4/v16/node_modules/@signal-tree/kernel/dist/lib/internals/utilities/is-built-in-object.js": "48b9269302bcc03d18147c399f105c968f7cb6285a182c4d43ccd62850cf8dee",
+      "/private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/application-baseline-4/v16/node_modules/@signal-tree/kernel/dist/lib/internals/visit-tree.js": "4a0f98ac82f24a0f2ac20ef3942b0cbc7ba1404fd2f70012bbeb66556e8e5c0c",
+      "/private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/application-baseline-4/v16/node_modules/@signal-tree/kernel/dist/lib/internals/write-observation-scope.js": "4dc4f650e78d56ae6172f5a769c62b0083a070c6b8df1d808fc9019d3d9a0d99",
+      "/private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/application-baseline-4/v16/node_modules/@signal-tree/kernel/dist/lib/internals/write-observation.js": "e4224471cfbac2b091d97ac8a2812830e879cd294d222f11923f543c0de0c6cc",
+      "/private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/application-baseline-4/v16/node_modules/@signal-tree/kernel/dist/lib/leaf.js": "d8b4384510c497d4073d43c4b8941f4e6ee8845e25f99984e949f8ecb225ec76",
+      "/private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/application-baseline-4/v16/node_modules/@signal-tree/kernel/dist/lib/link.js": "a1f1dfa163584e84f7b1cd3f55e4c4ab18a86dc5e2547e60fb1ce7cb6db6a025",
+      "/private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/application-baseline-4/v16/node_modules/@signal-tree/kernel/dist/lib/markers/entity-map.js": "791e611bb87e3ec05a98850579364f0171ee5ddf26da1464a5ee441b4991c97c",
+      "/private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/application-baseline-4/v16/node_modules/@signal-tree/kernel/dist/lib/path-notifier.js": "f3fa6c4a15c340059f46070d71d6333ba17644236842125fde968879b4ae9dbf",
+      "/private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/application-baseline-4/v16/node_modules/@signal-tree/kernel/dist/lib/physical/entity-handle-resolution.js": "ce90278c24c0708532055390e4d4fc4609017471df2aefdabbdcaa85cefb2c37",
+      "/private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/application-baseline-4/v16/node_modules/@signal-tree/kernel/dist/lib/physical/entity-mutation-frame.js": "a60f6d891c4806ad5674f70da3a5e339082f007b0b084bc98d2205d9f1fd1df7",
+      "/private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/application-baseline-4/v16/node_modules/@signal-tree/kernel/dist/lib/physical/entity-ordinary-topology.js": "f4d5a824e515a3b0ff62d46522906263df58b70f1f4d686a2c623023ca9a55d6",
+      "/private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/application-baseline-4/v16/node_modules/@signal-tree/kernel/dist/lib/physical/entity-placement-stage.js": "1c7c6b1e11ff1127d03c081b01d80c4d4cd46d328abbe4a302a3717b46348dc0",
+      "/private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/application-baseline-4/v16/node_modules/@signal-tree/kernel/dist/lib/physical/entity-value-store.js": "3626cfae31e8d7829b3d494bc03ec1edc955a192961d9d6dbbabdf8475b51e8f",
+      "/private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/application-baseline-4/v16/node_modules/@signal-tree/kernel/dist/lib/physical/order-restores-for-placement.js": "26239b84c3c8b057e55d7a0748f909fb676cab4fd6cf6d07698e10a934811e3f",
+      "/private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/application-baseline-4/v16/node_modules/@signal-tree/kernel/dist/lib/physical/ordinary-key-evidence.js": "94774122a140c9051153c83240449227cf8690e53c0a166b5eea48425df79d96",
+      "/private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/application-baseline-4/v16/node_modules/@signal-tree/kernel/dist/lib/physical/ordinary-restoration-placement.js": "bd4ed04ec35e7de075cc6989e4fadb376c154a80229942731715155d3ee8bc9a",
+      "/private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/application-baseline-4/v16/node_modules/@signal-tree/kernel/dist/lib/physical/prepare-entity-target.js": "f9c27850208a772a619fdf3bc1088382616727e1d81e3be94edde447cb064f81",
+      "/private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/application-baseline-4/v16/node_modules/@signal-tree/kernel/dist/lib/physical/prepare-structural-target.js": "2bd50c7f15a197b3746d74cde5d8d4d01dd10a7cb87c97f80d8cfb0c35f4fe7a",
+      "/private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/application-baseline-4/v16/node_modules/@signal-tree/kernel/dist/lib/physical/prepared-placement-visibility.js": "06f43b4e25a64d2526da327ce87fe4f1b1cc0abb7dff871686e49aa0a0eeee6e",
+      "/private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/application-baseline-4/v16/node_modules/@signal-tree/kernel/dist/lib/physical/structural-store.js": "73691ba75615b47ad9e87c537b660f36b979a4acfee91eb78d6d3882e86988db",
+      "/private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/application-baseline-4/v16/node_modules/@signal-tree/kernel/dist/lib/readonly.js": "99a42cd7d0ea2b78d8b348e68149d6a8e04227298e8372e8406342aafe01b364",
+      "/private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/application-baseline-4/v16/node_modules/@signal-tree/kernel/dist/lib/signal-tree.js": "d04274fc3935d254795fb56ffe4f02bff1abf3f676d118fe0e1ca80c4591dc17",
+      "/private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/application-baseline-4/v16/node_modules/@signal-tree/kernel/dist/lib/types.js": "b6d98bc9167425df63e74e67d140a89c6c5e985e241b77e54f19904fb4aeb4b8",
+      "/private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/application-baseline-4/v16/node_modules/@signal-tree/kernel/dist/lib/undoable.js": "1b6bd2bd39c95e3d595ed1e7a87117a731bf64736fa849d33d8c1167be32320a",
+      "/private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/application-baseline-4/v16/node_modules/@signal-tree/kernel/dist/lib/utils.js": "37e05c1e4c8bd2bbd29d55cbf4795feaf44b0d8f43519fb38f94335fa67c92c9",
+      "/private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/application-baseline-4/v16/node_modules/@signal-tree/kernel/dist/lib/write-context.js": "0e5accd045f855e65ea5dcfc72b34085cab7fa4623ed8a64f4fd4ecef650f975",
+      "/private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/application-baseline-4/v16/node_modules/@signal-tree/kernel/dist/lib/write-participation.js": "01f57ab1e693a6f2c75ce1e106466c3e1553519387db5d6ec41920d1669dc6d9",
+      "/private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/application-baseline-4/v16/node_modules/@signal-tree/kernel/llms.txt": "df7d674c94b0a41b90e9874ae400f8e7c9aef1c4056054399f51ca4c8c498ebf",
+      "/private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-application-lab-xmhw_k7_/application-baseline-4/v16/node_modules/@signal-tree/kernel/package.json": "a738dcb86c2f21f3c1f99d6906b64452db8c7e695f9b9680888ad512aef8e206"
+    },
+    "results": [
+      {
+        "arm": "bare",
+        "initialClaims": {
+          "owners": 0,
+          "claimedSubjects": 0
+        },
+        "cycles": [
+          {
+            "cycle": 1,
+            "observedLifetimes": 10,
+            "populatedClaims": {
+              "owners": 0,
+              "claimedSubjects": 0
+            },
+            "settledClaims": {
+              "owners": 0,
+              "claimedSubjects": 0
+            },
+            "history": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "candidates": 0
+          },
+          {
+            "cycle": 2,
+            "observedLifetimes": 20,
+            "populatedClaims": {
+              "owners": 0,
+              "claimedSubjects": 0
+            },
+            "settledClaims": {
+              "owners": 0,
+              "claimedSubjects": 0
+            },
+            "history": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "candidates": 0
+          },
+          {
+            "cycle": 3,
+            "observedLifetimes": 30,
+            "populatedClaims": {
+              "owners": 0,
+              "claimedSubjects": 0
+            },
+            "settledClaims": {
+              "owners": 0,
+              "claimedSubjects": 0
+            },
+            "history": 0,
+            "retainedLifetimes": 0,
+            "retainedValueBackings": 0,
+            "candidates": 0
+          }
+        ]
+      },
+      {
+        "arm": "transactions-never-called",
+        "initialClaims": {
+          "owners": 0,
+          "claimedSubjects": 0
+        },
+        "cycles": [
+          {
+            "cycle": 1,
+            "observedLifetimes": 10,
+            "populatedClaims": {
+              "owners": 0,
+              "claimedSubjects": 0
+            },
+            "settledClaims": {
+              "owners": 0,
+              "claimedSubjects": 0
+            },
+            "history": 0,
+            "retainedLifetimes": 10,
+            "retainedValueBackings": 10,
+            "candidates": 10
+          },
+          {
+            "cycle": 2,
+            "observedLifetimes": 20,
+            "populatedClaims": {
+              "owners": 0,
+              "claimedSubjects": 0
+            },
+            "settledClaims": {
+              "owners": 0,
+              "claimedSubjects": 0
+            },
+            "history": 0,
+            "retainedLifetimes": 20,
+            "retainedValueBackings": 20,
+            "candidates": 20
+          },
+          {
+            "cycle": 3,
+            "observedLifetimes": 30,
+            "populatedClaims": {
+              "owners": 0,
+              "claimedSubjects": 0
+            },
+            "settledClaims": {
+              "owners": 0,
+              "claimedSubjects": 0
+            },
+            "history": 0,
+            "retainedLifetimes": 30,
+            "retainedValueBackings": 30,
+            "candidates": 30
+          }
+        ]
+      },
+      {
+        "arm": "transactions-after-settled-scalar",
+        "initialClaims": {
+          "owners": 0,
+          "claimedSubjects": 0
+        },
+        "cycles": [
+          {
+            "cycle": 1,
+            "observedLifetimes": 10,
+            "populatedClaims": {
+              "owners": 0,
+              "claimedSubjects": 0
+            },
+            "settledClaims": {
+              "owners": 0,
+              "claimedSubjects": 0
+            },
+            "history": 0,
+            "retainedLifetimes": 10,
+            "retainedValueBackings": 10,
+            "candidates": 10
+          },
+          {
+            "cycle": 2,
+            "observedLifetimes": 20,
+            "populatedClaims": {
+              "owners": 0,
+              "claimedSubjects": 0
+            },
+            "settledClaims": {
+              "owners": 0,
+              "claimedSubjects": 0
+            },
+            "history": 0,
+            "retainedLifetimes": 20,
+            "retainedValueBackings": 20,
+            "candidates": 20
+          },
+          {
+            "cycle": 3,
+            "observedLifetimes": 30,
+            "populatedClaims": {
+              "owners": 0,
+              "claimedSubjects": 0
+            },
+            "settledClaims": {
+              "owners": 0,
+              "claimedSubjects": 0
+            },
+            "history": 0,
+            "retainedLifetimes": 30,
+            "retainedValueBackings": 30,
+            "candidates": 30
+          }
+        ]
+      },
+      {
+        "arm": "transactions-restoration-ordinary",
+        "initialClaims": {
+          "owners": 0,
+          "claimedSubjects": 0
+        },
+        "cycles": [
+          {
+            "cycle": 1,
+            "observedLifetimes": 10,
+            "populatedClaims": {
+              "owners": 0,
+              "claimedSubjects": 0
+            },
+            "settledClaims": {
+              "owners": 0,
+              "claimedSubjects": 0
+            },
+            "history": 0,
+            "retainedLifetimes": 10,
+            "retainedValueBackings": 10,
+            "candidates": 10
+          },
+          {
+            "cycle": 2,
+            "observedLifetimes": 20,
+            "populatedClaims": {
+              "owners": 0,
+              "claimedSubjects": 0
+            },
+            "settledClaims": {
+              "owners": 0,
+              "claimedSubjects": 0
+            },
+            "history": 0,
+            "retainedLifetimes": 20,
+            "retainedValueBackings": 20,
+            "candidates": 20
+          },
+          {
+            "cycle": 3,
+            "observedLifetimes": 30,
+            "populatedClaims": {
+              "owners": 0,
+              "claimedSubjects": 0
+            },
+            "settledClaims": {
+              "owners": 0,
+              "claimedSubjects": 0
+            },
+            "history": 0,
+            "retainedLifetimes": 30,
+            "retainedValueBackings": 30,
+            "candidates": 30
+          }
+        ]
+      },
+      {
+        "arm": "transactions-restoration-designated",
+        "initialClaims": {
+          "owners": 0,
+          "claimedSubjects": 0
+        },
+        "cycles": [
+          {
+            "cycle": 1,
+            "observedLifetimes": 10,
+            "populatedClaims": {
+              "owners": 1,
+              "claimedSubjects": 10
+            },
+            "settledClaims": {
+              "owners": 2,
+              "claimedSubjects": 10
+            },
+            "history": 2,
+            "retainedLifetimes": 10,
+            "retainedValueBackings": 10,
+            "candidates": 10
+          },
+          {
+            "cycle": 2,
+            "observedLifetimes": 20,
+            "populatedClaims": {
+              "owners": 2,
+              "claimedSubjects": 20
+            },
+            "settledClaims": {
+              "owners": 2,
+              "claimedSubjects": 10
+            },
+            "history": 2,
+            "retainedLifetimes": 10,
+            "retainedValueBackings": 10,
+            "candidates": 10
+          },
+          {
+            "cycle": 3,
+            "observedLifetimes": 30,
+            "populatedClaims": {
+              "owners": 2,
+              "claimedSubjects": 20
+            },
+            "settledClaims": {
+              "owners": 2,
+              "claimedSubjects": 10
+            },
+            "history": 2,
+            "retainedLifetimes": 10,
+            "retainedValueBackings": 10,
+            "candidates": 10
+          }
+        ]
+      }
+    ],
+    "limits": "Deterministic source-owned inventory only; no CPU or heap claim. Full installed ESM barrel intentionally used; not ordinary consumer bundle cost."
+  }
+}

@@ -1,0 +1,177 @@
+{
+  "source": "/private/tmp/st-v15-residual-map-census.json",
+  "sha256": "ca0804460c38e1db3ca4346267e8b792d2e3b960ac029199ccc73223759ea09c",
+  "result": {
+    "command": [
+      "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+      "/private/tmp/st-v15-residual-map-census.mjs"
+    ],
+    "bundle": "/private/tmp/st-v15-reclamation-aging-bundles-final/lazy.production.mjs",
+    "sha256": "504e009329a1fda9c997c1d0828c0700c3e02bb90794c197dcddfd0b0ccd14c2",
+    "runnerSha256": "8381d30e43cdac1471d153f80d89bc83cdb0568b13611ea7d69def41ad940cf6",
+    "limits": "Instrumented identity/count diagnostic only; no CPU/heap inference. Method restored after workload.",
+    "cycles": [
+      {
+        "cycle": 1,
+        "maps": []
+      },
+      {
+        "cycle": 2,
+        "maps": [
+          {
+            "size": 2000,
+            "stack": "Error\n    at Map.set (file:///private/tmp/st-v15-residual-map-census.mjs:9:100)\n    at it (file:///private/tmp/st-v15-reclamation-aging-bundles-final/lazy.production.mjs:3:170874)\n    at O (file:///private/tmp/st-v15-reclamation-aging-bundles-final/lazy.production.mjs:3:177391)\n    at _ (file:///private/tmp/st-v15-reclamation-aging-bundles-final/lazy.production.mjs:3:177485)\n    at $ (file:///private/tmp/st-v15-reclamation-aging-bundles-final/lazy.production.mjs:3:177548)\n    at vd (file:///private/tmp/st-v15-reclamation-aging-bundles-final/lazy.production.mjs:3:99554)\n    at Za (file:///private/tmp/st-v15-reclamation-aging-bundles-final/lazy.production.mjs:3:100254)\n    at eu (file:///private/tmp/st-v15-reclamation-aging-bundles-final/lazy.production.mjs:3:100482)\n    at Object.validateEffects (file:///private/tmp/st-v15-reclamation-aging-bundles-final/lazy.production.mjs:3:90813)\n    at Ca (file:///private/tmp/st-v15-reclamation-aging-bundles-final/lazy.production.mjs:3:77425)",
+            "keyType": "number",
+            "valueType": "object",
+            "firstEntries": [
+              [
+                1,
+                {
+                  "type": "object",
+                  "keys": []
+                }
+              ],
+              [
+                2,
+                {
+                  "type": "object",
+                  "keys": []
+                }
+              ],
+              [
+                3,
+                {
+                  "type": "object",
+                  "keys": []
+                }
+              ]
+            ]
+          }
+        ]
+      },
+      {
+        "cycle": 10,
+        "maps": [
+          {
+            "size": 10000,
+            "stack": "Error\n    at Map.set (file:///private/tmp/st-v15-residual-map-census.mjs:9:100)\n    at it (file:///private/tmp/st-v15-reclamation-aging-bundles-final/lazy.production.mjs:3:170874)\n    at O (file:///private/tmp/st-v15-reclamation-aging-bundles-final/lazy.production.mjs:3:177391)\n    at _ (file:///private/tmp/st-v15-reclamation-aging-bundles-final/lazy.production.mjs:3:177485)\n    at $ (file:///private/tmp/st-v15-reclamation-aging-bundles-final/lazy.production.mjs:3:177548)\n    at vd (file:///private/tmp/st-v15-reclamation-aging-bundles-final/lazy.production.mjs:3:99554)\n    at Za (file:///private/tmp/st-v15-reclamation-aging-bundles-final/lazy.production.mjs:3:100254)\n    at eu (file:///private/tmp/st-v15-reclamation-aging-bundles-final/lazy.production.mjs:3:100482)\n    at Object.validateEffects (file:///private/tmp/st-v15-reclamation-aging-bundles-final/lazy.production.mjs:3:90813)\n    at Ca (file:///private/tmp/st-v15-reclamation-aging-bundles-final/lazy.production.mjs:3:77425)",
+            "keyType": "number",
+            "valueType": "object",
+            "firstEntries": [
+              [
+                1,
+                {
+                  "type": "object",
+                  "keys": []
+                }
+              ],
+              [
+                2,
+                {
+                  "type": "object",
+                  "keys": []
+                }
+              ],
+              [
+                3,
+                {
+                  "type": "object",
+                  "keys": []
+                }
+              ]
+            ]
+          },
+          {
+            "size": 0,
+            "stack": "Error\n    at Map.set (file:///private/tmp/st-v15-residual-map-census.mjs:9:100)\n    at Pu (file:///private/tmp/st-v15-reclamation-aging-bundles-final/lazy.production.mjs:3:178663)\n    at Object.byId (file:///private/tmp/st-v15-reclamation-aging-bundles-final/lazy.production.mjs:3:181122)\n    at Proxy.byIdOrFail (file:///private/tmp/st-v15-reclamation-aging-bundles-final/lazy.production.mjs:3:181166)\n    at vd (file:///private/tmp/st-v15-reclamation-aging-bundles-final/lazy.production.mjs:3:99512)\n    at Za (file:///private/tmp/st-v15-reclamation-aging-bundles-final/lazy.production.mjs:3:100254)\n    at eu (file:///private/tmp/st-v15-reclamation-aging-bundles-final/lazy.production.mjs:3:100482)\n    at Object.validateEffects (file:///private/tmp/st-v15-reclamation-aging-bundles-final/lazy.production.mjs:3:90813)\n    at Ca (file:///private/tmp/st-v15-reclamation-aging-bundles-final/lazy.production.mjs:3:77425)\n    at file:///private/tmp/st-v15-reclamation-aging-bundles-final/lazy.production.mjs:3:141134",
+            "keyType": "number",
+            "valueType": "object",
+            "firstEntries": []
+          }
+        ]
+      },
+      {
+        "cycle": 20,
+        "maps": [
+          {
+            "size": 20000,
+            "stack": "Error\n    at Map.set (file:///private/tmp/st-v15-residual-map-census.mjs:9:100)\n    at it (file:///private/tmp/st-v15-reclamation-aging-bundles-final/lazy.production.mjs:3:170874)\n    at O (file:///private/tmp/st-v15-reclamation-aging-bundles-final/lazy.production.mjs:3:177391)\n    at _ (file:///private/tmp/st-v15-reclamation-aging-bundles-final/lazy.production.mjs:3:177485)\n    at $ (file:///private/tmp/st-v15-reclamation-aging-bundles-final/lazy.production.mjs:3:177548)\n    at vd (file:///private/tmp/st-v15-reclamation-aging-bundles-final/lazy.production.mjs:3:99554)\n    at Za (file:///private/tmp/st-v15-reclamation-aging-bundles-final/lazy.production.mjs:3:100254)\n    at eu (file:///private/tmp/st-v15-reclamation-aging-bundles-final/lazy.production.mjs:3:100482)\n    at Object.validateEffects (file:///private/tmp/st-v15-reclamation-aging-bundles-final/lazy.production.mjs:3:90813)\n    at Ca (file:///private/tmp/st-v15-reclamation-aging-bundles-final/lazy.production.mjs:3:77425)",
+            "keyType": "number",
+            "valueType": "object",
+            "firstEntries": [
+              [
+                1,
+                {
+                  "type": "object",
+                  "keys": []
+                }
+              ],
+              [
+                2,
+                {
+                  "type": "object",
+                  "keys": []
+                }
+              ],
+              [
+                3,
+                {
+                  "type": "object",
+                  "keys": []
+                }
+              ]
+            ]
+          },
+          {
+            "size": 0,
+            "stack": "Error\n    at Map.set (file:///private/tmp/st-v15-residual-map-census.mjs:9:100)\n    at Pu (file:///private/tmp/st-v15-reclamation-aging-bundles-final/lazy.production.mjs:3:178663)\n    at Object.byId (file:///private/tmp/st-v15-reclamation-aging-bundles-final/lazy.production.mjs:3:181122)\n    at Proxy.byIdOrFail (file:///private/tmp/st-v15-reclamation-aging-bundles-final/lazy.production.mjs:3:181166)\n    at vd (file:///private/tmp/st-v15-reclamation-aging-bundles-final/lazy.production.mjs:3:99512)\n    at Za (file:///private/tmp/st-v15-reclamation-aging-bundles-final/lazy.production.mjs:3:100254)\n    at eu (file:///private/tmp/st-v15-reclamation-aging-bundles-final/lazy.production.mjs:3:100482)\n    at Object.validateEffects (file:///private/tmp/st-v15-reclamation-aging-bundles-final/lazy.production.mjs:3:90813)\n    at Ca (file:///private/tmp/st-v15-reclamation-aging-bundles-final/lazy.production.mjs:3:77425)\n    at file:///private/tmp/st-v15-reclamation-aging-bundles-final/lazy.production.mjs:3:141134",
+            "keyType": "number",
+            "valueType": "object",
+            "firstEntries": []
+          }
+        ]
+      },
+      {
+        "cycle": 30,
+        "maps": [
+          {
+            "size": 30000,
+            "stack": "Error\n    at Map.set (file:///private/tmp/st-v15-residual-map-census.mjs:9:100)\n    at it (file:///private/tmp/st-v15-reclamation-aging-bundles-final/lazy.production.mjs:3:170874)\n    at O (file:///private/tmp/st-v15-reclamation-aging-bundles-final/lazy.production.mjs:3:177391)\n    at _ (file:///private/tmp/st-v15-reclamation-aging-bundles-final/lazy.production.mjs:3:177485)\n    at $ (file:///private/tmp/st-v15-reclamation-aging-bundles-final/lazy.production.mjs:3:177548)\n    at vd (file:///private/tmp/st-v15-reclamation-aging-bundles-final/lazy.production.mjs:3:99554)\n    at Za (file:///private/tmp/st-v15-reclamation-aging-bundles-final/lazy.production.mjs:3:100254)\n    at eu (file:///private/tmp/st-v15-reclamation-aging-bundles-final/lazy.production.mjs:3:100482)\n    at Object.validateEffects (file:///private/tmp/st-v15-reclamation-aging-bundles-final/lazy.production.mjs:3:90813)\n    at Ca (file:///private/tmp/st-v15-reclamation-aging-bundles-final/lazy.production.mjs:3:77425)",
+            "keyType": "number",
+            "valueType": "object",
+            "firstEntries": [
+              [
+                1,
+                {
+                  "type": "object",
+                  "keys": []
+                }
+              ],
+              [
+                2,
+                {
+                  "type": "object",
+                  "keys": []
+                }
+              ],
+              [
+                3,
+                {
+                  "type": "object",
+                  "keys": []
+                }
+              ]
+            ]
+          },
+          {
+            "size": 0,
+            "stack": "Error\n    at Map.set (file:///private/tmp/st-v15-residual-map-census.mjs:9:100)\n    at Pu (file:///private/tmp/st-v15-reclamation-aging-bundles-final/lazy.production.mjs:3:178663)\n    at Object.byId (file:///private/tmp/st-v15-reclamation-aging-bundles-final/lazy.production.mjs:3:181122)\n    at Proxy.byIdOrFail (file:///private/tmp/st-v15-reclamation-aging-bundles-final/lazy.production.mjs:3:181166)\n    at vd (file:///private/tmp/st-v15-reclamation-aging-bundles-final/lazy.production.mjs:3:99512)\n    at Za (file:///private/tmp/st-v15-reclamation-aging-bundles-final/lazy.production.mjs:3:100254)\n    at eu (file:///private/tmp/st-v15-reclamation-aging-bundles-final/lazy.production.mjs:3:100482)\n    at Object.validateEffects (file:///private/tmp/st-v15-reclamation-aging-bundles-final/lazy.production.mjs:3:90813)\n    at Ca (file:///private/tmp/st-v15-reclamation-aging-bundles-final/lazy.production.mjs:3:77425)\n    at file:///private/tmp/st-v15-reclamation-aging-bundles-final/lazy.production.mjs:3:141134",
+            "keyType": "number",
+            "valueType": "object",
+            "firstEntries": []
+          }
+        ]
+      }
+    ]
+  }
+}

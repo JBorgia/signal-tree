@@ -1,0 +1,695 @@
+{
+  "source": "/private/tmp/st-v16-terminal-final-relative-analysis.json",
+  "sha256": "bcf22134696cd86cb4988e02ab92581c98dce51f133bad419b1c24e987916757",
+  "result": {
+    "analyzerSha256": "9eb03e3756cb5430a36c20ebdcee76d1429c71f3003197fd63ede967b1d44681",
+    "bindings": {
+      "/private/tmp/st-v16-final-residual/results.json": "1a00009b1d622959d429921f5ce28920ac0b4c92596e9b1b40539e808899a0d4",
+      "/private/tmp/st-v16-terminal-source-stage1-residual/results.json": "bbaabf2b9136c0ceb629cef54cb1655a9fa2f89f9afb90ca7f65478f14aaac96",
+      "/private/tmp/st-v16-terminal-final-residual/results.json": "6dbf65902c8e42296473eb895d2a3d63f235b3398a31ca867db34b252c0b3955",
+      "/private/tmp/st-v16-final-rollback-aging/results.json": "0086cfa96b56446d8423da98bf966234c5fd8a7d95f16cafcfa6e9d2fb4394c3",
+      "/private/tmp/st-v16-terminal-final-aging/results.json": "555ffe7cbc18fdb88e28310cf61ddc773aa88298cabe56c97d049a9af9adbc6b"
+    },
+    "unit": "MiB =1048576bytes, delta from same child empty-store checkpoint",
+    "residual": {
+      "a35": {
+        "recipient=False,cumulativeIds=False": {
+          "children": [
+            {
+              "repeat": 0,
+              "passed": true,
+              "availableCycles": 30,
+              "error": null,
+              "deltaC10C20C30MiB": [
+                7.0569915771484375,
+                10.774894714355469,
+                13.009689331054688
+              ],
+              "beforeEmptyAfterHelperBytes": [
+                5531240,
+                5821144,
+                8713960
+              ]
+            },
+            {
+              "repeat": 1,
+              "passed": true,
+              "availableCycles": 30,
+              "error": null,
+              "deltaC10C20C30MiB": [
+                7.072517395019531,
+                10.791015625,
+                13.047943115234375
+              ],
+              "beforeEmptyAfterHelperBytes": [
+                5531176,
+                5821008,
+                8721824
+              ]
+            }
+          ],
+          "completeCell": true,
+          "medianDeltaC10C20C30MiB": [
+            7.064754486083984,
+            10.782955169677734,
+            13.028816223144531
+          ]
+        },
+        "recipient=False,cumulativeIds=True": {
+          "children": [
+            {
+              "repeat": 0,
+              "passed": false,
+              "availableCycles": 0,
+              "error": "AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n\n1 !== 0\n\n    at retainedStore (file:///Users/jonathanborgia/code/signaltree/.worktrees/application-comparison/tools/application-lab/v16-residual-heap.mjs:141:16)\n    at async file:///Users/jonathanborgia/code/signaltree/.worktrees/application-comparison/tools/application-lab/v16-residual-heap.mjs:151:18",
+              "deltaC10C20C30MiB": [
+                null,
+                null,
+                null
+              ],
+              "beforeEmptyAfterHelperBytes": [
+                5531240,
+                5821072,
+                null
+              ]
+            },
+            {
+              "repeat": 1,
+              "passed": true,
+              "availableCycles": 30,
+              "error": null,
+              "deltaC10C20C30MiB": [
+                7.122215270996094,
+                10.951324462890625,
+                13.389266967773438
+              ],
+              "beforeEmptyAfterHelperBytes": [
+                5531176,
+                5821008,
+                8723656
+              ]
+            }
+          ],
+          "completeCell": false,
+          "medianDeltaC10C20C30MiB": null
+        },
+        "recipient=True,cumulativeIds=False": {
+          "children": [
+            {
+              "repeat": 0,
+              "passed": true,
+              "availableCycles": 30,
+              "error": null,
+              "deltaC10C20C30MiB": [
+                11.881942749023438,
+                19.619468688964844,
+                24.756729125976562
+              ],
+              "beforeEmptyAfterHelperBytes": [
+                5531240,
+                5950128,
+                9270304
+              ]
+            },
+            {
+              "repeat": 1,
+              "passed": true,
+              "availableCycles": 30,
+              "error": null,
+              "deltaC10C20C30MiB": [
+                11.891067504882812,
+                19.715431213378906,
+                24.750396728515625
+              ],
+              "beforeEmptyAfterHelperBytes": [
+                5531176,
+                5950064,
+                9270984
+              ]
+            }
+          ],
+          "completeCell": true,
+          "medianDeltaC10C20C30MiB": [
+            11.886505126953125,
+            19.667449951171875,
+            24.753562927246094
+          ]
+        },
+        "recipient=True,cumulativeIds=True": {
+          "children": [
+            {
+              "repeat": 0,
+              "passed": true,
+              "availableCycles": 30,
+              "error": null,
+              "deltaC10C20C30MiB": [
+                11.895965576171875,
+                19.837249755859375,
+                25.026565551757812
+              ],
+              "beforeEmptyAfterHelperBytes": [
+                5531240,
+                5950128,
+                9288744
+              ]
+            },
+            {
+              "repeat": 1,
+              "passed": true,
+              "availableCycles": 30,
+              "error": null,
+              "deltaC10C20C30MiB": [
+                11.904647827148438,
+                19.812530517578125,
+                25.01203155517578
+              ],
+              "beforeEmptyAfterHelperBytes": [
+                5531176,
+                5950064,
+                9285744
+              ]
+            }
+          ],
+          "completeCell": true,
+          "medianDeltaC10C20C30MiB": [
+            11.900306701660156,
+            19.82489013671875,
+            25.019298553466797
+          ]
+        }
+      },
+      "source145": {
+        "recipient=False,cumulativeIds=False": {
+          "children": [
+            {
+              "repeat": 0,
+              "passed": true,
+              "availableCycles": 30,
+              "error": null,
+              "deltaC10C20C30MiB": [
+                3.5689544677734375,
+                3.7193374633789062,
+                3.7593002319335938
+              ],
+              "beforeEmptyAfterHelperBytes": [
+                5538120,
+                5827688,
+                8756512
+              ]
+            },
+            {
+              "repeat": 1,
+              "passed": true,
+              "availableCycles": 30,
+              "error": null,
+              "deltaC10C20C30MiB": [
+                3.5419540405273438,
+                3.7164764404296875,
+                3.7516860961914062
+              ],
+              "beforeEmptyAfterHelperBytes": [
+                5538120,
+                5827616,
+                8753928
+              ]
+            }
+          ],
+          "completeCell": true,
+          "medianDeltaC10C20C30MiB": [
+            3.5554542541503906,
+            3.717906951904297,
+            3.7554931640625
+          ]
+        },
+        "recipient=False,cumulativeIds=True": {
+          "children": [
+            {
+              "repeat": 0,
+              "passed": true,
+              "availableCycles": 30,
+              "error": null,
+              "deltaC10C20C30MiB": [
+                3.6225204467773438,
+                3.8895263671875,
+                4.030914306640625
+              ],
+              "beforeEmptyAfterHelperBytes": [
+                5538120,
+                5827688,
+                8759784
+              ]
+            },
+            {
+              "repeat": 1,
+              "passed": true,
+              "availableCycles": 30,
+              "error": null,
+              "deltaC10C20C30MiB": [
+                3.6323928833007812,
+                3.89703369140625,
+                4.021797180175781
+              ],
+              "beforeEmptyAfterHelperBytes": [
+                5538120,
+                5827616,
+                8759952
+              ]
+            }
+          ],
+          "completeCell": true,
+          "medianDeltaC10C20C30MiB": [
+            3.6274566650390625,
+            3.893280029296875,
+            4.026355743408203
+          ]
+        },
+        "recipient=True,cumulativeIds=False": {
+          "children": [
+            {
+              "repeat": 0,
+              "passed": true,
+              "availableCycles": 30,
+              "error": null,
+              "deltaC10C20C30MiB": [
+                8.39556884765625,
+                12.588180541992188,
+                15.452896118164062
+              ],
+              "beforeEmptyAfterHelperBytes": [
+                5538120,
+                5957984,
+                9301816
+              ]
+            },
+            {
+              "repeat": 1,
+              "passed": true,
+              "availableCycles": 30,
+              "error": null,
+              "deltaC10C20C30MiB": [
+                8.363273620605469,
+                12.588897705078125,
+                15.45355224609375
+              ],
+              "beforeEmptyAfterHelperBytes": [
+                5538120,
+                5957984,
+                9310568
+              ]
+            }
+          ],
+          "completeCell": true,
+          "medianDeltaC10C20C30MiB": [
+            8.37942123413086,
+            12.588539123535156,
+            15.453224182128906
+          ]
+        },
+        "recipient=True,cumulativeIds=True": {
+          "children": [
+            {
+              "repeat": 0,
+              "passed": true,
+              "availableCycles": 30,
+              "error": null,
+              "deltaC10C20C30MiB": [
+                8.445648193359375,
+                12.764328002929688,
+                15.7576904296875
+              ],
+              "beforeEmptyAfterHelperBytes": [
+                5538120,
+                5957984,
+                9334432
+              ]
+            },
+            {
+              "repeat": 1,
+              "passed": true,
+              "availableCycles": 30,
+              "error": null,
+              "deltaC10C20C30MiB": [
+                8.426994323730469,
+                12.761940002441406,
+                15.747344970703125
+              ],
+              "beforeEmptyAfterHelperBytes": [
+                5538120,
+                5957984,
+                9324784
+              ]
+            }
+          ],
+          "completeCell": true,
+          "medianDeltaC10C20C30MiB": [
+            8.436321258544922,
+            12.763134002685547,
+            15.752517700195312
+          ]
+        }
+      },
+      "final5d": {
+        "recipient=False,cumulativeIds=False": {
+          "children": [
+            {
+              "repeat": 0,
+              "passed": true,
+              "availableCycles": 30,
+              "error": null,
+              "deltaC10C20C30MiB": [
+                3.5770416259765625,
+                3.7293319702148438,
+                3.7616043090820312
+              ],
+              "beforeEmptyAfterHelperBytes": [
+                5539736,
+                5829232,
+                8758120
+              ]
+            },
+            {
+              "repeat": 1,
+              "passed": true,
+              "availableCycles": 30,
+              "error": null,
+              "deltaC10C20C30MiB": [
+                3.5679473876953125,
+                3.7211990356445312,
+                3.76025390625
+              ],
+              "beforeEmptyAfterHelperBytes": [
+                5539768,
+                5829264,
+                8762376
+              ]
+            }
+          ],
+          "completeCell": true,
+          "medianDeltaC10C20C30MiB": [
+            3.5724945068359375,
+            3.7252655029296875,
+            3.7609291076660156
+          ]
+        },
+        "recipient=False,cumulativeIds=True": {
+          "children": [
+            {
+              "repeat": 0,
+              "passed": true,
+              "availableCycles": 30,
+              "error": null,
+              "deltaC10C20C30MiB": [
+                3.620452880859375,
+                3.8849716186523438,
+                4.017066955566406
+              ],
+              "beforeEmptyAfterHelperBytes": [
+                5539768,
+                5829336,
+                8756352
+              ]
+            },
+            {
+              "repeat": 1,
+              "passed": true,
+              "availableCycles": 30,
+              "error": null,
+              "deltaC10C20C30MiB": [
+                3.62994384765625,
+                3.8998565673828125,
+                4.0955810546875
+              ],
+              "beforeEmptyAfterHelperBytes": [
+                5539768,
+                5829264,
+                8761992
+              ]
+            }
+          ],
+          "completeCell": true,
+          "medianDeltaC10C20C30MiB": [
+            3.6251983642578125,
+            3.892414093017578,
+            4.056324005126953
+          ]
+        },
+        "recipient=True,cumulativeIds=False": {
+          "children": [
+            {
+              "repeat": 0,
+              "passed": true,
+              "availableCycles": 30,
+              "error": null,
+              "deltaC10C20C30MiB": [
+                5.027748107910156,
+                7.0027313232421875,
+                7.519859313964844
+              ],
+              "beforeEmptyAfterHelperBytes": [
+                5539768,
+                5959744,
+                8158152
+              ]
+            },
+            {
+              "repeat": 1,
+              "passed": true,
+              "availableCycles": 30,
+              "error": null,
+              "deltaC10C20C30MiB": [
+                5.0279541015625,
+                6.935844421386719,
+                7.540077209472656
+              ],
+              "beforeEmptyAfterHelperBytes": [
+                5539768,
+                5959816,
+                8157584
+              ]
+            }
+          ],
+          "completeCell": true,
+          "medianDeltaC10C20C30MiB": [
+            5.027851104736328,
+            6.969287872314453,
+            7.52996826171875
+          ]
+        },
+        "recipient=True,cumulativeIds=True": {
+          "children": [
+            {
+              "repeat": 0,
+              "passed": true,
+              "availableCycles": 30,
+              "error": null,
+              "deltaC10C20C30MiB": [
+                6.156608581542969,
+                7.155487060546875,
+                7.815742492675781
+              ],
+              "beforeEmptyAfterHelperBytes": [
+                5539768,
+                5959744,
+                8177320
+              ]
+            },
+            {
+              "repeat": 1,
+              "passed": true,
+              "availableCycles": 30,
+              "error": null,
+              "deltaC10C20C30MiB": [
+                6.141082763671875,
+                7.108612060546875,
+                7.801399230957031
+              ],
+              "beforeEmptyAfterHelperBytes": [
+                5539768,
+                5959744,
+                8174896
+              ]
+            }
+          ],
+          "completeCell": true,
+          "medianDeltaC10C20C30MiB": [
+            6.148845672607422,
+            7.132049560546875,
+            7.808570861816406
+          ]
+        }
+      }
+    },
+    "aging": {
+      "a35": {
+        "baseline-reused": {
+          "medianDeltaC1C10MiB": [
+            5.117218017578125,
+            23.536544799804688
+          ],
+          "perChildDeltaC1C10MiB": [
+            [
+              4.874359130859375,
+              23.538795471191406
+            ],
+            [
+              5.215476989746094,
+              23.536544799804688
+            ],
+            [
+              5.117218017578125,
+              23.528175354003906
+            ]
+          ]
+        },
+        "baseline-fresh": {
+          "medianDeltaC1C10MiB": [
+            4.943267822265625,
+            23.534706115722656
+          ],
+          "perChildDeltaC1C10MiB": [
+            [
+              4.943267822265625,
+              24.588623046875
+            ],
+            [
+              4.89715576171875,
+              23.534034729003906
+            ],
+            [
+              5.009361267089844,
+              23.534706115722656
+            ]
+          ]
+        },
+        "lazy-reused": {
+          "medianDeltaC1C10MiB": [
+            4.2463531494140625,
+            11.888740539550781
+          ],
+          "perChildDeltaC1C10MiB": [
+            [
+              4.2463531494140625,
+              11.888740539550781
+            ],
+            [
+              4.254203796386719,
+              11.897254943847656
+            ],
+            [
+              4.2299957275390625,
+              11.870750427246094
+            ]
+          ]
+        },
+        "lazy-fresh": {
+          "medianDeltaC1C10MiB": [
+            4.2532196044921875,
+            11.886222839355469
+          ],
+          "perChildDeltaC1C10MiB": [
+            [
+              4.264732360839844,
+              11.896781921386719
+            ],
+            [
+              4.2532196044921875,
+              11.881515502929688
+            ],
+            [
+              4.2376556396484375,
+              11.886222839355469
+            ]
+          ]
+        }
+      },
+      "final5d": {
+        "baseline-reused": {
+          "medianDeltaC1C10MiB": [
+            4.896842956542969,
+            23.532249450683594
+          ],
+          "perChildDeltaC1C10MiB": [
+            [
+              4.896842956542969,
+              23.532249450683594
+            ],
+            [
+              4.893241882324219,
+              23.529563903808594
+            ],
+            [
+              4.9232330322265625,
+              23.535301208496094
+            ]
+          ]
+        },
+        "baseline-fresh": {
+          "medianDeltaC1C10MiB": [
+            4.899101257324219,
+            23.53870391845703
+          ],
+          "perChildDeltaC1C10MiB": [
+            [
+              4.8986053466796875,
+              23.543563842773438
+            ],
+            [
+              5.0269317626953125,
+              23.53870391845703
+            ],
+            [
+              4.899101257324219,
+              23.5357666015625
+            ]
+          ]
+        },
+        "lazy-reused": {
+          "medianDeltaC1C10MiB": [
+            3.7329254150390625,
+            6.137702941894531
+          ],
+          "perChildDeltaC1C10MiB": [
+            [
+              3.7181472778320312,
+              6.114601135253906
+            ],
+            [
+              3.7796096801757812,
+              6.140838623046875
+            ],
+            [
+              3.7329254150390625,
+              6.137702941894531
+            ]
+          ]
+        },
+        "lazy-fresh": {
+          "medianDeltaC1C10MiB": [
+            3.7755203247070312,
+            6.1368255615234375
+          ],
+          "perChildDeltaC1C10MiB": [
+            [
+              3.7520523071289062,
+              6.129524230957031
+            ],
+            [
+              3.7755203247070312,
+              6.1368255615234375
+            ],
+            [
+              3.9365310668945312,
+              6.139656066894531
+            ]
+          ]
+        }
+      }
+    },
+    "limits": [
+      "Original a35 residual incomplete/failed cells remain represented; no median for incomplete cells.",
+      "Cells are matched workload snapshots, not pooled independent runs or time-normalized byte attribution.",
+      "Absolute heaps remain in raw files; this supplement explicitly uses empty-store-relative deltas.",
+      "Map entry counts grow linearly; heap jumps need not be linear due to allocation/capacity/VM effects not individually attributed here."
+    ]
+  }
+}

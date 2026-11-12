@@ -1,0 +1,977 @@
+{
+  "source": "/private/tmp/st-v16-final-retention-independent-interpretation-corrected.json",
+  "sha256": "b9ac91c1236410a6fc456f84ce1a498d9c709b1e782ce6591e72f5044b2b1d5a",
+  "result": {
+    "review": "Final5d retention, pending authority, coordination and point-work bounded interpretation",
+    "reviewer": "/root/v15_release_review",
+    "runtimeCommit": "5d04ff65d2eaab1986ed1b420cbc013edc01542b",
+    "scope": "Raw evidence and source-oracle inspection with light offline hashing/arithmetic; no runtime/test/build/benchmark jobs and no main README conclusions read.",
+    "verificationReceipt": "/private/tmp/st-v16-final-retention-independent-verification.json",
+    "verificationSha256": "b42b0aeea78e6c35ffb91064ce58605c080fc5a7025a18ef8b6643a51f3def6f",
+    "premises": [
+      {
+        "revision": "18e2eed330629900b5e519168785591c0ab751dc",
+        "source": "docs/performance/measurement-contract.md",
+        "quote": "Distinguish whole heap, filtered snapshot self-size, retained/dominator memory,\n  per-size slopes and positive-only attribution. Do not add incompatible metrics."
+      },
+      {
+        "revision": "18e2eed330629900b5e519168785591c0ab751dc",
+        "source": "docs/performance/measurement-contract.md",
+        "quote": "Destroy bounded-lifetime stores. Finite cleanup/GC samples do not prove no leaks\n  or bounded growth for every long-lived workload."
+      }
+    ],
+    "checkedEvidence": {
+      "hashBindings": 991,
+      "rawChildrenAndExpectedFailureControls": 85,
+      "additionalPointWitness": 1,
+      "retentionSubset": 35,
+      "pendingComparison": 40,
+      "coordinationComparison": 10,
+      "authorRelativeAnalysis": "12 residual cells and36 cycle10/20/30 median positions recalculated; incomplete a35 cell remains unavailable. Module8 child/checkpoint trajectories exactly match raw."
+    },
+    "artifactLimit": "143 non-manifest payloads match frozen5d package byte-for-byte; packet manifest has exactly one appended newline. Archives/manifests have distinct preserved identities. Final kernel source seal a8220c572802aae475bf647e2c3c5c572477d56da90764f9defa941d5bd1f744.",
+    "findings": [
+      {
+        "claim": "Physical storage reclamation works in these cycles.",
+        "evidence": "All candidate10-cycle aging and30-cycle residual settled checkpoints have0 retained lifetimes/backings/candidates and0 sampled payload/transaction survivors while tree remains alive. Frozen2826/ba5 baseline retains10000 backing records and10 payload samples bycycle10.",
+        "limit": "Combined final-vs-old-baseline effect; physical cleanup was already present in a35. It cannot all be credited to terminal packing or sharing."
+      },
+      {
+        "claim": "Source packing and recipient sharing materially lower retained-history cost.",
+        "evidence": "Separate current-ID30-cycle cells, MiB above each child empty checkpoint: a35 no recipient13.010\u201313.048, active24.750\u201324.757; source145 no recipient3.752\u20133.759, active15.453\u201315.454; final5d no recipient3.760\u20133.762, active7.520\u20137.540. No pooled timing or paired cross-cohort significance claim.",
+        "limit": "a35 overall residual aggregate isfalse: one no-recipient/cumulative-ID child failed before recordingcycle1. Its missing cell was not replaced or averaged into a complete cohort."
+      },
+      {
+        "claim": "Facts are represented more compactly; history is not erased.",
+        "evidence": "Atcycle30 source census reports30000 logical subjects,30000packedSubjects,30packedRuns,0unpackedSubjectFacets. No source Map exceeding1024 appears in this thresholded census. Active recipient retains two30000-key exact-address Maps. Sampled6 evidence modes at5 checkpoints inbotharms preserve the exact serialized native role/outcome/flag summaries versus a35 and145.",
+        "limit": "Census is sampled proof shape/outcome evidence, not all-ID reference identity proof. Distinct histories and adversarial run order need separate coverage; source history still grows by runs and recipient address counts remain linear."
+      },
+      {
+        "claim": "Pending-memory savings preserve meaningful authority checks.",
+        "evidence": "All 40 fresh pending children passed full pending row equality, pending=1, and zero pre-settlement output; each confirm publishes one full collection and each rollback one empty collection, pending=0. At 10,000 rows, median pending heap above the same child empty-store checkpoint is 58.710 MiB final versus 83.898 MiB frozen baseline for confirm (83.897 MiB baseline for rollback). The rollback settled-handle-dropped delta above empty store is 8.974 versus 26.281 MiB.",
+        "limit": "Whole-process values include live store/oracle/Link and restoration state; neither residual58.71MiB nor saved25.19MiB is a minimum guarantee price."
+      },
+      {
+        "claim": "Cleanup savings do not conceal a synchronous-only timing boundary.",
+        "evidence": "Fresh10k final population CPU medians700.516ms(confirm),725.652ms(rollback), versus5715.926/5859.731ms frozenbaseline. Rollback+full drain CPU1111.883ms versus11273.155ms; elapsed607.830ms versus10845.936ms. Confirm+drain remains about44ms CPU inbotharms.",
+        "limit": "These are5-child neutral synchronous Node diagnostics on a shared host, including current defined work. Overlapping settlement intervals must not be added. Earliera35 timing cohorts remain separate descriptive context."
+      },
+      {
+        "claim": "Coordinated behavior is still exercised.",
+        "evidence": "All10 children run100episodes each: held dependent receipt blocks before ownerconfirmation, independent delivery doesnot settle inspected owner, failed earlier rollback preserves laterwrite, oldreader remainsretired on replacement, late enrollment honors foreign pendinghistory, callback-failure recovery leavespending1/consequencesReleasedfalse until explicitconfirm.128 extra pending inverses restore exactvalues; held receipts remainstarted/declared.",
+        "limit": "This is selected neutral v16 behavior, not proof of all semantics or rival equivalence. Episode1001k wholeheap is bimodal11.579\u201312.323MiB, returning to settled128 range11.651\u201311.655; do not infer a stable per-episode leak from onecheckpoint."
+      },
+      {
+        "claim": "The existing point-work bound is retained.",
+        "evidence": "Installed exact candidate witness records 1,800 charges at 2,000 and 20,000 rows, satisfying the strict bound < 2,000; width controls 4,000/40,000, planted charge 7 and throw-undefined preservation pass.",
+        "limit": "Original200distinct2-fieldupdate witness withngDevModefalse; productionDefinefalse is recorded. This is counted point work, not bundled CPU, generic capture or late-enrollment complexity."
+      },
+      {
+        "claim": "GC diagnostic establishes sample collection, not the cause of all heap classes.",
+        "evidence": "6normal module-only children collect sampled actualtree/storedrow atfirst destroyed-inside-helper3GC checkpoint;2explicit pins retainboth throughhelperreturn then collectafterrelease. One normal child perarm drops populatedheap byabout2MiB only at12extraGCjobs while actualtree/row staysalive; others remainhigh. One finaledited sample dropsabout2MiB afteroneextraGC.",
+        "limit": "EarlierGC andhelper scope are interventions. Original highdestroyedclass wasnot reproduced. No causal attribution toJIT,stackretention,noise,or specificruntime allocation, and no rewriting original3GC values."
+      }
+    ],
+    "adoptionInterpretation": "These observations support retaining the bounded reclamation, exact source packing and lexical sharing changes: they reduce observed cost while the specified pending/recovery/retirement contracts and original point bound still pass. No new blocker is demonstrated by these datasets. They do not alone close release qualification, application performance, distinct/deep-history capture cost, or universal retention claims. Existing exact-address history is a remaining cost to price; arbitrary deletion is not justified by an empty physical store.",
+    "unknowns": [
+      "Whole-source capture and late-enrollment cost after deep/distinct histories are addressed by the separate registered study, not inferred here.",
+      "Final browser/app comparative outcomes and full final qualification are outside this receipt.",
+      "Unlimited retained history and adversarial distinct fact patterns do not have a universal space bound.",
+      "Remaining heap ownership and sampled GC classes are not fully attributed; sampled object collection is narrower than all-resource collection."
+    ],
+    "pendingCells": [
+      {
+        "rows": 1000,
+        "settlement": "confirm",
+        "arm": "baseline",
+        "heapMiBFromEmpty": {
+          "pending": {
+            "values": [
+              9.665107727050781,
+              9.423492431640625,
+              9.422561645507812,
+              9.421218872070312,
+              9.434410095214844
+            ],
+            "median": 9.423492431640625,
+            "min": 9.421218872070312,
+            "max": 9.665107727050781
+          },
+          "settledHandleDropped": {
+            "values": [
+              8.1580810546875,
+              8.159149169921875,
+              8.156318664550781,
+              8.156227111816406,
+              8.149078369140625
+            ],
+            "median": 8.156318664550781,
+            "min": 8.149078369140625,
+            "max": 8.159149169921875
+          },
+          "disposedLink": {
+            "values": [
+              4.2166900634765625,
+              4.2177581787109375,
+              4.214927673339844,
+              4.214836120605469,
+              4.216522216796875
+            ],
+            "median": 4.216522216796875,
+            "min": 4.214836120605469,
+            "max": 4.2177581787109375
+          },
+          "destroyed": {
+            "values": [
+              1.3171463012695312,
+              1.3182144165039062,
+              1.3155441284179688,
+              1.3154525756835938,
+              1.3156890869140625
+            ],
+            "median": 1.3156890869140625,
+            "min": 1.3154525756835938,
+            "max": 1.3182144165039062
+          }
+        },
+        "phases": {
+          "population": {
+            "cpuMs": {
+              "values": [
+                156.422,
+                172.176,
+                155.414,
+                157.626,
+                155.361
+              ],
+              "median": 156.422,
+              "min": 155.361,
+              "max": 172.176
+            },
+            "elapsedMs": {
+              "values": [
+                97.133333,
+                96.986583,
+                95.6145,
+                97.939,
+                94.04725
+              ],
+              "median": 96.986583,
+              "min": 94.04725,
+              "max": 97.939
+            }
+          },
+          "settlementIncludingDrain": {
+            "cpuMs": {
+              "values": [
+                8.411,
+                8.21,
+                8.713,
+                8.373,
+                8.732
+              ],
+              "median": 8.411,
+              "min": 8.21,
+              "max": 8.732
+            },
+            "elapsedMs": {
+              "values": [
+                3.38775,
+                3.34125,
+                3.424208,
+                3.406292,
+                3.526208
+              ],
+              "median": 3.406292,
+              "min": 3.34125,
+              "max": 3.526208
+            }
+          }
+        }
+      },
+      {
+        "rows": 1000,
+        "settlement": "confirm",
+        "arm": "lazy",
+        "heapMiBFromEmpty": {
+          "pending": {
+            "values": [
+              6.907768249511719,
+              6.9042510986328125,
+              7.0617828369140625,
+              6.909942626953125,
+              7.0619964599609375
+            ],
+            "median": 6.909942626953125,
+            "min": 6.9042510986328125,
+            "max": 7.0619964599609375
+          },
+          "settledHandleDropped": {
+            "values": [
+              5.634407043457031,
+              5.634407043457031,
+              5.634407043457031,
+              5.634407043457031,
+              5.6341552734375
+            ],
+            "median": 5.634407043457031,
+            "min": 5.6341552734375,
+            "max": 5.634407043457031
+          },
+          "disposedLink": {
+            "values": [
+              4.222602844238281,
+              4.222602844238281,
+              4.222602844238281,
+              4.222602844238281,
+              4.22235107421875
+            ],
+            "median": 4.222602844238281,
+            "min": 4.22235107421875,
+            "max": 4.222602844238281
+          },
+          "destroyed": {
+            "values": [
+              1.3213272094726562,
+              1.3213272094726562,
+              1.3213272094726562,
+              1.321258544921875,
+              1.321075439453125
+            ],
+            "median": 1.3213272094726562,
+            "min": 1.321075439453125,
+            "max": 1.3213272094726562
+          }
+        },
+        "phases": {
+          "population": {
+            "cpuMs": {
+              "values": [
+                111.414,
+                106.126,
+                109.206,
+                107.591,
+                108.776
+              ],
+              "median": 108.776,
+              "min": 106.126,
+              "max": 111.414
+            },
+            "elapsedMs": {
+              "values": [
+                56.505834,
+                54.648416,
+                56.396125,
+                55.273333,
+                55.348875
+              ],
+              "median": 55.348875,
+              "min": 54.648416,
+              "max": 56.505834
+            }
+          },
+          "settlementIncludingDrain": {
+            "cpuMs": {
+              "values": [
+                9.029,
+                8.977,
+                8.914,
+                8.33,
+                8.766
+              ],
+              "median": 8.914,
+              "min": 8.33,
+              "max": 9.029
+            },
+            "elapsedMs": {
+              "values": [
+                3.801583,
+                3.796083,
+                3.778375,
+                3.558166,
+                3.659584
+              ],
+              "median": 3.778375,
+              "min": 3.558166,
+              "max": 3.801583
+            }
+          }
+        }
+      },
+      {
+        "rows": 1000,
+        "settlement": "rollback",
+        "arm": "baseline",
+        "heapMiBFromEmpty": {
+          "pending": {
+            "values": [
+              9.4295654296875,
+              9.650146484375,
+              9.425750732421875,
+              9.427947998046875,
+              9.421188354492188
+            ],
+            "median": 9.427947998046875,
+            "min": 9.421188354492188,
+            "max": 9.650146484375
+          },
+          "settledHandleDropped": {
+            "values": [
+              4.506011962890625,
+              4.500907897949219,
+              4.5028076171875,
+              4.504295349121094,
+              4.4999847412109375
+            ],
+            "median": 4.5028076171875,
+            "min": 4.4999847412109375,
+            "max": 4.506011962890625
+          },
+          "disposedLink": {
+            "values": [
+              4.0553436279296875,
+              4.052764892578125,
+              4.054664611816406,
+              4.05615234375,
+              4.051841735839844
+            ],
+            "median": 4.054664611816406,
+            "min": 4.051841735839844,
+            "max": 4.05615234375
+          },
+          "destroyed": {
+            "values": [
+              2.0574722290039062,
+              2.054962158203125,
+              2.0568618774414062,
+              2.058349609375,
+              2.0540390014648438
+            ],
+            "median": 2.0568618774414062,
+            "min": 2.0540390014648438,
+            "max": 2.058349609375
+          }
+        },
+        "phases": {
+          "population": {
+            "cpuMs": {
+              "values": [
+                157.902,
+                159.038,
+                161.158,
+                180.788,
+                160.347
+              ],
+              "median": 160.347,
+              "min": 157.902,
+              "max": 180.788
+            },
+            "elapsedMs": {
+              "values": [
+                98.739292,
+                104.327792,
+                101.356291,
+                112.668417,
+                97.381833
+              ],
+              "median": 101.356291,
+              "min": 97.381833,
+              "max": 112.668417
+            }
+          },
+          "settlementIncludingDrain": {
+            "cpuMs": {
+              "values": [
+                200.162,
+                184.571,
+                183.631,
+                196.033,
+                207.855
+              ],
+              "median": 196.033,
+              "min": 183.631,
+              "max": 207.855
+            },
+            "elapsedMs": {
+              "values": [
+                155.716083,
+                142.491417,
+                141.562542,
+                152.748334,
+                156.901125
+              ],
+              "median": 152.748334,
+              "min": 141.562542,
+              "max": 156.901125
+            }
+          }
+        }
+      },
+      {
+        "rows": 1000,
+        "settlement": "rollback",
+        "arm": "lazy",
+        "heapMiBFromEmpty": {
+          "pending": {
+            "values": [
+              7.086082458496094,
+              6.91143798828125,
+              6.90374755859375,
+              7.131874084472656,
+              7.07086181640625
+            ],
+            "median": 7.07086181640625,
+            "min": 6.90374755859375,
+            "max": 7.131874084472656
+          },
+          "settledHandleDropped": {
+            "values": [
+              3.2694549560546875,
+              3.2695999145507812,
+              3.2694549560546875,
+              3.2615585327148438,
+              3.2637939453125
+            ],
+            "median": 3.2694549560546875,
+            "min": 3.2615585327148438,
+            "max": 3.2695999145507812
+          },
+          "disposedLink": {
+            "values": [
+              3.0585403442382812,
+              3.058685302734375,
+              3.0585403442382812,
+              3.0506439208984375,
+              3.0528793334960938
+            ],
+            "median": 3.0585403442382812,
+            "min": 3.0506439208984375,
+            "max": 3.058685302734375
+          },
+          "destroyed": {
+            "values": [
+              2.3770523071289062,
+              2.3769302368164062,
+              2.3770523071289062,
+              2.3744964599609375,
+              2.3767318725585938
+            ],
+            "median": 2.3769302368164062,
+            "min": 2.3744964599609375,
+            "max": 2.3770523071289062
+          }
+        },
+        "phases": {
+          "population": {
+            "cpuMs": {
+              "values": [
+                112.584,
+                106.661,
+                105.965,
+                151.932,
+                114.905
+              ],
+              "median": 112.584,
+              "min": 105.965,
+              "max": 151.932
+            },
+            "elapsedMs": {
+              "values": [
+                57.817041,
+                54.526292,
+                54.323917,
+                67.899791,
+                58.373292
+              ],
+              "median": 57.817041,
+              "min": 54.323917,
+              "max": 67.899791
+            }
+          },
+          "settlementIncludingDrain": {
+            "cpuMs": {
+              "values": [
+                134.719,
+                133.743,
+                131.895,
+                138.516,
+                146.283
+              ],
+              "median": 134.719,
+              "min": 131.895,
+              "max": 146.283
+            },
+            "elapsedMs": {
+              "values": [
+                72.072292,
+                70.671875,
+                68.811125,
+                75.167,
+                76.783666
+              ],
+              "median": 72.072292,
+              "min": 68.811125,
+              "max": 76.783666
+            }
+          }
+        }
+      },
+      {
+        "rows": 10000,
+        "settlement": "confirm",
+        "arm": "baseline",
+        "heapMiBFromEmpty": {
+          "pending": {
+            "values": [
+              83.90238952636719,
+              83.89608764648438,
+              83.8978271484375,
+              83.89637756347656,
+              83.9021987915039
+            ],
+            "median": 83.8978271484375,
+            "min": 83.89608764648438,
+            "max": 83.90238952636719
+          },
+          "settledHandleDropped": {
+            "values": [
+              69.31829833984375,
+              69.31105041503906,
+              69.31009674072266,
+              69.31107330322266,
+              69.31794738769531
+            ],
+            "median": 69.31107330322266,
+            "min": 69.31009674072266,
+            "max": 69.31829833984375
+          },
+          "disposedLink": {
+            "values": [
+              31.248245239257812,
+              31.249839782714844,
+              31.248397827148438,
+              31.249862670898438,
+              31.247894287109375
+            ],
+            "median": 31.248397827148438,
+            "min": 31.247894287109375,
+            "max": 31.249862670898438
+          },
+          "destroyed": {
+            "values": [
+              1.7817459106445312,
+              1.7831649780273438,
+              1.7817230224609375,
+              1.7831039428710938,
+              1.7814712524414062
+            ],
+            "median": 1.7817459106445312,
+            "min": 1.7814712524414062,
+            "max": 1.7831649780273438
+          }
+        },
+        "phases": {
+          "population": {
+            "cpuMs": {
+              "values": [
+                5903.625,
+                5569.673,
+                5715.926,
+                5693.686,
+                5759.253
+              ],
+              "median": 5715.926,
+              "min": 5569.673,
+              "max": 5903.625
+            },
+            "elapsedMs": {
+              "values": [
+                5632.567333,
+                5251.021167,
+                5417.63,
+                5392.408583,
+                5433.412375
+              ],
+              "median": 5417.63,
+              "min": 5251.021167,
+              "max": 5632.567333
+            }
+          },
+          "settlementIncludingDrain": {
+            "cpuMs": {
+              "values": [
+                46.202,
+                43.069,
+                44.076,
+                44.951,
+                43.547
+              ],
+              "median": 44.076,
+              "min": 43.069,
+              "max": 46.202
+            },
+            "elapsedMs": {
+              "values": [
+                21.204,
+                20.96325,
+                21.189292,
+                20.681542,
+                20.1425
+              ],
+              "median": 20.96325,
+              "min": 20.1425,
+              "max": 21.204
+            }
+          }
+        }
+      },
+      {
+        "rows": 10000,
+        "settlement": "confirm",
+        "arm": "lazy",
+        "heapMiBFromEmpty": {
+          "pending": {
+            "values": [
+              58.71040344238281,
+              58.71031188964844,
+              58.709503173828125,
+              58.719940185546875,
+              58.709556579589844
+            ],
+            "median": 58.71031188964844,
+            "min": 58.709503173828125,
+            "max": 58.719940185546875
+          },
+          "settledHandleDropped": {
+            "values": [
+              44.13691711425781,
+              44.136871337890625,
+              44.13584899902344,
+              44.136383056640625,
+              44.13604736328125
+            ],
+            "median": 44.136383056640625,
+            "min": 44.13584899902344,
+            "max": 44.13691711425781
+          },
+          "disposedLink": {
+            "values": [
+              31.255950927734375,
+              31.255783081054688,
+              31.2548828125,
+              31.255416870117188,
+              31.254837036132812
+            ],
+            "median": 31.255416870117188,
+            "min": 31.254837036132812,
+            "max": 31.255950927734375
+          },
+          "destroyed": {
+            "values": [
+              1.78607177734375,
+              1.7859420776367188,
+              1.785003662109375,
+              1.7855758666992188,
+              1.7852020263671875
+            ],
+            "median": 1.7855758666992188,
+            "min": 1.785003662109375,
+            "max": 1.78607177734375
+          }
+        },
+        "phases": {
+          "population": {
+            "cpuMs": {
+              "values": [
+                664.841,
+                724.818,
+                700.516,
+                747.271,
+                686.529
+              ],
+              "median": 700.516,
+              "min": 664.841,
+              "max": 747.271
+            },
+            "elapsedMs": {
+              "values": [
+                409.793708,
+                443.815583,
+                428.816792,
+                451.327084,
+                416.776917
+              ],
+              "median": 428.816792,
+              "min": 409.793708,
+              "max": 451.327084
+            }
+          },
+          "settlementIncludingDrain": {
+            "cpuMs": {
+              "values": [
+                41.977,
+                45.622,
+                44.847,
+                43.944,
+                42.077
+              ],
+              "median": 43.944,
+              "min": 41.977,
+              "max": 45.622
+            },
+            "elapsedMs": {
+              "values": [
+                21.045,
+                23.538459,
+                23.195041,
+                21.952542,
+                20.906708
+              ],
+              "median": 21.952542,
+              "min": 20.906708,
+              "max": 23.538459
+            }
+          }
+        }
+      },
+      {
+        "rows": 10000,
+        "settlement": "rollback",
+        "arm": "baseline",
+        "heapMiBFromEmpty": {
+          "pending": {
+            "values": [
+              83.90772247314453,
+              83.90652465820312,
+              83.89545440673828,
+              83.89667510986328,
+              83.89740753173828
+            ],
+            "median": 83.89740753173828,
+            "min": 83.89545440673828,
+            "max": 83.90772247314453
+          },
+          "settledHandleDropped": {
+            "values": [
+              26.290939331054688,
+              26.27843475341797,
+              26.281570434570312,
+              26.281089782714844,
+              26.281455993652344
+            ],
+            "median": 26.281455993652344,
+            "min": 26.27843475341797,
+            "max": 26.290939331054688
+          },
+          "disposedLink": {
+            "values": [
+              22.123497009277344,
+              22.110992431640625,
+              22.11412811279297,
+              22.1136474609375,
+              22.114051818847656
+            ],
+            "median": 22.114051818847656,
+            "min": 22.110992431640625,
+            "max": 22.123497009277344
+          },
+          "destroyed": {
+            "values": [
+              3.4103775024414062,
+              3.4133224487304688,
+              3.4012908935546875,
+              3.4007415771484375,
+              3.401031494140625
+            ],
+            "median": 3.4012908935546875,
+            "min": 3.4007415771484375,
+            "max": 3.4133224487304688
+          }
+        },
+        "phases": {
+          "population": {
+            "cpuMs": {
+              "values": [
+                5634.528,
+                5859.731,
+                5613.46,
+                5983.75,
+                5867.712
+              ],
+              "median": 5859.731,
+              "min": 5613.46,
+              "max": 5983.75
+            },
+            "elapsedMs": {
+              "values": [
+                5378.171958,
+                5584.257209,
+                5350.471375,
+                5644.366708,
+                5817.269
+              ],
+              "median": 5584.257209,
+              "min": 5350.471375,
+              "max": 5817.269
+            }
+          },
+          "settlementIncludingDrain": {
+            "cpuMs": {
+              "values": [
+                11273.155,
+                11061.085,
+                10917.802,
+                11426.15,
+                11605.083
+              ],
+              "median": 11273.155,
+              "min": 10917.802,
+              "max": 11605.083
+            },
+            "elapsedMs": {
+              "values": [
+                10845.935959,
+                10737.343125,
+                10499.883916,
+                10995.817334,
+                11110.042083
+              ],
+              "median": 10845.935959,
+              "min": 10499.883916,
+              "max": 11110.042083
+            }
+          }
+        }
+      },
+      {
+        "rows": 10000,
+        "settlement": "rollback",
+        "arm": "lazy",
+        "heapMiBFromEmpty": {
+          "pending": {
+            "values": [
+              58.7103271484375,
+              58.710182189941406,
+              58.710723876953125,
+              58.715904235839844,
+              58.70860290527344
+            ],
+            "median": 58.7103271484375,
+            "min": 58.70860290527344,
+            "max": 58.715904235839844
+          },
+          "settledHandleDropped": {
+            "values": [
+              8.969078063964844,
+              8.966423034667969,
+              8.973716735839844,
+              8.976081848144531,
+              9.398933410644531
+            ],
+            "median": 8.973716735839844,
+            "min": 8.966423034667969,
+            "max": 9.398933410644531
+          },
+          "disposedLink": {
+            "values": [
+              7.0859832763671875,
+              7.08331298828125,
+              7.090606689453125,
+              7.0929718017578125,
+              7.5401763916015625
+            ],
+            "median": 7.090606689453125,
+            "min": 7.08331298828125,
+            "max": 7.5401763916015625
+          },
+          "destroyed": {
+            "values": [
+              4.177268981933594,
+              4.174659729003906,
+              4.17864990234375,
+              4.184112548828125,
+              4.159965515136719
+            ],
+            "median": 4.177268981933594,
+            "min": 4.159965515136719,
+            "max": 4.184112548828125
+          }
+        },
+        "phases": {
+          "population": {
+            "cpuMs": {
+              "values": [
+                727.428,
+                721.196,
+                790.552,
+                678.452,
+                725.652
+              ],
+              "median": 725.652,
+              "min": 678.452,
+              "max": 790.552
+            },
+            "elapsedMs": {
+              "values": [
+                445.616916,
+                436.042542,
+                470.627083,
+                415.203542,
+                459.257791
+              ],
+              "median": 445.616916,
+              "min": 415.203542,
+              "max": 470.627083
+            }
+          },
+          "settlementIncludingDrain": {
+            "cpuMs": {
+              "values": [
+                1107.872,
+                1069.87,
+                1111.883,
+                1203.249,
+                1134.299
+              ],
+              "median": 1111.883,
+              "min": 1069.87,
+              "max": 1203.249
+            },
+            "elapsedMs": {
+              "values": [
+                607.700459,
+                579.270625,
+                607.830167,
+                641.235625,
+                607.852542
+              ],
+              "median": 607.830167,
+              "min": 579.270625,
+              "max": 641.235625
+            }
+          }
+        }
+      }
+    ],
+    "falsifiers": [
+      {
+        "name": "Physical row/payload retention predictions, explicitpins and early-delivery/skipped-population controls",
+        "status": "Executed in reviewed raw records; hashes and useful assertions verified, not rerun."
+      },
+      {
+        "name": "Coordination ownerauthority/refusal/late-reader and existing point-work bound",
+        "status": "Executed in reviewed raw records; sourceoracles and resultbindings inspected, not rerun."
+      },
+      {
+        "name": "Deep-history cost shifted into capture/lateenrollment/newbulkwork",
+        "status": "Separate study; not certified by these results."
+      }
+    ],
+    "correction": {
+      "supersedes": "/private/tmp/st-v16-final-retention-independent-interpretation.json",
+      "priorSha256": "30e9431cf82b5af6a811d5ca6352a04ba5293c868447872ce62cf3e11ddbbc3c",
+      "scope": "Wording only: strict point-work bound and explicit heap reference; original receipt preserved. No runtime or measurement rerun."
+    },
+    "heapReferenceClarification": "All pendingCells.heapMiBFromEmpty values and the 58.710/83.898 MiB comparison subtract the same child empty-store heap. The separate pre-store-relative table (59.102/84.280 MiB) uses a different denominator; neither pair is interchangeable or contradictory."
+  }
+}

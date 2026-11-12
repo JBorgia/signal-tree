@@ -1,0 +1,141 @@
+{
+  "scope": "Exact selected evidence integrity and declared hash-reference closure; extraction independent of original paths. Corruption and missing-payload controls use disposable copies.",
+  "archive": "/private/tmp/st-long-lived-evidence-final.tar.gz",
+  "archiveSha256": "9bc32da11f407d5e103135cc5140ccb59695f8fd5b429327ce8ee0603e8a683c",
+  "archiveBytes": 84091379,
+  "manifestSha256": "11e010c1a8044e8cde4fb9843ab23cc70eb192b370dbd7142a3fa9f60c8c964a",
+  "verifierSha256": "71683eb8d1a3a7470aa859fa87882222000e6795ca7fc6b33d37281000025c1f",
+  "entryCount": 18776,
+  "uniquePayloadCount": 7590,
+  "payloadBytes": 296827721,
+  "selectedFiles": 13331,
+  "steps": [
+    {
+      "label": "verify-source",
+      "command": [
+        "python3",
+        "/Users/jonathanborgia/code/signaltree/.worktrees/application-comparison/tools/application-lab/archive-evidence.py",
+        "verify",
+        "/private/tmp/st-long-lived-integrating-archive-11"
+      ],
+      "exitCode": 0,
+      "expectedExitCode": 0,
+      "elapsedSeconds": 7.854475021362305,
+      "log": "/private/tmp/st-long-lived-archive-verification-final/verify-source.log",
+      "logSha256": "94cd385ff7e03a6269386109ed053580e456d02a795cb8669b816639c98fb5cd"
+    },
+    {
+      "label": "pack",
+      "command": [
+        "python3",
+        "/Users/jonathanborgia/code/signaltree/.worktrees/application-comparison/tools/application-lab/archive-evidence.py",
+        "pack",
+        "/private/tmp/st-long-lived-integrating-archive-11",
+        "/private/tmp/st-long-lived-evidence-final.tar.gz"
+      ],
+      "exitCode": 0,
+      "expectedExitCode": 0,
+      "elapsedSeconds": 28.321594953536987,
+      "log": "/private/tmp/st-long-lived-archive-verification-final/pack.log",
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "label": "verify-tar",
+      "command": [
+        "python3",
+        "/Users/jonathanborgia/code/signaltree/.worktrees/application-comparison/tools/application-lab/archive-evidence.py",
+        "verify",
+        "/private/tmp/st-long-lived-evidence-final.tar.gz"
+      ],
+      "exitCode": 0,
+      "expectedExitCode": 0,
+      "elapsedSeconds": 7.827978134155273,
+      "log": "/private/tmp/st-long-lived-archive-verification-final/verify-tar.log",
+      "logSha256": "94cd385ff7e03a6269386109ed053580e456d02a795cb8669b816639c98fb5cd"
+    },
+    {
+      "label": "extract",
+      "command": [
+        "python3",
+        "/Users/jonathanborgia/code/signaltree/.worktrees/application-comparison/tools/application-lab/archive-evidence.py",
+        "extract",
+        "/private/tmp/st-long-lived-evidence-final.tar.gz",
+        "/private/tmp/st-long-lived-evidence-final-extracted"
+      ],
+      "exitCode": 0,
+      "expectedExitCode": 0,
+      "elapsedSeconds": 17.631117820739746,
+      "log": "/private/tmp/st-long-lived-archive-verification-final/extract.log",
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "label": "verify-extracted",
+      "command": [
+        "python3",
+        "/private/tmp/st-long-lived-evidence-final-extracted/archive-evidence.py",
+        "verify",
+        "/private/tmp/st-long-lived-evidence-final-extracted"
+      ],
+      "exitCode": 0,
+      "expectedExitCode": 0,
+      "elapsedSeconds": 8.27049708366394,
+      "log": "/private/tmp/st-long-lived-archive-verification-final/verify-extracted.log",
+      "logSha256": "94cd385ff7e03a6269386109ed053580e456d02a795cb8669b816639c98fb5cd"
+    },
+    {
+      "label": "reject-corrupted-payload",
+      "command": [
+        "python3",
+        "/private/tmp/st-long-lived-evidence-final-controls/archive-evidence.py",
+        "verify",
+        "/private/tmp/st-long-lived-evidence-final-controls"
+      ],
+      "exitCode": 1,
+      "expectedExitCode": 1,
+      "elapsedSeconds": 0.8846907615661621,
+      "log": "/private/tmp/st-long-lived-archive-verification-final/reject-corrupted-payload.log",
+      "logSha256": "b49ab564c579ef397f6b23446f70df293a93aa773bbb45bb408e3f95bd5dd22e"
+    },
+    {
+      "label": "reject-missing-payload",
+      "command": [
+        "python3",
+        "/private/tmp/st-long-lived-evidence-final-controls/archive-evidence.py",
+        "verify",
+        "/private/tmp/st-long-lived-evidence-final-controls"
+      ],
+      "exitCode": 1,
+      "expectedExitCode": 1,
+      "elapsedSeconds": 0.7627439498901367,
+      "log": "/private/tmp/st-long-lived-archive-verification-final/reject-missing-payload.log",
+      "logSha256": "3819dc2e78c0a8ab85e61247fe8c9a1785f0e7ad8547f3b5c86375b453e99ce4"
+    },
+    {
+      "label": "verify-restored-control",
+      "command": [
+        "python3",
+        "/private/tmp/st-long-lived-evidence-final-controls/archive-evidence.py",
+        "verify",
+        "/private/tmp/st-long-lived-evidence-final-controls"
+      ],
+      "exitCode": 0,
+      "expectedExitCode": 0,
+      "elapsedSeconds": 8.59111213684082,
+      "log": "/private/tmp/st-long-lived-archive-verification-final/verify-restored-control.log",
+      "logSha256": "94cd385ff7e03a6269386109ed053580e456d02a795cb8669b816639c98fb5cd"
+    }
+  ],
+  "controls": {
+    "tamperedPayloadRejected": true,
+    "missingPayloadRejected": true,
+    "restoredCopyVerified": true
+  },
+  "limits": [
+    "Integrity, not authenticity or semantic correctness.",
+    "Only explicit selections and discovered hash-reference closure are included. This is not complete repository history or a reproducible installed/build environment.",
+    "Paths remain original identities, not extraction destinations. Multiple historical hashes for one original path are preserved separately.",
+    "Scalar hash-only identities have no invented original path. Explicit opaque inputs are preserved as bytes without reference discovery.",
+    "Remote registry integrity without a local archive and aggregate sourceSeal metadata are retained as provenance, not followed as file payloads.",
+    "No source-map URL crawl, dependency installation or automatic node_modules traversal. Maps enter only when explicitly selected or hash-referenced."
+  ]
+}

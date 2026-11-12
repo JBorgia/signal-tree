@@ -1,0 +1,12 @@
+{
+  "source": "/private/tmp/st-retirement-facet-alias-review-5d04ff65.json",
+  "sha256": "94838fbb5707546aeae1ed993dd63afc67c3b962ebf499a27ea3f5e3704df14d",
+  "result": {
+    "commit": "5d04ff65d2eaab1986ed1b420cbc013edc01542b",
+    "source": "/Users/jonathanborgia/code/signaltree/.worktrees/v16-egress-support-scan/packages/kernel/src/lib/experimental-publication/entity.ts",
+    "sha256": "424cba4edb948cffb6fc18d1ab92d3cd5400863bd310d2275288d7b79c1eaa51",
+    "scope": "Five const aliases replacing nonnull assertions in compact closure",
+    "finding": "No observable contract change demonstrated. Local ordinary array snapshots has own data slots, is never mutated or exposed; aliases retain identical object references, not copied requirement contents. Existing eligibility/revision/currentness/readiness checks unchanged.",
+    "execution": "Source/diff inspection only; no test/build/jobs. New emitted artifact bindings still required."
+  }
+}

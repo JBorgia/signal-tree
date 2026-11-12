@@ -1,0 +1,3133 @@
+{
+  "source": "/private/tmp/st-v16-terminal-final-pending-comparison/results.json",
+  "sha256": "394323426c418d7a2646f7b61d709cfd7a36388937a61466ac61cfe32c2b7a3a",
+  "result": {
+    "passed": true,
+    "scheduleSha256": "4955887f91af2c27064f4050573ca9a0005f6e774545629d406745ce04c224e3",
+    "reportSha256": "ba5ba39cb60c4d8924a65e995ab97e4be42c24cca92fc040c6b67aac1d5d20f6",
+    "results": [
+      {
+        "sample": {
+          "arm": "baseline",
+          "rows": 1000,
+          "round": 0,
+          "settlement": "confirm"
+        },
+        "node": "v24.15.0",
+        "pid": 7364,
+        "bundleSha256": "719951bc5328bc94d3a0fa819afe6271d17fbc4e27514b734c58473cc42f002f",
+        "host": {
+          "cpu": "Apple M4",
+          "load": [
+            5.86767578125,
+            7.06640625,
+            7.2294921875
+          ]
+        },
+        "heapBytes": {
+          "before": 5684784,
+          "empty": 6085672,
+          "synchronousAfterWrite": 36042992,
+          "synchronousAfterTransaction": 40367240,
+          "pending": 16220272,
+          "settledHandleHeld": 14753744,
+          "settledHandleDropped": 14640040,
+          "disposedLink": 10507192,
+          "destroyed": 7466800
+        },
+        "stages": {
+          "population": {
+            "elapsedNs": 97133333,
+            "cpuUs": {
+              "user": 148973,
+              "system": 7449
+            }
+          },
+          "settlement": {
+            "elapsedNs": 2987583,
+            "cpuUs": {
+              "user": 7322,
+              "system": 109
+            }
+          },
+          "settlementIncludingDrain": {
+            "elapsedNs": 3387750,
+            "cpuUs": {
+              "user": 8276,
+              "system": 135
+            }
+          }
+        },
+        "passed": true,
+        "deliveries": 1
+      },
+      {
+        "sample": {
+          "arm": "lazy",
+          "rows": 1000,
+          "round": 0,
+          "settlement": "confirm"
+        },
+        "node": "v24.15.0",
+        "pid": 7365,
+        "bundleSha256": "b962e61b6270a10d95826841f2389c5ef0ee741a844babd25f173747187d7037",
+        "host": {
+          "cpu": "Apple M4",
+          "load": [
+            5.86767578125,
+            7.06640625,
+            7.2294921875
+          ]
+        },
+        "heapBytes": {
+          "before": 5703648,
+          "empty": 6114792,
+          "synchronousAfterWrite": 24146744,
+          "synchronousAfterTransaction": 31807840,
+          "pending": 13358112,
+          "settledHandleHeld": 12139784,
+          "settledHandleDropped": 12022896,
+          "disposedLink": 10542512,
+          "destroyed": 7500304
+        },
+        "stages": {
+          "population": {
+            "elapsedNs": 56505834,
+            "cpuUs": {
+              "user": 103634,
+              "system": 7780
+            }
+          },
+          "settlement": {
+            "elapsedNs": 3073417,
+            "cpuUs": {
+              "user": 6884,
+              "system": 105
+            }
+          },
+          "settlementIncludingDrain": {
+            "elapsedNs": 3801583,
+            "cpuUs": {
+              "user": 8838,
+              "system": 191
+            }
+          }
+        },
+        "passed": true,
+        "deliveries": 1
+      },
+      {
+        "sample": {
+          "arm": "baseline",
+          "rows": 1000,
+          "round": 0,
+          "settlement": "rollback"
+        },
+        "node": "v24.15.0",
+        "pid": 7366,
+        "bundleSha256": "719951bc5328bc94d3a0fa819afe6271d17fbc4e27514b734c58473cc42f002f",
+        "host": {
+          "cpu": "Apple M4",
+          "load": [
+            5.86767578125,
+            7.06640625,
+            7.2294921875
+          ]
+        },
+        "heapBytes": {
+          "before": 5684784,
+          "empty": 6085744,
+          "synchronousAfterWrite": 33076528,
+          "synchronousAfterTransaction": 37286360,
+          "pending": 15973360,
+          "settledHandleHeld": 10932464,
+          "settledHandleDropped": 10810640,
+          "disposedLink": 10338080,
+          "destroyed": 8243160
+        },
+        "stages": {
+          "population": {
+            "elapsedNs": 98739292,
+            "cpuUs": {
+              "user": 150090,
+              "system": 7812
+            }
+          },
+          "settlement": {
+            "elapsedNs": 146283041,
+            "cpuUs": {
+              "user": 178624,
+              "system": 7234
+            }
+          },
+          "settlementIncludingDrain": {
+            "elapsedNs": 155716083,
+            "cpuUs": {
+              "user": 192512,
+              "system": 7650
+            }
+          }
+        },
+        "passed": true,
+        "deliveries": 1
+      },
+      {
+        "sample": {
+          "arm": "lazy",
+          "rows": 1000,
+          "round": 0,
+          "settlement": "rollback"
+        },
+        "node": "v24.15.0",
+        "pid": 7369,
+        "bundleSha256": "b962e61b6270a10d95826841f2389c5ef0ee741a844babd25f173747187d7037",
+        "host": {
+          "cpu": "Apple M4",
+          "load": [
+            6.1181640625,
+            7.09814453125,
+            7.23974609375
+          ]
+        },
+        "heapBytes": {
+          "before": 5703792,
+          "empty": 6114936,
+          "synchronousAfterWrite": 24221232,
+          "synchronousAfterTransaction": 32257752,
+          "pending": 13545232,
+          "settledHandleHeld": 9703968,
+          "settledHandleDropped": 9543208,
+          "disposedLink": 9322048,
+          "destroyed": 8607456
+        },
+        "stages": {
+          "population": {
+            "elapsedNs": 57817041,
+            "cpuUs": {
+              "user": 104564,
+              "system": 8020
+            }
+          },
+          "settlement": {
+            "elapsedNs": 45328375,
+            "cpuUs": {
+              "user": 77501,
+              "system": 3766
+            }
+          },
+          "settlementIncludingDrain": {
+            "elapsedNs": 72072292,
+            "cpuUs": {
+              "user": 127418,
+              "system": 7301
+            }
+          }
+        },
+        "passed": true,
+        "deliveries": 1
+      },
+      {
+        "sample": {
+          "arm": "lazy",
+          "rows": 1000,
+          "round": 1,
+          "settlement": "confirm"
+        },
+        "node": "v24.15.0",
+        "pid": 7370,
+        "bundleSha256": "b962e61b6270a10d95826841f2389c5ef0ee741a844babd25f173747187d7037",
+        "host": {
+          "cpu": "Apple M4",
+          "load": [
+            6.1181640625,
+            7.09814453125,
+            7.23974609375
+          ]
+        },
+        "heapBytes": {
+          "before": 5703720,
+          "empty": 6114864,
+          "synchronousAfterWrite": 24027856,
+          "synchronousAfterTransaction": 31898672,
+          "pending": 13354496,
+          "settledHandleHeld": 12139856,
+          "settledHandleDropped": 12022968,
+          "disposedLink": 10542584,
+          "destroyed": 7500376
+        },
+        "stages": {
+          "population": {
+            "elapsedNs": 54648416,
+            "cpuUs": {
+              "user": 99301,
+              "system": 6825
+            }
+          },
+          "settlement": {
+            "elapsedNs": 3098625,
+            "cpuUs": {
+              "user": 6974,
+              "system": 164
+            }
+          },
+          "settlementIncludingDrain": {
+            "elapsedNs": 3796083,
+            "cpuUs": {
+              "user": 8769,
+              "system": 208
+            }
+          }
+        },
+        "passed": true,
+        "deliveries": 1
+      },
+      {
+        "sample": {
+          "arm": "baseline",
+          "rows": 1000,
+          "round": 1,
+          "settlement": "confirm"
+        },
+        "node": "v24.15.0",
+        "pid": 7371,
+        "bundleSha256": "719951bc5328bc94d3a0fa819afe6271d17fbc4e27514b734c58473cc42f002f",
+        "host": {
+          "cpu": "Apple M4",
+          "load": [
+            6.1181640625,
+            7.09814453125,
+            7.23974609375
+          ]
+        },
+        "heapBytes": {
+          "before": 5684784,
+          "empty": 6085672,
+          "synchronousAfterWrite": 35852800,
+          "synchronousAfterTransaction": 40650480,
+          "pending": 15966920,
+          "settledHandleHeld": 14754528,
+          "settledHandleDropped": 14641160,
+          "disposedLink": 10508312,
+          "destroyed": 7467920
+        },
+        "stages": {
+          "population": {
+            "elapsedNs": 96986583,
+            "cpuUs": {
+              "user": 163700,
+              "system": 8476
+            }
+          },
+          "settlement": {
+            "elapsedNs": 2910584,
+            "cpuUs": {
+              "user": 7145,
+              "system": 104
+            }
+          },
+          "settlementIncludingDrain": {
+            "elapsedNs": 3341250,
+            "cpuUs": {
+              "user": 8091,
+              "system": 119
+            }
+          }
+        },
+        "passed": true,
+        "deliveries": 1
+      },
+      {
+        "sample": {
+          "arm": "lazy",
+          "rows": 1000,
+          "round": 1,
+          "settlement": "rollback"
+        },
+        "node": "v24.15.0",
+        "pid": 7372,
+        "bundleSha256": "b962e61b6270a10d95826841f2389c5ef0ee741a844babd25f173747187d7037",
+        "host": {
+          "cpu": "Apple M4",
+          "load": [
+            6.1181640625,
+            7.09814453125,
+            7.23974609375
+          ]
+        },
+        "heapBytes": {
+          "before": 5703648,
+          "empty": 6114792,
+          "synchronousAfterWrite": 24330608,
+          "synchronousAfterTransaction": 32105336,
+          "pending": 13361960,
+          "settledHandleHeld": 9691792,
+          "settledHandleDropped": 9543216,
+          "disposedLink": 9322056,
+          "destroyed": 8607184
+        },
+        "stages": {
+          "population": {
+            "elapsedNs": 54526292,
+            "cpuUs": {
+              "user": 99980,
+              "system": 6681
+            }
+          },
+          "settlement": {
+            "elapsedNs": 44434125,
+            "cpuUs": {
+              "user": 76317,
+              "system": 4237
+            }
+          },
+          "settlementIncludingDrain": {
+            "elapsedNs": 70671875,
+            "cpuUs": {
+              "user": 125903,
+              "system": 7840
+            }
+          }
+        },
+        "passed": true,
+        "deliveries": 1
+      },
+      {
+        "sample": {
+          "arm": "baseline",
+          "rows": 1000,
+          "round": 1,
+          "settlement": "rollback"
+        },
+        "node": "v24.15.0",
+        "pid": 7373,
+        "bundleSha256": "719951bc5328bc94d3a0fa819afe6271d17fbc4e27514b734c58473cc42f002f",
+        "host": {
+          "cpu": "Apple M4",
+          "load": [
+            6.1181640625,
+            7.09814453125,
+            7.23974609375
+          ]
+        },
+        "heapBytes": {
+          "before": 5684784,
+          "empty": 6085672,
+          "synchronousAfterWrite": 22256608,
+          "synchronousAfterTransaction": 27815912,
+          "pending": 16204584,
+          "settledHandleHeld": 10923208,
+          "settledHandleDropped": 10805216,
+          "disposedLink": 10335304,
+          "destroyed": 8240456
+        },
+        "stages": {
+          "population": {
+            "elapsedNs": 104327792,
+            "cpuUs": {
+              "user": 151008,
+              "system": 8030
+            }
+          },
+          "settlement": {
+            "elapsedNs": 134149750,
+            "cpuUs": {
+              "user": 165842,
+              "system": 6515
+            }
+          },
+          "settlementIncludingDrain": {
+            "elapsedNs": 142491417,
+            "cpuUs": {
+              "user": 177938,
+              "system": 6633
+            }
+          }
+        },
+        "passed": true,
+        "deliveries": 1
+      },
+      {
+        "sample": {
+          "arm": "baseline",
+          "rows": 1000,
+          "round": 2,
+          "settlement": "confirm"
+        },
+        "node": "v24.15.0",
+        "pid": 7374,
+        "bundleSha256": "719951bc5328bc94d3a0fa819afe6271d17fbc4e27514b734c58473cc42f002f",
+        "host": {
+          "cpu": "Apple M4",
+          "load": [
+            6.1181640625,
+            7.09814453125,
+            7.23974609375
+          ]
+        },
+        "heapBytes": {
+          "before": 5684784,
+          "empty": 6085672,
+          "synchronousAfterWrite": 22149680,
+          "synchronousAfterTransaction": 27759032,
+          "pending": 15965944,
+          "settledHandleHeld": 14751560,
+          "settledHandleDropped": 14638192,
+          "disposedLink": 10505344,
+          "destroyed": 7465120
+        },
+        "stages": {
+          "population": {
+            "elapsedNs": 95614500,
+            "cpuUs": {
+              "user": 147448,
+              "system": 7966
+            }
+          },
+          "settlement": {
+            "elapsedNs": 3020875,
+            "cpuUs": {
+              "user": 7622,
+              "system": 148
+            }
+          },
+          "settlementIncludingDrain": {
+            "elapsedNs": 3424208,
+            "cpuUs": {
+              "user": 8552,
+              "system": 161
+            }
+          }
+        },
+        "passed": true,
+        "deliveries": 1
+      },
+      {
+        "sample": {
+          "arm": "lazy",
+          "rows": 1000,
+          "round": 2,
+          "settlement": "confirm"
+        },
+        "node": "v24.15.0",
+        "pid": 7375,
+        "bundleSha256": "b962e61b6270a10d95826841f2389c5ef0ee741a844babd25f173747187d7037",
+        "host": {
+          "cpu": "Apple M4",
+          "load": [
+            6.1181640625,
+            7.09814453125,
+            7.23974609375
+          ]
+        },
+        "heapBytes": {
+          "before": 5703648,
+          "empty": 6114792,
+          "synchronousAfterWrite": 24033240,
+          "synchronousAfterTransaction": 31552832,
+          "pending": 13519608,
+          "settledHandleHeld": 12139784,
+          "settledHandleDropped": 12022896,
+          "disposedLink": 10542512,
+          "destroyed": 7500304
+        },
+        "stages": {
+          "population": {
+            "elapsedNs": 56396125,
+            "cpuUs": {
+              "user": 102302,
+              "system": 6904
+            }
+          },
+          "settlement": {
+            "elapsedNs": 3100000,
+            "cpuUs": {
+              "user": 6966,
+              "system": 141
+            }
+          },
+          "settlementIncludingDrain": {
+            "elapsedNs": 3778375,
+            "cpuUs": {
+              "user": 8727,
+              "system": 187
+            }
+          }
+        },
+        "passed": true,
+        "deliveries": 1
+      },
+      {
+        "sample": {
+          "arm": "baseline",
+          "rows": 1000,
+          "round": 2,
+          "settlement": "rollback"
+        },
+        "node": "v24.15.0",
+        "pid": 7376,
+        "bundleSha256": "719951bc5328bc94d3a0fa819afe6271d17fbc4e27514b734c58473cc42f002f",
+        "host": {
+          "cpu": "Apple M4",
+          "load": [
+            6.1181640625,
+            7.09814453125,
+            7.23974609375
+          ]
+        },
+        "heapBytes": {
+          "before": 5684856,
+          "empty": 6085744,
+          "synchronousAfterWrite": 35318840,
+          "synchronousAfterTransaction": 39311464,
+          "pending": 15969360,
+          "settledHandleHeld": 10921720,
+          "settledHandleDropped": 10807280,
+          "disposedLink": 10337368,
+          "destroyed": 8242520
+        },
+        "stages": {
+          "population": {
+            "elapsedNs": 101356291,
+            "cpuUs": {
+              "user": 153120,
+              "system": 8038
+            }
+          },
+          "settlement": {
+            "elapsedNs": 132909375,
+            "cpuUs": {
+              "user": 164423,
+              "system": 6565
+            }
+          },
+          "settlementIncludingDrain": {
+            "elapsedNs": 141562542,
+            "cpuUs": {
+              "user": 176872,
+              "system": 6759
+            }
+          }
+        },
+        "passed": true,
+        "deliveries": 1
+      },
+      {
+        "sample": {
+          "arm": "lazy",
+          "rows": 1000,
+          "round": 2,
+          "settlement": "rollback"
+        },
+        "node": "v24.15.0",
+        "pid": 7377,
+        "bundleSha256": "b962e61b6270a10d95826841f2389c5ef0ee741a844babd25f173747187d7037",
+        "host": {
+          "cpu": "Apple M4",
+          "load": [
+            6.1181640625,
+            7.09814453125,
+            7.23974609375
+          ]
+        },
+        "heapBytes": {
+          "before": 5703648,
+          "empty": 6114792,
+          "synchronousAfterWrite": 23837072,
+          "synchronousAfterTransaction": 31682808,
+          "pending": 13353896,
+          "settledHandleHeld": 9703824,
+          "settledHandleDropped": 9543064,
+          "disposedLink": 9321904,
+          "destroyed": 8607312
+        },
+        "stages": {
+          "population": {
+            "elapsedNs": 54323917,
+            "cpuUs": {
+              "user": 99289,
+              "system": 6676
+            }
+          },
+          "settlement": {
+            "elapsedNs": 43890584,
+            "cpuUs": {
+              "user": 77065,
+              "system": 3890
+            }
+          },
+          "settlementIncludingDrain": {
+            "elapsedNs": 68811125,
+            "cpuUs": {
+              "user": 124592,
+              "system": 7303
+            }
+          }
+        },
+        "passed": true,
+        "deliveries": 1
+      },
+      {
+        "sample": {
+          "arm": "lazy",
+          "rows": 1000,
+          "round": 3,
+          "settlement": "confirm"
+        },
+        "node": "v24.15.0",
+        "pid": 7378,
+        "bundleSha256": "b962e61b6270a10d95826841f2389c5ef0ee741a844babd25f173747187d7037",
+        "host": {
+          "cpu": "Apple M4",
+          "load": [
+            6.1181640625,
+            7.09814453125,
+            7.23974609375
+          ]
+        },
+        "heapBytes": {
+          "before": 5703720,
+          "empty": 6114936,
+          "synchronousAfterWrite": 24017080,
+          "synchronousAfterTransaction": 31967376,
+          "pending": 13360536,
+          "settledHandleHeld": 12139928,
+          "settledHandleDropped": 12023040,
+          "disposedLink": 10542656,
+          "destroyed": 7500376
+        },
+        "stages": {
+          "population": {
+            "elapsedNs": 55273333,
+            "cpuUs": {
+              "user": 100666,
+              "system": 6925
+            }
+          },
+          "settlement": {
+            "elapsedNs": 2911625,
+            "cpuUs": {
+              "user": 6655,
+              "system": 70
+            }
+          },
+          "settlementIncludingDrain": {
+            "elapsedNs": 3558166,
+            "cpuUs": {
+              "user": 8235,
+              "system": 95
+            }
+          }
+        },
+        "passed": true,
+        "deliveries": 1
+      },
+      {
+        "sample": {
+          "arm": "baseline",
+          "rows": 1000,
+          "round": 3,
+          "settlement": "confirm"
+        },
+        "node": "v24.15.0",
+        "pid": 7379,
+        "bundleSha256": "719951bc5328bc94d3a0fa819afe6271d17fbc4e27514b734c58473cc42f002f",
+        "host": {
+          "cpu": "Apple M4",
+          "load": [
+            6.1181640625,
+            7.09814453125,
+            7.23974609375
+          ]
+        },
+        "heapBytes": {
+          "before": 5684856,
+          "empty": 6085744,
+          "synchronousAfterWrite": 22020584,
+          "synchronousAfterTransaction": 27717216,
+          "pending": 15964608,
+          "settledHandleHeld": 14751200,
+          "settledHandleDropped": 14638168,
+          "disposedLink": 10505320,
+          "destroyed": 7465096
+        },
+        "stages": {
+          "population": {
+            "elapsedNs": 97939000,
+            "cpuUs": {
+              "user": 150010,
+              "system": 7616
+            }
+          },
+          "settlement": {
+            "elapsedNs": 2990375,
+            "cpuUs": {
+              "user": 7310,
+              "system": 102
+            }
+          },
+          "settlementIncludingDrain": {
+            "elapsedNs": 3406292,
+            "cpuUs": {
+              "user": 8253,
+              "system": 120
+            }
+          }
+        },
+        "passed": true,
+        "deliveries": 1
+      },
+      {
+        "sample": {
+          "arm": "lazy",
+          "rows": 1000,
+          "round": 3,
+          "settlement": "rollback"
+        },
+        "node": "v24.15.0",
+        "pid": 7381,
+        "bundleSha256": "b962e61b6270a10d95826841f2389c5ef0ee741a844babd25f173747187d7037",
+        "host": {
+          "cpu": "Apple M4",
+          "load": [
+            6.1181640625,
+            7.09814453125,
+            7.23974609375
+          ]
+        },
+        "heapBytes": {
+          "before": 5703648,
+          "empty": 6114864,
+          "synchronousAfterWrite": 23627896,
+          "synchronousAfterTransaction": 31168912,
+          "pending": 13593176,
+          "settledHandleHeld": 9683232,
+          "settledHandleDropped": 9534856,
+          "disposedLink": 9313696,
+          "destroyed": 8604704
+        },
+        "stages": {
+          "population": {
+            "elapsedNs": 67899791,
+            "cpuUs": {
+              "user": 141480,
+              "system": 10452
+            }
+          },
+          "settlement": {
+            "elapsedNs": 45750042,
+            "cpuUs": {
+              "user": 81000,
+              "system": 4161
+            }
+          },
+          "settlementIncludingDrain": {
+            "elapsedNs": 75167000,
+            "cpuUs": {
+              "user": 130399,
+              "system": 8117
+            }
+          }
+        },
+        "passed": true,
+        "deliveries": 1
+      },
+      {
+        "sample": {
+          "arm": "baseline",
+          "rows": 1000,
+          "round": 3,
+          "settlement": "rollback"
+        },
+        "node": "v24.15.0",
+        "pid": 7382,
+        "bundleSha256": "719951bc5328bc94d3a0fa819afe6271d17fbc4e27514b734c58473cc42f002f",
+        "host": {
+          "cpu": "Apple M4",
+          "load": [
+            6.1181640625,
+            7.09814453125,
+            7.23974609375
+          ]
+        },
+        "heapBytes": {
+          "before": 5684856,
+          "empty": 6085744,
+          "synchronousAfterWrite": 35849656,
+          "synchronousAfterTransaction": 40816232,
+          "pending": 15971664,
+          "settledHandleHeld": 10923320,
+          "settledHandleDropped": 10808840,
+          "disposedLink": 10338928,
+          "destroyed": 8244080
+        },
+        "stages": {
+          "population": {
+            "elapsedNs": 112668417,
+            "cpuUs": {
+              "user": 170825,
+              "system": 9963
+            }
+          },
+          "settlement": {
+            "elapsedNs": 143711125,
+            "cpuUs": {
+              "user": 176156,
+              "system": 6939
+            }
+          },
+          "settlementIncludingDrain": {
+            "elapsedNs": 152748334,
+            "cpuUs": {
+              "user": 188909,
+              "system": 7124
+            }
+          }
+        },
+        "passed": true,
+        "deliveries": 1
+      },
+      {
+        "sample": {
+          "arm": "baseline",
+          "rows": 1000,
+          "round": 4,
+          "settlement": "confirm"
+        },
+        "node": "v24.15.0",
+        "pid": 7383,
+        "bundleSha256": "719951bc5328bc94d3a0fa819afe6271d17fbc4e27514b734c58473cc42f002f",
+        "host": {
+          "cpu": "Apple M4",
+          "load": [
+            6.1181640625,
+            7.09814453125,
+            7.23974609375
+          ]
+        },
+        "heapBytes": {
+          "before": 5684856,
+          "empty": 6085744,
+          "synchronousAfterWrite": 23962536,
+          "synchronousAfterTransaction": 29093296,
+          "pending": 15978440,
+          "settledHandleHeld": 14747560,
+          "settledHandleDropped": 14630672,
+          "disposedLink": 10507088,
+          "destroyed": 7465344
+        },
+        "stages": {
+          "population": {
+            "elapsedNs": 94047250,
+            "cpuUs": {
+              "user": 148529,
+              "system": 6832
+            }
+          },
+          "settlement": {
+            "elapsedNs": 3132250,
+            "cpuUs": {
+              "user": 7619,
+              "system": 185
+            }
+          },
+          "settlementIncludingDrain": {
+            "elapsedNs": 3526208,
+            "cpuUs": {
+              "user": 8534,
+              "system": 198
+            }
+          }
+        },
+        "passed": true,
+        "deliveries": 1
+      },
+      {
+        "sample": {
+          "arm": "lazy",
+          "rows": 1000,
+          "round": 4,
+          "settlement": "confirm"
+        },
+        "node": "v24.15.0",
+        "pid": 7384,
+        "bundleSha256": "b962e61b6270a10d95826841f2389c5ef0ee741a844babd25f173747187d7037",
+        "host": {
+          "cpu": "Apple M4",
+          "load": [
+            6.1181640625,
+            7.09814453125,
+            7.23974609375
+          ]
+        },
+        "heapBytes": {
+          "before": 5703720,
+          "empty": 6114864,
+          "synchronousAfterWrite": 23773816,
+          "synchronousAfterTransaction": 31637216,
+          "pending": 13519904,
+          "settledHandleHeld": 12139592,
+          "settledHandleDropped": 12022704,
+          "disposedLink": 10542320,
+          "destroyed": 7500112
+        },
+        "stages": {
+          "population": {
+            "elapsedNs": 55348875,
+            "cpuUs": {
+              "user": 102370,
+              "system": 6406
+            }
+          },
+          "settlement": {
+            "elapsedNs": 2993708,
+            "cpuUs": {
+              "user": 6822,
+              "system": 97
+            }
+          },
+          "settlementIncludingDrain": {
+            "elapsedNs": 3659584,
+            "cpuUs": {
+              "user": 8623,
+              "system": 143
+            }
+          }
+        },
+        "passed": true,
+        "deliveries": 1
+      },
+      {
+        "sample": {
+          "arm": "baseline",
+          "rows": 1000,
+          "round": 4,
+          "settlement": "rollback"
+        },
+        "node": "v24.15.0",
+        "pid": 7385,
+        "bundleSha256": "719951bc5328bc94d3a0fa819afe6271d17fbc4e27514b734c58473cc42f002f",
+        "host": {
+          "cpu": "Apple M4",
+          "load": [
+            6.1181640625,
+            7.09814453125,
+            7.23974609375
+          ]
+        },
+        "heapBytes": {
+          "before": 5684856,
+          "empty": 6085744,
+          "synchronousAfterWrite": 24352040,
+          "synchronousAfterTransaction": 29465768,
+          "pending": 15964576,
+          "settledHandleHeld": 10920592,
+          "settledHandleDropped": 10804320,
+          "disposedLink": 10334408,
+          "destroyed": 8239560
+        },
+        "stages": {
+          "population": {
+            "elapsedNs": 97381833,
+            "cpuUs": {
+              "user": 152638,
+              "system": 7709
+            }
+          },
+          "settlement": {
+            "elapsedNs": 147329291,
+            "cpuUs": {
+              "user": 185552,
+              "system": 7864
+            }
+          },
+          "settlementIncludingDrain": {
+            "elapsedNs": 156901125,
+            "cpuUs": {
+              "user": 199663,
+              "system": 8192
+            }
+          }
+        },
+        "passed": true,
+        "deliveries": 1
+      },
+      {
+        "sample": {
+          "arm": "lazy",
+          "rows": 1000,
+          "round": 4,
+          "settlement": "rollback"
+        },
+        "node": "v24.15.0",
+        "pid": 7386,
+        "bundleSha256": "b962e61b6270a10d95826841f2389c5ef0ee741a844babd25f173747187d7037",
+        "host": {
+          "cpu": "Apple M4",
+          "load": [
+            6.1181640625,
+            7.09814453125,
+            7.23974609375
+          ]
+        },
+        "heapBytes": {
+          "before": 5703648,
+          "empty": 6114792,
+          "synchronousAfterWrite": 23604472,
+          "synchronousAfterTransaction": 31870272,
+          "pending": 13529128,
+          "settledHandleHeld": 9696096,
+          "settledHandleDropped": 9537128,
+          "disposedLink": 9315968,
+          "destroyed": 8606976
+        },
+        "stages": {
+          "population": {
+            "elapsedNs": 58373292,
+            "cpuUs": {
+              "user": 107664,
+              "system": 7241
+            }
+          },
+          "settlement": {
+            "elapsedNs": 48741375,
+            "cpuUs": {
+              "user": 84822,
+              "system": 4438
+            }
+          },
+          "settlementIncludingDrain": {
+            "elapsedNs": 76783666,
+            "cpuUs": {
+              "user": 137549,
+              "system": 8734
+            }
+          }
+        },
+        "passed": true,
+        "deliveries": 1
+      },
+      {
+        "sample": {
+          "arm": "baseline",
+          "rows": 10000,
+          "round": 0,
+          "settlement": "confirm"
+        },
+        "node": "v24.15.0",
+        "pid": 7387,
+        "bundleSha256": "719951bc5328bc94d3a0fa819afe6271d17fbc4e27514b734c58473cc42f002f",
+        "host": {
+          "cpu": "Apple M4",
+          "load": [
+            6.1181640625,
+            7.09814453125,
+            7.23974609375
+          ]
+        },
+        "heapBytes": {
+          "before": 7052784,
+          "empty": 7453672,
+          "synchronousAfterWrite": 323786536,
+          "synchronousAfterTransaction": 333605512,
+          "pending": 95431704,
+          "settledHandleHeld": 81100800,
+          "settledHandleDropped": 80139176,
+          "disposedLink": 40219832,
+          "destroyed": 9321968
+        },
+        "stages": {
+          "population": {
+            "elapsedNs": 5632567333,
+            "cpuUs": {
+              "user": 5515270,
+              "system": 388355
+            }
+          },
+          "settlement": {
+            "elapsedNs": 20646542,
+            "cpuUs": {
+              "user": 43881,
+              "system": 769
+            }
+          },
+          "settlementIncludingDrain": {
+            "elapsedNs": 21204000,
+            "cpuUs": {
+              "user": 45418,
+              "system": 784
+            }
+          }
+        },
+        "passed": true,
+        "deliveries": 1
+      },
+      {
+        "sample": {
+          "arm": "lazy",
+          "rows": 10000,
+          "round": 0,
+          "settlement": "confirm"
+        },
+        "node": "v24.15.0",
+        "pid": 7391,
+        "bundleSha256": "b962e61b6270a10d95826841f2389c5ef0ee741a844babd25f173747187d7037",
+        "host": {
+          "cpu": "Apple M4",
+          "load": [
+            5.8681640625,
+            7.02978515625,
+            7.21484375
+          ]
+        },
+        "heapBytes": {
+          "before": 7071648,
+          "empty": 7482792,
+          "synchronousAfterWrite": 231445856,
+          "synchronousAfterTransaction": 237035760,
+          "pending": 69045112,
+          "settledHandleHeld": 54725328,
+          "settledHandleDropped": 53763704,
+          "disposedLink": 40257032,
+          "destroyed": 9355624
+        },
+        "stages": {
+          "population": {
+            "elapsedNs": 409793708,
+            "cpuUs": {
+              "user": 624620,
+              "system": 40221
+            }
+          },
+          "settlement": {
+            "elapsedNs": 19435833,
+            "cpuUs": {
+              "user": 37260,
+              "system": 746
+            }
+          },
+          "settlementIncludingDrain": {
+            "elapsedNs": 21045000,
+            "cpuUs": {
+              "user": 41197,
+              "system": 780
+            }
+          }
+        },
+        "passed": true,
+        "deliveries": 1
+      },
+      {
+        "sample": {
+          "arm": "baseline",
+          "rows": 10000,
+          "round": 0,
+          "settlement": "rollback"
+        },
+        "node": "v24.15.0",
+        "pid": 7392,
+        "bundleSha256": "719951bc5328bc94d3a0fa819afe6271d17fbc4e27514b734c58473cc42f002f",
+        "host": {
+          "cpu": "Apple M4",
+          "load": [
+            6.11865234375,
+            7.06201171875,
+            7.22509765625
+          ]
+        },
+        "heapBytes": {
+          "before": 7052792,
+          "empty": 7453680,
+          "synchronousAfterWrite": 294389536,
+          "synchronousAfterTransaction": 362291216,
+          "pending": 95437304,
+          "settledHandleHeld": 36011240,
+          "settledHandleDropped": 35021728,
+          "disposedLink": 30651848,
+          "destroyed": 11029720
+        },
+        "stages": {
+          "population": {
+            "elapsedNs": 5378171958,
+            "cpuUs": {
+              "user": 5262294,
+              "system": 372234
+            }
+          },
+          "settlement": {
+            "elapsedNs": 10764513375,
+            "cpuUs": {
+              "user": 10377591,
+              "system": 782285
+            }
+          },
+          "settlementIncludingDrain": {
+            "elapsedNs": 10845935959,
+            "cpuUs": {
+              "user": 10489467,
+              "system": 783688
+            }
+          }
+        },
+        "passed": true,
+        "deliveries": 1
+      },
+      {
+        "sample": {
+          "arm": "lazy",
+          "rows": 10000,
+          "round": 0,
+          "settlement": "rollback"
+        },
+        "node": "v24.15.0",
+        "pid": 7431,
+        "bundleSha256": "b962e61b6270a10d95826841f2389c5ef0ee741a844babd25f173747187d7037",
+        "host": {
+          "cpu": "Apple M4",
+          "load": [
+            5.69775390625,
+            6.92626953125,
+            7.173828125
+          ]
+        },
+        "heapBytes": {
+          "before": 7071720,
+          "empty": 7482864,
+          "synchronousAfterWrite": 230446288,
+          "synchronousAfterTransaction": 235625232,
+          "pending": 69045104,
+          "settledHandleHeld": 17948688,
+          "settledHandleDropped": 16887624,
+          "disposedLink": 14913056,
+          "destroyed": 11863048
+        },
+        "stages": {
+          "population": {
+            "elapsedNs": 445616916,
+            "cpuUs": {
+              "user": 684709,
+              "system": 42719
+            }
+          },
+          "settlement": {
+            "elapsedNs": 391226208,
+            "cpuUs": {
+              "user": 634328,
+              "system": 28017
+            }
+          },
+          "settlementIncludingDrain": {
+            "elapsedNs": 607700459,
+            "cpuUs": {
+              "user": 1051013,
+              "system": 56859
+            }
+          }
+        },
+        "passed": true,
+        "deliveries": 1
+      },
+      {
+        "sample": {
+          "arm": "lazy",
+          "rows": 10000,
+          "round": 1,
+          "settlement": "confirm"
+        },
+        "node": "v24.15.0",
+        "pid": 7432,
+        "bundleSha256": "b962e61b6270a10d95826841f2389c5ef0ee741a844babd25f173747187d7037",
+        "host": {
+          "cpu": "Apple M4",
+          "load": [
+            5.69775390625,
+            6.92626953125,
+            7.173828125
+          ]
+        },
+        "heapBytes": {
+          "before": 7071792,
+          "empty": 7482936,
+          "synchronousAfterWrite": 224416560,
+          "synchronousAfterTransaction": 229651344,
+          "pending": 69045160,
+          "settledHandleHeld": 54725424,
+          "settledHandleDropped": 53763800,
+          "disposedLink": 40257000,
+          "destroyed": 9355632
+        },
+        "stages": {
+          "population": {
+            "elapsedNs": 443815583,
+            "cpuUs": {
+              "user": 680771,
+              "system": 44047
+            }
+          },
+          "settlement": {
+            "elapsedNs": 21335667,
+            "cpuUs": {
+              "user": 40069,
+              "system": 928
+            }
+          },
+          "settlementIncludingDrain": {
+            "elapsedNs": 23538459,
+            "cpuUs": {
+              "user": 44565,
+              "system": 1057
+            }
+          }
+        },
+        "passed": true,
+        "deliveries": 1
+      },
+      {
+        "sample": {
+          "arm": "baseline",
+          "rows": 10000,
+          "round": 1,
+          "settlement": "confirm"
+        },
+        "node": "v24.15.0",
+        "pid": 7433,
+        "bundleSha256": "719951bc5328bc94d3a0fa819afe6271d17fbc4e27514b734c58473cc42f002f",
+        "host": {
+          "cpu": "Apple M4",
+          "load": [
+            5.69775390625,
+            6.92626953125,
+            7.173828125
+          ]
+        },
+        "heapBytes": {
+          "before": 7052784,
+          "empty": 7453672,
+          "synchronousAfterWrite": 297759000,
+          "synchronousAfterTransaction": 363267976,
+          "pending": 95425096,
+          "settledHandleHeld": 81093200,
+          "settledHandleDropped": 80131576,
+          "disposedLink": 40221504,
+          "destroyed": 9323456
+        },
+        "stages": {
+          "population": {
+            "elapsedNs": 5251021167,
+            "cpuUs": {
+              "user": 5192670,
+              "system": 377003
+            }
+          },
+          "settlement": {
+            "elapsedNs": 20395208,
+            "cpuUs": {
+              "user": 40904,
+              "system": 708
+            }
+          },
+          "settlementIncludingDrain": {
+            "elapsedNs": 20963250,
+            "cpuUs": {
+              "user": 42294,
+              "system": 775
+            }
+          }
+        },
+        "passed": true,
+        "deliveries": 1
+      },
+      {
+        "sample": {
+          "arm": "lazy",
+          "rows": 10000,
+          "round": 1,
+          "settlement": "rollback"
+        },
+        "node": "v24.15.0",
+        "pid": 7439,
+        "bundleSha256": "b962e61b6270a10d95826841f2389c5ef0ee741a844babd25f173747187d7037",
+        "host": {
+          "cpu": "Apple M4",
+          "load": [
+            5.7216796875,
+            6.91064453125,
+            7.16650390625
+          ]
+        },
+        "heapBytes": {
+          "before": 7071648,
+          "empty": 7482792,
+          "synchronousAfterWrite": 225006208,
+          "synchronousAfterTransaction": 230844352,
+          "pending": 69044880,
+          "settledHandleHeld": 17945736,
+          "settledHandleDropped": 16884768,
+          "disposedLink": 14910184,
+          "destroyed": 11860240
+        },
+        "stages": {
+          "population": {
+            "elapsedNs": 436042542,
+            "cpuUs": {
+              "user": 678430,
+              "system": 42766
+            }
+          },
+          "settlement": {
+            "elapsedNs": 369084709,
+            "cpuUs": {
+              "user": 601743,
+              "system": 24034
+            }
+          },
+          "settlementIncludingDrain": {
+            "elapsedNs": 579270625,
+            "cpuUs": {
+              "user": 1017494,
+              "system": 52376
+            }
+          }
+        },
+        "passed": true,
+        "deliveries": 1
+      },
+      {
+        "sample": {
+          "arm": "baseline",
+          "rows": 10000,
+          "round": 1,
+          "settlement": "rollback"
+        },
+        "node": "v24.15.0",
+        "pid": 7441,
+        "bundleSha256": "719951bc5328bc94d3a0fa819afe6271d17fbc4e27514b734c58473cc42f002f",
+        "host": {
+          "cpu": "Apple M4",
+          "load": [
+            5.66357421875,
+            6.87890625,
+            7.15380859375
+          ]
+        },
+        "heapBytes": {
+          "before": 7052792,
+          "empty": 7453680,
+          "synchronousAfterWrite": 324808808,
+          "synchronousAfterTransaction": 339184728,
+          "pending": 95436048,
+          "settledHandleHeld": 36105832,
+          "settledHandleDropped": 35008616,
+          "disposedLink": 30638736,
+          "destroyed": 11032808
+        },
+        "stages": {
+          "population": {
+            "elapsedNs": 5584257209,
+            "cpuUs": {
+              "user": 5435848,
+              "system": 423883
+            }
+          },
+          "settlement": {
+            "elapsedNs": 10654297959,
+            "cpuUs": {
+              "user": 10077246,
+              "system": 869229
+            }
+          },
+          "settlementIncludingDrain": {
+            "elapsedNs": 10737343125,
+            "cpuUs": {
+              "user": 10189874,
+              "system": 871211
+            }
+          }
+        },
+        "passed": true,
+        "deliveries": 1
+      },
+      {
+        "sample": {
+          "arm": "baseline",
+          "rows": 10000,
+          "round": 2,
+          "settlement": "confirm"
+        },
+        "node": "v24.15.0",
+        "pid": 7995,
+        "bundleSha256": "719951bc5328bc94d3a0fa819afe6271d17fbc4e27514b734c58473cc42f002f",
+        "host": {
+          "cpu": "Apple M4",
+          "load": [
+            5.8916015625,
+            6.86865234375,
+            7.14501953125
+          ]
+        },
+        "heapBytes": {
+          "before": 7052784,
+          "empty": 7453672,
+          "synchronousAfterWrite": 292461320,
+          "synchronousAfterTransaction": 358029488,
+          "pending": 95426920,
+          "settledHandleHeld": 81092200,
+          "settledHandleDropped": 80130576,
+          "disposedLink": 40219992,
+          "destroyed": 9321944
+        },
+        "stages": {
+          "population": {
+            "elapsedNs": 5417630000,
+            "cpuUs": {
+              "user": 5331299,
+              "system": 384627
+            }
+          },
+          "settlement": {
+            "elapsedNs": 20619458,
+            "cpuUs": {
+              "user": 42616,
+              "system": 852
+            }
+          },
+          "settlementIncludingDrain": {
+            "elapsedNs": 21189292,
+            "cpuUs": {
+              "user": 43205,
+              "system": 871
+            }
+          }
+        },
+        "passed": true,
+        "deliveries": 1
+      },
+      {
+        "sample": {
+          "arm": "lazy",
+          "rows": 10000,
+          "round": 2,
+          "settlement": "confirm"
+        },
+        "node": "v24.15.0",
+        "pid": 8023,
+        "bundleSha256": "b962e61b6270a10d95826841f2389c5ef0ee741a844babd25f173747187d7037",
+        "host": {
+          "cpu": "Apple M4",
+          "load": [
+            5.65966796875,
+            6.80419921875,
+            7.12060546875
+          ]
+        },
+        "heapBytes": {
+          "before": 7071792,
+          "empty": 7482936,
+          "synchronousAfterWrite": 234956160,
+          "synchronousAfterTransaction": 239329400,
+          "pending": 69044312,
+          "settledHandleHeld": 54724352,
+          "settledHandleDropped": 53762728,
+          "disposedLink": 40256056,
+          "destroyed": 9354648
+        },
+        "stages": {
+          "population": {
+            "elapsedNs": 428816792,
+            "cpuUs": {
+              "user": 654392,
+              "system": 46124
+            }
+          },
+          "settlement": {
+            "elapsedNs": 21436333,
+            "cpuUs": {
+              "user": 39764,
+              "system": 1134
+            }
+          },
+          "settlementIncludingDrain": {
+            "elapsedNs": 23195041,
+            "cpuUs": {
+              "user": 43636,
+              "system": 1211
+            }
+          }
+        },
+        "passed": true,
+        "deliveries": 1
+      },
+      {
+        "sample": {
+          "arm": "baseline",
+          "rows": 10000,
+          "round": 2,
+          "settlement": "rollback"
+        },
+        "node": "v24.15.0",
+        "pid": 8024,
+        "bundleSha256": "719951bc5328bc94d3a0fa819afe6271d17fbc4e27514b734c58473cc42f002f",
+        "host": {
+          "cpu": "Apple M4",
+          "load": [
+            5.65966796875,
+            6.80419921875,
+            7.12060546875
+          ]
+        },
+        "heapBytes": {
+          "before": 7052936,
+          "empty": 7453824,
+          "synchronousAfterWrite": 294586624,
+          "synchronousAfterTransaction": 362916168,
+          "pending": 95424584,
+          "settledHandleHeld": 36066736,
+          "settledHandleDropped": 35012048,
+          "disposedLink": 30642168,
+          "destroyed": 11020336
+        },
+        "stages": {
+          "population": {
+            "elapsedNs": 5350471375,
+            "cpuUs": {
+              "user": 5233532,
+              "system": 379928
+            }
+          },
+          "settlement": {
+            "elapsedNs": 10411398542,
+            "cpuUs": {
+              "user": 9985440,
+              "system": 803990
+            }
+          },
+          "settlementIncludingDrain": {
+            "elapsedNs": 10499883916,
+            "cpuUs": {
+              "user": 10111493,
+              "system": 806309
+            }
+          }
+        },
+        "passed": true,
+        "deliveries": 1
+      },
+      {
+        "sample": {
+          "arm": "lazy",
+          "rows": 10000,
+          "round": 2,
+          "settlement": "rollback"
+        },
+        "node": "v24.15.0",
+        "pid": 8044,
+        "bundleSha256": "b962e61b6270a10d95826841f2389c5ef0ee741a844babd25f173747187d7037",
+        "host": {
+          "cpu": "Apple M4",
+          "load": [
+            6.14697265625,
+            6.8603515625,
+            7.13525390625
+          ]
+        },
+        "heapBytes": {
+          "before": 7071648,
+          "empty": 7482792,
+          "synchronousAfterWrite": 183900056,
+          "synchronousAfterTransaction": 191524112,
+          "pending": 69045448,
+          "settledHandleHeld": 17953480,
+          "settledHandleDropped": 16892416,
+          "disposedLink": 14917832,
+          "destroyed": 11864424
+        },
+        "stages": {
+          "population": {
+            "elapsedNs": 470627083,
+            "cpuUs": {
+              "user": 730667,
+              "system": 59885
+            }
+          },
+          "settlement": {
+            "elapsedNs": 388733959,
+            "cpuUs": {
+              "user": 636830,
+              "system": 26728
+            }
+          },
+          "settlementIncludingDrain": {
+            "elapsedNs": 607830167,
+            "cpuUs": {
+              "user": 1057150,
+              "system": 54733
+            }
+          }
+        },
+        "passed": true,
+        "deliveries": 1
+      },
+      {
+        "sample": {
+          "arm": "lazy",
+          "rows": 10000,
+          "round": 3,
+          "settlement": "confirm"
+        },
+        "node": "v24.15.0",
+        "pid": 8049,
+        "bundleSha256": "b962e61b6270a10d95826841f2389c5ef0ee741a844babd25f173747187d7037",
+        "host": {
+          "cpu": "Apple M4",
+          "load": [
+            5.974609375,
+            6.8125,
+            7.11669921875
+          ]
+        },
+        "heapBytes": {
+          "before": 7071648,
+          "empty": 7482792,
+          "synchronousAfterWrite": 225750928,
+          "synchronousAfterTransaction": 231412664,
+          "pending": 69055112,
+          "settledHandleHeld": 54724768,
+          "settledHandleDropped": 53763144,
+          "disposedLink": 40256472,
+          "destroyed": 9355104
+        },
+        "stages": {
+          "population": {
+            "elapsedNs": 451327084,
+            "cpuUs": {
+              "user": 699767,
+              "system": 47504
+            }
+          },
+          "settlement": {
+            "elapsedNs": 20314208,
+            "cpuUs": {
+              "user": 39487,
+              "system": 884
+            }
+          },
+          "settlementIncludingDrain": {
+            "elapsedNs": 21952542,
+            "cpuUs": {
+              "user": 43017,
+              "system": 927
+            }
+          }
+        },
+        "passed": true,
+        "deliveries": 1
+      },
+      {
+        "sample": {
+          "arm": "baseline",
+          "rows": 10000,
+          "round": 3,
+          "settlement": "confirm"
+        },
+        "node": "v24.15.0",
+        "pid": 8113,
+        "bundleSha256": "719951bc5328bc94d3a0fa819afe6271d17fbc4e27514b734c58473cc42f002f",
+        "host": {
+          "cpu": "Apple M4",
+          "load": [
+            5.974609375,
+            6.8125,
+            7.11669921875
+          ]
+        },
+        "heapBytes": {
+          "before": 7052856,
+          "empty": 7453744,
+          "synchronousAfterWrite": 308628704,
+          "synchronousAfterTransaction": 374385304,
+          "pending": 95425472,
+          "settledHandleHeld": 81093296,
+          "settledHandleDropped": 80131672,
+          "disposedLink": 40221600,
+          "destroyed": 9323464
+        },
+        "stages": {
+          "population": {
+            "elapsedNs": 5392408583,
+            "cpuUs": {
+              "user": 5305420,
+              "system": 388266
+            }
+          },
+          "settlement": {
+            "elapsedNs": 20078041,
+            "cpuUs": {
+              "user": 42431,
+              "system": 770
+            }
+          },
+          "settlementIncludingDrain": {
+            "elapsedNs": 20681542,
+            "cpuUs": {
+              "user": 44167,
+              "system": 784
+            }
+          }
+        },
+        "passed": true,
+        "deliveries": 1
+      },
+      {
+        "sample": {
+          "arm": "lazy",
+          "rows": 10000,
+          "round": 3,
+          "settlement": "rollback"
+        },
+        "node": "v24.15.0",
+        "pid": 8122,
+        "bundleSha256": "b962e61b6270a10d95826841f2389c5ef0ee741a844babd25f173747187d7037",
+        "host": {
+          "cpu": "Apple M4",
+          "load": [
+            5.65625,
+            6.732421875,
+            7.08642578125
+          ]
+        },
+        "heapBytes": {
+          "before": 7071720,
+          "empty": 7482864,
+          "synchronousAfterWrite": 181048584,
+          "synchronousAfterTransaction": 245806800,
+          "pending": 69050952,
+          "settledHandleHeld": 17955968,
+          "settledHandleDropped": 16894968,
+          "disposedLink": 14920384,
+          "destroyed": 11870224
+        },
+        "stages": {
+          "population": {
+            "elapsedNs": 415203542,
+            "cpuUs": {
+              "user": 635543,
+              "system": 42909
+            }
+          },
+          "settlement": {
+            "elapsedNs": 403581250,
+            "cpuUs": {
+              "user": 667178,
+              "system": 29010
+            }
+          },
+          "settlementIncludingDrain": {
+            "elapsedNs": 641235625,
+            "cpuUs": {
+              "user": 1140730,
+              "system": 62519
+            }
+          }
+        },
+        "passed": true,
+        "deliveries": 1
+      },
+      {
+        "sample": {
+          "arm": "baseline",
+          "rows": 10000,
+          "round": 3,
+          "settlement": "rollback"
+        },
+        "node": "v24.15.0",
+        "pid": 8210,
+        "bundleSha256": "719951bc5328bc94d3a0fa819afe6271d17fbc4e27514b734c58473cc42f002f",
+        "host": {
+          "cpu": "Apple M4",
+          "load": [
+            5.65625,
+            6.732421875,
+            7.08642578125
+          ]
+        },
+        "heapBytes": {
+          "before": 7052864,
+          "empty": 7453752,
+          "synchronousAfterWrite": 290606264,
+          "synchronousAfterTransaction": 357235160,
+          "pending": 95425792,
+          "settledHandleHeld": 36066232,
+          "settledHandleDropped": 35011472,
+          "disposedLink": 30641592,
+          "destroyed": 11019688
+        },
+        "stages": {
+          "population": {
+            "elapsedNs": 5644366708,
+            "cpuUs": {
+              "user": 5553353,
+              "system": 430397
+            }
+          },
+          "settlement": {
+            "elapsedNs": 10896189584,
+            "cpuUs": {
+              "user": 10446802,
+              "system": 835153
+            }
+          },
+          "settlementIncludingDrain": {
+            "elapsedNs": 10995817334,
+            "cpuUs": {
+              "user": 10587639,
+              "system": 838511
+            }
+          }
+        },
+        "passed": true,
+        "deliveries": 1
+      },
+      {
+        "sample": {
+          "arm": "baseline",
+          "rows": 10000,
+          "round": 4,
+          "settlement": "confirm"
+        },
+        "node": "v24.15.0",
+        "pid": 8658,
+        "bundleSha256": "719951bc5328bc94d3a0fa819afe6271d17fbc4e27514b734c58473cc42f002f",
+        "host": {
+          "cpu": "Apple M4",
+          "load": [
+            5.30126953125,
+            6.5986328125,
+            7.03173828125
+          ]
+        },
+        "heapBytes": {
+          "before": 7052784,
+          "empty": 7453672,
+          "synchronousAfterWrite": 314207784,
+          "synchronousAfterTransaction": 325738928,
+          "pending": 95431504,
+          "settledHandleHeld": 81100432,
+          "settledHandleDropped": 80138808,
+          "disposedLink": 40219464,
+          "destroyed": 9321680
+        },
+        "stages": {
+          "population": {
+            "elapsedNs": 5433412375,
+            "cpuUs": {
+              "user": 5344423,
+              "system": 414830
+            }
+          },
+          "settlement": {
+            "elapsedNs": 19585542,
+            "cpuUs": {
+              "user": 42204,
+              "system": 757
+            }
+          },
+          "settlementIncludingDrain": {
+            "elapsedNs": 20142500,
+            "cpuUs": {
+              "user": 42738,
+              "system": 809
+            }
+          }
+        },
+        "passed": true,
+        "deliveries": 1
+      },
+      {
+        "sample": {
+          "arm": "lazy",
+          "rows": 10000,
+          "round": 4,
+          "settlement": "confirm"
+        },
+        "node": "v24.15.0",
+        "pid": 9101,
+        "bundleSha256": "b962e61b6270a10d95826841f2389c5ef0ee741a844babd25f173747187d7037",
+        "host": {
+          "cpu": "Apple M4",
+          "load": [
+            5.40185546875,
+            6.578125,
+            7.01904296875
+          ]
+        },
+        "heapBytes": {
+          "before": 7071720,
+          "empty": 7482864,
+          "synchronousAfterWrite": 221032472,
+          "synchronousAfterTransaction": 226482352,
+          "pending": 69044296,
+          "settledHandleHeld": 54724488,
+          "settledHandleDropped": 53762864,
+          "disposedLink": 40255936,
+          "destroyed": 9354784
+        },
+        "stages": {
+          "population": {
+            "elapsedNs": 416776917,
+            "cpuUs": {
+              "user": 642605,
+              "system": 43924
+            }
+          },
+          "settlement": {
+            "elapsedNs": 19257375,
+            "cpuUs": {
+              "user": 37723,
+              "system": 788
+            }
+          },
+          "settlementIncludingDrain": {
+            "elapsedNs": 20906708,
+            "cpuUs": {
+              "user": 41256,
+              "system": 821
+            }
+          }
+        },
+        "passed": true,
+        "deliveries": 1
+      },
+      {
+        "sample": {
+          "arm": "baseline",
+          "rows": 10000,
+          "round": 4,
+          "settlement": "rollback"
+        },
+        "node": "v24.15.0",
+        "pid": 9132,
+        "bundleSha256": "719951bc5328bc94d3a0fa819afe6271d17fbc4e27514b734c58473cc42f002f",
+        "host": {
+          "cpu": "Apple M4",
+          "load": [
+            5.40185546875,
+            6.578125,
+            7.01904296875
+          ]
+        },
+        "heapBytes": {
+          "before": 7052864,
+          "empty": 7453752,
+          "synchronousAfterWrite": 319443048,
+          "synchronousAfterTransaction": 332383984,
+          "pending": 95426560,
+          "settledHandleHeld": 36068632,
+          "settledHandleDropped": 35011856,
+          "disposedLink": 30642016,
+          "destroyed": 11019992
+        },
+        "stages": {
+          "population": {
+            "elapsedNs": 5817269000,
+            "cpuUs": {
+              "user": 5393712,
+              "system": 474000
+            }
+          },
+          "settlement": {
+            "elapsedNs": 11010884292,
+            "cpuUs": {
+              "user": 10572230,
+              "system": 847969
+            }
+          },
+          "settlementIncludingDrain": {
+            "elapsedNs": 11110042083,
+            "cpuUs": {
+              "user": 10752748,
+              "system": 852335
+            }
+          }
+        },
+        "passed": true,
+        "deliveries": 1
+      },
+      {
+        "sample": {
+          "arm": "lazy",
+          "rows": 10000,
+          "round": 4,
+          "settlement": "rollback"
+        },
+        "node": "v24.15.0",
+        "pid": 9182,
+        "bundleSha256": "b962e61b6270a10d95826841f2389c5ef0ee741a844babd25f173747187d7037",
+        "host": {
+          "cpu": "Apple M4",
+          "load": [
+            5.060546875,
+            6.4501953125,
+            6.96533203125
+          ]
+        },
+        "heapBytes": {
+          "before": 7071648,
+          "empty": 7482792,
+          "synchronousAfterWrite": 184458664,
+          "synchronousAfterTransaction": 249362968,
+          "pending": 69043224,
+          "settledHandleHeld": 18382496,
+          "settledHandleDropped": 17338288,
+          "disposedLink": 15389240,
+          "destroyed": 11844832
+        },
+        "stages": {
+          "population": {
+            "elapsedNs": 459257791,
+            "cpuUs": {
+              "user": 676712,
+              "system": 48940
+            }
+          },
+          "settlement": {
+            "elapsedNs": 390119625,
+            "cpuUs": {
+              "user": 640674,
+              "system": 25693
+            }
+          },
+          "settlementIncludingDrain": {
+            "elapsedNs": 607852542,
+            "cpuUs": {
+              "user": 1084168,
+              "system": 50131
+            }
+          }
+        },
+        "passed": true,
+        "deliveries": 1
+      }
+    ],
+    "groups": [
+      {
+        "rows": 1000,
+        "settlement": "confirm",
+        "cells": {
+          "baseline": {
+            "n": 5,
+            "populationMs": 96.986583,
+            "populationValuesMs": [
+              97.133333,
+              96.986583,
+              95.6145,
+              97.939,
+              94.04725
+            ],
+            "settlementIncludingDrainMs": 3.406292,
+            "settlementIncludingDrainValuesMs": [
+              3.38775,
+              3.34125,
+              3.424208,
+              3.406292,
+              3.526208
+            ],
+            "settlementIncludingDrainCpuMs": 8.411,
+            "heaps": {
+              "before": {
+                "median": 0,
+                "values": [
+                  0,
+                  0,
+                  0,
+                  0,
+                  0
+                ]
+              },
+              "empty": {
+                "median": 400888,
+                "values": [
+                  400888,
+                  400888,
+                  400888,
+                  400888,
+                  400888
+                ]
+              },
+              "synchronousAfterWrite": {
+                "median": 18277680,
+                "values": [
+                  30358208,
+                  30168016,
+                  16464896,
+                  16335728,
+                  18277680
+                ]
+              },
+              "synchronousAfterTransaction": {
+                "median": 23408440,
+                "values": [
+                  34682456,
+                  34965696,
+                  22074248,
+                  22032360,
+                  23408440
+                ]
+              },
+              "pending": {
+                "median": 10282136,
+                "values": [
+                  10535488,
+                  10282136,
+                  10281160,
+                  10279752,
+                  10293584
+                ]
+              },
+              "settledHandleHeld": {
+                "median": 9066776,
+                "values": [
+                  9068960,
+                  9069744,
+                  9066776,
+                  9066344,
+                  9062704
+                ]
+              },
+              "settledHandleDropped": {
+                "median": 8953408,
+                "values": [
+                  8955256,
+                  8956376,
+                  8953408,
+                  8953312,
+                  8945816
+                ]
+              },
+              "disposedLink": {
+                "median": 4822232,
+                "values": [
+                  4822408,
+                  4823528,
+                  4820560,
+                  4820464,
+                  4822232
+                ]
+              },
+              "destroyed": {
+                "median": 1780488,
+                "values": [
+                  1782016,
+                  1783136,
+                  1780336,
+                  1780240,
+                  1780488
+                ]
+              }
+            }
+          },
+          "lazy": {
+            "n": 5,
+            "populationMs": 55.348875,
+            "populationValuesMs": [
+              56.505834,
+              54.648416,
+              56.396125,
+              55.273333,
+              55.348875
+            ],
+            "settlementIncludingDrainMs": 3.778375,
+            "settlementIncludingDrainValuesMs": [
+              3.801583,
+              3.796083,
+              3.778375,
+              3.558166,
+              3.659584
+            ],
+            "settlementIncludingDrainCpuMs": 8.914,
+            "heaps": {
+              "before": {
+                "median": 0,
+                "values": [
+                  0,
+                  0,
+                  0,
+                  0,
+                  0
+                ]
+              },
+              "empty": {
+                "median": 411144,
+                "values": [
+                  411144,
+                  411144,
+                  411144,
+                  411216,
+                  411144
+                ]
+              },
+              "synchronousAfterWrite": {
+                "median": 18324136,
+                "values": [
+                  18443096,
+                  18324136,
+                  18329592,
+                  18313360,
+                  18070096
+                ]
+              },
+              "synchronousAfterTransaction": {
+                "median": 26104192,
+                "values": [
+                  26104192,
+                  26194952,
+                  25849184,
+                  26263656,
+                  25933496
+                ]
+              },
+              "pending": {
+                "median": 7656816,
+                "values": [
+                  7654464,
+                  7650776,
+                  7815960,
+                  7656816,
+                  7816184
+                ]
+              },
+              "settledHandleHeld": {
+                "median": 6436136,
+                "values": [
+                  6436136,
+                  6436136,
+                  6436136,
+                  6436208,
+                  6435872
+                ]
+              },
+              "settledHandleDropped": {
+                "median": 6319248,
+                "values": [
+                  6319248,
+                  6319248,
+                  6319248,
+                  6319320,
+                  6318984
+                ]
+              },
+              "disposedLink": {
+                "median": 4838864,
+                "values": [
+                  4838864,
+                  4838864,
+                  4838864,
+                  4838936,
+                  4838600
+                ]
+              },
+              "destroyed": {
+                "median": 1796656,
+                "values": [
+                  1796656,
+                  1796656,
+                  1796656,
+                  1796656,
+                  1796392
+                ]
+              }
+            }
+          }
+        }
+      },
+      {
+        "rows": 1000,
+        "settlement": "rollback",
+        "cells": {
+          "baseline": {
+            "n": 5,
+            "populationMs": 101.356291,
+            "populationValuesMs": [
+              98.739292,
+              104.327792,
+              101.356291,
+              112.668417,
+              97.381833
+            ],
+            "settlementIncludingDrainMs": 152.748334,
+            "settlementIncludingDrainValuesMs": [
+              155.716083,
+              142.491417,
+              141.562542,
+              152.748334,
+              156.901125
+            ],
+            "settlementIncludingDrainCpuMs": 196.033,
+            "heaps": {
+              "before": {
+                "median": 0,
+                "values": [
+                  0,
+                  0,
+                  0,
+                  0,
+                  0
+                ]
+              },
+              "empty": {
+                "median": 400888,
+                "values": [
+                  400960,
+                  400888,
+                  400888,
+                  400888,
+                  400888
+                ]
+              },
+              "synchronousAfterWrite": {
+                "median": 27391744,
+                "values": [
+                  27391744,
+                  16571824,
+                  29633984,
+                  30164800,
+                  18667184
+                ]
+              },
+              "synchronousAfterTransaction": {
+                "median": 31601576,
+                "values": [
+                  31601576,
+                  22131128,
+                  33626608,
+                  35131376,
+                  23780912
+                ]
+              },
+              "pending": {
+                "median": 10286808,
+                "values": [
+                  10288576,
+                  10519800,
+                  10284504,
+                  10286808,
+                  10279720
+                ]
+              },
+              "settledHandleHeld": {
+                "median": 5238424,
+                "values": [
+                  5247680,
+                  5238424,
+                  5236864,
+                  5238464,
+                  5235736
+                ]
+              },
+              "settledHandleDropped": {
+                "median": 5122424,
+                "values": [
+                  5125856,
+                  5120432,
+                  5122424,
+                  5123984,
+                  5119464
+                ]
+              },
+              "disposedLink": {
+                "median": 4652512,
+                "values": [
+                  4653296,
+                  4650520,
+                  4652512,
+                  4654072,
+                  4649552
+                ]
+              },
+              "destroyed": {
+                "median": 2557664,
+                "values": [
+                  2558376,
+                  2555672,
+                  2557664,
+                  2559224,
+                  2554704
+                ]
+              }
+            }
+          },
+          "lazy": {
+            "n": 5,
+            "populationMs": 57.817041,
+            "populationValuesMs": [
+              57.817041,
+              54.526292,
+              54.323917,
+              67.899791,
+              58.373292
+            ],
+            "settlementIncludingDrainMs": 72.072292,
+            "settlementIncludingDrainValuesMs": [
+              72.072292,
+              70.671875,
+              68.811125,
+              75.167,
+              76.783666
+            ],
+            "settlementIncludingDrainCpuMs": 134.719,
+            "heaps": {
+              "before": {
+                "median": 0,
+                "values": [
+                  0,
+                  0,
+                  0,
+                  0,
+                  0
+                ]
+              },
+              "empty": {
+                "median": 411144,
+                "values": [
+                  411144,
+                  411144,
+                  411144,
+                  411216,
+                  411144
+                ]
+              },
+              "synchronousAfterWrite": {
+                "median": 18133424,
+                "values": [
+                  18517440,
+                  18626960,
+                  18133424,
+                  17924248,
+                  17900824
+                ]
+              },
+              "synchronousAfterTransaction": {
+                "median": 26166624,
+                "values": [
+                  26553960,
+                  26401688,
+                  25979160,
+                  25465264,
+                  26166624
+                ]
+              },
+              "pending": {
+                "median": 7825480,
+                "values": [
+                  7841440,
+                  7658312,
+                  7650248,
+                  7889528,
+                  7825480
+                ]
+              },
+              "settledHandleHeld": {
+                "median": 3992448,
+                "values": [
+                  4000176,
+                  3988144,
+                  4000176,
+                  3979584,
+                  3992448
+                ]
+              },
+              "settledHandleDropped": {
+                "median": 3839416,
+                "values": [
+                  3839416,
+                  3839568,
+                  3839416,
+                  3831208,
+                  3833480
+                ]
+              },
+              "disposedLink": {
+                "median": 3618256,
+                "values": [
+                  3618256,
+                  3618408,
+                  3618256,
+                  3610048,
+                  3612320
+                ]
+              },
+              "destroyed": {
+                "median": 2903536,
+                "values": [
+                  2903664,
+                  2903536,
+                  2903664,
+                  2901056,
+                  2903328
+                ]
+              }
+            }
+          }
+        }
+      },
+      {
+        "rows": 10000,
+        "settlement": "confirm",
+        "cells": {
+          "baseline": {
+            "n": 5,
+            "populationMs": 5417.63,
+            "populationValuesMs": [
+              5632.567333,
+              5251.021167,
+              5417.63,
+              5392.408583,
+              5433.412375
+            ],
+            "settlementIncludingDrainMs": 20.96325,
+            "settlementIncludingDrainValuesMs": [
+              21.204,
+              20.96325,
+              21.189292,
+              20.681542,
+              20.1425
+            ],
+            "settlementIncludingDrainCpuMs": 44.076,
+            "heaps": {
+              "before": {
+                "median": 0,
+                "values": [
+                  0,
+                  0,
+                  0,
+                  0,
+                  0
+                ]
+              },
+              "empty": {
+                "median": 400888,
+                "values": [
+                  400888,
+                  400888,
+                  400888,
+                  400888,
+                  400888
+                ]
+              },
+              "synchronousAfterWrite": {
+                "median": 301575848,
+                "values": [
+                  316733752,
+                  290706216,
+                  285408536,
+                  301575848,
+                  307155000
+                ]
+              },
+              "synchronousAfterTransaction": {
+                "median": 350976704,
+                "values": [
+                  326552728,
+                  356215192,
+                  350976704,
+                  367332448,
+                  318686144
+                ]
+              },
+              "pending": {
+                "median": 88374136,
+                "values": [
+                  88378920,
+                  88372312,
+                  88374136,
+                  88372616,
+                  88378720
+                ]
+              },
+              "settledHandleHeld": {
+                "median": 74040440,
+                "values": [
+                  74048016,
+                  74040416,
+                  74039416,
+                  74040440,
+                  74047648
+                ]
+              },
+              "settledHandleDropped": {
+                "median": 73078816,
+                "values": [
+                  73086392,
+                  73078792,
+                  73077792,
+                  73078816,
+                  73086024
+                ]
+              },
+              "disposedLink": {
+                "median": 33167208,
+                "values": [
+                  33167048,
+                  33168720,
+                  33167208,
+                  33168744,
+                  33166680
+                ]
+              },
+              "destroyed": {
+                "median": 2269184,
+                "values": [
+                  2269184,
+                  2270672,
+                  2269160,
+                  2270608,
+                  2268896
+                ]
+              }
+            }
+          },
+          "lazy": {
+            "n": 5,
+            "populationMs": 428.816792,
+            "populationValuesMs": [
+              409.793708,
+              443.815583,
+              428.816792,
+              451.327084,
+              416.776917
+            ],
+            "settlementIncludingDrainMs": 21.952542,
+            "settlementIncludingDrainValuesMs": [
+              21.045,
+              23.538459,
+              23.195041,
+              21.952542,
+              20.906708
+            ],
+            "settlementIncludingDrainCpuMs": 43.944,
+            "heaps": {
+              "before": {
+                "median": 0,
+                "values": [
+                  0,
+                  0,
+                  0,
+                  0,
+                  0
+                ]
+              },
+              "empty": {
+                "median": 411144,
+                "values": [
+                  411144,
+                  411144,
+                  411144,
+                  411144,
+                  411144
+                ]
+              },
+              "synchronousAfterWrite": {
+                "median": 218679280,
+                "values": [
+                  224374208,
+                  217344768,
+                  227884368,
+                  218679280,
+                  213960752
+                ]
+              },
+              "synchronousAfterTransaction": {
+                "median": 224341016,
+                "values": [
+                  229964112,
+                  222579552,
+                  232257608,
+                  224341016,
+                  219410632
+                ]
+              },
+              "pending": {
+                "median": 61973368,
+                "values": [
+                  61973464,
+                  61973368,
+                  61972520,
+                  61983464,
+                  61972576
+                ]
+              },
+              "settledHandleHeld": {
+                "median": 47653120,
+                "values": [
+                  47653680,
+                  47653632,
+                  47652560,
+                  47653120,
+                  47652768
+                ]
+              },
+              "settledHandleDropped": {
+                "median": 46691496,
+                "values": [
+                  46692056,
+                  46692008,
+                  46690936,
+                  46691496,
+                  46691144
+                ]
+              },
+              "disposedLink": {
+                "median": 33184824,
+                "values": [
+                  33185384,
+                  33185208,
+                  33184264,
+                  33184824,
+                  33184216
+                ]
+              },
+              "destroyed": {
+                "median": 2283456,
+                "values": [
+                  2283976,
+                  2283840,
+                  2282856,
+                  2283456,
+                  2283064
+                ]
+              }
+            }
+          }
+        }
+      },
+      {
+        "rows": 10000,
+        "settlement": "rollback",
+        "cells": {
+          "baseline": {
+            "n": 5,
+            "populationMs": 5584.257209,
+            "populationValuesMs": [
+              5378.171958,
+              5584.257209,
+              5350.471375,
+              5644.366708,
+              5817.269
+            ],
+            "settlementIncludingDrainMs": 10845.935959,
+            "settlementIncludingDrainValuesMs": [
+              10845.935959,
+              10737.343125,
+              10499.883916,
+              10995.817334,
+              11110.042083
+            ],
+            "settlementIncludingDrainCpuMs": 11273.155,
+            "heaps": {
+              "before": {
+                "median": 0,
+                "values": [
+                  0,
+                  0,
+                  0,
+                  0,
+                  0
+                ]
+              },
+              "empty": {
+                "median": 400888,
+                "values": [
+                  400888,
+                  400888,
+                  400888,
+                  400888,
+                  400888
+                ]
+              },
+              "synchronousAfterWrite": {
+                "median": 287533688,
+                "values": [
+                  287336744,
+                  317756016,
+                  287533688,
+                  283553400,
+                  312390184
+                ]
+              },
+              "synchronousAfterTransaction": {
+                "median": 350182296,
+                "values": [
+                  355238424,
+                  332131936,
+                  355863232,
+                  350182296,
+                  325331120
+                ]
+              },
+              "pending": {
+                "median": 88373696,
+                "values": [
+                  88384512,
+                  88383256,
+                  88371648,
+                  88372928,
+                  88373696
+                ]
+              },
+              "settledHandleHeld": {
+                "median": 29013800,
+                "values": [
+                  28958448,
+                  29053040,
+                  29013800,
+                  29013368,
+                  29015768
+                ]
+              },
+              "settledHandleDropped": {
+                "median": 27958992,
+                "values": [
+                  27968936,
+                  27955824,
+                  27959112,
+                  27958608,
+                  27958992
+                ]
+              },
+              "disposedLink": {
+                "median": 23589152,
+                "values": [
+                  23599056,
+                  23585944,
+                  23589232,
+                  23588728,
+                  23589152
+                ]
+              },
+              "destroyed": {
+                "median": 3967400,
+                "values": [
+                  3976928,
+                  3980016,
+                  3967400,
+                  3966824,
+                  3967128
+                ]
+              }
+            }
+          },
+          "lazy": {
+            "n": 5,
+            "populationMs": 445.616916,
+            "populationValuesMs": [
+              445.616916,
+              436.042542,
+              470.627083,
+              415.203542,
+              459.257791
+            ],
+            "settlementIncludingDrainMs": 607.830167,
+            "settlementIncludingDrainValuesMs": [
+              607.700459,
+              579.270625,
+              607.830167,
+              641.235625,
+              607.852542
+            ],
+            "settlementIncludingDrainCpuMs": 1111.883,
+            "heaps": {
+              "before": {
+                "median": 0,
+                "values": [
+                  0,
+                  0,
+                  0,
+                  0,
+                  0
+                ]
+              },
+              "empty": {
+                "median": 411144,
+                "values": [
+                  411144,
+                  411144,
+                  411144,
+                  411144,
+                  411144
+                ]
+              },
+              "synchronousAfterWrite": {
+                "median": 177387016,
+                "values": [
+                  223374568,
+                  217934560,
+                  176828408,
+                  173976864,
+                  177387016
+                ]
+              },
+              "synchronousAfterTransaction": {
+                "median": 228553512,
+                "values": [
+                  228553512,
+                  223772704,
+                  184452464,
+                  238735080,
+                  242291320
+                ]
+              },
+              "pending": {
+                "median": 61973384,
+                "values": [
+                  61973384,
+                  61973232,
+                  61973800,
+                  61979232,
+                  61971576
+                ]
+              },
+              "settledHandleHeld": {
+                "median": 10881832,
+                "values": [
+                  10876968,
+                  10874088,
+                  10881832,
+                  10884248,
+                  11310848
+                ]
+              },
+              "settledHandleDropped": {
+                "median": 9820768,
+                "values": [
+                  9815904,
+                  9813120,
+                  9820768,
+                  9823248,
+                  10266640
+                ]
+              },
+              "disposedLink": {
+                "median": 7846184,
+                "values": [
+                  7841336,
+                  7838536,
+                  7846184,
+                  7848664,
+                  8317592
+                ]
+              },
+              "destroyed": {
+                "median": 4791328,
+                "values": [
+                  4791328,
+                  4788592,
+                  4792776,
+                  4798504,
+                  4773184
+                ]
+              }
+            }
+          }
+        }
+      }
+    ]
+  }
+}

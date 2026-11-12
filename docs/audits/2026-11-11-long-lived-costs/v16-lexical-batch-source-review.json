@@ -1,0 +1,65 @@
+{
+  "source": "/private/tmp/st-recipient-lexical-batch-independent-review.json",
+  "sha256": "5a837550884e93bb505e72cf5f95abce1e0ec73dd664bd0c25edca0cc1ce4f56",
+  "result": {
+    "base": "a4316e1229d4c54d3af8044c44dee2d56a8ec043",
+    "state": "Three-file uncommitted lexical batch-sharing diff",
+    "status": "No concrete semantic blocker demonstrated. Performance and final artifact qualification remain open.",
+    "bindings": {
+      "/Users/jonathanborgia/code/signaltree/.worktrees/v16-egress-support-scan/packages/kernel/src/lib/experimental-publication/recipient-occurrence.ts": "a7d980b6b08b41319133c089a66ae2e3ace50c1488eb28d496b7dc533d346569",
+      "/Users/jonathanborgia/code/signaltree/.worktrees/v16-egress-support-scan/packages/kernel/src/lib/experimental-publication/private.ts": "cd9a67e4a0e3176f92d5c4cab074942e41a34d940fd751ab19deea0bbaf9fa07",
+      "/Users/jonathanborgia/code/signaltree/.worktrees/v16-egress-support-scan/packages/kernel/src/lib/recipient-ready-contribution-storage.spec.ts": "0e3180f66fb3e058b3a7dc69e226ce0ea192dea19a7b0bcc2efe8c6d9b19c886",
+      "/private/tmp/st-v16-ready-contribution-batch-gc.json": "c0dbf32c8ce24dc7a4fd7c4ae8cd41d6132392fa249a470a8567be81bccfec1d",
+      "/private/tmp/st-v16-ready-contribution-batch-gc.mjs": "28080abe6b7407f1cc0f7ddb5ab49a30df2fa241537b35b12f968850e6154b64",
+      "/private/tmp/st-v16-recipient-batch-focused-1.log": "3ce7a2811a15cd5b12b781c1566a2a003dee75086de04a480c3720bf06fe5b8e",
+      "/private/tmp/st-v16-recipient-batch-typecheck-1.log": "66b45f54373ca2d6c431ed9b610e3f7f3c8ca3720d4a9a833b900e707c6dad8e",
+      "/private/tmp/st-v16-recipient-batch-spec-types-1.log": "d96bf296ada40f7aab19740c790ec23835aeae7f307cf347a059d16fd348a7cb",
+      "/private/tmp/st-v16-recipient-batch-build-1.log": "39ed3a621beefc60351cde9c85d6d404d723794fcd7dbf50373eea651bdf65cf"
+    },
+    "scope": "Batch entry points, iterator/reentry/disposal, mutable-proof snapshot meaning, exact key/reseed lifecycle, cache ownership and point-path work. Prior reviewer verdicts not used as premises.",
+    "source_observations": [
+      {
+        "anchor": "recipient-occurrence.ts:126-132",
+        "finding": "ReadyBatch is a fresh local object per synchronous method call. It is not stored on index, group, entry or global state. Nested calls cannot overwrite outer candidate. get(handle) occurs for every item after iterator/change property evaluation, so disposal before next item rejects. Throws preserve already installed changes like prior loop."
+      },
+      {
+        "anchor": "recipient-occurrence.ts:45-65,108-122",
+        "finding": "Identity is only cache candidate; all five ordered role arrays and duplicate counts, four flags and rejected bits are compared. Copied contribution and Entry freeze only on actual second share. OwnerCells remain mutable. Unresolved/callback-bearing entries stay distinct and own readiness mutation/cancellation."
+      },
+      {
+        "anchor": "private.ts:318-324,440-446",
+        "finding": "Only multi-edit collection reduction and multi-entry collection enrollment create batches; they retain exact iteration order and keys. Payload/projection reduction remains after the loop. Empty/single paths retain direct replacement; normal scalar point path has no WeakRef/freezing/cache allocation. Collection point adds constant length check; multi-field edits are deliberately batch work."
+      },
+      {
+        "anchor": "recipient-occurrence.ts:107-147",
+        "finding": "Per-address Map entries, contribution addition/subtraction, group visibility, readiness and dispose remain unchanged. Shared immutable snapshots do not aggregate or erase addresses, so exact replacements and inbound clear/reseed remain supported."
+      }
+    ],
+    "stored_run_evidence": {
+      "focused_tests": 51,
+      "focused_files": 5,
+      "type_and_spec_logs": "record success; no new spec ratchet error",
+      "gc": {
+        "generator_and_three_built_module_hashes_verified": true,
+        "pinnedAlive": true,
+        "retainedAfterDisposal": false,
+        "passed": true,
+        "fixture": "Two actual batch addresses share one entry; index disposed, proof kept live after ownerarrays cleared; owner survives pin then collects after pin release with job-separatedGC."
+      }
+    },
+    "falsifiers_run_by_reviewer": [
+      "Source/diff inspection",
+      "Hash comparison of GC generator and three built module bindings",
+      "Stored focused/type/spec/build log inspection"
+    ],
+    "falsifiers_not_run_by_reviewer": [
+      "Runtime tests/builds/benchmarks or GC probe rerun",
+      "Final immutablepackage/source equivalence and CPUcost study not yet supplied"
+    ],
+    "limits": [
+      "No adoption orrelease approval. No fixed CPU benefit inferred from removed WeakRefs or allocation path.",
+      "Only bound ready-batch GC fixture observed; no universal whole-store heap claim.",
+      "Future source changes require new binding review."
+    ]
+  }
+}
