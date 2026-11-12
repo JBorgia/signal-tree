@@ -1,0 +1,109 @@
+{
+  "command": [
+    "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+    "/private/tmp/st-v15-maintenance-release-prep/inspect-registry.mjs"
+  ],
+  "node": "v24.15.0",
+  "records": [
+    {
+      "name": "@signal-tree/kernel",
+      "url": "https://registry.npmjs.org/@signal-tree%2fkernel",
+      "retrievedUTC": "2026-11-12T01:36:12.823Z",
+      "path": "/private/tmp/st-v15-maintenance-release-prep/kernel.registry.json",
+      "sha256": "e473e7626074abbdc746f67d89814a5ecd2225bb9847d9ef7bbad20ba05333e4",
+      "distTags": {
+        "rc": "15.0.0-rc.16",
+        "latest": "15.4.8"
+      },
+      "proposedVersion": "15.4.9",
+      "proposedPublished": false,
+      "latestV15": "15.4.8",
+      "published1548": {
+        "time": "2026-11-11T16:26:17.818Z",
+        "integrity": "sha512-LTFxvZFTHk8qsGhleoZS8OZDl+6ACaQC1vAsjgC2zm1tAc8+T7aQUFLHh80EzG7JpaXHqKVeGfQUFjZA6k02Rg==",
+        "tarball": "https://registry.npmjs.org/@signal-tree/kernel/-/kernel-15.4.8.tgz"
+      }
+    },
+    {
+      "name": "@signal-tree/angular",
+      "url": "https://registry.npmjs.org/@signal-tree%2fangular",
+      "retrievedUTC": "2026-11-12T01:36:13.051Z",
+      "path": "/private/tmp/st-v15-maintenance-release-prep/angular.registry.json",
+      "sha256": "f428760c77fcc64f75f441ec44727f0568ba8e77467766abba78c3111b4481b1",
+      "distTags": {
+        "rc": "15.0.0-rc.16",
+        "latest": "15.4.8"
+      },
+      "proposedVersion": "15.4.9",
+      "proposedPublished": false,
+      "latestV15": "15.4.8",
+      "published1548": {
+        "time": "2026-11-11T16:23:24.678Z",
+        "integrity": "sha512-i/ip0wV+3SGSD43C+xFLR7z/7GVS/vGIpbAXfCt1YfeJF2v08aJvoLz+l7PZteUCC1OZNLW6Urfd2q0swLvECg==",
+        "tarball": "https://registry.npmjs.org/@signal-tree/angular/-/angular-15.4.8.tgz"
+      }
+    },
+    {
+      "name": "@signal-tree/react",
+      "url": "https://registry.npmjs.org/@signal-tree%2freact",
+      "retrievedUTC": "2026-11-12T01:36:13.312Z",
+      "path": "/private/tmp/st-v15-maintenance-release-prep/react.registry.json",
+      "sha256": "b2163f414840434cdd573393b2244378b5f2e01a0521bdd14121e5c978ecbfb8",
+      "distTags": {
+        "rc": "15.0.0-rc.16",
+        "latest": "15.4.8"
+      },
+      "proposedVersion": "15.4.9",
+      "proposedPublished": false,
+      "latestV15": "15.4.8",
+      "published1548": {
+        "time": "2026-11-11T16:23:01.406Z",
+        "integrity": "sha512-1O6GantRyjkZr89j8GhkuGiLiLNWBHIi7NRyhgNcT7012pqN8JZ7j5Yit7NL9Xvu0/Qi+TeeyT0hizqkiKljnw==",
+        "tarball": "https://registry.npmjs.org/@signal-tree/react/-/react-15.4.8.tgz"
+      }
+    },
+    {
+      "name": "@signal-tree/vue",
+      "url": "https://registry.npmjs.org/@signal-tree%2fvue",
+      "retrievedUTC": "2026-11-12T01:36:13.531Z",
+      "path": "/private/tmp/st-v15-maintenance-release-prep/vue.registry.json",
+      "sha256": "f58111c9fc41028d00df82edffcd94d27dc81b03e7137fa654deacae19e925a6",
+      "distTags": {
+        "rc": "15.0.0-rc.16",
+        "latest": "15.4.8"
+      },
+      "proposedVersion": "15.4.9",
+      "proposedPublished": false,
+      "latestV15": "15.4.8",
+      "published1548": {
+        "time": "2026-11-11T16:24:42.536Z",
+        "integrity": "sha512-G8jT02botkzQazkbGrbTLRORaZ5oDCo4ehp5gX5DKoIbvO77kMOIf87WZ0Q/9ZljEzglNEh1nmb+0Fhvci2yzA==",
+        "tarball": "https://registry.npmjs.org/@signal-tree/vue/-/vue-15.4.8.tgz"
+      }
+    },
+    {
+      "name": "@signal-tree/solid",
+      "url": "https://registry.npmjs.org/@signal-tree%2fsolid",
+      "retrievedUTC": "2026-11-12T01:36:13.765Z",
+      "path": "/private/tmp/st-v15-maintenance-release-prep/solid.registry.json",
+      "sha256": "019bbaa426430478e645c36bd36a64130ea8b15b7e5a63ba2bae4429350473e9",
+      "distTags": {
+        "latest": "15.4.8"
+      },
+      "proposedVersion": "15.4.9",
+      "proposedPublished": false,
+      "latestV15": "15.4.8",
+      "published1548": {
+        "time": "2026-11-11T16:23:02.103Z",
+        "integrity": "sha512-4BSxxvWoQxbUTXSqw83HPqKI0/v/wDkyl4BOLut1j4/aOxM0VJ4sWGxIFrnuWkQbHAt0GmGA1xWdxvJzC4t+Lw==",
+        "tarball": "https://registry.npmjs.org/@signal-tree/solid/-/solid-15.4.8.tgz"
+      }
+    }
+  ],
+  "remoteTags": {
+    "path": "/private/tmp/st-v15-maintenance-release-prep/remote-v15-tags.txt",
+    "sha256": "566a824ef496c7ec012155a54fd1415d4c78ad938e80bff034da021a86808ab8",
+    "proposedTagAbsent": true
+  },
+  "scope": "Read-only published-state inspection for a local15.4.9 proposal; no publication or dist-tag mutation."
+}

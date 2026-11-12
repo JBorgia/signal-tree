@@ -1,3 +1,23 @@
+## 15.4.9 (2026-11-12)
+
+- Long-lived EntityMap collections with `transactions()` or `restoration()`
+  release eligible retired values after notification capture and ownership ends.
+  Ordinary removals also reclaim when the installed transaction capability has
+  never been called; pending work and retained history remain protected.
+- Permanent entity-lifetime removal clears weak activation bookkeeping, including
+  carriers acquired internally during rollback validation. Old and late readers
+  remain attached to their original lifetime instead of a replacement row.
+- Repeated EntityMap `all()` projections reuse the active lifetime order while
+  returning fresh current values. Structural changes invalidate the cached order.
+  Applications that request both IDs and values may retain both order arrays.
+- Active and absent entity lifetimes are rejected before retirement preparation
+  enumerates their row metadata.
+
+These maintenance changes preserve the v15 public API, transaction refusal,
+observer-delivery and settlement behavior, and supported framework peer ranges.
+See [the maintenance preparation record](docs/audits/2026-11-11-v15-maintenance-successor/README.md)
+for qualification status and the separate numerical bundle-budget disposition.
+
 ## 15.4.8 (2026-11-11)
 
 - Abandoned derived-state graphs can now be collected when a computation closes
