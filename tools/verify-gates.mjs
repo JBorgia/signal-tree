@@ -1180,7 +1180,7 @@ const GATES = [
   {
     name: 'retention-gc',
     covers:
-      'the GC-requiring retention proofs: diagnostic and persistence owners release values at their boundaries, source locations do not retain abandoned derived recipes, an entity collection retains no clone of an added row it announced, and a tree retains no Link once it is disposed or destroyed',
+      'the GC-requiring retention proofs: diagnostic journals and Link owners release values at their boundaries, source locations do not retain abandoned derived recipes, an entity collection retains no clone of an added row it announced, and a tree retains no Link once it is disposed or destroyed',
     // Runs outside `nx test kernel` because it needs --expose-gc, and it FAILS
     // rather than skips without it: a WeakRef that is merely eligible for
     // collection proves nothing, and a skipped retention test reads as evidence.
@@ -1195,8 +1195,8 @@ const GATES = [
     ],
     env: { NODE_OPTIONS: '--expose-gc' },
     mutation: {
-      file: 'packages/kernel/src/enhancers/serialization/a2-5-lifetime.spec.ts',
-      find: "    if (mode === 'destroyed') (tree as Persisted).destroy?.();",
+      file: 'packages/kernel/src/lib/internals/link-lifetime-retention.spec.ts',
+      find: "    if (mode === 'destroyed') tree.destroy();",
       replace: "    if (mode === 'destroyed') void tree;",
     },
   },
@@ -1236,7 +1236,6 @@ const GATES = [
       '--config',
       'vitest.retention.config.ts',
       'src/lib/internals/link-lifetime-retention.spec.ts',
-      'src/enhancers/serialization/a2-5-lifetime.spec.ts',
     ],
     env: { NODE_OPTIONS: '--expose-gc' },
     // The f0f15d18 shape: the closure built inside bindLinkToTree shares its

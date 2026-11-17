@@ -1,47 +1,32 @@
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it } from 'vitest';
 
-import { entityMap } from '../../lib/markers/entity-map';
-import { persistence } from './serialization';
-import { signalTree } from '../../lib/signal-tree';
-import { transactions } from '../transactions/transactions';
-import { withWriteContext } from '../../lib/write-context';
-import type { StorageAdapter } from './storage-adapters';
+import { entityMap } from './markers/entity-map';
+import { link } from '../index';
+import { signalTree } from './signal-tree';
+import { transactions } from '../enhancers/transactions/transactions';
+import { withWriteContext } from './write-context';
+type StorageAdapter = {
+  getItem(key: string): string | null;
+  setItem(key: string, value: string): void;
+  removeItem(key: string): void;
+};
+const cleanup: Array<() => void> = [];
+afterEach(() => {
+  for (const dispose of cleanup.splice(0)) dispose();
+});
 
 /**
- * PERSISTENCE-AS-LINK-SWAP-0 — the discriminating matrix.
- *
- * THE HYPOTHESIS UNDER LOAD:
- *
- *   Persistence does not need its own relationship authority model.
- *   Persistence = Link + application/durability policy.
- *
- * This file is the discriminator for that swap, and it is written against the
- * INCUMBENT first so the baseline is measured rather than assumed. The same
- * rows are re-run after the substitution; a row that already fails here is
- * incumbent behaviour to be CLASSIFIED (SWAP-D), not a regression the swap
- * introduced.
- *
- * ⚠️ THE PREREGISTERED PREDICTION. `persistence()` detects change by WHOLE-TREE
- * REFERENCE IDENTITY (`tree.$()` !== previousState) and gates the write on a
- * whole-tree string compare. That is structurally the SAME mechanism as
- * LINK-ROOT-SOURCE-0's M3 mutation — "replace the eligible projection with a
- * current whole-tree re-read" — which passed six rows and killed the inspection
- * row ALONE. So P2/P3 are predicted to FAIL here, for a reason already proved
- * one level down: CORRECT COMPLETE SHAPE IS NOT CORRECT EXTERNALLY-AUTHORIZED
- * TRUTH.
- *
- * Timing: autoSave debounces through setTimeout and, outside an Angular
- * injection context, falls back to a 100ms poll. Three earlier probes in this
- * audit were fooled by awaiting microtasks only. Waits below clear the poll.
+ * P1–P9 shared authority/egress assertions migrated from the retired serializer.
+ * JSON envelopes are owned by this test endpoint; public Link owns acquisition,
+ * publication and disposal. No serializer implementation is retained here.
  */
-
 type S = { a: string; b: string; c: string };
 const INITIAL: S = { a: 'a0', b: 'b0', c: 'c0' };
 
 const flush = async () => {
   await Promise.resolve();
   await Promise.resolve();
-  await new Promise((r) => setTimeout(r, 350));
+  for (let i = 0; i < 8; i++) await Promise.resolve();
 };
 
 const INSPECTION = {
@@ -73,22 +58,17 @@ function lastDurable<T>(writes: string[]): T | null {
   return (JSON.parse(writes[writes.length - 1]) as { data: T }).data;
 }
 
-type Persisted<T extends object> = ReturnType<typeof signalTree<T>> & {
-  save(): Promise<void>;
-  load(): Promise<void>;
-  __flushAutoSave?: () => Promise<void>;
-};
-
 function makeTree(adapter: StorageAdapter, key: string) {
-  return signalTree(
-    { ...INITIAL },
-    {
-      enhancers: [
-        transactions(),
-        persistence({ key, storage: adapter, debounceMs: 0, autoLoad: false }),
-      ],
-    }
-  ) as unknown as Persisted<S>;
+  const tree = signalTree({ ...INITIAL }, { enhancers: [transactions()] });
+  const connection = link(tree.$, {
+    get: () => (JSON.parse(adapter.getItem(key) ?? '{}') as { data: S }).data,
+    set: (value) => adapter.setItem(key, JSON.stringify({ data: value })),
+  });
+  cleanup.push(() => {
+    connection.dispose();
+    tree.destroy();
+  });
+  return { tree, connection };
 }
 
 // ============================================================================
@@ -97,7 +77,7 @@ function makeTree(adapter: StorageAdapter, key: string) {
 describe('P1 — an authored write reaches the durable endpoint complete', () => {
   it('persists the whole-tree value including the authored change', async () => {
     const { adapter, writes } = recordingAdapter();
-    const tree = makeTree(adapter, 'p1');
+    const { tree, connection } = makeTree(adapter, 'p1');
     await flush();
     writes.length = 0;
 
@@ -119,7 +99,7 @@ describe('P1 — an authored write reaches the durable endpoint complete', () =>
 describe('P2 — an inspection write changes state but not durable truth', () => {
   it('local state advances', async () => {
     const { adapter } = recordingAdapter();
-    const tree = makeTree(adapter, 'p2a');
+    const { tree, connection } = makeTree(adapter, 'p2a');
     await flush();
 
     withWriteContext(INSPECTION, () => tree.$.b('SCRUBBED'));
@@ -128,7 +108,7 @@ describe('P2 — an inspection write changes state but not durable truth', () =>
 
   it('the durable endpoint does NOT advance', async () => {
     const { adapter, writes } = recordingAdapter();
-    const tree = makeTree(adapter, 'p2b');
+    const { tree, connection } = makeTree(adapter, 'p2b');
     await flush();
     writes.length = 0;
 
@@ -139,21 +119,19 @@ describe('P2 — an inspection write changes state but not durable truth', () =>
     if (durable !== null) expect(durable.b).not.toBe('SCRUBBED');
   });
 
-  it('an EXPLICIT save() does not make an inspection scrub durable', async () => {
-    // ⚠️ THE MANUAL PATH IS A SEPARATE ROUTE TO THE SAME DEFECT, and it is the
-    // one an autoSave-only matrix misses entirely: a developer scrubs a value
-    // in devtools, the application calls `save()`, and the scrub is durable.
-    // `save()` therefore publishes the ELIGIBLE value, never `tree.$()`.
+  it('waiting for settlement does not publish an inspection scrub', async () => {
+    // The retired explicit save route has no public Link equivalent. settled()
+    // waits for admitted work; this assertion does not claim a forced save.
     const { adapter, writes } = recordingAdapter();
-    const tree = makeTree(adapter, 'p2c');
+    const { tree, connection } = makeTree(adapter, 'p2c');
     await flush();
 
     tree.$.a('AUTHORED');
-    await tree.save();
+    await connection.settled();
     writes.length = 0;
 
     withWriteContext(INSPECTION, () => tree.$.b('SCRUBBED'));
-    await tree.save();
+    await connection.settled();
     await flush();
 
     expect(tree.$.b()).toBe('SCRUBBED');
@@ -167,7 +145,7 @@ describe('P2 — an inspection write changes state but not durable truth', () =>
 describe('P3 — an inspection value never rides out on a later authored write', () => {
   it('durable value is A + C, and never B', async () => {
     const { adapter, writes } = recordingAdapter();
-    const tree = makeTree(adapter, 'p3');
+    const { tree, connection } = makeTree(adapter, 'p3');
     await flush();
     writes.length = 0;
 
@@ -198,8 +176,8 @@ describe('P4 — durable truth loaded from storage is realized, not inspection',
       'p4',
       JSON.stringify({ data: { a: 'FROM_DISK', b: 'b0', c: 'c0' } })
     );
-    const tree = makeTree(adapter, 'p4');
-    await tree.load();
+    const { tree, connection } = makeTree(adapter, 'p4');
+    await connection.retrieve();
     await flush();
 
     expect(tree.$.a()).toBe('FROM_DISK');
@@ -211,8 +189,8 @@ describe('P4 — durable truth loaded from storage is realized, not inspection',
       'p4b',
       JSON.stringify({ data: { a: 'FROM_DISK', b: 'b0', c: 'c0' } })
     );
-    const tree = makeTree(adapter, 'p4b');
-    await tree.load();
+    const { tree, connection } = makeTree(adapter, 'p4b');
+    await connection.retrieve();
     await flush();
     writes.length = 0;
 
@@ -229,7 +207,7 @@ describe('P4 — durable truth loaded from storage is realized, not inspection',
 describe('P5 — external acquisition moves eligible authority with no local mutation', () => {
   it('acquiring the inspection-displayed value makes it eligible, without a state change', async () => {
     const { adapter, store, writes } = recordingAdapter();
-    const tree = makeTree(adapter, 'p5');
+    const { tree, connection } = makeTree(adapter, 'p5');
     await flush();
 
     // eligible baseline = a0; observable state becomes INSPECTED via inspection
@@ -243,7 +221,7 @@ describe('P5 — external acquisition moves eligible authority with no local mut
       JSON.stringify({ data: { a: 'INSPECTED', b: 'b0', c: 'c0' } })
     );
     const before = tree.$.a();
-    await tree.load();
+    await connection.retrieve();
     await flush();
 
     // OBSERVABLE STATE MAY NOT CHANGE...
@@ -277,7 +255,7 @@ describe('P5 — external acquisition moves eligible authority with no local mut
     // relationship is not told. This row is kept because the invariant is real
     // and worth stating, NOT because it proves anything.
     const { adapter, store } = recordingAdapter();
-    const tree = makeTree(adapter, 'p5b');
+    const { tree, connection } = makeTree(adapter, 'p5b');
     await flush();
     // ⚠️ THE EXTERNAL VALUE MUST LAND ON THE LEAF THE TRANSACTION TOUCHED.
     // A first version of this row wrote the payload into an UNRELATED leaf, so
@@ -289,14 +267,10 @@ describe('P5 — external acquisition moves eligible authority with no local mut
       JSON.stringify({ data: { a: 'EXTERNAL', b: 'b0', c: 'c0' } })
     );
 
-    const pending = (
-      tree as unknown as {
-        transaction(fn: () => void): { confirm(): void; rollback(): void };
-      }
-    ).transaction(() => {
+    const pending = tree.transaction(() => {
       tree.$.a('SPECULATIVE');
     });
-    await tree.load();
+    await connection.retrieve();
     pending.rollback();
     await flush();
 
@@ -310,17 +284,17 @@ describe('P5 — external acquisition moves eligible authority with no local mut
 // P6 — NO BAD ECHO
 // ============================================================================
 describe('P6 — incoming durable truth is not echoed straight back out', () => {
-  it('load() does not provoke a redundant outbound save', async () => {
+  it('retrieve() does not provoke a redundant outbound send', async () => {
     const { adapter, store, writes } = recordingAdapter();
     store.set(
       'p6',
       JSON.stringify({ data: { a: 'FROM_DISK', b: 'b0', c: 'c0' } })
     );
-    const tree = makeTree(adapter, 'p6');
+    const { tree, connection } = makeTree(adapter, 'p6');
     await flush();
     writes.length = 0;
 
-    await tree.load();
+    await connection.retrieve();
     await flush();
 
     expect(writes.length).toBe(0);
@@ -330,41 +304,30 @@ describe('P6 — incoming durable truth is not echoed straight back out', () => 
 // ============================================================================
 // P7 — ENTITY WHOLE TREE
 // ============================================================================
-describe('P7 — a collection inside the persisted root publishes canonically', () => {
+describe('P7 — a collection Link publishes the eligible rows', () => {
   type Row = { id: string; n: number };
-  // ⚠️ ENVELOPE IS CODEC, NOT AUTHORITY. A collection serializes as its marker
-  // snapshot `{ all: Row[] }`, not a bare array. That is persistence's encoding
-  // policy and is deliberately NOT what this row is testing — P7 asks whether
-  // the ROWS the endpoint receives are canonical, whatever envelope carries
-  // them. A swap that changed the envelope would be a breaking codec change and
-  // would have to be argued on its own terms.
+  // Application-owned JSON envelope; the Link source is the collection.
+  // Root sources containing construction EntityMap markers are not accepted
+  // by the current public Link types, so this is not root-source coverage.
   type E = { rows: { all: Row[] } };
 
-  const makeEntityTree = (adapter: StorageAdapter, key: string) =>
-    signalTree(
-      { rows: entityMap<Row, string>({ selectId: (r: Row) => r.id }) },
-      {
-        enhancers: [
-          transactions(),
-          persistence({
-            key,
-            storage: adapter,
-            debounceMs: 0,
-            autoLoad: false,
-          }),
-        ],
-      }
-    ) as unknown as Persisted<E> & {
-      $: {
-        rows: {
-          addOne(r: Row): void;
-          updateOne(id: string, p: Partial<Row>): void;
-          removeOne(id: string): void;
-        };
-      };
-    };
+  const makeEntityTree = (adapter: StorageAdapter, key: string) => {
+    const tree = signalTree(
+      { rows: entityMap<Row, string>({ selectId: (r) => r.id }) },
+      { enhancers: [transactions()] }
+    );
+    const connection = link(tree.$.rows, {
+      set: (rows) =>
+        adapter.setItem(key, JSON.stringify({ data: { rows: { all: rows } } })),
+    });
+    cleanup.push(() => {
+      connection.dispose();
+      tree.destroy();
+    });
+    return tree;
+  };
 
-  it('addOne / updateOne / removeOne each produce the canonical durable whole-tree value', async () => {
+  it('addOne / updateOne / removeOne each produce the eligible complete collection value', async () => {
     const { adapter, writes } = recordingAdapter();
     const tree = makeEntityTree(adapter, 'p7');
     await flush();
@@ -401,8 +364,8 @@ describe('P8 — one tree never persists because a same-shaped sibling changed',
   it("tree A's endpoint does not advance from tree B's writes", async () => {
     const a = recordingAdapter();
     const b = recordingAdapter();
-    const treeA = makeTree(a.adapter, 'p8a');
-    const treeB = makeTree(b.adapter, 'p8b');
+    const { tree: treeA } = makeTree(a.adapter, 'p8a');
+    const { tree: treeB } = makeTree(b.adapter, 'p8b');
     await flush();
     a.writes.length = 0;
     b.writes.length = 0;
@@ -418,13 +381,13 @@ describe('P8 — one tree never persists because a same-shaped sibling changed',
 // ============================================================================
 // P9 — DISPOSE / LIFECYCLE
 // ============================================================================
-describe('P9 — a disposed persistence relationship produces no durable consequence', () => {
-  it('writes after destroy mutate state but reach no endpoint', async () => {
+describe('P9 — a disposed Link produces no durable consequence', () => {
+  it('writes after disposal mutate state but reach no endpoint', async () => {
     const { adapter, writes } = recordingAdapter();
-    const tree = makeTree(adapter, 'p9');
+    const { tree, connection } = makeTree(adapter, 'p9');
     await flush();
 
-    (tree as unknown as { destroy(): void }).destroy();
+    connection.dispose();
     await flush();
     writes.length = 0;
 

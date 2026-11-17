@@ -16,10 +16,11 @@
  */
 import { normalizeBareSubject, isProbeEntry } from './bare-module-list.mjs';
 
+// Synthetic collision fixtures; these paths need not name current modules.
 const PLANTED = {
   colliding: [
     'dist/packages/kernel/dist/lib/constants.js',
-    'dist/packages/kernel/dist/enhancers/serialization/constants.js',
+    'dist/packages/kernel/dist/synthetic-collision/constants.js',
   ],
   collidingIndex: [
     'dist/packages/kernel/dist/enhancers/index.js',

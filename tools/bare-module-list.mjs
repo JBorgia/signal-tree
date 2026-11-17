@@ -8,8 +8,8 @@ import { pathToFileURL } from 'node:url';
  *     IF A PATH WAS REQUIRED TO DISAMBIGUATE THE SUBJECT, THE PATH MUST
  *     PARTICIPATE IN THE SUBJECT'S IDENTITY.
  *
- * A basename scheme collapsed `lib/constants.ts` with
- * `enhancers/serialization/constants.ts`, and the package barrel with
+ * A basename scheme can collapse `lib/constants.ts` with
+ * `synthetic-collision/constants.ts`, and the package barrel with
  * `lib/markers/index.ts`. That today's bundle happens to contain only one of
  * each pair does not make the scheme valid.
  */
@@ -62,7 +62,7 @@ if (
   const inputs = Object.values(o.metafile.outputs)[0].inputs;
   // ⚠️ EMIT THE PATH, NOT JUST THE BASENAME. Reporting `basename(p)` made two
   // bare modules unresolvable — `constants.js` could be `lib/constants.ts` or
-  // `enhancers/serialization/constants.ts`, and `index.js` could be the package
+  // `synthetic-collision/constants.ts`, and `index.js` could be the package
   // barrel or `lib/markers/index.ts`. Ownership cannot be joined to a subject
   // through a name that two subjects share, and the synthetic probe entry this
   // file writes was itself reported as a mysterious module called `b.js`.

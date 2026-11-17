@@ -1,47 +1,22 @@
 import { afterEach, describe, expect, it } from 'vitest';
 
-import { getPathNotifier } from '../../lib/path-notifier';
-import { link, type Link } from '../../lib/link';
-import { persistence } from './serialization';
-import { signalTree } from '../../lib/signal-tree';
-import { transactions } from '../transactions/transactions';
-import { withWriteContext } from '../../lib/write-context';
-import type { StorageAdapter } from './storage-adapters';
-
-/**
- * SERIALIZATION'S ROLE, DISPOSED — the final `INSPECTION-EGRESS-0` row.
- *
- * THE THREE-WAY SPLIT this file pins:
- *
- *   serialization   TRANSFORMS VALUES — encode out, acquire in
- *   Link            DECIDES AUTHORIZED EXTERNAL TRUTH
- *   persistence     APPLIES DURABILITY POLICY to that relationship
- *
- * ⚠️ AND THE FIRST THING TO SAY IS WHAT IS *NOT* A DEFECT. `serialize()`
- * encodes CURRENT OBSERVABLE STATE, so an inspection scrub CAN appear in its
- * output. That is intentional and SER-1 pins it, because the tempting "fix" —
- * making `serialize()` encode eligible authority because persistence does — is
- * wrong:
- *
- *     ENCODING DOES NOT CHOOSE AUTHORITY. THE CALLER DOES.
- *
- * A caller asking for bytes is asking about the state it can see. The invariant
- * is narrower than "inspection must never be visible": inspection may alter
- * observable and diagnostic state, and may not ACQUIRE EXTERNAL CAUSAL
- * AUTHORITY.
- *
- * ⚠️ REACHABILITY. `serialization()` is not exported from any package
- * entrypoint — `core` has exactly one (`.`) and it exports `persistence` alone.
- * So "standalone serialization" is reachable only as the `SerializationMethods`
- * half of a persisted tree, which is what these rows drive.
- */
+import { getPathNotifier } from './path-notifier';
+import { link, type Link } from '../index';
+import { signalTree } from './signal-tree';
+import { transactions } from '../enhancers/transactions/transactions';
+import { withWriteContext } from './write-context';
+type StorageAdapter = {
+  getItem(key: string): string | null;
+  setItem(key: string, value: string): void;
+  removeItem(key: string): void;
+};
 
 type S = { a: string; b: string; c: string };
 const INITIAL: S = { a: 'a0', b: 'b0', c: 'c0' };
 
 const flush = async () => {
   await Promise.resolve();
-  await new Promise((r) => setTimeout(r, 350));
+  for (let i = 0; i < 12; i++) await Promise.resolve();
 };
 
 const INSPECTION = {
@@ -71,33 +46,33 @@ const lastDurable = (writes: string[]): S | null =>
     ? (JSON.parse(writes[writes.length - 1]) as { data: S }).data
     : null;
 
-type Ser = {
-  serialize(): string;
-  deserialize(json: string): void;
-  load(): Promise<void>;
-};
-
-const makeTree = (adapter: StorageAdapter, key: string) =>
-  signalTree(
-    { ...INITIAL },
-    {
-      enhancers: [
-        transactions(),
-        persistence({ key, storage: adapter, debounceMs: 0, autoLoad: false }),
-      ],
-    }
-  ) as unknown as ReturnType<typeof signalTree<S>> & Ser;
-
 const live: Link[] = [];
+const trees: Array<{ destroy(): void }> = [];
+const makeTree = (adapter: StorageAdapter, key: string) => {
+  const tree = signalTree({ ...INITIAL }, { enhancers: [transactions()] });
+  live.push(
+    link(tree.$, {
+      set: (value) => adapter.setItem(key, JSON.stringify({ data: value })),
+    })
+  );
+  trees.push(tree);
+  return tree;
+};
 afterEach(() => {
   for (const l of live.splice(0)) l.dispose();
+  for (const t of trees.splice(0)) t.destroy();
 });
+const acquire = async (tree: ReturnType<typeof makeTree>, value: S) => {
+  const inbound = link(tree.$, { get: () => value });
+  live.push(inbound);
+  await inbound.retrieve();
+};
 
 // ============================================================================
-// SER-1 — ENCODE. serialize() is current state, and that is CORRECT.
+// SER-1 — ENCODE. JSON snapshot reads is current state, and that is CORRECT.
 // ============================================================================
-describe('SER-1 — serialize() encodes observable state, inspection included', () => {
-  it('an inspection scrub appears in serialize() output, and that is allowed', async () => {
+describe('SER-1 — snapshot reads include observable inspection state', () => {
+  it('an inspection scrub appears in a JSON snapshot', async () => {
     const { adapter } = recordingAdapter();
     const tree = makeTree(adapter, 'ser1');
     await flush();
@@ -105,7 +80,7 @@ describe('SER-1 — serialize() encodes observable state, inspection included', 
     withWriteContext(INSPECTION, () => tree.$.b('SCRUBBED'));
 
     // ⚠️ DO NOT "FIX" THIS. A caller asked what the tree currently holds.
-    expect(tree.serialize()).toContain('SCRUBBED');
+    expect(JSON.stringify(tree.$())).toContain('SCRUBBED');
   });
 
   it('...while the SAME scrub never becomes durable truth', async () => {
@@ -129,24 +104,21 @@ describe('SER-1 — serialize() encodes observable state, inspection included', 
 // ============================================================================
 // SER-2 — ENCODE IS NOT EGRESS.
 // ============================================================================
-describe('SER-2 — serialization owns no egress', () => {
-  it('calling serialize() never publishes to an attached relationship', async () => {
+describe('SER-2 — snapshot reads own no egress', () => {
+  it('reading a JSON snapshot never publishes to an attached relationship', async () => {
     const { adapter } = recordingAdapter();
     const tree = makeTree(adapter, 'ser2');
     await flush();
 
     const got: S[] = [];
     live.push(
-      link(
-        tree.$ as never,
-        {
-          set: (v: S) => void got.push({ ...v }),
-        } as never
-      )
+      link(tree.$, {
+        set: (v: S) => void got.push({ ...v }),
+      })
     );
 
-    tree.serialize();
-    tree.serialize();
+    JSON.stringify(tree.$());
+    JSON.stringify(tree.$());
     await flush();
 
     // Encoding is a read. It produces a value FOR THE CALLER, and the caller
@@ -187,36 +159,43 @@ describe('SER-3 — every inbound method declares external truth identically', (
 
   const REALIZED = { origin: 'external', participation: 'realized' };
 
-  it('load() — the Link acquisition path', async () => {
+  it('retrieve() — the Link acquisition path', async () => {
     const { adapter, store } = recordingAdapter();
     store.set('ser3a', JSON.stringify({ data: { a: 'X', b: 'b0', c: 'c0' } }));
     const tree = makeTree(adapter, 'ser3a');
     await flush();
-    expect(await firstMeta(() => tree.load())).toEqual(REALIZED);
+    expect(
+      await firstMeta(() =>
+        acquire(tree, JSON.parse(store.get('ser3a')!).data as S)
+      )
+    ).toEqual(REALIZED);
   });
 
-  it('deserialize() — the direct public path', async () => {
+  it('subscribe() acquisition declares realized external truth', async () => {
     const { adapter } = recordingAdapter();
     const tree = makeTree(adapter, 'ser3b');
-    await flush();
-    const meta = await firstMeta(() =>
-      tree.deserialize(JSON.stringify({ data: { a: 'X', b: 'b0', c: 'c0' } }))
+    let emit: ((value: S) => void) | undefined;
+    live.push(
+      link(tree.$, {
+        subscribe: (next) => {
+          emit = next;
+          return () => {
+            emit = undefined;
+          };
+        },
+      })
     );
-    expect(meta).toEqual(REALIZED);
+    expect(emit).toBeTypeOf('function');
+    expect(await firstMeta(() => emit!({ a: 'X', b: 'b0', c: 'c0' }))).toEqual(
+      REALIZED
+    );
   });
-
-  // ⚠️ THE `restore()` ROW IS RETIRED WITH ITS SUBJECT.
-  // PRE-RELEASE-PUBLIC-SURFACE-DEDUPE-0 deleted `restore`, `toJSON`, `snapshot`
-  // and the public `fromJSON` as spellings of two jobs. The invariant this
-  // block carries — every inbound method declares external truth identically —
-  // is unchanged; it simply has two members now instead of three, and
-  // `deserialize` still converges on the same internal acquisition point.
 });
 
 // ============================================================================
 // SER-4 — ACQUIRE does not carry inspection outward.
 // ============================================================================
-describe('SER-4 — an inspection value does not hitchhike out through deserialize()', () => {
+describe('SER-4 — an inspection value does not hitchhike out through Link acquisition', () => {
   it('authored A, inspection B, then an acquisition — B never reaches storage', async () => {
     const { adapter, writes } = recordingAdapter();
     const tree = makeTree(adapter, 'ser4');
@@ -227,7 +206,7 @@ describe('SER-4 — an inspection value does not hitchhike out through deseriali
     await flush();
     withWriteContext(INSPECTION, () => tree.$.b('SCRUB'));
     await flush();
-    tree.deserialize(JSON.stringify({ data: { a: 'A1', b: 'b0', c: 'C1' } }));
+    await acquire(tree, { a: 'A1', b: 'b0', c: 'C1' });
     await flush();
 
     expect(lastDurable(writes)).toEqual({ a: 'A1', b: 'b0', c: 'C1' });

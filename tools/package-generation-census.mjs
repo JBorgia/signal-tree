@@ -75,7 +75,7 @@ const DISPOSITION = {
   devtools: ['ABSORB', 'now core/enhancers/devtools; `devTools()` is public'],
   serialization: [
     'ABSORB',
-    'now core/enhancers/serialization; `persistence()` is public',
+    'retired internal enhancer; current durability uses public link()',
   ],
   'time-travel': [
     'ABSORB',

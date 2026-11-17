@@ -11,27 +11,22 @@ import { signalTree } from '../signal-tree';
  * installed by `bindLinkToTree`. The closure was created INSIDE
  * `bindLinkToTree`, so it shared that call's scope with the unbind closure,
  * which captures the Link's `dispose` — and through it the Link, its endpoint
- * and the tree. The registry is reachable from every owned location, and
- * location-runtime's dependency FinalizationRegistry holds a consumer's
- * dependency map strongly; that map reaches the consumer itself through
+ * and the tree. The registry was reachable from every owned location, and
+ * location-runtime's dependency FinalizationRegistry held a consumer's
+ * dependency map strongly; that map reached the consumer itself through
  * location -> registry -> close -> dispose -> tree, so the consumer was never
  * finalized and a destroyed tree with a Link was retained forever.
- * `a2-5-lifetime` (persistence() is built on link()) went red at f0f15d18.
+ * The original reproducer was the now-retired persistence enhancer.
+ * e37d1536c isolated the registry close closure; 713f8a458 later replaced the
+ * finalizer's strong dependency-map holdings with cleanupEdges containing
+ * weak consumer references. The abandoned derived-chain case in
+ * location-runtime-retention.spec.ts covers that finalizer fix directly.
+ * These cases cover current scalar/root Link ownership and release, including
+ * a root endpoint that captures and reads its owner during a real delivery.
  *
- * Arms, as in a2-5:
- *
- * ```text
- * live tree, Link bound               payload must LIVE  -> the harness measures
- *                                                           a real retention
- * tree destroyed                      payload must DIE   -> destroy() releases it
- * Link disposed, tree alive           endpoint must DIE  -> a disposed Link is
- *                                                           not kept by its tree
- * ```
- *
- * The disposed-Link arm is the direct carrier (red at f0f15d18..3e42c133). The
- * destroyed arm here stays green there too: it needs a consumer whose
- * dependency map reaches the registry, which persistence()'s autoSave creates
- * and a bare tree does not — `a2-5-lifetime` arm C is that carrier.
+ * A bare tree must be collected; a live Link retains its payload; destroying
+ * the tree releases that payload. A disposed Link must also release its endpoint
+ * while the owning tree remains alive and usable.
  *
  * Requires `--expose-gc` (vitest.retention.config.ts, gate `retention-gc`).
  */
@@ -65,35 +60,86 @@ const endpointFor = (): LinkEndpoint<string> => ({
   subscribe: () => () => undefined,
 });
 
+// Keep endpoint closures outside probe's scope: only the root endpoint should
+// intentionally capture its owner, and neither route may capture probe's
+// cleanup references or otherwise keep its specimen alive through the test.
+const connectScalar = (tree: Tree) => {
+  const sent: string[] = [];
+  const ownerReads: string[] = [];
+  const relationship = link(tree.$.a, {
+    set: (value) => void sent.push(value),
+    subscribe: () => () => undefined,
+  });
+  return { relationship, sent, ownerReads };
+};
+
+const connectRoot = (tree: Tree) => {
+  const sent: string[] = [];
+  const ownerReads: string[] = [];
+  const relationship = link(tree.$, {
+    set: (value) => {
+      sent.push(value.a);
+      ownerReads.push(tree.$().a);
+    },
+    subscribe: () => () => undefined,
+  });
+  return { relationship, sent, ownerReads };
+};
+
 describe('Link lifetime retention', () => {
   it('runs with a real collector', () => {
     expect(typeof (globalThis as { gc?: unknown }).gc).toBe('function');
   });
 
-  const probe = async (mode: 'live' | 'destroyed') => {
+  const probe = async (
+    route: 'scalar' | 'root',
+    mode: 'none' | 'live' | 'destroyed'
+  ) => {
     let payload: unknown = { marker: 'link-lifetime-payload' };
     const ref = new WeakRef(payload as object);
     let tree: Tree | null = makeTree();
     tree.$.obj(payload);
     payload = null;
-    link(tree.$.a, endpointFor());
-    // A whole-state read, as persistence's autoSave does: it leaves a
-    // dependency consumer registered with location-runtime's finalizer, whose
-    // held dependency map is what made the registry's closure fatal.
+    let connection =
+      mode === 'none'
+        ? null
+        : route === 'root'
+          ? connectRoot(tree)
+          : connectScalar(tree);
+    const treeRef = new WeakRef(tree);
+    tree.$.a('a1');
+    // Exercise the current snapshot dependency path on every control, without
+    // retaining the snapshot (and its payload) in the test itself.
     void tree.$();
     await flush();
+    if (connection) {
+      await connection.relationship.settled();
+      expect(connection.sent).toEqual(['a1']);
+      if (route === 'root') expect(connection.ownerReads).toEqual(['a1']);
+    }
+    connection = null;
     if (mode === 'destroyed') tree.destroy();
     tree = null;
     await applyPressure();
-    return ref.deref();
+    const alive = ref.deref() !== undefined;
+    // Release the positive-control owner too, without keeping the destroyed
+    // specimen alive during collection through a captured cleanup closure.
+    treeRef.deref()?.destroy();
+    return alive;
   };
 
-  it('control: a live tree with a Link keeps its state', async () => {
-    expect(await probe('live')).toBeDefined();
-  });
+  describe.each(['scalar', 'root'] as const)('%s Link route', (route) => {
+    it('control: a bare abandoned tree is collected', async () => {
+      expect(await probe(route, 'none')).toBe(false);
+    });
 
-  it('a destroyed tree with a Link is released', async () => {
-    expect(await probe('destroyed')).toBeUndefined();
+    it('control: a live tree with a Link keeps its state', async () => {
+      expect(await probe(route, 'live')).toBe(true);
+    });
+
+    it('a destroyed tree with a Link is released', async () => {
+      expect(await probe(route, 'destroyed')).toBe(false);
+    });
   });
 
   it('a disposed Link is not retained by the tree that still lives', async () => {

@@ -1,83 +1,22 @@
 import { describe, expect, it, vi } from 'vitest';
 import { undoable } from '../../lib/undoable';
 
-import { createAuditTracker } from '../../lib/audit/audit';
 import { signalTree } from '../../lib/signal-tree';
-import { serialization } from '../serialization/serialization';
+import { link } from '../../index';
 import { restoration } from './restoration';
 
 /**
- * Characterization tests for the history defects documented as TODO 6a-6d.
- *
- * ## Why these exist
- *
- * These defects are DOCUMENTED on live surfaces but deliberately NOT fixed — 6a's
- * code fix is gated on the representation decision. Without tests, nothing catches a
- * silent change in behaviour, and the documentation quietly stops being true. That is
- * exactly how a defect report survived on four surfaces while being false: the claim
- * "collection mutations create no restoration history entry" came from asserting a counter in the
- * same tick as a `queueMicrotask` flush, and `undo()` was never called once.
- *
- * ## How to read a failure
- *
- * A failure here does NOT necessarily mean a regression. It may mean someone FIXED
- * the defect — which is good news, and means the docs citing it are now wrong. Each
- * test names the surfaces to update.
- *
- * These are not the same thing as `tools/verify-history-defects.mjs`, which is a
- * provenance generator for published figures and has deliberately inverted exit
- * codes. These are ordinary tests: they assert the behaviour the docs describe.
- *
- * ## The rule every assertion here follows
- *
- * Call `undo()` and inspect the resulting state. Reading `getRestorationHistory().length` or
- * `canUndo()` without a following `undo()` is not evidence.
+ * Surviving restoration regressions from the historical TODO 6a–6d audit.
+ * External acquisition is not undoable user work, and invalid history limits
+ * report a diagnostic rather than silently disabling undo. Each history claim
+ * calls undo() and inspects state; a counter alone is insufficient evidence.
+ * The old audit tracker cases retired with their unexported implementation.
  */
 
 const flush = () => new Promise((r) => setTimeout(r, 0));
 
-describe('6b — createAuditTracker samples on a timer', () => {
-  // The interval is the literal constant at lib/audit/audit.ts:156
-  // (`setInterval(handleChange, 100)`) — cited rather than measured here.
-  // If this fails, the tracker may have become event-driven. Update:
-  //   docs/guides/restoration-in-production.md (the composition table row)
-  //   TODO.md 6b
-  it('two writes inside one sampling window collapse to one entry', async () => {
-    const tree = signalTree({ n: 0 });
-    const log: unknown[] = [];
-    const stop = createAuditTracker(tree, log as never);
-    await new Promise((r) => setTimeout(r, 120));
-    const base = log.length;
-
-    undoable(() => tree.$.n(1));
-    tree.$.n(2); // same window
-    await new Promise((r) => setTimeout(r, 250));
-    stop();
-
-    expect(log.length - base).toBe(1);
-    // Outcome: the intermediate state is unrecoverable from the trail.
-    expect(tree.$.n()).toBe(2);
-  });
-
-  it('write-then-revert inside one window is INVISIBLE to the trail', async () => {
-    const tree = signalTree({ name: 'a' });
-    const log: unknown[] = [];
-    const stop = createAuditTracker(tree, log as never);
-    await new Promise((r) => setTimeout(r, 120));
-    const base = log.length;
-
-    undoable(() => tree.$.name('TEMP'));
-    tree.$.name('a'); // reverted in the same window
-    await new Promise((r) => setTimeout(r, 250));
-    stop();
-
-    expect(log.length - base).toBe(0);
-    expect(tree.$.name()).toBe('a');
-  });
-});
-
-describe('6c — undo() after deserialize() (REPAIRED by opt-in eligibility)', () => {
-  // ✅ FIXED, and not by fixing it. `deserialize()` is not an operation a user
+describe('6c — undo() after external Link retrieval (REPAIRED by opt-in eligibility)', () => {
+  // ✅ FIXED, and not by fixing it. `retrieve()` is not an operation a user
   // authored, so it is never designated and never becomes an undo step — there
   // is nothing for a first undo to discard.
   //
@@ -89,27 +28,33 @@ describe('6c — undo() after deserialize() (REPAIRED by opt-in eligibility)', (
   //   docs/guides/restoration-in-production.md
   //   TODO.md 6c
   it('a restored payload is NOT an undo step, so undo cannot discard it', async () => {
-    const make = () =>
-      signalTree({ n: 0 }, { enhancers: [serialization(), restoration({})] });
+    const make = () => signalTree({ n: 0 }, { enhancers: [restoration({})] });
 
     const source = make();
     undoable(() => source.$.n(7));
     await flush();
-    const payload = source.serialize();
+    const payload = source.$();
 
     const target = make();
     await flush();
-    target.deserialize(payload);
-    await flush();
+    const connection = link(target.$, { get: () => payload });
+    try {
+      await connection.retrieve();
+      await flush();
 
-    expect(target.$.n()).toBe(7);
+      expect(target.$.n()).toBe(7);
 
-    // The defect was `canUndo()` being true here, with the first undo throwing
-    // the restore away.
-    expect(target.canUndo()).toBe(false);
+      // The defect was `canUndo()` being true here, with the first undo throwing
+      // the restore away.
+      expect(target.canUndo()).toBe(false);
 
-    target.undo();
-    expect(target.$.n()).toBe(7);
+      target.undo();
+      expect(target.$.n()).toBe(7);
+    } finally {
+      connection.dispose();
+      target.destroy();
+      source.destroy();
+    }
   });
 });
 
@@ -134,6 +79,7 @@ describe('6d — maxHistorySize validation (FIXED in 14.1.1)', () => {
       tree.undo();
       spent++;
     }
+    tree.destroy();
     return spent;
   };
 

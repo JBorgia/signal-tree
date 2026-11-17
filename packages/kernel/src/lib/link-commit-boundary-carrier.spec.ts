@@ -1,42 +1,31 @@
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it } from 'vitest';
 
-import { persistence } from './serialization';
-import { resetPathNotifier } from '../../lib/path-notifier';
-import { signalTree } from '../../lib/signal-tree';
-import { transactions } from '../transactions/transactions';
-import type { StorageAdapter } from './storage-adapters';
+import { link } from '../index';
+import { resetPathNotifier } from './path-notifier';
+import { signalTree } from './signal-tree';
+import { transactions } from '../enhancers/transactions/transactions';
+type StorageAdapter = {
+  getItem(key: string): string | null;
+  setItem(key: string, value: string): void;
+  removeItem(key: string): void;
+};
+const cleanup: Array<() => void> = [];
+afterEach(() => {
+  for (const dispose of cleanup.splice(0)) dispose();
+});
 
 /**
- * THE COMMIT BOUNDARY FOR DURABLE WRITES — successor carrier.
- *
- * ⚠️ WHY THIS FILE EXISTS. These invariants were real and general, and every
- * one of them was observed ONLY through `stored()` — in
- * `stored-commit-ordering.spec.ts` and in a `describe('… observed through
- * stored()')` block inside `commit-consequence.spec.ts`. `stored()` is a frozen
- * DELETE, so retiring it would have taken the invariants with it.
- *
- * A carrier check found the rest already carried elsewhere:
- *
- *   a rolled-back value is never durable   a2-persistence-discriminators case 3
- *   the drain respects settlement          a2-4-1-drain-settlement
- *   owner isolation                        persistence-as-link-swap-0 P8
- *   inspection never egresses              persistence-as-link-swap-0 P2/P2c/P3
- *
- * What was NOT carried anywhere is below: CONFIRM (as opposed to rollback), a
- * THROWN transaction, a SUPERSEDED intermediate, OUT-OF-ORDER confirm of
- * overlapping transactions, and FOREIGN-tree scope absorption. This file is the
- * minimum carrier added BEFORE the deletion, per STORED-R-C.
- *
- * The subject moved from the marker to the enhancer, which is the whole point:
- * the boundary was never `stored()`'s property. It belongs to the durable
- * consequence authority, which Link now claims on persistence's behalf.
+ * Shared durable-consequence assertions migrated from the retired serializer.
+ * These rows retain the bare-write control, confirm/throw, supersession,
+ * overlapping out-of-order settlement and foreign-tree scope assertions.
+ * Public Link carries the authority; JSON here is application endpoint policy.
  */
 
 type S = { a: string; b: string };
 
 const flush = async () => {
   await Promise.resolve();
-  await new Promise((r) => setTimeout(r, 350));
+  for (let i = 0; i < 8; i++) await Promise.resolve();
 };
 
 function recordingAdapter() {
@@ -58,20 +47,22 @@ function recordingAdapter() {
 const durable = (writes: string[]): S[] =>
   writes.map((w) => (JSON.parse(w) as { data: S }).data);
 
-type Tx = { confirm(): void; rollback(): void };
-type Tree = ReturnType<typeof signalTree<S>> & {
-  transaction(fn: () => void): Tx;
+const makeTree = (adapter: StorageAdapter, key: string) => {
+  const tree = signalTree(
+    { a: 'a0', b: 'b0' },
+    { enhancers: [transactions()] }
+  );
+  const connection = link(tree.$, {
+    set: (value) => adapter.setItem(key, JSON.stringify({ data: value })),
+  });
+  cleanup.push(() => {
+    connection.dispose();
+    tree.destroy();
+  });
+  return tree;
 };
 
-const makeTree = (adapter: StorageAdapter, key: string) =>
-  signalTree({ a: 'a0', b: 'b0' }, {
-    enhancers: [
-      transactions(),
-      persistence({ key, storage: adapter, debounceMs: 0, autoLoad: false }),
-    ],
-  }) as unknown as Tree;
-
-describe('the durable commit boundary, carried by persistence()', () => {
+describe('the durable commit boundary, carried by public Link', () => {
   it('CONTROL — a bare write with no transaction becomes durable', async () => {
     resetPathNotifier();
     const { adapter, writes } = recordingAdapter();
