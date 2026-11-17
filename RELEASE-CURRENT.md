@@ -1,16 +1,27 @@
-# v15 legacy cleanup — candidate validation in progress
+# v15 legacy cleanup — local qualification complete
 
-The compatible cleanup source is `2833164cfbba72ab1e79a4ad3d6956b858533938`
-on `codex/v15-legacy-boundary-cleanup`. It removes unreachable audit/serialization
-implementations and preserves surviving behavior in direct Link, rollback,
-marker, typing, retention and SSR tests. Supported exports and semantic ownership
-are unchanged. The [scope audit](docs/audits/2026-11-17-legacy-cleanup/README.md)
-records the evidence and the decision against another public package or flag.
+The qualified source is `891159222d40ccb8f55da038334b9197e0bc3432` on
+`codex/v15-legacy-boundary-cleanup`; this controller is a documentation-only
+successor. The [scope audit](docs/audits/2026-11-17-legacy-cleanup/README.md)
+records removal of unreachable audit and serialization implementations and the
+preserved Link, rollback, marker, typing, retention and SSR behavior coverage.
+No supported public capability requires removal, another package or a new flag.
 
-Development checks pass; fresh committed-candidate gates, artifact comparison
-and production demo validation follow. The preceding qualification below applies
-to its named earlier runtime, not automatically to this cleanup. No tag, registry
-publication or deployment is selected by this task.
+Fresh before/after builds are byte-identical across all five packages, including
+JavaScript, declarations and manifests. Canonical packing verifies 158 shipped
+payloads. Strict installed types, Angular AOT, facade/SSR, the strict production
+demo and all 146 browser checks pass. The normal registry plus the documented
+link correction covers 90/91 passing gates; all 91 mutation checks pass with
+source restoration. This is not a claim of one all-green normal run.
+
+**Decision: retain the compatible source cleanup; local qualification is complete
+with the specific unchanged numerical-size exception.** Entity gzip remains
+25,333 production / 28,273 development bytes, 40.2 / 113 bytes over the unchanged
+ceilings. Fresh comparison proves zero byte growth; a passing/grown/restored
+fixture returns 0/1/0. The numerical gate remains failed. This task selects no
+tag, registry publication or deployment. The
+[central evidence](https://github.com/JBorgia/signal-tree/blob/codex/publication-activation-study/docs/audits/2026-11-17-publication-activation/README.md)
+retains exact artifacts, commands, failed attempts and qualification limits.
 
 ---
 

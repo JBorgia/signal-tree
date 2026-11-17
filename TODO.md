@@ -11,10 +11,14 @@ existing observation/realization contracts and four framework/kernel packages.
 
 ## V15 pre-GA source hygiene
 
-- Remove stale internal comments in `signal-tree.ts` that still teach the
-  deleted builder, `.with()`, `.state`, or historical overload architecture.
-  This is documentation/source hygiene only; do not reopen the one-way public
-  construction surface while cleaning it.
+- [x] Checked during the November 17 legacy audit: deleted builder, `.with()`
+  and `.state` teaching comments are already absent from `signal-tree.ts`.
+  Remaining overload notes describe the current `SignalTreeFactory`; the
+  supported construction surface is unchanged.
+- [x] Remove unreachable audit/serialization source and preserve surviving
+  behavior coverage. The [completed scope audit](docs/audits/2026-11-17-legacy-cleanup/README.md)
+  finds no supported public feature to remove or split; fresh package bytes are
+  unchanged and local artifact qualification is complete with its stated size exception.
 
 ## DEEP-TYPING-DEPTH-0 — CLOSED
 

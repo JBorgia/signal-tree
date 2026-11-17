@@ -47,3 +47,32 @@ Evidence is generated under
 logs, exits and hashes are retained. The central publication-activation study
 records both v15 cleanup and the separate v16 experiment. No tag, registry
 publication or deployment is selected by this cleanup.
+
+## Final artifact qualification
+
+Qualified source: `891159222d40ccb8f55da038334b9197e0bc3432`. The full normal
+registry at `e35dfa1b7` passed 88/91 gates. Its two documentation failures were a
+historical RFC link to deleted source; the documentation-only successor pins the
+link to the baseline commit and both checks pass. The covered set is 90/91,
+with only the numerical entity-bundle gate failed. All 91 mutation checks pass,
+with a clean restored checkout. No single all-green normal run is claimed.
+
+Fresh uncached five-package builds of the baseline and candidate have identical
+file sets and every payload byte is equal, including JavaScript, declarations
+and manifests. All 158 canonical shipped payloads join to those fresh builds and
+journal archive integrities. Strict installed consumers under bundler/node16,
+Angular AOT, facade/SSR, the strict production demo and all 146 browser checks
+pass with no skips or flakes. Incomplete packed-receipt controls are rejected.
+
+The unchanged canonical gzip sizes are bare 11,011 production / 13,159 development
+bytes and entities 25,333 / 28,273 bytes. The entity ceilings remain exceeded by
+40.2 / 113 bytes. Accept this specific unchanged cost under the owner's
+cost/feasibility instruction; do not relabel the gate or grant a future blanket
+exception. The independent passing/grown/restored fixture returns 0/1/0.
+This deletion improves maintenance surface, not delivered size or runtime speed.
+
+The old source-hygiene TODO was checked against the actual factory: deleted
+builder, `.with()` and `.state` teaching comments are already absent. Remaining
+overload comments describe the current `SignalTreeFactory`. Close that stale TODO
+without changing the supported construction API. Final controller/documentation
+updates are successors to the exact artifact source above.
