@@ -135,7 +135,7 @@ type PersistOption =
   | { adapter: StorageAdapter; key: string; hydrateThenRevalidate?: boolean };
 ```
 
-Reuses the existing [`StorageAdapter` + `createIndexedDBAdapter`](../../packages/kernel/src/enhancers/serialization/serialization.ts) — **no new persistence mechanism, no merge of `stored`/`persistence`.** When `hydrateThenRevalidate: true`, on materialize the collection seeds `all` from the persisted snapshot _instantly_ (offline-first), marks itself stale, and revalidates via `load()` in the background — the SWR/offline story from gap 5, delivered through this marker rather than a persistence rewrite.
+Reuses the existing [`StorageAdapter` + `createIndexedDBAdapter`](https://github.com/JBorgia/signal-tree/blob/fc279c279b3f1a9d6a9ac17330f5dcf9d0ccdba4/packages/kernel/src/enhancers/serialization/serialization.ts) — **no new persistence mechanism, no merge of `stored`/`persistence`.** When `hydrateThenRevalidate: true`, on materialize the collection seeds `all` from the persisted snapshot _instantly_ (offline-first), marks itself stale, and revalidates via `load()` in the background — the SWR/offline story from gap 5, delivered through this marker rather than a persistence rewrite.
 
 ## 5. Interaction with existing primitives
 
