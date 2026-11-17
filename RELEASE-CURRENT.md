@@ -1,3 +1,22 @@
+# v15 optimization sweep — candidate under qualification
+
+The November17 optimization instruction continues on this isolated branch from
+prepared15.4.9, preserving stable v15 APIs and settlement semantics. The selected
+change bounds confirmed-ledger trimming by the diagnostic suffix before scanning
+pending or record IDs. It preserves existing fractional-history behavior and
+leaves the ordinary zero-obligation fast path unchanged.
+
+Baseline-first work witnesses, compatibility/retention checks and the complete
+64-child CPU/14-control study support this narrow work reduction. Timing gains
+remain variable; no broad startup or ordinary-write speedup is claimed. The
+[central integration record](https://github.com/JBorgia/signal-tree/blob/codex/optimization-sweep/docs/audits/2026-11-17-optimization-sweep/INTEGRATION.md)
+records selection and alternatives. Full qualification and same-strategy
+application comparison are pending. This branch is not published; version15.4.8
+remains the released baseline. No tag, registry publication, merge or deployment
+is selected by this optimization phase.
+
+---
+
 # Current v15.4.9 preparation — complete with a documented size exception
 
 Updated November 17, 2026 UTC. The owner accepted maintenance preparation following

@@ -1061,23 +1061,23 @@ class TransactionAuthority {
   private releaseConfirmedBeyondObligation(): void {
     const turns = this.confirmedTurns;
     if (turns.length === 0) return;
+    // Both obligations keep a suffix. A diagnostic window that already keeps
+    // every record needs neither a pending-ID scan nor any record-ID reads.
+    // Preserve the existing slice(-0) behavior for positive fractions below1.
+    let diagnosticStart = turns.length;
+    if (this.historyRetain > 0) {
+      const newest = Math.trunc(this.historyRetain);
+      diagnosticStart = newest === 0 ? 0 : Math.max(0, turns.length - newest);
+      if (diagnosticStart === 0) return;
+    }
     let minPending = Infinity;
     for (const id of this.pendingTurns.keys()) {
       if (id < minPending) minPending = id;
     }
-    // `insertConfirmed` keeps the ledger sorted by id, so the required turns
-    // (`id > minPending`) are a suffix and so are the `historyRetain` newest:
-    // what survives is the longer suffix. Trimming the front replaces a whole
-    // filter per record, which made every flush under a pending turn O(ledger).
+    // IDs remain sorted by insertConfirmed. Stop as soon as either the live
+    // pending obligation or diagnostic suffix begins; retained IDs need no scan.
     let start = 0;
-    while (start < turns.length && turns[start].id <= minPending) start++;
-    if (this.historyRetain > 0) {
-      // Exactly `slice(-historyRetain)`, which truncates the count: a
-      // fractional retain below 1 is `slice(-0)` and keeps everything.
-      const newest = Math.trunc(this.historyRetain);
-      start =
-        newest === 0 ? 0 : Math.min(start, Math.max(0, turns.length - newest));
-    }
+    while (start < diagnosticStart && turns[start].id <= minPending) start++;
     if (start > 0) {
       this.confirmedTurns = turns.slice(start);
       this.evictedConfirmed = true;
