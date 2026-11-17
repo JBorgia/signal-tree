@@ -231,7 +231,7 @@ record-then-filter step.
 
 ## Composition patterns, and whether they hold up
 
-<!-- measured: the 100 ms sampling interval is a source constant — `setInterval(handleChange, 100)` in packages/kernel/src/lib/audit/audit.ts. Cited rather than benchmarked on purpose: a constant breaks greppably when someone changes it, where a timing run only breaks when re-run. -->
+<!-- Historical audit-tracker implementation and sampling measurements are archived in Git. The unexported tracker was removed by the 2026-11-17 legacy cleanup; tools/verify-history-defects.mjs now explicitly reports that no current verification ran. -->
 <!-- measured: node tools/verify-history-defects.mjs — reproduces the CONSEQUENCES by outcome (every check calls undo() and inspects state): the fixed form-coverage behaviour, that write-then-revert pairs are dropped, and the maxHistorySize fallback. It does NOT measure the 100 ms figure — its sleeps are chosen from the constant above. -->
 
 | What you are building                               | Pattern                                                                                                      | Supported                                                                             |

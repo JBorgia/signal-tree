@@ -1,3 +1,19 @@
+# v15 legacy cleanup — candidate validation in progress
+
+The compatible cleanup source is `2833164cfbba72ab1e79a4ad3d6956b858533938`
+on `codex/v15-legacy-boundary-cleanup`. It removes unreachable audit/serialization
+implementations and preserves surviving behavior in direct Link, rollback,
+marker, typing, retention and SSR tests. Supported exports and semantic ownership
+are unchanged. The [scope audit](docs/audits/2026-11-17-legacy-cleanup/README.md)
+records the evidence and the decision against another public package or flag.
+
+Development checks pass; fresh committed-candidate gates, artifact comparison
+and production demo validation follow. The preceding qualification below applies
+to its named earlier runtime, not automatically to this cleanup. No tag, registry
+publication or deployment is selected by this task.
+
+---
+
 # v15 optimization sweep — local qualification complete
 
 The qualified runtime is `4d1142d6166b2d5b2874715e38097665545864dc`.

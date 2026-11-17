@@ -3610,7 +3610,7 @@ read-model — already written, do not duplicate). Everything else below
   `link-1-relationship.spec.ts`.
 - **`persistence.md`** — same `link()` shape as `persistent-remote-state.md`,
   endpoint = storage. Executable-example anchors (already exist, direct hit):
-  `packages/kernel/src/enhancers/serialization/persistence-as-link-swap-0.spec.ts`,
+  `packages/kernel/src/lib/link-authority-carrier.spec.ts`,
   `packages/kernel/src/lib/link-persistence-conformance.spec.ts`,
   `persistence-decompose-0.spec.ts`.
 - **`optimistic-update.md`** — word this carefully: teach the authority
