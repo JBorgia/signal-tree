@@ -1,79 +1,50 @@
-# v16 optimization sweep — active investigation
+# v16 optimization sweep — local qualification complete
 
-The November 17 owner instruction reopens optimization across cost areas before
-another report. This isolated branch starts from C1 runtime `2c439198b` and
-tooling `2810528ef`; those frozen artifacts remain the comparison baseline.
-Individual prototypes and their exact identities are tracked in the
-[study protocol](https://github.com/JBorgia/signal-tree/blob/codex/optimization-sweep/docs/audits/2026-11-17-optimization-sweep/PROTOCOL.md)
-and candidate ledger. A prototype in this checkout is not automatically adopted
-or release-qualified. Preserve public semantics, original budgets and counterexamples;
-root coordinates the single heavy execution slot and final integration.
-No publication, tag, merge or deployment is selected by this investigation.
+The qualified runtime is `7ab6cbcc70bf5abe9c5070e38a51bd0229ed1830`.
+This controller update is a documentation-only successor; measurements and
+qualification retain that exact runtime/artifact identity. The
+[completed comparison](https://github.com/JBorgia/signal-tree/blob/codex/optimization-sweep/docs/audits/2026-11-17-optimization-sweep/README.md)
+and [integration decision](https://github.com/JBorgia/signal-tree/blob/codex/optimization-sweep/docs/audits/2026-11-17-optimization-sweep/INTEGRATION.md)
+record the selected changes, rejected alternatives, first failures and limits.
 
-## Combined candidate under qualification
+**Decision: retain the selected improvements; local release-candidate qualification
+is complete with explicit numerical-size exceptions.** Fresh normal release gates
+complete 86/87, with only the unchanged bundle ceiling failing. All 87 mutation
+checks complete with exact source restoration. A separate passing/grown/restored
+fixture returns 0/1/0, supplying the detector discrimination the already-red
+candidate baseline cannot establish. Five rebuilt canonical packages and all
+193 shipped payloads verify, including installed strict consumers, Angular AOT
+and facade/SSR checks.
 
-The successor candidate also includes the isolated direct-collection empty
-retirement preparation correction and exact sparse terminal-fact packing from
-prototype checkpoints `05ffb136e` and `525609219`. The former removes repeated
-full collection reads during empty retirement publication; nested getter,
-latent topology, native publication and point-work contracts remain covered.
-The latter preserves missing placement and every retained requirement identity
-while representing eligible confirmed removals in existing exact runs. Both
-have baseline cost witnesses, meaningful mutation controls and independent
-source reviews. Raw prototype comparisons retain the rollback/CPU penalties;
-the sparse representation reduces the ten-cycle10k confirmed held-store heap
-checkpoint by21,040,952 bytes while increasing full-drain CPU in all three pairs.
-The fragmented-proof comparison has mixed CPU and no uniform heap saving;
-its adverse intermediate checkpoint remains recorded. The integrated T/U
-checkpoint completes86/87 normal gates (bundle ceiling only) and87/87 mutation
-checks with exact source restoration. Final successor qualification remains pending.
-Candidate validation continues under the owner's optimization instruction.
-The release disposition remains pending.
+The strict demo still fails its 570 kB ceiling at 823.91 kB. A recorded review
+build temporarily omits budgets and restores the configuration exactly. All
+137 behavioral route checks pass; the remaining assertion measures a 798,215-byte
+main bundle against 570,000 bytes. Numerical misses remain failures.
 
-The successor now includes pending-only notification subscriptions from
-`14f18309c`. Terminal owners still queue their wake, then release both notification
-indexes; exact proofs, native requirements and registered operations remain.
-The isolated96-child comparison preserves all behavior and collection checks.
-At1,024 rollback episodes it removes525,824 terminal memberships in each index,
-reduces live whole-process heap by about39.8MiB, and lowers complete measured
-lifecycle CPU in all three pairs. Short-history CPU is mixed, including adverse
-32-episode samples. This measured change adds no public mode. Its19 focused,
-323 affected and7 mutation checks are not combined release qualification.
+Final comparisons complete across 176 application children, 66 native workflow
+children, and 66 N100 capture children plus 16 controls. Independent reviews join
+source/artifacts, preserve adverse samples and recompute the results. Late readers,
+reentry, safe rollback refusal, entity lifetime/retirement, pending ownership and
+the original point-work bound remain covered. No public API, configuration switch,
+guarantee or numerical ceiling changes.
 
-The successor also integrates completed noncurrent operation retirement from
-`168bf0c18`. Sibling publications can share a predecessor and leave the first completed
-operation registered after both supersede that predecessor. Cleanup now follows
-this reduction's completed work and rechecks the live current recipient after
-the queue drains; exact cached proofs, native requirements and issued evidence
-remain. The96-child comparison reduces held heap from24,510,088 to13,704,680
-bytes at1,024 rollbacks. CPU is mixed: ordinary32 complete lifecycle is11–22%
-slower across three pairs, mostly during construction. A separate numeric event
-diagnostic observes zero cleanup lists/helpers in that exact ordinary workload;
-it does not establish the slowdown's cause. The first historical-proof mutant
-survived an incomplete oracle. The strengthened test checks every relevant fact,
-and all five mutants now fail useful assertions with exact source restoration.
-The final test differs from the measured build's test snapshot; runtime bytes
-are identical. This tradeoff is selected for combined qualification, with no
-new public mode and no universal history or speed claim.
+The selected runtime removes unnecessary preparation and ledger work, demand-caches
+projection order and native selection, avoids direct empty-retirement collection
+reads, packs exact sparse terminal facts, releases terminal notification indexes,
+and retires eligible completed noncurrent operations after a live/drained recheck.
+Required native evidence, cached proofs and issued inputs remain available.
+Bulk confirmation and long-history retention improve substantially. Ordinary
+startup remains expensive; smaller rollback and edit-transition costs are mixed.
+The four-phase H/I studies include their explicit teardown drains. Final native
+sums cover recorded stages and omit disposal and some flushes; they are not
+end-to-end CPU. No universal speed, heap or history-bound claim is made.
 
-The selected runtime removes unused preparation work and owner-path state,
-maintains the exact confirmed-ledger suffix, avoids discarded ordinary record
-copies, demand-caches value-projection order, and reuses native whole-input
-selection while issuing fresh inputs and owner evidence. Public APIs, lifetime,
-publication and rollback guarantees remain unchanged. The central
-[integration record](https://github.com/JBorgia/signal-tree/blob/codex/optimization-sweep/docs/audits/2026-11-17-optimization-sweep/INTEGRATION.md)
-retains alternatives, adverse profiles and the reasons for excluding them.
-
-The first full combined run passed84/87 gates. It exposed an extra point-write
-array copy that failed the existing strict work ceiling, three test-only lint
-errors and the existing numerical bundle-budget miss. The correction invalidates
-whole-input selection at the end of the existing native point command, removing
-the redundant record, array copy and terminal command. The original point-work
-oracle is unchanged; late installation readers have an explicit missing-clear
-mutation control. Focused checks do not qualify this combined build. Full gates,
-mutation checks, exact rebuilt artifacts and application/native comparisons are
-still required. Bundle ceilings remain unchanged and numerical misses remain
-reported separately from the owner's cost/feasibility decision.
+Accept this identified candidate's measured costs under the owner's instruction
+to weigh budgets against benefit, cost and feasibility. This is a candidate-specific
+economic disposition, not a numerical pass or an exception for future changes.
+Evidence packaging and review-branch sharing close the study. Merge, final
+version/tag qualification, registry publication and deployment remain separately
+selected release actions; no new publication is selected here.
 
 ---
 
