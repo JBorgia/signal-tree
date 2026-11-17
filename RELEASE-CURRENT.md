@@ -12,6 +12,21 @@ No publication, tag, merge or deployment is selected by this investigation.
 
 ## Combined candidate under qualification
 
+The successor candidate also includes the isolated direct-collection empty
+retirement preparation correction and exact sparse terminal-fact packing from
+prototype checkpoints `05ffb136e` and `525609219`. The former removes repeated
+full collection reads during empty retirement publication; nested getter,
+latent topology, native publication and point-work contracts remain covered.
+The latter preserves missing placement and every retained requirement identity
+while representing eligible confirmed removals in existing exact runs. Both
+have baseline cost witnesses, meaningful mutation controls and independent
+source reviews. Raw prototype comparisons retain the rollback/CPU penalties;
+the sparse representation reduces the ten-cycle10k confirmed held-store heap
+checkpoint by21,040,952 bytes while increasing full-drain CPU in all three pairs.
+Fragmented-proof economics and final successor qualification remain pending.
+Candidate validation continues under the owner's optimization instruction.
+The release disposition remains pending.
+
 The selected runtime removes unused preparation work and owner-path state,
 maintains the exact confirmed-ledger suffix, avoids discarded ordinary record
 copies, demand-caches value-projection order, and reuses native whole-input

@@ -596,6 +596,15 @@ export function link<S>(
     releaseEntityPublications.push(binding.source.subscribe({
       seedRequested:()=>!!projection&&research.acquiringCollection(consequenceKey,node as object),
       prepare(packet,native){
+        // Retirement can publish an empty packet for each old entity lifetime.
+        // This direct recipient has no value or support work in that case;
+        // preparing it would render every surviving row only to discard the
+        // snapshot. Native preparation and other recipients still run. Keep
+        // nested aggregates on their existing path, which can read user getters.
+        if(projection&&!nested&&packet.seed===undefined&&
+          packet.physical.length===0&&entityPublicationOrdinary(packet).length===0&&
+          packet.physicalOrder===undefined&&packet.ordinaryOrder===undefined&&
+          packet.ordinaryPlacements===undefined)return;
         const support=(native as {support?:(subject?:number,field?:string)=>NativeRequirement}|undefined)?.support;
         const prepared=native as {requirement?:NativeRequirement;facts?:EntityPublicationEvidence}|undefined;
         const acquired=!!projection&&research.acquiringCollection(consequenceKey,node as object)&&packet.seed!==undefined;
