@@ -1,0 +1,20 @@
+{
+  "command": [
+    "/Library/Frameworks/Python.framework/Versions/3.14/bin/python3",
+    "/Users/jonathanborgia/code/signaltree/.worktrees/agent-collaboration-evaluation/tools/application-lab/archive-evidence.py",
+    "create",
+    "/Users/jonathanborgia/code/signaltree/artifacts/optimization-sweep-final-packaging-1/archive-pipeline-1/archive",
+    "--selection",
+    "/Users/jonathanborgia/code/signaltree/artifacts/optimization-sweep-closure-final-6/selection.json",
+    "--recover",
+    "/Users/jonathanborgia/code/signaltree/artifacts/optimization-sweep-closure-final-6/recovery"
+  ],
+  "cwd": "/Users/jonathanborgia/code/signaltree",
+  "startedUTC": "2026-11-17T20:46:21.688652+00:00",
+  "runner": "/Users/jonathanborgia/code/signaltree/artifacts/optimization-sweep-2026-11-17/run-command.py",
+  "runnerSha256": "ad17c8aded98d98a8ff11cd1b1c5a34a6356f03c01707e5dd20dfa3f25682c80",
+  "environment": {
+    "PATH": "/Applications/ChatGPT.app/Contents/Resources/codex-cli/codex-path:/Users/jonathanborgia/.codex/tmp/arg0-macos/codex-arg0m8BLOx:/Users/jonathanborgia/.cache/codex-runtimes/codex-primary-runtime/dependencies/bin/override:/Users/jonathanborgia/.local/bin:/Users/jonathanborgia/.agentic/server:/Users/jonathanborgia/.opencode/bin:/Users/jonathanborgia/bin:/Users/jonathanborgia/.rd/bin:/Users/jonathanborgia/.codeium/windsurf/bin:/Users/jonathanborgia/Library/pnpm:/Users/jonathanborgia/Library/Android/sdk/platform-tools:/opt/homebrew/opt/openjdk@17/bin:/Users/jonathanborgia/.pyenv/shims:/opt/homebrew/opt/openjdk@17/bin:/Library/Frameworks/Python.framework/Versions/3.14/bin:/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin:/opt/homebrew/bin:/opt/homebrew/sbin:/usr/local/bin:/System/Cryptexes/App/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin:/opt/pmk/env/global/bin:/Library/Apple/usr/bin:/usr/local/share/dotnet:~/.dotnet/tools:/opt/homebrew/bin:/Users/jonathanborgia/.foundry/bin:/Users/jonathanborgia/.cache/codex-runtimes/codex-primary-runtime/dependencies/bin/fallback:/Applications/ChatGPT.app/Contents/Resources:/Applications/ChatGPT.app/Contents/Resources/codex-cli/CodexCLI.app/Contents/MacOS:/Users/jonathanborgia/.foundry/bin",
+    "TMPDIR": "/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/"
+  }
+}

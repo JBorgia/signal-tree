@@ -1,0 +1,14 @@
+{
+  "arms": {
+    "baseline": {
+      "manifest": "/Users/jonathanborgia/code/signaltree/artifacts/optimization-sweep-2026-11-17/v15-full-input-build/kernel.json",
+      "manifestSha256": "72e6df74807e804f158fab17f36b0bcdee146e102eae7cc3548fd381639d9dd0",
+      "transactionsSourceSha256": "0a02b211c6f8e9a73f800eacdac65c87cc97a946cddb242f55093cd05c9ef5a4"
+    },
+    "L2": {
+      "manifest": "/Users/jonathanborgia/code/signaltree/artifacts/optimization-sweep-2026-11-17/v15-l2-build/kernel.json",
+      "manifestSha256": "dc3ec7197158a45af5d809d94f14b1376635e4ac14a6f265557a7d285934e919",
+      "transactionsSourceSha256": "2b08cbd63a98513063834e125a7f3765c89caf26523fca3493080d256637352f"
+    }
+  }
+}

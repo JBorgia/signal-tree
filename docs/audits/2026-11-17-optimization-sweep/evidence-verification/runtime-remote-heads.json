@@ -1,0 +1,23 @@
+{
+  "passed": true,
+  "expected": {
+    "codex/v16-optimization-sweep": "aed4775434b843294310c227e27dc6134f027fb7",
+    "codex/v15-optimization-sweep": "fc279c279b3f1a9d6a9ac17330f5dcf9d0ccdba4",
+    "codex/v16-operation-retirement": "168bf0c18c45210d76941803ee98a72fe5620936",
+    "codex/v16-terminal-wakeup": "14f18309c079f51c8d7a069da71a31f4d4990d4c",
+    "codex/v16-egress-preparation": "05ffb136e257f28c21b23069ce4624e404629162",
+    "codex/v16-sparse-terminal-facets": "5256092193296f493bf26758cff56cf2a785dc4a"
+  },
+  "actual": {
+    "codex/v15-optimization-sweep": "fc279c279b3f1a9d6a9ac17330f5dcf9d0ccdba4",
+    "codex/v16-egress-preparation": "05ffb136e257f28c21b23069ce4624e404629162",
+    "codex/v16-operation-retirement": "168bf0c18c45210d76941803ee98a72fe5620936",
+    "codex/v16-optimization-sweep": "aed4775434b843294310c227e27dc6134f027fb7",
+    "codex/v16-sparse-terminal-facets": "5256092193296f493bf26758cff56cf2a785dc4a",
+    "codex/v16-terminal-wakeup": "14f18309c079f51c8d7a069da71a31f4d4990d4c"
+  },
+  "receipt": "/Users/jonathanborgia/code/signaltree/artifacts/optimization-sweep-final-packaging-1/remote-heads-1/receipt.json",
+  "receiptSha256": "a13a0d9eca85964ed022c492e6bcdcf96e807109adf1adb7bbd795e8ab85d72d",
+  "publication": false,
+  "merge": false
+}

@@ -1,0 +1,7 @@
+{
+  "kind": "native-final-config-v1",
+  "artifactPlan": "/Users/jonathanborgia/code/signaltree/artifacts/optimization-sweep-2026-11-17/application-final-packet/plan.json",
+  "artifactPlanSha256": "FILL_FROM_FROZEN_FINAL_PLAN",
+  "dispatchBuild": "/Users/jonathanborgia/code/signaltree/artifacts/optimization-sweep-2026-11-17/application-final-packet/dispatch-build.json",
+  "dispatchBuildSha256": "FILL_FROM_FROZEN_FINAL_BUILD"
+}

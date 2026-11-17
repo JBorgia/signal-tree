@@ -1,0 +1,1297 @@
+{
+  "complete": false,
+  "limits": "Missing versions remain failures. Metadata-only digest classifications do not verify serialized domain values. Source recovery proves bytes, not semantic qualification.",
+  "parsedJsonVersions": 23648,
+  "resolvedVersionCount": 124036,
+  "selectedFileCount": 64751,
+  "selectedRootCount": 630,
+  "unresolved": [
+    {
+      "error": "Expected version unavailable: /Users/jonathanborgia/code/signaltree/artifacts/optimization-sweep-2026-11-17/context-strategy-helper-1/synthetic-receipt/child-0.json fada09a1de938edd0bd5c31c00f7688611fd7ae36375d0080c11fd089a09f736",
+      "reference": {
+        "algorithm": "sha256",
+        "expected": "fada09a1de938edd0bd5c31c00f7688611fd7ae36375d0080c11fd089a09f736",
+        "jsonExpected": false,
+        "original": "/Users/jonathanborgia/code/signaltree/artifacts/optimization-sweep-2026-11-17/context-strategy-helper-1/synthetic-receipt/child-0.json",
+        "pointer": "/children/0/sha256",
+        "traversalRole": "evidence"
+      }
+    },
+    {
+      "error": "Expected version unavailable: hash:sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "reference": {
+        "algorithm": "sha256",
+        "expected": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "jsonExpected": false,
+        "original": "hash:sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "pointer": "/bundleSha256",
+        "traversalRole": "evidence"
+      }
+    },
+    {
+      "error": "Expected version unavailable: hash:sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "reference": {
+        "algorithm": "sha256",
+        "expected": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "jsonExpected": false,
+        "original": "hash:sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "pointer": "/bundleSha256",
+        "traversalRole": "evidence"
+      }
+    },
+    {
+      "error": "Expected version unavailable: /Users/jonathanborgia/code/signaltree/artifacts/optimization-sweep-2026-11-17/m-helper/admission-fixture/cohort/invocation-0.json 269f79156c3138bc76d852601c46c65eec522f5c21a0b8d72b33f89ab011baeb",
+      "reference": {
+        "algorithm": "sha256",
+        "expected": "269f79156c3138bc76d852601c46c65eec522f5c21a0b8d72b33f89ab011baeb",
+        "jsonExpected": false,
+        "original": "/Users/jonathanborgia/code/signaltree/artifacts/optimization-sweep-2026-11-17/m-helper/admission-fixture/cohort/invocation-0.json",
+        "pointer": "/results/0/invocationSha256",
+        "traversalRole": "evidence"
+      }
+    },
+    {
+      "error": "Expected version unavailable: /Users/jonathanborgia/code/signaltree/artifacts/optimization-sweep-2026-11-17/m2-helper/admission-fixture/cohort/invocation-0.json abef42fb9357225003f320365a045b5d2028cd2626c533fd78f5ce4f30e72194",
+      "reference": {
+        "algorithm": "sha256",
+        "expected": "abef42fb9357225003f320365a045b5d2028cd2626c533fd78f5ce4f30e72194",
+        "jsonExpected": false,
+        "original": "/Users/jonathanborgia/code/signaltree/artifacts/optimization-sweep-2026-11-17/m2-helper/admission-fixture/cohort/invocation-0.json",
+        "pointer": "/results/0/invocationSha256",
+        "traversalRole": "evidence"
+      }
+    },
+    {
+      "error": "Expected version unavailable: /Users/jonathanborgia/code/signaltree/artifacts/optimization-sweep-2026-11-17/proposals/sweep-archive/self-test-3/unavailable-historical-tool.mjs 9548f205585f10a0259946770aca9034a1cf616a30ffcdb9271e0752651fbafe",
+      "reference": {
+        "algorithm": "sha256",
+        "expected": "9548f205585f10a0259946770aca9034a1cf616a30ffcdb9271e0752651fbafe",
+        "jsonExpected": false,
+        "original": "/Users/jonathanborgia/code/signaltree/artifacts/optimization-sweep-2026-11-17/proposals/sweep-archive/self-test-3/unavailable-historical-tool.mjs",
+        "pointer": "/bindings/~1Users~1jonathanborgia~1code~1signaltree~1artifacts~1optimization-sweep-2026-11-17~1proposals~1sweep-archive~1self-test-3~1unavailable-historical-tool.mjs",
+        "traversalRole": "evidence"
+      }
+    },
+    {
+      "error": "Expected version unavailable: /Users/jonathanborgia/code/signaltree/artifacts/optimization-sweep-2026-11-17/proposals/sweep-archive/self-test-4/unavailable-historical-tool.mjs 9548f205585f10a0259946770aca9034a1cf616a30ffcdb9271e0752651fbafe",
+      "reference": {
+        "algorithm": "sha256",
+        "expected": "9548f205585f10a0259946770aca9034a1cf616a30ffcdb9271e0752651fbafe",
+        "jsonExpected": false,
+        "original": "/Users/jonathanborgia/code/signaltree/artifacts/optimization-sweep-2026-11-17/proposals/sweep-archive/self-test-4/unavailable-historical-tool.mjs",
+        "pointer": "/bindings/~1Users~1jonathanborgia~1code~1signaltree~1artifacts~1optimization-sweep-2026-11-17~1proposals~1sweep-archive~1self-test-4~1unavailable-historical-tool.mjs",
+        "traversalRole": "evidence"
+      }
+    },
+    {
+      "error": "Expected version unavailable: hash:sha256:43d17a162035b1864621cbe90d07ed48f963b0174f94f4d357b4c7d97ff4625a 43d17a162035b1864621cbe90d07ed48f963b0174f94f4d357b4c7d97ff4625a",
+      "reference": {
+        "algorithm": "sha256",
+        "expected": "43d17a162035b1864621cbe90d07ed48f963b0174f94f4d357b4c7d97ff4625a",
+        "jsonExpected": false,
+        "original": "hash:sha256:43d17a162035b1864621cbe90d07ed48f963b0174f94f4d357b4c7d97ff4625a",
+        "pointer": "/census/0/semanticSha256",
+        "traversalRole": "evidence"
+      }
+    },
+    {
+      "error": "Expected version unavailable: hash:sha256:01c3705faf913998f6de47e4a3721ce9b3d726219a4f4e21304016917e38b608 01c3705faf913998f6de47e4a3721ce9b3d726219a4f4e21304016917e38b608",
+      "reference": {
+        "algorithm": "sha256",
+        "expected": "01c3705faf913998f6de47e4a3721ce9b3d726219a4f4e21304016917e38b608",
+        "jsonExpected": false,
+        "original": "hash:sha256:01c3705faf913998f6de47e4a3721ce9b3d726219a4f4e21304016917e38b608",
+        "pointer": "/census/1/semanticSha256",
+        "traversalRole": "evidence"
+      }
+    },
+    {
+      "error": "Expected version unavailable: hash:sha256:6fd6729e3c90c89d1c711919bfad7d00e796130696445cd1a77b3ecf42fd02ee 6fd6729e3c90c89d1c711919bfad7d00e796130696445cd1a77b3ecf42fd02ee",
+      "reference": {
+        "algorithm": "sha256",
+        "expected": "6fd6729e3c90c89d1c711919bfad7d00e796130696445cd1a77b3ecf42fd02ee",
+        "jsonExpected": false,
+        "original": "hash:sha256:6fd6729e3c90c89d1c711919bfad7d00e796130696445cd1a77b3ecf42fd02ee",
+        "pointer": "/census/2/semanticSha256",
+        "traversalRole": "evidence"
+      }
+    },
+    {
+      "error": "Expected version unavailable: hash:sha256:76a857b6d104c149a9614ca9fb77852577e031da5ac38998e0a8a82457128ec4 76a857b6d104c149a9614ca9fb77852577e031da5ac38998e0a8a82457128ec4",
+      "reference": {
+        "algorithm": "sha256",
+        "expected": "76a857b6d104c149a9614ca9fb77852577e031da5ac38998e0a8a82457128ec4",
+        "jsonExpected": false,
+        "original": "hash:sha256:76a857b6d104c149a9614ca9fb77852577e031da5ac38998e0a8a82457128ec4",
+        "pointer": "/census/3/semanticSha256",
+        "traversalRole": "evidence"
+      }
+    },
+    {
+      "error": "Expected version unavailable: hash:sha256:2222222222222222222222222222222222222222222222222222222222222222 2222222222222222222222222222222222222222222222222222222222222222",
+      "reference": {
+        "algorithm": "sha256",
+        "expected": "2222222222222222222222222222222222222222222222222222222222222222",
+        "jsonExpected": false,
+        "original": "hash:sha256:2222222222222222222222222222222222222222222222222222222222222222",
+        "pointer": "/bundles/L2/sha256",
+        "traversalRole": "evidence"
+      }
+    },
+    {
+      "error": "Expected version unavailable: hash:sha256:1111111111111111111111111111111111111111111111111111111111111111 1111111111111111111111111111111111111111111111111111111111111111",
+      "reference": {
+        "algorithm": "sha256",
+        "expected": "1111111111111111111111111111111111111111111111111111111111111111",
+        "jsonExpected": false,
+        "original": "hash:sha256:1111111111111111111111111111111111111111111111111111111111111111",
+        "pointer": "/bundles/baseline/sha256",
+        "traversalRole": "evidence"
+      }
+    },
+    {
+      "error": "Expected version unavailable: /synthetic/node 0000000000000000000000000000000000000000000000000000000000000000",
+      "reference": {
+        "algorithm": "sha256",
+        "expected": "0000000000000000000000000000000000000000000000000000000000000000",
+        "jsonExpected": false,
+        "original": "/synthetic/node",
+        "pointer": "/node/sha256",
+        "traversalRole": "evidence"
+      }
+    },
+    {
+      "error": "Expected version unavailable: hash:sha256:3183a182e24d6ba724689fceee83efc6038f162aa8e405d2effaafc701a970cc 3183a182e24d6ba724689fceee83efc6038f162aa8e405d2effaafc701a970cc",
+      "reference": {
+        "algorithm": "sha256",
+        "expected": "3183a182e24d6ba724689fceee83efc6038f162aa8e405d2effaafc701a970cc",
+        "jsonExpected": false,
+        "original": "hash:sha256:3183a182e24d6ba724689fceee83efc6038f162aa8e405d2effaafc701a970cc",
+        "pointer": "/verifierSha256",
+        "traversalRole": "evidence"
+      }
+    },
+    {
+      "error": "Expected version unavailable: hash:sha256:a1ed206e923084c7bb979c8caf87b42c5bc7a037e523cbb80a1695663d38a73a a1ed206e923084c7bb979c8caf87b42c5bc7a037e523cbb80a1695663d38a73a",
+      "reference": {
+        "algorithm": "sha256",
+        "expected": "a1ed206e923084c7bb979c8caf87b42c5bc7a037e523cbb80a1695663d38a73a",
+        "jsonExpected": false,
+        "original": "hash:sha256:a1ed206e923084c7bb979c8caf87b42c5bc7a037e523cbb80a1695663d38a73a",
+        "pointer": "/hashes/consumer~1package-lock.json",
+        "traversalRole": "evidence"
+      }
+    },
+    {
+      "error": "Expected version unavailable: hash:sha256:95c9c898de7f18de85ff77e845835bc8d0a52145ef228bac05c719eb28326526 95c9c898de7f18de85ff77e845835bc8d0a52145ef228bac05c719eb28326526",
+      "reference": {
+        "algorithm": "sha256",
+        "expected": "95c9c898de7f18de85ff77e845835bc8d0a52145ef228bac05c719eb28326526",
+        "jsonExpected": false,
+        "original": "hash:sha256:95c9c898de7f18de85ff77e845835bc8d0a52145ef228bac05c719eb28326526",
+        "pointer": "/hashes/consumer~1package.json",
+        "traversalRole": "evidence"
+      }
+    },
+    {
+      "error": "Expected version unavailable: hash:sha256:da6bf34cd1769f323ef26c43acd0cf388028e348a34a8fbbc8e976b01a800993 da6bf34cd1769f323ef26c43acd0cf388028e348a34a8fbbc8e976b01a800993",
+      "reference": {
+        "algorithm": "sha256",
+        "expected": "da6bf34cd1769f323ef26c43acd0cf388028e348a34a8fbbc8e976b01a800993",
+        "jsonExpected": false,
+        "original": "hash:sha256:da6bf34cd1769f323ef26c43acd0cf388028e348a34a8fbbc8e976b01a800993",
+        "pointer": "/hashes/packs~1signal-tree-angular-16.0.0-dev.tgz",
+        "traversalRole": "evidence"
+      }
+    },
+    {
+      "error": "Expected version unavailable: hash:sha256:64cfcda4aa980a4e27322693edf28d22c9aae54905d2e1d1b0c821ad455ac019 64cfcda4aa980a4e27322693edf28d22c9aae54905d2e1d1b0c821ad455ac019",
+      "reference": {
+        "algorithm": "sha256",
+        "expected": "64cfcda4aa980a4e27322693edf28d22c9aae54905d2e1d1b0c821ad455ac019",
+        "jsonExpected": false,
+        "original": "hash:sha256:64cfcda4aa980a4e27322693edf28d22c9aae54905d2e1d1b0c821ad455ac019",
+        "pointer": "/hashes/packs~1signal-tree-kernel-16.0.0-dev.tgz",
+        "traversalRole": "evidence"
+      }
+    },
+    {
+      "error": "Expected version unavailable: hash:sha256:d95ca596a0cf429f075bc9599cb87de7e8917c34e145c8e1a0307fd28d039f0b d95ca596a0cf429f075bc9599cb87de7e8917c34e145c8e1a0307fd28d039f0b",
+      "reference": {
+        "algorithm": "sha256",
+        "expected": "d95ca596a0cf429f075bc9599cb87de7e8917c34e145c8e1a0307fd28d039f0b",
+        "jsonExpected": false,
+        "original": "hash:sha256:d95ca596a0cf429f075bc9599cb87de7e8917c34e145c8e1a0307fd28d039f0b",
+        "pointer": "/hashes/site~1app.js",
+        "traversalRole": "evidence"
+      }
+    },
+    {
+      "error": "Expected version unavailable: hash:sha256:403d4bd222d08c74e3e4dffad5df8efb32e45ac24a91ad24a5b7635787fdc287 403d4bd222d08c74e3e4dffad5df8efb32e45ac24a91ad24a5b7635787fdc287",
+      "reference": {
+        "algorithm": "sha256",
+        "expected": "403d4bd222d08c74e3e4dffad5df8efb32e45ac24a91ad24a5b7635787fdc287",
+        "jsonExpected": false,
+        "original": "hash:sha256:403d4bd222d08c74e3e4dffad5df8efb32e45ac24a91ad24a5b7635787fdc287",
+        "pointer": "/sourceArchiveSha256",
+        "traversalRole": "evidence"
+      }
+    },
+    {
+      "error": "Expected version unavailable: hash:sha256:02c5f40b3b9f06997f68d87e0cd18270159cc3a06559f1000a2382d347d8f5fc 02c5f40b3b9f06997f68d87e0cd18270159cc3a06559f1000a2382d347d8f5fc",
+      "reference": {
+        "algorithm": "sha256",
+        "expected": "02c5f40b3b9f06997f68d87e0cd18270159cc3a06559f1000a2382d347d8f5fc",
+        "jsonExpected": false,
+        "original": "hash:sha256:02c5f40b3b9f06997f68d87e0cd18270159cc3a06559f1000a2382d347d8f5fc",
+        "pointer": "/hashes/angular-consumer~1angular-runtime.mjs",
+        "traversalRole": "evidence"
+      }
+    },
+    {
+      "error": "Expected version unavailable: hash:sha256:69b7da53e681b01d957765ea25e2593cc5f805e563469aa956b4405a84893b73 69b7da53e681b01d957765ea25e2593cc5f805e563469aa956b4405a84893b73",
+      "reference": {
+        "algorithm": "sha256",
+        "expected": "69b7da53e681b01d957765ea25e2593cc5f805e563469aa956b4405a84893b73",
+        "jsonExpected": false,
+        "original": "hash:sha256:69b7da53e681b01d957765ea25e2593cc5f805e563469aa956b4405a84893b73",
+        "pointer": "/hashes/angular-consumer~1node_modules~1@signal-tree~1angular~1dist~1lib~1observation-adapter.js",
+        "traversalRole": "evidence"
+      }
+    },
+    {
+      "error": "Expected version unavailable: hash:sha256:3e8213b1456088b387399b4526cc1d4edc4bfb87708761fc7d8fb0bcb4591285 3e8213b1456088b387399b4526cc1d4edc4bfb87708761fc7d8fb0bcb4591285",
+      "reference": {
+        "algorithm": "sha256",
+        "expected": "3e8213b1456088b387399b4526cc1d4edc4bfb87708761fc7d8fb0bcb4591285",
+        "jsonExpected": false,
+        "original": "hash:sha256:3e8213b1456088b387399b4526cc1d4edc4bfb87708761fc7d8fb0bcb4591285",
+        "pointer": "/hashes/angular-consumer~1node_modules~1@signal-tree~1angular~1llms.txt",
+        "traversalRole": "evidence"
+      }
+    },
+    {
+      "error": "Expected version unavailable: hash:sha256:9529c877ff56f0c928b34682822acf8f2bea06c9ca9981873b0420a49db5a01b 9529c877ff56f0c928b34682822acf8f2bea06c9ca9981873b0420a49db5a01b",
+      "reference": {
+        "algorithm": "sha256",
+        "expected": "9529c877ff56f0c928b34682822acf8f2bea06c9ca9981873b0420a49db5a01b",
+        "jsonExpected": false,
+        "original": "hash:sha256:9529c877ff56f0c928b34682822acf8f2bea06c9ca9981873b0420a49db5a01b",
+        "pointer": "/hashes/angular-consumer~1node_modules~1@signal-tree~1kernel~1README.md",
+        "traversalRole": "evidence"
+      }
+    },
+    {
+      "error": "Expected version unavailable: hash:sha256:6c18e3514e188387cd2fde2764cb031d5bce05de771fbc90b6e118395866265b 6c18e3514e188387cd2fde2764cb031d5bce05de771fbc90b6e118395866265b",
+      "reference": {
+        "algorithm": "sha256",
+        "expected": "6c18e3514e188387cd2fde2764cb031d5bce05de771fbc90b6e118395866265b",
+        "jsonExpected": false,
+        "original": "hash:sha256:6c18e3514e188387cd2fde2764cb031d5bce05de771fbc90b6e118395866265b",
+        "pointer": "/hashes/angular-consumer~1node_modules~1@signal-tree~1kernel~1dist~1_adapter-D0sVNyWF.d.ts",
+        "traversalRole": "evidence"
+      }
+    },
+    {
+      "error": "Expected version unavailable: hash:sha256:677a62d81cd03022527cc2071e6c17bf903ef4dd0925153a42393b1be3f57d87 677a62d81cd03022527cc2071e6c17bf903ef4dd0925153a42393b1be3f57d87",
+      "reference": {
+        "algorithm": "sha256",
+        "expected": "677a62d81cd03022527cc2071e6c17bf903ef4dd0925153a42393b1be3f57d87",
+        "jsonExpected": false,
+        "original": "hash:sha256:677a62d81cd03022527cc2071e6c17bf903ef4dd0925153a42393b1be3f57d87",
+        "pointer": "/hashes/angular-consumer~1node_modules~1@signal-tree~1kernel~1dist~1adapter.d.ts",
+        "traversalRole": "evidence"
+      }
+    },
+    {
+      "error": "Expected version unavailable: hash:sha256:2f0fd4197f29092373641f4a2d112170b16b9a3fbf3f578050bee3754f699491 2f0fd4197f29092373641f4a2d112170b16b9a3fbf3f578050bee3754f699491",
+      "reference": {
+        "algorithm": "sha256",
+        "expected": "2f0fd4197f29092373641f4a2d112170b16b9a3fbf3f578050bee3754f699491",
+        "jsonExpected": false,
+        "original": "hash:sha256:2f0fd4197f29092373641f4a2d112170b16b9a3fbf3f578050bee3754f699491",
+        "pointer": "/hashes/angular-consumer~1node_modules~1@signal-tree~1kernel~1dist~1enhancers~1restoration~1order-boundary-evidence.js",
+        "traversalRole": "evidence"
+      }
+    },
+    {
+      "error": "Expected version unavailable: hash:sha256:03ef88d411329579f82fafa103c7cc8d0b4303faa40c631dbb63ec133ba74c38 03ef88d411329579f82fafa103c7cc8d0b4303faa40c631dbb63ec133ba74c38",
+      "reference": {
+        "algorithm": "sha256",
+        "expected": "03ef88d411329579f82fafa103c7cc8d0b4303faa40c631dbb63ec133ba74c38",
+        "jsonExpected": false,
+        "original": "hash:sha256:03ef88d411329579f82fafa103c7cc8d0b4303faa40c631dbb63ec133ba74c38",
+        "pointer": "/hashes/angular-consumer~1node_modules~1@signal-tree~1kernel~1dist~1enhancers~1restoration~1restoration.js",
+        "traversalRole": "evidence"
+      }
+    },
+    {
+      "error": "Expected version unavailable: hash:sha256:8892dffc2903564c39d97300c5982daffe4e7d29b217b37900a12ad93be63b0c 8892dffc2903564c39d97300c5982daffe4e7d29b217b37900a12ad93be63b0c",
+      "reference": {
+        "algorithm": "sha256",
+        "expected": "8892dffc2903564c39d97300c5982daffe4e7d29b217b37900a12ad93be63b0c",
+        "jsonExpected": false,
+        "original": "hash:sha256:8892dffc2903564c39d97300c5982daffe4e7d29b217b37900a12ad93be63b0c",
+        "pointer": "/hashes/angular-consumer~1node_modules~1@signal-tree~1kernel~1dist~1enhancers~1transactions~1transactions.js",
+        "traversalRole": "evidence"
+      }
+    },
+    {
+      "error": "Expected version unavailable: hash:sha256:d2070e4a3084373c313f01c8e9c433939f9c4b446b2fc77bbd0df3168dffa321 d2070e4a3084373c313f01c8e9c433939f9c4b446b2fc77bbd0df3168dffa321",
+      "reference": {
+        "algorithm": "sha256",
+        "expected": "d2070e4a3084373c313f01c8e9c433939f9c4b446b2fc77bbd0df3168dffa321",
+        "jsonExpected": false,
+        "original": "hash:sha256:d2070e4a3084373c313f01c8e9c433939f9c4b446b2fc77bbd0df3168dffa321",
+        "pointer": "/hashes/angular-consumer~1node_modules~1@signal-tree~1kernel~1dist~1index.d.ts",
+        "traversalRole": "evidence"
+      }
+    },
+    {
+      "error": "Expected version unavailable: hash:sha256:3c3d136fd82128d15e7e6f033751d0136acb0503b592072c285c4e3d8f212a28 3c3d136fd82128d15e7e6f033751d0136acb0503b592072c285c4e3d8f212a28",
+      "reference": {
+        "algorithm": "sha256",
+        "expected": "3c3d136fd82128d15e7e6f033751d0136acb0503b592072c285c4e3d8f212a28",
+        "jsonExpected": false,
+        "original": "hash:sha256:3c3d136fd82128d15e7e6f033751d0136acb0503b592072c285c4e3d8f212a28",
+        "pointer": "/hashes/angular-consumer~1node_modules~1@signal-tree~1kernel~1dist~1internals.d.ts",
+        "traversalRole": "evidence"
+      }
+    },
+    {
+      "error": "Expected version unavailable: hash:sha256:969946e374794fe221294b48e22afcf073dfdfd26639a928aa48c59a950f4974 969946e374794fe221294b48e22afcf073dfdfd26639a928aa48c59a950f4974",
+      "reference": {
+        "algorithm": "sha256",
+        "expected": "969946e374794fe221294b48e22afcf073dfdfd26639a928aa48c59a950f4974",
+        "jsonExpected": false,
+        "original": "hash:sha256:969946e374794fe221294b48e22afcf073dfdfd26639a928aa48c59a950f4974",
+        "pointer": "/hashes/angular-consumer~1node_modules~1@signal-tree~1kernel~1dist~1lib~1constants.js",
+        "traversalRole": "evidence"
+      }
+    },
+    {
+      "error": "Expected version unavailable: hash:sha256:161a948ca04c27e9cfa03a359ec1ebabe047412f8308b53a55be48589ba66a23 161a948ca04c27e9cfa03a359ec1ebabe047412f8308b53a55be48589ba66a23",
+      "reference": {
+        "algorithm": "sha256",
+        "expected": "161a948ca04c27e9cfa03a359ec1ebabe047412f8308b53a55be48589ba66a23",
+        "jsonExpected": false,
+        "original": "hash:sha256:161a948ca04c27e9cfa03a359ec1ebabe047412f8308b53a55be48589ba66a23",
+        "pointer": "/hashes/angular-consumer~1node_modules~1@signal-tree~1kernel~1dist~1lib~1entity-signal.js",
+        "traversalRole": "evidence"
+      }
+    },
+    {
+      "error": "Expected version unavailable: hash:sha256:11c612b6b2111b8d520ccc057d6c8a203a38fa20493cd01d25d3a201f1cd5e53 11c612b6b2111b8d520ccc057d6c8a203a38fa20493cd01d25d3a201f1cd5e53",
+      "reference": {
+        "algorithm": "sha256",
+        "expected": "11c612b6b2111b8d520ccc057d6c8a203a38fa20493cd01d25d3a201f1cd5e53",
+        "jsonExpected": false,
+        "original": "hash:sha256:11c612b6b2111b8d520ccc057d6c8a203a38fa20493cd01d25d3a201f1cd5e53",
+        "pointer": "/hashes/angular-consumer~1node_modules~1@signal-tree~1kernel~1dist~1lib~1internals~1causal-runtime~1pending-rollback.js",
+        "traversalRole": "evidence"
+      }
+    },
+    {
+      "error": "Expected version unavailable: hash:sha256:36ab484c438683ab96d083919d565a36b310724ab9b595e4af63ad1fe3e4dd81 36ab484c438683ab96d083919d565a36b310724ab9b595e4af63ad1fe3e4dd81",
+      "reference": {
+        "algorithm": "sha256",
+        "expected": "36ab484c438683ab96d083919d565a36b310724ab9b595e4af63ad1fe3e4dd81",
+        "jsonExpected": false,
+        "original": "hash:sha256:36ab484c438683ab96d083919d565a36b310724ab9b595e4af63ad1fe3e4dd81",
+        "pointer": "/hashes/angular-consumer~1node_modules~1@signal-tree~1kernel~1dist~1lib~1internals~1causal-runtime~1target-transition.js",
+        "traversalRole": "evidence"
+      }
+    },
+    {
+      "error": "Expected version unavailable: hash:sha256:4a1938365ba391b64df7b934156600e6db722a67882dbaaae903e14294e78cb2 4a1938365ba391b64df7b934156600e6db722a67882dbaaae903e14294e78cb2",
+      "reference": {
+        "algorithm": "sha256",
+        "expected": "4a1938365ba391b64df7b934156600e6db722a67882dbaaae903e14294e78cb2",
+        "jsonExpected": false,
+        "original": "hash:sha256:4a1938365ba391b64df7b934156600e6db722a67882dbaaae903e14294e78cb2",
+        "pointer": "/hashes/angular-consumer~1node_modules~1@signal-tree~1kernel~1dist~1lib~1internals~1causal-runtime~1tree-realization-adapter.js",
+        "traversalRole": "evidence"
+      }
+    },
+    {
+      "error": "Expected version unavailable: hash:sha256:fca3c59f219b16daa96b71b6eda7b02beddc59af98013b12216797df43b1655d fca3c59f219b16daa96b71b6eda7b02beddc59af98013b12216797df43b1655d",
+      "reference": {
+        "algorithm": "sha256",
+        "expected": "fca3c59f219b16daa96b71b6eda7b02beddc59af98013b12216797df43b1655d",
+        "jsonExpected": false,
+        "original": "hash:sha256:fca3c59f219b16daa96b71b6eda7b02beddc59af98013b12216797df43b1655d",
+        "pointer": "/hashes/angular-consumer~1node_modules~1@signal-tree~1kernel~1dist~1lib~1internals~1entity-egress-projection.js",
+        "traversalRole": "evidence"
+      }
+    },
+    {
+      "error": "Expected version unavailable: hash:sha256:b84981dcee85cc32c1db6a3d682d7617a04e0a59331b1fe511c8d7c91df59d10 b84981dcee85cc32c1db6a3d682d7617a04e0a59331b1fe511c8d7c91df59d10",
+      "reference": {
+        "algorithm": "sha256",
+        "expected": "b84981dcee85cc32c1db6a3d682d7617a04e0a59331b1fe511c8d7c91df59d10",
+        "jsonExpected": false,
+        "original": "hash:sha256:b84981dcee85cc32c1db6a3d682d7617a04e0a59331b1fe511c8d7c91df59d10",
+        "pointer": "/hashes/angular-consumer~1node_modules~1@signal-tree~1kernel~1dist~1lib~1internals~1entity-membership-inventory.js",
+        "traversalRole": "evidence"
+      }
+    },
+    {
+      "error": "Expected version unavailable: hash:sha256:ee54dbdb19ef9b5a28ab9a071f1c93168aabd4a6ceaa7d98c367bdd56fbaa61c ee54dbdb19ef9b5a28ab9a071f1c93168aabd4a6ceaa7d98c367bdd56fbaa61c",
+      "reference": {
+        "algorithm": "sha256",
+        "expected": "ee54dbdb19ef9b5a28ab9a071f1c93168aabd4a6ceaa7d98c367bdd56fbaa61c",
+        "jsonExpected": false,
+        "original": "hash:sha256:ee54dbdb19ef9b5a28ab9a071f1c93168aabd4a6ceaa7d98c367bdd56fbaa61c",
+        "pointer": "/hashes/angular-consumer~1node_modules~1@signal-tree~1kernel~1dist~1lib~1internals~1intercept-leaf-signals.js",
+        "traversalRole": "evidence"
+      }
+    },
+    {
+      "error": "Expected version unavailable: hash:sha256:9d4471a6243ef15f4f83916e80a5a5136c79ee2691e44088dc49c40edebdb8d2 9d4471a6243ef15f4f83916e80a5a5136c79ee2691e44088dc49c40edebdb8d2",
+      "reference": {
+        "algorithm": "sha256",
+        "expected": "9d4471a6243ef15f4f83916e80a5a5136c79ee2691e44088dc49c40edebdb8d2",
+        "jsonExpected": false,
+        "original": "hash:sha256:9d4471a6243ef15f4f83916e80a5a5136c79ee2691e44088dc49c40edebdb8d2",
+        "pointer": "/hashes/angular-consumer~1node_modules~1@signal-tree~1kernel~1dist~1lib~1internals~1intrinsic-mutation.js",
+        "traversalRole": "evidence"
+      }
+    },
+    {
+      "error": "Expected version unavailable: hash:sha256:752d4fa7eb01e114f1c590a3d22e8b7ebe5fe5257c13444a8ead8bb20859d20c 752d4fa7eb01e114f1c590a3d22e8b7ebe5fe5257c13444a8ead8bb20859d20c",
+      "reference": {
+        "algorithm": "sha256",
+        "expected": "752d4fa7eb01e114f1c590a3d22e8b7ebe5fe5257c13444a8ead8bb20859d20c",
+        "jsonExpected": false,
+        "original": "hash:sha256:752d4fa7eb01e114f1c590a3d22e8b7ebe5fe5257c13444a8ead8bb20859d20c",
+        "pointer": "/hashes/angular-consumer~1node_modules~1@signal-tree~1kernel~1dist~1lib~1internals~1location-runtime.js",
+        "traversalRole": "evidence"
+      }
+    },
+    {
+      "error": "Expected version unavailable: hash:sha256:29b142837c2400b572e4892ce567b3cfacabf115b86a35a6e4701af92d044aab 29b142837c2400b572e4892ce567b3cfacabf115b86a35a6e4701af92d044aab",
+      "reference": {
+        "algorithm": "sha256",
+        "expected": "29b142837c2400b572e4892ce567b3cfacabf115b86a35a6e4701af92d044aab",
+        "jsonExpected": false,
+        "original": "hash:sha256:29b142837c2400b572e4892ce567b3cfacabf115b86a35a6e4701af92d044aab",
+        "pointer": "/hashes/angular-consumer~1node_modules~1@signal-tree~1kernel~1dist~1lib~1internals~1materialize-markers.js",
+        "traversalRole": "evidence"
+      }
+    },
+    {
+      "error": "Expected version unavailable: hash:sha256:9080080be9023ddd7c7733b4c998f503a982ba2834129c9876c07f919ec3b1fa 9080080be9023ddd7c7733b4c998f503a982ba2834129c9876c07f919ec3b1fa",
+      "reference": {
+        "algorithm": "sha256",
+        "expected": "9080080be9023ddd7c7733b4c998f503a982ba2834129c9876c07f919ec3b1fa",
+        "jsonExpected": false,
+        "original": "hash:sha256:9080080be9023ddd7c7733b4c998f503a982ba2834129c9876c07f919ec3b1fa",
+        "pointer": "/hashes/angular-consumer~1node_modules~1@signal-tree~1kernel~1dist~1lib~1internals~1member-membership.js",
+        "traversalRole": "evidence"
+      }
+    },
+    {
+      "error": "Expected version unavailable: hash:sha256:b009f0eedc0d95462c3f176386b408a569b50438af3dd9e8b0e0a58046f9df86 b009f0eedc0d95462c3f176386b408a569b50438af3dd9e8b0e0a58046f9df86",
+      "reference": {
+        "algorithm": "sha256",
+        "expected": "b009f0eedc0d95462c3f176386b408a569b50438af3dd9e8b0e0a58046f9df86",
+        "jsonExpected": false,
+        "original": "hash:sha256:b009f0eedc0d95462c3f176386b408a569b50438af3dd9e8b0e0a58046f9df86",
+        "pointer": "/hashes/angular-consumer~1node_modules~1@signal-tree~1kernel~1dist~1lib~1internals~1mutation-capture-runtime.js",
+        "traversalRole": "evidence"
+      }
+    },
+    {
+      "error": "Expected version unavailable: hash:sha256:7c80bc2ce8f23bfaa94d079b2573a26f00bf745a18399778cc0a29b85f9dd198 7c80bc2ce8f23bfaa94d079b2573a26f00bf745a18399778cc0a29b85f9dd198",
+      "reference": {
+        "algorithm": "sha256",
+        "expected": "7c80bc2ce8f23bfaa94d079b2573a26f00bf745a18399778cc0a29b85f9dd198",
+        "jsonExpected": false,
+        "original": "hash:sha256:7c80bc2ce8f23bfaa94d079b2573a26f00bf745a18399778cc0a29b85f9dd198",
+        "pointer": "/hashes/angular-consumer~1node_modules~1@signal-tree~1kernel~1dist~1lib~1internals~1native-location-realization.js",
+        "traversalRole": "evidence"
+      }
+    },
+    {
+      "error": "Expected version unavailable: hash:sha256:de02b393206fca51acaa4bd8e9021aa4c07f8729276e82ca02b75b7bc6e030c6 de02b393206fca51acaa4bd8e9021aa4c07f8729276e82ca02b75b7bc6e030c6",
+      "reference": {
+        "algorithm": "sha256",
+        "expected": "de02b393206fca51acaa4bd8e9021aa4c07f8729276e82ca02b75b7bc6e030c6",
+        "jsonExpected": false,
+        "original": "hash:sha256:de02b393206fca51acaa4bd8e9021aa4c07f8729276e82ca02b75b7bc6e030c6",
+        "pointer": "/hashes/angular-consumer~1node_modules~1@signal-tree~1kernel~1dist~1lib~1internals~1native-tree-scalar-leaf-runtime.js",
+        "traversalRole": "evidence"
+      }
+    },
+    {
+      "error": "Expected version unavailable: hash:sha256:b67d430021eaacbf5d9b63b8ea8d1989f0d69158adbe49b0201c5a712e2401da b67d430021eaacbf5d9b63b8ea8d1989f0d69158adbe49b0201c5a712e2401da",
+      "reference": {
+        "algorithm": "sha256",
+        "expected": "b67d430021eaacbf5d9b63b8ea8d1989f0d69158adbe49b0201c5a712e2401da",
+        "jsonExpected": false,
+        "original": "hash:sha256:b67d430021eaacbf5d9b63b8ea8d1989f0d69158adbe49b0201c5a712e2401da",
+        "pointer": "/hashes/angular-consumer~1node_modules~1@signal-tree~1kernel~1dist~1lib~1internals~1observation-substrate.js",
+        "traversalRole": "evidence"
+      }
+    },
+    {
+      "error": "Expected version unavailable: hash:sha256:4fbe64fb1d82b6e58fb4014b21ba4cf5b935cbdf54c0e5f77d48159eccc43f96 4fbe64fb1d82b6e58fb4014b21ba4cf5b935cbdf54c0e5f77d48159eccc43f96",
+      "reference": {
+        "algorithm": "sha256",
+        "expected": "4fbe64fb1d82b6e58fb4014b21ba4cf5b935cbdf54c0e5f77d48159eccc43f96",
+        "jsonExpected": false,
+        "original": "hash:sha256:4fbe64fb1d82b6e58fb4014b21ba4cf5b935cbdf54c0e5f77d48159eccc43f96",
+        "pointer": "/hashes/angular-consumer~1node_modules~1@signal-tree~1kernel~1dist~1lib~1internals~1plain-branch-membership.js",
+        "traversalRole": "evidence"
+      }
+    },
+    {
+      "error": "Expected version unavailable: hash:sha256:ddda8357d4d92036fa005569f401d333d454317319b7ac29319166df90f36ea7 ddda8357d4d92036fa005569f401d333d454317319b7ac29319166df90f36ea7",
+      "reference": {
+        "algorithm": "sha256",
+        "expected": "ddda8357d4d92036fa005569f401d333d454317319b7ac29319166df90f36ea7",
+        "jsonExpected": false,
+        "original": "hash:sha256:ddda8357d4d92036fa005569f401d333d454317319b7ac29319166df90f36ea7",
+        "pointer": "/hashes/angular-consumer~1node_modules~1@signal-tree~1kernel~1dist~1lib~1internals~1position-registry.js",
+        "traversalRole": "evidence"
+      }
+    },
+    {
+      "error": "Expected version unavailable: hash:sha256:2a4aa7cf346b1dfed863f8659d8b4569f85eb6a7cf3e091e72573eb2d146c855 2a4aa7cf346b1dfed863f8659d8b4569f85eb6a7cf3e091e72573eb2d146c855",
+      "reference": {
+        "algorithm": "sha256",
+        "expected": "2a4aa7cf346b1dfed863f8659d8b4569f85eb6a7cf3e091e72573eb2d146c855",
+        "jsonExpected": false,
+        "original": "hash:sha256:2a4aa7cf346b1dfed863f8659d8b4569f85eb6a7cf3e091e72573eb2d146c855",
+        "pointer": "/hashes/angular-consumer~1node_modules~1@signal-tree~1kernel~1dist~1lib~1internals~1source-mutation.js",
+        "traversalRole": "evidence"
+      }
+    },
+    {
+      "error": "Expected version unavailable: hash:sha256:60a7ed7cc6af8133d434984e9b91917fc514a7317c4897adfbbb5f336793a176 60a7ed7cc6af8133d434984e9b91917fc514a7317c4897adfbbb5f336793a176",
+      "reference": {
+        "algorithm": "sha256",
+        "expected": "60a7ed7cc6af8133d434984e9b91917fc514a7317c4897adfbbb5f336793a176",
+        "jsonExpected": false,
+        "original": "hash:sha256:60a7ed7cc6af8133d434984e9b91917fc514a7317c4897adfbbb5f336793a176",
+        "pointer": "/hashes/angular-consumer~1node_modules~1@signal-tree~1kernel~1dist~1lib~1internals~1tree-scalar-leaf-runtime.js",
+        "traversalRole": "evidence"
+      }
+    },
+    {
+      "error": "Expected version unavailable: hash:sha256:0fbcc08359f8500658063bc8005d76e90f0d64071d04523951288b1873a53d6f 0fbcc08359f8500658063bc8005d76e90f0d64071d04523951288b1873a53d6f",
+      "reference": {
+        "algorithm": "sha256",
+        "expected": "0fbcc08359f8500658063bc8005d76e90f0d64071d04523951288b1873a53d6f",
+        "jsonExpected": false,
+        "original": "hash:sha256:0fbcc08359f8500658063bc8005d76e90f0d64071d04523951288b1873a53d6f",
+        "pointer": "/hashes/angular-consumer~1node_modules~1@signal-tree~1kernel~1dist~1lib~1internals~1tree-scalar-slot-runtime.js",
+        "traversalRole": "evidence"
+      }
+    },
+    {
+      "error": "Expected version unavailable: hash:sha256:b4d6739061bef2a6ea27419d3230307d2b0673892ade7f4d45e4eb7108459426 b4d6739061bef2a6ea27419d3230307d2b0673892ade7f4d45e4eb7108459426",
+      "reference": {
+        "algorithm": "sha256",
+        "expected": "b4d6739061bef2a6ea27419d3230307d2b0673892ade7f4d45e4eb7108459426",
+        "jsonExpected": false,
+        "original": "hash:sha256:b4d6739061bef2a6ea27419d3230307d2b0673892ade7f4d45e4eb7108459426",
+        "pointer": "/hashes/angular-consumer~1node_modules~1@signal-tree~1kernel~1dist~1lib~1link.js",
+        "traversalRole": "evidence"
+      }
+    },
+    {
+      "error": "Expected version unavailable: hash:sha256:b0358de151d96795acc8e7d3f036acb95a99e485f2442003e00ed6c459ea73fa b0358de151d96795acc8e7d3f036acb95a99e485f2442003e00ed6c459ea73fa",
+      "reference": {
+        "algorithm": "sha256",
+        "expected": "b0358de151d96795acc8e7d3f036acb95a99e485f2442003e00ed6c459ea73fa",
+        "jsonExpected": false,
+        "original": "hash:sha256:b0358de151d96795acc8e7d3f036acb95a99e485f2442003e00ed6c459ea73fa",
+        "pointer": "/hashes/angular-consumer~1node_modules~1@signal-tree~1kernel~1dist~1lib~1markers~1entity-map.js",
+        "traversalRole": "evidence"
+      }
+    },
+    {
+      "error": "Expected version unavailable: hash:sha256:18db31a3a542a709056004b2602b1ae71a80e9b0ecc687fae29443620755d98c 18db31a3a542a709056004b2602b1ae71a80e9b0ecc687fae29443620755d98c",
+      "reference": {
+        "algorithm": "sha256",
+        "expected": "18db31a3a542a709056004b2602b1ae71a80e9b0ecc687fae29443620755d98c",
+        "jsonExpected": false,
+        "original": "hash:sha256:18db31a3a542a709056004b2602b1ae71a80e9b0ecc687fae29443620755d98c",
+        "pointer": "/hashes/angular-consumer~1node_modules~1@signal-tree~1kernel~1dist~1lib~1path-notifier.js",
+        "traversalRole": "evidence"
+      }
+    },
+    {
+      "error": "Expected version unavailable: hash:sha256:9ed275a329f1e01e1920c1f8ba27d879b0d2975f024ac0f99a9f127b2bc08b92 9ed275a329f1e01e1920c1f8ba27d879b0d2975f024ac0f99a9f127b2bc08b92",
+      "reference": {
+        "algorithm": "sha256",
+        "expected": "9ed275a329f1e01e1920c1f8ba27d879b0d2975f024ac0f99a9f127b2bc08b92",
+        "jsonExpected": false,
+        "original": "hash:sha256:9ed275a329f1e01e1920c1f8ba27d879b0d2975f024ac0f99a9f127b2bc08b92",
+        "pointer": "/hashes/angular-consumer~1node_modules~1@signal-tree~1kernel~1dist~1lib~1physical~1entity-mutation-frame.js",
+        "traversalRole": "evidence"
+      }
+    },
+    {
+      "error": "Expected version unavailable: hash:sha256:7d31db69895c48b2e4bff264d0f0de245ad200ac113f9b53239afdb6b978db00 7d31db69895c48b2e4bff264d0f0de245ad200ac113f9b53239afdb6b978db00",
+      "reference": {
+        "algorithm": "sha256",
+        "expected": "7d31db69895c48b2e4bff264d0f0de245ad200ac113f9b53239afdb6b978db00",
+        "jsonExpected": false,
+        "original": "hash:sha256:7d31db69895c48b2e4bff264d0f0de245ad200ac113f9b53239afdb6b978db00",
+        "pointer": "/hashes/angular-consumer~1node_modules~1@signal-tree~1kernel~1dist~1lib~1physical~1prepare-entity-target.js",
+        "traversalRole": "evidence"
+      }
+    },
+    {
+      "error": "Expected version unavailable: hash:sha256:a990d63c8c8ad2848dd25a94fa2c15ce8b73f8c5b2e39a7df7ccf7611b8a73d1 a990d63c8c8ad2848dd25a94fa2c15ce8b73f8c5b2e39a7df7ccf7611b8a73d1",
+      "reference": {
+        "algorithm": "sha256",
+        "expected": "a990d63c8c8ad2848dd25a94fa2c15ce8b73f8c5b2e39a7df7ccf7611b8a73d1",
+        "jsonExpected": false,
+        "original": "hash:sha256:a990d63c8c8ad2848dd25a94fa2c15ce8b73f8c5b2e39a7df7ccf7611b8a73d1",
+        "pointer": "/hashes/angular-consumer~1node_modules~1@signal-tree~1kernel~1dist~1lib~1physical~1structural-store.js",
+        "traversalRole": "evidence"
+      }
+    },
+    {
+      "error": "Expected version unavailable: hash:sha256:4cd6509dd76b23948e9aced581bb15ffa81873315144ae73bd92fb17ac04b6e9 4cd6509dd76b23948e9aced581bb15ffa81873315144ae73bd92fb17ac04b6e9",
+      "reference": {
+        "algorithm": "sha256",
+        "expected": "4cd6509dd76b23948e9aced581bb15ffa81873315144ae73bd92fb17ac04b6e9",
+        "jsonExpected": false,
+        "original": "hash:sha256:4cd6509dd76b23948e9aced581bb15ffa81873315144ae73bd92fb17ac04b6e9",
+        "pointer": "/hashes/angular-consumer~1node_modules~1@signal-tree~1kernel~1dist~1lib~1signal-tree.js",
+        "traversalRole": "evidence"
+      }
+    },
+    {
+      "error": "Expected version unavailable: hash:sha256:d5c2979ec2848ee0695a570ed182fcf037a65ce29ffacae6ad520d5c39dd62a7 d5c2979ec2848ee0695a570ed182fcf037a65ce29ffacae6ad520d5c39dd62a7",
+      "reference": {
+        "algorithm": "sha256",
+        "expected": "d5c2979ec2848ee0695a570ed182fcf037a65ce29ffacae6ad520d5c39dd62a7",
+        "jsonExpected": false,
+        "original": "hash:sha256:d5c2979ec2848ee0695a570ed182fcf037a65ce29ffacae6ad520d5c39dd62a7",
+        "pointer": "/hashes/angular-consumer~1node_modules~1@signal-tree~1kernel~1dist~1lib~1utils.js",
+        "traversalRole": "evidence"
+      }
+    },
+    {
+      "error": "Expected version unavailable: hash:sha256:ea8e635ac9e81bd3da098e0b00c3ca59d620132b4bae48da3db26cc303d8bcf3 ea8e635ac9e81bd3da098e0b00c3ca59d620132b4bae48da3db26cc303d8bcf3",
+      "reference": {
+        "algorithm": "sha256",
+        "expected": "ea8e635ac9e81bd3da098e0b00c3ca59d620132b4bae48da3db26cc303d8bcf3",
+        "jsonExpected": false,
+        "original": "hash:sha256:ea8e635ac9e81bd3da098e0b00c3ca59d620132b4bae48da3db26cc303d8bcf3",
+        "pointer": "/hashes/angular-consumer~1out~1reference.component.js",
+        "traversalRole": "evidence"
+      }
+    },
+    {
+      "error": "Expected version unavailable: hash:sha256:c253d1e840da9f5b73b15ee32470b45d9c1ecb721e095611df7a53e4b12ac62d c253d1e840da9f5b73b15ee32470b45d9c1ecb721e095611df7a53e4b12ac62d",
+      "reference": {
+        "algorithm": "sha256",
+        "expected": "c253d1e840da9f5b73b15ee32470b45d9c1ecb721e095611df7a53e4b12ac62d",
+        "jsonExpected": false,
+        "original": "hash:sha256:c253d1e840da9f5b73b15ee32470b45d9c1ecb721e095611df7a53e4b12ac62d",
+        "pointer": "/hashes/angular-consumer~1package-lock.json",
+        "traversalRole": "evidence"
+      }
+    },
+    {
+      "error": "Expected version unavailable: hash:sha256:7c04f7f43ba9d10eec1bed768d8450c56e72ab90b505b8bfa0b8f34e5040e0f6 7c04f7f43ba9d10eec1bed768d8450c56e72ab90b505b8bfa0b8f34e5040e0f6",
+      "reference": {
+        "algorithm": "sha256",
+        "expected": "7c04f7f43ba9d10eec1bed768d8450c56e72ab90b505b8bfa0b8f34e5040e0f6",
+        "jsonExpected": false,
+        "original": "hash:sha256:7c04f7f43ba9d10eec1bed768d8450c56e72ab90b505b8bfa0b8f34e5040e0f6",
+        "pointer": "/hashes/angular-consumer~1reference.component.ts",
+        "traversalRole": "evidence"
+      }
+    },
+    {
+      "error": "Expected version unavailable: hash:sha256:6ac34cb63e85db9af0fe90b3da6c42dd0ff81ae1a904b810c847c4a34879db11 6ac34cb63e85db9af0fe90b3da6c42dd0ff81ae1a904b810c847c4a34879db11",
+      "reference": {
+        "algorithm": "sha256",
+        "expected": "6ac34cb63e85db9af0fe90b3da6c42dd0ff81ae1a904b810c847c4a34879db11",
+        "jsonExpected": false,
+        "original": "hash:sha256:6ac34cb63e85db9af0fe90b3da6c42dd0ff81ae1a904b810c847c4a34879db11",
+        "pointer": "/hashes/consumer~1coordinator.mjs",
+        "traversalRole": "evidence"
+      }
+    },
+    {
+      "error": "Expected version unavailable: hash:sha256:7c7192a747a8219d2629517424e567f03624a5c475522bb4ac5b0d51adc0690d 7c7192a747a8219d2629517424e567f03624a5c475522bb4ac5b0d51adc0690d",
+      "reference": {
+        "algorithm": "sha256",
+        "expected": "7c7192a747a8219d2629517424e567f03624a5c475522bb4ac5b0d51adc0690d",
+        "jsonExpected": false,
+        "original": "hash:sha256:7c7192a747a8219d2629517424e567f03624a5c475522bb4ac5b0d51adc0690d",
+        "pointer": "/hashes/consumer~1dispatch-fixture.d.mts",
+        "traversalRole": "evidence"
+      }
+    },
+    {
+      "error": "Expected version unavailable: hash:sha256:ba241cb40cf4517fd47a9c6e9ef1cc08a6ab7d7992137fd58e1eedfe8f4fe7b1 ba241cb40cf4517fd47a9c6e9ef1cc08a6ab7d7992137fd58e1eedfe8f4fe7b1",
+      "reference": {
+        "algorithm": "sha256",
+        "expected": "ba241cb40cf4517fd47a9c6e9ef1cc08a6ab7d7992137fd58e1eedfe8f4fe7b1",
+        "jsonExpected": false,
+        "original": "hash:sha256:ba241cb40cf4517fd47a9c6e9ef1cc08a6ab7d7992137fd58e1eedfe8f4fe7b1",
+        "pointer": "/hashes/consumer~1package-lock.json",
+        "traversalRole": "evidence"
+      }
+    },
+    {
+      "error": "Expected version unavailable: hash:sha256:a548f69b83d8016f808b8bb6c692a097aea5315f750173187a35555a2355100d a548f69b83d8016f808b8bb6c692a097aea5315f750173187a35555a2355100d",
+      "reference": {
+        "algorithm": "sha256",
+        "expected": "a548f69b83d8016f808b8bb6c692a097aea5315f750173187a35555a2355100d",
+        "jsonExpected": false,
+        "original": "hash:sha256:a548f69b83d8016f808b8bb6c692a097aea5315f750173187a35555a2355100d",
+        "pointer": "/archiveSha256",
+        "traversalRole": "evidence"
+      }
+    },
+    {
+      "error": "Expected version unavailable: /Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/recovered-before-mutation/historical-records/final-angular-aot-1.receipt.json b25adf1187258cd09fb98c8c82f5ac3174364c0c8082ccb31e66044b73a707c5",
+      "reference": {
+        "algorithm": "sha256",
+        "expected": "b25adf1187258cd09fb98c8c82f5ac3174364c0c8082ccb31e66044b73a707c5",
+        "jsonExpected": true,
+        "original": "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/recovered-before-mutation/historical-records/final-angular-aot-1.receipt.json",
+        "pointer": "/commands/0/receiptSha256",
+        "traversalRole": "evidence"
+      }
+    },
+    {
+      "error": "Expected version unavailable: hash:sha256:a391a9433a8169cb0f15dc92c71792d2c2d6a1a6ae8a5f2da6addeb123f66c61 a391a9433a8169cb0f15dc92c71792d2c2d6a1a6ae8a5f2da6addeb123f66c61",
+      "reference": {
+        "algorithm": "sha256",
+        "expected": "a391a9433a8169cb0f15dc92c71792d2c2d6a1a6ae8a5f2da6addeb123f66c61",
+        "jsonExpected": false,
+        "original": "hash:sha256:a391a9433a8169cb0f15dc92c71792d2c2d6a1a6ae8a5f2da6addeb123f66c61",
+        "pointer": "/commands/0/runnerSha256",
+        "traversalRole": "evidence"
+      }
+    },
+    {
+      "error": "Expected version unavailable: hash:sha256:848fb7699ce535ead3e1cc0f279bf021fb3da63a5e5676582134f5bf317dfddd 848fb7699ce535ead3e1cc0f279bf021fb3da63a5e5676582134f5bf317dfddd",
+      "reference": {
+        "algorithm": "sha256",
+        "expected": "848fb7699ce535ead3e1cc0f279bf021fb3da63a5e5676582134f5bf317dfddd",
+        "jsonExpected": false,
+        "original": "hash:sha256:848fb7699ce535ead3e1cc0f279bf021fb3da63a5e5676582134f5bf317dfddd",
+        "pointer": "/commands/1/logSha256",
+        "traversalRole": "evidence"
+      }
+    },
+    {
+      "error": "Expected version unavailable: /Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/recovered-before-mutation/historical-records/final-budget-discrimination-1.receipt.json 85a867e2161e2862d29e3dc3ab695d8d24928ed6a20e233b41c08c5c34df4592",
+      "reference": {
+        "algorithm": "sha256",
+        "expected": "85a867e2161e2862d29e3dc3ab695d8d24928ed6a20e233b41c08c5c34df4592",
+        "jsonExpected": true,
+        "original": "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/recovered-before-mutation/historical-records/final-budget-discrimination-1.receipt.json",
+        "pointer": "/commands/1/receiptSha256",
+        "traversalRole": "evidence"
+      }
+    },
+    {
+      "error": "Expected version unavailable: /Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/recovered-before-mutation/historical-records/final-version-claims-1.receipt.json bf36bb354c68ee7741ecbf1ee5ba465620bfe5bfca9bfaf1b503d72be004d4aa",
+      "reference": {
+        "algorithm": "sha256",
+        "expected": "bf36bb354c68ee7741ecbf1ee5ba465620bfe5bfca9bfaf1b503d72be004d4aa",
+        "jsonExpected": true,
+        "original": "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/recovered-before-mutation/historical-records/final-version-claims-1.receipt.json",
+        "pointer": "/commands/10/receiptSha256",
+        "traversalRole": "evidence"
+      }
+    },
+    {
+      "error": "Expected version unavailable: hash:sha256:a118cf55309f5e8fe899db2ca8d243973ac2230f0824292299b836ba3b765c18 a118cf55309f5e8fe899db2ca8d243973ac2230f0824292299b836ba3b765c18",
+      "reference": {
+        "algorithm": "sha256",
+        "expected": "a118cf55309f5e8fe899db2ca8d243973ac2230f0824292299b836ba3b765c18",
+        "jsonExpected": false,
+        "original": "hash:sha256:a118cf55309f5e8fe899db2ca8d243973ac2230f0824292299b836ba3b765c18",
+        "pointer": "/commands/11/logSha256",
+        "traversalRole": "evidence"
+      }
+    },
+    {
+      "error": "Expected version unavailable: /Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/recovered-before-mutation/historical-records/install-1.receipt.json 2030e5e5ff00c544ec39d947b7052e7b783ed28110f30359d7b5f27f1ffdaa63",
+      "reference": {
+        "algorithm": "sha256",
+        "expected": "2030e5e5ff00c544ec39d947b7052e7b783ed28110f30359d7b5f27f1ffdaa63",
+        "jsonExpected": true,
+        "original": "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/recovered-before-mutation/historical-records/install-1.receipt.json",
+        "pointer": "/commands/11/receiptSha256",
+        "traversalRole": "evidence"
+      }
+    },
+    {
+      "error": "Expected version unavailable: hash:sha256:e685b83ef7af4d5b730b59c981e5b711bc1a88a4f5915743c18ce911f8499b66 e685b83ef7af4d5b730b59c981e5b711bc1a88a4f5915743c18ce911f8499b66",
+      "reference": {
+        "algorithm": "sha256",
+        "expected": "e685b83ef7af4d5b730b59c981e5b711bc1a88a4f5915743c18ce911f8499b66",
+        "jsonExpected": false,
+        "original": "hash:sha256:e685b83ef7af4d5b730b59c981e5b711bc1a88a4f5915743c18ce911f8499b66",
+        "pointer": "/commands/12/logSha256",
+        "traversalRole": "evidence"
+      }
+    },
+    {
+      "error": "Expected version unavailable: /Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/recovered-before-mutation/historical-records/install-2.receipt.json 5e9caba79fccab94e635185daaf449cc266e0a1e64cd1c0f6e2da94365d14f5d",
+      "reference": {
+        "algorithm": "sha256",
+        "expected": "5e9caba79fccab94e635185daaf449cc266e0a1e64cd1c0f6e2da94365d14f5d",
+        "jsonExpected": true,
+        "original": "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/recovered-before-mutation/historical-records/install-2.receipt.json",
+        "pointer": "/commands/12/receiptSha256",
+        "traversalRole": "evidence"
+      }
+    },
+    {
+      "error": "Expected version unavailable: hash:sha256:110225a7622bfb6bc7b6594ad86f3060c6a693caffc6384deef6daade31f5f6e 110225a7622bfb6bc7b6594ad86f3060c6a693caffc6384deef6daade31f5f6e",
+      "reference": {
+        "algorithm": "sha256",
+        "expected": "110225a7622bfb6bc7b6594ad86f3060c6a693caffc6384deef6daade31f5f6e",
+        "jsonExpected": false,
+        "original": "hash:sha256:110225a7622bfb6bc7b6594ad86f3060c6a693caffc6384deef6daade31f5f6e",
+        "pointer": "/commands/13/logSha256",
+        "traversalRole": "evidence"
+      }
+    },
+    {
+      "error": "Expected version unavailable: /Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/recovered-before-mutation/historical-records/metadata-1.receipt.json 94aa63a99c5da664dc001b5298ae38b7cde2b21550016e21cb75e0f313162070",
+      "reference": {
+        "algorithm": "sha256",
+        "expected": "94aa63a99c5da664dc001b5298ae38b7cde2b21550016e21cb75e0f313162070",
+        "jsonExpected": true,
+        "original": "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/recovered-before-mutation/historical-records/metadata-1.receipt.json",
+        "pointer": "/commands/13/receiptSha256",
+        "traversalRole": "evidence"
+      }
+    },
+    {
+      "error": "Expected version unavailable: hash:sha256:b7a031abb6746837595e3ad2e28a35ab0571c7b5f2a203d32f468edbeacf2884 b7a031abb6746837595e3ad2e28a35ab0571c7b5f2a203d32f468edbeacf2884",
+      "reference": {
+        "algorithm": "sha256",
+        "expected": "b7a031abb6746837595e3ad2e28a35ab0571c7b5f2a203d32f468edbeacf2884",
+        "jsonExpected": false,
+        "original": "hash:sha256:b7a031abb6746837595e3ad2e28a35ab0571c7b5f2a203d32f468edbeacf2884",
+        "pointer": "/commands/14/logSha256",
+        "traversalRole": "evidence"
+      }
+    },
+    {
+      "error": "Expected version unavailable: /Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/recovered-before-mutation/historical-records/metadata-check-1.receipt.json bee10637c40552f85331f49ef8bcd87f2c76417673e767e5814574fb9c7d8c3c",
+      "reference": {
+        "algorithm": "sha256",
+        "expected": "bee10637c40552f85331f49ef8bcd87f2c76417673e767e5814574fb9c7d8c3c",
+        "jsonExpected": true,
+        "original": "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/recovered-before-mutation/historical-records/metadata-check-1.receipt.json",
+        "pointer": "/commands/14/receiptSha256",
+        "traversalRole": "evidence"
+      }
+    },
+    {
+      "error": "Expected version unavailable: hash:sha256:9169fdd50c41d8380acd0d2a7007d5a3e1465190b4b52dccd6c52606136ebd4d 9169fdd50c41d8380acd0d2a7007d5a3e1465190b4b52dccd6c52606136ebd4d",
+      "reference": {
+        "algorithm": "sha256",
+        "expected": "9169fdd50c41d8380acd0d2a7007d5a3e1465190b4b52dccd6c52606136ebd4d",
+        "jsonExpected": false,
+        "original": "hash:sha256:9169fdd50c41d8380acd0d2a7007d5a3e1465190b4b52dccd6c52606136ebd4d",
+        "pointer": "/commands/15/logSha256",
+        "traversalRole": "evidence"
+      }
+    },
+    {
+      "error": "Expected version unavailable: /Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/recovered-before-mutation/historical-records/rebuild-after-mutations-1.receipt.json 1098c96e1618b6513bfc0187d4678126a9e9278b0c08693c9793cd7e014c054a",
+      "reference": {
+        "algorithm": "sha256",
+        "expected": "1098c96e1618b6513bfc0187d4678126a9e9278b0c08693c9793cd7e014c054a",
+        "jsonExpected": true,
+        "original": "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/recovered-before-mutation/historical-records/rebuild-after-mutations-1.receipt.json",
+        "pointer": "/commands/15/receiptSha256",
+        "traversalRole": "evidence"
+      }
+    },
+    {
+      "error": "Expected version unavailable: /Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/recovered-before-mutation/historical-records/release-gates-1.receipt.json 8dd25753fb6b793c26bc078671db0af48d698a39bff21506f10b1a784462507d",
+      "reference": {
+        "algorithm": "sha256",
+        "expected": "8dd25753fb6b793c26bc078671db0af48d698a39bff21506f10b1a784462507d",
+        "jsonExpected": true,
+        "original": "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/recovered-before-mutation/historical-records/release-gates-1.receipt.json",
+        "pointer": "/commands/16/receiptSha256",
+        "traversalRole": "evidence"
+      }
+    },
+    {
+      "error": "Expected version unavailable: /Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/recovered-before-mutation/historical-records/release-mutations-1.receipt.json 3a8032ceaeaaf062bbc9cc0ad5c4a1af261f1f15b51540a5d5e2ddaa8241b9b2",
+      "reference": {
+        "algorithm": "sha256",
+        "expected": "3a8032ceaeaaf062bbc9cc0ad5c4a1af261f1f15b51540a5d5e2ddaa8241b9b2",
+        "jsonExpected": true,
+        "original": "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/recovered-before-mutation/historical-records/release-mutations-1.receipt.json",
+        "pointer": "/commands/17/receiptSha256",
+        "traversalRole": "evidence"
+      }
+    },
+    {
+      "error": "Expected version unavailable: /Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/recovered-before-mutation/historical-records/final-candidate-prepare-only-1.receipt.json 275e60103c651f107604673fa23ce7b3070c76d36801fbc486a89392c0829ae8",
+      "reference": {
+        "algorithm": "sha256",
+        "expected": "275e60103c651f107604673fa23ce7b3070c76d36801fbc486a89392c0829ae8",
+        "jsonExpected": true,
+        "original": "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/recovered-before-mutation/historical-records/final-candidate-prepare-only-1.receipt.json",
+        "pointer": "/commands/2/receiptSha256",
+        "traversalRole": "evidence"
+      }
+    },
+    {
+      "error": "Expected version unavailable: /Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/recovered-before-mutation/historical-records/final-changelog-1.receipt.json 756063c5dcfd0dc5046684617b73ba9350cec56de407cba73a72cdbcd01f3e0b",
+      "reference": {
+        "algorithm": "sha256",
+        "expected": "756063c5dcfd0dc5046684617b73ba9350cec56de407cba73a72cdbcd01f3e0b",
+        "jsonExpected": true,
+        "original": "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/recovered-before-mutation/historical-records/final-changelog-1.receipt.json",
+        "pointer": "/commands/3/receiptSha256",
+        "traversalRole": "evidence"
+      }
+    },
+    {
+      "error": "Expected version unavailable: /Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/recovered-before-mutation/historical-records/final-consumer-typecheck-1.receipt.json 247338cfac7d5bd1d3010c1a74161726fa5377f8c1d3e855bd7d1f2e169cee9b",
+      "reference": {
+        "algorithm": "sha256",
+        "expected": "247338cfac7d5bd1d3010c1a74161726fa5377f8c1d3e855bd7d1f2e169cee9b",
+        "jsonExpected": true,
+        "original": "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/recovered-before-mutation/historical-records/final-consumer-typecheck-1.receipt.json",
+        "pointer": "/commands/4/receiptSha256",
+        "traversalRole": "evidence"
+      }
+    },
+    {
+      "error": "Expected version unavailable: hash:sha256:acafbea6f31c2b76ffae75540bc901ca85576bfd53da1757ad59f32f2dea4b20 acafbea6f31c2b76ffae75540bc901ca85576bfd53da1757ad59f32f2dea4b20",
+      "reference": {
+        "algorithm": "sha256",
+        "expected": "acafbea6f31c2b76ffae75540bc901ca85576bfd53da1757ad59f32f2dea4b20",
+        "jsonExpected": false,
+        "original": "hash:sha256:acafbea6f31c2b76ffae75540bc901ca85576bfd53da1757ad59f32f2dea4b20",
+        "pointer": "/commands/5/logSha256",
+        "traversalRole": "evidence"
+      }
+    },
+    {
+      "error": "Expected version unavailable: /Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/recovered-before-mutation/historical-records/final-demo-production-1.receipt.json b88ded1ca46373a9f40a931c16f33eaf124bf7dd1fd166ce390b608c4e7cbe7d",
+      "reference": {
+        "algorithm": "sha256",
+        "expected": "b88ded1ca46373a9f40a931c16f33eaf124bf7dd1fd166ce390b608c4e7cbe7d",
+        "jsonExpected": true,
+        "original": "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/recovered-before-mutation/historical-records/final-demo-production-1.receipt.json",
+        "pointer": "/commands/5/receiptSha256",
+        "traversalRole": "evidence"
+      }
+    },
+    {
+      "error": "Expected version unavailable: hash:sha256:0307ce49a0bef14e54b5337a1e9e9bbf1d8f17c20bc043e0569c72a509433821 0307ce49a0bef14e54b5337a1e9e9bbf1d8f17c20bc043e0569c72a509433821",
+      "reference": {
+        "algorithm": "sha256",
+        "expected": "0307ce49a0bef14e54b5337a1e9e9bbf1d8f17c20bc043e0569c72a509433821",
+        "jsonExpected": false,
+        "original": "hash:sha256:0307ce49a0bef14e54b5337a1e9e9bbf1d8f17c20bc043e0569c72a509433821",
+        "pointer": "/commands/6/logSha256",
+        "traversalRole": "evidence"
+      }
+    },
+    {
+      "error": "Expected version unavailable: /Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/recovered-before-mutation/historical-records/final-exact-budget-1.receipt.json a106575f17f02b17d8755c7a58c09e8f43cd100ea7b9124fecc0e7e2d587a633",
+      "reference": {
+        "algorithm": "sha256",
+        "expected": "a106575f17f02b17d8755c7a58c09e8f43cd100ea7b9124fecc0e7e2d587a633",
+        "jsonExpected": true,
+        "original": "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/recovered-before-mutation/historical-records/final-exact-budget-1.receipt.json",
+        "pointer": "/commands/6/receiptSha256",
+        "traversalRole": "evidence"
+      }
+    },
+    {
+      "error": "Expected version unavailable: /Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/recovered-before-mutation/historical-records/final-release-state-1.receipt.json 258950c46c4ea1008f0ba071a20f7f2f97fc10b6e360ef87867056fcd163b0da",
+      "reference": {
+        "algorithm": "sha256",
+        "expected": "258950c46c4ea1008f0ba071a20f7f2f97fc10b6e360ef87867056fcd163b0da",
+        "jsonExpected": true,
+        "original": "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/recovered-before-mutation/historical-records/final-release-state-1.receipt.json",
+        "pointer": "/commands/7/receiptSha256",
+        "traversalRole": "evidence"
+      }
+    },
+    {
+      "error": "Expected version unavailable: hash:sha256:9dd14847f05ade3515650cee2983f9338fc7d7fb913bede466fe933be994f33a 9dd14847f05ade3515650cee2983f9338fc7d7fb913bede466fe933be994f33a",
+      "reference": {
+        "algorithm": "sha256",
+        "expected": "9dd14847f05ade3515650cee2983f9338fc7d7fb913bede466fe933be994f33a",
+        "jsonExpected": false,
+        "original": "hash:sha256:9dd14847f05ade3515650cee2983f9338fc7d7fb913bede466fe933be994f33a",
+        "pointer": "/commands/8/logSha256",
+        "traversalRole": "evidence"
+      }
+    },
+    {
+      "error": "Expected version unavailable: /Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/recovered-before-mutation/historical-records/final-route-smoke-1.receipt.json 81e8c7f5c35ced1681b485cd2d3c507783013467bee55f3719962ea0e791f711",
+      "reference": {
+        "algorithm": "sha256",
+        "expected": "81e8c7f5c35ced1681b485cd2d3c507783013467bee55f3719962ea0e791f711",
+        "jsonExpected": true,
+        "original": "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/recovered-before-mutation/historical-records/final-route-smoke-1.receipt.json",
+        "pointer": "/commands/8/receiptSha256",
+        "traversalRole": "evidence"
+      }
+    },
+    {
+      "error": "Expected version unavailable: hash:sha256:141ef3ed7053d1e84a454073c419c1c1d7c685801bca01d6df8b1b79d057264b 141ef3ed7053d1e84a454073c419c1c1d7c685801bca01d6df8b1b79d057264b",
+      "reference": {
+        "algorithm": "sha256",
+        "expected": "141ef3ed7053d1e84a454073c419c1c1d7c685801bca01d6df8b1b79d057264b",
+        "jsonExpected": false,
+        "original": "hash:sha256:141ef3ed7053d1e84a454073c419c1c1d7c685801bca01d6df8b1b79d057264b",
+        "pointer": "/commands/9/logSha256",
+        "traversalRole": "evidence"
+      }
+    },
+    {
+      "error": "Expected version unavailable: /Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/recovered-before-mutation/historical-records/final-tarball-consumer-1.receipt.json 73c33c1622d0e332d80ae10690fbf3025446b45a6a8758b1ede6651cc86faeee",
+      "reference": {
+        "algorithm": "sha256",
+        "expected": "73c33c1622d0e332d80ae10690fbf3025446b45a6a8758b1ede6651cc86faeee",
+        "jsonExpected": true,
+        "original": "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/recovered-before-mutation/historical-records/final-tarball-consumer-1.receipt.json",
+        "pointer": "/commands/9/receiptSha256",
+        "traversalRole": "evidence"
+      }
+    },
+    {
+      "error": "Expected version unavailable: /private/tmp/st-v15-maintenance-release-prep/candidate-da2e92cca-source.tar.gz 4ba8528ffc7a20a147715a617828c63e4bd59ad6afdc29cb4966b05fc17e2008",
+      "reference": {
+        "algorithm": "sha256",
+        "expected": "4ba8528ffc7a20a147715a617828c63e4bd59ad6afdc29cb4966b05fc17e2008",
+        "jsonExpected": false,
+        "original": "/private/tmp/st-v15-maintenance-release-prep/candidate-da2e92cca-source.tar.gz",
+        "pointer": "/sourceArchive/sha256",
+        "traversalRole": "evidence"
+      }
+    },
+    {
+      "error": "Expected version unavailable: hash:sha256:b25adf1187258cd09fb98c8c82f5ac3174364c0c8082ccb31e66044b73a707c5 b25adf1187258cd09fb98c8c82f5ac3174364c0c8082ccb31e66044b73a707c5",
+      "reference": {
+        "algorithm": "sha256",
+        "expected": "b25adf1187258cd09fb98c8c82f5ac3174364c0c8082ccb31e66044b73a707c5",
+        "jsonExpected": true,
+        "original": "hash:sha256:b25adf1187258cd09fb98c8c82f5ac3174364c0c8082ccb31e66044b73a707c5",
+        "pointer": "/commands/0/receiptSha256",
+        "traversalRole": "evidence"
+      }
+    },
+    {
+      "error": "Expected version unavailable: hash:sha256:85a867e2161e2862d29e3dc3ab695d8d24928ed6a20e233b41c08c5c34df4592 85a867e2161e2862d29e3dc3ab695d8d24928ed6a20e233b41c08c5c34df4592",
+      "reference": {
+        "algorithm": "sha256",
+        "expected": "85a867e2161e2862d29e3dc3ab695d8d24928ed6a20e233b41c08c5c34df4592",
+        "jsonExpected": true,
+        "original": "hash:sha256:85a867e2161e2862d29e3dc3ab695d8d24928ed6a20e233b41c08c5c34df4592",
+        "pointer": "/commands/1/receiptSha256",
+        "traversalRole": "evidence"
+      }
+    },
+    {
+      "error": "Expected version unavailable: hash:sha256:bf36bb354c68ee7741ecbf1ee5ba465620bfe5bfca9bfaf1b503d72be004d4aa bf36bb354c68ee7741ecbf1ee5ba465620bfe5bfca9bfaf1b503d72be004d4aa",
+      "reference": {
+        "algorithm": "sha256",
+        "expected": "bf36bb354c68ee7741ecbf1ee5ba465620bfe5bfca9bfaf1b503d72be004d4aa",
+        "jsonExpected": true,
+        "original": "hash:sha256:bf36bb354c68ee7741ecbf1ee5ba465620bfe5bfca9bfaf1b503d72be004d4aa",
+        "pointer": "/commands/10/receiptSha256",
+        "traversalRole": "evidence"
+      }
+    },
+    {
+      "error": "Expected version unavailable: hash:sha256:2030e5e5ff00c544ec39d947b7052e7b783ed28110f30359d7b5f27f1ffdaa63 2030e5e5ff00c544ec39d947b7052e7b783ed28110f30359d7b5f27f1ffdaa63",
+      "reference": {
+        "algorithm": "sha256",
+        "expected": "2030e5e5ff00c544ec39d947b7052e7b783ed28110f30359d7b5f27f1ffdaa63",
+        "jsonExpected": true,
+        "original": "hash:sha256:2030e5e5ff00c544ec39d947b7052e7b783ed28110f30359d7b5f27f1ffdaa63",
+        "pointer": "/commands/11/receiptSha256",
+        "traversalRole": "evidence"
+      }
+    },
+    {
+      "error": "Expected version unavailable: hash:sha256:5e9caba79fccab94e635185daaf449cc266e0a1e64cd1c0f6e2da94365d14f5d 5e9caba79fccab94e635185daaf449cc266e0a1e64cd1c0f6e2da94365d14f5d",
+      "reference": {
+        "algorithm": "sha256",
+        "expected": "5e9caba79fccab94e635185daaf449cc266e0a1e64cd1c0f6e2da94365d14f5d",
+        "jsonExpected": true,
+        "original": "hash:sha256:5e9caba79fccab94e635185daaf449cc266e0a1e64cd1c0f6e2da94365d14f5d",
+        "pointer": "/commands/12/receiptSha256",
+        "traversalRole": "evidence"
+      }
+    },
+    {
+      "error": "Expected version unavailable: hash:sha256:94aa63a99c5da664dc001b5298ae38b7cde2b21550016e21cb75e0f313162070 94aa63a99c5da664dc001b5298ae38b7cde2b21550016e21cb75e0f313162070",
+      "reference": {
+        "algorithm": "sha256",
+        "expected": "94aa63a99c5da664dc001b5298ae38b7cde2b21550016e21cb75e0f313162070",
+        "jsonExpected": true,
+        "original": "hash:sha256:94aa63a99c5da664dc001b5298ae38b7cde2b21550016e21cb75e0f313162070",
+        "pointer": "/commands/13/receiptSha256",
+        "traversalRole": "evidence"
+      }
+    },
+    {
+      "error": "Expected version unavailable: hash:sha256:bee10637c40552f85331f49ef8bcd87f2c76417673e767e5814574fb9c7d8c3c bee10637c40552f85331f49ef8bcd87f2c76417673e767e5814574fb9c7d8c3c",
+      "reference": {
+        "algorithm": "sha256",
+        "expected": "bee10637c40552f85331f49ef8bcd87f2c76417673e767e5814574fb9c7d8c3c",
+        "jsonExpected": true,
+        "original": "hash:sha256:bee10637c40552f85331f49ef8bcd87f2c76417673e767e5814574fb9c7d8c3c",
+        "pointer": "/commands/14/receiptSha256",
+        "traversalRole": "evidence"
+      }
+    },
+    {
+      "error": "Expected version unavailable: hash:sha256:1098c96e1618b6513bfc0187d4678126a9e9278b0c08693c9793cd7e014c054a 1098c96e1618b6513bfc0187d4678126a9e9278b0c08693c9793cd7e014c054a",
+      "reference": {
+        "algorithm": "sha256",
+        "expected": "1098c96e1618b6513bfc0187d4678126a9e9278b0c08693c9793cd7e014c054a",
+        "jsonExpected": true,
+        "original": "hash:sha256:1098c96e1618b6513bfc0187d4678126a9e9278b0c08693c9793cd7e014c054a",
+        "pointer": "/commands/15/receiptSha256",
+        "traversalRole": "evidence"
+      }
+    },
+    {
+      "error": "Expected version unavailable: hash:sha256:8dd25753fb6b793c26bc078671db0af48d698a39bff21506f10b1a784462507d 8dd25753fb6b793c26bc078671db0af48d698a39bff21506f10b1a784462507d",
+      "reference": {
+        "algorithm": "sha256",
+        "expected": "8dd25753fb6b793c26bc078671db0af48d698a39bff21506f10b1a784462507d",
+        "jsonExpected": true,
+        "original": "hash:sha256:8dd25753fb6b793c26bc078671db0af48d698a39bff21506f10b1a784462507d",
+        "pointer": "/commands/16/receiptSha256",
+        "traversalRole": "evidence"
+      }
+    },
+    {
+      "error": "Expected version unavailable: hash:sha256:3a8032ceaeaaf062bbc9cc0ad5c4a1af261f1f15b51540a5d5e2ddaa8241b9b2 3a8032ceaeaaf062bbc9cc0ad5c4a1af261f1f15b51540a5d5e2ddaa8241b9b2",
+      "reference": {
+        "algorithm": "sha256",
+        "expected": "3a8032ceaeaaf062bbc9cc0ad5c4a1af261f1f15b51540a5d5e2ddaa8241b9b2",
+        "jsonExpected": true,
+        "original": "hash:sha256:3a8032ceaeaaf062bbc9cc0ad5c4a1af261f1f15b51540a5d5e2ddaa8241b9b2",
+        "pointer": "/commands/17/receiptSha256",
+        "traversalRole": "evidence"
+      }
+    },
+    {
+      "error": "Expected version unavailable: hash:sha256:275e60103c651f107604673fa23ce7b3070c76d36801fbc486a89392c0829ae8 275e60103c651f107604673fa23ce7b3070c76d36801fbc486a89392c0829ae8",
+      "reference": {
+        "algorithm": "sha256",
+        "expected": "275e60103c651f107604673fa23ce7b3070c76d36801fbc486a89392c0829ae8",
+        "jsonExpected": true,
+        "original": "hash:sha256:275e60103c651f107604673fa23ce7b3070c76d36801fbc486a89392c0829ae8",
+        "pointer": "/commands/2/receiptSha256",
+        "traversalRole": "evidence"
+      }
+    },
+    {
+      "error": "Expected version unavailable: hash:sha256:756063c5dcfd0dc5046684617b73ba9350cec56de407cba73a72cdbcd01f3e0b 756063c5dcfd0dc5046684617b73ba9350cec56de407cba73a72cdbcd01f3e0b",
+      "reference": {
+        "algorithm": "sha256",
+        "expected": "756063c5dcfd0dc5046684617b73ba9350cec56de407cba73a72cdbcd01f3e0b",
+        "jsonExpected": true,
+        "original": "hash:sha256:756063c5dcfd0dc5046684617b73ba9350cec56de407cba73a72cdbcd01f3e0b",
+        "pointer": "/commands/3/receiptSha256",
+        "traversalRole": "evidence"
+      }
+    },
+    {
+      "error": "Expected version unavailable: hash:sha256:247338cfac7d5bd1d3010c1a74161726fa5377f8c1d3e855bd7d1f2e169cee9b 247338cfac7d5bd1d3010c1a74161726fa5377f8c1d3e855bd7d1f2e169cee9b",
+      "reference": {
+        "algorithm": "sha256",
+        "expected": "247338cfac7d5bd1d3010c1a74161726fa5377f8c1d3e855bd7d1f2e169cee9b",
+        "jsonExpected": true,
+        "original": "hash:sha256:247338cfac7d5bd1d3010c1a74161726fa5377f8c1d3e855bd7d1f2e169cee9b",
+        "pointer": "/commands/4/receiptSha256",
+        "traversalRole": "evidence"
+      }
+    },
+    {
+      "error": "Expected version unavailable: hash:sha256:b88ded1ca46373a9f40a931c16f33eaf124bf7dd1fd166ce390b608c4e7cbe7d b88ded1ca46373a9f40a931c16f33eaf124bf7dd1fd166ce390b608c4e7cbe7d",
+      "reference": {
+        "algorithm": "sha256",
+        "expected": "b88ded1ca46373a9f40a931c16f33eaf124bf7dd1fd166ce390b608c4e7cbe7d",
+        "jsonExpected": true,
+        "original": "hash:sha256:b88ded1ca46373a9f40a931c16f33eaf124bf7dd1fd166ce390b608c4e7cbe7d",
+        "pointer": "/commands/5/receiptSha256",
+        "traversalRole": "evidence"
+      }
+    },
+    {
+      "error": "Expected version unavailable: hash:sha256:a106575f17f02b17d8755c7a58c09e8f43cd100ea7b9124fecc0e7e2d587a633 a106575f17f02b17d8755c7a58c09e8f43cd100ea7b9124fecc0e7e2d587a633",
+      "reference": {
+        "algorithm": "sha256",
+        "expected": "a106575f17f02b17d8755c7a58c09e8f43cd100ea7b9124fecc0e7e2d587a633",
+        "jsonExpected": true,
+        "original": "hash:sha256:a106575f17f02b17d8755c7a58c09e8f43cd100ea7b9124fecc0e7e2d587a633",
+        "pointer": "/commands/6/receiptSha256",
+        "traversalRole": "evidence"
+      }
+    },
+    {
+      "error": "Expected version unavailable: hash:sha256:258950c46c4ea1008f0ba071a20f7f2f97fc10b6e360ef87867056fcd163b0da 258950c46c4ea1008f0ba071a20f7f2f97fc10b6e360ef87867056fcd163b0da",
+      "reference": {
+        "algorithm": "sha256",
+        "expected": "258950c46c4ea1008f0ba071a20f7f2f97fc10b6e360ef87867056fcd163b0da",
+        "jsonExpected": true,
+        "original": "hash:sha256:258950c46c4ea1008f0ba071a20f7f2f97fc10b6e360ef87867056fcd163b0da",
+        "pointer": "/commands/7/receiptSha256",
+        "traversalRole": "evidence"
+      }
+    },
+    {
+      "error": "Expected version unavailable: hash:sha256:81e8c7f5c35ced1681b485cd2d3c507783013467bee55f3719962ea0e791f711 81e8c7f5c35ced1681b485cd2d3c507783013467bee55f3719962ea0e791f711",
+      "reference": {
+        "algorithm": "sha256",
+        "expected": "81e8c7f5c35ced1681b485cd2d3c507783013467bee55f3719962ea0e791f711",
+        "jsonExpected": true,
+        "original": "hash:sha256:81e8c7f5c35ced1681b485cd2d3c507783013467bee55f3719962ea0e791f711",
+        "pointer": "/commands/8/receiptSha256",
+        "traversalRole": "evidence"
+      }
+    },
+    {
+      "error": "Expected version unavailable: hash:sha256:73c33c1622d0e332d80ae10690fbf3025446b45a6a8758b1ede6651cc86faeee 73c33c1622d0e332d80ae10690fbf3025446b45a6a8758b1ede6651cc86faeee",
+      "reference": {
+        "algorithm": "sha256",
+        "expected": "73c33c1622d0e332d80ae10690fbf3025446b45a6a8758b1ede6651cc86faeee",
+        "jsonExpected": true,
+        "original": "hash:sha256:73c33c1622d0e332d80ae10690fbf3025446b45a6a8758b1ede6651cc86faeee",
+        "pointer": "/commands/9/receiptSha256",
+        "traversalRole": "evidence"
+      }
+    },
+    {
+      "error": "Expected version unavailable: hash:sha256:0000000000000000000000000000000000000000000000000000000000000000 0000000000000000000000000000000000000000000000000000000000000000",
+      "reference": {
+        "algorithm": "sha256",
+        "expected": "0000000000000000000000000000000000000000000000000000000000000000",
+        "jsonExpected": true,
+        "original": "hash:sha256:0000000000000000000000000000000000000000000000000000000000000000",
+        "pointer": "/sourceIdentity/planSha256",
+        "traversalRole": "evidence"
+      }
+    }
+  ]
+}

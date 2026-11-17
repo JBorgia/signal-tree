@@ -1,0 +1,9 @@
+{
+  "complete": true,
+  "limits": "Missing versions remain failures. Metadata-only digest classifications do not verify serialized domain values. Source recovery proves bytes, not semantic qualification.",
+  "parsedJsonVersions": 23659,
+  "resolvedVersionCount": 124050,
+  "selectedFileCount": 64760,
+  "selectedRootCount": 630,
+  "unresolved": []
+}

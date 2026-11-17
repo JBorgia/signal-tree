@@ -1,5 +1,11 @@
 # TODO
 
+## Completed optimization sweep
+
+- [x] Complete the [coverage and candidate ledger](docs/audits/2026-11-17-optimization-sweep/CANDIDATES.md), inspecting relevant history and independently challenging consequential premises.
+- [x] Prototype and falsify promising mechanisms; measure startup, first demand, steady work, pending/retained heap and delivered cost as applicable.
+- [x] Combine worthwhile changes, qualify exact artifacts, rerun affected comparisons, independently review interpretation and report the results with portable verified evidence.
+
 ## Every demo-site update
 
 - [ ] Review every demo for clarity and ease of understanding: make its purpose,

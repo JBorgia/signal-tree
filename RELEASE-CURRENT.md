@@ -5,6 +5,36 @@ first failures and sealed predecessors remain evidence, not competing queues.
 
 ## Active owner instruction
 
+### November 17 broader optimization sweep — complete
+
+The owner directs continuing across optimization options and areas before
+reporting again. The [new protocol](docs/audits/2026-11-17-optimization-sweep/PROTOCOL.md)
+and [candidate ledger](docs/audits/2026-11-17-optimization-sweep/CANDIDATES.md)
+preserve the completed C1/v15 study as baselines and track concrete mechanisms,
+falsifiers, costs and dispositions. The bounded mechanism investigation is complete;
+selected changes and rejected alternatives retain their adverse profiles and
+unpriced questions. Runtime checkpoint `7ab6cbcc70bf5abe9c5070e38a51bd0229ed1830`
+on `codex/v16-optimization-sweep` completes86/87 fresh normal release gates, with
+only the unchanged numerical bundle ceiling failing and source unchanged.
+All87 mutation checks now complete with source restored exactly. The fresh five
+canonical packages and193 shipped files verify, including installed consumers,
+Angular AOT and facade/SSR. Demo behavior passes137 checks; the sole remaining
+route assertion and strict production build fail the unchanged numerical size
+ceilings. Final eight-arm application, full-native CPU/heap and N100 capture
+comparisons complete, with independent raw verification and interpretation.
+Retain the selected runtime as a locally qualified release candidate with explicit
+numerical-size exceptions under the owner's cost/feasibility instruction. Ordinary
+startup, smaller rollback and edit/capture costs remain documented; no broad
+speedup or universal memory bound is claimed. The portable evidence archive
+verifies after extraction with original-file opens denied; corrupt/missing payload
+controls and ordered-part reassembly pass. Final documentation and review-branch
+sharing close this phase. The [evidence index](docs/audits/2026-11-17-optimization-sweep/EVIDENCE.json)
+records exact identities, checks and historical scope limits.
+The study lives on `codex/optimization-sweep`; v15's narrow compatible correction
+remains `4d1142d61`. Prepared v15 and C1 comparison artifacts stay unchanged.
+No public guarantee, numerical ceiling, release publication or deployment changes
+through this investigation. Cost acceptance and numerical results remain distinct.
+
 ### November 11 maintenance preparation and human/agent collaboration — complete
 
 The owner accepted the completed study's recommendations and requested broader

@@ -1,0 +1,14 @@
+{
+  "complete": false,
+  "limits": "Missing versions remain failures. Metadata-only digest classifications do not verify serialized domain values. Source recovery proves bytes, not semantic qualification.",
+  "parsedJsonVersions": 0,
+  "resolvedVersionCount": 0,
+  "selectedFileCount": 64676,
+  "selectedRootCount": 630,
+  "unresolved": [
+    {
+      "error": "'str' object has no attribute 'get'",
+      "stage": "selection-or-configuration"
+    }
+  ]
+}

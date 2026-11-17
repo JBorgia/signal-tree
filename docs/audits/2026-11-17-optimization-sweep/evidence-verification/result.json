@@ -1,0 +1,134 @@
+{
+  "passed": true,
+  "completedUTC": "2026-11-17T20:56:27.743293+00:00",
+  "closure": {
+    "path": "/Users/jonathanborgia/code/signaltree/artifacts/optimization-sweep-closure-final-6/closure.json",
+    "sha256": "dd6799652a6e237cdff5ce260c8ea3b91572a684458fe8b27017dd88b7824db6"
+  },
+  "selector": {
+    "path": "/Users/jonathanborgia/code/signaltree/.worktrees/agent-collaboration-evaluation/tools/optimization-sweep/archive-selection.py",
+    "sha256": "12811cbe60f20da9f9a873c1bd7b854d16cd5d2a1ec34c439b05178190517f76"
+  },
+  "legacyVerifier": {
+    "path": "/Users/jonathanborgia/code/signaltree/.worktrees/agent-collaboration-evaluation/tools/application-lab/archive-evidence.py",
+    "sha256": "71683eb8d1a3a7470aa859fa87882222000e6795ca7fc6b33d37281000025c1f"
+  },
+  "originalReadDenialWrapper": {
+    "path": "/Users/jonathanborgia/code/signaltree/artifacts/optimization-sweep-final-packaging-1/original-free-source11/original-free.py",
+    "sha256": "b51ecebb02ef27551057f8095ede26dbcab8347d9d37b3df6013fe1a5f6423b7"
+  },
+  "archive": {
+    "path": "/Users/jonathanborgia/code/signaltree/artifacts/optimization-sweep-final-packaging-1/archive-pipeline-1/evidence.tar.gz",
+    "bytes": 804932468,
+    "sha256": "44e14f2fbd07617feeb94b0f003d1cb3993d6aebdcfd3ec1ce64c30d1da976d7",
+    "manifestSha256": "c35635a5c690f9b3f919eb4b1f1751e36b92d0484039908405ee680e9ab74688",
+    "partsInOrder": [
+      {
+        "file": "evidence.tar.gz.part-001",
+        "bytes": 90000000,
+        "sha256": "d19f3b121c4b55b638ab9cc7d9f132da3a21c33ed12281ee897d64289d1120d9"
+      },
+      {
+        "file": "evidence.tar.gz.part-002",
+        "bytes": 90000000,
+        "sha256": "207c43a9e68ff5e8f51e57042f4f883adbf4cba362d45b56fe1c48116e1f02bc"
+      },
+      {
+        "file": "evidence.tar.gz.part-003",
+        "bytes": 90000000,
+        "sha256": "5ba964539a31aa5e9b1fe8454abce45019eef8bd4f5c4e57744cb674388d4de8"
+      },
+      {
+        "file": "evidence.tar.gz.part-004",
+        "bytes": 90000000,
+        "sha256": "4029ac38f03b411fb99ff5ba1058bdd04a556c51564bef8f4c410d1542b8f9da"
+      },
+      {
+        "file": "evidence.tar.gz.part-005",
+        "bytes": 90000000,
+        "sha256": "78824fa3f1fa25790ea654ffdc112b6615874b1a76d9db73695af67adcee91c2"
+      },
+      {
+        "file": "evidence.tar.gz.part-006",
+        "bytes": 90000000,
+        "sha256": "da14bf46af5ee909e4b00cd54739bad17f46b6402a8da92011e9bb4452c98515"
+      },
+      {
+        "file": "evidence.tar.gz.part-007",
+        "bytes": 90000000,
+        "sha256": "7a8313ce71a00722f1e134d3f914d318a15f88d9798c60ae28de83c37f9cb77f"
+      },
+      {
+        "file": "evidence.tar.gz.part-008",
+        "bytes": 90000000,
+        "sha256": "6eed05ed242c21758bca65ee594d961b115863d9cf18a8702f9de4bf13b1865c"
+      },
+      {
+        "file": "evidence.tar.gz.part-009",
+        "bytes": 84932468,
+        "sha256": "0a664e111a1c9876186733e2d5bc4c1968e15de032d146d099fdb8baa72aaf5f"
+      }
+    ]
+  },
+  "counts": {
+    "originalVersionMappings": 124053,
+    "uniquePayloads": 33695,
+    "payloadBytes": 2954825036
+  },
+  "checks": [
+    {
+      "name": "create",
+      "receipt": "/Users/jonathanborgia/code/signaltree/artifacts/optimization-sweep-final-packaging-1/archive-pipeline-1/create/receipt.json",
+      "receiptSha256": "58bc8be38b7271c6110576228accc110a0d456775626aef291c1ada37d702741",
+      "exitCode": 0
+    },
+    {
+      "name": "pack",
+      "receipt": "/Users/jonathanborgia/code/signaltree/artifacts/optimization-sweep-final-packaging-1/archive-pipeline-1/pack/receipt.json",
+      "receiptSha256": "4c8e2ae3e6943dc6709b278750e4f7cee00c2e498d015604260966a681920b69",
+      "exitCode": 0
+    },
+    {
+      "name": "extract",
+      "receipt": "/Users/jonathanborgia/code/signaltree/artifacts/optimization-sweep-final-packaging-1/archive-pipeline-1/extract/receipt.json",
+      "receiptSha256": "4ab622c332e2aeecfde577b5b4022404b9e3ce1f9fa76f5a122341c8a35edd8f",
+      "exitCode": 0
+    },
+    {
+      "name": "verify-extracted",
+      "receipt": "/Users/jonathanborgia/code/signaltree/artifacts/optimization-sweep-final-packaging-1/archive-pipeline-1/verify-extracted/receipt.json",
+      "receiptSha256": "7c32ccd839994c6d9375b5fe98798ed8be8de561cb3cbe4257e835c3e2cc11b7",
+      "exitCode": 0
+    },
+    {
+      "name": "reject-corrupt",
+      "receipt": "/Users/jonathanborgia/code/signaltree/artifacts/optimization-sweep-final-packaging-1/archive-pipeline-1/reject-corrupt/receipt.json",
+      "receiptSha256": "4a04b15c80d52391718d5ff087a17e67813beb733f9cf8a1d1eefc6d6ce2cceb",
+      "exitCode": 1
+    },
+    {
+      "name": "reject-missing",
+      "receipt": "/Users/jonathanborgia/code/signaltree/artifacts/optimization-sweep-final-packaging-1/archive-pipeline-1/reject-missing/receipt.json",
+      "receiptSha256": "0e0be3fd40fb6dfdeec217dfc843c17921816fcaa186288d9ebeb2c5dc08ed60",
+      "exitCode": 1
+    },
+    {
+      "name": "original-read-denial-restored",
+      "receipt": "/Users/jonathanborgia/code/signaltree/artifacts/optimization-sweep-final-packaging-1/archive-pipeline-1/original-read-denial-restored/receipt.json",
+      "receiptSha256": "ebe59b2830f66c3725461367f660aa3a2a1e3b862b48e66281822bca1ed19fa3",
+      "exitCode": 0
+    }
+  ],
+  "corruptionControl": {
+    "payloadDigest": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+    "bytes": 2,
+    "restored": true
+  },
+  "reassembledBytesIdentical": true,
+  "limits": [
+    "Integrity and typed evidence-reference closure, not authenticity or a universal semantic claim.",
+    "Full predecessor index bytes and producer-selected members are checked; unrelated historical members are not requalified.",
+    "Original-read denial is a Python open/dependency audit of this known verifier, not an OS security sandbox.",
+    "Post-packaging receipts and the final public index are external to avoid a self-hash cycle."
+  ]
+}

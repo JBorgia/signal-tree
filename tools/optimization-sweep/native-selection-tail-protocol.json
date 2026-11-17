@@ -1,0 +1,19 @@
+{
+  "version": 3,
+  "sourceReference": "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/capture/fresh-generator/capture-cost.mjs",
+  "sourceReferenceSha256": "6ee0aeb434939e90897126d6ea213a40b60e0f5f70478df6693fa5caaff2329b",
+  "question": "Price C1, N dual invalidation and N tail-only invalidation with identical all-arm pre-import verification and a complete no-history100-operation episode. No runtime/API change.",
+  "profiles": {
+    "no-history": "1000live nine-fieldrows,20initial meaningful updates. Original20edit/capture prefix unchanged;80more operations revisit same20IDs withfreshvalues. Everyoperation mustretain11000representedfacts and21selections.",
+    "homogeneous": "10\u00d71000 bulk population/rollback lifetimes, no live rows.",
+    "mixed": "5\u00d7200 bulk rollback plus256 distinct reverse rollback, then200 live rows. Fallback must exist before live population."
+  },
+  "schedule": "Per CPU or heap cohort:3profiles\u00d73matched three-arm rounds=27primary children, plus1C1 A/A pair perprofile=6, total33. Each profile rotates every arm through all3 positions across3rounds. Eight planted controls (four each ondual/tail) precede each cohort. No early samples discarded.",
+  "metrics": "First cold capture and19warm captures remain separate from alternating edits. no-history retains the original first20 timed operations (live0..19,f0=20000+i), then revisits those same20IDs with fresh f0=20000+i for100total. Report operation1\u201320,21\u201340,41\u2013100 andtotal100, retaining every sample. Each operation independently asserts11000logicalfacts,21selected references,11000executed visits,exact current value/ref/owner and fresh captures. Per-op snapshots/counter oracles are outside each timer. CPU/elapsed only CPU children. Heap retains original four-GC capture before/held/released checkpoints; no separate100-op allocated-byte or final-store heap claim.",
+  "preservation": "Original native-selection-screen.mjs/source2 remains unchanged. New generator snapshots predecessor source/protocol; all results/newplans distinct. Fresh captures and owner arrays, role flags, exact requirement/owner identities,logicalfacts,expanded traversal positivecontrol anddestroy/drain retained. Strictpoint/ordinarykernel qualification separate.",
+  "limits": "Direct built ESM barrel with native factory present and production environment; no minified facade/browser/startup/recipient/workflow claim. No savings inferred for cached public root reads.",
+  "predecessorGenerator": "/Users/jonathanborgia/code/signaltree/.worktrees/agent-collaboration-evaluation/tools/optimization-sweep/native-selection-screen.mjs",
+  "predecessorGeneratorSha256": "ef12d335a4931ae942c8302e100fedd8395177da51a9d8d4416e60bb8f2e7de9",
+  "prehistory": "Every child parses the same plan and verifies every bound arm in fixed baseline/dual/tail order before any runtime import or timing, and again after work. Source snapshot and package hashing asymmetry cannot depend on selected arm. Runtime imports remain one selected exact package in each fresh process. Plan/source/protocol/Node/artifact identities remain bound.",
+  "controls": "Missing capture, swapped requirement and swapped owner original controls usehomogeneous history ondual andtail. Missing post-edit invalidation control usesno-history: after a useful timed edit/capture, substitute fresh wrappers over pre-edit references; exact post-edit reference oracle mustreject. Independent execution counts are additionalchecks, not a substitute for usefulbehavior."
+}

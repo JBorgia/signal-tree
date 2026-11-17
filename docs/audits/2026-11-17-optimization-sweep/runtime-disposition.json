@@ -1,0 +1,71 @@
+{
+  "kind": "root-final-runtime-adoption-and-economic-disposition-v1",
+  "createdUTC": "2026-11-17T18:18:07.531973+00:00",
+  "ownerAuthority": "Continue optimization/qualification; weigh budgets against benefit, cost and feasibility; existing review-branch sharing authority. No new release publication selected.",
+  "runtimeHeads": {
+    "v16": "7ab6cbcc70bf5abe9c5070e38a51bd0229ed1830",
+    "v15": "4d1142d6166b2d5b2874715e38097665545864dc"
+  },
+  "decision": "Adopt selected internal changes; local release-candidate qualification is complete with explicit numerical-size exceptions. No remaining demonstrated semantic/admission blocker in the bounded investigation.",
+  "allNumericalGatesPass": false,
+  "budgetsChanged": false,
+  "publicConfigurationAdded": false,
+  "publicGuaranteesWeakened": false,
+  "publicationSelected": false,
+  "bindings": {
+    "/Users/jonathanborgia/code/signaltree/artifacts/optimization-sweep-2026-11-17/final-integrated-qualification/v16-normal-gates-1-result.json": "f575b367b6b0a15daaaa02256704ad67fbfcd6cb60e58e94a9eadc930a102705",
+    "/Users/jonathanborgia/code/signaltree/artifacts/optimization-sweep-2026-11-17/final-integrated-qualification/v16-mutations-gates-1-result.json": "b4d85f0a0fdedca4d787dfe03bbe0354d8a03ccdbf3a3ed91610b6c4c27153f8",
+    "/Users/jonathanborgia/code/signaltree/artifacts/optimization-sweep-2026-11-17/final-integrated-qualification/qualified-packages-seal.json": "45b30e08cc49a01e9f7dfd4abb64655e5eb1338d2e4ae6410fc9f0b74649c778",
+    "/Users/jonathanborgia/code/signaltree/artifacts/optimization-sweep-2026-11-17/final-integrated-qualification/v16-final-artifact-checks/result.json": "fb0fa159a0d3e3a80712a870e235c8f6acaedef8dee462ffc63ef64538aeb666",
+    "/Users/jonathanborgia/code/signaltree/artifacts/optimization-sweep-2026-11-17/v15-normal-gates-1-result.json": "86de6a27e11bea6d8097fb1c391516b52f4ec7716e2689532192854c00e87809",
+    "/Users/jonathanborgia/code/signaltree/artifacts/optimization-sweep-2026-11-17/v15-mutations-gates-1-result.json": "0a98903a49c4625307b20adb257a3bbaaa8386af1e0e293614728458454d8ccb",
+    "/Users/jonathanborgia/code/signaltree/artifacts/optimization-sweep-2026-11-17/v15-final-artifact-checks/result.json": "bc4ea8603d3ff2e80feb8a0c31e96ba994c8aece91a75a6befaa0e5fa7e39758",
+    "/Users/jonathanborgia/code/signaltree/artifacts/optimization-sweep-2026-11-17/t-application-final-run-1/driver-results.json": "d4aa85b62c9475744af90e26b1c0ef6dec2c5d2756e1023baff486d439869550",
+    "/Users/jonathanborgia/code/signaltree/artifacts/optimization-sweep-2026-11-17/t-native-final-run-1/driver-results.json": "db51e06cc9636026493d279761a6d34b3fa6a4a03a6cf82ca736c5f7c988c03a",
+    "/Users/jonathanborgia/code/signaltree/artifacts/optimization-sweep-2026-11-17/t-n100-final-run-1/driver-results.json": "0a43ad61e60351eeba6ae260d73803480f28355aafaf57b5d7f0ec385bc1a3a7",
+    "/Users/jonathanborgia/code/signaltree/artifacts/optimization-sweep-2026-11-17/v16-bundle-economics-final-1/result.json": "a42f4868d53df416412f60d8fd50c04319524ccc6d3fb6b080456e764c00fa49",
+    "/Users/jonathanborgia/code/signaltree/artifacts/optimization-sweep-2026-11-17/v15-bundle-economics-2/result.json": "80c769b596de0562c5064a327ac48cd6a1079e0986cf5c739be50295e5894af0",
+    "/Users/jonathanborgia/code/signaltree/artifacts/optimization-sweep-2026-11-17/reviews/final-integrated-application/run-1/closure.json": "2a0fbc8e92ee253b047534dddac28d20ab5474e203681f9749ac0979563bb38f",
+    "/Users/jonathanborgia/code/signaltree/artifacts/optimization-sweep-2026-11-17/reviews/final-integrated-application/run-1/interpretation.json": "08186dc29fa4501f032af26957df51d3325c8efee52c941a50b8f7f2bc054326",
+    "/Users/jonathanborgia/code/signaltree/artifacts/optimization-sweep-2026-11-17/reviews/final-integrated-application/run-1/host-context-addendum.json": "f9cac4045646432540f02a1793a2a024b55f98fdbe74b1fdf77123c53265b350",
+    "/Users/jonathanborgia/code/signaltree/artifacts/optimization-sweep-2026-11-17/reviews/final-integrated-native-qualification/run-1/receipt-2.json": "bdd0b2b2148165dcc85bd82750b59d467722ecdaa810474380795174d0fc8677",
+    "/Users/jonathanborgia/code/signaltree/artifacts/optimization-sweep-2026-11-17/reviews/final-integrated-bundle/run-1/review.json": "d3eb0e28276c645defdb2e0682cc87adf6d7abd01c3b0b2fe876a19709febc67",
+    "/Users/jonathanborgia/code/signaltree/artifacts/optimization-sweep-2026-11-17/reviews/direct-empty-egress-raw/receipt.json": "bcaa05fbc31b1ab085e9e8a32a6cf53b49b497ee81f5e48d8b406063879135b3",
+    "/Users/jonathanborgia/code/signaltree/artifacts/optimization-sweep-2026-11-17/reviews/sparse-terminal-facets-raw/receipt.json": "6c348ba33ff0b8ea4d19c537e86f19d83ecf458fd9f836bf4733247ac7c3b990",
+    "/Users/jonathanborgia/code/signaltree/artifacts/optimization-sweep-2026-11-17/reviews/sparse-terminal-facets-fragmented-raw/receipt.json": "996bcc5b99ab8556a0548e02d9bf55f2520ac92c483570754bf3b6cc811a334a",
+    "/Users/jonathanborgia/code/signaltree/artifacts/optimization-sweep-2026-11-17/reviews/terminal-wakeup-raw-independent/receipt.json": "4db85298f192098de0e4a6edea12093848d056527e0f58143fbd7f34a620d9aa",
+    "/Users/jonathanborgia/code/signaltree/artifacts/optimization-sweep-2026-11-17/reviews/historical-operation-retirement-cost-raw-independent/receipt.json": "0597f655519de2c419b8eed5ebbd926d3022583d3e439cd653ac72b96b6a5c51",
+    "/Users/jonathanborgia/code/signaltree/artifacts/optimization-sweep-2026-11-17/reviews/i-proof-and-counter-followup-independent/review.json": "6ec1bee06ca9f7f96572335d4a2a30332868e835a4315f177d9218cece8d75be",
+    "/Users/jonathanborgia/code/signaltree/artifacts/optimization-sweep-2026-11-17/reviews/optimization-scope-closure/source-1/review.json": "88dbab38644289f64ad4aa8377be91e7145902aeb0947cfc604cb1b47bce489e"
+  },
+  "rationale": [
+    "T removes direct empty-retirement reads with a substantial confirmed bulk-work benefit; retain its adverse rollback profiles.",
+    "U retains exact absent-placement facts in packed runs; accept confirmed-history memory savings with measured CPU cost and no uniform fragmented-proof benefit.",
+    "H removes terminal notification memberships after required wake selection; long rollback history improves while short-history profiles remain mixed.",
+    "I removes only this reduction's eligible completed noncurrent operations after an actual-current/drained recheck. Exact historical proofs remain. Strong retained-state savings justify the narrow change despite ordinary32 recorded lifecycle CPU increases whose cause is not established.",
+    "The v15 change is the compatible diagnostic-suffix scan correction; it is not a wholesale v16 backport or a broad ordinary-app speed claim.",
+    "The final same-strategy app, active-native workflow, capture and canonical/native fixture comparisons preserve their exact independent workload boundaries. No new optional public switch has demonstrated a sufficient compatible overall benefit."
+  ],
+  "economicException": {
+    "v15": "Accept the unchanged specific entity gzip excess (40.2 production/113 development bytes); numerical failure preserved.",
+    "v16": "Accept this identified candidate's existing bare/entity/demo numerical misses and measured delivered-cost increment in exchange for retained guarantees and the documented workload improvements. Canonical bare is unchanged; entities add57/66 prod/dev gzip bytes; neutral native-workflow fixture adds351 gzip bytes. This is candidate-specific, not a new ceiling or blanket future exception."
+  },
+  "limits": [
+    "Native summed recorded stages omit pending flush, Link disposal/drain, post-destroy flush, input generation and most oracles; do not call them end-to-end CPU. Isolated H/I four-phase totals include their explicit teardown phases.",
+    "Ordinary v16 construction remains expensive; no general amortization crossover or rival-library ranking is established. Shared development-host measurements are descriptive, not significance or exclusive-host evidence.",
+    "Small native rollback and edit/capture results include adverse samples. Pending/retained/immediate heap checkpoints differ; finite GC and weak-reference observations are not universal leak bounds.",
+    "Module-absent D does not price a module-present per-tree activation option; that specific opportunity remains unpriced without a compatible demonstrated mechanism.",
+    "A full equivalent v16-guarantee NgRx implementation and engineering burden are not priced. Durable backends, authorization, cross-tab policy and model quality remain application/service work.",
+    "This closes actionable mechanisms in the registered sweep, not every possible future optimization."
+  ],
+  "remainingPhaseWork": [
+    "Final source-template-aware archive closure with exact historical versions and corruption/missing/restoration controls",
+    "Final report/controller/doc gates and review-branch commits/push verification"
+  ],
+  "notSelected": [
+    "new version/tag",
+    "merge",
+    "registry publication",
+    "demo deployment"
+  ]
+}

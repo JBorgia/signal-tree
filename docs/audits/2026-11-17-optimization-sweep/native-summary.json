@@ -1,0 +1,3440 @@
+{
+  "passed": true,
+  "packetSha256": "eb0e5b9103a444e4f36287fa3afc38199504faa6070803ed0a77c8a10e304fb2",
+  "command": [
+    "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+    "/Users/jonathanborgia/code/signaltree/artifacts/optimization-sweep-2026-11-17/t-native-final-run-1/packet/tools/analyze.mjs",
+    "/Users/jonathanborgia/code/signaltree/artifacts/optimization-sweep-2026-11-17/t-native-final-run-1/cpu/execution/results.json",
+    "/Users/jonathanborgia/code/signaltree/artifacts/optimization-sweep-2026-11-17/t-native-final-run-1/heap/execution/results.json",
+    "/Users/jonathanborgia/code/signaltree/artifacts/optimization-sweep-2026-11-17/t-native-final-run-1/functional/execution/results.json",
+    "/Users/jonathanborgia/code/signaltree/artifacts/optimization-sweep-2026-11-17/t-native-final-run-1/analysis"
+  ],
+  "inputs": {
+    "/Users/jonathanborgia/code/signaltree/artifacts/optimization-sweep-2026-11-17/t-native-final-run-1/cpu/execution/results.json": "9ade39d2e6ac6ea18317207d3a331ed45fedff1ed960320f68351f4e549ed9bc",
+    "/Users/jonathanborgia/code/signaltree/artifacts/optimization-sweep-2026-11-17/t-native-final-run-1/heap/execution/results.json": "b06f476fcd07a43cdb55e5fd931ada5afd37692eca7dde1a844ae9e0eebb089e",
+    "/Users/jonathanborgia/code/signaltree/artifacts/optimization-sweep-2026-11-17/t-native-final-run-1/functional/execution/results.json": "a99726ad1c5e37f224847df9b788e911e41060772e6d5f9e8b5f292b50478845"
+  },
+  "counts": {
+    "cpu": 32,
+    "heap": 12,
+    "functional": 12
+  },
+  "comparisons": [
+    {
+      "rows": 1000,
+      "settlement": "confirm",
+      "cycles": 10,
+      "cpu": {
+        "before": {
+          "population.elapsedMs": {
+            "values": [
+              3879.759834,
+              4131.659125,
+              3680.3603759999996
+            ],
+            "median": 3879.759834,
+            "min": 3680.3603759999996,
+            "max": 4131.659125
+          },
+          "population.cpuMs": {
+            "values": [
+              2910.493,
+              3184.13,
+              3542.6460000000006
+            ],
+            "median": 3184.13,
+            "min": 2910.493,
+            "max": 3542.6460000000006
+          },
+          "settlementSync.elapsedMs": {
+            "values": [
+              185.132124,
+              119.36274999999999,
+              138.714666
+            ],
+            "median": 138.714666,
+            "min": 119.36274999999999,
+            "max": 185.132124
+          },
+          "settlementSync.cpuMs": {
+            "values": [
+              186.218,
+              136.12699999999998,
+              142.76199999999997
+            ],
+            "median": 142.76199999999997,
+            "min": 136.12699999999998,
+            "max": 186.218
+          },
+          "settlementIncludingDrain.elapsedMs": {
+            "values": [
+              1868.790835,
+              1309.485208,
+              1209.7471679999999
+            ],
+            "median": 1309.485208,
+            "min": 1209.7471679999999,
+            "max": 1868.790835
+          },
+          "settlementIncludingDrain.cpuMs": {
+            "values": [
+              1412.3470000000002,
+              1150.112,
+              1285.368
+            ],
+            "median": 1285.368,
+            "min": 1150.112,
+            "max": 1412.3470000000002
+          }
+        },
+        "after": {
+          "population.elapsedMs": {
+            "values": [
+              3933.99,
+              4067.39746,
+              3277.5013320000003
+            ],
+            "median": 3933.99,
+            "min": 3277.5013320000003,
+            "max": 4067.39746
+          },
+          "population.cpuMs": {
+            "values": [
+              3150.999,
+              3357.1240000000003,
+              3259.399
+            ],
+            "median": 3259.399,
+            "min": 3150.999,
+            "max": 3357.1240000000003
+          },
+          "settlementSync.elapsedMs": {
+            "values": [
+              196.57470600000002,
+              169.144958,
+              198.71837600000003
+            ],
+            "median": 196.57470600000002,
+            "min": 169.144958,
+            "max": 198.71837600000003
+          },
+          "settlementSync.cpuMs": {
+            "values": [
+              136.14100000000002,
+              143.132,
+              141.672
+            ],
+            "median": 141.672,
+            "min": 136.14100000000002,
+            "max": 143.132
+          },
+          "settlementIncludingDrain.elapsedMs": {
+            "values": [
+              1479.0291650000001,
+              699.132334,
+              779.143167
+            ],
+            "median": 779.143167,
+            "min": 699.132334,
+            "max": 1479.0291650000001
+          },
+          "settlementIncludingDrain.cpuMs": {
+            "values": [
+              721.698,
+              806.865,
+              851.2990000000001
+            ],
+            "median": 806.865,
+            "min": 721.698,
+            "max": 851.2990000000001
+          }
+        }
+      },
+      "pairedAfterMinusBefore": {
+        "population.elapsedMs": [
+          54.23016599999983,
+          -64.261665,
+          -402.85904399999936
+        ],
+        "population.cpuMs": [
+          240.50599999999986,
+          172.99400000000014,
+          -283.24700000000075
+        ],
+        "settlementSync.elapsedMs": [
+          11.442582000000016,
+          49.78220800000001,
+          60.00371000000004
+        ],
+        "settlementSync.cpuMs": [
+          -50.07699999999997,
+          7.005000000000024,
+          -1.089999999999975
+        ],
+        "settlementIncludingDrain.elapsedMs": [
+          -389.76166999999987,
+          -610.352874,
+          -430.6040009999999
+        ],
+        "settlementIncludingDrain.cpuMs": [
+          -690.6490000000002,
+          -343.24700000000007,
+          -434.06899999999985
+        ]
+      },
+      "baselineAASecondMinusFirst": {
+        "population.elapsedMs": -1.9652079999996204,
+        "population.cpuMs": -291.9829999999997,
+        "settlementSync.elapsedMs": 28.269997999999987,
+        "settlementSync.cpuMs": 58.05800000000002,
+        "settlementIncludingDrain.elapsedMs": 71.91166699999997,
+        "settlementIncludingDrain.cpuMs": 55.819999999999936
+      },
+      "memory": {
+        "before": [
+          {
+            "aa": false,
+            "before": 5595888,
+            "empty": 6026184,
+            "cycles": [
+              {
+                "cycle": 1,
+                "pending": 13655408,
+                "settledHandleHeld": 12199320,
+                "settledHandleDropped": 12082352,
+                "helperReturned": 11954704,
+                "resources": {
+                  "checkedRetired": 0,
+                  "retiredLifetimes": 0,
+                  "retiredValueBackings": 0,
+                  "currentSubjects": 1000,
+                  "active": 1000,
+                  "facades": 0,
+                  "reclamationCandidates": 0
+                },
+                "sampled": {
+                  "payloadAlive": true,
+                  "transactionAlive": false,
+                  "previousPayloadAlive": false
+                }
+              },
+              {
+                "cycle": 2,
+                "pending": 16292824,
+                "settledHandleHeld": 13648752,
+                "settledHandleDropped": 13431784,
+                "helperReturned": 13303216,
+                "resources": {
+                  "checkedRetired": 1000,
+                  "retiredLifetimes": 0,
+                  "retiredValueBackings": 0,
+                  "currentSubjects": 1000,
+                  "active": 1000,
+                  "facades": 0,
+                  "reclamationCandidates": 0
+                },
+                "sampled": {
+                  "payloadAlive": true,
+                  "transactionAlive": false,
+                  "previousPayloadAlive": false
+                }
+              },
+              {
+                "cycle": 3,
+                "pending": 17312176,
+                "settledHandleHeld": 14218776,
+                "settledHandleDropped": 13973944,
+                "helperReturned": 13845448,
+                "resources": {
+                  "checkedRetired": 1000,
+                  "retiredLifetimes": 0,
+                  "retiredValueBackings": 0,
+                  "currentSubjects": 1000,
+                  "active": 1000,
+                  "facades": 0,
+                  "reclamationCandidates": 0
+                },
+                "sampled": {
+                  "payloadAlive": true,
+                  "transactionAlive": false,
+                  "previousPayloadAlive": false
+                }
+              },
+              {
+                "cycle": 4,
+                "pending": 17437880,
+                "settledHandleHeld": 14445584,
+                "settledHandleDropped": 14193360,
+                "helperReturned": 14064560,
+                "resources": {
+                  "checkedRetired": 1000,
+                  "retiredLifetimes": 0,
+                  "retiredValueBackings": 0,
+                  "currentSubjects": 1000,
+                  "active": 1000,
+                  "facades": 0,
+                  "reclamationCandidates": 0
+                },
+                "sampled": {
+                  "payloadAlive": true,
+                  "transactionAlive": false,
+                  "previousPayloadAlive": false
+                }
+              },
+              {
+                "cycle": 5,
+                "pending": 18259784,
+                "settledHandleHeld": 15072736,
+                "settledHandleDropped": 14878784,
+                "helperReturned": 14749984,
+                "resources": {
+                  "checkedRetired": 1000,
+                  "retiredLifetimes": 0,
+                  "retiredValueBackings": 0,
+                  "currentSubjects": 1000,
+                  "active": 1000,
+                  "facades": 0,
+                  "reclamationCandidates": 0
+                },
+                "sampled": {
+                  "payloadAlive": true,
+                  "transactionAlive": false,
+                  "previousPayloadAlive": false
+                }
+              },
+              {
+                "cycle": 6,
+                "pending": 18290088,
+                "settledHandleHeld": 15313448,
+                "settledHandleDropped": 15056536,
+                "helperReturned": 14927736,
+                "resources": {
+                  "checkedRetired": 1000,
+                  "retiredLifetimes": 0,
+                  "retiredValueBackings": 0,
+                  "currentSubjects": 1000,
+                  "active": 1000,
+                  "facades": 0,
+                  "reclamationCandidates": 0
+                },
+                "sampled": {
+                  "payloadAlive": true,
+                  "transactionAlive": false,
+                  "previousPayloadAlive": false
+                }
+              },
+              {
+                "cycle": 7,
+                "pending": 19565160,
+                "settledHandleHeld": 16357872,
+                "settledHandleDropped": 16159928,
+                "helperReturned": 16028328,
+                "resources": {
+                  "checkedRetired": 1000,
+                  "retiredLifetimes": 0,
+                  "retiredValueBackings": 0,
+                  "currentSubjects": 1000,
+                  "active": 1000,
+                  "facades": 0,
+                  "reclamationCandidates": 0
+                },
+                "sampled": {
+                  "payloadAlive": true,
+                  "transactionAlive": false,
+                  "previousPayloadAlive": false
+                }
+              },
+              {
+                "cycle": 8,
+                "pending": 19591968,
+                "settledHandleHeld": 16579224,
+                "settledHandleDropped": 16383840,
+                "helperReturned": 16255040,
+                "resources": {
+                  "checkedRetired": 1000,
+                  "retiredLifetimes": 0,
+                  "retiredValueBackings": 0,
+                  "currentSubjects": 1000,
+                  "active": 1000,
+                  "facades": 0,
+                  "reclamationCandidates": 0
+                },
+                "sampled": {
+                  "payloadAlive": true,
+                  "transactionAlive": false,
+                  "previousPayloadAlive": false
+                }
+              },
+              {
+                "cycle": 9,
+                "pending": 20968448,
+                "settledHandleHeld": 17874480,
+                "settledHandleDropped": 17617568,
+                "helperReturned": 17506568,
+                "resources": {
+                  "checkedRetired": 1000,
+                  "retiredLifetimes": 0,
+                  "retiredValueBackings": 0,
+                  "currentSubjects": 1000,
+                  "active": 1000,
+                  "facades": 0,
+                  "reclamationCandidates": 0
+                },
+                "sampled": {
+                  "payloadAlive": true,
+                  "transactionAlive": false,
+                  "previousPayloadAlive": false
+                }
+              },
+              {
+                "cycle": 10,
+                "pending": 21090144,
+                "settledHandleHeld": 18066272,
+                "settledHandleDropped": 17814560,
+                "helperReturned": 17721328,
+                "resources": {
+                  "checkedRetired": 1000,
+                  "retiredLifetimes": 0,
+                  "retiredValueBackings": 0,
+                  "currentSubjects": 1000,
+                  "active": 1000,
+                  "facades": 0,
+                  "reclamationCandidates": 0
+                },
+                "sampled": {
+                  "payloadAlive": true,
+                  "transactionAlive": false,
+                  "previousPayloadAlive": false
+                }
+              }
+            ],
+            "lifecycle": {
+              "before": 5595888,
+              "empty": 6026184,
+              "linkDisposed": 14689312,
+              "destroyedTreeHeld": 14675032,
+              "ownerHelperReturned": 8313184
+            },
+            "treeCollectedAfterHelperReturn": true
+          },
+          {
+            "aa": true,
+            "before": 5596128,
+            "empty": 6026448,
+            "cycles": [
+              {
+                "cycle": 1,
+                "pending": 13426120,
+                "settledHandleHeld": 12199784,
+                "settledHandleDropped": 12082816,
+                "helperReturned": 11955168,
+                "resources": {
+                  "checkedRetired": 0,
+                  "retiredLifetimes": 0,
+                  "retiredValueBackings": 0,
+                  "currentSubjects": 1000,
+                  "active": 1000,
+                  "facades": 0,
+                  "reclamationCandidates": 0
+                },
+                "sampled": {
+                  "payloadAlive": true,
+                  "transactionAlive": false,
+                  "previousPayloadAlive": false
+                }
+              },
+              {
+                "cycle": 2,
+                "pending": 16288296,
+                "settledHandleHeld": 13653864,
+                "settledHandleDropped": 13435736,
+                "helperReturned": 13307168,
+                "resources": {
+                  "checkedRetired": 1000,
+                  "retiredLifetimes": 0,
+                  "retiredValueBackings": 0,
+                  "currentSubjects": 1000,
+                  "active": 1000,
+                  "facades": 0,
+                  "reclamationCandidates": 0
+                },
+                "sampled": {
+                  "payloadAlive": true,
+                  "transactionAlive": false,
+                  "previousPayloadAlive": false
+                }
+              },
+              {
+                "cycle": 3,
+                "pending": 17312120,
+                "settledHandleHeld": 14217016,
+                "settledHandleDropped": 13973504,
+                "helperReturned": 13845008,
+                "resources": {
+                  "checkedRetired": 1000,
+                  "retiredLifetimes": 0,
+                  "retiredValueBackings": 0,
+                  "currentSubjects": 1000,
+                  "active": 1000,
+                  "facades": 0,
+                  "reclamationCandidates": 0
+                },
+                "sampled": {
+                  "payloadAlive": true,
+                  "transactionAlive": false,
+                  "previousPayloadAlive": false
+                }
+              },
+              {
+                "cycle": 4,
+                "pending": 17439352,
+                "settledHandleHeld": 14392496,
+                "settledHandleDropped": 14197112,
+                "helperReturned": 14068312,
+                "resources": {
+                  "checkedRetired": 1000,
+                  "retiredLifetimes": 0,
+                  "retiredValueBackings": 0,
+                  "currentSubjects": 1000,
+                  "active": 1000,
+                  "facades": 0,
+                  "reclamationCandidates": 0
+                },
+                "sampled": {
+                  "payloadAlive": true,
+                  "transactionAlive": false,
+                  "previousPayloadAlive": false
+                }
+              },
+              {
+                "cycle": 5,
+                "pending": 18263416,
+                "settledHandleHeld": 15077504,
+                "settledHandleDropped": 14883552,
+                "helperReturned": 14754752,
+                "resources": {
+                  "checkedRetired": 1000,
+                  "retiredLifetimes": 0,
+                  "retiredValueBackings": 0,
+                  "currentSubjects": 1000,
+                  "active": 1000,
+                  "facades": 0,
+                  "reclamationCandidates": 0
+                },
+                "sampled": {
+                  "payloadAlive": true,
+                  "transactionAlive": false,
+                  "previousPayloadAlive": false
+                }
+              },
+              {
+                "cycle": 6,
+                "pending": 18294024,
+                "settledHandleHeld": 15316576,
+                "settledHandleDropped": 15059616,
+                "helperReturned": 14930816,
+                "resources": {
+                  "checkedRetired": 1000,
+                  "retiredLifetimes": 0,
+                  "retiredValueBackings": 0,
+                  "currentSubjects": 1000,
+                  "active": 1000,
+                  "facades": 0,
+                  "reclamationCandidates": 0
+                },
+                "sampled": {
+                  "payloadAlive": true,
+                  "transactionAlive": false,
+                  "previousPayloadAlive": false
+                }
+              },
+              {
+                "cycle": 7,
+                "pending": 19567040,
+                "settledHandleHeld": 16360848,
+                "settledHandleDropped": 16162904,
+                "helperReturned": 16031304,
+                "resources": {
+                  "checkedRetired": 1000,
+                  "retiredLifetimes": 0,
+                  "retiredValueBackings": 0,
+                  "currentSubjects": 1000,
+                  "active": 1000,
+                  "facades": 0,
+                  "reclamationCandidates": 0
+                },
+                "sampled": {
+                  "payloadAlive": true,
+                  "transactionAlive": false,
+                  "previousPayloadAlive": false
+                }
+              },
+              {
+                "cycle": 8,
+                "pending": 19609552,
+                "settledHandleHeld": 16582112,
+                "settledHandleDropped": 16386728,
+                "helperReturned": 16257928,
+                "resources": {
+                  "checkedRetired": 1000,
+                  "retiredLifetimes": 0,
+                  "retiredValueBackings": 0,
+                  "currentSubjects": 1000,
+                  "active": 1000,
+                  "facades": 0,
+                  "reclamationCandidates": 0
+                },
+                "sampled": {
+                  "payloadAlive": true,
+                  "transactionAlive": false,
+                  "previousPayloadAlive": false
+                }
+              },
+              {
+                "cycle": 9,
+                "pending": 20977192,
+                "settledHandleHeld": 17886336,
+                "settledHandleDropped": 17629456,
+                "helperReturned": 17518456,
+                "resources": {
+                  "checkedRetired": 1000,
+                  "retiredLifetimes": 0,
+                  "retiredValueBackings": 0,
+                  "currentSubjects": 1000,
+                  "active": 1000,
+                  "facades": 0,
+                  "reclamationCandidates": 0
+                },
+                "sampled": {
+                  "payloadAlive": true,
+                  "transactionAlive": false,
+                  "previousPayloadAlive": false
+                }
+              },
+              {
+                "cycle": 10,
+                "pending": 21089128,
+                "settledHandleHeld": 18033536,
+                "settledHandleDropped": 17816584,
+                "helperReturned": 17687784,
+                "resources": {
+                  "checkedRetired": 1000,
+                  "retiredLifetimes": 0,
+                  "retiredValueBackings": 0,
+                  "currentSubjects": 1000,
+                  "active": 1000,
+                  "facades": 0,
+                  "reclamationCandidates": 0
+                },
+                "sampled": {
+                  "payloadAlive": true,
+                  "transactionAlive": false,
+                  "previousPayloadAlive": false
+                }
+              }
+            ],
+            "lifecycle": {
+              "before": 5596128,
+              "empty": 6026448,
+              "linkDisposed": 14709496,
+              "destroyedTreeHeld": 14693904,
+              "ownerHelperReturned": 8312344
+            },
+            "treeCollectedAfterHelperReturn": true
+          }
+        ],
+        "after": [
+          {
+            "aa": false,
+            "before": 5597688,
+            "empty": 6028768,
+            "cycles": [
+              {
+                "cycle": 1,
+                "pending": 13880488,
+                "settledHandleHeld": 12195784,
+                "settledHandleDropped": 12078816,
+                "helperReturned": 11951168,
+                "resources": {
+                  "checkedRetired": 0,
+                  "retiredLifetimes": 0,
+                  "retiredValueBackings": 0,
+                  "currentSubjects": 1000,
+                  "active": 1000,
+                  "facades": 0,
+                  "reclamationCandidates": 0
+                },
+                "sampled": {
+                  "payloadAlive": true,
+                  "transactionAlive": false,
+                  "previousPayloadAlive": false
+                }
+              },
+              {
+                "cycle": 2,
+                "pending": 16287856,
+                "settledHandleHeld": 13589544,
+                "settledHandleDropped": 13390080,
+                "helperReturned": 13248840,
+                "resources": {
+                  "checkedRetired": 1000,
+                  "retiredLifetimes": 0,
+                  "retiredValueBackings": 0,
+                  "currentSubjects": 1000,
+                  "active": 1000,
+                  "facades": 0,
+                  "reclamationCandidates": 0
+                },
+                "sampled": {
+                  "payloadAlive": true,
+                  "transactionAlive": false,
+                  "previousPayloadAlive": false
+                }
+              },
+              {
+                "cycle": 3,
+                "pending": 17253024,
+                "settledHandleHeld": 13778096,
+                "settledHandleDropped": 13577272,
+                "helperReturned": 13448776,
+                "resources": {
+                  "checkedRetired": 1000,
+                  "retiredLifetimes": 0,
+                  "retiredValueBackings": 0,
+                  "currentSubjects": 1000,
+                  "active": 1000,
+                  "facades": 0,
+                  "reclamationCandidates": 0
+                },
+                "sampled": {
+                  "payloadAlive": true,
+                  "transactionAlive": false,
+                  "previousPayloadAlive": false
+                }
+              },
+              {
+                "cycle": 4,
+                "pending": 17016928,
+                "settledHandleHeld": 13895384,
+                "settledHandleDropped": 13701400,
+                "helperReturned": 13572600,
+                "resources": {
+                  "checkedRetired": 1000,
+                  "retiredLifetimes": 0,
+                  "retiredValueBackings": 0,
+                  "currentSubjects": 1000,
+                  "active": 1000,
+                  "facades": 0,
+                  "reclamationCandidates": 0
+                },
+                "sampled": {
+                  "payloadAlive": true,
+                  "transactionAlive": false,
+                  "previousPayloadAlive": false
+                }
+              },
+              {
+                "cycle": 5,
+                "pending": 17535016,
+                "settledHandleHeld": 14016088,
+                "settledHandleDropped": 13820800,
+                "helperReturned": 13692000,
+                "resources": {
+                  "checkedRetired": 1000,
+                  "retiredLifetimes": 0,
+                  "retiredValueBackings": 0,
+                  "currentSubjects": 1000,
+                  "active": 1000,
+                  "facades": 0,
+                  "reclamationCandidates": 0
+                },
+                "sampled": {
+                  "payloadAlive": true,
+                  "transactionAlive": false,
+                  "previousPayloadAlive": false
+                }
+              },
+              {
+                "cycle": 6,
+                "pending": 17228608,
+                "settledHandleHeld": 14156024,
+                "settledHandleDropped": 13896976,
+                "helperReturned": 13768176,
+                "resources": {
+                  "checkedRetired": 1000,
+                  "retiredLifetimes": 0,
+                  "retiredValueBackings": 0,
+                  "currentSubjects": 1000,
+                  "active": 1000,
+                  "facades": 0,
+                  "reclamationCandidates": 0
+                },
+                "sampled": {
+                  "payloadAlive": true,
+                  "transactionAlive": false,
+                  "previousPayloadAlive": false
+                }
+              },
+              {
+                "cycle": 7,
+                "pending": 18626352,
+                "settledHandleHeld": 15081976,
+                "settledHandleDropped": 14884032,
+                "helperReturned": 14753752,
+                "resources": {
+                  "checkedRetired": 1000,
+                  "retiredLifetimes": 0,
+                  "retiredValueBackings": 0,
+                  "currentSubjects": 1000,
+                  "active": 1000,
+                  "facades": 0,
+                  "reclamationCandidates": 0
+                },
+                "sampled": {
+                  "payloadAlive": true,
+                  "transactionAlive": false,
+                  "previousPayloadAlive": false
+                }
+              },
+              {
+                "cycle": 8,
+                "pending": 18323176,
+                "settledHandleHeld": 15189352,
+                "settledHandleDropped": 14993968,
+                "helperReturned": 14865168,
+                "resources": {
+                  "checkedRetired": 1000,
+                  "retiredLifetimes": 0,
+                  "retiredValueBackings": 0,
+                  "currentSubjects": 1000,
+                  "active": 1000,
+                  "facades": 0,
+                  "reclamationCandidates": 0
+                },
+                "sampled": {
+                  "payloadAlive": true,
+                  "transactionAlive": false,
+                  "previousPayloadAlive": false
+                }
+              },
+              {
+                "cycle": 9,
+                "pending": 18890968,
+                "settledHandleHeld": 15391848,
+                "settledHandleDropped": 15196560,
+                "helperReturned": 15085560,
+                "resources": {
+                  "checkedRetired": 1000,
+                  "retiredLifetimes": 0,
+                  "retiredValueBackings": 0,
+                  "currentSubjects": 1000,
+                  "active": 1000,
+                  "facades": 0,
+                  "reclamationCandidates": 0
+                },
+                "sampled": {
+                  "payloadAlive": true,
+                  "transactionAlive": false,
+                  "previousPayloadAlive": false
+                }
+              },
+              {
+                "cycle": 10,
+                "pending": 18650200,
+                "settledHandleHeld": 15655232,
+                "settledHandleDropped": 15293896,
+                "helperReturned": 15200664,
+                "resources": {
+                  "checkedRetired": 1000,
+                  "retiredLifetimes": 0,
+                  "retiredValueBackings": 0,
+                  "currentSubjects": 1000,
+                  "active": 1000,
+                  "facades": 0,
+                  "reclamationCandidates": 0
+                },
+                "sampled": {
+                  "payloadAlive": true,
+                  "transactionAlive": false,
+                  "previousPayloadAlive": false
+                }
+              }
+            ],
+            "lifecycle": {
+              "before": 5597688,
+              "empty": 6028768,
+              "linkDisposed": 12170128,
+              "destroyedTreeHeld": 12155480,
+              "ownerHelperReturned": 8374152
+            },
+            "treeCollectedAfterHelperReturn": true
+          }
+        ]
+      }
+    },
+    {
+      "rows": 1000,
+      "settlement": "rollback",
+      "cycles": 10,
+      "cpu": {
+        "before": {
+          "population.elapsedMs": {
+            "values": [
+              2687.2314570000003,
+              1462.4618300000002,
+              1992.8109149999998
+            ],
+            "median": 1992.8109149999998,
+            "min": 1462.4618300000002,
+            "max": 2687.2314570000003
+          },
+          "population.cpuMs": {
+            "values": [
+              2102.734,
+              1859.789,
+              2097.264
+            ],
+            "median": 2097.264,
+            "min": 1859.789,
+            "max": 2102.734
+          },
+          "settlementSync.elapsedMs": {
+            "values": [
+              2011.135751,
+              1192.897251,
+              1472.6514159999997
+            ],
+            "median": 1472.6514159999997,
+            "min": 1192.897251,
+            "max": 2011.135751
+          },
+          "settlementSync.cpuMs": {
+            "values": [
+              1618.647,
+              1393.998,
+              1532.543
+            ],
+            "median": 1532.543,
+            "min": 1393.998,
+            "max": 1618.647
+          },
+          "settlementIncludingDrain.elapsedMs": {
+            "values": [
+              3472.4909169999996,
+              1870.810958,
+              2500.4216229999997
+            ],
+            "median": 2500.4216229999997,
+            "min": 1870.810958,
+            "max": 3472.4909169999996
+          },
+          "settlementIncludingDrain.cpuMs": {
+            "values": [
+              2691.31,
+              2300.501,
+              2755.745
+            ],
+            "median": 2691.31,
+            "min": 2300.501,
+            "max": 2755.745
+          }
+        },
+        "after": {
+          "population.elapsedMs": {
+            "values": [
+              4036.123084,
+              3904.415459,
+              2229.0280409999996
+            ],
+            "median": 3904.415459,
+            "min": 2229.0280409999996,
+            "max": 4036.123084
+          },
+          "population.cpuMs": {
+            "values": [
+              2307.29,
+              2154.2,
+              2140.045
+            ],
+            "median": 2154.2,
+            "min": 2140.045,
+            "max": 2307.29
+          },
+          "settlementSync.elapsedMs": {
+            "values": [
+              2096.594,
+              2751.424292,
+              1625.1790409999999
+            ],
+            "median": 2096.594,
+            "min": 1625.1790409999999,
+            "max": 2751.424292
+          },
+          "settlementSync.cpuMs": {
+            "values": [
+              1759.526,
+              1761.846,
+              1609.254
+            ],
+            "median": 1759.526,
+            "min": 1609.254,
+            "max": 1761.846
+          },
+          "settlementIncludingDrain.elapsedMs": {
+            "values": [
+              3608.0957920000005,
+              3894.113085,
+              3063.4651660000004
+            ],
+            "median": 3608.0957920000005,
+            "min": 3063.4651660000004,
+            "max": 3894.113085
+          },
+          "settlementIncludingDrain.cpuMs": {
+            "values": [
+              2897.6220000000003,
+              2816.982,
+              2657.789
+            ],
+            "median": 2816.982,
+            "min": 2657.789,
+            "max": 2897.6220000000003
+          }
+        }
+      },
+      "pairedAfterMinusBefore": {
+        "population.elapsedMs": [
+          1348.8916269999995,
+          2441.9536289999996,
+          236.21712599999978
+        ],
+        "population.cpuMs": [
+          204.55600000000004,
+          294.41099999999983,
+          42.78099999999995
+        ],
+        "settlementSync.elapsedMs": [
+          85.45824900000002,
+          1558.527041,
+          152.52762500000017
+        ],
+        "settlementSync.cpuMs": [
+          140.87900000000013,
+          367.84799999999996,
+          76.71100000000001
+        ],
+        "settlementIncludingDrain.elapsedMs": [
+          135.6048750000009,
+          2023.302127,
+          563.0435430000007
+        ],
+        "settlementIncludingDrain.cpuMs": [
+          206.31200000000035,
+          516.4809999999998,
+          -97.95599999999968
+        ]
+      },
+      "baselineAASecondMinusFirst": {
+        "population.elapsedMs": -311.51337499999954,
+        "population.cpuMs": 4.707000000000335,
+        "settlementSync.elapsedMs": -772.2985819999999,
+        "settlementSync.cpuMs": -76.34600000000023,
+        "settlementIncludingDrain.elapsedMs": -565.6408310000002,
+        "settlementIncludingDrain.cpuMs": -236.9939999999997
+      },
+      "memory": {
+        "before": [
+          {
+            "aa": false,
+            "before": 5595888,
+            "empty": 6026184,
+            "cycles": [
+              {
+                "cycle": 1,
+                "pending": 13419592,
+                "settledHandleHeld": 9738856,
+                "settledHandleDropped": 9593112,
+                "helperReturned": 9439760,
+                "resources": {
+                  "checkedRetired": 1000,
+                  "retiredLifetimes": 0,
+                  "retiredValueBackings": 0,
+                  "currentSubjects": 1000,
+                  "active": 0,
+                  "facades": 0,
+                  "reclamationCandidates": 0
+                },
+                "sampled": {
+                  "payloadAlive": false,
+                  "transactionAlive": false,
+                  "previousPayloadAlive": false
+                }
+              },
+              {
+                "cycle": 2,
+                "pending": 15240712,
+                "settledHandleHeld": 10051848,
+                "settledHandleDropped": 9904864,
+                "helperReturned": 9749048,
+                "resources": {
+                  "checkedRetired": 1000,
+                  "retiredLifetimes": 0,
+                  "retiredValueBackings": 0,
+                  "currentSubjects": 1000,
+                  "active": 0,
+                  "facades": 0,
+                  "reclamationCandidates": 0
+                },
+                "sampled": {
+                  "payloadAlive": false,
+                  "transactionAlive": false,
+                  "previousPayloadAlive": false
+                }
+              },
+              {
+                "cycle": 3,
+                "pending": 15396464,
+                "settledHandleHeld": 10452000,
+                "settledHandleDropped": 10347416,
+                "helperReturned": 10185912,
+                "resources": {
+                  "checkedRetired": 1000,
+                  "retiredLifetimes": 0,
+                  "retiredValueBackings": 0,
+                  "currentSubjects": 1000,
+                  "active": 0,
+                  "facades": 0,
+                  "reclamationCandidates": 0
+                },
+                "sampled": {
+                  "payloadAlive": false,
+                  "transactionAlive": false,
+                  "previousPayloadAlive": false
+                }
+              },
+              {
+                "cycle": 4,
+                "pending": 15613704,
+                "settledHandleHeld": 10570680,
+                "settledHandleDropped": 10453144,
+                "helperReturned": 10299208,
+                "resources": {
+                  "checkedRetired": 1000,
+                  "retiredLifetimes": 0,
+                  "retiredValueBackings": 0,
+                  "currentSubjects": 1000,
+                  "active": 0,
+                  "facades": 0,
+                  "reclamationCandidates": 0
+                },
+                "sampled": {
+                  "payloadAlive": false,
+                  "transactionAlive": false,
+                  "previousPayloadAlive": false
+                }
+              },
+              {
+                "cycle": 5,
+                "pending": 15763416,
+                "settledHandleHeld": 11052016,
+                "settledHandleDropped": 10909752,
+                "helperReturned": 10755616,
+                "resources": {
+                  "checkedRetired": 1000,
+                  "retiredLifetimes": 0,
+                  "retiredValueBackings": 0,
+                  "currentSubjects": 1000,
+                  "active": 0,
+                  "facades": 0,
+                  "reclamationCandidates": 0
+                },
+                "sampled": {
+                  "payloadAlive": false,
+                  "transactionAlive": false,
+                  "previousPayloadAlive": false
+                }
+              },
+              {
+                "cycle": 6,
+                "pending": 16296352,
+                "settledHandleHeld": 11120432,
+                "settledHandleDropped": 10997624,
+                "helperReturned": 10843488,
+                "resources": {
+                  "checkedRetired": 1000,
+                  "retiredLifetimes": 0,
+                  "retiredValueBackings": 0,
+                  "currentSubjects": 1000,
+                  "active": 0,
+                  "facades": 0,
+                  "reclamationCandidates": 0
+                },
+                "sampled": {
+                  "payloadAlive": false,
+                  "transactionAlive": false,
+                  "previousPayloadAlive": false
+                }
+              },
+              {
+                "cycle": 7,
+                "pending": 16849872,
+                "settledHandleHeld": 11214112,
+                "settledHandleDropped": 11100968,
+                "helperReturned": 10946792,
+                "resources": {
+                  "checkedRetired": 1000,
+                  "retiredLifetimes": 0,
+                  "retiredValueBackings": 0,
+                  "currentSubjects": 1000,
+                  "active": 0,
+                  "facades": 0,
+                  "reclamationCandidates": 0
+                },
+                "sampled": {
+                  "payloadAlive": false,
+                  "transactionAlive": false,
+                  "previousPayloadAlive": false
+                }
+              },
+              {
+                "cycle": 8,
+                "pending": 16965840,
+                "settledHandleHeld": 11336880,
+                "settledHandleDropped": 11186960,
+                "helperReturned": 11032824,
+                "resources": {
+                  "checkedRetired": 1000,
+                  "retiredLifetimes": 0,
+                  "retiredValueBackings": 0,
+                  "currentSubjects": 1000,
+                  "active": 0,
+                  "facades": 0,
+                  "reclamationCandidates": 0
+                },
+                "sampled": {
+                  "payloadAlive": false,
+                  "transactionAlive": false,
+                  "previousPayloadAlive": false
+                }
+              },
+              {
+                "cycle": 9,
+                "pending": 17055024,
+                "settledHandleHeld": 12200368,
+                "settledHandleDropped": 12069464,
+                "helperReturned": 11930056,
+                "resources": {
+                  "checkedRetired": 1000,
+                  "retiredLifetimes": 0,
+                  "retiredValueBackings": 0,
+                  "currentSubjects": 1000,
+                  "active": 0,
+                  "facades": 0,
+                  "reclamationCandidates": 0
+                },
+                "sampled": {
+                  "payloadAlive": false,
+                  "transactionAlive": false,
+                  "previousPayloadAlive": false
+                }
+              },
+              {
+                "cycle": 10,
+                "pending": 17284128,
+                "settledHandleHeld": 12296512,
+                "settledHandleDropped": 12190328,
+                "helperReturned": 12037432,
+                "resources": {
+                  "checkedRetired": 1000,
+                  "retiredLifetimes": 0,
+                  "retiredValueBackings": 0,
+                  "currentSubjects": 1000,
+                  "active": 0,
+                  "facades": 0,
+                  "reclamationCandidates": 0
+                },
+                "sampled": {
+                  "payloadAlive": false,
+                  "transactionAlive": false,
+                  "previousPayloadAlive": false
+                }
+              }
+            ],
+            "lifecycle": {
+              "before": 5595888,
+              "empty": 6026184,
+              "linkDisposed": 9971384,
+              "destroyedTreeHeld": 9962048,
+              "ownerHelperReturned": 9140512
+            },
+            "treeCollectedAfterHelperReturn": true
+          },
+          {
+            "aa": true,
+            "before": 5596128,
+            "empty": 6026448,
+            "cycles": [
+              {
+                "cycle": 1,
+                "pending": 13837624,
+                "settledHandleHeld": 9720704,
+                "settledHandleDropped": 9591728,
+                "helperReturned": 9438208,
+                "resources": {
+                  "checkedRetired": 1000,
+                  "retiredLifetimes": 0,
+                  "retiredValueBackings": 0,
+                  "currentSubjects": 1000,
+                  "active": 0,
+                  "facades": 0,
+                  "reclamationCandidates": 0
+                },
+                "sampled": {
+                  "payloadAlive": false,
+                  "transactionAlive": false,
+                  "previousPayloadAlive": false
+                }
+              },
+              {
+                "cycle": 2,
+                "pending": 15223184,
+                "settledHandleHeld": 10057152,
+                "settledHandleDropped": 9905360,
+                "helperReturned": 9749592,
+                "resources": {
+                  "checkedRetired": 1000,
+                  "retiredLifetimes": 0,
+                  "retiredValueBackings": 0,
+                  "currentSubjects": 1000,
+                  "active": 0,
+                  "facades": 0,
+                  "reclamationCandidates": 0
+                },
+                "sampled": {
+                  "payloadAlive": false,
+                  "transactionAlive": false,
+                  "previousPayloadAlive": false
+                }
+              },
+              {
+                "cycle": 3,
+                "pending": 15396552,
+                "settledHandleHeld": 10465520,
+                "settledHandleDropped": 10339520,
+                "helperReturned": 10184104,
+                "resources": {
+                  "checkedRetired": 1000,
+                  "retiredLifetimes": 0,
+                  "retiredValueBackings": 0,
+                  "currentSubjects": 1000,
+                  "active": 0,
+                  "facades": 0,
+                  "reclamationCandidates": 0
+                },
+                "sampled": {
+                  "payloadAlive": false,
+                  "transactionAlive": false,
+                  "previousPayloadAlive": false
+                }
+              },
+              {
+                "cycle": 4,
+                "pending": 15611624,
+                "settledHandleHeld": 10566632,
+                "settledHandleDropped": 10450520,
+                "helperReturned": 10296584,
+                "resources": {
+                  "checkedRetired": 1000,
+                  "retiredLifetimes": 0,
+                  "retiredValueBackings": 0,
+                  "currentSubjects": 1000,
+                  "active": 0,
+                  "facades": 0,
+                  "reclamationCandidates": 0
+                },
+                "sampled": {
+                  "payloadAlive": false,
+                  "transactionAlive": false,
+                  "previousPayloadAlive": false
+                }
+              },
+              {
+                "cycle": 5,
+                "pending": 15742992,
+                "settledHandleHeld": 11055744,
+                "settledHandleDropped": 10908264,
+                "helperReturned": 10754128,
+                "resources": {
+                  "checkedRetired": 1000,
+                  "retiredLifetimes": 0,
+                  "retiredValueBackings": 0,
+                  "currentSubjects": 1000,
+                  "active": 0,
+                  "facades": 0,
+                  "reclamationCandidates": 0
+                },
+                "sampled": {
+                  "payloadAlive": false,
+                  "transactionAlive": false,
+                  "previousPayloadAlive": false
+                }
+              },
+              {
+                "cycle": 6,
+                "pending": 16305256,
+                "settledHandleHeld": 11130256,
+                "settledHandleDropped": 10999712,
+                "helperReturned": 10845536,
+                "resources": {
+                  "checkedRetired": 1000,
+                  "retiredLifetimes": 0,
+                  "retiredValueBackings": 0,
+                  "currentSubjects": 1000,
+                  "active": 0,
+                  "facades": 0,
+                  "reclamationCandidates": 0
+                },
+                "sampled": {
+                  "payloadAlive": false,
+                  "transactionAlive": false,
+                  "previousPayloadAlive": false
+                }
+              },
+              {
+                "cycle": 7,
+                "pending": 16852848,
+                "settledHandleHeld": 11214544,
+                "settledHandleDropped": 11104736,
+                "helperReturned": 10950600,
+                "resources": {
+                  "checkedRetired": 1000,
+                  "retiredLifetimes": 0,
+                  "retiredValueBackings": 0,
+                  "currentSubjects": 1000,
+                  "active": 0,
+                  "facades": 0,
+                  "reclamationCandidates": 0
+                },
+                "sampled": {
+                  "payloadAlive": false,
+                  "transactionAlive": false,
+                  "previousPayloadAlive": false
+                }
+              },
+              {
+                "cycle": 8,
+                "pending": 16961848,
+                "settledHandleHeld": 11340624,
+                "settledHandleDropped": 11181760,
+                "helperReturned": 11027624,
+                "resources": {
+                  "checkedRetired": 1000,
+                  "retiredLifetimes": 0,
+                  "retiredValueBackings": 0,
+                  "currentSubjects": 1000,
+                  "active": 0,
+                  "facades": 0,
+                  "reclamationCandidates": 0
+                },
+                "sampled": {
+                  "payloadAlive": false,
+                  "transactionAlive": false,
+                  "previousPayloadAlive": false
+                }
+              },
+              {
+                "cycle": 9,
+                "pending": 17046840,
+                "settledHandleHeld": 12188472,
+                "settledHandleDropped": 12062872,
+                "helperReturned": 11923464,
+                "resources": {
+                  "checkedRetired": 1000,
+                  "retiredLifetimes": 0,
+                  "retiredValueBackings": 0,
+                  "currentSubjects": 1000,
+                  "active": 0,
+                  "facades": 0,
+                  "reclamationCandidates": 0
+                },
+                "sampled": {
+                  "payloadAlive": false,
+                  "transactionAlive": false,
+                  "previousPayloadAlive": false
+                }
+              },
+              {
+                "cycle": 10,
+                "pending": 17278632,
+                "settledHandleHeld": 12288992,
+                "settledHandleDropped": 12183120,
+                "helperReturned": 12030224,
+                "resources": {
+                  "checkedRetired": 1000,
+                  "retiredLifetimes": 0,
+                  "retiredValueBackings": 0,
+                  "currentSubjects": 1000,
+                  "active": 0,
+                  "facades": 0,
+                  "reclamationCandidates": 0
+                },
+                "sampled": {
+                  "payloadAlive": false,
+                  "transactionAlive": false,
+                  "previousPayloadAlive": false
+                }
+              }
+            ],
+            "lifecycle": {
+              "before": 5596128,
+              "empty": 6026448,
+              "linkDisposed": 9973216,
+              "destroyedTreeHeld": 9963880,
+              "ownerHelperReturned": 9148112
+            },
+            "treeCollectedAfterHelperReturn": true
+          }
+        ],
+        "after": [
+          {
+            "aa": false,
+            "before": 5597728,
+            "empty": 6028736,
+            "cycles": [
+              {
+                "cycle": 1,
+                "pending": 13419256,
+                "settledHandleHeld": 9753456,
+                "settledHandleDropped": 9615792,
+                "helperReturned": 9462560,
+                "resources": {
+                  "checkedRetired": 1000,
+                  "retiredLifetimes": 0,
+                  "retiredValueBackings": 0,
+                  "currentSubjects": 1000,
+                  "active": 0,
+                  "facades": 0,
+                  "reclamationCandidates": 0
+                },
+                "sampled": {
+                  "payloadAlive": false,
+                  "transactionAlive": false,
+                  "previousPayloadAlive": false
+                }
+              },
+              {
+                "cycle": 2,
+                "pending": 15276280,
+                "settledHandleHeld": 10061880,
+                "settledHandleDropped": 9908632,
+                "helperReturned": 9752816,
+                "resources": {
+                  "checkedRetired": 1000,
+                  "retiredLifetimes": 0,
+                  "retiredValueBackings": 0,
+                  "currentSubjects": 1000,
+                  "active": 0,
+                  "facades": 0,
+                  "reclamationCandidates": 0
+                },
+                "sampled": {
+                  "payloadAlive": false,
+                  "transactionAlive": false,
+                  "previousPayloadAlive": false
+                }
+              },
+              {
+                "cycle": 3,
+                "pending": 15396920,
+                "settledHandleHeld": 10492360,
+                "settledHandleDropped": 10386912,
+                "helperReturned": 10219104,
+                "resources": {
+                  "checkedRetired": 1000,
+                  "retiredLifetimes": 0,
+                  "retiredValueBackings": 0,
+                  "currentSubjects": 1000,
+                  "active": 0,
+                  "facades": 0,
+                  "reclamationCandidates": 0
+                },
+                "sampled": {
+                  "payloadAlive": false,
+                  "transactionAlive": false,
+                  "previousPayloadAlive": false
+                }
+              },
+              {
+                "cycle": 4,
+                "pending": 15648800,
+                "settledHandleHeld": 10605016,
+                "settledHandleDropped": 10491704,
+                "helperReturned": 10337768,
+                "resources": {
+                  "checkedRetired": 1000,
+                  "retiredLifetimes": 0,
+                  "retiredValueBackings": 0,
+                  "currentSubjects": 1000,
+                  "active": 0,
+                  "facades": 0,
+                  "reclamationCandidates": 0
+                },
+                "sampled": {
+                  "payloadAlive": false,
+                  "transactionAlive": false,
+                  "previousPayloadAlive": false
+                }
+              },
+              {
+                "cycle": 5,
+                "pending": 15793760,
+                "settledHandleHeld": 11057000,
+                "settledHandleDropped": 10948720,
+                "helperReturned": 10794584,
+                "resources": {
+                  "checkedRetired": 1000,
+                  "retiredLifetimes": 0,
+                  "retiredValueBackings": 0,
+                  "currentSubjects": 1000,
+                  "active": 0,
+                  "facades": 0,
+                  "reclamationCandidates": 0
+                },
+                "sampled": {
+                  "payloadAlive": false,
+                  "transactionAlive": false,
+                  "previousPayloadAlive": false
+                }
+              },
+              {
+                "cycle": 6,
+                "pending": 16340200,
+                "settledHandleHeld": 11193640,
+                "settledHandleDropped": 11045392,
+                "helperReturned": 10891256,
+                "resources": {
+                  "checkedRetired": 1000,
+                  "retiredLifetimes": 0,
+                  "retiredValueBackings": 0,
+                  "currentSubjects": 1000,
+                  "active": 0,
+                  "facades": 0,
+                  "reclamationCandidates": 0
+                },
+                "sampled": {
+                  "payloadAlive": false,
+                  "transactionAlive": false,
+                  "previousPayloadAlive": false
+                }
+              },
+              {
+                "cycle": 7,
+                "pending": 16895144,
+                "settledHandleHeld": 11268992,
+                "settledHandleDropped": 11136512,
+                "helperReturned": 10982376,
+                "resources": {
+                  "checkedRetired": 1000,
+                  "retiredLifetimes": 0,
+                  "retiredValueBackings": 0,
+                  "currentSubjects": 1000,
+                  "active": 0,
+                  "facades": 0,
+                  "reclamationCandidates": 0
+                },
+                "sampled": {
+                  "payloadAlive": false,
+                  "transactionAlive": false,
+                  "previousPayloadAlive": false
+                }
+              },
+              {
+                "cycle": 8,
+                "pending": 16976872,
+                "settledHandleHeld": 11350576,
+                "settledHandleDropped": 11217296,
+                "helperReturned": 11063120,
+                "resources": {
+                  "checkedRetired": 1000,
+                  "retiredLifetimes": 0,
+                  "retiredValueBackings": 0,
+                  "currentSubjects": 1000,
+                  "active": 0,
+                  "facades": 0,
+                  "reclamationCandidates": 0
+                },
+                "sampled": {
+                  "payloadAlive": false,
+                  "transactionAlive": false,
+                  "previousPayloadAlive": false
+                }
+              },
+              {
+                "cycle": 9,
+                "pending": 17093416,
+                "settledHandleHeld": 12233792,
+                "settledHandleDropped": 12101568,
+                "helperReturned": 11962160,
+                "resources": {
+                  "checkedRetired": 1000,
+                  "retiredLifetimes": 0,
+                  "retiredValueBackings": 0,
+                  "currentSubjects": 1000,
+                  "active": 0,
+                  "facades": 0,
+                  "reclamationCandidates": 0
+                },
+                "sampled": {
+                  "payloadAlive": false,
+                  "transactionAlive": false,
+                  "previousPayloadAlive": false
+                }
+              },
+              {
+                "cycle": 10,
+                "pending": 17334168,
+                "settledHandleHeld": 12295512,
+                "settledHandleDropped": 12163336,
+                "helperReturned": 12009200,
+                "resources": {
+                  "checkedRetired": 1000,
+                  "retiredLifetimes": 0,
+                  "retiredValueBackings": 0,
+                  "currentSubjects": 1000,
+                  "active": 0,
+                  "facades": 0,
+                  "reclamationCandidates": 0
+                },
+                "sampled": {
+                  "payloadAlive": false,
+                  "transactionAlive": false,
+                  "previousPayloadAlive": false
+                }
+              }
+            ],
+            "lifecycle": {
+              "before": 5597728,
+              "empty": 6028736,
+              "linkDisposed": 10013352,
+              "destroyedTreeHeld": 10004016,
+              "ownerHelperReturned": 9188480
+            },
+            "treeCollectedAfterHelperReturn": true
+          }
+        ]
+      }
+    },
+    {
+      "rows": 10000,
+      "settlement": "confirm",
+      "cycles": 10,
+      "cpu": {
+        "before": {
+          "population.elapsedMs": {
+            "values": [
+              55758.17771,
+              16668.631416,
+              20881.655083
+            ],
+            "median": 20881.655083,
+            "min": 16668.631416,
+            "max": 55758.17771
+          },
+          "population.cpuMs": {
+            "values": [
+              33046.098,
+              20001.921000000002,
+              21770.194000000003
+            ],
+            "median": 21770.194000000003,
+            "min": 20001.921000000002,
+            "max": 33046.098
+          },
+          "settlementSync.elapsedMs": {
+            "values": [
+              3343.896918,
+              817.122084,
+              1019.630125
+            ],
+            "median": 1019.630125,
+            "min": 817.122084,
+            "max": 3343.896918
+          },
+          "settlementSync.cpuMs": {
+            "values": [
+              2168.0809999999997,
+              1112.15,
+              1395.9409999999998
+            ],
+            "median": 1395.9409999999998,
+            "min": 1112.15,
+            "max": 2168.0809999999997
+          },
+          "settlementIncludingDrain.elapsedMs": {
+            "values": [
+              149596.26920799998,
+              35936.570124,
+              40682.707083999994
+            ],
+            "median": 40682.707083999994,
+            "min": 35936.570124,
+            "max": 149596.26920799998
+          },
+          "settlementIncludingDrain.cpuMs": {
+            "values": [
+              82688.97499999999,
+              39788.165,
+              43509.225
+            ],
+            "median": 43509.225,
+            "min": 39788.165,
+            "max": 82688.97499999999
+          }
+        },
+        "after": {
+          "population.elapsedMs": {
+            "values": [
+              33849.23554,
+              17750.389456999997,
+              17390.542166
+            ],
+            "median": 17750.389456999997,
+            "min": 17390.542166,
+            "max": 33849.23554
+          },
+          "population.cpuMs": {
+            "values": [
+              28382.189000000002,
+              19708.364999999998,
+              18413.02
+            ],
+            "median": 19708.364999999998,
+            "min": 18413.02,
+            "max": 28382.189000000002
+          },
+          "settlementSync.elapsedMs": {
+            "values": [
+              1696.806251,
+              1087.875708,
+              1104.089499
+            ],
+            "median": 1104.089499,
+            "min": 1087.875708,
+            "max": 1696.806251
+          },
+          "settlementSync.cpuMs": {
+            "values": [
+              1781.185,
+              1155.065,
+              1364.988
+            ],
+            "median": 1364.988,
+            "min": 1155.065,
+            "max": 1781.185
+          },
+          "settlementIncludingDrain.elapsedMs": {
+            "values": [
+              7067.443209000001,
+              3326.1376659999996,
+              4201.05279
+            ],
+            "median": 4201.05279,
+            "min": 3326.1376659999996,
+            "max": 7067.443209000001
+          },
+          "settlementIncludingDrain.cpuMs": {
+            "values": [
+              8999.406,
+              5597.581,
+              6633.929999999999
+            ],
+            "median": 6633.929999999999,
+            "min": 5597.581,
+            "max": 8999.406
+          }
+        }
+      },
+      "pairedAfterMinusBefore": {
+        "population.elapsedMs": [
+          -21908.942170000002,
+          1081.7580409999973,
+          -3491.112917000002
+        ],
+        "population.cpuMs": [
+          -4663.908999999996,
+          -293.55600000000413,
+          -3357.1740000000027
+        ],
+        "settlementSync.elapsedMs": [
+          -1647.090667,
+          270.75362400000006,
+          84.45937399999991
+        ],
+        "settlementSync.cpuMs": [
+          -386.89599999999973,
+          42.914999999999964,
+          -30.952999999999747
+        ],
+        "settlementIncludingDrain.elapsedMs": [
+          -142528.825999,
+          -32610.432458,
+          -36481.65429399999
+        ],
+        "settlementIncludingDrain.cpuMs": [
+          -73689.56899999999,
+          -34190.584,
+          -36875.295
+        ]
+      },
+      "baselineAASecondMinusFirst": {
+        "population.elapsedMs": -1257.1660010000014,
+        "population.cpuMs": 79.13600000000224,
+        "settlementSync.elapsedMs": -266.9172930000002,
+        "settlementSync.cpuMs": -362.56300000000033,
+        "settlementIncludingDrain.elapsedMs": -2945.319875000001,
+        "settlementIncludingDrain.cpuMs": -2602.201000000008
+      },
+      "memory": {
+        "before": [
+          {
+            "aa": false,
+            "before": 5595888,
+            "empty": 6026184,
+            "cycles": [
+              {
+                "cycle": 1,
+                "pending": 69401032,
+                "settledHandleHeld": 55071808,
+                "settledHandleDropped": 53894104,
+                "helperReturned": 52614456,
+                "resources": {
+                  "checkedRetired": 0,
+                  "retiredLifetimes": 0,
+                  "retiredValueBackings": 0,
+                  "currentSubjects": 10000,
+                  "active": 10000,
+                  "facades": 0,
+                  "reclamationCandidates": 0
+                },
+                "sampled": {
+                  "payloadAlive": true,
+                  "transactionAlive": false,
+                  "previousPayloadAlive": false
+                }
+              },
+              {
+                "cycle": 2,
+                "pending": 97218352,
+                "settledHandleHeld": 65740208,
+                "settledHandleDropped": 63196032,
+                "helperReturned": 61915464,
+                "resources": {
+                  "checkedRetired": 10000,
+                  "retiredLifetimes": 0,
+                  "retiredValueBackings": 0,
+                  "currentSubjects": 10000,
+                  "active": 10000,
+                  "facades": 0,
+                  "reclamationCandidates": 0
+                },
+                "sampled": {
+                  "payloadAlive": true,
+                  "transactionAlive": false,
+                  "previousPayloadAlive": false
+                }
+              },
+              {
+                "cycle": 3,
+                "pending": 99041744,
+                "settledHandleHeld": 66601536,
+                "settledHandleDropped": 63973576,
+                "helperReturned": 62693080,
+                "resources": {
+                  "checkedRetired": 10000,
+                  "retiredLifetimes": 0,
+                  "retiredValueBackings": 0,
+                  "currentSubjects": 10000,
+                  "active": 10000,
+                  "facades": 0,
+                  "reclamationCandidates": 0
+                },
+                "sampled": {
+                  "payloadAlive": true,
+                  "transactionAlive": false,
+                  "previousPayloadAlive": false
+                }
+              },
+              {
+                "cycle": 4,
+                "pending": 111718000,
+                "settledHandleHeld": 79237224,
+                "settledHandleDropped": 76638456,
+                "helperReturned": 75391496,
+                "resources": {
+                  "checkedRetired": 10000,
+                  "retiredLifetimes": 0,
+                  "retiredValueBackings": 0,
+                  "currentSubjects": 10000,
+                  "active": 10000,
+                  "facades": 0,
+                  "reclamationCandidates": 0
+                },
+                "sampled": {
+                  "payloadAlive": true,
+                  "transactionAlive": false,
+                  "previousPayloadAlive": false
+                }
+              },
+              {
+                "cycle": 5,
+                "pending": 113256656,
+                "settledHandleHeld": 80884176,
+                "settledHandleDropped": 78260832,
+                "helperReturned": 76980544,
+                "resources": {
+                  "checkedRetired": 10000,
+                  "retiredLifetimes": 0,
+                  "retiredValueBackings": 0,
+                  "currentSubjects": 10000,
+                  "active": 10000,
+                  "facades": 0,
+                  "reclamationCandidates": 0
+                },
+                "sampled": {
+                  "payloadAlive": true,
+                  "transactionAlive": false,
+                  "previousPayloadAlive": false
+                }
+              },
+              {
+                "cycle": 6,
+                "pending": 115007312,
+                "settledHandleHeld": 82545152,
+                "settledHandleDropped": 79957744,
+                "helperReturned": 78676944,
+                "resources": {
+                  "checkedRetired": 10000,
+                  "retiredLifetimes": 0,
+                  "retiredValueBackings": 0,
+                  "currentSubjects": 10000,
+                  "active": 10000,
+                  "facades": 0,
+                  "reclamationCandidates": 0
+                },
+                "sampled": {
+                  "payloadAlive": true,
+                  "transactionAlive": false,
+                  "previousPayloadAlive": false
+                }
+              },
+              {
+                "cycle": 7,
+                "pending": 123980464,
+                "settledHandleHeld": 91561568,
+                "settledHandleDropped": 88942616,
+                "helperReturned": 87661816,
+                "resources": {
+                  "checkedRetired": 10000,
+                  "retiredLifetimes": 0,
+                  "retiredValueBackings": 0,
+                  "currentSubjects": 10000,
+                  "active": 10000,
+                  "facades": 0,
+                  "reclamationCandidates": 0
+                },
+                "sampled": {
+                  "payloadAlive": true,
+                  "transactionAlive": false,
+                  "previousPayloadAlive": false
+                }
+              },
+              {
+                "cycle": 8,
+                "pending": 132968512,
+                "settledHandleHeld": 100506864,
+                "settledHandleDropped": 97901984,
+                "helperReturned": 96621184,
+                "resources": {
+                  "checkedRetired": 10000,
+                  "retiredLifetimes": 0,
+                  "retiredValueBackings": 0,
+                  "currentSubjects": 10000,
+                  "active": 10000,
+                  "facades": 0,
+                  "reclamationCandidates": 0
+                },
+                "sampled": {
+                  "payloadAlive": true,
+                  "transactionAlive": false,
+                  "previousPayloadAlive": false
+                }
+              },
+              {
+                "cycle": 9,
+                "pending": 127322528,
+                "settledHandleHeld": 94966784,
+                "settledHandleDropped": 92361088,
+                "helperReturned": 91098088,
+                "resources": {
+                  "checkedRetired": 10000,
+                  "retiredLifetimes": 0,
+                  "retiredValueBackings": 0,
+                  "currentSubjects": 10000,
+                  "active": 10000,
+                  "facades": 0,
+                  "reclamationCandidates": 0
+                },
+                "sampled": {
+                  "payloadAlive": true,
+                  "transactionAlive": false,
+                  "previousPayloadAlive": false
+                }
+              },
+              {
+                "cycle": 10,
+                "pending": 129192544,
+                "settledHandleHeld": 96727768,
+                "settledHandleDropped": 94105920,
+                "helperReturned": 92825120,
+                "resources": {
+                  "checkedRetired": 10000,
+                  "retiredLifetimes": 0,
+                  "retiredValueBackings": 0,
+                  "currentSubjects": 10000,
+                  "active": 10000,
+                  "facades": 0,
+                  "reclamationCandidates": 0
+                },
+                "sampled": {
+                  "payloadAlive": true,
+                  "transactionAlive": false,
+                  "previousPayloadAlive": false
+                }
+              }
+            ],
+            "lifecycle": {
+              "before": 5595888,
+              "empty": 6026184,
+              "linkDisposed": 67455800,
+              "destroyedTreeHeld": 67432520,
+              "ownerHelperReturned": 8176408
+            },
+            "treeCollectedAfterHelperReturn": true
+          },
+          {
+            "aa": true,
+            "before": 5596096,
+            "empty": 6026416,
+            "cycles": [
+              {
+                "cycle": 1,
+                "pending": 69370248,
+                "settledHandleHeld": 55071432,
+                "settledHandleDropped": 53893728,
+                "helperReturned": 52614080,
+                "resources": {
+                  "checkedRetired": 0,
+                  "retiredLifetimes": 0,
+                  "retiredValueBackings": 0,
+                  "currentSubjects": 10000,
+                  "active": 10000,
+                  "facades": 0,
+                  "reclamationCandidates": 0
+                },
+                "sampled": {
+                  "payloadAlive": true,
+                  "transactionAlive": false,
+                  "previousPayloadAlive": false
+                }
+              },
+              {
+                "cycle": 2,
+                "pending": 97194784,
+                "settledHandleHeld": 65648216,
+                "settledHandleDropped": 63186144,
+                "helperReturned": 61905576,
+                "resources": {
+                  "checkedRetired": 10000,
+                  "retiredLifetimes": 0,
+                  "retiredValueBackings": 0,
+                  "currentSubjects": 10000,
+                  "active": 10000,
+                  "facades": 0,
+                  "reclamationCandidates": 0
+                },
+                "sampled": {
+                  "payloadAlive": true,
+                  "transactionAlive": false,
+                  "previousPayloadAlive": false
+                }
+              },
+              {
+                "cycle": 3,
+                "pending": 99056384,
+                "settledHandleHeld": 66551232,
+                "settledHandleDropped": 64050976,
+                "helperReturned": 62770480,
+                "resources": {
+                  "checkedRetired": 10000,
+                  "retiredLifetimes": 0,
+                  "retiredValueBackings": 0,
+                  "currentSubjects": 10000,
+                  "active": 10000,
+                  "facades": 0,
+                  "reclamationCandidates": 0
+                },
+                "sampled": {
+                  "payloadAlive": true,
+                  "transactionAlive": false,
+                  "previousPayloadAlive": false
+                }
+              },
+              {
+                "cycle": 4,
+                "pending": 111746224,
+                "settledHandleHeld": 79259560,
+                "settledHandleDropped": 76659512,
+                "helperReturned": 75412552,
+                "resources": {
+                  "checkedRetired": 10000,
+                  "retiredLifetimes": 0,
+                  "retiredValueBackings": 0,
+                  "currentSubjects": 10000,
+                  "active": 10000,
+                  "facades": 0,
+                  "reclamationCandidates": 0
+                },
+                "sampled": {
+                  "payloadAlive": true,
+                  "transactionAlive": false,
+                  "previousPayloadAlive": false
+                }
+              },
+              {
+                "cycle": 5,
+                "pending": 113293976,
+                "settledHandleHeld": 80918472,
+                "settledHandleDropped": 78293872,
+                "helperReturned": 77013584,
+                "resources": {
+                  "checkedRetired": 10000,
+                  "retiredLifetimes": 0,
+                  "retiredValueBackings": 0,
+                  "currentSubjects": 10000,
+                  "active": 10000,
+                  "facades": 0,
+                  "reclamationCandidates": 0
+                },
+                "sampled": {
+                  "payloadAlive": true,
+                  "transactionAlive": false,
+                  "previousPayloadAlive": false
+                }
+              },
+              {
+                "cycle": 6,
+                "pending": 115025200,
+                "settledHandleHeld": 82557496,
+                "settledHandleDropped": 79968832,
+                "helperReturned": 78688032,
+                "resources": {
+                  "checkedRetired": 10000,
+                  "retiredLifetimes": 0,
+                  "retiredValueBackings": 0,
+                  "currentSubjects": 10000,
+                  "active": 10000,
+                  "facades": 0,
+                  "reclamationCandidates": 0
+                },
+                "sampled": {
+                  "payloadAlive": true,
+                  "transactionAlive": false,
+                  "previousPayloadAlive": false
+                }
+              },
+              {
+                "cycle": 7,
+                "pending": 123987288,
+                "settledHandleHeld": 91576064,
+                "settledHandleDropped": 88955856,
+                "helperReturned": 87675056,
+                "resources": {
+                  "checkedRetired": 10000,
+                  "retiredLifetimes": 0,
+                  "retiredValueBackings": 0,
+                  "currentSubjects": 10000,
+                  "active": 10000,
+                  "facades": 0,
+                  "reclamationCandidates": 0
+                },
+                "sampled": {
+                  "payloadAlive": true,
+                  "transactionAlive": false,
+                  "previousPayloadAlive": false
+                }
+              },
+              {
+                "cycle": 8,
+                "pending": 132975432,
+                "settledHandleHeld": 100514064,
+                "settledHandleDropped": 97909248,
+                "helperReturned": 96628448,
+                "resources": {
+                  "checkedRetired": 10000,
+                  "retiredLifetimes": 0,
+                  "retiredValueBackings": 0,
+                  "currentSubjects": 10000,
+                  "active": 10000,
+                  "facades": 0,
+                  "reclamationCandidates": 0
+                },
+                "sampled": {
+                  "payloadAlive": true,
+                  "transactionAlive": false,
+                  "previousPayloadAlive": false
+                }
+              },
+              {
+                "cycle": 9,
+                "pending": 127356072,
+                "settledHandleHeld": 95005240,
+                "settledHandleDropped": 92380664,
+                "helperReturned": 91117664,
+                "resources": {
+                  "checkedRetired": 10000,
+                  "retiredLifetimes": 0,
+                  "retiredValueBackings": 0,
+                  "currentSubjects": 10000,
+                  "active": 10000,
+                  "facades": 0,
+                  "reclamationCandidates": 0
+                },
+                "sampled": {
+                  "payloadAlive": true,
+                  "transactionAlive": false,
+                  "previousPayloadAlive": false
+                }
+              },
+              {
+                "cycle": 10,
+                "pending": 129214712,
+                "settledHandleHeld": 96766640,
+                "settledHandleDropped": 94160912,
+                "helperReturned": 92880112,
+                "resources": {
+                  "checkedRetired": 10000,
+                  "retiredLifetimes": 0,
+                  "retiredValueBackings": 0,
+                  "currentSubjects": 10000,
+                  "active": 10000,
+                  "facades": 0,
+                  "reclamationCandidates": 0
+                },
+                "sampled": {
+                  "payloadAlive": true,
+                  "transactionAlive": false,
+                  "previousPayloadAlive": false
+                }
+              }
+            ],
+            "lifecycle": {
+              "before": 5596096,
+              "empty": 6026416,
+              "linkDisposed": 67510960,
+              "destroyedTreeHeld": 67487776,
+              "ownerHelperReturned": 8184616
+            },
+            "treeCollectedAfterHelperReturn": true
+          }
+        ],
+        "after": [
+          {
+            "aa": false,
+            "before": 5597728,
+            "empty": 6028736,
+            "cycles": [
+              {
+                "cycle": 1,
+                "pending": 69585944,
+                "settledHandleHeld": 55062680,
+                "settledHandleDropped": 53884976,
+                "helperReturned": 52605328,
+                "resources": {
+                  "checkedRetired": 0,
+                  "retiredLifetimes": 0,
+                  "retiredValueBackings": 0,
+                  "currentSubjects": 10000,
+                  "active": 10000,
+                  "facades": 0,
+                  "reclamationCandidates": 0
+                },
+                "sampled": {
+                  "payloadAlive": true,
+                  "transactionAlive": false,
+                  "previousPayloadAlive": false
+                }
+              },
+              {
+                "cycle": 2,
+                "pending": 97210280,
+                "settledHandleHeld": 64943640,
+                "settledHandleDropped": 62456272,
+                "helperReturned": 61175704,
+                "resources": {
+                  "checkedRetired": 10000,
+                  "retiredLifetimes": 0,
+                  "retiredValueBackings": 0,
+                  "currentSubjects": 10000,
+                  "active": 10000,
+                  "facades": 0,
+                  "reclamationCandidates": 0
+                },
+                "sampled": {
+                  "payloadAlive": true,
+                  "transactionAlive": false,
+                  "previousPayloadAlive": false
+                }
+              },
+              {
+                "cycle": 3,
+                "pending": 99297216,
+                "settledHandleHeld": 65782528,
+                "settledHandleDropped": 63199640,
+                "helperReturned": 61919144,
+                "resources": {
+                  "checkedRetired": 10000,
+                  "retiredLifetimes": 0,
+                  "retiredValueBackings": 0,
+                  "currentSubjects": 10000,
+                  "active": 10000,
+                  "facades": 0,
+                  "reclamationCandidates": 0
+                },
+                "sampled": {
+                  "payloadAlive": true,
+                  "transactionAlive": false,
+                  "previousPayloadAlive": false
+                }
+              },
+              {
+                "cycle": 4,
+                "pending": 106291240,
+                "settledHandleHeld": 72795568,
+                "settledHandleDropped": 70137056,
+                "helperReturned": 68890096,
+                "resources": {
+                  "checkedRetired": 10000,
+                  "retiredLifetimes": 0,
+                  "retiredValueBackings": 0,
+                  "currentSubjects": 10000,
+                  "active": 10000,
+                  "facades": 0,
+                  "reclamationCandidates": 0
+                },
+                "sampled": {
+                  "payloadAlive": true,
+                  "transactionAlive": false,
+                  "previousPayloadAlive": false
+                }
+              },
+              {
+                "cycle": 5,
+                "pending": 106635072,
+                "settledHandleHeld": 73183816,
+                "settledHandleDropped": 70500808,
+                "helperReturned": 69220520,
+                "resources": {
+                  "checkedRetired": 10000,
+                  "retiredLifetimes": 0,
+                  "retiredValueBackings": 0,
+                  "currentSubjects": 10000,
+                  "active": 10000,
+                  "facades": 0,
+                  "reclamationCandidates": 0
+                },
+                "sampled": {
+                  "payloadAlive": true,
+                  "transactionAlive": false,
+                  "previousPayloadAlive": false
+                }
+              },
+              {
+                "cycle": 6,
+                "pending": 107214536,
+                "settledHandleHeld": 73741056,
+                "settledHandleDropped": 71076544,
+                "helperReturned": 69795744,
+                "resources": {
+                  "checkedRetired": 10000,
+                  "retiredLifetimes": 0,
+                  "retiredValueBackings": 0,
+                  "currentSubjects": 10000,
+                  "active": 10000,
+                  "facades": 0,
+                  "reclamationCandidates": 0
+                },
+                "sampled": {
+                  "payloadAlive": true,
+                  "transactionAlive": false,
+                  "previousPayloadAlive": false
+                }
+              },
+              {
+                "cycle": 7,
+                "pending": 107739144,
+                "settledHandleHeld": 74245160,
+                "settledHandleDropped": 71566736,
+                "helperReturned": 70285936,
+                "resources": {
+                  "checkedRetired": 10000,
+                  "retiredLifetimes": 0,
+                  "retiredValueBackings": 0,
+                  "currentSubjects": 10000,
+                  "active": 10000,
+                  "facades": 0,
+                  "reclamationCandidates": 0
+                },
+                "sampled": {
+                  "payloadAlive": true,
+                  "transactionAlive": false,
+                  "previousPayloadAlive": false
+                }
+              },
+              {
+                "cycle": 8,
+                "pending": 115564280,
+                "settledHandleHeld": 82089632,
+                "settledHandleDropped": 79426672,
+                "helperReturned": 78145872,
+                "resources": {
+                  "checkedRetired": 10000,
+                  "retiredLifetimes": 0,
+                  "retiredValueBackings": 0,
+                  "currentSubjects": 10000,
+                  "active": 10000,
+                  "facades": 0,
+                  "reclamationCandidates": 0
+                },
+                "sampled": {
+                  "payloadAlive": true,
+                  "transactionAlive": false,
+                  "previousPayloadAlive": false
+                }
+              },
+              {
+                "cycle": 9,
+                "pending": 108847312,
+                "settledHandleHeld": 75436160,
+                "settledHandleDropped": 72753016,
+                "helperReturned": 71490016,
+                "resources": {
+                  "checkedRetired": 10000,
+                  "retiredLifetimes": 0,
+                  "retiredValueBackings": 0,
+                  "currentSubjects": 10000,
+                  "active": 10000,
+                  "facades": 0,
+                  "reclamationCandidates": 0
+                },
+                "sampled": {
+                  "payloadAlive": true,
+                  "transactionAlive": false,
+                  "previousPayloadAlive": false
+                }
+              },
+              {
+                "cycle": 10,
+                "pending": 109574336,
+                "settledHandleHeld": 76082440,
+                "settledHandleDropped": 73398168,
+                "helperReturned": 72117368,
+                "resources": {
+                  "checkedRetired": 10000,
+                  "retiredLifetimes": 0,
+                  "retiredValueBackings": 0,
+                  "currentSubjects": 10000,
+                  "active": 10000,
+                  "facades": 0,
+                  "reclamationCandidates": 0
+                },
+                "sampled": {
+                  "payloadAlive": true,
+                  "transactionAlive": false,
+                  "previousPayloadAlive": false
+                }
+              }
+            ],
+            "lifecycle": {
+              "before": 5597728,
+              "empty": 6028736,
+              "linkDisposed": 46719560,
+              "destroyedTreeHeld": 46696192,
+              "ownerHelperReturned": 8450320
+            },
+            "treeCollectedAfterHelperReturn": true
+          }
+        ]
+      }
+    },
+    {
+      "rows": 10000,
+      "settlement": "rollback",
+      "cycles": 10,
+      "cpu": {
+        "before": {
+          "population.elapsedMs": {
+            "values": [
+              13091.766585000001,
+              12336.847127000001,
+              9928.212625
+            ],
+            "median": 12336.847127000001,
+            "min": 9928.212625,
+            "max": 13091.766585000001
+          },
+          "population.cpuMs": {
+            "values": [
+              14113.706,
+              13032.366,
+              11665.004
+            ],
+            "median": 13032.366,
+            "min": 11665.004,
+            "max": 14113.706
+          },
+          "settlementSync.elapsedMs": {
+            "values": [
+              13829.17704,
+              13377.784085,
+              11239.733206999997
+            ],
+            "median": 13377.784085,
+            "min": 11239.733206999997,
+            "max": 13829.17704
+          },
+          "settlementSync.cpuMs": {
+            "values": [
+              14849.731,
+              14639.953,
+              11781.701000000001
+            ],
+            "median": 14639.953,
+            "min": 11781.701000000001,
+            "max": 14849.731
+          },
+          "settlementIncludingDrain.elapsedMs": {
+            "values": [
+              20594.661083,
+              18772.811999999998,
+              16294.962959
+            ],
+            "median": 18772.811999999998,
+            "min": 16294.962959,
+            "max": 20594.661083
+          },
+          "settlementIncludingDrain.cpuMs": {
+            "values": [
+              24005.89,
+              21972.823999999997,
+              19084.245
+            ],
+            "median": 21972.823999999997,
+            "min": 19084.245,
+            "max": 24005.89
+          }
+        },
+        "after": {
+          "population.elapsedMs": {
+            "values": [
+              10435.970415000002,
+              9559.029459000001,
+              11290.772872999998
+            ],
+            "median": 10435.970415000002,
+            "min": 9559.029459000001,
+            "max": 11290.772872999998
+          },
+          "population.cpuMs": {
+            "values": [
+              11995.767,
+              12285.182999999999,
+              12687.563000000002
+            ],
+            "median": 12285.182999999999,
+            "min": 11995.767,
+            "max": 12687.563000000002
+          },
+          "settlementSync.elapsedMs": {
+            "values": [
+              13337.100375,
+              9307.49746,
+              11457.449417
+            ],
+            "median": 11457.449417,
+            "min": 9307.49746,
+            "max": 13337.100375
+          },
+          "settlementSync.cpuMs": {
+            "values": [
+              14527.418000000001,
+              11677.868999999999,
+              14115.015000000001
+            ],
+            "median": 14115.015000000001,
+            "min": 11677.868999999999,
+            "max": 14527.418000000001
+          },
+          "settlementIncludingDrain.elapsedMs": {
+            "values": [
+              18590.545916,
+              12956.596585000001,
+              16030.534833
+            ],
+            "median": 16030.534833,
+            "min": 12956.596585000001,
+            "max": 18590.545916
+          },
+          "settlementIncludingDrain.cpuMs": {
+            "values": [
+              20825.700999999997,
+              16934.841,
+              20973.212
+            ],
+            "median": 20825.700999999997,
+            "min": 16934.841,
+            "max": 20973.212
+          }
+        }
+      },
+      "pairedAfterMinusBefore": {
+        "population.elapsedMs": [
+          -2655.7961699999996,
+          -2777.8176679999997,
+          1362.560247999998
+        ],
+        "population.cpuMs": [
+          -2117.9390000000003,
+          -747.1830000000009,
+          1022.5590000000011
+        ],
+        "settlementSync.elapsedMs": [
+          -492.0766650000005,
+          -4070.286624999999,
+          217.71621000000232
+        ],
+        "settlementSync.cpuMs": [
+          -322.3129999999983,
+          -2962.0840000000007,
+          2333.3140000000003
+        ],
+        "settlementIncludingDrain.elapsedMs": [
+          -2004.115167,
+          -5816.215414999997,
+          -264.4281260000007
+        ],
+        "settlementIncludingDrain.cpuMs": [
+          -3180.189000000002,
+          -5037.9829999999965,
+          1888.9670000000006
+        ]
+      },
+      "baselineAASecondMinusFirst": {
+        "population.elapsedMs": 66.17391900000075,
+        "population.cpuMs": -999.0429999999997,
+        "settlementSync.elapsedMs": 565.7617099999989,
+        "settlementSync.cpuMs": 1652.9479999999985,
+        "settlementIncludingDrain.elapsedMs": 354.83458299999984,
+        "settlementIncludingDrain.cpuMs": 608.5160000000014
+      },
+      "memory": {
+        "before": [
+          {
+            "aa": false,
+            "before": 5595856,
+            "empty": 6026152,
+            "cycles": [
+              {
+                "cycle": 1,
+                "pending": 69387392,
+                "settledHandleHeld": 18303272,
+                "settledHandleDropped": 17025824,
+                "helperReturned": 15504304,
+                "resources": {
+                  "checkedRetired": 10000,
+                  "retiredLifetimes": 0,
+                  "retiredValueBackings": 0,
+                  "currentSubjects": 10000,
+                  "active": 0,
+                  "facades": 0,
+                  "reclamationCandidates": 0
+                },
+                "sampled": {
+                  "payloadAlive": false,
+                  "transactionAlive": false,
+                  "previousPayloadAlive": false
+                }
+              },
+              {
+                "cycle": 2,
+                "pending": 73923320,
+                "settledHandleHeld": 19974864,
+                "settledHandleDropped": 18800704,
+                "helperReturned": 17275416,
+                "resources": {
+                  "checkedRetired": 10000,
+                  "retiredLifetimes": 0,
+                  "retiredValueBackings": 0,
+                  "currentSubjects": 10000,
+                  "active": 0,
+                  "facades": 0,
+                  "reclamationCandidates": 0
+                },
+                "sampled": {
+                  "payloadAlive": false,
+                  "transactionAlive": false,
+                  "previousPayloadAlive": false
+                }
+              },
+              {
+                "cycle": 3,
+                "pending": 74105688,
+                "settledHandleHeld": 20411216,
+                "settledHandleDropped": 19277056,
+                "helperReturned": 17780904,
+                "resources": {
+                  "checkedRetired": 10000,
+                  "retiredLifetimes": 0,
+                  "retiredValueBackings": 0,
+                  "currentSubjects": 10000,
+                  "active": 0,
+                  "facades": 0,
+                  "reclamationCandidates": 0
+                },
+                "sampled": {
+                  "payloadAlive": false,
+                  "transactionAlive": false,
+                  "previousPayloadAlive": false
+                }
+              },
+              {
+                "cycle": 4,
+                "pending": 82045864,
+                "settledHandleHeld": 23892440,
+                "settledHandleDropped": 22645344,
+                "helperReturned": 21121296,
+                "resources": {
+                  "checkedRetired": 10000,
+                  "retiredLifetimes": 0,
+                  "retiredValueBackings": 0,
+                  "currentSubjects": 10000,
+                  "active": 0,
+                  "facades": 0,
+                  "reclamationCandidates": 0
+                },
+                "sampled": {
+                  "payloadAlive": false,
+                  "transactionAlive": false,
+                  "previousPayloadAlive": false
+                }
+              },
+              {
+                "cycle": 5,
+                "pending": 82664288,
+                "settledHandleHeld": 24534312,
+                "settledHandleDropped": 23352408,
+                "helperReturned": 21701200,
+                "resources": {
+                  "checkedRetired": 10000,
+                  "retiredLifetimes": 0,
+                  "retiredValueBackings": 0,
+                  "currentSubjects": 10000,
+                  "active": 0,
+                  "facades": 0,
+                  "reclamationCandidates": 0
+                },
+                "sampled": {
+                  "payloadAlive": false,
+                  "transactionAlive": false,
+                  "previousPayloadAlive": false
+                }
+              },
+              {
+                "cycle": 6,
+                "pending": 83247096,
+                "settledHandleHeld": 25062840,
+                "settledHandleDropped": 23764728,
+                "helperReturned": 22239208,
+                "resources": {
+                  "checkedRetired": 10000,
+                  "retiredLifetimes": 0,
+                  "retiredValueBackings": 0,
+                  "currentSubjects": 10000,
+                  "active": 0,
+                  "facades": 0,
+                  "reclamationCandidates": 0
+                },
+                "sampled": {
+                  "payloadAlive": false,
+                  "transactionAlive": false,
+                  "previousPayloadAlive": false
+                }
+              },
+              {
+                "cycle": 7,
+                "pending": 83747592,
+                "settledHandleHeld": 31104080,
+                "settledHandleDropped": 29814456,
+                "helperReturned": 28289752,
+                "resources": {
+                  "checkedRetired": 10000,
+                  "retiredLifetimes": 0,
+                  "retiredValueBackings": 0,
+                  "currentSubjects": 10000,
+                  "active": 0,
+                  "facades": 0,
+                  "reclamationCandidates": 0
+                },
+                "sampled": {
+                  "payloadAlive": false,
+                  "transactionAlive": false,
+                  "previousPayloadAlive": false
+                }
+              },
+              {
+                "cycle": 8,
+                "pending": 91616896,
+                "settledHandleHeld": 31538872,
+                "settledHandleDropped": 30321408,
+                "helperReturned": 28792488,
+                "resources": {
+                  "checkedRetired": 10000,
+                  "retiredLifetimes": 0,
+                  "retiredValueBackings": 0,
+                  "currentSubjects": 10000,
+                  "active": 0,
+                  "facades": 0,
+                  "reclamationCandidates": 0
+                },
+                "sampled": {
+                  "payloadAlive": false,
+                  "transactionAlive": false,
+                  "previousPayloadAlive": false
+                }
+              },
+              {
+                "cycle": 9,
+                "pending": 84796200,
+                "settledHandleHeld": 32226624,
+                "settledHandleDropped": 30973688,
+                "helperReturned": 29463712,
+                "resources": {
+                  "checkedRetired": 10000,
+                  "retiredLifetimes": 0,
+                  "retiredValueBackings": 0,
+                  "currentSubjects": 10000,
+                  "active": 0,
+                  "facades": 0,
+                  "reclamationCandidates": 0
+                },
+                "sampled": {
+                  "payloadAlive": false,
+                  "transactionAlive": false,
+                  "previousPayloadAlive": false
+                }
+              },
+              {
+                "cycle": 10,
+                "pending": 85698376,
+                "settledHandleHeld": 32922664,
+                "settledHandleDropped": 31625024,
+                "helperReturned": 30000624,
+                "resources": {
+                  "checkedRetired": 10000,
+                  "retiredLifetimes": 0,
+                  "retiredValueBackings": 0,
+                  "currentSubjects": 10000,
+                  "active": 0,
+                  "facades": 0,
+                  "reclamationCandidates": 0
+                },
+                "sampled": {
+                  "payloadAlive": false,
+                  "transactionAlive": false,
+                  "previousPayloadAlive": false
+                }
+              }
+            ],
+            "lifecycle": {
+              "before": 5595856,
+              "empty": 6026152,
+              "linkDisposed": 13954752,
+              "destroyedTreeHeld": 13931688,
+              "ownerHelperReturned": 9984576
+            },
+            "treeCollectedAfterHelperReturn": true
+          },
+          {
+            "aa": true,
+            "before": 5596136,
+            "empty": 6026456,
+            "cycles": [
+              {
+                "cycle": 1,
+                "pending": 69404672,
+                "settledHandleHeld": 18295760,
+                "settledHandleDropped": 17020096,
+                "helperReturned": 15498576,
+                "resources": {
+                  "checkedRetired": 10000,
+                  "retiredLifetimes": 0,
+                  "retiredValueBackings": 0,
+                  "currentSubjects": 10000,
+                  "active": 0,
+                  "facades": 0,
+                  "reclamationCandidates": 0
+                },
+                "sampled": {
+                  "payloadAlive": false,
+                  "transactionAlive": false,
+                  "previousPayloadAlive": false
+                }
+              },
+              {
+                "cycle": 2,
+                "pending": 73897072,
+                "settledHandleHeld": 19844808,
+                "settledHandleDropped": 18686688,
+                "helperReturned": 17161400,
+                "resources": {
+                  "checkedRetired": 10000,
+                  "retiredLifetimes": 0,
+                  "retiredValueBackings": 0,
+                  "currentSubjects": 10000,
+                  "active": 0,
+                  "facades": 0,
+                  "reclamationCandidates": 0
+                },
+                "sampled": {
+                  "payloadAlive": false,
+                  "transactionAlive": false,
+                  "previousPayloadAlive": false
+                }
+              },
+              {
+                "cycle": 3,
+                "pending": 74058976,
+                "settledHandleHeld": 20714592,
+                "settledHandleDropped": 19330432,
+                "helperReturned": 17765760,
+                "resources": {
+                  "checkedRetired": 10000,
+                  "retiredLifetimes": 0,
+                  "retiredValueBackings": 0,
+                  "currentSubjects": 10000,
+                  "active": 0,
+                  "facades": 0,
+                  "reclamationCandidates": 0
+                },
+                "sampled": {
+                  "payloadAlive": false,
+                  "transactionAlive": false,
+                  "previousPayloadAlive": false
+                }
+              },
+              {
+                "cycle": 4,
+                "pending": 82048512,
+                "settledHandleHeld": 23808064,
+                "settledHandleDropped": 22615968,
+                "helperReturned": 21091408,
+                "resources": {
+                  "checkedRetired": 10000,
+                  "retiredLifetimes": 0,
+                  "retiredValueBackings": 0,
+                  "currentSubjects": 10000,
+                  "active": 0,
+                  "facades": 0,
+                  "reclamationCandidates": 0
+                },
+                "sampled": {
+                  "payloadAlive": false,
+                  "transactionAlive": false,
+                  "previousPayloadAlive": false
+                }
+              },
+              {
+                "cycle": 5,
+                "pending": 82553840,
+                "settledHandleHeld": 24397320,
+                "settledHandleDropped": 23148392,
+                "helperReturned": 21624200,
+                "resources": {
+                  "checkedRetired": 10000,
+                  "retiredLifetimes": 0,
+                  "retiredValueBackings": 0,
+                  "currentSubjects": 10000,
+                  "active": 0,
+                  "facades": 0,
+                  "reclamationCandidates": 0
+                },
+                "sampled": {
+                  "payloadAlive": false,
+                  "transactionAlive": false,
+                  "previousPayloadAlive": false
+                }
+              },
+              {
+                "cycle": 6,
+                "pending": 83156824,
+                "settledHandleHeld": 24968272,
+                "settledHandleDropped": 23805120,
+                "helperReturned": 22161432,
+                "resources": {
+                  "checkedRetired": 10000,
+                  "retiredLifetimes": 0,
+                  "retiredValueBackings": 0,
+                  "currentSubjects": 10000,
+                  "active": 0,
+                  "facades": 0,
+                  "reclamationCandidates": 0
+                },
+                "sampled": {
+                  "payloadAlive": false,
+                  "transactionAlive": false,
+                  "previousPayloadAlive": false
+                }
+              },
+              {
+                "cycle": 7,
+                "pending": 83683960,
+                "settledHandleHeld": 31030192,
+                "settledHandleDropped": 29712936,
+                "helperReturned": 28188232,
+                "resources": {
+                  "checkedRetired": 10000,
+                  "retiredLifetimes": 0,
+                  "retiredValueBackings": 0,
+                  "currentSubjects": 10000,
+                  "active": 0,
+                  "facades": 0,
+                  "reclamationCandidates": 0
+                },
+                "sampled": {
+                  "payloadAlive": false,
+                  "transactionAlive": false,
+                  "previousPayloadAlive": false
+                }
+              },
+              {
+                "cycle": 8,
+                "pending": 91486456,
+                "settledHandleHeld": 31416416,
+                "settledHandleDropped": 30222448,
+                "helperReturned": 28693528,
+                "resources": {
+                  "checkedRetired": 10000,
+                  "retiredLifetimes": 0,
+                  "retiredValueBackings": 0,
+                  "currentSubjects": 10000,
+                  "active": 0,
+                  "facades": 0,
+                  "reclamationCandidates": 0
+                },
+                "sampled": {
+                  "payloadAlive": false,
+                  "transactionAlive": false,
+                  "previousPayloadAlive": false
+                }
+              },
+              {
+                "cycle": 9,
+                "pending": 84708536,
+                "settledHandleHeld": 32141512,
+                "settledHandleDropped": 30883424,
+                "helperReturned": 29373448,
+                "resources": {
+                  "checkedRetired": 10000,
+                  "retiredLifetimes": 0,
+                  "retiredValueBackings": 0,
+                  "currentSubjects": 10000,
+                  "active": 0,
+                  "facades": 0,
+                  "reclamationCandidates": 0
+                },
+                "sampled": {
+                  "payloadAlive": false,
+                  "transactionAlive": false,
+                  "previousPayloadAlive": false
+                }
+              },
+              {
+                "cycle": 10,
+                "pending": 85604424,
+                "settledHandleHeld": 32807224,
+                "settledHandleDropped": 31503672,
+                "helperReturned": 29906152,
+                "resources": {
+                  "checkedRetired": 10000,
+                  "retiredLifetimes": 0,
+                  "retiredValueBackings": 0,
+                  "currentSubjects": 10000,
+                  "active": 0,
+                  "facades": 0,
+                  "reclamationCandidates": 0
+                },
+                "sampled": {
+                  "payloadAlive": false,
+                  "transactionAlive": false,
+                  "previousPayloadAlive": false
+                }
+              }
+            ],
+            "lifecycle": {
+              "before": 5596136,
+              "empty": 6026456,
+              "linkDisposed": 13857592,
+              "destroyedTreeHeld": 13834432,
+              "ownerHelperReturned": 9978864
+            },
+            "treeCollectedAfterHelperReturn": true
+          }
+        ],
+        "after": [
+          {
+            "aa": false,
+            "before": 5597728,
+            "empty": 6028736,
+            "cycles": [
+              {
+                "cycle": 1,
+                "pending": 69394408,
+                "settledHandleHeld": 19064656,
+                "settledHandleDropped": 17788552,
+                "helperReturned": 16267032,
+                "resources": {
+                  "checkedRetired": 10000,
+                  "retiredLifetimes": 0,
+                  "retiredValueBackings": 0,
+                  "currentSubjects": 10000,
+                  "active": 0,
+                  "facades": 0,
+                  "reclamationCandidates": 0
+                },
+                "sampled": {
+                  "payloadAlive": false,
+                  "transactionAlive": false,
+                  "previousPayloadAlive": false
+                }
+              },
+              {
+                "cycle": 2,
+                "pending": 74666416,
+                "settledHandleHeld": 20125040,
+                "settledHandleDropped": 18945968,
+                "helperReturned": 17420680,
+                "resources": {
+                  "checkedRetired": 10000,
+                  "retiredLifetimes": 0,
+                  "retiredValueBackings": 0,
+                  "currentSubjects": 10000,
+                  "active": 0,
+                  "facades": 0,
+                  "reclamationCandidates": 0
+                },
+                "sampled": {
+                  "payloadAlive": false,
+                  "transactionAlive": false,
+                  "previousPayloadAlive": false
+                }
+              },
+              {
+                "cycle": 3,
+                "pending": 74290080,
+                "settledHandleHeld": 20723448,
+                "settledHandleDropped": 19574432,
+                "helperReturned": 18045456,
+                "resources": {
+                  "checkedRetired": 10000,
+                  "retiredLifetimes": 0,
+                  "retiredValueBackings": 0,
+                  "currentSubjects": 10000,
+                  "active": 0,
+                  "facades": 0,
+                  "reclamationCandidates": 0
+                },
+                "sampled": {
+                  "payloadAlive": false,
+                  "transactionAlive": false,
+                  "previousPayloadAlive": false
+                }
+              },
+              {
+                "cycle": 4,
+                "pending": 82311144,
+                "settledHandleHeld": 24139920,
+                "settledHandleDropped": 22869280,
+                "helperReturned": 21344720,
+                "resources": {
+                  "checkedRetired": 10000,
+                  "retiredLifetimes": 0,
+                  "retiredValueBackings": 0,
+                  "currentSubjects": 10000,
+                  "active": 0,
+                  "facades": 0,
+                  "reclamationCandidates": 0
+                },
+                "sampled": {
+                  "payloadAlive": false,
+                  "transactionAlive": false,
+                  "previousPayloadAlive": false
+                }
+              },
+              {
+                "cycle": 5,
+                "pending": 82841856,
+                "settledHandleHeld": 24687032,
+                "settledHandleDropped": 23506160,
+                "helperReturned": 21868880,
+                "resources": {
+                  "checkedRetired": 10000,
+                  "retiredLifetimes": 0,
+                  "retiredValueBackings": 0,
+                  "currentSubjects": 10000,
+                  "active": 0,
+                  "facades": 0,
+                  "reclamationCandidates": 0
+                },
+                "sampled": {
+                  "payloadAlive": false,
+                  "transactionAlive": false,
+                  "previousPayloadAlive": false
+                }
+              },
+              {
+                "cycle": 6,
+                "pending": 83413120,
+                "settledHandleHeld": 25198864,
+                "settledHandleDropped": 23921448,
+                "helperReturned": 22396744,
+                "resources": {
+                  "checkedRetired": 10000,
+                  "retiredLifetimes": 0,
+                  "retiredValueBackings": 0,
+                  "currentSubjects": 10000,
+                  "active": 0,
+                  "facades": 0,
+                  "reclamationCandidates": 0
+                },
+                "sampled": {
+                  "payloadAlive": false,
+                  "transactionAlive": false,
+                  "previousPayloadAlive": false
+                }
+              },
+              {
+                "cycle": 7,
+                "pending": 83869272,
+                "settledHandleHeld": 31218752,
+                "settledHandleDropped": 29975144,
+                "helperReturned": 28449624,
+                "resources": {
+                  "checkedRetired": 10000,
+                  "retiredLifetimes": 0,
+                  "retiredValueBackings": 0,
+                  "currentSubjects": 10000,
+                  "active": 0,
+                  "facades": 0,
+                  "reclamationCandidates": 0
+                },
+                "sampled": {
+                  "payloadAlive": false,
+                  "transactionAlive": false,
+                  "previousPayloadAlive": false
+                }
+              },
+              {
+                "cycle": 8,
+                "pending": 91758488,
+                "settledHandleHeld": 31715104,
+                "settledHandleDropped": 30451088,
+                "helperReturned": 28922040,
+                "resources": {
+                  "checkedRetired": 10000,
+                  "retiredLifetimes": 0,
+                  "retiredValueBackings": 0,
+                  "currentSubjects": 10000,
+                  "active": 0,
+                  "facades": 0,
+                  "reclamationCandidates": 0
+                },
+                "sampled": {
+                  "payloadAlive": false,
+                  "transactionAlive": false,
+                  "previousPayloadAlive": false
+                }
+              },
+              {
+                "cycle": 9,
+                "pending": 84948936,
+                "settledHandleHeld": 32355976,
+                "settledHandleDropped": 31103112,
+                "helperReturned": 29593328,
+                "resources": {
+                  "checkedRetired": 10000,
+                  "retiredLifetimes": 0,
+                  "retiredValueBackings": 0,
+                  "currentSubjects": 10000,
+                  "active": 0,
+                  "facades": 0,
+                  "reclamationCandidates": 0
+                },
+                "sampled": {
+                  "payloadAlive": false,
+                  "transactionAlive": false,
+                  "previousPayloadAlive": false
+                }
+              },
+              {
+                "cycle": 10,
+                "pending": 85786832,
+                "settledHandleHeld": 32965696,
+                "settledHandleDropped": 31692120,
+                "helperReturned": 30095416,
+                "resources": {
+                  "checkedRetired": 10000,
+                  "retiredLifetimes": 0,
+                  "retiredValueBackings": 0,
+                  "currentSubjects": 10000,
+                  "active": 0,
+                  "facades": 0,
+                  "reclamationCandidates": 0
+                },
+                "sampled": {
+                  "payloadAlive": false,
+                  "transactionAlive": false,
+                  "previousPayloadAlive": false
+                }
+              }
+            ],
+            "lifecycle": {
+              "before": 5597728,
+              "empty": 6028736,
+              "linkDisposed": 14090504,
+              "destroyedTreeHeld": 14067440,
+              "ownerHelperReturned": 10244976
+            },
+            "treeCollectedAfterHelperReturn": true
+          }
+        ]
+      }
+    }
+  ],
+  "limits": [
+    "Three paired CPU rounds and one A/A pair per profile are exploratory; no significance or confidence-interval claim.",
+    "CPU population is transact+row copying+population; settlementIncludingDrain includes native settlement, fixed microtask draining and useful sink hashing. It contains settlementSync: do not add them.",
+    "No forced GC occurs in CPU children. Heap children run fixed three job-separated GCs per checkpoint; their timing is not compared.",
+    "Held and post-helper whole-heap bytes are retained-process observations, not allocated bytes, peak heap or universal leak absence.",
+    "Finite repeated fresh-lifetime history can legitimately retain exact terminal facts; physical payload reclamation does not authorize proof erasure.",
+    "Public and HTTP suites prove tested functional cases; fixture authority is not production auth, durable recovery or throughput evidence."
+  ]
+}

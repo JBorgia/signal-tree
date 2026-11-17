@@ -1,0 +1,24 @@
+{
+  "arms": {
+    "C1": {
+      "manifest": "/ABSOLUTE/PERSISTENT/C1-build/kernel.json",
+      "manifestSha256": "REPLACE_WITH_EXACT_MANIFEST_SHA256",
+      "transactionsSourceSha256": "ccdd7d729b34739343e5b6a0211e57a66cd697255bdc8227e2dfb7fa18eacce0"
+    },
+    "L1": {
+      "manifest": "/ABSOLUTE/PERSISTENT/L1-build/kernel.json",
+      "manifestSha256": "REPLACE_WITH_EXACT_MANIFEST_SHA256",
+      "transactionsSourceSha256": "d911e242da3962cc8535f8488f713dca8ba884339540fd6b70269df68b0437dd"
+    },
+    "L2": {
+      "manifest": "/ABSOLUTE/PERSISTENT/L2-build/kernel.json",
+      "manifestSha256": "REPLACE_WITH_EXACT_MANIFEST_SHA256",
+      "transactionsSourceSha256": "fe333db704ae9397cb69fcc1e6b5219d1d3d495cd1c16f95fbf7ec5d525fbbea"
+    },
+    "L3": {
+      "manifest": "/ABSOLUTE/PERSISTENT/L3-build/kernel.json",
+      "manifestSha256": "REPLACE_WITH_EXACT_MANIFEST_SHA256",
+      "transactionsSourceSha256": "049e95d7950f510d8b4869702a5ea7b11f793e31559ddae2e495ff745c2af943"
+    }
+  }
+}

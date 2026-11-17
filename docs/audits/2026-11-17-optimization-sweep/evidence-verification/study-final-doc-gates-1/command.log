@@ -1,0 +1,10 @@
+
+Running 4 gates
+
+  · version-claims       pass ✓  (every documented Angular-version claim matches peerDependencies)
+  · numeric-claims       pass ✓  (every measured figure on a live surface names a tool that produces it — ratcheted, so new ungenerated numbers cannot land)
+  · release-claims       pass ✓  (every symbol/code ADDED since the last release tag reaches every surface that claims to describe the library)
+  · doc-links            pass ✓  (every relative link resolves AND every install instruction selects a publishable current package (archive/CHANGELOG excluded as point-in-time))
+
+──────────────────────────────────────────────────────────────────────────────
+4/4 passed, 0 failed, 0 known-red.

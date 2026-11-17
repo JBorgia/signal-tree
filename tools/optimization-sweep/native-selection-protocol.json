@@ -1,0 +1,15 @@
+{
+  "version": 1,
+  "sourceReference": "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/capture/fresh-generator/capture-cost.mjs",
+  "sourceReferenceSha256": "6ee0aeb434939e90897126d6ea213a40b60e0f5f70478df6693fa5caaff2329b",
+  "question": "Price whole native requirement-selection reuse against exact C1. Existing explicit capture semantics/oracles are retained, manifests updated, separate CPU/heap processes.",
+  "profiles": {
+    "no-history": "1000 live nine-field rows with20 meaningful field updates; no history. Additional20 meaningful edit/capture pairs have independent expanded reference/owner checks outside each timer.",
+    "homogeneous": "10\u00d71000 bulk population/rollback lifetimes, no live rows.",
+    "mixed": "5\u00d7200 bulk rollback plus256 distinct reverse rollback, then200 live rows. Fallback must exist before live population."
+  },
+  "schedule": "Per kind,3profiles\u00d73matchedpairs plus1C1 A/A pair perprofile=24children. Three planted original oracle faults precede each cohort; do not overwrite or select retries.",
+  "metrics": "Actual cold first capture (counter admission must prove it),19 repeated captures, separate no-history20 edit/capture sum. CPU/elapsed only in CPU children. Heap children report original four-GC before/held/released finite wholeprocess checkpoints; those include deliberately retained oracle references, never per-feature or universal leak attribution.",
+  "preservation": "Fresh captured objects and owner arrays, exact requirement and owner identity/order, proof flags, represented facts, expanded run census positive control, destroy/drain. Existing ordinary and original point bounds are separate.",
+  "limits": "Direct built ESM barrel with native factory present and production environment; no minified facade/browser/startup/recipient/workflow claim. No savings inferred for cached public root reads."
+}

@@ -1,0 +1,193 @@
+{
+  "format": "signaltree-optimization-sweep-evidence-index-v2",
+  "completedUTC": "2026-11-17T20:56:27.743293+00:00",
+  "archive": {
+    "file": "evidence.tar.gz",
+    "bytes": 804932468,
+    "sha256": "44e14f2fbd07617feeb94b0f003d1cb3993d6aebdcfd3ec1ce64c30d1da976d7",
+    "manifestSha256": "c35635a5c690f9b3f919eb4b1f1751e36b92d0484039908405ee680e9ab74688",
+    "partsInOrder": [
+      {
+        "file": "evidence.tar.gz.part-001",
+        "bytes": 90000000,
+        "sha256": "d19f3b121c4b55b638ab9cc7d9f132da3a21c33ed12281ee897d64289d1120d9"
+      },
+      {
+        "file": "evidence.tar.gz.part-002",
+        "bytes": 90000000,
+        "sha256": "207c43a9e68ff5e8f51e57042f4f883adbf4cba362d45b56fe1c48116e1f02bc"
+      },
+      {
+        "file": "evidence.tar.gz.part-003",
+        "bytes": 90000000,
+        "sha256": "5ba964539a31aa5e9b1fe8454abce45019eef8bd4f5c4e57744cb674388d4de8"
+      },
+      {
+        "file": "evidence.tar.gz.part-004",
+        "bytes": 90000000,
+        "sha256": "4029ac38f03b411fb99ff5ba1058bdd04a556c51564bef8f4c410d1542b8f9da"
+      },
+      {
+        "file": "evidence.tar.gz.part-005",
+        "bytes": 90000000,
+        "sha256": "78824fa3f1fa25790ea654ffdc112b6615874b1a76d9db73695af67adcee91c2"
+      },
+      {
+        "file": "evidence.tar.gz.part-006",
+        "bytes": 90000000,
+        "sha256": "da14bf46af5ee909e4b00cd54739bad17f46b6402a8da92011e9bb4452c98515"
+      },
+      {
+        "file": "evidence.tar.gz.part-007",
+        "bytes": 90000000,
+        "sha256": "7a8313ce71a00722f1e134d3f914d318a15f88d9798c60ae28de83c37f9cb77f"
+      },
+      {
+        "file": "evidence.tar.gz.part-008",
+        "bytes": 90000000,
+        "sha256": "6eed05ed242c21758bca65ee594d961b115863d9cf18a8702f9de4bf13b1865c"
+      },
+      {
+        "file": "evidence.tar.gz.part-009",
+        "bytes": 84932468,
+        "sha256": "0a664e111a1c9876186733e2d5bc4c1968e15de032d146d099fdb8baa72aaf5f"
+      }
+    ],
+    "counts": {
+      "originalVersionMappings": 124053,
+      "uniquePayloads": 33695,
+      "payloadBytes": 2954825036
+    }
+  },
+  "closure": {
+    "sha256": "dd6799652a6e237cdff5ce260c8ea3b91572a684458fe8b27017dd88b7824db6",
+    "format": "signaltree-optimization-closure-v2",
+    "complete": true,
+    "report": "evidence-verification/prepare-report.json",
+    "reportSha256": "2b7faa49f0bc1b3440099f1c8077d5d3d2bdb8d38ea2a859a0cbab4418c2cd22"
+  },
+  "verifiers": [
+    {
+      "file": "evidence-verification/archive-selection.py",
+      "sha256": "12811cbe60f20da9f9a873c1bd7b854d16cd5d2a1ec34c439b05178190517f76"
+    },
+    {
+      "file": "evidence-verification/archive-evidence.py",
+      "sha256": "71683eb8d1a3a7470aa859fa87882222000e6795ca7fc6b33d37281000025c1f"
+    },
+    {
+      "file": "evidence-verification/original-free.py",
+      "sha256": "b51ecebb02ef27551057f8095ede26dbcab8347d9d37b3df6013fe1a5f6423b7"
+    }
+  ],
+  "verification": {
+    "passed": true,
+    "receipt": "evidence-verification/result.json",
+    "receiptSha256": "337e942b92ba71e9825c2bac5cbf20d83955155a4a0ebd4756b3b17c48a31360",
+    "checks": [
+      "create",
+      "pack",
+      "extract",
+      "verify-extracted",
+      "reject-corrupt",
+      "reject-missing",
+      "original-read-denial-restored"
+    ],
+    "reassembledBytesIdentical": true,
+    "firstPrepareAttempts": [
+      {
+        "receipt": "evidence-verification/prepare-1/receipt.json",
+        "sha256": "0e4e113957055b53975769b5646b7b99653a66159a56ce2c4e4377f78ee7fa41",
+        "exitCode": 1
+      },
+      {
+        "receipt": "evidence-verification/prepare-2/receipt.json",
+        "sha256": "b34c5060390b917557cc020838cbb3e5c9a1f2c341579c3b9480bd97540ca518",
+        "exitCode": 1
+      },
+      {
+        "receipt": "evidence-verification/prepare-3/receipt.json",
+        "sha256": "f12b0ea9ef7de0c8f93ba8636f8c97cc30904a9621d5847e0e51223744d94ee0",
+        "exitCode": 1
+      },
+      {
+        "receipt": "evidence-verification/prepare-4/receipt.json",
+        "sha256": "5a9caac190c42696bc52b41b02dd5f997354a74fbbd45e324cae3fe46bf26a01",
+        "exitCode": 1
+      },
+      {
+        "receipt": "evidence-verification/prepare-5/receipt.json",
+        "sha256": "2d1d23008469138d231b461641da512303f8a6d92cc8ea29e52d7d2fdb692934",
+        "exitCode": 1
+      },
+      {
+        "receipt": "evidence-verification/prepare-6/receipt.json",
+        "sha256": "442d89e002387fd20f878216c4d53d0611b2fe53e6453eb3a9bd4747c7e8fc68",
+        "exitCode": 0
+      }
+    ]
+  },
+  "readableSummaries": [
+    {
+      "file": "application-summary.json",
+      "sha256": "6731e2785686f070322ec5a6b285b36901eb47233a485a95cc2d6df3aef6181d"
+    },
+    {
+      "file": "native-summary.json",
+      "sha256": "241fd587f0c21e15d58d3ef7ed4cb6f8356cceeacc781ccc85c8c168a5e0ab4f"
+    },
+    {
+      "file": "capture-analysis.json",
+      "sha256": "fe824d0a6d0e4b5496d2f462d156b5a086f588e36c8c06dd61d607b29a450446"
+    },
+    {
+      "file": "runtime-disposition.json",
+      "sha256": "8029691ffd417eaed731fb87bf15db7cb7bbe529f5dc8d4d821e0f892e5bd98a"
+    }
+  ],
+  "runtimeIdentities": {
+    "v15": "4d1142d6166b2d5b2874715e38097665545864dc",
+    "v16": "7ab6cbcc70bf5abe9c5070e38a51bd0229ed1830",
+    "remoteHeads": "evidence-verification/runtime-remote-heads.json",
+    "remoteHeadsSha256": "1cf7671128411e2ca7fd4b06257d4044f8ace5e08a6ac7971b005c36bcf4c5af"
+  },
+  "verificationCommandsFromRepositoryRoot": [
+    "ST_VERIFY_DIR=\"$(mktemp -d)\"",
+    "cat docs/audits/2026-11-17-optimization-sweep/evidence.tar.gz.part-* > \"$ST_VERIFY_DIR/evidence.tar.gz\"",
+    "shasum -a 256 \"$ST_VERIFY_DIR/evidence.tar.gz\"",
+    "python3 docs/audits/2026-11-17-optimization-sweep/evidence-verification/archive-evidence.py extract \"$ST_VERIFY_DIR/evidence.tar.gz\" \"$ST_VERIFY_DIR/extracted\"",
+    "python3 \"$ST_VERIFY_DIR/extracted/payloads/sha256/12811cbe60f20da9f9a873c1bd7b854d16cd5d2a1ec34c439b05178190517f76\" verify-extracted \"$ST_VERIFY_DIR/extracted\" dd6799652a6e237cdff5ce260c8ea3b91572a684458fe8b27017dd88b7824db6",
+    "python3 -I -B docs/audits/2026-11-17-optimization-sweep/evidence-verification/original-free.py \"$ST_VERIFY_DIR/extracted\" dd6799652a6e237cdff5ce260c8ea3b91572a684458fe8b27017dd88b7824db6 docs/audits/2026-11-17-optimization-sweep/README.md"
+  ],
+  "usage": "Check each ordered part hash and the aggregate archive hash against this index before extraction. Original paths are identities, not extraction destinations. The final command uses an existing file outside extraction to prove outside opens are denied, then runs the archived selector.",
+  "limits": [
+    "Integrity and typed evidence-reference closure, not authenticity or a universal semantic claim.",
+    "Full predecessor index bytes and producer-selected members are checked; unrelated historical members are not requalified.",
+    "Original-read denial is a Python open/dependency audit of this known verifier, not an OS security sandbox.",
+    "Post-packaging receipts and the final public index are external to avoid a self-hash cycle.",
+    "Source and inspection edges preserve exact input bytes without replaying historical embedded test claims. Explicit current qualification and evidence edges retain their obligations; the strongest role wins across aliases.",
+    "Data-field rules bind exact document bytes, JSON pointer and value with producer/control evidence. Synthetic invalid identities and in-memory value digests are not physical file claims.",
+    "The old v15 qualification summary supplies candidate archive identities only. Its already-documented missing historical logs are not recovered or passed; fresh qualification logs and exact archive joins are required.",
+    "Overwritten positive synthetic fixture bytes and historical demo outputs were recovered only when their full recorded SHA-256 matched. Recovered bytes are not a rerun of old tests.",
+    "Final report/index, packaging/verification receipts and final documentation gates are external to their own archive to avoid a self-hash cycle.",
+    "Pinned local candidate qualification includes explicit numerical-size exceptions; no merge, tag, npm publication or deployment is selected."
+  ],
+  "finalDocumentationChecks": [
+    {
+      "scope": "study-final-documentation-gates",
+      "receipt": "evidence-verification/study-final-doc-gates-1/receipt.json",
+      "receiptSha256": "5246ff97fb80f4d2d339500eb783cf1edbd6a8214da99634627796e2353e98be",
+      "result": "4/4 pass"
+    }
+  ],
+  "finalization": {
+    "receipt": "evidence-verification/finalize-study-command-1/receipt.json",
+    "receiptSha256": "3dfe797add32a23d8067375fbee87226f7f235dba519b4248f4c649c87a47fb7"
+  },
+  "preparationContract": {
+    "status": "completed",
+    "selectorVersion": "source11",
+    "selectorSha256": "12811cbe60f20da9f9a873c1bd7b854d16cd5d2a1ec34c439b05178190517f76",
+    "note": "The archived selection configuration preserves the original planned source6/wrapper obligations as history. Reviewed source11 and its exact pinned wrapper execute the final closure and extraction contract; actual passing receipts are indexed here. This does not relabel prior failed preparation attempts."
+  }
+}
