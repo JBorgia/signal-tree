@@ -27,7 +27,9 @@ const applyPressure = async () => {
 describe('LocationRuntime retention', () => {
   it('releases a deleted field carrier while its row and tree remain alive', async () => {
     expect(typeof (globalThis as { gc?: unknown }).gc).toBe('function');
-    const tree = signalTree({ rows: entityMap<{ id: string; value: number }, string>() });
+    const tree = signalTree({
+      rows: entityMap<{ id: string; value: number }, string>(),
+    });
     tree.$.rows.addOne({ id: 'a', value: 1 });
     const row = tree.$.rows.byIdOrFail('a');
     const reference = (() => {
@@ -42,7 +44,9 @@ describe('LocationRuntime retention', () => {
       expect(reference.deref()).toBeUndefined();
       tree.$.rows.updateOne('a', { value: 2 });
       expect(row()).toEqual({ id: 'a', value: 2 });
-    } finally { tree.destroy(); }
+    } finally {
+      tree.destroy();
+    }
   });
 
   it('does not retain a row creation value through unmaterialized field getters', async () => {
@@ -61,7 +65,9 @@ describe('LocationRuntime retention', () => {
       await applyPressure();
       expect(held.reference.deref()).toBeUndefined();
       expect(held.row.payload()).toEqual({ value: 2 });
-    } finally { tree.destroy(); }
+    } finally {
+      tree.destroy();
+    }
   });
 
   it('releases an abandoned derived chain whose recipes close over their owner', async () => {
@@ -78,13 +84,19 @@ describe('LocationRuntime retention', () => {
       expect(owner.second()).toBe(5);
       owner.source(3);
       expect(owner.second()).toBe(7);
-      return [new WeakRef(owner), new WeakRef(owner.first), new WeakRef(owner.second)];
+      return [
+        new WeakRef(owner),
+        new WeakRef(owner.first),
+        new WeakRef(owner.second),
+      ];
     })();
 
     await applyPressure();
 
     expect(references.map((reference) => reference.deref())).toEqual([
-      undefined, undefined, undefined,
+      undefined,
+      undefined,
+      undefined,
     ]);
   });
 
@@ -92,15 +104,18 @@ describe('LocationRuntime retention', () => {
     expect(typeof (globalThis as { gc?: unknown }).gc).toBe('function');
     type Job = { id: string; title: string; team: string };
     const createStore = () => {
-      const store = signalTree({
-        jobs: entityMap<Job, string>({ selectId: (job) => job.id }),
-        team: 'North',
-      }, {
-        derived: ($) => ({
-          visible: () => $.jobs.all().filter((job) => job.team === $.team()),
-          selectedTitle: () => $.jobs.activeEntity()?.title,
-        }),
-      });
+      const store = signalTree(
+        {
+          jobs: entityMap<Job, string>({ selectId: (job) => job.id }),
+          team: 'North',
+        },
+        {
+          derived: ($) => ({
+            visible: () => $.jobs.all().filter((job) => job.team === $.team()),
+            selectedTitle: () => $.jobs.activeEntity()?.title,
+          }),
+        }
+      );
       store.$.jobs.setAll([
         { id: 'a', title: 'Inspect pump', team: 'North' },
         { id: 'b', title: 'Service gate', team: 'South' },
@@ -112,7 +127,9 @@ describe('LocationRuntime retention', () => {
     };
     const references = (() => {
       const store = createStore();
-      expect(store.$.visible()).toEqual([{ id: 'a', title: 'Inspect pump', team: 'North' }]);
+      expect(store.$.visible()).toEqual([
+        { id: 'a', title: 'Inspect pump', team: 'North' },
+      ]);
       expect(store.$.selectedTitle()).toBe('Inspect pump');
       store.rename('Inspect pump again');
       expect(store.$.selectedTitle()).toBe('Inspect pump again');
@@ -129,7 +146,10 @@ describe('LocationRuntime retention', () => {
     await applyPressure();
 
     expect(references.map((reference) => reference.deref())).toEqual([
-      undefined, undefined, undefined, undefined,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
     ]);
   });
 
@@ -139,7 +159,9 @@ describe('LocationRuntime retention', () => {
     const chooseLeft = runtime.createCell(true);
     const left = runtime.createCell(2);
     const right = runtime.createCell(10);
-    const selected = runtime.createDerived(() => chooseLeft() ? left() : right());
+    const selected = runtime.createDerived(() =>
+      chooseLeft() ? left() : right()
+    );
     const doubled = runtime.createDerived(() => selected() * 2);
     const seen: number[] = [];
     const unsubscribe = doubled.subscribe(() => seen.push(doubled()));
@@ -153,7 +175,9 @@ describe('LocationRuntime retention', () => {
       right(11);
       expect(seen).toEqual([6, 20, 22]);
       expect(doubled()).toBe(22);
-    } finally { unsubscribe(); }
+    } finally {
+      unsubscribe();
+    }
   });
 
   it('releases an abandoned derived recipe from its source dependencies', async () => {
@@ -187,4 +211,51 @@ describe('LocationRuntime retention', () => {
     source(1);
     expect(runs).toBe(1);
   });
+});
+
+it('releases a replaced physical requirement after whole capture while the source stays alive', async () => {
+  expect(typeof (globalThis as { gc?: unknown }).gc).toBe('function');
+  // Load the same native authority as an ordinary public consumer, within this
+  // final test so the earlier neutral retention fixtures keep their imports.
+  await import('../../index');
+  const { getEntityPublicationBinding } = await import('./entity-publication');
+  const tree = signalTree({
+    rows: entityMap<{ id: string; value: number }, string>(),
+  });
+  const pins: object[] = [];
+  try {
+    tree.$.rows.addOne({ id: 'a', value: 0 });
+    const source = getEntityPublicationBinding(tree.$.rows)?.source;
+    const subject = getEntityPublicationBinding(
+      tree.$.rows.byIdOrFail('a')
+    )?.subject;
+    if (!source || subject === undefined)
+      throw new Error('native source binding missing');
+    expect(source.inspect().native).toBe(1);
+    const old = (() => {
+      tree.$.rows.updateOne('a', { value: 1 });
+      const requirement = source
+        .evidence()
+        ?.field(subject, 'value', 'physical');
+      if (!requirement) throw new Error('physical requirement missing');
+      source.captureInput();
+      const reference = new WeakRef(requirement);
+      pins.push(requirement);
+      tree.$.rows.updateOne('a', { value: 2 });
+      expect(source.evidence()?.field(subject, 'value', 'physical')).not.toBe(
+        requirement
+      );
+      return reference;
+    })();
+    await applyPressure();
+    expect(old.deref()).toBeDefined();
+    pins.length = 0;
+    await applyPressure();
+    expect(old.deref()).toBeUndefined();
+    expect(tree.$.rows.byIdOrFail('a').value()).toBe(2);
+    expect(source.inspect().native).toBe(1);
+  } finally {
+    pins.length = 0;
+    tree.destroy();
+  }
 });

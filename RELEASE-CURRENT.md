@@ -1,4 +1,39 @@
-# Current release — v16 candidate qualified
+# v16 optimization sweep — active investigation
+
+The November 17 owner instruction reopens optimization across cost areas before
+another report. This isolated branch starts from C1 runtime `2c439198b` and
+tooling `2810528ef`; those frozen artifacts remain the comparison baseline.
+Individual prototypes and their exact identities are tracked in the
+[study protocol](https://github.com/JBorgia/signal-tree/blob/codex/optimization-sweep/docs/audits/2026-11-17-optimization-sweep/PROTOCOL.md)
+and candidate ledger. A prototype in this checkout is not automatically adopted
+or release-qualified. Preserve public semantics, original budgets and counterexamples;
+root coordinates the single heavy execution slot and final integration.
+No publication, tag, merge or deployment is selected by this investigation.
+
+## Combined candidate under qualification
+
+The selected runtime removes unused preparation work and owner-path state,
+maintains the exact confirmed-ledger suffix, avoids discarded ordinary record
+copies, demand-caches value-projection order, and reuses native whole-input
+selection while issuing fresh inputs and owner evidence. Public APIs, lifetime,
+publication and rollback guarantees remain unchanged. The central
+[integration record](https://github.com/JBorgia/signal-tree/blob/codex/optimization-sweep/docs/audits/2026-11-17-optimization-sweep/INTEGRATION.md)
+retains alternatives, adverse profiles and the reasons for excluding them.
+
+The first full combined run passed84/87 gates. It exposed an extra point-write
+array copy that failed the existing strict work ceiling, three test-only lint
+errors and the existing numerical bundle-budget miss. The correction invalidates
+whole-input selection at the end of the existing native point command, removing
+the redundant record, array copy and terminal command. The original point-work
+oracle is unchanged; late installation readers have an explicit missing-clear
+mutation control. Focused checks do not qualify this combined build. Full gates,
+mutation checks, exact rebuilt artifacts and application/native comparisons are
+still required. Bundle ceilings remain unchanged and numerical misses remain
+reported separately from the owner's cost/feasibility decision.
+
+---
+
+# Historical release controller — v16 candidate qualified
 
 Updated November 11, 2026. This is the single active acceptance ledger. Historical
 first failures and sealed predecessors remain evidence, not competing queues.

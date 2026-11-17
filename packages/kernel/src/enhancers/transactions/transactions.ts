@@ -285,7 +285,6 @@ type CaptureBucket = {
    * location key (see windowKeys).
    */
   ownWriteSeq: Map<string, number>;
-  ownerPaths: Set<string>;
   subjectIds: Set<number>;
   positionIds: Set<number>;
   baselineValues: Map<number, unknown>;
@@ -901,10 +900,28 @@ class TransactionAuthority {
     subjectIds?: number[],
     positionIds?: number[],
     effects?: TurnEffect[]
-  ): TransactionTurnRecord | undefined {
+  ): void {
+    if (
+      this.pendingTurns.size === 0 &&
+      this.historyRetain === 0 &&
+      this.confirmedTurns.length === 0
+    ) {
+      // Capture/drain and descriptor release still run in the caller. Only
+      // skip a record that would be immediately evicted with no reader.
+      if (
+        (subjectIds?.length ?? 0) > 0 ||
+        (positionIds?.length ?? 0) > 0 ||
+        (effects?.length ?? 0) > 0
+      ) {
+        this.nextTurnId++;
+        this.ledgerSeq++;
+        this.evictedConfirmed = true;
+      }
+      return;
+    }
     const turn = this.buildTurn(subjectIds, positionIds, effects);
     if (!turn) {
-      return undefined;
+      return;
     }
     this.insertConfirmed(turn);
     // ORDINARY writes reach the ledger here, not through confirmPending, so
@@ -913,7 +930,6 @@ class TransactionAuthority {
     // a turn recorded while something is pending has a higher id than
     // min(pendingIds) and is kept by `required`.
     this.releaseConfirmedBeyondObligation();
-    return cloneTurnRecord(turn);
   }
 
   /**
@@ -1224,50 +1240,29 @@ class TransactionAuthority {
    * layered on top of it.
    */
   private releaseConfirmedBeyondObligation(): void {
-    // Correctness-only is the DEFAULT (owner decision, 2026-09-24). Retaining
-    // records inside the correctness machinery for diagnostic purposes is the
-    // L15 violation itself, and the old default asserted a complete history
-    // that no contract backed — `truncated: false` was true only because
-    // nothing evicted. Diagnostics are now requested explicitly via
-    // `transactions({ history: { retain } })`, and the reader reports what it
-    // actually kept.
-    if (this.confirmedTurns.length === 0) return;
+    const turns = this.confirmedTurns;
+    if (turns.length === 0) return;
+    // Required records and the diagnostic window are both suffixes of the
+    // ID-sorted ledger. Preserve slice(-retain), including slice(-0) for a
+    // positive fractional retain below one; this does not redefine its policy.
+    const retained = Math.trunc(this.historyRetain);
+    const diagnosticStart = this.historyRetain > 0
+      ? retained === 0 ? 0 : Math.max(0, turns.length - retained)
+      : turns.length;
+    if (diagnosticStart === 0) return;
     let minPending = Infinity;
     for (const id of this.pendingTurns.keys()) {
       if (id < minPending) minPending = id;
     }
-    const required = (turn: TransactionTurnRecord) => turn.id > minPending;
-    const before = this.confirmedTurns.length;
-    if (this.historyRetain <= 0) {
-      this.confirmedTurns = this.confirmedTurns.filter(required);
-      if (this.confirmedTurns.length < before) this.evictedConfirmed = true;
-      this.forgetStampsOutside();
-      return;
-    }
-    const keep = new Set<number>();
-    for (const turn of this.confirmedTurns)
-      if (required(turn)) keep.add(turn.id);
-    for (const turn of this.confirmedTurns.slice(-this.historyRetain))
-      keep.add(turn.id);
-    this.confirmedTurns = this.confirmedTurns.filter((t) => keep.has(t.id));
-    if (this.confirmedTurns.length < before) this.evictedConfirmed = true;
-    this.forgetStampsOutside();
-  }
-
-  /**
-   * `confirmedAtSeq` is CORRECTNESS state — `getPendingRollbackPlan` reads it
-   * to order `authoredLater` — so L15 binds it exactly as it binds the records
-   * themselves. Bounding the array while letting the stamps accumulate left
-   * ~50 B per settled turn growing linearly forever while the ledger reported
-   * zero retained records, which made "correctness-only retention" only half
-   * true.
-   */
-  private forgetStampsOutside(): void {
-    if (this.confirmedAtSeq.size === 0) return;
-    const live = new Set(this.confirmedTurns.map((turn) => turn.id));
-    for (const id of this.confirmedAtSeq.keys()) {
-      if (!live.has(id)) this.confirmedAtSeq.delete(id);
-    }
+    let start = 0;
+    while (start < diagnosticStart && turns[start].id <= minPending) start++;
+    if (start === 0) return;
+    // Stamps are correctness state on the shared authored/realized clock.
+    // Drop exactly the evicted prefix; retained stamps keep their original seq.
+    for (let index = 0; index < start; index++)
+      this.confirmedAtSeq.delete(turns[index].id);
+    this.confirmedTurns = turns.slice(start);
+    this.evictedConfirmed = true;
   }
 
   /** Explicit retention metadata for the reader. Never inferred from ids. */
@@ -1361,6 +1356,13 @@ class TransactionAuthority {
     // the concatenation it replaced.
     this.ledgerSeq += 1;
     this.confirmedAtSeq.set(turn.id, this.ledgerSeq);
+    // Fresh ordinary IDs append; settling an older pending ID still uses the
+    // ordered insertion below. Stamp every insertion before either branch.
+    const last = this.confirmedTurns[this.confirmedTurns.length - 1];
+    if (!last || last.id < turn.id) {
+      this.confirmedTurns.push(turn);
+      return;
+    }
     const insertIndex = this.confirmedTurns.findIndex(
       (candidate) => candidate.id > turn.id
     );
@@ -1390,7 +1392,6 @@ function createCaptureBucket(): CaptureBucket {
   return {
     entityFootprints: new Map(),
     ownWriteSeq: new Map<string, number>(),
-    ownerPaths: new Set<string>(),
     subjectIds: new Set<number>(),
     positionIds: new Set<number>(),
     baselineValues: new Map(),
@@ -1859,15 +1860,12 @@ export function getOrCreateInternalTransactionRuntime<T>(
   const drainCaptureBucket = (
     bucket: CaptureBucket
   ): {
-    ownerPaths: string[];
     subjectIds: number[];
     positionIds: number[];
     baselineValues: Map<number, unknown>;
     effects: TurnEffect[];
     collectionOrders: Array<Omit<CollectionOrderCapture, 'meta'>>;
   } => {
-    const ownerPaths = Array.from(bucket.ownerPaths).sort();
-    bucket.ownerPaths.clear();
     bucket.ownWriteSeq.clear();
     bucket.entityFootprints.clear();
     const subjectIds = Array.from(bucket.subjectIds).sort((a, b) => a - b);
@@ -1899,7 +1897,6 @@ export function getOrCreateInternalTransactionRuntime<T>(
     bucket.collectionOrders.clear();
     bucket.orderBoundaries.clear();
     return {
-      ownerPaths,
       subjectIds,
       positionIds,
       baselineValues,
@@ -2399,7 +2396,6 @@ export function getOrCreateInternalTransactionRuntime<T>(
         adds: [
           { set: operation.owners, value: effect.position },
           { set: bucket.positionIds, value: effect.position },
-          { set: bucket.ownerPaths, value: effect.ownerPath },
         ],
       };
     };
@@ -2715,7 +2711,6 @@ export function getOrCreateInternalTransactionRuntime<T>(
         adds: [
           { set: operation.owners, value: capture.owner },
           { set: bucket.positionIds, value: capture.owner },
-          { set: bucket.ownerPaths, value: capture.ownerPath },
           ...capture.changes.map((c) => ({
             set: bucket.subjectIds,
             value: c.subject,
@@ -2840,7 +2835,6 @@ export function getOrCreateInternalTransactionRuntime<T>(
     if (membership) {
       for (const effect of membership) {
         bucket.positionIds.add(effect.position);
-        bucket.ownerPaths.add(effect.ownerPath);
         if (pendingTransactions.size > 0) {
           for (const key of windowKeys([effect.position], undefined))
             bucket.ownWriteSeq.set(key, windowWriteSeq);
@@ -2849,7 +2843,6 @@ export function getOrCreateInternalTransactionRuntime<T>(
       }
       return;
     }
-    bucket.ownerPaths.add(ownerPath ?? path);
     for (const subjectId of subjectIds ?? []) {
       bucket.subjectIds.add(subjectId);
     }
@@ -2926,9 +2919,9 @@ export function getOrCreateInternalTransactionRuntime<T>(
 
   const recordConfirmedBucket = (
     bucket: CaptureBucket
-  ): TransactionTurnRecord | undefined => {
+  ): void => {
     const { subjectIds, positionIds, effects } = drainCaptureBucket(bucket);
-    const turn = authority.recordConfirmed(
+    authority.recordConfirmed(
       subjectIds.length > 0 ? subjectIds : undefined,
       positionIds.length > 0 ? positionIds : undefined,
       effects.length > 0 ? effects : undefined
@@ -2940,7 +2933,6 @@ export function getOrCreateInternalTransactionRuntime<T>(
     // a history entry, whichever flush listener runs first. Physical
     // reclamation has its own eligibility boundary.
     forgetUnclaimedDescriptorSubjects(subjectIds);
-    return turn;
   };
 
   const getTransactionBucket = (transactionId: number): CaptureBucket => {
@@ -3103,7 +3095,6 @@ export function getOrCreateInternalTransactionRuntime<T>(
             bucket.collectionOrders.get(capture.owner)
           )
         );
-      bucket.ownerPaths.add(capture.ownerPath);
       bucket.positionIds.add(capture.owner);
     }) ?? null;
 
@@ -4383,7 +4374,6 @@ export function getOrCreateInternalTransactionRuntime<T>(
               adds: [
                 { set: operation.owners, value: position },
                 { set: bucket.positionIds, value: position },
-                { set: bucket.ownerPaths, value: ownerPath ?? path },
               ],
             };
           };

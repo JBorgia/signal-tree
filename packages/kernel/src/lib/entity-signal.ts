@@ -334,6 +334,8 @@ function survivingOrderChanged(
   before: readonly number[],
   after: readonly number[]
 ): boolean {
+  // Fewer than two shared survivors cannot change their relative order.
+  if (before.length < 2 || after.length < 2) return false;
   const inAfter = new Set(after);
   const inBefore = new Set(before);
   const survivingBefore = before.filter((subject) => inAfter.has(subject));
@@ -504,7 +506,20 @@ export function createEntitySignal<
   }
 
   function getProjectedEntities(): E[] {
-    return getProjectedEntries().map(([, entity]) => entity);
+    // The public array stays fresh, while structural order is cached on demand.
+    // Native predicates and sort callbacks still need each physical row's exact
+    // subject identity; bypassing entry tuples must not widen their inputs.
+    const entities: E[] = [];
+    for (const subjectId of structuralStore.activeSubjectsSnapshot()) {
+      const entity = valueStore.backingForSubject(subjectId);
+      if (entity !== undefined) {
+        if (entity && typeof entity === 'object') {
+          physicalRowSubjects.set(entity, subjectId);
+        }
+        entities.push(entity);
+      }
+    }
+    return entities;
   }
 
   /**
@@ -1452,12 +1467,13 @@ export function createEntitySignal<
     const restoredByStep = new Map<number,ReadonlyMap<string,NativeFieldEndpoint>>();
     const authoredByStep = new Map<number, import('./internals/entity-publication').EntityAuthoredFootprint>();
     for (const m of frame.mutations) {
-      changeIndexByMutation.set(m, changes.length);
       const key =
         'key' in m ? m.key : structuralStore.activeKeyForSubject(m.subjectId);
       const before = valueStore.backingForSubject(m.subjectId);
       const path = `${basePath}.${String(key)}`;
       if (m.kind === 'replace-value') {
+        // Only replacement results consume this per-mutation change index.
+        changeIndexByMutation.set(m, changes.length);
         authoredByStep.set(changes.length, authoredFootprint(m.authoredFields));
         if(m.restoredFields)restoredByStep.set(changes.length,m.restoredFields);
         const transition = valueTransitions.get(m);

@@ -98,6 +98,16 @@ export const createEntityPublicationParticipant: () => EntityPublicationParticip
     keyMapping:(id,view)=>view==='ordinary'?(ordinaryMappings?ordinaryMappings.get(id):mappingAt(id))??missing:(physicalMappings?physicalMappings.get(id):mappingViewAt(id))?.requirement??missing,
   });
   let acquisitions=0,retirements=0,inputVisits=0,wholeInputFactsRepresented=0;
+  // Selection only: owner outcomes and issued inputs are captured on every read.
+  let wholeSelection: { requirements: readonly Requirement[]; represented: number } | undefined;
+  const clearSelection = () => { wholeSelection = undefined; };
+  // Native installation uses precomputed internal edits. Clear after its
+  // writes, before a later participant can read the installed source and
+  // before Source advances its revision token. Keep the delete plan unchanged.
+  const selectionWrite = { map: { set: clearSelection }, key: undefined, value: undefined };
+  const selectingRecord = (record: TerminalRecordPlan): TerminalRecordPlan => ({
+    ...record, writes: [...record.writes, selectionWrite],
+  });
   const physicalViews=(subject?:number,field?:string):View[]=>{
     if(subject!==undefined){
       const member=visibleAt(subject),row=views.get(subject);
@@ -111,7 +121,8 @@ export const createEntityPublicationParticipant: () => EntityPublicationParticip
     for(const [id,row]of views)if(visibleAt(id)?.present!==false)result.push(...row.values());
     inputVisits+=result.length;return result;
   };
-  const wholeInputRequirements=():Set<Requirement>=>{
+  const wholeInputRequirements=():readonly Requirement[]=>{
+    if(wholeSelection){wholeInputFactsRepresented+=wholeSelection.represented;return wholeSelection.requirements;}
     const requirements=new Set<Requirement>();
     let visits=0;
     for(const view of visible.values()){requirements.add(view.requirement);visits++;}
@@ -126,8 +137,10 @@ export const createEntityPublicationParticipant: () => EntityPublicationParticip
     inputVisits+=visits;
     // Logical coverage is separate from executed iteration. captureViews still
     // expands its View identities; addressed capture keeps its existing count.
-    wholeInputFactsRepresented+=visits+2*((retired?.size??0)-(retired?.runCount??0));
-    return requirements;
+    const represented=visits+2*((retired?.size??0)-(retired?.runCount??0));
+    wholeInputFactsRepresented+=represented;
+    wholeSelection={requirements:[...requirements],represented};
+    return wholeSelection.requirements;
   };
   const nativeRequirement=(packet:EntityPublicationPacket,inspection:boolean)=>{
     const meta=getActiveWriteContext()??packet.meta,id=meta?.transactionId;
@@ -147,7 +160,9 @@ export const createEntityPublicationParticipant: () => EntityPublicationParticip
       return [...result];
     }}),
     captureInput(subject,field){
-      const requirements=subject===undefined?wholeInputRequirements():new Set(physicalViews(subject,field).map(view=>view.requirement));
+      // Whole-selection reuse never reuses a captured input or owner array.
+      if(subject===undefined)return {native:Object.freeze(wholeInputRequirements().map(lifecycle.captureNativeInput))};
+      const requirements=new Set(physicalViews(subject,field).map(view=>view.requirement));
       // Select every reference before evaluating proof; each capture samples
       // owner outcomes afresh and issues its own frozen inputs and owner arrays.
       return {native:Object.freeze([...requirements].map(lifecycle.captureNativeInput))};
@@ -242,6 +257,10 @@ export const createEntityPublicationParticipant: () => EntityPublicationParticip
           if(retirementRevisions.has(targetFields))retirementRevisions.set(targetFields,revision);
           if(retirementRevisions.has(targetViews))retirementRevisions.set(targetViews,revision);
           fields.set(edit.subject,targetFields);views.set(edit.subject,targetViews);
+          // This private point writer is already the final native write. Clear
+          // at its tail, including selection first demanded after preparation,
+          // without copying its record just to append another terminal command.
+          clearSelection();
         }},key:undefined,value:undefined};
         return {
           // The requirement currently contributes frame adds only. Preserve any
@@ -394,7 +413,7 @@ export const createEntityPublicationParticipant: () => EntityPublicationParticip
         for(const row of nextFields.values())escaped.add(row);
         for(const row of nextViews.values())escaped.add(row);
       });
-      return {record:combineTerminalRecords(responsibility,prepared?.record,{writes,deletes,adds:[]}),completion,finalize:()=>{
+      return {record:selectingRecord(combineTerminalRecords(responsibility,prepared?.record,{writes,deletes,adds:[]})),completion,finalize:()=>{
         if(prepared)lifecycle.finalizeNativeRequirement(requirement);
       }};
     },
@@ -457,6 +476,7 @@ export const createEntityPublicationParticipant: () => EntityPublicationParticip
         compact:packable?()=>{
           const fact:RetiredFacts={member,visible:visibleFact,placement,mapping,mappingView};
           if(!(retired??=new ExactSubjectRuns(sameRetired)).tryAppend(subject,fact))return false;
+          clearSelection();
           members.delete(subject);visible.delete(subject);placementViews.delete(subject);mappings.delete(subject);mappingViews.delete(subject);
           return true;
         }:undefined,
@@ -476,7 +496,7 @@ export const createEntityPublicationParticipant: () => EntityPublicationParticip
         },
       };
     },
-    retire(subject){retired?.delete(subject);fields.delete(subject);members.delete(subject);placements.delete(subject);views.delete(subject);visible.delete(subject);placementViews.delete(subject);mappings.delete(subject);mappingViews.delete(subject);retirements++;},
+    retire(subject){clearSelection();retired?.delete(subject);fields.delete(subject);members.delete(subject);placements.delete(subject);views.delete(subject);visible.delete(subject);placementViews.delete(subject);mappings.delete(subject);mappingViews.delete(subject);retirements++;},
   };
   return participant;
 };
