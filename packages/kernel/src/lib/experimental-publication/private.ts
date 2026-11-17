@@ -305,6 +305,7 @@ function completeMembership(completion:object):void{
 function ready(channel:object,b:Binding):void{
  if(b.delivery.reducing)return;
  b.delivery.reducing=true;
+ let completedNoncurrent:Fact[]|undefined;
  try{
  for(const unit of b.pending){
   if(!unit.complete)break;
@@ -375,8 +376,19 @@ function ready(channel:object,b:Binding):void{
    selectProjection(b,unit.fact,support.present?(b.aggregate?maskPayload(b):b.valuePayload):(b.source&&b.collections.has(b.source)?[]:undefined),unit.changed);
   }
   unit.comparison=undefined;unit.relevance=undefined;unit.payload=undefined;b.pending.delete(unit);unit.resolve();
+  // Only this invocation's completed work is a retirement candidate. The common
+  // single-current-unit path allocates no list; a partial drain does no cleanup.
+  if(!noop&&reduced&&unit.fact!==b.current)(completedNoncurrent??=[]).push(unit.fact);
  }
  if(!b.pending.size)drainLegacyScalars(channel,b);
+ if(completedNoncurrent){
+  // Completion can reenter and replace the Binding wrapper. Recheck the live
+  // recipient and final current selection after every queued unit/no-write.
+  const current=bindings.get(channel);
+  if(current?.index===b.index&&!current.pending.size&&!current.legacyScalars.length&&current.index.unresolved()===0){
+   for(const fact of completedNoncurrent)if(fact!==current.current)lifecycle.retireCompletedUndeclaredRevision(channel,fact);
+  }
+ }
  }finally{b.delivery.reducing=false;}
 }
 function wakeChannel(channel:object):void{queueMicrotask(()=>{const b=bindings.get(channel);if(b)ready(channel,b);callbacks.get(channel)?.();});}

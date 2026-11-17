@@ -486,6 +486,17 @@ export function started(channel:object,revision:object,basis:'declared'|'survivi
  op.started=true;op.surviving=basis==='surviving';setOperationState(op,{state:'started',basis});
  retire(op);op.noopFallbacks.clear();op.proof=undefined;op.frames.clear();op.views.clear();connections.get(channel)?.ops.delete(revision);
 }
+/** Called only for a fully reduced unit after its recipient queue drains.
+ * The reducer preserves facts/native evidence and excludes the live current.
+ * An undeclared operation cannot be a receipt fallback: only matching frames
+ * add operations to Frame.ops, which is required when creating that edge.
+ * Native readiness was already proved by the reducer and is monotone; do not
+ * repeat a native graph traversal or confuse readiness with owner settlement. */
+export function retireCompletedUndeclaredRevision(channel:object,revision:object):void{
+ const c=connections.get(channel),op=c?.ops.get(revision);
+ if(!c||!op||op.declared||op.started||op.frames.size||op.views.size||op.projectionPending||op.relevance?.size||op.noopFallbacks.size)return;
+ retire(op);c.ops.delete(revision);
+}
 export function supersede(channel:object,revision:object):void{
  const c=connections.get(channel),op=c?.ops.get(revision);if(!c||!op)return;
  if(!op.started)setOperationState(op,{state:'superseded'});
