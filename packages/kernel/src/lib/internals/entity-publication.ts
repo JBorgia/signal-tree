@@ -151,6 +151,10 @@ export interface EntityRetirementPlan {
 }
 type RetirementRequest = { eligible: () => boolean; release?: () => void; queued: boolean };
 export interface EntityPublicationParticipant {
+  /** A never-observed prefix of ordinary, owner-free positive facts only. */
+  initializeCleanSeed?(seed: readonly EntityProjectionSeedEntry<string | number, unknown>[]): void;
+  /** Preserve neutral preparation scopes; a sealed window must not be resampled. */
+  prepareClean?(packet: EntityPublicationPacket, sealed: boolean): PreparedPublicationUnit | undefined;
   seedRequested?():boolean;
   prepare(packet: EntityPublicationPacket, native?: object): PreparedPublicationUnit | undefined;
   /** Source-issued single-field preparation; never selected for generic/foreign packets. */
@@ -166,9 +170,13 @@ export interface EntityPublicationParticipant {
   inspect?(): Readonly<Record<string,number>>;
 }
 let factory: ((source: EntityPublicationSource) => EntityPublicationParticipant) | undefined;
-export function registerEntityPublicationFactory(value: NonNullable<typeof factory>): void {
+let canDeferPublication: ((packet: EntityPublicationPacket) => boolean) | undefined;
+let canRemainDeferredPublication: (() => boolean) | undefined;
+export function registerEntityPublicationFactory(value: NonNullable<typeof factory>, canDefer?: typeof canDeferPublication, canRemainDeferred?: () => boolean): void {
   if (factory) throw new Error('Entity publication authority already registered');
   factory = value;
+  canDeferPublication = canDefer;
+  canRemainDeferredPublication = canRemainDeferred;
 }
 /** Native ownership lives with the collection even when there are no recipients. */
 export class EntityPublicationSource {
@@ -182,7 +190,8 @@ export class EntityPublicationSource {
   private retirementRevision: object = {};
   private readonly retirements = new Map<number, RetirementRequest>();
   private disposed = false;
-  constructor(receivePointPreparer?: (prepare: SourcePointPreparer) => void) {
+  constructor(receivePointPreparer?: (prepare: SourcePointPreparer) => void,
+    private cleanSeed?: () => readonly EntityProjectionSeedEntry<string | number, unknown>[]) {
     // Only the constructing owner receives this closure. A recipient with a
     // source reference cannot mint fast-admission packets for that source.
     receivePointPreparer?.(input => this.prepare(this.admission.point(input)));
@@ -246,7 +255,13 @@ export class EntityPublicationSource {
   }
   revision():object { return this.revisionToken; }
   private nativeParticipant(): EntityPublicationParticipant | undefined {
-    return this.native ??= factory?.(this);
+    if (!this.native && factory) {
+      const participant = factory(this);
+      if (this.cleanSeed) participant.initializeCleanSeed?.(this.cleanSeed());
+      this.native = participant;
+      this.cleanSeed = undefined;
+    }
+    return this.native;
   }
   subscribe(participant: EntityPublicationParticipant): () => void {
     this.nativeParticipant();
@@ -273,13 +288,18 @@ export class EntityPublicationSource {
     }
     group.state.packets.push(packet);return group.publication;
   }
-  prepare(packet: EntityPublicationPacket): PreparedPublicationUnit | undefined {
+  prepare(packet: EntityPublicationPacket, clean?: 'prepared' | 'sealed'): PreparedPublicationUnit | undefined {
     const recipientRevision = this.recipientRevision,sourceRevision=this.revisionToken;
     const retirementRevision = this.retirementRevision;
     const parts: { participant: EntityPublicationParticipant; unit: PreparedPublicationUnit }[] = [];
     packet=this.admission.prepare(packet);
+    if (!clean && !this.native && this.cleanSeed && canDeferPublication?.(packet)) {
+      if (sourceRevision !== this.revisionToken || recipientRevision !== this.recipientRevision)
+        throw new Error('Entity publication source changed during preparation');
+      return this.prepareDeferred(packet, sourceRevision, retirementRevision);
+    }
     const native = this.nativeParticipant();
-    const nativeUnit = native && this.admission.ownsPoint(packet) && this.recipients.size === 0 && !packet.prepareResponsibility
+    const nativeUnit = clean ? native?.prepareClean?.(packet, clean === 'sealed') : native && this.admission.ownsPoint(packet) && this.recipients.size === 0 && !packet.prepareResponsibility
       ? native.preparePoint?.(packet) ?? native.prepare(packet)
       : native?.prepare(packet);
     const fallbackRecord = native ? undefined : packet.prepareResponsibility?.();
@@ -327,6 +347,51 @@ export class EntityPublicationSource {
         validate();
         if (beforeFinalize !== this.revisionToken)
           throw new Error('Entity publication source changed during finalization');
+      },
+    };
+  }
+  /** Keep interception from construction. A cold prefix has no issued evidence,
+   * negative facts or divergent ordinary state. Promotion never replays user
+   * code; it uses the evaluated packet and the owner's private current seed. */
+  private prepareDeferred(packet: EntityPublicationPacket, revision: object, retirement: object): PreparedPublicationUnit {
+    let full: PreparedPublicationUnit | undefined;
+    let finalized = false;
+    const completion = {};
+    const nextRevision = {};
+    pointCompletions.set(completion, () => { if (full) this.complete(full.completion); });
+    const validate = () => {
+      if (this.disposed || revision !== this.revisionToken || retirement !== this.retirementRevision)
+        throw new Error('Entity publication source changed before installation');
+      if (finalized && !full && this.native) {
+        full = this.prepare(packet, 'sealed');
+        full?.finalize?.();
+      }
+      full?.validate?.();
+    };
+    return {
+      completion, validate,
+      // Forward each phase separately: composed plans retain their global
+      // delete/write/add order even when finalization promotes this source.
+      record: {
+        deletes: [{map: {delete: () => { for (const edit of full?.record.deletes ?? []) edit.map.delete(edit.key); }}, key: undefined}],
+        writes: [{map: {set: () => {
+          for (const edit of full?.record.writes ?? []) edit.map.set(edit.key, edit.value);
+          if (!full) this.revisionToken = nextRevision;
+        }}, key: undefined, value: undefined}],
+        adds: [{set: {add: () => { for (const edit of full?.record.adds ?? []) edit.set.add(edit.value); }}, value: undefined}],
+      },
+      finalize: () => {
+        validate();
+        if (finalized) return;
+        finalized = true;
+        // A preparer may have opened a foreign owner or captured this source.
+        // Preserve original neutral scopes, then sample the installation window.
+        if (this.native || !canRemainDeferredPublication?.()) {
+          this.nativeParticipant();
+          full = this.prepare(packet, 'prepared');
+          full?.finalize?.();
+        }
+        validate();
       },
     };
   }

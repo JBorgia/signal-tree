@@ -28,6 +28,9 @@ it('acceptance: ordinary churn releases metadata, keeping old handles and receip
 
 it.each(['mappings','mappingViews'])('acceptance: %s counter reports allocation then retirement',async(key)=>{
  const tree=make(),rows=tree.$.rows;rows.addOne({id:'a',n:1});await flush();const source=binding(rows).source;
+ // First evidence demand activates a cold collection. Keep the positive
+ // allocation witness before testing retirement; absence alone cannot pass.
+ source.captureInput();
  try{expect(measured(source.inspect(),key),key).toBeGreaterThan(0);rows.removeOne('a');await flush();expect(measured(source.inspect(),key),key).toBe(0);}finally{tree.destroy();}
 });
 

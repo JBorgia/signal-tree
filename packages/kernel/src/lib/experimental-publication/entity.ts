@@ -18,6 +18,42 @@ const unavailable = lifecycle.unavailableRequirement;
 const own = (row:unknown,key:string):boolean=>row!==null&&typeof row==='object'&&Object.prototype.hasOwnProperty.call(row,key);
 const fieldValue = (row:unknown,key:string):unknown=>own(row,key)?(row as Record<string,unknown>)[key]:undefined;
 
+/** Only a positive, unobserved prefix can be represented by the owner's current
+ * state. Negative support, restoration and framed/foreign obligations activate
+ * the ordinary participant before preparation. */
+export function canRemainDeferredEntityPublication(): boolean {
+  return getActiveWriteContext() === undefined && lifecycle.canDeferCleanPublication() &&
+    currentNativePublicationInputs().length === 0 && currentEntityPublicationInputs().length === 0;
+}
+export function canDeferEntityPublication(packet: EntityPublicationPacket): boolean {
+  if (!canRemainDeferredEntityPublication() || packet.prepareResponsibility || packet.inputs?.length) return false;
+  if (packet.meta) {
+    const keys = Reflect.ownKeys(packet.meta);
+    for (let i = 0; i < keys.length; i++) if (keys[i] !== 'ownerId') return false;
+  }
+  const positive = (edits: readonly EntityPublicationEdit[]) => {
+    for (let i = 0; i < edits.length; i++) {
+      const edit = edits[i];
+      if (edit.restoredFields || edit.structural && edit.structural.kind !== 'add') return false;
+      if (!edit.structural && edit.fields === null) return false;
+      // Prior cold fields are already data-only. A point checks only its
+      // supplied fields; no complete row scan on each sparse edit.
+      const keys = edit.structural ? Object.keys(edit.after ?? {}) : edit.fields!;
+      for (let j = 0; j < keys.length; j++) {
+        const descriptor = Object.getOwnPropertyDescriptor(edit.after, keys[j]);
+        if (!descriptor || !('value' in descriptor)) return false;
+      }
+    }
+    return true;
+  };
+  if (!positive(packet.physical) || !positive(packet.ordinary)) return false;
+  for (let i = 0; i < (packet.steps?.length ?? 0); i++) {
+    const step = packet.steps![i];
+    if (step.authoredRemoval || step.authoredFootprint?.kind === 'derive') return false;
+  }
+  return true;
+}
+
 /** Pair only within one admitted unit. Metadata is source-owned and stable;
  * payloads are never read here. Keep the first physical occurrence (Array.find),
  * independently of the last-ordinary proposal lookup below. */
@@ -62,6 +98,7 @@ function pairPhysicalUnit(
 
 /** Only current support identities; values and placement remain native kernel truth. */
 export const createEntityPublicationParticipant: () => EntityPublicationParticipant = () => {
+  const cleanPackets = new WeakMap<EntityPublicationPacket, boolean>();
   const fields=new Map<number,FieldRow<NativeFieldEndpoint>>();
   const members=new Map<number,Member>();
   const placements=new Map<number,Requirement>();
@@ -147,6 +184,10 @@ export const createEntityPublicationParticipant: () => EntityPublicationParticip
     return wholeSelection.requirements;
   };
   const nativeRequirement=(packet:EntityPublicationPacket,inspection:boolean)=>{
+    if (cleanPackets.has(packet)) {
+      const prepared = cleanPackets.get(packet) ? undefined : lifecycle.prepareDeferredCleanRequirement();
+      return {prepared, requirement: prepared?.requirement ?? lifecycle.cleanAuthoredRequirement()};
+    }
     const meta=getActiveWriteContext()??packet.meta,id=meta?.transactionId;
     const owner=typeof id==='number'?lifecycle.ownerCell(packet.owner,id):undefined;
     const valid=id===undefined||!!owner&&meta?.transactionOwner===lifecycle.ownerToken(packet.owner);
@@ -155,6 +196,34 @@ export const createEntityPublicationParticipant: () => EntityPublicationParticip
     return {prepared,requirement:prepared?.requirement??unavailable()};
   };
   const participant:EntityPublicationParticipant={
+    initializeCleanSeed(seed) {
+      const requirement = lifecycle.cleanAuthoredRequirement();
+      for (const {subjectId, row} of seed) {
+        const endpoints = new Map<string, NativeFieldEndpoint>();
+        const physical = new Map<string, View>();
+        for (const key of Object.keys(row ?? {})) {
+          const descriptor = Object.getOwnPropertyDescriptor(row, key);
+          if (!descriptor || !('value' in descriptor)) throw new Error('Cold publication seed lost its data-only invariant');
+          endpoints.set(key, {present: true, value: descriptor.value, requirement});
+          physical.set(key, {present: true, requirement});
+        }
+        fields.set(subjectId, endpoints.size > 0 && endpoints.size <= 3 ? new PackedFieldRow(endpoints) : endpoints);
+        views.set(subjectId, physical.size > 0 && physical.size <= 3 ? new PackedFieldRow(physical) : physical);
+        members.set(subjectId, {present: true, requirement});
+        visible.set(subjectId, {present: true, requirement});
+        placements.set(subjectId, requirement);
+        placementViews.set(subjectId, {requirement});
+        mappings.set(subjectId, requirement);
+        mappingViews.set(subjectId, {requirement});
+      }
+    },
+    prepareClean(packet, sealed) {
+      // Authorship was admitted in a neutral scope. Materialization preserves
+      // that scope, and an already sealed window cannot be widened either.
+      cleanPackets.set(packet, sealed);
+      try { return participant.prepare(packet); }
+      finally { cleanPackets.delete(packet); }
+    },
     captureViews:physicalViews,
     evidence:()=>({...evidence(),exclusions:()=>{
       const result=new Map<number,object>();

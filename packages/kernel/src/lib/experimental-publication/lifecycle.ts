@@ -298,12 +298,34 @@ export function nativeProof(requirement: NativeRequirement): Proof {
   invalid:inputs.some(p=>p.invalid)||validation.some(p=>p.invalid)};
 }
 export function initialRequirement():NativeRequirement{return {proof:{owners:[],unknown:false,invalid:false},inputs:[],frames:[],known:[],unknown:false,possible:[],captureWindow:false};}
+/** Eligibility only. The source must also rule out issued inputs, negative
+ * facts, inspection and deferred responsibility work. Recheck at finalization. */
+export function canDeferCleanPublication(): boolean {
+ return pending.size === 0 && stack.length === 0;
+}
+/** An already installed, never observed neutral authored prefix. Its empty
+ * historical window stays empty even if promotion occurs during a later owner. */
+export function cleanAuthoredRequirement(): NativeRequirement {
+ const requirement: NativeRequirement = {...initialRequirement(), retirementOwnWindowOnly: true};
+ requirement.captureWindow = true;
+ requirement.proof = undefined;
+ requirement.proof = nativeProof(requirement);
+ return requirement;
+}
 /** An exact physical input whose ordinary authorship cannot be certified. */
 export function unavailableRequirement():NativeRequirement {
  return {proof:{owners:[],unknown:true,invalid:false,unavailableInput:true},inputs:[],frames:[],known:[],unknown:true,possible:[],captureWindow:false};
 }
 export function prepareNativeRequirement(known:readonly OwnerCell[], unknown:boolean, inputs:readonly NativeInput[]):{requirement:NativeRequirement;record:TerminalRecordPlan}{
- const active=[...stack];
+ return prepareNativeRequirementWithFrames(known,unknown,inputs,[...stack]);
+}
+/** Materialize a preparation that was admitted outside every owner/input/frame
+ * scope. Its installation window is still finalized normally; later scopes
+ * must not become authorship or validation of the earlier preparation. */
+export function prepareDeferredCleanRequirement():{requirement:NativeRequirement;record:TerminalRecordPlan}{
+ return prepareNativeRequirementWithFrames([],false,[],[]);
+}
+function prepareNativeRequirementWithFrames(known:readonly OwnerCell[],unknown:boolean,inputs:readonly NativeInput[],active:Frame[]):{requirement:NativeRequirement;record:TerminalRecordPlan}{
  // Input completeness, not destination ownership, decides whether W applies.
  const captureWindow=active.length===0||active.some(f=>f.declaredOwners===undefined)
   ||inputs.some(input=>nativeProof(input.requirement).unavailableInput===true);

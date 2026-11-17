@@ -47,8 +47,8 @@ describe('whole entity input capture', () => {
       await flush();
       rows.updateOne('first', { value: 3 });
       expect(rows.byIdOrFail('first').value()).toBe(3);
-      expect(source.inspect().packedSubjects).toBe(0);
       const result = exactCapture(source);
+      expect(source.inspect().packedSubjects).toBe(0);
       expect(result.represented).toBe(8);
       expect(result.representedCount).toBe(result.represented);
       expect(result.visits).toBe(result.represented);

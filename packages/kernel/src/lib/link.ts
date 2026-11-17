@@ -1,6 +1,6 @@
 import type { PublicationDeclaration, PublicationReceipt } from './publication-declaration';
 import { scalarPublicationCovers, scalarNotificationContributions } from './internals/scalar-publication-coverage';
-import { createEntityPublicationParticipant } from './experimental-publication/entity';
+import { canDeferEntityPublication, canRemainDeferredEntityPublication, createEntityPublicationParticipant } from './experimental-publication/entity';
 import { registerEntityPublicationFactory, entityPublicationOrdinary, entityPublicationUnit, getEntityPublicationBinding, type EntityPublicationEvidence } from './internals/entity-publication';
 import { entityValueTransition } from './internals/entity-value-transition';
 import type { NativeRequirement } from './experimental-publication/lifecycle';
@@ -62,7 +62,7 @@ import type { ResolveLeafDefinitions } from './types';
 
 // Consume the factory at module initialization, before application writes.
 // Participant state remains lazy and source-owned; Link calls do not register.
-registerEntityPublicationFactory(createEntityPublicationParticipant);
+registerEntityPublicationFactory(createEntityPublicationParticipant, canDeferEntityPublication, canRemainDeferredEntityPublication);
 
 /** Physical topology and eligible semantic facts have distinct existing carriers. */
 function applyCollectionNotification(

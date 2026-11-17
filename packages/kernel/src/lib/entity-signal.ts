@@ -1899,7 +1899,12 @@ export function createEntitySignal<
   const hasRestorationAuthority = options?.hasRestorationAuthority ?? true;
   const ownerId = options?.ownerId;
   let prepareSourcePoint!: SourcePointPreparer;
-  const entityPublication = new EntityPublicationSource(prepare => { prepareSourcePoint = prepare; });
+  const entityPublication = new EntityPublicationSource(prepare => { prepareSourcePoint = prepare; }, () =>
+    structuralStore.activeSubjectsSnapshot().map(subjectId => ({
+      subjectId,
+      key: structuralStore.activeKeyForSubject(subjectId)!,
+      row: valueStore.backingForSubject(subjectId),
+    })));
   options?.onDispose?.(() => entityPublication.dispose());
   const physicalCommitClock = options?.physicalCommitClock;
   const mutationCaptureRuntime = options?.mutationCaptureRuntime;

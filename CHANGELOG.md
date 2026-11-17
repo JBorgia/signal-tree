@@ -19,6 +19,15 @@ retained framework-native readers observe current values/errors on direct reads,
 including during nested writes. Missing capability rejects factory construction;
 ordinary cached readonly behavior is unchanged.
 
+### Runtime maintenance
+
+Large entity collections can defer some initial work and memory until a full
+snapshot, Link or another operation requires publication evidence. First use can
+pay that deferred setup cost; active-store performance is workload-dependent.
+Transaction and publication behavior are unchanged and no setting is required.
+Full snapshots of wide collections no longer exceed the engine's call-argument
+limit. Unreachable legacy audit code has been removed.
+
 ### Read-only runtime observation
 
 These reader entry points and structured effect-address fields already exist in

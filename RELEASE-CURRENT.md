@@ -1,3 +1,21 @@
+# v16 publication activation — candidate validation in progress
+
+The current `codex/v16-publication-activation` candidate retains automatic deferred
+entity publication allocation, the independently reproduced wide-snapshot repair
+`7d51fb13b`, and legacy cleanup `dd0702f69`. The
+[implementation/cost decision](docs/audits/2026-11-17-publication-activation/README.md)
+records the preserved guarantees, first-activation cost and bounded performance
+claims. No public switch or package split is introduced.
+
+The runtime has passed its full development kernel suite and identified-artifact
+cost/semantic controls. Fresh committed-candidate release gates, mutation checks,
+canonical packages, consumers and production demo checks follow. Qualification
+below applies to its named earlier runtime; it does not automatically qualify
+this candidate. Numerical ceilings remain unchanged. No tag, registry publication
+or deployment is selected by this work.
+
+---
+
 # v16 optimization sweep — local qualification complete
 
 The qualified runtime is `7ab6cbcc70bf5abe9c5070e38a51bd0229ed1830`.
