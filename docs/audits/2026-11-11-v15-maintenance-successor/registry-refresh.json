@@ -1,0 +1,88 @@
+{
+  "createdUTC": "2026-11-17T05:17:42.891034+00:00",
+  "generatorSha256": "b304acda7b5da245f7053c7e5d8fe685cd40f10c8014913687488ba3aadefd48",
+  "readOnly": true,
+  "packages": [
+    {
+      "package": "@signal-tree/kernel",
+      "packumentReceipt": "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/registry-refresh/curl-2/kernel-packument.response.json",
+      "candidateReceipt": "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/registry-refresh/curl-2/kernel-15.4.9.response.json",
+      "distTags": {
+        "rc": "15.0.0-rc.16",
+        "latest": "15.4.8"
+      },
+      "latest": "15.4.8",
+      "latestIntegrity": "sha512-LTFxvZFTHk8qsGhleoZS8OZDl+6ACaQC1vAsjgC2zm1tAc8+T7aQUFLHh80EzG7JpaXHqKVeGfQUFjZA6k02Rg==",
+      "latestTarball": "https://registry.npmjs.org/@signal-tree/kernel/-/kernel-15.4.8.tgz",
+      "candidateInPackument": false,
+      "candidateEndpointStatus": 404,
+      "candidateAbsentConfirmed": true
+    },
+    {
+      "package": "@signal-tree/angular",
+      "packumentReceipt": "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/registry-refresh/curl-2/angular-packument.response.json",
+      "candidateReceipt": "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/registry-refresh/curl-2/angular-15.4.9.response.json",
+      "distTags": {
+        "rc": "15.0.0-rc.16",
+        "latest": "15.4.8"
+      },
+      "latest": "15.4.8",
+      "latestIntegrity": "sha512-i/ip0wV+3SGSD43C+xFLR7z/7GVS/vGIpbAXfCt1YfeJF2v08aJvoLz+l7PZteUCC1OZNLW6Urfd2q0swLvECg==",
+      "latestTarball": "https://registry.npmjs.org/@signal-tree/angular/-/angular-15.4.8.tgz",
+      "candidateInPackument": false,
+      "candidateEndpointStatus": 404,
+      "candidateAbsentConfirmed": true
+    },
+    {
+      "package": "@signal-tree/react",
+      "packumentReceipt": "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/registry-refresh/curl-2/react-packument.response.json",
+      "candidateReceipt": "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/registry-refresh/curl-2/react-15.4.9.response.json",
+      "distTags": {
+        "rc": "15.0.0-rc.16",
+        "latest": "15.4.8"
+      },
+      "latest": "15.4.8",
+      "latestIntegrity": "sha512-1O6GantRyjkZr89j8GhkuGiLiLNWBHIi7NRyhgNcT7012pqN8JZ7j5Yit7NL9Xvu0/Qi+TeeyT0hizqkiKljnw==",
+      "latestTarball": "https://registry.npmjs.org/@signal-tree/react/-/react-15.4.8.tgz",
+      "candidateInPackument": false,
+      "candidateEndpointStatus": 404,
+      "candidateAbsentConfirmed": true
+    },
+    {
+      "package": "@signal-tree/vue",
+      "packumentReceipt": "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/registry-refresh/curl-2/vue-packument.response.json",
+      "candidateReceipt": "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/registry-refresh/curl-2/vue-15.4.9.response.json",
+      "distTags": {
+        "rc": "15.0.0-rc.16",
+        "latest": "15.4.8"
+      },
+      "latest": "15.4.8",
+      "latestIntegrity": "sha512-G8jT02botkzQazkbGrbTLRORaZ5oDCo4ehp5gX5DKoIbvO77kMOIf87WZ0Q/9ZljEzglNEh1nmb+0Fhvci2yzA==",
+      "latestTarball": "https://registry.npmjs.org/@signal-tree/vue/-/vue-15.4.8.tgz",
+      "candidateInPackument": false,
+      "candidateEndpointStatus": 404,
+      "candidateAbsentConfirmed": true
+    },
+    {
+      "package": "@signal-tree/solid",
+      "packumentReceipt": "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/registry-refresh/curl-2/solid-packument.response.json",
+      "candidateReceipt": "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/registry-refresh/curl-2/solid-15.4.9.response.json",
+      "distTags": {
+        "latest": "15.4.8"
+      },
+      "latest": "15.4.8",
+      "latestIntegrity": "sha512-4BSxxvWoQxbUTXSqw83HPqKI0/v/wDkyl4BOLut1j4/aOxM0VJ4sWGxIFrnuWkQbHAt0GmGA1xWdxvJzC4t+Lw==",
+      "latestTarball": "https://registry.npmjs.org/@signal-tree/solid/-/solid-15.4.8.tgz",
+      "candidateInPackument": false,
+      "candidateEndpointStatus": 404,
+      "candidateAbsentConfirmed": true
+    }
+  ],
+  "remoteTagsReceipt": "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/registry-refresh/curl-2/remote-tags.receipt.json",
+  "allFiveRegistryVersionsAbsent": true,
+  "remoteCandidateTagAbsent": true,
+  "limits": [
+    "Point-in-time public registry and remote-tag state, not reservation or publication authority.",
+    "No package install, build, test, registry mutation or Git ref change executed."
+  ]
+}

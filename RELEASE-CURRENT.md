@@ -1,4 +1,44 @@
-# Current v15 maintenance publication — authorized November 11, 2026
+# Current v15.4.9 preparation — complete with a documented size exception
+
+Updated November 17, 2026 UTC. The owner accepted maintenance preparation following
+study `8dd709401`; this block supersedes historical publication instructions below.
+The prepared source is `da2e92ccab46747471cae810fb9221f563d0a906` on
+`codex/v15-maintenance-release-prep`, retaining runtime `0d2b96192`.
+
+The five canonical 15.4.9 archives have passed local artifact qualification:
+90/91 normal release gates; the mutation harness and restored-source checks;
+uncached package rebuild; strict installed types and Angular AOT; production demo;
+and 146 browser checks. Independent review verifies the source, logs and exact
+packed payloads. The numerical bundle gate remains failed: entity gzip is
+25,333 production bytes and 28,273 development bytes, exceeding existing ceilings
+by 40.2 and 113 bytes respectively.
+
+Fresh persistent requalification replaces the temporary raw logs lost after the
+first preparation. It reruns all 91 normal gates and 91 mutation proofs, directly
+records dist removal, rebuilds without cache and reproduces all five preserved
+archives exactly. The qualified source seal also includes the audit/controller
+edits present during that run; later documentation-only commits are distinct
+from candidate `da2e92cca`. The November 17 registry/tag inspection still finds
+15.4.8 latest and no 15.4.9 package or tag. This is preparation, not publication.
+
+**Budget disposition:** accept this specific measured excess for local preparation
+under the owner's standing instruction to weigh budgets against benefit, cost and
+feasibility. Repeated broad projection work improves materially and the identified
+retirement retention is repaired. No cheap semantics-preserving alternative was
+established. This is an explicit economic exception, not a numerical pass; the
+canonical ceilings and failure receipt remain unchanged. It grants no blanket
+exception to future artifacts or other gates.
+
+The [successor audit](docs/audits/2026-11-11-v15-maintenance-successor/README.md)
+records qualification, exact bytes, benefits, tradeoffs and evidence limits.
+This phase prepares a concrete release candidate. It does not select signed
+tagging, exact-tag Linux CI, registry publication or demo promotion. Existing
+review-branch sharing authority continues; the frozen candidate and receipts
+remain intact for any subsequently selected publication phase.
+
+---
+
+# Historical v15.4.8 publication — completed November 11, 2026
 
 The owner explicitly directed: release the v15 maintenance update first, then
 build automated application scenarios, define metrics and run comparative

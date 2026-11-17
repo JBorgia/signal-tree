@@ -1,0 +1,405 @@
+{
+  "phase": "qualify",
+  "startedUTC": "2026-11-17T04:57:33.488938+00:00",
+  "finishedUTC": "2026-11-17T05:12:46.415770+00:00",
+  "complete": true,
+  "error": null,
+  "head": "da2e92ccab46747471cae810fb9221f563d0a906",
+  "sourceSeal": "e31dab97acd9fe4d3a88e36a0d7f6b2ca68c23721c6abaf23872a2218e54fe0c",
+  "commands": [
+    {
+      "name": "node-version",
+      "command": [
+        "node",
+        "--version"
+      ],
+      "cwd": "/Users/jonathanborgia/code/signaltree/.worktrees/v15-maintenance-release-prep",
+      "startedUTC": "2026-11-17T04:57:34.866604+00:00",
+      "runnerSha256": "eca85ef36b809668c94c7cd9545e76290130d08493bc9e82cb91329a7b63588c",
+      "sourceSeal": "e31dab97acd9fe4d3a88e36a0d7f6b2ca68c23721c6abaf23872a2218e54fe0c",
+      "environment": {
+        "NX_DAEMON": "false",
+        "NX_ISOLATE_PLUGINS": "false",
+        "CI": "true",
+        "COPYFILE_DISABLE": "1",
+        "TMPDIR": "/private/tmp/st-v15-requalification-qualify-g4pjlesv"
+      },
+      "exitCode": 0,
+      "finishedUTC": "2026-11-17T04:57:34.882774+00:00",
+      "log": "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/qualification-1/logs/node-version.log",
+      "logSha256": "c642a0de246dcdc6c51318fe449646fc5067b981a8d09e9ccdb8141a5756339a"
+    },
+    {
+      "name": "pnpm-version",
+      "command": [
+        "pnpm",
+        "--version"
+      ],
+      "cwd": "/Users/jonathanborgia/code/signaltree/.worktrees/v15-maintenance-release-prep",
+      "startedUTC": "2026-11-17T04:57:34.886951+00:00",
+      "runnerSha256": "eca85ef36b809668c94c7cd9545e76290130d08493bc9e82cb91329a7b63588c",
+      "sourceSeal": "e31dab97acd9fe4d3a88e36a0d7f6b2ca68c23721c6abaf23872a2218e54fe0c",
+      "environment": {
+        "NX_DAEMON": "false",
+        "NX_ISOLATE_PLUGINS": "false",
+        "CI": "true",
+        "COPYFILE_DISABLE": "1",
+        "TMPDIR": "/private/tmp/st-v15-requalification-qualify-g4pjlesv"
+      },
+      "exitCode": 0,
+      "finishedUTC": "2026-11-17T04:57:35.093970+00:00",
+      "log": "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/qualification-1/logs/pnpm-version.log",
+      "logSha256": "f900da1311a910c04e5c793491190353e8aa6b8c73c89db3228677e1e107a5fb"
+    },
+    {
+      "name": "release-gates",
+      "command": [
+        "node",
+        "tools/verify-gates.mjs",
+        "--release"
+      ],
+      "cwd": "/Users/jonathanborgia/code/signaltree/.worktrees/v15-maintenance-release-prep",
+      "startedUTC": "2026-11-17T04:57:35.103279+00:00",
+      "runnerSha256": "eca85ef36b809668c94c7cd9545e76290130d08493bc9e82cb91329a7b63588c",
+      "sourceSeal": "e31dab97acd9fe4d3a88e36a0d7f6b2ca68c23721c6abaf23872a2218e54fe0c",
+      "environment": {
+        "NX_DAEMON": "false",
+        "NX_ISOLATE_PLUGINS": "false",
+        "CI": "true",
+        "COPYFILE_DISABLE": "1",
+        "TMPDIR": "/private/tmp/st-v15-requalification-qualify-g4pjlesv"
+      },
+      "exitCode": 1,
+      "finishedUTC": "2026-11-17T05:03:19.893121+00:00",
+      "log": "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/qualification-1/logs/release-gates.log",
+      "logSha256": "a70d54b64b674956362d6f8658e8da0235462547d93655199a2312735d9212c6"
+    },
+    {
+      "name": "release-mutations",
+      "command": [
+        "node",
+        "tools/verify-gates.mjs",
+        "--self-test",
+        "--release"
+      ],
+      "cwd": "/Users/jonathanborgia/code/signaltree/.worktrees/v15-maintenance-release-prep",
+      "startedUTC": "2026-11-17T05:03:29.059366+00:00",
+      "runnerSha256": "eca85ef36b809668c94c7cd9545e76290130d08493bc9e82cb91329a7b63588c",
+      "sourceSeal": "e31dab97acd9fe4d3a88e36a0d7f6b2ca68c23721c6abaf23872a2218e54fe0c",
+      "environment": {
+        "NX_DAEMON": "false",
+        "NX_ISOLATE_PLUGINS": "false",
+        "CI": "true",
+        "COPYFILE_DISABLE": "1",
+        "TMPDIR": "/private/tmp/st-v15-requalification-qualify-g4pjlesv"
+      },
+      "exitCode": 0,
+      "finishedUTC": "2026-11-17T05:08:58.445197+00:00",
+      "log": "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/qualification-1/logs/release-mutations.log",
+      "logSha256": "a043c8ee3b872bb8f86787f1baf823c67805da0a55d0f9dfc9f1a82e70d40d3f"
+    },
+    {
+      "name": "final-uncached-build",
+      "command": [
+        "pnpm",
+        "run",
+        "build:all",
+        "--skip-nx-cache"
+      ],
+      "cwd": "/Users/jonathanborgia/code/signaltree/.worktrees/v15-maintenance-release-prep",
+      "startedUTC": "2026-11-17T05:09:06.285583+00:00",
+      "runnerSha256": "eca85ef36b809668c94c7cd9545e76290130d08493bc9e82cb91329a7b63588c",
+      "sourceSeal": "e31dab97acd9fe4d3a88e36a0d7f6b2ca68c23721c6abaf23872a2218e54fe0c",
+      "environment": {
+        "NX_DAEMON": "false",
+        "NX_ISOLATE_PLUGINS": "false",
+        "CI": "true",
+        "COPYFILE_DISABLE": "1",
+        "TMPDIR": "/private/tmp/st-v15-requalification-qualify-g4pjlesv"
+      },
+      "exitCode": 0,
+      "finishedUTC": "2026-11-17T05:09:15.442606+00:00",
+      "log": "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/qualification-1/logs/final-uncached-build.log",
+      "logSha256": "29d5f0156c1ca2152f38b0b1a90c9fa7237e7ee14981754978e9448fdd709f88"
+    },
+    {
+      "name": "final-canonical-prepare-only",
+      "command": [
+        "node",
+        "scripts/publish-candidate.mjs",
+        "--prebuilt",
+        "--prepare-only"
+      ],
+      "cwd": "/Users/jonathanborgia/code/signaltree/.worktrees/v15-maintenance-release-prep",
+      "startedUTC": "2026-11-17T05:09:22.518475+00:00",
+      "runnerSha256": "eca85ef36b809668c94c7cd9545e76290130d08493bc9e82cb91329a7b63588c",
+      "sourceSeal": "e31dab97acd9fe4d3a88e36a0d7f6b2ca68c23721c6abaf23872a2218e54fe0c",
+      "environment": {
+        "NX_DAEMON": "false",
+        "NX_ISOLATE_PLUGINS": "false",
+        "CI": "true",
+        "COPYFILE_DISABLE": "1",
+        "TMPDIR": "/private/tmp/st-v15-requalification-qualify-g4pjlesv"
+      },
+      "exitCode": 0,
+      "finishedUTC": "2026-11-17T05:09:35.374004+00:00",
+      "log": "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/qualification-1/logs/final-canonical-prepare-only.log",
+      "logSha256": "d83ba58cd783069b9942283cdc03d457244d013b10afeac817cf13688bb7d360"
+    },
+    {
+      "name": "final-angular-aot",
+      "command": [
+        "node",
+        "tools/verify-angular-aot-consumer.mjs",
+        "--kernel-tarball=/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/qualification-1/final-candidate/tarballs/signal-tree-kernel-15.4.9.tgz",
+        "--angular-tarball=/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/qualification-1/final-candidate/tarballs/signal-tree-angular-15.4.9.tgz"
+      ],
+      "cwd": "/Users/jonathanborgia/code/signaltree/.worktrees/v15-maintenance-release-prep",
+      "startedUTC": "2026-11-17T05:09:48.481668+00:00",
+      "runnerSha256": "eca85ef36b809668c94c7cd9545e76290130d08493bc9e82cb91329a7b63588c",
+      "sourceSeal": "e31dab97acd9fe4d3a88e36a0d7f6b2ca68c23721c6abaf23872a2218e54fe0c",
+      "environment": {
+        "NX_DAEMON": "false",
+        "NX_ISOLATE_PLUGINS": "false",
+        "CI": "true",
+        "COPYFILE_DISABLE": "1",
+        "TMPDIR": "/private/tmp/st-v15-requalification-qualify-g4pjlesv"
+      },
+      "exitCode": 0,
+      "finishedUTC": "2026-11-17T05:10:06.097253+00:00",
+      "log": "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/qualification-1/logs/final-angular-aot.log",
+      "logSha256": "8076ea766d301ae307069e3114a197e0f4bd02dcc0768c6ab14420c725d817ed"
+    },
+    {
+      "name": "final-demo-production",
+      "command": [
+        "pnpm",
+        "nx",
+        "build",
+        "demo",
+        "--configuration=production",
+        "--skip-nx-cache"
+      ],
+      "cwd": "/Users/jonathanborgia/code/signaltree/.worktrees/v15-maintenance-release-prep",
+      "startedUTC": "2026-11-17T05:10:14.099714+00:00",
+      "runnerSha256": "eca85ef36b809668c94c7cd9545e76290130d08493bc9e82cb91329a7b63588c",
+      "sourceSeal": "e31dab97acd9fe4d3a88e36a0d7f6b2ca68c23721c6abaf23872a2218e54fe0c",
+      "environment": {
+        "NX_DAEMON": "false",
+        "NX_ISOLATE_PLUGINS": "false",
+        "CI": "true",
+        "COPYFILE_DISABLE": "1",
+        "TMPDIR": "/private/tmp/st-v15-requalification-qualify-g4pjlesv"
+      },
+      "exitCode": 0,
+      "finishedUTC": "2026-11-17T05:10:22.341956+00:00",
+      "log": "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/qualification-1/logs/final-demo-production.log",
+      "logSha256": "e153c59c1aff8c4fa80a19a14be3607e9bf5cd254a1bd61eb2968751933230db"
+    },
+    {
+      "name": "final-route-smoke",
+      "command": [
+        "pnpm",
+        "run",
+        "smoke:routes"
+      ],
+      "cwd": "/Users/jonathanborgia/code/signaltree/.worktrees/v15-maintenance-release-prep",
+      "startedUTC": "2026-11-17T05:10:31.439521+00:00",
+      "runnerSha256": "eca85ef36b809668c94c7cd9545e76290130d08493bc9e82cb91329a7b63588c",
+      "sourceSeal": "e31dab97acd9fe4d3a88e36a0d7f6b2ca68c23721c6abaf23872a2218e54fe0c",
+      "environment": {
+        "NX_DAEMON": "false",
+        "NX_ISOLATE_PLUGINS": "false",
+        "CI": "true",
+        "COPYFILE_DISABLE": "1",
+        "TMPDIR": "/private/tmp/st-v15-requalification-qualify-g4pjlesv"
+      },
+      "exitCode": 0,
+      "finishedUTC": "2026-11-17T05:11:07.236557+00:00",
+      "log": "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/qualification-1/logs/final-route-smoke.log",
+      "logSha256": "d4d850337a8f2b299f8d5149b6535a52b4a6d4f2e0d228943bc4d3f80dacd29a"
+    },
+    {
+      "name": "final-version-claims",
+      "command": [
+        "node",
+        "scripts/verify-version-claims.js"
+      ],
+      "cwd": "/Users/jonathanborgia/code/signaltree/.worktrees/v15-maintenance-release-prep",
+      "startedUTC": "2026-11-17T05:11:16.439334+00:00",
+      "runnerSha256": "eca85ef36b809668c94c7cd9545e76290130d08493bc9e82cb91329a7b63588c",
+      "sourceSeal": "e31dab97acd9fe4d3a88e36a0d7f6b2ca68c23721c6abaf23872a2218e54fe0c",
+      "environment": {
+        "NX_DAEMON": "false",
+        "NX_ISOLATE_PLUGINS": "false",
+        "CI": "true",
+        "COPYFILE_DISABLE": "1",
+        "TMPDIR": "/private/tmp/st-v15-requalification-qualify-g4pjlesv"
+      },
+      "exitCode": 0,
+      "finishedUTC": "2026-11-17T05:11:16.483011+00:00",
+      "log": "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/qualification-1/logs/final-version-claims.log",
+      "logSha256": "41a04cf1861a570f722448cefa8f7dadbb827d1a489b54f31198311d3dcbd457"
+    },
+    {
+      "name": "final-release-state",
+      "command": [
+        "node",
+        "scripts/verify-release-state.js"
+      ],
+      "cwd": "/Users/jonathanborgia/code/signaltree/.worktrees/v15-maintenance-release-prep",
+      "startedUTC": "2026-11-17T05:11:30.176142+00:00",
+      "runnerSha256": "eca85ef36b809668c94c7cd9545e76290130d08493bc9e82cb91329a7b63588c",
+      "sourceSeal": "e31dab97acd9fe4d3a88e36a0d7f6b2ca68c23721c6abaf23872a2218e54fe0c",
+      "environment": {
+        "NX_DAEMON": "false",
+        "NX_ISOLATE_PLUGINS": "false",
+        "CI": "true",
+        "COPYFILE_DISABLE": "1",
+        "TMPDIR": "/private/tmp/st-v15-requalification-qualify-g4pjlesv"
+      },
+      "exitCode": 0,
+      "finishedUTC": "2026-11-17T05:11:30.207210+00:00",
+      "log": "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/qualification-1/logs/final-release-state.log",
+      "logSha256": "6f5df8790aff8a93ed2cf1fe5c8528eae082171dd176345e0675e0e523c04a5b"
+    },
+    {
+      "name": "final-changelog",
+      "command": [
+        "bash",
+        "scripts/verify-changelog-entry.sh",
+        "15.4.9"
+      ],
+      "cwd": "/Users/jonathanborgia/code/signaltree/.worktrees/v15-maintenance-release-prep",
+      "startedUTC": "2026-11-17T05:11:41.825756+00:00",
+      "runnerSha256": "eca85ef36b809668c94c7cd9545e76290130d08493bc9e82cb91329a7b63588c",
+      "sourceSeal": "e31dab97acd9fe4d3a88e36a0d7f6b2ca68c23721c6abaf23872a2218e54fe0c",
+      "environment": {
+        "NX_DAEMON": "false",
+        "NX_ISOLATE_PLUGINS": "false",
+        "CI": "true",
+        "COPYFILE_DISABLE": "1",
+        "TMPDIR": "/private/tmp/st-v15-requalification-qualify-g4pjlesv"
+      },
+      "exitCode": 0,
+      "finishedUTC": "2026-11-17T05:11:41.835995+00:00",
+      "log": "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/qualification-1/logs/final-changelog.log",
+      "logSha256": "1ee534a5e2aba269c9336f5505ee5c722b67be9c4c22e56acda5f81f1ae1e8b8"
+    },
+    {
+      "name": "final-diff-check",
+      "command": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "cwd": "/Users/jonathanborgia/code/signaltree/.worktrees/v15-maintenance-release-prep",
+      "startedUTC": "2026-11-17T05:11:49.519378+00:00",
+      "runnerSha256": "eca85ef36b809668c94c7cd9545e76290130d08493bc9e82cb91329a7b63588c",
+      "sourceSeal": "e31dab97acd9fe4d3a88e36a0d7f6b2ca68c23721c6abaf23872a2218e54fe0c",
+      "environment": {
+        "NX_DAEMON": "false",
+        "NX_ISOLATE_PLUGINS": "false",
+        "CI": "true",
+        "COPYFILE_DISABLE": "1",
+        "TMPDIR": "/private/tmp/st-v15-requalification-qualify-g4pjlesv"
+      },
+      "exitCode": 0,
+      "finishedUTC": "2026-11-17T05:11:49.544157+00:00",
+      "log": "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/qualification-1/logs/final-diff-check.log",
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "exact-budget",
+      "command": [
+        "node",
+        "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/qualification-1/exact-budget.mjs"
+      ],
+      "cwd": "/Users/jonathanborgia/code/signaltree/.worktrees/v15-maintenance-release-prep",
+      "startedUTC": "2026-11-17T05:11:59.998274+00:00",
+      "runnerSha256": "eca85ef36b809668c94c7cd9545e76290130d08493bc9e82cb91329a7b63588c",
+      "sourceSeal": "e31dab97acd9fe4d3a88e36a0d7f6b2ca68c23721c6abaf23872a2218e54fe0c",
+      "environment": {
+        "NX_DAEMON": "false",
+        "NX_ISOLATE_PLUGINS": "false",
+        "CI": "true",
+        "COPYFILE_DISABLE": "1",
+        "TMPDIR": "/private/tmp/st-v15-requalification-qualify-g4pjlesv"
+      },
+      "exitCode": 1,
+      "finishedUTC": "2026-11-17T05:12:00.132607+00:00",
+      "log": "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/qualification-1/logs/exact-budget.log",
+      "logSha256": "260b2c111aba0bcaee504c71572330a080e29c41bcd22b9a05b28b96c580fc68"
+    },
+    {
+      "name": "bare-control-before",
+      "command": [
+        "node",
+        "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/qualification-1/bare-control-before.mjs"
+      ],
+      "cwd": "/Users/jonathanborgia/code/signaltree/.worktrees/v15-maintenance-release-prep",
+      "startedUTC": "2026-11-17T05:12:10.291162+00:00",
+      "runnerSha256": "eca85ef36b809668c94c7cd9545e76290130d08493bc9e82cb91329a7b63588c",
+      "sourceSeal": "e31dab97acd9fe4d3a88e36a0d7f6b2ca68c23721c6abaf23872a2218e54fe0c",
+      "environment": {
+        "NX_DAEMON": "false",
+        "NX_ISOLATE_PLUGINS": "false",
+        "CI": "true",
+        "COPYFILE_DISABLE": "1",
+        "TMPDIR": "/private/tmp/st-v15-requalification-qualify-g4pjlesv"
+      },
+      "exitCode": 0,
+      "finishedUTC": "2026-11-17T05:12:10.390479+00:00",
+      "log": "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/qualification-1/logs/bare-control-before.log",
+      "logSha256": "fa05adf5200d7534bc4c8f85cc0146d6bf38cb662db086ced4e2f30ad9b51125"
+    },
+    {
+      "name": "bare-control-planted",
+      "command": [
+        "node",
+        "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/qualification-1/bare-control-planted.mjs"
+      ],
+      "cwd": "/Users/jonathanborgia/code/signaltree/.worktrees/v15-maintenance-release-prep",
+      "startedUTC": "2026-11-17T05:12:23.076647+00:00",
+      "runnerSha256": "eca85ef36b809668c94c7cd9545e76290130d08493bc9e82cb91329a7b63588c",
+      "sourceSeal": "e31dab97acd9fe4d3a88e36a0d7f6b2ca68c23721c6abaf23872a2218e54fe0c",
+      "environment": {
+        "NX_DAEMON": "false",
+        "NX_ISOLATE_PLUGINS": "false",
+        "CI": "true",
+        "COPYFILE_DISABLE": "1",
+        "TMPDIR": "/private/tmp/st-v15-requalification-qualify-g4pjlesv"
+      },
+      "exitCode": 1,
+      "finishedUTC": "2026-11-17T05:12:23.157518+00:00",
+      "log": "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/qualification-1/logs/bare-control-planted.log",
+      "logSha256": "21e8c5d0edf56d8f7530d050a6dd7eff8a7a7648516d857a4bf7a75ff1d3d03f"
+    },
+    {
+      "name": "bare-control-restored",
+      "command": [
+        "node",
+        "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/qualification-1/bare-control-restored.mjs"
+      ],
+      "cwd": "/Users/jonathanborgia/code/signaltree/.worktrees/v15-maintenance-release-prep",
+      "startedUTC": "2026-11-17T05:12:35.586597+00:00",
+      "runnerSha256": "eca85ef36b809668c94c7cd9545e76290130d08493bc9e82cb91329a7b63588c",
+      "sourceSeal": "e31dab97acd9fe4d3a88e36a0d7f6b2ca68c23721c6abaf23872a2218e54fe0c",
+      "environment": {
+        "NX_DAEMON": "false",
+        "NX_ISOLATE_PLUGINS": "false",
+        "CI": "true",
+        "COPYFILE_DISABLE": "1",
+        "TMPDIR": "/private/tmp/st-v15-requalification-qualify-g4pjlesv"
+      },
+      "exitCode": 0,
+      "finishedUTC": "2026-11-17T05:12:35.661044+00:00",
+      "log": "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/qualification-1/logs/bare-control-restored.log",
+      "logSha256": "fa05adf5200d7534bc4c8f85cc0146d6bf38cb662db086ced4e2f30ad9b51125"
+    }
+  ],
+  "publication": false,
+  "limits": [
+    "No signed tag, exact-tag CI, publication or deployment. Numerical bundle failure remains a failure even if within the recorded preparation disposition."
+  ]
+}

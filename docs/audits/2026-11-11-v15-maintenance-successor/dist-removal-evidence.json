@@ -1,0 +1,36 @@
+{
+  "kind": "later-transcription-of-conversation-tool-evidence",
+  "createdFor": "independent release preparation review",
+  "candidateCommit": "da2e92ccab46747471cae810fb9221f563d0a906",
+  "cwd": "/Users/jonathanborgia/code/signaltree/.worktrees/v15-maintenance-release-prep",
+  "historicalTool": "functions.exec -> tools.exec_command",
+  "historicalToolResult": {
+    "chunk_id": "07f1af",
+    "session_id": 61312
+  },
+  "historicalCommand": "tail -14 /private/tmp/st-v15-maintenance-release-prep/release-mutations-1.log && node /private/tmp/st-v15-maintenance-release-prep/seal-source.mjs source-after-mutations && node -e \"const fs=require('fs');const a=JSON.parse(fs.readFileSync('/private/tmp/st-v15-maintenance-release-prep/source-before-full-gates.json'));const b=JSON.parse(fs.readFileSync('/private/tmp/st-v15-maintenance-release-prep/source-after-mutations.json'));if(a.sourceSeal!==b.sourceSeal||b.status)throw Error('Source not restored');console.log('Source fully restored to frozen candidate');fs.rmSync('dist',{recursive:true,force:true});\" && node /private/tmp/st-v15-maintenance-release-prep/run.mjs rebuild-after-mutations-1 pnpm run build:all --skip-nx-cache",
+  "observedToolOutput": [
+    "91/91 gates PROVEN able to fail (15 indirectly, via a companion self-test gate). 0 unproven, 0 vacuous, 0 blind, 0 errored.",
+    "{\"head\":\"da2e92ccab46747471cae810fb9221f563d0a906\",\"sourceSeal\":\"480b325993535f7949d9d62c8acc68171bfbe3f64002d86dbffac62e8b3c6475\",\"files\":1766,\"status\":\"\"}",
+    "Source fully restored to frozen candidate"
+  ],
+  "subsequentToolObservation": {
+    "session_id": 61312,
+    "exit_code": 0,
+    "output": "rebuild-after-mutations-1 0"
+  },
+  "contemporaneousDurableEvidence": [
+    "/private/tmp/st-v15-maintenance-release-prep/source-after-mutations.json",
+    "/private/tmp/st-v15-maintenance-release-prep/rebuild-after-mutations-1.receipt.json",
+    "/private/tmp/st-v15-maintenance-release-prep/rebuild-after-mutations-1.log",
+    "/private/tmp/st-v15-maintenance-release-prep/artifacts-after-clean-build.json"
+  ],
+  "limits": [
+    "This file is a later transcription, not a contemporaneous execution receipt.",
+    "The durable run.mjs receipt begins after the dist-removal prelude; it does not independently record that prelude.",
+    "No pre-removal or post-removal directory listing was preserved.",
+    "The tool command and successful subsequent command establish the agent's tool-backed removal claim; a reviewer relying only on archived execution receipts must retain this evidence gap.",
+    "No deletion, rebuild, or other validation was rerun to dress the historical evidence."
+  ],
+  "transcribedUTC": "2026-11-12T02:20:59.037Z"
+}

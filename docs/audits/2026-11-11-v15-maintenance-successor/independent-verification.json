@@ -1,0 +1,14 @@
+{
+  "reviewType": "Independent read-only hash and Git payload verification; no builds, tests, mutation or browser reruns",
+  "head": "da2e92ccab46747471cae810fb9221f563d0a906",
+  "tree": "b3c426af5817cfed647da3202b5850e7965ccc11",
+  "sourceArchiveGitBlobPayloads": 1766,
+  "criticalFilesVerified": 12,
+  "commandReceiptAndLogPairsVerified": 18,
+  "currentSourceFilesVerified": 1766,
+  "currentBuiltPayloadsVerified": 162,
+  "packedPayloadsVerified": 158,
+  "tarballsVerified": 5,
+  "scriptSha256": "a7d2a28c705850137526d49bbef672e9158808ef92844a80c9ff728b9fd8bfe9",
+  "passed": true
+}

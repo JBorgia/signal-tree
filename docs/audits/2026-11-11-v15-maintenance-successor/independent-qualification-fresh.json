@@ -1,0 +1,876 @@
+{
+  "kind": "independent-offline-final-v15-qualification-review",
+  "candidate": "da2e92ccab46747471cae810fb9221f563d0a906",
+  "runtime": "0d2b9619206ab9e7a7af998944e744f6d2b6e492",
+  "version": "15.4.9",
+  "sourceSeal": "e31dab97acd9fe4d3a88e36a0d7f6b2ca68c23721c6abaf23872a2218e54fe0c",
+  "disposition": "No additional local preparation blocker demonstrated. Fresh local qualification supports the exact prepared artifacts with the explicitly retained entity-size exception. This is not a numerical all-gates pass, exact-tag Linux release qualification or publication authorization.",
+  "source": {
+    "verifiedSourceFilesPerSnapshot": 1769,
+    "preservedSourceTrees": 2,
+    "checkpointMapsEqual": 7,
+    "runtimeSourceFilesEqualToRuntimeCommit": 706,
+    "modifiedTrackedDocsVersusCommit": [
+      "RELEASE-CURRENT.md",
+      "docs/audits/2026-11-11-v15-maintenance-successor/README.md"
+    ],
+    "untrackedSealedAuditFiles": [
+      "docs/audits/2026-11-11-v15-maintenance-successor/dist-removal-evidence.json",
+      "docs/audits/2026-11-11-v15-maintenance-successor/independent-verification.json",
+      "docs/audits/2026-11-11-v15-maintenance-successor/qualification-summary.json"
+    ],
+    "limit": "The sealed source includes five root-owned audit/controller files differing from committed HEAD. It is development/local-preparation evidence; later audit-only edits are outside this snapshot and do not change the verified runtime or archives."
+  },
+  "artifact": {
+    "counts": {
+      "kernel": 109,
+      "angular": 16,
+      "react": 9,
+      "vue": 12,
+      "solid": 12
+    },
+    "totalPayloads": 158,
+    "builtDistFiles": 162,
+    "payloadSeal": "19f457d0d89c5905c1af021ae888a01818cc8298000ff979ad86139baf1b5130",
+    "archiveSha256": {
+      "kernel": "b92f5981da5327fa66f3c9a91838718e3cace9eaeff698222479ad795d8ec847",
+      "angular": "1aa50b5e7e83bf71947beba81cee26895d3e4030c4bdb8e9286a13780b63338c",
+      "react": "7bec965f935f7389a0d1f7a7823b077e6ae8fc04f81bc4462e76010c86412836",
+      "vue": "60a7a577380b5be8c03b4c889c7900772407bda5077da7427ca859b38b0a41b0",
+      "solid": "20126c6279856253f72b0029c3fbfea6fc70fa6febfd903daf7f23b451247ded"
+    },
+    "finalEqualsQuickAndRecoveredArchives": true,
+    "allTarballPayloadsEqualFreshDistAndExtractedTrees": true,
+    "installedConsumerPayloads": [
+      {
+        "root": "st-consumer-tsc-TeoIBd",
+        "package": "kernel",
+        "files": 109
+      },
+      {
+        "root": "st-consumer-tsc-TeoIBd",
+        "package": "angular",
+        "files": 16
+      },
+      {
+        "root": "st-consumer-tsc-TeoIBd",
+        "package": "react",
+        "files": 9
+      },
+      {
+        "root": "st-consumer-tsc-TeoIBd",
+        "package": "vue",
+        "files": 12
+      },
+      {
+        "root": "st-consumer-tsc-TeoIBd",
+        "package": "solid",
+        "files": 12
+      },
+      {
+        "root": "st-tarball-HUv2KW",
+        "package": "kernel",
+        "files": 109
+      },
+      {
+        "root": "st-tarball-HUv2KW",
+        "package": "angular",
+        "files": 16
+      },
+      {
+        "root": "st-tarball-HUv2KW",
+        "package": "react",
+        "files": 9
+      },
+      {
+        "root": "st-tarball-HUv2KW",
+        "package": "vue",
+        "files": 12
+      },
+      {
+        "root": "st-tarball-HUv2KW",
+        "package": "solid",
+        "files": 12
+      }
+    ],
+    "limit": "Canonical state=validated means package/consumer validation. Existing immutable archives were checked against fresh rebuilt dist; byte equality is not a claim that lost November11 raw logs were recovered."
+  },
+  "checks": {
+    "normal": {
+      "passed": 90,
+      "total": 91,
+      "failed": [
+        "bundle-budget"
+      ]
+    },
+    "mutations": {
+      "reportedProven": 91,
+      "total": 91,
+      "indirect": 15,
+      "unproven": 0,
+      "vacuous": 0,
+      "blind": 0,
+      "errored": 0,
+      "qualification": "Already-red entity budget baseline makes its ordinary seeded rejection non-discriminating. Separate passing bare control fails only after retained payload injection and returns to exact passing sizes."
+    },
+    "browser": {
+      "passed": 146,
+      "uniqueSuccessfulTestIndices": 146,
+      "failed": 0,
+      "servedFreshProductionDemo": true,
+      "limit": "Route-smoke source, command, exit and individual pass lines verified; complete immutable demo output inventory was not included in the packet."
+    },
+    "angularAOT": {
+      "passed": true,
+      "exactSuppliedFinalTarballs": true,
+      "sourceAssertions": [
+        "installed lock integrity",
+        "single supplied kernel path",
+        "production AOT stats consume Angular and kernel",
+        "no Angular compiler in browser",
+        "repeated DOM values",
+        "component/root teardown",
+        "zero browser errors"
+      ],
+      "limit": "Successful AOT fixture deletes itself in finally. Exact installation is bound by checker assertions/command/log, not a retained AOT filesystem inventory."
+    },
+    "strictConsumers": {
+      "bundler": true,
+      "node16": true,
+      "skipLibCheck": false,
+      "retainedAllFiveInstalledPayloadsVerified": true
+    },
+    "cleanBuild": {
+      "sourceRestored": true,
+      "distRemovalContemporaneousReceipt": true,
+      "uncachedRebuildAfterRemoval": true
+    }
+  },
+  "budget": {
+    "exact": [
+      {
+        "id": "signaltree-bare",
+        "prodBytes": 11011,
+        "devBytes": 13159,
+        "prodLimitBytes": 11059.2,
+        "devLimitBytes": 13209.6
+      },
+      {
+        "id": "signaltree-entities",
+        "prodBytes": 25333,
+        "devBytes": 28273,
+        "prodLimitBytes": 25292.8,
+        "devLimitBytes": 28160
+      }
+    ],
+    "entityProductionExcessBytes": 40.2,
+    "entityDevelopmentExcessBytes": 113,
+    "numericalVerdict": "FAIL",
+    "bareControl": {
+      "before": [
+        {
+          "id": "signaltree-bare",
+          "prodBytes": 11011,
+          "devBytes": 13159,
+          "prodLimitBytes": 11059.2,
+          "devLimitBytes": 13209.6
+        }
+      ],
+      "planted": [
+        {
+          "id": "signaltree-bare",
+          "prodBytes": 47866,
+          "devBytes": 49992,
+          "prodLimitBytes": 11059.2,
+          "devLimitBytes": 13209.6
+        }
+      ],
+      "restored": [
+        {
+          "id": "signaltree-bare",
+          "prodBytes": 11011,
+          "devBytes": 13159,
+          "prodLimitBytes": 11059.2,
+          "devLimitBytes": 13209.6
+        }
+      ]
+    },
+    "interpretation": "The frozen controller records an artifact-specific economic exception for local preparation, weighing earlier measured broad-projection benefit and repaired retirement retention. Fresh numbers are equal to that disposition. This review verifies the size/disposition match, not a new performance comparison or proof that no cheaper alternative exists. Thresholds and canonical failure remain unchanged."
+  },
+  "registry": {
+    "observedUTC": "2026-11-17T05:17:42.891034+00:00",
+    "packages": [
+      {
+        "package": "kernel",
+        "latestAtReceipt": "15.4.8",
+        "candidateStatus": 404
+      },
+      {
+        "package": "angular",
+        "latestAtReceipt": "15.4.8",
+        "candidateStatus": 404
+      },
+      {
+        "package": "react",
+        "latestAtReceipt": "15.4.8",
+        "candidateStatus": 404
+      },
+      {
+        "package": "vue",
+        "latestAtReceipt": "15.4.8",
+        "candidateStatus": 404
+      },
+      {
+        "package": "solid",
+        "latestAtReceipt": "15.4.8",
+        "candidateStatus": 404
+      }
+    ],
+    "remoteCandidateTagAbsent": true,
+    "limit": "Point-in-time raw public-registry and remote-tag observations; not a reservation or permission to publish. Reviewer made no network request."
+  },
+  "firstFailures": [
+    "Fresh quick-1 frozen install failed ENOTFOUND and remains preserved; quick-2 succeeded with unchanged source seal.",
+    "Initial registry Python TLS lookup failed; separate curl-2 uses default certificate verification and succeeds.",
+    "Canonical entity bundle gate remains failed; no green relabeling."
+  ],
+  "historicalBoundary": "November11 qualification summary and old dist-removal transcription remain historical with lost original raw logs. Fresh quick-2/qualification-1 command logs, exact source trees, mutation restoration and direct dist-removal receipts provide the new qualification evidence.",
+  "releaseLimits": [
+    "No signed candidate tag, exact-tag Linux CI, provenance publication, registry installation of15.4.9 or demo promotion established.",
+    "No blanket claim of semantic completeness, leak freedom, whole-workspace coverage percentages or cross-platform equivalence.",
+    "Source/runtime compatibility is supported by the preserved runtime identity, API and behavioral gate execution; this offline review does not rerun tests or re-derive every runtime change."
+  ],
+  "verificationActivity": "Read/hash/parse only; no source/runtime edits, install, build, test, benchmark, network, tag, push or publication.",
+  "bindings": {
+    "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/qualification-1/source-before.json": {
+      "sha256": "f6fb87f1e44189f9a23cd8af0234f8bc00224f16a0fa06338ead7a22f07f703f",
+      "bytes": 226728
+    },
+    "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/quick-2/source-before.json": {
+      "sha256": "f6fb87f1e44189f9a23cd8af0234f8bc00224f16a0fa06338ead7a22f07f703f",
+      "bytes": 226728
+    },
+    "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/quick-2/source-after-install.json": {
+      "sha256": "f6fb87f1e44189f9a23cd8af0234f8bc00224f16a0fa06338ead7a22f07f703f",
+      "bytes": 226728
+    },
+    "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/quick-2/source-after-quick.json": {
+      "sha256": "f6fb87f1e44189f9a23cd8af0234f8bc00224f16a0fa06338ead7a22f07f703f",
+      "bytes": 226728
+    },
+    "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/qualification-1/source-after-normal.json": {
+      "sha256": "f6fb87f1e44189f9a23cd8af0234f8bc00224f16a0fa06338ead7a22f07f703f",
+      "bytes": 226728
+    },
+    "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/qualification-1/source-after-mutations.json": {
+      "sha256": "f6fb87f1e44189f9a23cd8af0234f8bc00224f16a0fa06338ead7a22f07f703f",
+      "bytes": 226728
+    },
+    "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/qualification-1/source-final.json": {
+      "sha256": "f6fb87f1e44189f9a23cd8af0234f8bc00224f16a0fa06338ead7a22f07f703f",
+      "bytes": 226728
+    },
+    "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/quick-1/result.json": {
+      "sha256": "5d4ea835ca92aba5b9356f966d49c870475473b4ec8c91b1d78c734105708800",
+      "bytes": 3652
+    },
+    "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/quick-1/requalify.py": {
+      "sha256": "eca85ef36b809668c94c7cd9545e76290130d08493bc9e82cb91329a7b63588c",
+      "bytes": 21240
+    },
+    "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/quick-1/logs/node-version.receipt.json": {
+      "sha256": "97d6d0bd0e3be3140d19c5665768f8b777ba9bee56d3236cadee742fac445def",
+      "bytes": 882
+    },
+    "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/quick-1/logs/node-version.log": {
+      "sha256": "c642a0de246dcdc6c51318fe449646fc5067b981a8d09e9ccdb8141a5756339a",
+      "bytes": 9
+    },
+    "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/quick-1/logs/pnpm-version.receipt.json": {
+      "sha256": "26ba706f2bf5b63d2486087844d4d5a126eac48994703970fb332d7bccf028ed",
+      "bytes": 882
+    },
+    "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/quick-1/logs/pnpm-version.log": {
+      "sha256": "f900da1311a910c04e5c793491190353e8aa6b8c73c89db3228677e1e107a5fb",
+      "bytes": 8
+    },
+    "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/quick-1/logs/frozen-install.receipt.json": {
+      "sha256": "d14448e98a9e978e1a27aaf7d44456b1f2808e8012544b8aa3f8e40c439b62a9",
+      "bytes": 909
+    },
+    "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/quick-1/logs/frozen-install.log": {
+      "sha256": "985928d906419545b79f2fc8ed1bac5da3f564791fa57ee542b78a76cdb591a2",
+      "bytes": 7865
+    },
+    "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/quick-2/result.json": {
+      "sha256": "cd1987b3c54a86263576a713e58206ccad8b0553c987374a71ba673f261198e1",
+      "bytes": 5538
+    },
+    "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/quick-2/requalify.py": {
+      "sha256": "eca85ef36b809668c94c7cd9545e76290130d08493bc9e82cb91329a7b63588c",
+      "bytes": 21240
+    },
+    "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/quick-2/logs/node-version.receipt.json": {
+      "sha256": "26d593c86665d2f9bd268df112ee5e3d7817129a69abf2200954c92a4986cb8c",
+      "bytes": 882
+    },
+    "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/quick-2/logs/node-version.log": {
+      "sha256": "c642a0de246dcdc6c51318fe449646fc5067b981a8d09e9ccdb8141a5756339a",
+      "bytes": 9
+    },
+    "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/quick-2/logs/pnpm-version.receipt.json": {
+      "sha256": "e3dfd9b7bcd1bf484574ea0f5d6a52ab935c711e3146eca12a3d19291d221513",
+      "bytes": 882
+    },
+    "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/quick-2/logs/pnpm-version.log": {
+      "sha256": "f900da1311a910c04e5c793491190353e8aa6b8c73c89db3228677e1e107a5fb",
+      "bytes": 8
+    },
+    "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/quick-2/logs/frozen-install.receipt.json": {
+      "sha256": "a0d22de76a321f00ad08615d3159f4baadaff67f376336e26c771e10c9a8dc09",
+      "bytes": 909
+    },
+    "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/quick-2/logs/frozen-install.log": {
+      "sha256": "a74a355e18fb831e1188c9e2c5ce1e98252af1c1f3e4f826ce83996b5cf080bc",
+      "bytes": 3744
+    },
+    "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/quick-2/logs/fresh-build.receipt.json": {
+      "sha256": "4bb6b30f8e2fb775e37d547f0e73d0abc817939bf4a571d43f8b20692af7ece6",
+      "bytes": 914
+    },
+    "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/quick-2/logs/fresh-build.log": {
+      "sha256": "c98b983532f3451acf4dc8151f5140a7e5838ecae3b55a4de6896586290d833d",
+      "bytes": 8940
+    },
+    "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/quick-2/logs/canonical-prepare-only.receipt.json": {
+      "sha256": "ea01c7d63ddde6131c198f26a1998ee56812ff4d0aaf702960af5b70c4017eb5",
+      "bytes": 962
+    },
+    "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/quick-2/logs/canonical-prepare-only.log": {
+      "sha256": "d83ba58cd783069b9942283cdc03d457244d013b10afeac817cf13688bb7d360",
+      "bytes": 6656
+    },
+    "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/qualification-1/result.json": {
+      "sha256": "50560ac2b9c1dea34784b0caab155a6e1073980b319ad56310f67f6767d0829c",
+      "bytes": 18741
+    },
+    "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/qualification-1/requalify.py": {
+      "sha256": "eca85ef36b809668c94c7cd9545e76290130d08493bc9e82cb91329a7b63588c",
+      "bytes": 21240
+    },
+    "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/qualification-1/logs/node-version.receipt.json": {
+      "sha256": "5543ef3a53680a0baa2931b74b480252a2dd8483ceb15daf7028a0220177030a",
+      "bytes": 892
+    },
+    "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/qualification-1/logs/node-version.log": {
+      "sha256": "c642a0de246dcdc6c51318fe449646fc5067b981a8d09e9ccdb8141a5756339a",
+      "bytes": 9
+    },
+    "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/qualification-1/logs/pnpm-version.receipt.json": {
+      "sha256": "513baded5c2ab2d67f70ac8e66376ed5952a38d662841af93a56f98c11c57f77",
+      "bytes": 892
+    },
+    "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/qualification-1/logs/pnpm-version.log": {
+      "sha256": "f900da1311a910c04e5c793491190353e8aa6b8c73c89db3228677e1e107a5fb",
+      "bytes": 8
+    },
+    "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/qualification-1/logs/release-gates.receipt.json": {
+      "sha256": "e7c3f3dfda9a7b5454b5ecc7e2534679ae691c75cbacd9ae7dd5b85eaaead39d",
+      "bytes": 924
+    },
+    "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/qualification-1/logs/release-gates.log": {
+      "sha256": "a70d54b64b674956362d6f8658e8da0235462547d93655199a2312735d9212c6",
+      "bytes": 14606
+    },
+    "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/qualification-1/logs/release-mutations.receipt.json": {
+      "sha256": "0007c0fa0219d324d3e4417b60f33239aa018c1f5cbbe0cb0ae10ea5f64796dd",
+      "bytes": 951
+    },
+    "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/qualification-1/logs/release-mutations.log": {
+      "sha256": "a043c8ee3b872bb8f86787f1baf823c67805da0a55d0f9dfc9f1a82e70d40d3f",
+      "bytes": 9085
+    },
+    "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/qualification-1/logs/final-uncached-build.receipt.json": {
+      "sha256": "49cee1608ca8c387d8592ec2bdb4a059e22d8d8b50a778afa3b85426a3d983e1",
+      "bytes": 942
+    },
+    "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/qualification-1/logs/final-uncached-build.log": {
+      "sha256": "29d5f0156c1ca2152f38b0b1a90c9fa7237e7ee14981754978e9448fdd709f88",
+      "bytes": 8940
+    },
+    "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/qualification-1/logs/final-canonical-prepare-only.receipt.json": {
+      "sha256": "20e1005d10fffbd2bebb25f1cb5368eb6f2cee048428588c12f56b1daee143ed",
+      "bytes": 984
+    },
+    "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/qualification-1/logs/final-canonical-prepare-only.log": {
+      "sha256": "d83ba58cd783069b9942283cdc03d457244d013b10afeac817cf13688bb7d360",
+      "bytes": 6656
+    },
+    "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/qualification-1/logs/final-angular-aot.receipt.json": {
+      "sha256": "c6aa588c6b21251b16cfcb40114cefd962975e0e7070dcbee40db050c6ddcdfc",
+      "bytes": 1320
+    },
+    "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/qualification-1/logs/final-angular-aot.log": {
+      "sha256": "8076ea766d301ae307069e3114a197e0f4bd02dcc0768c6ab14420c725d817ed",
+      "bytes": 213
+    },
+    "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/qualification-1/logs/final-demo-production.receipt.json": {
+      "sha256": "8cba0392fd81fb94d530b4e6bc45ab3a59d00b48449dc281021b8bccf8cdbf93",
+      "bytes": 985
+    },
+    "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/qualification-1/logs/final-demo-production.log": {
+      "sha256": "e153c59c1aff8c4fa80a19a14be3607e9bf5cd254a1bd61eb2968751933230db",
+      "bytes": 5024
+    },
+    "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/qualification-1/logs/final-route-smoke.receipt.json": {
+      "sha256": "5f146d5e2e321988c90e5c0d8aadc5cfe0e71bb9f7f250a054ce5c70cb3752fa",
+      "bytes": 916
+    },
+    "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/qualification-1/logs/final-route-smoke.log": {
+      "sha256": "d4d850337a8f2b299f8d5149b6535a52b4a6d4f2e0d228943bc4d3f80dacd29a",
+      "bytes": 21193
+    },
+    "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/qualification-1/logs/final-version-claims.receipt.json": {
+      "sha256": "1e6458d8654f8f8218c397dc00b82ca20784021a485e10aba06af47cd47df927",
+      "bytes": 931
+    },
+    "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/qualification-1/logs/final-version-claims.log": {
+      "sha256": "41a04cf1861a570f722448cefa8f7dadbb827d1a489b54f31198311d3dcbd457",
+      "bytes": 271
+    },
+    "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/qualification-1/logs/final-release-state.receipt.json": {
+      "sha256": "ec1dc9a37cb53f3f8ac6e2bff943197d92756cb1c28a90a4a6f956367ffd704a",
+      "bytes": 928
+    },
+    "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/qualification-1/logs/final-release-state.log": {
+      "sha256": "6f5df8790aff8a93ed2cf1fe5c8528eae082171dd176345e0675e0e523c04a5b",
+      "bytes": 110
+    },
+    "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/qualification-1/logs/final-changelog.receipt.json": {
+      "sha256": "f1e946d60d6801380e336797729c82ed0a72f5cbd1e630e5087601eb4e91ffd2",
+      "bytes": 936
+    },
+    "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/qualification-1/logs/final-changelog.log": {
+      "sha256": "1ee534a5e2aba269c9336f5505ee5c722b67be9c4c22e56acda5f81f1ae1e8b8",
+      "bytes": 42
+    },
+    "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/qualification-1/logs/final-diff-check.receipt.json": {
+      "sha256": "dc8b0fe121337056d6fef79b8f6106bf47515cb36416286923bbcb30a4788683",
+      "bytes": 909
+    },
+    "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/qualification-1/logs/final-diff-check.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/qualification-1/logs/exact-budget.receipt.json": {
+      "sha256": "36a5cc9c911b9d0c3a6be5eab98faea42983728993b2d6fb4547cf489ef403fd",
+      "bytes": 1014
+    },
+    "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/qualification-1/logs/exact-budget.log": {
+      "sha256": "260b2c111aba0bcaee504c71572330a080e29c41bcd22b9a05b28b96c580fc68",
+      "bytes": 965
+    },
+    "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/qualification-1/logs/bare-control-before.receipt.json": {
+      "sha256": "4524d8ba00886e20d57e45285333088c5a90dbc3873e1a86d40b22928e499b44",
+      "bytes": 1035
+    },
+    "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/qualification-1/logs/bare-control-before.log": {
+      "sha256": "fa05adf5200d7534bc4c8f85cc0146d6bf38cb662db086ced4e2f30ad9b51125",
+      "bytes": 361
+    },
+    "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/qualification-1/logs/bare-control-planted.receipt.json": {
+      "sha256": "cb91cb5e4b3d270ef467b9585dbfe21323af4fe95bf7d489c1f8a6cae65c9e0e",
+      "bytes": 1038
+    },
+    "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/qualification-1/logs/bare-control-planted.log": {
+      "sha256": "21e8c5d0edf56d8f7530d050a6dd7eff8a7a7648516d857a4bf7a75ff1d3d03f",
+      "bytes": 906
+    },
+    "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/qualification-1/logs/bare-control-restored.receipt.json": {
+      "sha256": "09a6f52db5c9b3c20eb793fed1c5f71794be3fbe53ebe22aac59c474547e6077",
+      "bytes": 1041
+    },
+    "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/qualification-1/logs/bare-control-restored.log": {
+      "sha256": "fa05adf5200d7534bc4c8f85cc0146d6bf38cb662db086ced4e2f30ad9b51125",
+      "bytes": 361
+    },
+    "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/qualification-1/normal-gates.json": {
+      "sha256": "0b0e2ae3d8e8c9780506d8d711db4049ec940f95ab3f783bfbb16f741c342ad0",
+      "bytes": 114
+    },
+    "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/qualification-1/mutation-gates.json": {
+      "sha256": "6bafd59b0d9921db7bde689a104ec76b7ec58510ab1ef1a0e9eff668640fb61f",
+      "bytes": 253
+    },
+    "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/qualification-1/clean-after-mutations-before.json": {
+      "sha256": "de99d4ebe67ae6dd54dd87a6bf44d891387905d3c643eb8188d7612d7b233af8",
+      "bytes": 20061
+    },
+    "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/qualification-1/clean-after-mutations-after.json": {
+      "sha256": "72405eca31377ea200f50fe244a9ca840d515b49b80c7a81f5441f08d9666552",
+      "bytes": 170
+    },
+    "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/qualification-1/final-candidate-receipt.json": {
+      "sha256": "95762ba5e14d322f1a75fcddbda2546a4a097f82457f93dc5fcd33199d474399",
+      "bytes": 41899
+    },
+    "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/quick-2/provisional-candidate-receipt.json": {
+      "sha256": "e83b3b25e222f4b9af975738ecf6c45e2f8ca89c40bccfd0cec3781c597913d3",
+      "bytes": 41877
+    },
+    "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/recovered-before-mutation/candidate/tarballs/signal-tree-kernel-15.4.9.tgz": {
+      "sha256": "b92f5981da5327fa66f3c9a91838718e3cace9eaeff698222479ad795d8ec847",
+      "bytes": 203584
+    },
+    "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/recovered-before-mutation/candidate/tarballs/signal-tree-angular-15.4.9.tgz": {
+      "sha256": "1aa50b5e7e83bf71947beba81cee26895d3e4030c4bdb8e9286a13780b63338c",
+      "bytes": 20167
+    },
+    "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/recovered-before-mutation/candidate/tarballs/signal-tree-react-15.4.9.tgz": {
+      "sha256": "7bec965f935f7389a0d1f7a7823b077e6ae8fc04f81bc4462e76010c86412836",
+      "bytes": 14816
+    },
+    "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/recovered-before-mutation/candidate/tarballs/signal-tree-vue-15.4.9.tgz": {
+      "sha256": "60a7a577380b5be8c03b4c889c7900772407bda5077da7427ca859b38b0a41b0",
+      "bytes": 16187
+    },
+    "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/recovered-before-mutation/candidate/tarballs/signal-tree-solid-15.4.9.tgz": {
+      "sha256": "20126c6279856253f72b0029c3fbfea6fc70fa6febfd903daf7f23b451247ded",
+      "bytes": 16130
+    },
+    "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/qualification-1/provisional-final-equivalence.json": {
+      "sha256": "ec2379bc7578b8421f499471e82ff78ac796bfa59d2209ce6bc8c3366e6eb7b0",
+      "bytes": 433
+    },
+    "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/qualification-1/quick-input.json": {
+      "sha256": "aa83e3efb2b5d153091a50b6644c1cb93b6ed5dac549b1768fb04e51b3d0621b",
+      "bytes": 323
+    },
+    "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/recovered-before-mutation/recovery-receipt.json": {
+      "sha256": "2800ba7e7af25fe5a607e54dd344613bebef6987d53a5558b3a4f183a74e0c54",
+      "bytes": 38194
+    },
+    "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/reviews/v15-final-qualification/reviewed-source/AGENTS.md": {
+      "sha256": "54f7649b8f96a25efbc168139ab135d8971c471b96cb7032394c0915911e54cf",
+      "bytes": 5399
+    },
+    "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/reviews/v15-final-qualification/reviewed-source/RELEASE-CURRENT.md": {
+      "sha256": "71f2efa9861efad8961e8f02e0e7612213427a6717969c5ab85ce0f5d929c997",
+      "bytes": 40500
+    },
+    "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/reviews/v15-final-qualification/reviewed-source/docs/review-contract.md": {
+      "sha256": "b9b2f633a6d8dda9b1955cd01f92e3b1e8aabe8f3e110e806bbaa57c0a43e4e9",
+      "bytes": 1459
+    },
+    "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/reviews/v15-final-qualification/reviewed-source/docs/support-policy.md": {
+      "sha256": "7008f7e613266e81e6454ac30f44ea053823a9bdbd590778b6ed2f4b51188fa1",
+      "bytes": 7895
+    },
+    "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/reviews/v15-final-qualification/reviewed-source/docs/contributor-contracts.md": {
+      "sha256": "2a94783571590af1d41aee936504cdf8be5356099e19cd7cb2d380cc97c81a6f",
+      "bytes": 6680
+    },
+    "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/reviews/v15-final-qualification/reviewed-source/.agents/skills/signaltree-release/SKILL.md": {
+      "sha256": "d86d5f102f646498df9a6cf70bb378118998ee1b92d1728cac421fba69ccc2a4",
+      "bytes": 1134
+    },
+    "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/reviews/v15-final-qualification/reviewed-source/.github/VALIDATION_GUIDE.md": {
+      "sha256": "1fb6eba4bccad5f4f5517ea13a4bcf9b7649b1d62114ba903f8cb85f99660ef7",
+      "bytes": 5168
+    },
+    "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/reviews/v15-final-qualification/reviewed-source/RELEASE_PROCESS.md": {
+      "sha256": "10907dee270e65c93dfe58effe8a1748fbf5cd957de206d3a7613413f8cbe713",
+      "bytes": 4432
+    },
+    "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/reviews/v15-final-qualification/reviewed-source/tools/verify-gates.mjs": {
+      "sha256": "afd506ec6a9222b2f15d30e8fd9bf40665481f620eea907973a0ab4f90cdccd0",
+      "bytes": 86142
+    },
+    "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/reviews/v15-final-qualification/reviewed-source/tools/check-bundle-budget.mjs": {
+      "sha256": "06cf36285b825d34e4bfe2e406fc816e78a01305acc8fecbe906df2955076eeb",
+      "bytes": 33322
+    },
+    "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/reviews/v15-final-qualification/reviewed-source/tools/verify-consumer-typecheck.mjs": {
+      "sha256": "0e56681d9d29f7e9e5849c6e46fe42b7fd533185ddcc52e703b2bd61a9e3c63c",
+      "bytes": 22414
+    },
+    "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/reviews/v15-final-qualification/reviewed-source/tools/verify-angular-aot-consumer.mjs": {
+      "sha256": "02a1a9c6b5e43ed66f4a71fb0a31144e5bbbe6bb277a54cb50f9e63dddea9585",
+      "bytes": 12290
+    },
+    "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/reviews/v15-final-qualification/reviewed-source/scripts/publish-candidate.mjs": {
+      "sha256": "e54773e18393dd7b727914a4d26a2d0d0195f8e1a4ac8d9d6197da2d0a4d7efa",
+      "bytes": 5925
+    },
+    "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/reviews/v15-final-qualification/reviewed-source/scripts/release-plan.mjs": {
+      "sha256": "af153593b233d922a5a2eb35750fe2d6c3337ce2056b3dc0ed873c5604146200",
+      "bytes": 4860
+    },
+    "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/reviews/v15-final-qualification/reviewed-source/scripts/playwright/route-smoke.config.ts": {
+      "sha256": "5097fa4362a2f4661522e67eebfcb3f4f5e60ec90e909f96fc92e36503a2fced",
+      "bytes": 1362
+    },
+    "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/reviews/v15-final-qualification/reviewed-source/scripts/playwright/route-smoke.spec.ts": {
+      "sha256": "b3f98bb16e2f739b9a34cbe117e00717d37b5cc1248e183e65a7bd42e67ef123",
+      "bytes": 8474
+    },
+    "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/reviews/v15-final-qualification/reviewed-source/scripts/playwright/serve-dist.mjs": {
+      "sha256": "9a7d79b1cb465a025890ec5b50fc3643f925e7b0bd2106b0bc1d81b8928f7d40",
+      "bytes": 2903
+    },
+    "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/reviews/v15-final-qualification/reviewed-source/docs/audits/2026-11-11-v15-maintenance-successor/README.md": {
+      "sha256": "185c173d8b36d38232a026e20b85e51e708774457e9c82d2ddb4c2b9a5de9a77",
+      "bytes": 10123
+    },
+    "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/qualification-1/scratch-manifests/final-uncached-build.json": {
+      "sha256": "d9ef435ad6479c35063375abe360c526950d1108bec2c495d02cb466fdd0010d",
+      "bytes": 9148365
+    },
+    "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/qualification-1/scratch-manifests/final-canonical-prepare-only.json": {
+      "sha256": "5b3ed88bc766a6c21baa624729565ff7ecaedf5abdbae0a34870835252d6604c",
+      "bytes": 10890007
+    },
+    "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/qualification-1/route-smoke-artifacts/.last-run.json": {
+      "sha256": "91d1c43004802cd49950d78eb11c8fa7d05da8ffffe219a8b13b2f561bc00903",
+      "bytes": 45
+    },
+    "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/qualification-1/exact-budget-derivation.json": {
+      "sha256": "a008767d207fd3b60b50eeba447014c64df954fbff3ea83a3bc95eae6c5b8308",
+      "bytes": 2023
+    },
+    "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/qualification-1/exact-budget.mjs": {
+      "sha256": "845731b5a960a67ddc1142a19ff4861414e37d86996b78899fda16d82edc83c9",
+      "bytes": 33903
+    },
+    "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/qualification-1/exact-budget-numbers.json": {
+      "sha256": "d785167be59037f1c7704f1859f1770de63a164ee422905239a37f8fda9fd861",
+      "bytes": 295
+    },
+    "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/qualification-1/bare-control-before-derivation.json": {
+      "sha256": "4ede0f6ef9c2a860a7e3ff77db5244ed16a415b4e19052651f1a507a688c6f98",
+      "bytes": 2171
+    },
+    "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/qualification-1/bare-control-before.mjs": {
+      "sha256": "a7dbb5fc29208c54308b94ba48e4c8ff68085a2221e59bfb32388db50dcc6a90",
+      "bytes": 33953
+    },
+    "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/qualification-1/bare-control-before-numbers.json": {
+      "sha256": "707eba5a5ff114887ae6f4f1e2927f27db3bee2a053865c46e66de6f9975e890",
+      "bytes": 148
+    },
+    "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/qualification-1/bare-control-planted-derivation.json": {
+      "sha256": "54f3c954bdb80764bff57b83d64cfe0beb1ba1c9467f185c32d56f527fb316f3",
+      "bytes": 2318
+    },
+    "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/qualification-1/bare-control-planted.mjs": {
+      "sha256": "b74649b39b086d3ffe671e04406c686f832dccd1700608971aa62c72b549af7e",
+      "bytes": 99536
+    },
+    "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/qualification-1/bare-control-planted-numbers.json": {
+      "sha256": "13b29d24a6c09f7b4b21b2393968493bc01a80de602a4a91c2b11820edad1749",
+      "bytes": 148
+    },
+    "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/qualification-1/bare-control-restored-derivation.json": {
+      "sha256": "836384e2a62061920b35909a8b6edfc9de6a6e1e94204a73b951271b70e17553",
+      "bytes": 2175
+    },
+    "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/qualification-1/bare-control-restored.mjs": {
+      "sha256": "0e96df27a98be2f040346cbbfb8bb77af0b4285e8b3fc9f44809f931b906c32b",
+      "bytes": 33955
+    },
+    "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/qualification-1/bare-control-restored-numbers.json": {
+      "sha256": "707eba5a5ff114887ae6f4f1e2927f27db3bee2a053865c46e66de6f9975e890",
+      "bytes": 148
+    },
+    "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/qualification-1/budget-control.json": {
+      "sha256": "9dd45683af4f8f3f2d4cd333bb0c41b2c35acfcc3d95629c7c448189ad7fa526",
+      "bytes": 363
+    },
+    "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/registry-refresh/curl-2/summary.json": {
+      "sha256": "02719176879470cb37da30f8d8fb26086830b6816de4914185bb560ae3ff1fd1",
+      "bytes": 4885
+    },
+    "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/registry-refresh/curl-2/kernel-packument.response.json": {
+      "sha256": "ae1070526431a5e5b26c47dbdea4acbcd34d82b32cda0f2ffde5a76cfa6a1a05",
+      "bytes": 1817
+    },
+    "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/registry-refresh/curl-2/kernel-packument.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/registry-refresh/curl-2/kernel-packument.headers": {
+      "sha256": "6548ea929c32263d559f5f58093ac094b0bdb3292c9e894676640a473b22a839",
+      "bytes": 747
+    },
+    "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/registry-refresh/curl-2/kernel-packument.body.json": {
+      "sha256": "fcf3316fd594913a10f4bcd4f34817444a1bd94e05f189c958ef69648732c875",
+      "bytes": 17066
+    },
+    "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/registry-refresh/curl-2/kernel-15.4.9.response.json": {
+      "sha256": "2f231bb115897f7e470367afbfd302b5f2fb37d2a20466255429ee981bb59ee5",
+      "bytes": 1816
+    },
+    "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/registry-refresh/curl-2/kernel-15.4.9.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/registry-refresh/curl-2/kernel-15.4.9.headers": {
+      "sha256": "9f3296959c34d46fb6a60bc8705131a2333028051327293da318148e00b2bc6c",
+      "bytes": 466
+    },
+    "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/registry-refresh/curl-2/kernel-15.4.9.body.json": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/registry-refresh/curl-2/angular-packument.response.json": {
+      "sha256": "fbe80d711f45030ad59eef211707abb812d2e43ab6fb0b99f655a9077769e123",
+      "bytes": 1824
+    },
+    "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/registry-refresh/curl-2/angular-packument.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/registry-refresh/curl-2/angular-packument.headers": {
+      "sha256": "d8b81aa5ac49809bd8d78bb4fd048ede8fef587be4da8b99d0f7d162937529e7",
+      "bytes": 747
+    },
+    "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/registry-refresh/curl-2/angular-packument.body.json": {
+      "sha256": "bd0a987629e42790935c090f1e4c177e1d80ac6c7e46cbe890bb0aabeae4fc4b",
+      "bytes": 15759
+    },
+    "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/registry-refresh/curl-2/angular-15.4.9.response.json": {
+      "sha256": "d0fb20f7a5d817cd136633160de54b3bc3cabdb57c57e0ccc65f26e48af1dee5",
+      "bytes": 1823
+    },
+    "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/registry-refresh/curl-2/angular-15.4.9.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/registry-refresh/curl-2/angular-15.4.9.headers": {
+      "sha256": "cf7c36f671731488221d25f4eada301582862f73640995454565705b4857901f",
+      "bytes": 464
+    },
+    "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/registry-refresh/curl-2/angular-15.4.9.body.json": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/registry-refresh/curl-2/react-packument.response.json": {
+      "sha256": "6289cb4b0551b077cb943a923d5d59b0e24d62bade9e3bf5b8944e5749b8fe1c",
+      "bytes": 1810
+    },
+    "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/registry-refresh/curl-2/react-packument.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/registry-refresh/curl-2/react-packument.headers": {
+      "sha256": "74f82fa11771051f81d0de8044b4307ae009136840cda4b34de0f76b682f2ffa",
+      "bytes": 747
+    },
+    "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/registry-refresh/curl-2/react-packument.body.json": {
+      "sha256": "d2a8a01a7a58ffac687abc479170123a48f9d532620620589705975d55b40a8f",
+      "bytes": 16601
+    },
+    "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/registry-refresh/curl-2/react-15.4.9.response.json": {
+      "sha256": "365ee5e976ee9ca84a3a823aa9c23fac0de666ee6e6254392829351e4efae80c",
+      "bytes": 1809
+    },
+    "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/registry-refresh/curl-2/react-15.4.9.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/registry-refresh/curl-2/react-15.4.9.headers": {
+      "sha256": "53ec70515e262e32bf3ee9c837976ad3f7f5513601d8cf60eba6e35bed36252e",
+      "bytes": 466
+    },
+    "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/registry-refresh/curl-2/react-15.4.9.body.json": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/registry-refresh/curl-2/vue-packument.response.json": {
+      "sha256": "c61d2a05fbb4e74b6aff838450a1c07f8141ce7328a6b2b23505646db8537ebc",
+      "bytes": 1796
+    },
+    "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/registry-refresh/curl-2/vue-packument.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/registry-refresh/curl-2/vue-packument.headers": {
+      "sha256": "dbe83d85d93426090077cbede181cef12927be0bd903b1a0cc808eed295e94ac",
+      "bytes": 746
+    },
+    "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/registry-refresh/curl-2/vue-packument.body.json": {
+      "sha256": "df8d548e0b32877b6d0e1935f230c27ef6962e537097481a948c144e8aa66239",
+      "bytes": 14112
+    },
+    "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/registry-refresh/curl-2/vue-15.4.9.response.json": {
+      "sha256": "eebc708f65f750f00b5cf1a13c610d4d909ceed6e9663c8cbb4595dac2e91518",
+      "bytes": 1795
+    },
+    "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/registry-refresh/curl-2/vue-15.4.9.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/registry-refresh/curl-2/vue-15.4.9.headers": {
+      "sha256": "2584ec2492c4780b048b1d59026259dfa24134c24b44f990295fcfe268945b3e",
+      "bytes": 466
+    },
+    "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/registry-refresh/curl-2/vue-15.4.9.body.json": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/registry-refresh/curl-2/solid-packument.response.json": {
+      "sha256": "4f7fc2b3765439b1529b4610ef02b919c28c1d1a17e233b093ca66c3357be9d2",
+      "bytes": 1810
+    },
+    "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/registry-refresh/curl-2/solid-packument.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/registry-refresh/curl-2/solid-packument.headers": {
+      "sha256": "2c88a4e72906e094f12302f27826fa9c6dd62355e794138afa9e880e16c50876",
+      "bytes": 745
+    },
+    "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/registry-refresh/curl-2/solid-packument.body.json": {
+      "sha256": "792f48c9cd4eea1b6ec6c079b1072f0a674fa74142ddf6864bd7279ae32881ed",
+      "bytes": 7664
+    },
+    "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/registry-refresh/curl-2/solid-15.4.9.response.json": {
+      "sha256": "5c59eda27945258804df818bdbbd904aa98f6a0124aabb04e1118c85d6722d39",
+      "bytes": 1809
+    },
+    "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/registry-refresh/curl-2/solid-15.4.9.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/registry-refresh/curl-2/solid-15.4.9.headers": {
+      "sha256": "f50249f8542b32b8c054f5b22738c033084e153d9c82c39c075c3a3781d26da2",
+      "bytes": 466
+    },
+    "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/registry-refresh/curl-2/solid-15.4.9.body.json": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/registry-refresh/curl-2/remote-tags.receipt.json": {
+      "sha256": "de35ecb96ae713d8e722c7caed1ecc6c5147a5cf2351f102bf283320a252524e",
+      "bytes": 1039
+    },
+    "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/registry-refresh/curl-2/remote-tags.stdout": {
+      "sha256": "134c4302a707d7e29c7a3c98e651f007fcd3634f36163facaa844056d7bc1ada",
+      "bytes": 4671
+    },
+    "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/registry-refresh/curl-2/remote-tags.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/registry-refresh/summary.json": {
+      "sha256": "f6cdffe811c9c7b906c2277d3ec544896620e6b3a91cc89ef41951dbff51f8a0",
+      "bytes": 2627
+    },
+    "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/recovered-before-mutation/historical-records/qualification-summary.json": {
+      "sha256": "92bb385c447afd77183a0ef4927659921abfc27f2424674be21c4f7eb1d9d79d",
+      "bytes": 23045
+    }
+  },
+  "verifierSha256": "266f0d5aa75355b616088b3975cdfd91ac80809692de8f78ad07ed704ff30fca",
+  "reproduce": "python3 /Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/reviews/v15-final-qualification/verify.py"
+}

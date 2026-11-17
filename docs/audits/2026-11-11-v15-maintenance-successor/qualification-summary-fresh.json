@@ -1,0 +1,170 @@
+{
+  "generatedUTC": "2026-11-17T05:19:57.675522+00:00",
+  "kind": "Orchestration-author summary derived from fresh raw receipts; independent review is separate.",
+  "head": "da2e92ccab46747471cae810fb9221f563d0a906",
+  "version": "15.4.9",
+  "sourceSeal": "e31dab97acd9fe4d3a88e36a0d7f6b2ca68c23721c6abaf23872a2218e54fe0c",
+  "sourceFiles": 1769,
+  "frozenDirtySourceScope": "M RELEASE-CURRENT.md\n M docs/audits/2026-11-11-v15-maintenance-successor/README.md\n?? docs/audits/2026-11-11-v15-maintenance-successor/dist-removal-evidence.json\n?? docs/audits/2026-11-11-v15-maintenance-successor/independent-verification.json\n?? docs/audits/2026-11-11-v15-maintenance-successor/qualification-summary.json",
+  "authority": "Local preparation and qualification only. No tag, push, merge, publication or deployment.",
+  "normalGates": {
+    "passed": 90,
+    "total": 91,
+    "failed": [
+      "bundle-budget"
+    ],
+    "knownRed": 0,
+    "numericPass": false
+  },
+  "mutationProofs": {
+    "proven": 91,
+    "total": 91,
+    "indirect": 15,
+    "unproven": 0,
+    "vacuous": 0,
+    "blind": 0,
+    "errored": 0,
+    "limitation": "Already-red bundle baseline cannot prove its own seeded defect; separate passing bare-fixture discrimination required."
+  },
+  "strictExactArtifactConsumers": "Canonical preparation reran tarball validation and exact-candidate bundler/node16 type consumers; separate final production Angular AOT used explicit final kernel/Angular tarballs.",
+  "productionDemo": "exit0",
+  "browser": {
+    "passed": 146,
+    "flakyOrFailedSummaryPresent": false
+  },
+  "budget": [
+    {
+      "id": "signaltree-bare",
+      "prodBytes": 11011,
+      "devBytes": 13159,
+      "prodLimitBytes": 11059.2,
+      "devLimitBytes": 13209.6
+    },
+    {
+      "id": "signaltree-entities",
+      "prodBytes": 25333,
+      "devBytes": 28273,
+      "prodLimitBytes": 25292.8,
+      "devLimitBytes": 28160
+    }
+  ],
+  "budgetDisposition": "Specific previously documented40.2 production-byte/113 development-byte entity overages remain numerical failures; no thresholds or runtime changed.",
+  "budgetDiscrimination": "External copy of exact canonical checker, with bound paths/numeric hook and bare-fixture selection; baselinegreen\u2192retainedoversizedpayloadred\u2192exactrestoredgreen. Existing already-red entities baseline is explicitly not standalone mutation discrimination.",
+  "sourceRestored": true,
+  "distRemovalRecorded": true,
+  "finalPayloads": 158,
+  "finalDistPayloads": 162,
+  "payloadSeal": "19f457d0d89c5905c1af021ae888a01818cc8298000ff979ad86139baf1b5130",
+  "provisionalFinalEquivalence": {
+    "passed": true,
+    "quickReceiptSha256": "e83b3b25e222f4b9af975738ecf6c45e2f8ca89c40bccfd0cec3781c597913d3",
+    "finalPayloadSeal": "19f457d0d89c5905c1af021ae888a01818cc8298000ff979ad86139baf1b5130",
+    "packages": [
+      "kernel",
+      "angular",
+      "react",
+      "vue",
+      "solid"
+    ],
+    "payloads": 158,
+    "archiveBytesEqual": {
+      "kernel": true,
+      "angular": true,
+      "react": true,
+      "vue": true,
+      "solid": true
+    }
+  },
+  "finalArtifacts": {
+    "kernel": {
+      "archive": "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/qualification-1/final-candidate/tarballs/signal-tree-kernel-15.4.9.tgz",
+      "integrity": "sha512-4IsXgIn6toq2MM/L5ErWWVImi5yDN6Qm5g2XHcnYCbzflVLl+ON0udQruRAFF3ztHhXMS8MEpcPAAy3ou6umzg==",
+      "sha256": "b92f5981da5327fa66f3c9a91838718e3cace9eaeff698222479ad795d8ec847",
+      "packageRoot": "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/qualification-1/final-candidate-packages/kernel",
+      "sourceCommit": "da2e92ccab46747471cae810fb9221f563d0a906",
+      "version": "15.4.9",
+      "developmentArtifact": true,
+      "matchesHistoricalArchive": true
+    },
+    "angular": {
+      "archive": "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/qualification-1/final-candidate/tarballs/signal-tree-angular-15.4.9.tgz",
+      "integrity": "sha512-nYoswT4T12znPvzFLPNESwboQI6f0yywdrOGn9LdiZSArvNNN2mKJ2efbio8YEtqYadm9Gu0YcI9Wd3/j4VZTA==",
+      "sha256": "1aa50b5e7e83bf71947beba81cee26895d3e4030c4bdb8e9286a13780b63338c",
+      "packageRoot": "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/qualification-1/final-candidate-packages/angular",
+      "sourceCommit": "da2e92ccab46747471cae810fb9221f563d0a906",
+      "version": "15.4.9",
+      "developmentArtifact": true,
+      "matchesHistoricalArchive": true
+    },
+    "react": {
+      "archive": "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/qualification-1/final-candidate/tarballs/signal-tree-react-15.4.9.tgz",
+      "integrity": "sha512-sjosJkb258k/tv02ssqdeJgmkPJI6F3xRJFsbo3sRc3JIqJ19yNooX7BJaJ8V/Aw+nnEq+0RYGdkz/G1hsWHIQ==",
+      "sha256": "7bec965f935f7389a0d1f7a7823b077e6ae8fc04f81bc4462e76010c86412836",
+      "packageRoot": "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/qualification-1/final-candidate-packages/react",
+      "sourceCommit": "da2e92ccab46747471cae810fb9221f563d0a906",
+      "version": "15.4.9",
+      "developmentArtifact": true,
+      "matchesHistoricalArchive": true
+    },
+    "vue": {
+      "archive": "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/qualification-1/final-candidate/tarballs/signal-tree-vue-15.4.9.tgz",
+      "integrity": "sha512-Hm6N9cnnoMcpXKO8SQ1wZh4g4jh6/syum57zJEU9qi1gsyoPEK0OrNTKhkUPNkSR83nu3EwIirKIQoEOfHySWA==",
+      "sha256": "60a7a577380b5be8c03b4c889c7900772407bda5077da7427ca859b38b0a41b0",
+      "packageRoot": "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/qualification-1/final-candidate-packages/vue",
+      "sourceCommit": "da2e92ccab46747471cae810fb9221f563d0a906",
+      "version": "15.4.9",
+      "developmentArtifact": true,
+      "matchesHistoricalArchive": true
+    },
+    "solid": {
+      "archive": "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/qualification-1/final-candidate/tarballs/signal-tree-solid-15.4.9.tgz",
+      "integrity": "sha512-ZiUYg2Qp8FRrjoACAnfcJlvLe7XBeFVi5KfLV8cJx01TsTvLX9UtpcPgY11EWnmAhvjelQwdNF4W3ye5Bwe0hQ==",
+      "sha256": "20126c6279856253f72b0029c3fbfea6fc70fa6febfd903daf7f23b451247ded",
+      "packageRoot": "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/qualification-1/final-candidate-packages/solid",
+      "sourceCommit": "da2e92ccab46747471cae810fb9221f563d0a906",
+      "version": "15.4.9",
+      "developmentArtifact": true,
+      "matchesHistoricalArchive": true
+    }
+  },
+  "canonicalReceipts": {
+    "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/qualification-1/result.json": "50560ac2b9c1dea34784b0caab155a6e1073980b319ad56310f67f6767d0829c",
+    "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/qualification-1/source-before.json": "f6fb87f1e44189f9a23cd8af0234f8bc00224f16a0fa06338ead7a22f07f703f",
+    "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/qualification-1/source-after-normal.json": "f6fb87f1e44189f9a23cd8af0234f8bc00224f16a0fa06338ead7a22f07f703f",
+    "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/qualification-1/source-after-mutations.json": "f6fb87f1e44189f9a23cd8af0234f8bc00224f16a0fa06338ead7a22f07f703f",
+    "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/qualification-1/source-final.json": "f6fb87f1e44189f9a23cd8af0234f8bc00224f16a0fa06338ead7a22f07f703f",
+    "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/qualification-1/normal-gates.json": "0b0e2ae3d8e8c9780506d8d711db4049ec940f95ab3f783bfbb16f741c342ad0",
+    "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/qualification-1/mutation-gates.json": "6bafd59b0d9921db7bde689a104ec76b7ec58510ab1ef1a0e9eff668640fb61f",
+    "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/qualification-1/clean-after-mutations-before.json": "de99d4ebe67ae6dd54dd87a6bf44d891387905d3c643eb8188d7612d7b233af8",
+    "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/qualification-1/clean-after-mutations-after.json": "72405eca31377ea200f50fe244a9ca840d515b49b80c7a81f5441f08d9666552",
+    "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/qualification-1/final-candidate-receipt.json": "95762ba5e14d322f1a75fcddbda2546a4a097f82457f93dc5fcd33199d474399",
+    "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/qualification-1/provisional-final-equivalence.json": "ec2379bc7578b8421f499471e82ff78ac796bfa59d2209ce6bc8c3366e6eb7b0",
+    "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/qualification-1/exact-budget-numbers.json": "d785167be59037f1c7704f1859f1770de63a164ee422905239a37f8fda9fd861",
+    "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/qualification-1/budget-control.json": "9dd45683af4f8f3f2d4cd333bb0c41b2c35acfcc3d95629c7c448189ad7fa526"
+  },
+  "freshRegistry": {
+    "path": "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/v15-requalification/registry-refresh/curl-2/summary.json",
+    "sha256": "02719176879470cb37da30f8d8fb26086830b6816de4914185bb560ae3ff1fd1",
+    "observedUTC": "2026-11-17T05:17:42.891034+00:00",
+    "latest": {
+      "@signal-tree/kernel": "15.4.8",
+      "@signal-tree/angular": "15.4.8",
+      "@signal-tree/react": "15.4.8",
+      "@signal-tree/vue": "15.4.8",
+      "@signal-tree/solid": "15.4.8"
+    },
+    "allFive1549Absent": true,
+    "remote1549TagAbsent": true
+  },
+  "firstFailures": [
+    "quick-1/logs/frozen-install.log: sandboxDNSfailure beforedist removal",
+    "registry-refresh/*response.json: Python certificate-storefailure; later curl-2 used normal verified systemtrust"
+  ],
+  "limits": [
+    "Normal registry is90/91, not91/91; numerical size policy disposition is distinct from a passing measurement.",
+    "Old Nov11/12 raw qualification logs and source archive under /private/tmp were removed. Retained historical summaries are preserved opaque as records, not evidence those lost bytes exist. Fresh qualification supersedes their runtime-validation claims.",
+    "No exact-tag/Linux CI or registry publication verification was performed. Registry absence is a point-in-time observation, not a version reservation.",
+    "No whole-workspace coverage percentage measured.",
+    "Root may edit controller/audit after final source snapshot; those later edits are not represented by the frozen sourceSeal."
+  ]
+}

@@ -1,0 +1,625 @@
+{
+  "generatedUTC": "2026-11-12T02:05:40.723Z",
+  "worktree": "/Users/jonathanborgia/code/signaltree/.worktrees/v15-maintenance-release-prep",
+  "branch": "codex/v15-maintenance-release-prep",
+  "base": "969574ac9c3220596e4e3004761b3ee087148590",
+  "candidateCommit": "da2e92ccab46747471cae810fb9221f563d0a906",
+  "version": "15.4.9",
+  "authority": "Local release preparation only; no tag, push, merge, npm publication or deployment",
+  "disposition": "Concrete locally qualified preparation artifacts ready for independent review and explicit numerical budget disposition; numerical release gate remains failed",
+  "sourceSeal": "480b325993535f7949d9d62c8acc68171bfbe3f64002d86dbffac62e8b3c6475",
+  "sourceFiles": 1766,
+  "artifactSeal": "5446e18e81cd27aaa4ffc50159599533ece202f3f15d69b8ade631d20f6d4790",
+  "artifactFiles": 162,
+  "sourceArchive": {
+    "path": "/private/tmp/st-v15-maintenance-release-prep/candidate-da2e92cca-source.tar.gz",
+    "sha256": "4ba8528ffc7a20a147715a617828c63e4bd59ad6afdc29cb4966b05fc17e2008"
+  },
+  "qualification": {
+    "ordinaryReleaseGates": {
+      "passed": 90,
+      "total": 91,
+      "failed": [
+        "bundle-budget"
+      ],
+      "knownRed": 0
+    },
+    "mutationHarness": {
+      "reportedProven": 91,
+      "total": 91,
+      "indirect": 15,
+      "unproven": 0,
+      "vacuous": 0,
+      "blind": 0,
+      "errored": 0,
+      "limitation": "The entity baseline already failed its budget, so a seeded nonzero exit alone cannot discriminate that defect. A separate unchanged isolated control proves bare fixture green -> oversized red -> exact restored green."
+    },
+    "strictTarballConsumer": "pass",
+    "strictBundlerAndNode16Types": "pass",
+    "productionAngularAot": "pass",
+    "strictProductionDemo": "pass",
+    "productionBrowserTests": 146,
+    "productionBrowserPassed": 146,
+    "canonicalPrepareOnly": "pass"
+  },
+  "budget": [
+    {
+      "id": "signaltree-bare",
+      "prodBytes": 11011,
+      "devBytes": 13159,
+      "prodLimitBytes": 11059.2,
+      "devLimitBytes": 13209.6
+    },
+    {
+      "id": "signaltree-entities",
+      "prodBytes": 25333,
+      "devBytes": 28273,
+      "prodLimitBytes": 25292.8,
+      "devLimitBytes": 28160
+    }
+  ],
+  "compatibility": {
+    "manifestDiff": {
+      "kernel": [
+        {
+          "key": "version",
+          "before": "15.4.8",
+          "after": "15.4.9"
+        }
+      ],
+      "angular": [
+        {
+          "key": "version",
+          "before": "15.4.8",
+          "after": "15.4.9"
+        },
+        {
+          "key": "dependencies",
+          "before": {
+            "@signal-tree/kernel": "15.4.8"
+          },
+          "after": {
+            "@signal-tree/kernel": "15.4.9"
+          }
+        }
+      ],
+      "react": [
+        {
+          "key": "version",
+          "before": "15.4.8",
+          "after": "15.4.9"
+        },
+        {
+          "key": "dependencies",
+          "before": {
+            "@signal-tree/kernel": "15.4.8"
+          },
+          "after": {
+            "@signal-tree/kernel": "15.4.9"
+          }
+        }
+      ],
+      "vue": [
+        {
+          "key": "version",
+          "before": "15.4.8",
+          "after": "15.4.9"
+        },
+        {
+          "key": "dependencies",
+          "before": {
+            "@signal-tree/kernel": "15.4.8"
+          },
+          "after": {
+            "@signal-tree/kernel": "15.4.9"
+          }
+        }
+      ],
+      "solid": [
+        {
+          "key": "version",
+          "before": "15.4.8",
+          "after": "15.4.9"
+        },
+        {
+          "key": "dependencies",
+          "before": {
+            "@signal-tree/kernel": "15.4.8"
+          },
+          "after": {
+            "@signal-tree/kernel": "15.4.9"
+          }
+        }
+      ]
+    },
+    "nonmanifestPayloadsEqualToPrecedingFinalV15": 157,
+    "priorDiffReceipt": "pre-mutation-built-diff.json",
+    "publicApiBaseline": "passed in full release suite",
+    "runtimeEditsDuringPreparation": false,
+    "dependencyUpgrade": false
+  },
+  "candidate": {
+    "source": "/Users/jonathanborgia/code/signaltree/.worktrees/v15-maintenance-release-prep/.release/candidates/15.4.9",
+    "destination": "/private/tmp/st-v15-maintenance-release-prep/candidate-da2e92cca",
+    "createdUTC": "2026-11-12T02:04:37.092Z",
+    "journal": {
+      "schemaVersion": 1,
+      "commit": "da2e92ccab46747471cae810fb9221f563d0a906",
+      "version": "15.4.9",
+      "tag": "latest",
+      "packages": [
+        {
+          "name": "@signal-tree/kernel",
+          "package": "kernel",
+          "version": "15.4.9",
+          "tarball": "tarballs/signal-tree-kernel-15.4.9.tgz",
+          "integrity": "sha512-4IsXgIn6toq2MM/L5ErWWVImi5yDN6Qm5g2XHcnYCbzflVLl+ON0udQruRAFF3ztHhXMS8MEpcPAAy3ou6umzg=="
+        },
+        {
+          "name": "@signal-tree/angular",
+          "package": "angular",
+          "version": "15.4.9",
+          "tarball": "tarballs/signal-tree-angular-15.4.9.tgz",
+          "integrity": "sha512-nYoswT4T12znPvzFLPNESwboQI6f0yywdrOGn9LdiZSArvNNN2mKJ2efbio8YEtqYadm9Gu0YcI9Wd3/j4VZTA=="
+        },
+        {
+          "name": "@signal-tree/react",
+          "package": "react",
+          "version": "15.4.9",
+          "tarball": "tarballs/signal-tree-react-15.4.9.tgz",
+          "integrity": "sha512-sjosJkb258k/tv02ssqdeJgmkPJI6F3xRJFsbo3sRc3JIqJ19yNooX7BJaJ8V/Aw+nnEq+0RYGdkz/G1hsWHIQ=="
+        },
+        {
+          "name": "@signal-tree/vue",
+          "package": "vue",
+          "version": "15.4.9",
+          "tarball": "tarballs/signal-tree-vue-15.4.9.tgz",
+          "integrity": "sha512-Hm6N9cnnoMcpXKO8SQ1wZh4g4jh6/syum57zJEU9qi1gsyoPEK0OrNTKhkUPNkSR83nu3EwIirKIQoEOfHySWA=="
+        },
+        {
+          "name": "@signal-tree/solid",
+          "package": "solid",
+          "version": "15.4.9",
+          "tarball": "tarballs/signal-tree-solid-15.4.9.tgz",
+          "integrity": "sha512-ZiUYg2Qp8FRrjoACAnfcJlvLe7XBeFVi5KfLV8cJx01TsTvLX9UtpcPgY11EWnmAhvjelQwdNF4W3ye5Bwe0hQ=="
+        }
+      ],
+      "state": "validated"
+    },
+    "files": {
+      "tarballs/signal-tree-kernel-15.4.9.tgz": {
+        "sha256": "b92f5981da5327fa66f3c9a91838718e3cace9eaeff698222479ad795d8ec847",
+        "integrity": "sha512-4IsXgIn6toq2MM/L5ErWWVImi5yDN6Qm5g2XHcnYCbzflVLl+ON0udQruRAFF3ztHhXMS8MEpcPAAy3ou6umzg==",
+        "bytes": 203584
+      },
+      "tarballs/signal-tree-angular-15.4.9.tgz": {
+        "sha256": "1aa50b5e7e83bf71947beba81cee26895d3e4030c4bdb8e9286a13780b63338c",
+        "integrity": "sha512-nYoswT4T12znPvzFLPNESwboQI6f0yywdrOGn9LdiZSArvNNN2mKJ2efbio8YEtqYadm9Gu0YcI9Wd3/j4VZTA==",
+        "bytes": 20167
+      },
+      "tarballs/signal-tree-react-15.4.9.tgz": {
+        "sha256": "7bec965f935f7389a0d1f7a7823b077e6ae8fc04f81bc4462e76010c86412836",
+        "integrity": "sha512-sjosJkb258k/tv02ssqdeJgmkPJI6F3xRJFsbo3sRc3JIqJ19yNooX7BJaJ8V/Aw+nnEq+0RYGdkz/G1hsWHIQ==",
+        "bytes": 14816
+      },
+      "tarballs/signal-tree-vue-15.4.9.tgz": {
+        "sha256": "60a7a577380b5be8c03b4c889c7900772407bda5077da7427ca859b38b0a41b0",
+        "integrity": "sha512-Hm6N9cnnoMcpXKO8SQ1wZh4g4jh6/syum57zJEU9qi1gsyoPEK0OrNTKhkUPNkSR83nu3EwIirKIQoEOfHySWA==",
+        "bytes": 16187
+      },
+      "tarballs/signal-tree-solid-15.4.9.tgz": {
+        "sha256": "20126c6279856253f72b0029c3fbfea6fc70fa6febfd903daf7f23b451247ded",
+        "integrity": "sha512-ZiUYg2Qp8FRrjoACAnfcJlvLe7XBeFVi5KfLV8cJx01TsTvLX9UtpcPgY11EWnmAhvjelQwdNF4W3ye5Bwe0hQ==",
+        "bytes": 16130
+      },
+      "candidate.json": {
+        "sha256": "fe1a2ed9d717c24bf5fe9851e73a34f5bf334a94fb680f77637e747500002cb6",
+        "bytes": 1555
+      }
+    },
+    "scope": "Validated immutable local package preparation; not release-gate compliance or publication"
+  },
+  "commands": [
+    {
+      "receipt": "final-angular-aot-1.receipt.json",
+      "receiptSha256": "b25adf1187258cd09fb98c8c82f5ac3174364c0c8082ccb31e66044b73a707c5",
+      "command": [
+        "node",
+        "tools/verify-angular-aot-consumer.mjs"
+      ],
+      "cwd": "/Users/jonathanborgia/code/signaltree/.worktrees/v15-maintenance-release-prep",
+      "node": "v24.15.0",
+      "startedUTC": "2026-11-12T02:02:21.678Z",
+      "finishedUTC": "2026-11-12T02:02:36.224Z",
+      "exitCode": 0,
+      "signal": null,
+      "environment": {
+        "NX_DAEMON": "false",
+        "NX_ISOLATE_PLUGINS": "false",
+        "CI": "true"
+      },
+      "runnerSha256": "a391a9433a8169cb0f15dc92c71792d2c2d6a1a6ae8a5f2da6addeb123f66c61",
+      "logSha256": "8076ea766d301ae307069e3114a197e0f4bd02dcc0768c6ab14420c725d817ed"
+    },
+    {
+      "receipt": "final-budget-discrimination-1.receipt.json",
+      "receiptSha256": "85a867e2161e2862d29e3dc3ab695d8d24928ed6a20e233b41c08c5c34df4592",
+      "command": [
+        "node",
+        "/private/tmp/st-v15-maintenance-release-prep/budget-discrimination.mjs"
+      ],
+      "cwd": "/Users/jonathanborgia/code/signaltree/.worktrees/v15-maintenance-release-prep",
+      "node": "v24.15.0",
+      "startedUTC": "2026-11-12T02:03:29.862Z",
+      "finishedUTC": "2026-11-12T02:03:30.386Z",
+      "exitCode": 0,
+      "signal": null,
+      "environment": {
+        "NX_DAEMON": "false",
+        "NX_ISOLATE_PLUGINS": "false",
+        "CI": "true"
+      },
+      "runnerSha256": "a391a9433a8169cb0f15dc92c71792d2c2d6a1a6ae8a5f2da6addeb123f66c61",
+      "logSha256": "848fb7699ce535ead3e1cc0f279bf021fb3da63a5e5676582134f5bf317dfddd"
+    },
+    {
+      "receipt": "final-candidate-prepare-only-1.receipt.json",
+      "receiptSha256": "275e60103c651f107604673fa23ce7b3070c76d36801fbc486a89392c0829ae8",
+      "command": [
+        "node",
+        "scripts/publish-candidate.mjs",
+        "--prebuilt",
+        "--prepare-only"
+      ],
+      "cwd": "/Users/jonathanborgia/code/signaltree/.worktrees/v15-maintenance-release-prep",
+      "node": "v24.15.0",
+      "startedUTC": "2026-11-12T02:03:44.869Z",
+      "finishedUTC": "2026-11-12T02:03:56.722Z",
+      "exitCode": 0,
+      "signal": null,
+      "environment": {
+        "NX_DAEMON": "false",
+        "NX_ISOLATE_PLUGINS": "false",
+        "CI": "true"
+      },
+      "runnerSha256": "a391a9433a8169cb0f15dc92c71792d2c2d6a1a6ae8a5f2da6addeb123f66c61",
+      "logSha256": "d83ba58cd783069b9942283cdc03d457244d013b10afeac817cf13688bb7d360"
+    },
+    {
+      "receipt": "final-changelog-1.receipt.json",
+      "receiptSha256": "756063c5dcfd0dc5046684617b73ba9350cec56de407cba73a72cdbcd01f3e0b",
+      "command": [
+        "bash",
+        "scripts/verify-changelog-entry.sh",
+        "15.4.9"
+      ],
+      "cwd": "/Users/jonathanborgia/code/signaltree/.worktrees/v15-maintenance-release-prep",
+      "node": "v24.15.0",
+      "startedUTC": "2026-11-12T02:03:30.537Z",
+      "finishedUTC": "2026-11-12T02:03:30.547Z",
+      "exitCode": 0,
+      "signal": null,
+      "environment": {
+        "NX_DAEMON": "false",
+        "NX_ISOLATE_PLUGINS": "false",
+        "CI": "true"
+      },
+      "runnerSha256": "a391a9433a8169cb0f15dc92c71792d2c2d6a1a6ae8a5f2da6addeb123f66c61",
+      "logSha256": "1ee534a5e2aba269c9336f5505ee5c722b67be9c4c22e56acda5f81f1ae1e8b8"
+    },
+    {
+      "receipt": "final-consumer-typecheck-1.receipt.json",
+      "receiptSha256": "247338cfac7d5bd1d3010c1a74161726fa5377f8c1d3e855bd7d1f2e169cee9b",
+      "command": [
+        "node",
+        "tools/verify-consumer-typecheck.mjs"
+      ],
+      "cwd": "/Users/jonathanborgia/code/signaltree/.worktrees/v15-maintenance-release-prep",
+      "node": "v24.15.0",
+      "startedUTC": "2026-11-12T02:02:15.299Z",
+      "finishedUTC": "2026-11-12T02:02:21.649Z",
+      "exitCode": 0,
+      "signal": null,
+      "environment": {
+        "NX_DAEMON": "false",
+        "NX_ISOLATE_PLUGINS": "false",
+        "CI": "true"
+      },
+      "runnerSha256": "a391a9433a8169cb0f15dc92c71792d2c2d6a1a6ae8a5f2da6addeb123f66c61",
+      "logSha256": "a773289051a58cf35d19065195c79fa3457480d3518e371785cbe0611ffd35c0"
+    },
+    {
+      "receipt": "final-demo-production-1.receipt.json",
+      "receiptSha256": "b88ded1ca46373a9f40a931c16f33eaf124bf7dd1fd166ce390b608c4e7cbe7d",
+      "command": [
+        "pnpm",
+        "nx",
+        "build",
+        "demo",
+        "--configuration=production",
+        "--skip-nx-cache"
+      ],
+      "cwd": "/Users/jonathanborgia/code/signaltree/.worktrees/v15-maintenance-release-prep",
+      "node": "v24.15.0",
+      "startedUTC": "2026-11-12T02:02:36.252Z",
+      "finishedUTC": "2026-11-12T02:02:44.705Z",
+      "exitCode": 0,
+      "signal": null,
+      "environment": {
+        "NX_DAEMON": "false",
+        "NX_ISOLATE_PLUGINS": "false",
+        "CI": "true"
+      },
+      "runnerSha256": "a391a9433a8169cb0f15dc92c71792d2c2d6a1a6ae8a5f2da6addeb123f66c61",
+      "logSha256": "acafbea6f31c2b76ffae75540bc901ca85576bfd53da1757ad59f32f2dea4b20"
+    },
+    {
+      "receipt": "final-exact-budget-1.receipt.json",
+      "receiptSha256": "a106575f17f02b17d8755c7a58c09e8f43cd100ea7b9124fecc0e7e2d587a633",
+      "command": [
+        "node",
+        "/private/tmp/st-v15-maintenance-release-prep/measure-exact-budget.mjs"
+      ],
+      "cwd": "/Users/jonathanborgia/code/signaltree/.worktrees/v15-maintenance-release-prep",
+      "node": "v24.15.0",
+      "startedUTC": "2026-11-12T02:03:21.350Z",
+      "finishedUTC": "2026-11-12T02:03:21.512Z",
+      "exitCode": 1,
+      "signal": null,
+      "environment": {
+        "NX_DAEMON": "false",
+        "NX_ISOLATE_PLUGINS": "false",
+        "CI": "true"
+      },
+      "runnerSha256": "a391a9433a8169cb0f15dc92c71792d2c2d6a1a6ae8a5f2da6addeb123f66c61",
+      "logSha256": "0307ce49a0bef14e54b5337a1e9e9bbf1d8f17c20bc043e0569c72a509433821"
+    },
+    {
+      "receipt": "final-release-state-1.receipt.json",
+      "receiptSha256": "258950c46c4ea1008f0ba071a20f7f2f97fc10b6e360ef87867056fcd163b0da",
+      "command": [
+        "node",
+        "scripts/verify-release-state.js"
+      ],
+      "cwd": "/Users/jonathanborgia/code/signaltree/.worktrees/v15-maintenance-release-prep",
+      "node": "v24.15.0",
+      "startedUTC": "2026-11-12T02:03:30.483Z",
+      "finishedUTC": "2026-11-12T02:03:30.510Z",
+      "exitCode": 0,
+      "signal": null,
+      "environment": {
+        "NX_DAEMON": "false",
+        "NX_ISOLATE_PLUGINS": "false",
+        "CI": "true"
+      },
+      "runnerSha256": "a391a9433a8169cb0f15dc92c71792d2c2d6a1a6ae8a5f2da6addeb123f66c61",
+      "logSha256": "6f5df8790aff8a93ed2cf1fe5c8528eae082171dd176345e0675e0e523c04a5b"
+    },
+    {
+      "receipt": "final-route-smoke-1.receipt.json",
+      "receiptSha256": "81e8c7f5c35ced1681b485cd2d3c507783013467bee55f3719962ea0e791f711",
+      "command": [
+        "pnpm",
+        "run",
+        "smoke:routes"
+      ],
+      "cwd": "/Users/jonathanborgia/code/signaltree/.worktrees/v15-maintenance-release-prep",
+      "node": "v24.15.0",
+      "startedUTC": "2026-11-12T02:02:44.735Z",
+      "finishedUTC": "2026-11-12T02:03:15.444Z",
+      "exitCode": 0,
+      "signal": null,
+      "environment": {
+        "NX_DAEMON": "false",
+        "NX_ISOLATE_PLUGINS": "false",
+        "CI": "true"
+      },
+      "runnerSha256": "a391a9433a8169cb0f15dc92c71792d2c2d6a1a6ae8a5f2da6addeb123f66c61",
+      "logSha256": "9dd14847f05ade3515650cee2983f9338fc7d7fb913bede466fe933be994f33a"
+    },
+    {
+      "receipt": "final-tarball-consumer-1.receipt.json",
+      "receiptSha256": "73c33c1622d0e332d80ae10690fbf3025446b45a6a8758b1ede6651cc86faeee",
+      "command": [
+        "node",
+        "tools/verify-tarball-consumer.mjs"
+      ],
+      "cwd": "/Users/jonathanborgia/code/signaltree/.worktrees/v15-maintenance-release-prep",
+      "node": "v24.15.0",
+      "startedUTC": "2026-11-12T02:02:12.615Z",
+      "finishedUTC": "2026-11-12T02:02:15.273Z",
+      "exitCode": 0,
+      "signal": null,
+      "environment": {
+        "NX_DAEMON": "false",
+        "NX_ISOLATE_PLUGINS": "false",
+        "CI": "true"
+      },
+      "runnerSha256": "a391a9433a8169cb0f15dc92c71792d2c2d6a1a6ae8a5f2da6addeb123f66c61",
+      "logSha256": "141ef3ed7053d1e84a454073c419c1c1d7c685801bca01d6df8b1b79d057264b"
+    },
+    {
+      "receipt": "final-version-claims-1.receipt.json",
+      "receiptSha256": "bf36bb354c68ee7741ecbf1ee5ba465620bfe5bfca9bfaf1b503d72be004d4aa",
+      "command": [
+        "node",
+        "scripts/verify-version-claims.js"
+      ],
+      "cwd": "/Users/jonathanborgia/code/signaltree/.worktrees/v15-maintenance-release-prep",
+      "node": "v24.15.0",
+      "startedUTC": "2026-11-12T02:03:30.415Z",
+      "finishedUTC": "2026-11-12T02:03:30.457Z",
+      "exitCode": 0,
+      "signal": null,
+      "environment": {
+        "NX_DAEMON": "false",
+        "NX_ISOLATE_PLUGINS": "false",
+        "CI": "true"
+      },
+      "runnerSha256": "a391a9433a8169cb0f15dc92c71792d2c2d6a1a6ae8a5f2da6addeb123f66c61",
+      "logSha256": "41a04cf1861a570f722448cefa8f7dadbb827d1a489b54f31198311d3dcbd457"
+    },
+    {
+      "receipt": "install-1.receipt.json",
+      "receiptSha256": "2030e5e5ff00c544ec39d947b7052e7b783ed28110f30359d7b5f27f1ffdaa63",
+      "command": [
+        "pnpm",
+        "install",
+        "--frozen-lockfile"
+      ],
+      "cwd": "/Users/jonathanborgia/code/signaltree/.worktrees/v15-maintenance-release-prep",
+      "node": "v24.15.0",
+      "startedUTC": "2026-11-12T01:39:33.913Z",
+      "finishedUTC": "2026-11-12T01:40:44.352Z",
+      "exitCode": 1,
+      "signal": null,
+      "environment": {
+        "NX_DAEMON": "false",
+        "NX_ISOLATE_PLUGINS": "false",
+        "CI": "true"
+      },
+      "runnerSha256": "a391a9433a8169cb0f15dc92c71792d2c2d6a1a6ae8a5f2da6addeb123f66c61",
+      "logSha256": "a118cf55309f5e8fe899db2ca8d243973ac2230f0824292299b836ba3b765c18"
+    },
+    {
+      "receipt": "install-2.receipt.json",
+      "receiptSha256": "5e9caba79fccab94e635185daaf449cc266e0a1e64cd1c0f6e2da94365d14f5d",
+      "command": [
+        "pnpm",
+        "install",
+        "--frozen-lockfile"
+      ],
+      "cwd": "/Users/jonathanborgia/code/signaltree/.worktrees/v15-maintenance-release-prep",
+      "node": "v24.15.0",
+      "startedUTC": "2026-11-12T01:41:31.402Z",
+      "finishedUTC": "2026-11-12T01:41:45.329Z",
+      "exitCode": 0,
+      "signal": null,
+      "environment": {
+        "NX_DAEMON": "false",
+        "NX_ISOLATE_PLUGINS": "false",
+        "CI": "true"
+      },
+      "runnerSha256": "a391a9433a8169cb0f15dc92c71792d2c2d6a1a6ae8a5f2da6addeb123f66c61",
+      "logSha256": "e685b83ef7af4d5b730b59c981e5b711bc1a88a4f5915743c18ce911f8499b66"
+    },
+    {
+      "receipt": "metadata-1.receipt.json",
+      "receiptSha256": "94aa63a99c5da664dc001b5298ae38b7cde2b21550016e21cb75e0f313162070",
+      "command": [
+        "node",
+        "/private/tmp/st-v15-maintenance-release-prep/prepare-metadata.mjs"
+      ],
+      "cwd": "/Users/jonathanborgia/code/signaltree/.worktrees/v15-maintenance-release-prep",
+      "node": "v24.15.0",
+      "startedUTC": "2026-11-12T01:44:16.525Z",
+      "finishedUTC": "2026-11-12T01:44:16.672Z",
+      "exitCode": 0,
+      "signal": null,
+      "environment": {
+        "NX_DAEMON": "false",
+        "NX_ISOLATE_PLUGINS": "false",
+        "CI": "true"
+      },
+      "runnerSha256": "a391a9433a8169cb0f15dc92c71792d2c2d6a1a6ae8a5f2da6addeb123f66c61",
+      "logSha256": "110225a7622bfb6bc7b6594ad86f3060c6a693caffc6384deef6daade31f5f6e"
+    },
+    {
+      "receipt": "metadata-check-1.receipt.json",
+      "receiptSha256": "bee10637c40552f85331f49ef8bcd87f2c76417673e767e5814574fb9c7d8c3c",
+      "command": [
+        "node",
+        "tools/verify-gates.mjs",
+        "--only=version-claims,release-claims,release-plan,doc-links"
+      ],
+      "cwd": "/Users/jonathanborgia/code/signaltree/.worktrees/v15-maintenance-release-prep",
+      "node": "v24.15.0",
+      "startedUTC": "2026-11-12T01:44:29.749Z",
+      "finishedUTC": "2026-11-12T01:44:38.059Z",
+      "exitCode": 0,
+      "signal": null,
+      "environment": {
+        "NX_DAEMON": "false",
+        "NX_ISOLATE_PLUGINS": "false",
+        "CI": "true"
+      },
+      "runnerSha256": "a391a9433a8169cb0f15dc92c71792d2c2d6a1a6ae8a5f2da6addeb123f66c61",
+      "logSha256": "b7a031abb6746837595e3ad2e28a35ab0571c7b5f2a203d32f468edbeacf2884"
+    },
+    {
+      "receipt": "rebuild-after-mutations-1.receipt.json",
+      "receiptSha256": "1098c96e1618b6513bfc0187d4678126a9e9278b0c08693c9793cd7e014c054a",
+      "command": [
+        "pnpm",
+        "run",
+        "build:all",
+        "--skip-nx-cache"
+      ],
+      "cwd": "/Users/jonathanborgia/code/signaltree/.worktrees/v15-maintenance-release-prep",
+      "node": "v24.15.0",
+      "startedUTC": "2026-11-12T02:01:23.250Z",
+      "finishedUTC": "2026-11-12T02:01:32.217Z",
+      "exitCode": 0,
+      "signal": null,
+      "environment": {
+        "NX_DAEMON": "false",
+        "NX_ISOLATE_PLUGINS": "false",
+        "CI": "true"
+      },
+      "runnerSha256": "a391a9433a8169cb0f15dc92c71792d2c2d6a1a6ae8a5f2da6addeb123f66c61",
+      "logSha256": "9169fdd50c41d8380acd0d2a7007d5a3e1465190b4b52dccd6c52606136ebd4d"
+    },
+    {
+      "receipt": "release-gates-1.receipt.json",
+      "receiptSha256": "8dd25753fb6b793c26bc078671db0af48d698a39bff21506f10b1a784462507d",
+      "command": [
+        "node",
+        "tools/verify-gates.mjs",
+        "--release"
+      ],
+      "cwd": "/Users/jonathanborgia/code/signaltree/.worktrees/v15-maintenance-release-prep",
+      "node": "v24.15.0",
+      "startedUTC": "2026-11-12T01:45:10.727Z",
+      "finishedUTC": "2026-11-12T01:50:35.422Z",
+      "exitCode": 1,
+      "signal": null,
+      "environment": {
+        "NX_DAEMON": "false",
+        "NX_ISOLATE_PLUGINS": "false",
+        "CI": "true"
+      },
+      "runnerSha256": "a391a9433a8169cb0f15dc92c71792d2c2d6a1a6ae8a5f2da6addeb123f66c61",
+      "logSha256": "a70d54b64b674956362d6f8658e8da0235462547d93655199a2312735d9212c6"
+    },
+    {
+      "receipt": "release-mutations-1.receipt.json",
+      "receiptSha256": "3a8032ceaeaaf062bbc9cc0ad5c4a1af261f1f15b51540a5d5e2ddaa8241b9b2",
+      "command": [
+        "node",
+        "tools/verify-gates.mjs",
+        "--self-test",
+        "--release"
+      ],
+      "cwd": "/Users/jonathanborgia/code/signaltree/.worktrees/v15-maintenance-release-prep",
+      "node": "v24.15.0",
+      "startedUTC": "2026-11-12T01:56:32.849Z",
+      "finishedUTC": "2026-11-12T02:01:08.157Z",
+      "exitCode": 0,
+      "signal": null,
+      "environment": {
+        "NX_DAEMON": "false",
+        "NX_ISOLATE_PLUGINS": "false",
+        "CI": "true"
+      },
+      "runnerSha256": "a391a9433a8169cb0f15dc92c71792d2c2d6a1a6ae8a5f2da6addeb123f66c61",
+      "logSha256": "a043c8ee3b872bb8f86787f1baf823c67805da0a55d0f9dfc9f1a82e70d40d3f"
+    }
+  ],
+  "limits": [
+    "Full local release suite has one numerical failure; no budget was raised.",
+    "Canonical candidate state=validated refers to package/artifact validation, not acceptance of all release gates.",
+    "No exact-tag/Linux CI or publication receipt was created.",
+    "No separate whole-workspace coverage percentage was measured.",
+    "The root release owner retains controller, budget disposition and independent review authority."
+  ]
+}
