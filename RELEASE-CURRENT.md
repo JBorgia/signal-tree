@@ -40,6 +40,22 @@ lifecycle CPU in all three pairs. Short-history CPU is mixed, including adverse
 32-episode samples. This measured change adds no public mode. Its19 focused,
 323 affected and7 mutation checks are not combined release qualification.
 
+The successor also integrates completed noncurrent operation retirement from
+`168bf0c18`. Sibling publications can share a predecessor and leave the first completed
+operation registered after both supersede that predecessor. Cleanup now follows
+this reduction's completed work and rechecks the live current recipient after
+the queue drains; exact cached proofs, native requirements and issued evidence
+remain. The96-child comparison reduces held heap from24,510,088 to13,704,680
+bytes at1,024 rollbacks. CPU is mixed: ordinary32 complete lifecycle is11–22%
+slower across three pairs, mostly during construction. A separate numeric event
+diagnostic observes zero cleanup lists/helpers in that exact ordinary workload;
+it does not establish the slowdown's cause. The first historical-proof mutant
+survived an incomplete oracle. The strengthened test checks every relevant fact,
+and all five mutants now fail useful assertions with exact source restoration.
+The final test differs from the measured build's test snapshot; runtime bytes
+are identical. This tradeoff is selected for combined qualification, with no
+new public mode and no universal history or speed claim.
+
 The selected runtime removes unused preparation work and owner-path state,
 maintains the exact confirmed-ledger suffix, avoids discarded ordinary record
 copies, demand-caches value-projection order, and reuses native whole-input
