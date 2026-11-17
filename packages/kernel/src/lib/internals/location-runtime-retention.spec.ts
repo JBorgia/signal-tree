@@ -216,7 +216,7 @@ describe('LocationRuntime retention', () => {
 it('releases a replaced physical requirement after whole capture while the source stays alive', async () => {
   expect(typeof (globalThis as { gc?: unknown }).gc).toBe('function');
   // Load the same native authority as an ordinary public consumer, within this
-  // final test so the earlier neutral retention fixtures keep their imports.
+  // final public-authority tests so earlier neutral fixtures keep their imports.
   await import('../../index');
   const { getEntityPublicationBinding } = await import('./entity-publication');
   const tree = signalTree({
@@ -231,6 +231,8 @@ it('releases a replaced physical requirement after whole capture while the sourc
     )?.subject;
     if (!source || subject === undefined)
       throw new Error('native source binding missing');
+    // This case measures release of active evidence, so demand it explicitly.
+    expect(source.evidence()).toBeDefined();
     expect(source.inspect().native).toBe(1);
     const old = (() => {
       tree.$.rows.updateOne('a', { value: 1 });
@@ -257,5 +259,42 @@ it('releases a replaced physical requirement after whole capture while the sourc
   } finally {
     pins.length = 0;
     tree.destroy();
+  }
+});
+
+it('releases an unactivated source and its seed after the last held reader is released', async () => {
+  expect(typeof (globalThis as { gc?: unknown }).gc).toBe('function');
+  await import('../../index');
+  const { getEntityPublicationBinding } = await import('./entity-publication');
+  const pins: object[] = [];
+  const references = (() => {
+    const payload = { value: 7 };
+    const tree = signalTree({
+      rows: entityMap<{ id: string; payload: typeof payload }, string>(),
+    });
+    tree.$.rows.addOne({ id: 'a', payload });
+    const reader = tree.$.rows.byIdOrFail('a').payload;
+    const source = getEntityPublicationBinding(tree.$.rows)?.source;
+    if (!source) throw new Error('source binding missing');
+    expect(tree.$.rows.count()).toBe(1);
+    expect(reader()).toBe(payload);
+    expect(source.inspect().native).toBe(0);
+    const refs = [tree, source, reader, payload].map(value => new WeakRef(value));
+    tree.destroy();
+    expect(source.inspect().native).toBe(0);
+    expect(reader()).toBe(payload);
+    pins.push(tree, source, reader, payload);
+    return refs;
+  })();
+  try {
+    await applyPressure();
+    expect(references.every(reference => reference.deref() !== undefined)).toBe(true);
+    pins.length = 0;
+    await applyPressure();
+    expect(references.map(reference => reference.deref())).toEqual([
+      undefined, undefined, undefined, undefined,
+    ]);
+  } finally {
+    pins.length = 0;
   }
 });

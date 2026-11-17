@@ -617,7 +617,7 @@ try {
     const target = join(stage, 'kernel/dist/lib/link.js');
     const original = readFileSync(target, 'utf8');
     const anchor =
-      'registerEntityPublicationFactory(createEntityPublicationParticipant);';
+      'registerEntityPublicationFactory(createEntityPublicationParticipant,canDeferEntityPublication,canRemainDeferredEntityPublication);';
     assert.equal(
       original.split(anchor).length,
       2,

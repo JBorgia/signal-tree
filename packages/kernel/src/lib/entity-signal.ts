@@ -1902,7 +1902,8 @@ export function createEntitySignal<
   const entityPublication = new EntityPublicationSource(prepare => { prepareSourcePoint = prepare; }, () =>
     structuralStore.activeSubjectsSnapshot().map(subjectId => ({
       subjectId,
-      key: structuralStore.activeKeyForSubject(subjectId)!,
+      // The snapshot contains only currently active subjects.
+      key: structuralStore.activeKeyForSubject(subjectId) as K,
       row: valueStore.backingForSubject(subjectId),
     })));
   options?.onDispose?.(() => entityPublication.dispose());

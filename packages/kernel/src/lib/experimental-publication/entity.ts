@@ -38,7 +38,7 @@ export function canDeferEntityPublication(packet: EntityPublicationPacket): bool
       if (!edit.structural && edit.fields === null) return false;
       // Prior cold fields are already data-only. A point checks only its
       // supplied fields; no complete row scan on each sparse edit.
-      const keys = edit.structural ? Object.keys(edit.after ?? {}) : edit.fields!;
+      const keys = edit.structural ? Object.keys(edit.after ?? {}) : edit.fields as readonly string[];
       for (let j = 0; j < keys.length; j++) {
         const descriptor = Object.getOwnPropertyDescriptor(edit.after, keys[j]);
         if (!descriptor || !('value' in descriptor)) return false;
@@ -48,7 +48,7 @@ export function canDeferEntityPublication(packet: EntityPublicationPacket): bool
   };
   if (!positive(packet.physical) || !positive(packet.ordinary)) return false;
   for (let i = 0; i < (packet.steps?.length ?? 0); i++) {
-    const step = packet.steps![i];
+    const step = (packet.steps as NonNullable<EntityPublicationPacket['steps']>)[i];
     if (step.authoredRemoval || step.authoredFootprint?.kind === 'derive') return false;
   }
   return true;
