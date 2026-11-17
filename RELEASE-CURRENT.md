@@ -1,19 +1,39 @@
-# v15 optimization sweep — candidate under qualification
+# v15 optimization sweep — local qualification complete
 
-The November17 optimization instruction continues on this isolated branch from
-prepared15.4.9, preserving stable v15 APIs and settlement semantics. The selected
+The qualified runtime is `4d1142d6166b2d5b2874715e38097665545864dc`.
+This controller update is a documentation-only successor; measurements and
+qualification retain that exact runtime/artifact identity. The narrow compatible
 change bounds confirmed-ledger trimming by the diagnostic suffix before scanning
-pending or record IDs. It preserves existing fractional-history behavior and
-leaves the ordinary zero-obligation fast path unchanged.
+pending or record IDs. Fractional retention, settlement semantics and the ordinary
+zero-obligation fast path remain unchanged.
 
-Baseline-first work witnesses, compatibility/retention checks and the complete
-64-child CPU/14-control study support this narrow work reduction. Timing gains
-remain variable; no broad startup or ordinary-write speedup is claimed. The
-[central integration record](https://github.com/JBorgia/signal-tree/blob/codex/optimization-sweep/docs/audits/2026-11-17-optimization-sweep/INTEGRATION.md)
-records selection and alternatives. Full qualification and same-strategy
-application comparison are pending. This branch is not published; version15.4.8
-remains the released baseline. No tag, registry publication, merge or deployment
-is selected by this optimization phase.
+Baseline-first witnesses, compatibility/retention checks and the 64-child CPU /
+14-control study support the work reduction. Final local qualification completes
+90/91 normal gates (the existing entity bundle ceiling only), all 91 mutation
+checks with exact source restoration, five canonical packages and 158 shipped
+payloads, strict installed consumers, Angular AOT, facade/SSR, the strict demo
+build and all 146 route checks. The passing/grown/restored bundle fixture returns
+0/1/0. Source and shipped-byte identities remain bound to the original commands.
+
+The final eight-implementation application comparison uses the same bulk-context
+strategy for before/after arms. Ordinary CPU changes are mixed and ordinary heap
+is essentially unchanged; the default-history app does not heavily exercise the
+changed history algorithm. No broad startup or ordinary-write speedup is claimed.
+The [central report](https://github.com/JBorgia/signal-tree/blob/codex/optimization-sweep/docs/audits/2026-11-17-optimization-sweep/README.md)
+records all measured costs and independent interpretation.
+
+**Decision: retain the compatible repair; local preparation is qualified with the
+specific numerical-size exception.** Delivered bare/entity fixture bytes are
+unchanged. Entity gzip remains 25,333 production / 28,273 development bytes,
+exceeding the unchanged ceilings by 40.2 / 113 bytes. Accept that specific cost
+under the owner's cost/feasibility instruction; do not relabel the numerical
+failure or apply a blanket exception to future artifacts.
+
+This phase does not select a tag, merge, registry publication or deployment.
+The last recorded November 17 registry inspection identifies 15.4.8 as released;
+15.4.9 remains a preparation candidate requiring the selected release phase's
+fresh exact-tag/registry checks. Evidence packaging and authorized branch sharing
+close this optimization study.
 
 ---
 
