@@ -1,9 +1,66 @@
-# Current release — v15.4.8 released; long-lived follow-through complete
+# Current release — v15 maintenance preparation and agent collaboration evaluation
 
-Updated November 11, 2026. This is the single active acceptance ledger. Historical
+Updated November 17, 2026 UTC. This is the single active acceptance ledger. Historical
 first failures and sealed predecessors remain evidence, not competing queues.
 
 ## Active owner instruction
+
+### November 11 maintenance preparation and human/agent collaboration — complete
+
+The owner accepted the completed study's recommendations and requested broader
+metrics plus an audit of v16 supporting AI agents alongside web-app users.
+Continue authorized implementation, comparison and qualification without routine
+check-ins. The [registered scope](docs/audits/2026-11-11-agent-collaboration/PROTOCOL.md)
+keeps the prior `8dd709401` study, v15 runtime `0d2b96192` and v16 `5d04ff65`
+immutable as baselines. New work is isolated on `codex/agent-collaboration-evaluation`,
+`codex/v15-maintenance-release-prep` and `codex/v16-agent-readiness`.
+
+- [x] Refresh the maintained v15 patch qualification and exact
+      release-ready artifacts; no tag, publication, merge or deployment selected.
+- [x] Reduce whole-history capture overhead if ordered-reference and lifecycle
+      equivalence survive independent scrutiny and complete cost comparison.
+- [x] Attribute and address feasible ordinary v16 startup/publication activation
+      overhead, preserving supported late-reader and cross-tree behavior.
+- [x] Requalify supported public human/agent operations, review, recovery and
+      delivery composition against current artifacts and strong failure controls.
+- [x] Expand equivalent-outcome comparisons with responsiveness, context extraction,
+      throughput, concurrency, settlement, memory and implementation-duty metrics.
+- [x] Independently assess positive capabilities and remaining integration/service
+      obligations, complete artifact validation, and prepare reviewed study branches
+      for authorized sharing.
+
+The current public npm line is inspected at 15.4.8; 15.4.9 is the preparation
+candidate, subject to exact artifact and registry rechecks before any separately
+selected publication. No public configuration, export, weakened guarantee or
+production backend is implied by the audit. The governing multi-actor product
+objective remains complete supported workflow behavior, not internal tests alone.
+Heavy execution is serialized; preserve first failures and economic versus
+numerical budget dispositions. Root owns architectural decisions and study records.
+
+Fresh v15.4.9 preparation at frozen `da2e92cca` completes 90/91 normal release
+gates, all 91 mutation proofs with exact restoration, strict installed consumers,
+production demo and 146 browser checks. Persistent qualification replaces raw
+logs lost to temporary-directory cleanup; directly recorded dist removal and the
+uncached rebuild reproduce the preserved five archives identically. The fresh
+November 17 registry/tag inspection confirms 15.4.8 latest and 15.4.9 unused.
+The specific entity-size excess of 40.2 production and 113
+development gzip bytes is accepted under the owner's cost/feasibility instruction;
+the numerical gate stays red and ceilings stay unchanged. Independent evidence
+verifies source, all five tarballs and their measured-runtime equivalence. This
+economic disposition applies to this candidate, not future artifacts generally.
+
+Fresh C1 whole-capture and public workflow qualification, the 136-child expanded
+application cohort and four separate production profiles are complete. The
+[study](docs/audits/2026-11-11-agent-collaboration/README.md) preserves their
+identities and limits. A blind fresh-add notification gate is rejected by four
+concrete installed-artifact counterexamples; C1 remains unchanged. Full startup
+preparation still has a measured cost, and no new public optional mode is adopted.
+Independent interpretation and fresh v15 qualification are complete. The split
+evidence archive verifies 50,567 original/version mappings and 21,119 payloads
+after reassembly and standalone extraction. Corrupted and missing payload controls
+fail as intended; restoration verifies. The index preserves the first control-driver
+diagnostic mismatch separately. Review-branch sharing closes this phase without
+selecting merge, publication or deployment.
 
 ### November 11 long-lived cost and optionality follow-through — complete
 

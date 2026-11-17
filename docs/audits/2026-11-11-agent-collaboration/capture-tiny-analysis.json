@@ -1,0 +1,328 @@
+{
+  "raw": "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/capture/tiny/results.json",
+  "rawSha256": "d1a25f8c9dc153d1731477b071f12031e12f2c24647b6777b7062bfe8d8c351c",
+  "planSha256": "0cc4e82f55317010fa78992dc57975fac1dff9bca8bb5c4a7cbf6f29c3708f42",
+  "analyzer": "/Users/jonathanborgia/code/signaltree/.worktrees/v16-agent-readiness/tools/experiments/entity-whole-input-capture/analyze.py",
+  "analyzerSha256": "0e3e43ca35523f2f08bfb2768416af1b6895ffedf150bfe2c84f1295d95babc2",
+  "command": [
+    "tools/experiments/entity-whole-input-capture/analyze.py",
+    "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/capture/tiny",
+    "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/capture/tiny-analysis.json"
+  ],
+  "children": 14,
+  "controls": 3,
+  "summary": [
+    {
+      "profile": "tiny-history",
+      "workload": {
+        "captures": 20,
+        "activeRows": 1000,
+        "historicalSubjects": 2,
+        "uniqueRequirements": 22,
+        "profiles": "tiny-history"
+      },
+      "counts": {
+        "baseline": {
+          "counters": {
+            "executedFactVisits": 220080,
+            "representedFacts": 220080,
+            "sourceRepresentedFacts": null
+          },
+          "executionCensus": {
+            "expandedSubjects": 2,
+            "visitedRuns": 0
+          },
+          "sourceState": {
+            "rows": 1000,
+            "fields": 9000,
+            "presence": 1002,
+            "negativePresence": 2,
+            "placements": 1000,
+            "viewRows": 1000,
+            "viewFields": 9000,
+            "negativeViewFields": 0,
+            "visible": 1002,
+            "negativeVisible": 2,
+            "placementViews": 1002,
+            "mappings": 1002,
+            "mappingViews": 1002,
+            "packedSubjects": 2,
+            "packedRuns": 1,
+            "unpackedSubjectFacets": 5000,
+            "preparedFieldEdits": 9038,
+            "retireCalls": 0,
+            "inputFactVisits": 231084,
+            "recipients": 0,
+            "native": 1,
+            "retirementRequests": 0
+          }
+        },
+        "candidate": {
+          "counters": {
+            "executedFactVisits": 220040,
+            "representedFacts": 220080,
+            "sourceRepresentedFacts": 220080
+          },
+          "executionCensus": {
+            "expandedSubjects": 0,
+            "visitedRuns": 1
+          },
+          "sourceState": {
+            "rows": 1000,
+            "fields": 9000,
+            "presence": 1002,
+            "negativePresence": 2,
+            "placements": 1000,
+            "viewRows": 1000,
+            "viewFields": 9000,
+            "negativeViewFields": 0,
+            "visible": 1002,
+            "negativeVisible": 2,
+            "placementViews": 1002,
+            "mappings": 1002,
+            "mappingViews": 1002,
+            "packedSubjects": 2,
+            "packedRuns": 1,
+            "unpackedSubjectFacets": 5000,
+            "preparedFieldEdits": 9038,
+            "retireCalls": 0,
+            "inputFactVisits": 231044,
+            "wholeInputFactsRepresented": 220080,
+            "recipients": 0,
+            "native": 1,
+            "retirementRequests": 0
+          }
+        }
+      },
+      "metrics": {
+        "cpuMs": {
+          "arms": {
+            "baseline": {
+              "samples": [
+                10.071,
+                10.472,
+                10.608,
+                10.146,
+                10.4
+              ],
+              "median": 10.4,
+              "min": 10.071,
+              "max": 10.608
+            },
+            "candidate": {
+              "samples": [
+                9.797,
+                9.396,
+                9.986,
+                8.855,
+                12.348
+              ],
+              "median": 9.797,
+              "min": 8.855,
+              "max": 12.348
+            }
+          },
+          "pairedCandidateMinusBaseline": {
+            "samples": [
+              -0.27399999999999913,
+              -1.0759999999999987,
+              -0.6219999999999999,
+              -1.2910000000000004,
+              1.9480000000000004
+            ],
+            "median": -0.6219999999999999,
+            "min": -1.2910000000000004,
+            "max": 1.9480000000000004
+          },
+          "sameArmDifferences": [
+            -0.3509999999999991,
+            -1.3800000000000008
+          ],
+          "maxAbsoluteSameArmDifference": 1.3800000000000008
+        },
+        "elapsedMs": {
+          "arms": {
+            "baseline": {
+              "samples": [
+                7.037750000000017,
+                7.247291000000018,
+                7.380291,
+                6.94512499999999,
+                7.332499999999982
+              ],
+              "median": 7.247291000000018,
+              "min": 6.94512499999999,
+              "max": 7.380291
+            },
+            "candidate": {
+              "samples": [
+                4.138416999999976,
+                3.9981659999999977,
+                4.132291999999978,
+                4.1688330000000065,
+                5.546708999999993
+              ],
+              "median": 4.138416999999976,
+              "min": 3.9981659999999977,
+              "max": 5.546708999999993
+            }
+          },
+          "pairedCandidateMinusBaseline": {
+            "samples": [
+              -2.8993330000000412,
+              -3.2491250000000207,
+              -3.2479990000000214,
+              -2.7762919999999838,
+              -1.785790999999989
+            ],
+            "median": -2.8993330000000412,
+            "min": -3.2491250000000207,
+            "max": -1.785790999999989
+          },
+          "sameArmDifferences": [
+            0.033582999999993035,
+            -0.7642079999999964
+          ],
+          "maxAbsoluteSameArmDifference": 0.7642079999999964
+        },
+        "immediateHeapDelta": {
+          "arms": {
+            "baseline": {
+              "samples": [
+                11473648,
+                11473648,
+                11473648,
+                11473648,
+                11473648
+              ],
+              "median": 11473648,
+              "min": 11473648,
+              "max": 11473648
+            },
+            "candidate": {
+              "samples": [
+                15605296,
+                15605296,
+                15605296,
+                15605296,
+                15605296
+              ],
+              "median": 15605296,
+              "min": 15605296,
+              "max": 15605296
+            }
+          },
+          "pairedCandidateMinusBaseline": {
+            "samples": [
+              4131648,
+              4131648,
+              4131648,
+              4131648,
+              4131648
+            ],
+            "median": 4131648,
+            "min": 4131648,
+            "max": 4131648
+          },
+          "sameArmDifferences": [
+            0,
+            -102912
+          ],
+          "maxAbsoluteSameArmDifference": 102912
+        },
+        "afterGCWithCapturesDelta": {
+          "arms": {
+            "baseline": {
+              "samples": [
+                157112,
+                157112,
+                157112,
+                157112,
+                157112
+              ],
+              "median": 157112,
+              "min": 157112,
+              "max": 157112
+            },
+            "candidate": {
+              "samples": [
+                164360,
+                164360,
+                164360,
+                164360,
+                164360
+              ],
+              "median": 164360,
+              "min": 164360,
+              "max": 164360
+            }
+          },
+          "pairedCandidateMinusBaseline": {
+            "samples": [
+              7248,
+              7248,
+              7248,
+              7248,
+              7248
+            ],
+            "median": 7248,
+            "min": 7248,
+            "max": 7248
+          },
+          "sameArmDifferences": [
+            0,
+            0
+          ],
+          "maxAbsoluteSameArmDifference": 0
+        },
+        "afterGCReleasedCapturesDelta": {
+          "arms": {
+            "baseline": {
+              "samples": [
+                157848,
+                132008,
+                132008,
+                132008,
+                132008
+              ],
+              "median": 132008,
+              "min": 132008,
+              "max": 157848
+            },
+            "candidate": {
+              "samples": [
+                144944,
+                144944,
+                144944,
+                144944,
+                144944
+              ],
+              "median": 144944,
+              "min": 144944,
+              "max": 144944
+            }
+          },
+          "pairedCandidateMinusBaseline": {
+            "samples": [
+              -12904,
+              12936,
+              12936,
+              12936,
+              12936
+            ],
+            "median": 12936,
+            "min": -12904,
+            "max": 12936
+          },
+          "sameArmDifferences": [
+            0,
+            0
+          ],
+          "maxAbsoluteSameArmDifference": 0
+        }
+      },
+      "identicalPrimitiveProofAndCapturedOwnerSummariesAcrossAllSamples": true
+    }
+  ],
+  "limits": "Descriptive paired study of20 direct entity source captures. Immediate heap delta is an allocation/retention proxy; postGC heap is separate. No application startup/total allocation/leak inference. Pilot excluded."
+}

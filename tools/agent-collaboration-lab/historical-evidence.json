@@ -1,0 +1,12 @@
+{
+  "root": "/Users/jonathanborgia/code/signaltree/.worktrees/agent-collaboration-evaluation/artifacts/2026-11-16-agent-collaboration/predecessor-evidence",
+  "manifestSha256": "11e010c1a8044e8cde4fb9843ab23cc70eb192b370dbd7142a3fa9f60c8c964a",
+  "archiveIdentityReference": "9bc32da11f407d5e103135cc5140ccb59695f8fd5b429327ce8ee0603e8a683c",
+  "verificationScope": "This run verifies the bound extracted manifest and selected payload, not the archive container again.",
+  "allowedHistoricalVersions": [
+    {
+      "original": "/Users/jonathanborgia/code/signaltree/.worktrees/application-comparison/tools/application-lab/final-comparison-rerun-protocol.md",
+      "sha256": "51c3c4d57618d1bb2c0fdd8449af91afe221759b58ca332e58616ba188a8c078"
+    }
+  ]
+}

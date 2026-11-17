@@ -1,0 +1,128 @@
+{
+  "format": "signaltree-split-evidence-verification-v1",
+  "completedUTC": "2026-11-17T05:55:21.531337+00:00",
+  "scripts": {
+    "verify-final-archive.py": "b9f9f57278fca37065b48acb2c54407be4820517cde577e12e20735866232999",
+    "complete-archive-verification.py": "8da4010b742870f93e6d5a55c1d56d5c20c490025d1a5af72622e93059b0400c"
+  },
+  "archiveSha256": "5044780df9e81c847c1a702c14161db0ff9fb06a53e75f186e8760ce0eff8855",
+  "archiveBytes": 291574237,
+  "parts": [
+    {
+      "file": "evidence.tar.gz.part-001",
+      "bytes": 90000000,
+      "sha256": "cc84988ac104057347b78dc34228281d8829be2b9f72d710de6275d4130a03f0"
+    },
+    {
+      "file": "evidence.tar.gz.part-002",
+      "bytes": 90000000,
+      "sha256": "86fe1a0817898d75237f910b5fd44fd695d98d22584d72dd0307ba373067e543"
+    },
+    {
+      "file": "evidence.tar.gz.part-003",
+      "bytes": 90000000,
+      "sha256": "acab5eea7ef3facc189ccb4e15dcaf39d4dc143982e7a55c727e56f34450ba0f"
+    },
+    {
+      "file": "evidence.tar.gz.part-004",
+      "bytes": 21574237,
+      "sha256": "e6e619bbd84a2535343ce0118f0808e1b0e7bb92fda318058846328be740ffab"
+    }
+  ],
+  "manifestSha256": "4694cc61bdaed59537050a9642857c55a9450ea4776d3c81a3491b705c23d9ac",
+  "verifierSha256": "71683eb8d1a3a7470aa859fa87882222000e6795ca7fc6b33d37281000025c1f",
+  "counts": {
+    "originalVersionMappings": 50567,
+    "uniquePayloads": 21119,
+    "payloadBytes": 1049012484,
+    "explicitSelections": 32929,
+    "opaqueMappings": 23493,
+    "parsedJsonMappings": 899
+  },
+  "controlledPayload": {
+    "path": "payloads/sha256/0006982134b620f12addbf0a5f9b11af285e8d4b975a421d19f880095412d44c",
+    "sha256": "0006982134b620f12addbf0a5f9b11af285e8d4b975a421d19f880095412d44c",
+    "bytes": 1396
+  },
+  "runs": [
+    {
+      "label": "extract-and-verify",
+      "command": [
+        "/Library/Frameworks/Python.framework/Versions/3.14/bin/python3",
+        "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/evidence-final-verification/archive-evidence.py",
+        "extract",
+        "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/evidence-final-verification/reassembled.tar.gz",
+        "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/evidence-final-verification/extracted"
+      ],
+      "cwd": "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/evidence-final-verification",
+      "exitCode": 0,
+      "expectedExitCode": 0,
+      "seconds": 97.1436772912275,
+      "log": "extract-and-verify.log",
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "label": "reject-tampered-payload",
+      "command": [
+        "/Library/Frameworks/Python.framework/Versions/3.14/bin/python3",
+        "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/evidence-final-verification/extracted/archive-evidence.py",
+        "verify",
+        "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/evidence-final-verification/extracted"
+      ],
+      "cwd": "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/evidence-final-verification",
+      "exitCode": 1,
+      "expectedExitCode": 1,
+      "seconds": 2.578142333077267,
+      "log": "reject-tampered-payload.log",
+      "logSha256": "95962995ebf836e743dc323523a5df61b9166f4894b27016ecdd62bf124df360"
+    },
+    {
+      "label": "reject-missing-payload",
+      "command": [
+        "/Library/Frameworks/Python.framework/Versions/3.14/bin/python3",
+        "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/evidence-final-verification/extracted/archive-evidence.py",
+        "verify",
+        "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/evidence-final-verification/extracted"
+      ],
+      "cwd": "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/evidence-final-verification",
+      "exitCode": 1,
+      "expectedExitCode": 1,
+      "seconds": 3.1868584998883307,
+      "log": "reject-missing-payload.log",
+      "logSha256": "685817c02507b50986daa6c5b1175349d80277f5991fb1a4a12777c38c53e87c"
+    },
+    {
+      "label": "reject-missing-payload-corrected-diagnostic",
+      "command": [
+        "/Library/Frameworks/Python.framework/Versions/3.14/bin/python3",
+        "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/evidence-final-verification/extracted/archive-evidence.py",
+        "verify",
+        "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/evidence-final-verification/extracted"
+      ],
+      "cwd": "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/evidence-final-verification",
+      "exitCode": 1,
+      "expectedExitCode": 1,
+      "seconds": 2.62139808293432,
+      "log": "reject-missing-payload-corrected-diagnostic.log",
+      "logSha256": "685817c02507b50986daa6c5b1175349d80277f5991fb1a4a12777c38c53e87c"
+    },
+    {
+      "label": "restored-standalone-verification",
+      "command": [
+        "/Library/Frameworks/Python.framework/Versions/3.14/bin/python3",
+        "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/evidence-final-verification/extracted/archive-evidence.py",
+        "verify",
+        "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/evidence-final-verification/extracted"
+      ],
+      "cwd": "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/evidence-final-verification",
+      "exitCode": 0,
+      "expectedExitCode": 0,
+      "seconds": 110.2926056671422,
+      "log": "restored-standalone-verification.log",
+      "logSha256": "b8e3fb881ff305f218a0dc924dcc2af6e0c3a4d1460c88071c77a2e331318ff7"
+    }
+  ],
+  "result": "pass",
+  "firstDriverFailure": "The missing-payload control correctly exited 1, but the first driver expected an OS diagnostic instead of the verifier diagnostic Missing archived file. The original driver, log and receipt are preserved; the corrected expectation and restored positive check pass. No archive or verifier change.",
+  "limits": "Verifies supplied bytes and declared reference closure, not authenticity, semantic correctness, complete history or full installed-environment reproducibility. Original paths are identities; verification reads the supplied archive only."
+}

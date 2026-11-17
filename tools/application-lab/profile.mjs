@@ -8,6 +8,7 @@ import { createServer } from 'node:http';
 import { createRequire } from 'node:module';
 import { basename, join, resolve, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { resolveHistoricalInputs } from '../agent-collaboration-lab/historical-inputs.mjs';
 
 const [suppliedPacket, arm, scenario, suppliedOut, suppliedRows = '1000'] =
   process.argv.slice(2);
@@ -90,11 +91,21 @@ try {
     [checker]: sha(checker),
     [conformancePath]: sha(conformancePath),
   };
+  const resolverPath = fileURLToPath(new URL('../agent-collaboration-lab/historical-inputs.mjs', import.meta.url));
+  bindings[resolverPath] = sha(resolverPath);
+  const requiredLive = new Set([
+    fileURLToPath(import.meta.url), resolverPath, planPath, buildPath, checker, conformancePath,
+    ...Object.keys(build.arms[arm].dependencies), ...Object.keys(build.arms[arm].served),
+  ]);
+  const configPath = process.env.ST_HISTORICAL_INPUTS_CONFIG ? resolve(process.env.ST_HISTORICAL_INPUTS_CONFIG) : undefined;
+  const historical = resolveHistoricalInputs(bindings, requiredLive, configPath ? read(configPath) : undefined);
+  bindings = historical.bindings;
+  if (configPath) bindings[configPath] = sha(configPath);
   for (const [path, expected] of Object.entries(bindings))
     assert.equal(sha(path), expected, `Input drift: ${path}`);
   writeFileSync(
     join(out, 'preflight.json'),
-    JSON.stringify({ passed: true, bindings }, null, 2) + '\n',
+    JSON.stringify({ passed: true, bindings, historicalVersions: historical.versions }, null, 2) + '\n',
     { flag: 'wx' }
   );
 } catch (error) {

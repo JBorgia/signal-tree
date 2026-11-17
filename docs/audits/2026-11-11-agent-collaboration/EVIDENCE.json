@@ -1,0 +1,114 @@
+{
+  "format": "signaltree-agent-collaboration-evidence-index-v1",
+  "completedUTC": "2026-11-17T05:55:21.531337+00:00",
+  "archive": {
+    "file": "evidence.tar.gz",
+    "bytes": 291574237,
+    "sha256": "5044780df9e81c847c1a702c14161db0ff9fb06a53e75f186e8760ce0eff8855",
+    "partsInOrder": [
+      {
+        "file": "evidence.tar.gz.part-001",
+        "bytes": 90000000,
+        "sha256": "cc84988ac104057347b78dc34228281d8829be2b9f72d710de6275d4130a03f0"
+      },
+      {
+        "file": "evidence.tar.gz.part-002",
+        "bytes": 90000000,
+        "sha256": "86fe1a0817898d75237f910b5fd44fd695d98d22584d72dd0307ba373067e543"
+      },
+      {
+        "file": "evidence.tar.gz.part-003",
+        "bytes": 90000000,
+        "sha256": "acab5eea7ef3facc189ccb4e15dcaf39d4dc143982e7a55c727e56f34450ba0f"
+      },
+      {
+        "file": "evidence.tar.gz.part-004",
+        "bytes": 21574237,
+        "sha256": "e6e619bbd84a2535343ce0118f0808e1b0e7bb92fda318058846328be740ffab"
+      }
+    ],
+    "manifestSha256": "4694cc61bdaed59537050a9642857c55a9450ea4776d3c81a3491b705c23d9ac",
+    "verifierSha256": "71683eb8d1a3a7470aa859fa87882222000e6795ca7fc6b33d37281000025c1f",
+    "counts": {
+      "originalVersionMappings": 50567,
+      "uniquePayloads": 21119,
+      "payloadBytes": 1049012484,
+      "explicitSelections": 32929,
+      "opaqueMappings": 23493,
+      "parsedJsonMappings": 899
+    }
+  },
+  "verification": {
+    "result": "pass",
+    "receipt": "evidence-verification/result.json",
+    "receiptSha256": "aae760add8ec4821808c9e4d2d8de0998cfb7235e8225aa1536e740f7b4ddb94",
+    "checks": [
+      "Split files hash to the original packed archive in the specified order",
+      "Bundled verifier validates archive, extraction and supplied reference closure",
+      "Altered payload rejected by checksum/size validation",
+      "Missing payload rejected as a missing archived file",
+      "Original payload restored and complete standalone verification passes"
+    ],
+    "preservedDriverFailure": "The missing-payload control correctly exited 1, but the first driver expected an OS diagnostic instead of the verifier diagnostic Missing archived file. The original driver, log and receipt are preserved; the corrected expectation and restored positive check pass. No archive or verifier change."
+  },
+  "readableSummaries": [
+    {
+      "file": "metrics-summary.json",
+      "sha256": "fc5f8fd5c9c2445ac271324602c287f0e069c04945ae0aea9daebfcb25b196b0"
+    },
+    {
+      "file": "source-inventory.json",
+      "sha256": "861fa5fa37909cdbf787984bf98f3850f00b9ea13696520b8c847bc2976f5e8e"
+    },
+    {
+      "file": "capture-main-analysis.json",
+      "sha256": "1ac6d482bc09e1c28f5fbacbc439acd66ad5e6311e0d2df0ab1e77bb7d273093"
+    },
+    {
+      "file": "capture-tiny-analysis.json",
+      "sha256": "d129e0b80aa8860e677dfe15d27c95072a90f7bd9e16efa6f6a17948b214e23b"
+    }
+  ],
+  "predecessor": {
+    "file": "../2026-11-11-long-lived-costs/evidence.tar.gz",
+    "sha256": "9bc32da11f407d5e103135cc5140ccb59695f8fd5b429327ce8ee0603e8a683c",
+    "manifestSha256": "11e010c1a8044e8cde4fb9843ab23cc70eb192b370dbd7142a3fa9f60c8c964a",
+    "scope": "Separate unchanged predecessor. This archive includes its verified manifest and the exact inputs selected for fresh work, not every predecessor result."
+  },
+  "contents": [
+    "Fresh v16 C1 capture schedules, controls, GC diagnostics, exact packages, qualification and independent interpretation",
+    "136-child six-arm application comparison, controls, calibration, sources, production builds, conformance, analyzer controls and independent recomputation",
+    "Installed public workflows and browser-to-HTTP cases on both artifacts, first failures and negative controls",
+    "Four separate production startup profiles, source/history premise review, isolated delivery-gate falsification and independent final review",
+    "Fresh v15.4.9 complete local preparation: source snapshots, commands, normal/mutation gates, clean-build evidence, consumers, canonical packages, registry inspection and independent review"
+  ],
+  "verificationCommandsFromRepositoryRoot": [
+    "ST_VERIFY_DIR=\"$(mktemp -d)\"",
+    "cat docs/audits/2026-11-11-agent-collaboration/evidence.tar.gz.part-* > \"$ST_VERIFY_DIR/evidence.tar.gz\"",
+    "shasum -a 256 \"$ST_VERIFY_DIR/evidence.tar.gz\"",
+    "python3 tools/application-lab/archive-evidence.py extract \"$ST_VERIFY_DIR/evidence.tar.gz\" \"$ST_VERIFY_DIR/extracted\"",
+    "python3 \"$ST_VERIFY_DIR/extracted/archive-evidence.py\" verify \"$ST_VERIFY_DIR/extracted\""
+  ],
+  "usage": "Check the listed part hashes and aggregate hash first. Extraction validates both archive and extracted directory. The final verification uses the bundled verifier. Find original path/version mappings in manifest.json; payloads are addressed by SHA-256 rather than restored to original absolute paths.",
+  "limits": [
+    "Verifies supplied bytes and declared reference closure, not authenticity, semantic correctness, complete history or full installed-environment reproducibility. Original paths are identities; verification reads the supplied archive only.",
+    "Opaque records are still hash-verified bytes. Their logical content digests, deliberately invalid control labels, or historical unavailable references are not recursively claimed as file dependencies. Explicit selection policies and rationales are archived.",
+    "An exact source fragment and original AppleDouble member bytes were derived from identified source/archive bytes to satisfy recorded supporting digests. This is not newly executed timing evidence.",
+    "The final report, this index, archive packaging/verification receipts and final documentation checks are versioned outside the archive self-hash cycle. Source and measured artifacts remain bound to their original identities.",
+    "This evidence does not publish a package, tag or site, establish production backend durability/authentication, or replace exact-artifact qualification for a selected publication phase."
+  ],
+  "finalDocumentationChecks": [
+    {
+      "scope": "study-final-documentation-gates",
+      "receipt": "evidence-verification/study-final-documentation-gates/receipt.json",
+      "receiptSha256": "a9047f3edc6e7d42eadef41cf383ad79ab59ec6b5292a03f6b8335bbbc64c103",
+      "result": "4/4 pass"
+    },
+    {
+      "scope": "v15-final-documentation-gates",
+      "receipt": "evidence-verification/v15-final-documentation-gates/receipt.json",
+      "receiptSha256": "74a1b4746a27646d165bed0c5451e6707fa92fa524049cb82ef612ffdb9a1fe0",
+      "result": "4/4 pass"
+    }
+  ]
+}

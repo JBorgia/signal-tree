@@ -1,5 +1,20 @@
 # TODO
 
+## Every demo-site update
+
+- [ ] Review every demo for clarity and ease of understanding: make its purpose,
+      controls, expected behavior and visible results clear, and exercise the flow.
+- [ ] Check the relevant Vercel deployments for successful completion, inspect
+      failures and verify that the intended deployed site works before sign-off.
+
+The November 11 maintenance preparation and human/agent collaboration phase is
+complete under [the current controller](RELEASE-CURRENT.md#active-owner-instruction).
+The [study](docs/audits/2026-11-11-agent-collaboration/README.md) records fresh
+v15.4.9 preparation, the selected v16 capture improvement, 136 expanded comparison
+children, public agent/user workflows, startup attribution and the rejected unsafe
+shortcut. Independent interpretation and standalone evidence verification are
+complete. Publication and new public semantic modes are not selected.
+
 The November 11 long-lived cost follow-through is complete under
 [the current controller](RELEASE-CURRENT.md#active-owner-instruction). v15.4.8 is
 released and deployed; this follow-through creates separately identified successor

@@ -1,0 +1,78 @@
+[
+  {
+    "label": "extract-and-verify",
+    "command": [
+      "/Library/Frameworks/Python.framework/Versions/3.14/bin/python3",
+      "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/evidence-final-verification/archive-evidence.py",
+      "extract",
+      "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/evidence-final-verification/reassembled.tar.gz",
+      "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/evidence-final-verification/extracted"
+    ],
+    "cwd": "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/evidence-final-verification",
+    "exitCode": 0,
+    "expectedExitCode": 0,
+    "seconds": 97.1436772912275,
+    "log": "extract-and-verify.log",
+    "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "label": "reject-tampered-payload",
+    "command": [
+      "/Library/Frameworks/Python.framework/Versions/3.14/bin/python3",
+      "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/evidence-final-verification/extracted/archive-evidence.py",
+      "verify",
+      "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/evidence-final-verification/extracted"
+    ],
+    "cwd": "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/evidence-final-verification",
+    "exitCode": 1,
+    "expectedExitCode": 1,
+    "seconds": 2.578142333077267,
+    "log": "reject-tampered-payload.log",
+    "logSha256": "95962995ebf836e743dc323523a5df61b9166f4894b27016ecdd62bf124df360"
+  },
+  {
+    "label": "reject-missing-payload",
+    "command": [
+      "/Library/Frameworks/Python.framework/Versions/3.14/bin/python3",
+      "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/evidence-final-verification/extracted/archive-evidence.py",
+      "verify",
+      "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/evidence-final-verification/extracted"
+    ],
+    "cwd": "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/evidence-final-verification",
+    "exitCode": 1,
+    "expectedExitCode": 1,
+    "seconds": 3.1868584998883307,
+    "log": "reject-missing-payload.log",
+    "logSha256": "685817c02507b50986daa6c5b1175349d80277f5991fb1a4a12777c38c53e87c"
+  },
+  {
+    "label": "reject-missing-payload-corrected-diagnostic",
+    "command": [
+      "/Library/Frameworks/Python.framework/Versions/3.14/bin/python3",
+      "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/evidence-final-verification/extracted/archive-evidence.py",
+      "verify",
+      "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/evidence-final-verification/extracted"
+    ],
+    "cwd": "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/evidence-final-verification",
+    "exitCode": 1,
+    "expectedExitCode": 1,
+    "seconds": 2.62139808293432,
+    "log": "reject-missing-payload-corrected-diagnostic.log",
+    "logSha256": "685817c02507b50986daa6c5b1175349d80277f5991fb1a4a12777c38c53e87c"
+  },
+  {
+    "label": "restored-standalone-verification",
+    "command": [
+      "/Library/Frameworks/Python.framework/Versions/3.14/bin/python3",
+      "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/evidence-final-verification/extracted/archive-evidence.py",
+      "verify",
+      "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/evidence-final-verification/extracted"
+    ],
+    "cwd": "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/evidence-final-verification",
+    "exitCode": 0,
+    "expectedExitCode": 0,
+    "seconds": 110.2926056671422,
+    "log": "restored-standalone-verification.log",
+    "logSha256": "b8e3fb881ff305f218a0dc924dcc2af6e0c3a4d1460c88071c77a2e331318ff7"
+  }
+]

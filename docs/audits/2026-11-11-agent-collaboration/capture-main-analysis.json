@@ -1,0 +1,950 @@
+{
+  "raw": "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/capture/main/results.json",
+  "rawSha256": "1ec141e4ee7904005f338c9ac7558d1f53b0c919bde3a78bcc0359ed64cd0217",
+  "planSha256": "b80d4488eb71e5c9078eddc363816035d971d8ce36390f902f31144ec0ef7cff",
+  "analyzer": "/Users/jonathanborgia/code/signaltree/.worktrees/v16-agent-readiness/tools/experiments/entity-whole-input-capture/analyze.py",
+  "analyzerSha256": "0e3e43ca35523f2f08bfb2768416af1b6895ffedf150bfe2c84f1295d95babc2",
+  "command": [
+    "tools/experiments/entity-whole-input-capture/analyze.py",
+    "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/capture/main",
+    "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/capture/main-analysis.json"
+  ],
+  "children": 42,
+  "controls": 3,
+  "summary": [
+    {
+      "profile": "no-history",
+      "workload": {
+        "captures": 20,
+        "activeRows": 1000,
+        "historicalSubjects": 0,
+        "uniqueRequirements": 21,
+        "profiles": "no-history"
+      },
+      "counts": {
+        "baseline": {
+          "counters": {
+            "executedFactVisits": 220000,
+            "representedFacts": 220000,
+            "sourceRepresentedFacts": null
+          },
+          "executionCensus": {
+            "expandedSubjects": 0,
+            "visitedRuns": 0
+          },
+          "sourceState": {
+            "rows": 1000,
+            "fields": 9000,
+            "presence": 1000,
+            "negativePresence": 0,
+            "placements": 1000,
+            "viewRows": 1000,
+            "viewFields": 9000,
+            "negativeViewFields": 0,
+            "visible": 1000,
+            "negativeVisible": 0,
+            "placementViews": 1000,
+            "mappings": 1000,
+            "mappingViews": 1000,
+            "packedSubjects": 0,
+            "packedRuns": 0,
+            "unpackedSubjectFacets": 5000,
+            "preparedFieldEdits": 9020,
+            "retireCalls": 0,
+            "inputFactVisits": 231000,
+            "recipients": 0,
+            "native": 1,
+            "retirementRequests": 0
+          }
+        },
+        "candidate": {
+          "counters": {
+            "executedFactVisits": 220000,
+            "representedFacts": 220000,
+            "sourceRepresentedFacts": 220000
+          },
+          "executionCensus": {
+            "expandedSubjects": 0,
+            "visitedRuns": 0
+          },
+          "sourceState": {
+            "rows": 1000,
+            "fields": 9000,
+            "presence": 1000,
+            "negativePresence": 0,
+            "placements": 1000,
+            "viewRows": 1000,
+            "viewFields": 9000,
+            "negativeViewFields": 0,
+            "visible": 1000,
+            "negativeVisible": 0,
+            "placementViews": 1000,
+            "mappings": 1000,
+            "mappingViews": 1000,
+            "packedSubjects": 0,
+            "packedRuns": 0,
+            "unpackedSubjectFacets": 5000,
+            "preparedFieldEdits": 9020,
+            "retireCalls": 0,
+            "inputFactVisits": 231000,
+            "wholeInputFactsRepresented": 220000,
+            "recipients": 0,
+            "native": 1,
+            "retirementRequests": 0
+          }
+        }
+      },
+      "metrics": {
+        "cpuMs": {
+          "arms": {
+            "baseline": {
+              "samples": [
+                10.251,
+                12.012,
+                10.669,
+                10.077,
+                10.012
+              ],
+              "median": 10.251,
+              "min": 10.012,
+              "max": 12.012
+            },
+            "candidate": {
+              "samples": [
+                9.986,
+                10.648,
+                10.423,
+                10.924,
+                23.885
+              ],
+              "median": 10.648,
+              "min": 9.986,
+              "max": 23.885
+            }
+          },
+          "pairedCandidateMinusBaseline": {
+            "samples": [
+              -0.2649999999999988,
+              -1.3640000000000008,
+              -0.24600000000000044,
+              0.8469999999999995,
+              13.873000000000001
+            ],
+            "median": -0.24600000000000044,
+            "min": -1.3640000000000008,
+            "max": 13.873000000000001
+          },
+          "sameArmDifferences": [
+            -2.0980000000000008,
+            -0.5999999999999996
+          ],
+          "maxAbsoluteSameArmDifference": 2.0980000000000008
+        },
+        "elapsedMs": {
+          "arms": {
+            "baseline": {
+              "samples": [
+                8.710291999999981,
+                8.593165999999997,
+                7.609999999999985,
+                7.124499999999983,
+                7.00716700000001
+              ],
+              "median": 7.609999999999985,
+              "min": 7.00716700000001,
+              "max": 8.710291999999981
+            },
+            "candidate": {
+              "samples": [
+                4.701582999999999,
+                4.590041000000014,
+                4.685833000000002,
+                4.831832999999989,
+                63.051833000000016
+              ],
+              "median": 4.701582999999999,
+              "min": 4.590041000000014,
+              "max": 63.051833000000016
+            }
+          },
+          "pairedCandidateMinusBaseline": {
+            "samples": [
+              -4.008708999999982,
+              -4.003124999999983,
+              -2.924166999999983,
+              -2.2926669999999945,
+              56.04466600000001
+            ],
+            "median": -2.924166999999983,
+            "min": -4.008708999999982,
+            "max": 56.04466600000001
+          },
+          "sameArmDifferences": [
+            -0.5018329999999764,
+            -0.2435000000000116
+          ],
+          "maxAbsoluteSameArmDifference": 0.5018329999999764
+        },
+        "immediateHeapDelta": {
+          "arms": {
+            "baseline": {
+              "samples": [
+                10717672,
+                10830136,
+                10829320,
+                10717672,
+                10829320
+              ],
+              "median": 10829320,
+              "min": 10717672,
+              "max": 10830136
+            },
+            "candidate": {
+              "samples": [
+                15583704,
+                15584440,
+                15584440,
+                15584440,
+                13873544
+              ],
+              "median": 15584440,
+              "min": 13873544,
+              "max": 15584440
+            }
+          },
+          "pairedCandidateMinusBaseline": {
+            "samples": [
+              4866032,
+              4754304,
+              4755120,
+              4866768,
+              3044224
+            ],
+            "median": 4755120,
+            "min": 3044224,
+            "max": 4866768
+          },
+          "sameArmDifferences": [
+            0,
+            0
+          ],
+          "maxAbsoluteSameArmDifference": 0
+        },
+        "afterGCWithCapturesDelta": {
+          "arms": {
+            "baseline": {
+              "samples": [
+                134408,
+                134408,
+                134408,
+                134408,
+                134408
+              ],
+              "median": 134408,
+              "min": 134408,
+              "max": 134408
+            },
+            "candidate": {
+              "samples": [
+                104088,
+                141352,
+                140776,
+                140776,
+                141544
+              ],
+              "median": 140776,
+              "min": 104088,
+              "max": 141544
+            }
+          },
+          "pairedCandidateMinusBaseline": {
+            "samples": [
+              -30320,
+              6944,
+              6368,
+              6368,
+              7136
+            ],
+            "median": 6368,
+            "min": -30320,
+            "max": 7136
+          },
+          "sameArmDifferences": [
+            0,
+            0
+          ],
+          "maxAbsoluteSameArmDifference": 0
+        },
+        "afterGCReleasedCapturesDelta": {
+          "arms": {
+            "baseline": {
+              "samples": [
+                145648,
+                145696,
+                145648,
+                145648,
+                145648
+              ],
+              "median": 145648,
+              "min": 145648,
+              "max": 145696
+            },
+            "candidate": {
+              "samples": [
+                115048,
+                152384,
+                151808,
+                151808,
+                152504
+              ],
+              "median": 151808,
+              "min": 115048,
+              "max": 152504
+            }
+          },
+          "pairedCandidateMinusBaseline": {
+            "samples": [
+              -30600,
+              6688,
+              6160,
+              6160,
+              6856
+            ],
+            "median": 6160,
+            "min": -30600,
+            "max": 6856
+          },
+          "sameArmDifferences": [
+            0,
+            0
+          ],
+          "maxAbsoluteSameArmDifference": 0
+        }
+      },
+      "identicalPrimitiveProofAndCapturedOwnerSummariesAcrossAllSamples": true
+    },
+    {
+      "profile": "homogeneous",
+      "workload": {
+        "captures": 20,
+        "activeRows": 0,
+        "historicalSubjects": 10000,
+        "uniqueRequirements": 10,
+        "profiles": "homogeneous"
+      },
+      "counts": {
+        "baseline": {
+          "counters": {
+            "executedFactVisits": 400000,
+            "representedFacts": 400000,
+            "sourceRepresentedFacts": null
+          },
+          "executionCensus": {
+            "expandedSubjects": 10000,
+            "visitedRuns": 0
+          },
+          "sourceState": {
+            "rows": 0,
+            "fields": 0,
+            "presence": 10000,
+            "negativePresence": 10000,
+            "placements": 0,
+            "viewRows": 0,
+            "viewFields": 0,
+            "negativeViewFields": 0,
+            "visible": 10000,
+            "negativeVisible": 10000,
+            "placementViews": 10000,
+            "mappings": 10000,
+            "mappingViews": 10000,
+            "packedSubjects": 10000,
+            "packedRuns": 10,
+            "unpackedSubjectFacets": 0,
+            "preparedFieldEdits": 90000,
+            "retireCalls": 0,
+            "inputFactVisits": 420000,
+            "recipients": 0,
+            "native": 1,
+            "retirementRequests": 0
+          }
+        },
+        "candidate": {
+          "counters": {
+            "executedFactVisits": 400,
+            "representedFacts": 400000,
+            "sourceRepresentedFacts": 400000
+          },
+          "executionCensus": {
+            "expandedSubjects": 0,
+            "visitedRuns": 10
+          },
+          "sourceState": {
+            "rows": 0,
+            "fields": 0,
+            "presence": 10000,
+            "negativePresence": 10000,
+            "placements": 0,
+            "viewRows": 0,
+            "viewFields": 0,
+            "negativeViewFields": 0,
+            "visible": 10000,
+            "negativeVisible": 10000,
+            "placementViews": 10000,
+            "mappings": 10000,
+            "mappingViews": 10000,
+            "packedSubjects": 10000,
+            "packedRuns": 10,
+            "unpackedSubjectFacets": 0,
+            "preparedFieldEdits": 90000,
+            "retireCalls": 0,
+            "inputFactVisits": 20400,
+            "wholeInputFactsRepresented": 400000,
+            "recipients": 0,
+            "native": 1,
+            "retirementRequests": 0
+          }
+        }
+      },
+      "metrics": {
+        "cpuMs": {
+          "arms": {
+            "baseline": {
+              "samples": [
+                27.074,
+                32.575,
+                21.103,
+                18.942,
+                19.986
+              ],
+              "median": 21.103,
+              "min": 18.942,
+              "max": 32.575
+            },
+            "candidate": {
+              "samples": [
+                3.627,
+                2.269,
+                4.048,
+                2.513,
+                3.251
+              ],
+              "median": 3.251,
+              "min": 2.269,
+              "max": 4.048
+            }
+          },
+          "pairedCandidateMinusBaseline": {
+            "samples": [
+              -23.447000000000003,
+              -30.306000000000004,
+              -17.055,
+              -16.429000000000002,
+              -16.735
+            ],
+            "median": -17.055,
+            "min": -30.306000000000004,
+            "max": -16.429000000000002
+          },
+          "sameArmDifferences": [
+            1.8009999999999984,
+            4.7570000000000014
+          ],
+          "maxAbsoluteSameArmDifference": 4.7570000000000014
+        },
+        "elapsedMs": {
+          "arms": {
+            "baseline": {
+              "samples": [
+                10.327333000000067,
+                11.34354200000007,
+                11.282624999999939,
+                10.080042000000049,
+                10.630292000000054
+              ],
+              "median": 10.630292000000054,
+              "min": 10.080042000000049,
+              "max": 11.34354200000007
+            },
+            "candidate": {
+              "samples": [
+                0.20825000000002092,
+                0.18137500000000273,
+                0.4830419999999549,
+                0.18124999999997726,
+                0.1980829999999969
+              ],
+              "median": 0.1980829999999969,
+              "min": 0.18124999999997726,
+              "max": 0.4830419999999549
+            }
+          },
+          "pairedCandidateMinusBaseline": {
+            "samples": [
+              -10.119083000000046,
+              -11.162167000000068,
+              -10.799582999999984,
+              -9.898792000000071,
+              -10.432209000000057
+            ],
+            "median": -10.432209000000057,
+            "min": -11.162167000000068,
+            "max": -9.898792000000071
+          },
+          "sameArmDifferences": [
+            0.8354170000001204,
+            -1.142624000000069
+          ],
+          "maxAbsoluteSameArmDifference": 1.142624000000069
+        },
+        "immediateHeapDelta": {
+          "arms": {
+            "baseline": {
+              "samples": [
+                55858184,
+                55858160,
+                55796040,
+                54606024,
+                54619168
+              ],
+              "median": 55796040,
+              "min": 54606024,
+              "max": 55858184
+            },
+            "candidate": {
+              "samples": [
+                242176,
+                245768,
+                249792,
+                246696,
+                249232
+              ],
+              "median": 246696,
+              "min": 242176,
+              "max": 249792
+            }
+          },
+          "pairedCandidateMinusBaseline": {
+            "samples": [
+              -55616008,
+              -55612392,
+              -55546248,
+              -54359328,
+              -54369936
+            ],
+            "median": -55546248,
+            "min": -55616008,
+            "max": -54359328
+          },
+          "sameArmDifferences": [
+            11896,
+            -1138536
+          ],
+          "maxAbsoluteSameArmDifference": 1138536
+        },
+        "afterGCWithCapturesDelta": {
+          "arms": {
+            "baseline": {
+              "samples": [
+                -558912,
+                -554624,
+                -357592,
+                -325504,
+                -153040
+              ],
+              "median": -357592,
+              "min": -558912,
+              "max": -153040
+            },
+            "candidate": {
+              "samples": [
+                148056,
+                -351656,
+                148040,
+                148056,
+                148056
+              ],
+              "median": 148056,
+              "min": -351656,
+              "max": 148056
+            }
+          },
+          "pairedCandidateMinusBaseline": {
+            "samples": [
+              706968,
+              202968,
+              505632,
+              473560,
+              301096
+            ],
+            "median": 473560,
+            "min": 202968,
+            "max": 706968
+          },
+          "sameArmDifferences": [
+            200344,
+            -401520
+          ],
+          "maxAbsoluteSameArmDifference": 401520
+        },
+        "afterGCReleasedCapturesDelta": {
+          "arms": {
+            "baseline": {
+              "samples": [
+                -597432,
+                -593144,
+                -401232,
+                -364024,
+                -190744
+              ],
+              "median": -401232,
+              "min": -597432,
+              "max": -190744
+            },
+            "candidate": {
+              "samples": [
+                -194304,
+                -376712,
+                8224,
+                12544,
+                -195288
+              ],
+              "median": -194304,
+              "min": -376712,
+              "max": 12544
+            }
+          },
+          "pairedCandidateMinusBaseline": {
+            "samples": [
+              403128,
+              216432,
+              409456,
+              376568,
+              -4544
+            ],
+            "median": 376568,
+            "min": -4544,
+            "max": 409456
+          },
+          "sameArmDifferences": [
+            198312,
+            -402336
+          ],
+          "maxAbsoluteSameArmDifference": 402336
+        }
+      },
+      "identicalPrimitiveProofAndCapturedOwnerSummariesAcrossAllSamples": true
+    },
+    {
+      "profile": "mixed",
+      "workload": {
+        "captures": 20,
+        "activeRows": 200,
+        "historicalSubjects": 1256,
+        "uniqueRequirements": 27,
+        "profiles": "mixed"
+      },
+      "counts": {
+        "baseline": {
+          "counters": {
+            "executedFactVisits": 94240,
+            "representedFacts": 94240,
+            "sourceRepresentedFacts": null
+          },
+          "executionCensus": {
+            "expandedSubjects": 1001,
+            "visitedRuns": 0
+          },
+          "sourceState": {
+            "rows": 200,
+            "fields": 1800,
+            "presence": 1456,
+            "negativePresence": 1256,
+            "placements": 200,
+            "viewRows": 200,
+            "viewFields": 1800,
+            "negativeViewFields": 0,
+            "visible": 1456,
+            "negativeVisible": 1256,
+            "placementViews": 1456,
+            "mappings": 1456,
+            "mappingViews": 1456,
+            "packedSubjects": 1001,
+            "packedRuns": 6,
+            "unpackedSubjectFacets": 2275,
+            "preparedFieldEdits": 13124,
+            "retireCalls": 0,
+            "inputFactVisits": 98952,
+            "recipients": 0,
+            "native": 1,
+            "retirementRequests": 0
+          }
+        },
+        "candidate": {
+          "counters": {
+            "executedFactVisits": 54440,
+            "representedFacts": 94240,
+            "sourceRepresentedFacts": 94240
+          },
+          "executionCensus": {
+            "expandedSubjects": 0,
+            "visitedRuns": 6
+          },
+          "sourceState": {
+            "rows": 200,
+            "fields": 1800,
+            "presence": 1456,
+            "negativePresence": 1256,
+            "placements": 200,
+            "viewRows": 200,
+            "viewFields": 1800,
+            "negativeViewFields": 0,
+            "visible": 1456,
+            "negativeVisible": 1256,
+            "placementViews": 1456,
+            "mappings": 1456,
+            "mappingViews": 1456,
+            "packedSubjects": 1001,
+            "packedRuns": 6,
+            "unpackedSubjectFacets": 2275,
+            "preparedFieldEdits": 13124,
+            "retireCalls": 0,
+            "inputFactVisits": 59152,
+            "wholeInputFactsRepresented": 94240,
+            "recipients": 0,
+            "native": 1,
+            "retirementRequests": 0
+          }
+        }
+      },
+      "metrics": {
+        "cpuMs": {
+          "arms": {
+            "baseline": {
+              "samples": [
+                6.6,
+                6.959,
+                6.469,
+                6.171,
+                6.255
+              ],
+              "median": 6.469,
+              "min": 6.171,
+              "max": 6.959
+            },
+            "candidate": {
+              "samples": [
+                4.602,
+                4.399,
+                4.396,
+                4.755,
+                4.392
+              ],
+              "median": 4.399,
+              "min": 4.392,
+              "max": 4.755
+            }
+          },
+          "pairedCandidateMinusBaseline": {
+            "samples": [
+              -1.9979999999999993,
+              -2.5599999999999996,
+              -2.0730000000000004,
+              -1.4160000000000004,
+              -1.8629999999999995
+            ],
+            "median": -1.9979999999999993,
+            "min": -2.5599999999999996,
+            "max": -1.4160000000000004
+          },
+          "sameArmDifferences": [
+            2.1879999999999997,
+            0.7639999999999993
+          ],
+          "maxAbsoluteSameArmDifference": 2.1879999999999997
+        },
+        "elapsedMs": {
+          "arms": {
+            "baseline": {
+              "samples": [
+                3.1492079999999874,
+                3.227416000000005,
+                3.003084000000001,
+                2.9284170000000245,
+                2.9726249999999936
+              ],
+              "median": 3.003084000000001,
+              "min": 2.9284170000000245,
+              "max": 3.227416000000005
+            },
+            "candidate": {
+              "samples": [
+                1.389541999999949,
+                1.3647090000000048,
+                1.3018339999999853,
+                1.4631669999999986,
+                1.3533749999999998
+              ],
+              "median": 1.3647090000000048,
+              "min": 1.3018339999999853,
+              "max": 1.4631669999999986
+            }
+          },
+          "pairedCandidateMinusBaseline": {
+            "samples": [
+              -1.7596660000000384,
+              -1.8627070000000003,
+              -1.701250000000016,
+              -1.465250000000026,
+              -1.6192499999999939
+            ],
+            "median": -1.701250000000016,
+            "min": -1.8627070000000003,
+            "max": -1.465250000000026
+          },
+          "sameArmDifferences": [
+            2.1330000000000098,
+            0.2500419999999508
+          ],
+          "maxAbsoluteSameArmDifference": 2.1330000000000098
+        },
+        "immediateHeapDelta": {
+          "arms": {
+            "baseline": {
+              "samples": [
+                12470488,
+                12553736,
+                12553736,
+                12553736,
+                12553736
+              ],
+              "median": 12553736,
+              "min": 12470488,
+              "max": 12553736
+            },
+            "candidate": {
+              "samples": [
+                3824856,
+                3825336,
+                3825608,
+                3825096,
+                3825096
+              ],
+              "median": 3825096,
+              "min": 3824856,
+              "max": 3825608
+            }
+          },
+          "pairedCandidateMinusBaseline": {
+            "samples": [
+              -8645632,
+              -8728400,
+              -8728128,
+              -8728640,
+              -8728640
+            ],
+            "median": -8728400,
+            "min": -8728640,
+            "max": -8645632
+          },
+          "sameArmDifferences": [
+            -83248,
+            0
+          ],
+          "maxAbsoluteSameArmDifference": 83248
+        },
+        "afterGCWithCapturesDelta": {
+          "arms": {
+            "baseline": {
+              "samples": [
+                186288,
+                186216,
+                186456,
+                186600,
+                185704
+              ],
+              "median": 186288,
+              "min": 185704,
+              "max": 186600
+            },
+            "candidate": {
+              "samples": [
+                191000,
+                191656,
+                191752,
+                191584,
+                191584
+              ],
+              "median": 191584,
+              "min": 191000,
+              "max": 191752
+            }
+          },
+          "pairedCandidateMinusBaseline": {
+            "samples": [
+              4712,
+              5440,
+              5296,
+              4984,
+              5880
+            ],
+            "median": 5296,
+            "min": 4712,
+            "max": 5880
+          },
+          "sameArmDifferences": [
+            0,
+            -680
+          ],
+          "maxAbsoluteSameArmDifference": 680
+        },
+        "afterGCReleasedCapturesDelta": {
+          "arms": {
+            "baseline": {
+              "samples": [
+                155984,
+                133160,
+                133400,
+                132584,
+                131304
+              ],
+              "median": 133160,
+              "min": 131304,
+              "max": 155984
+            },
+            "candidate": {
+              "samples": [
+                394704,
+                137584,
+                142304,
+                140720,
+                401856
+              ],
+              "median": 142304,
+              "min": 137584,
+              "max": 401856
+            }
+          },
+          "pairedCandidateMinusBaseline": {
+            "samples": [
+              238720,
+              4424,
+              8904,
+              8136,
+              270552
+            ],
+            "median": 8904,
+            "min": 4424,
+            "max": 270552
+          },
+          "sameArmDifferences": [
+            20280,
+            25032
+          ],
+          "maxAbsoluteSameArmDifference": 25032
+        }
+      },
+      "identicalPrimitiveProofAndCapturedOwnerSummariesAcrossAllSamples": true
+    }
+  ],
+  "limits": "Descriptive paired study of20 direct entity source captures. Immediate heap delta is an allocation/retention proxy; postGC heap is separate. No application startup/total allocation/leak inference. Pilot excluded."
+}

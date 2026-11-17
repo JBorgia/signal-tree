@@ -1,0 +1,21 @@
+{
+  "sourceRevision": "5d04ff65d2eaab1986ed1b420cbc013edc01542b",
+  "artifactPlan": "/private/tmp/st-final-application-packet/plan.json",
+  "artifactPlanSha256": "252919614fb027184d93cc9d59f61dc4f637755393e32786f772d57aafc94e64",
+  "artifacts": {
+    "kernel": {
+      "archive": "/private/tmp/st-final-application-packet/archives/v16-final-kernel.tgz",
+      "integrity": "sha512-hA/oH9gx/kYz6T9QfY/8r6VrgP/nvk+EBs5WDEifY6NnKgV30UBqnkyM+mfB77CykqUw17EsCnazGO4v4YsWHA==",
+      "sourceCommit": "5d04ff65d2eaab1986ed1b420cbc013edc01542b",
+      "sourceReceipt": "/private/tmp/st-v16-recipient-batch-lint-final-package/bindings.json",
+      "developmentArtifact": true,
+      "note": "Exact validated payload snapshot; package version unchanged; not a registry publication receipt."
+    },
+    "angular": {
+      "archive": "/private/tmp/st-final-application-packet/archives/v16-angular.tgz",
+      "integrity": "sha512-9Tudhcb40XMXeXj+2yb5c82HWk/v9oz1OxX1Rag6IOWQDS0GOgpc8XVaBOlV24y7CX2PrAZ3n4vGTx8XntgKrQ==",
+      "sourceSeal": "sha256-ba5c01b75cd74e50293262f2a324cfe4072353dc845211e5c95e19948b126e05"
+    }
+  },
+  "limits": "Installed public Angular and kernel tooling surface; in-memory review/backend fixtures. No production identity, durable storage or restart-recovery claim."
+}
