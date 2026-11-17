@@ -23,9 +23,22 @@ have baseline cost witnesses, meaningful mutation controls and independent
 source reviews. Raw prototype comparisons retain the rollback/CPU penalties;
 the sparse representation reduces the ten-cycle10k confirmed held-store heap
 checkpoint by21,040,952 bytes while increasing full-drain CPU in all three pairs.
-Fragmented-proof economics and final successor qualification remain pending.
+The fragmented-proof comparison has mixed CPU and no uniform heap saving;
+its adverse intermediate checkpoint remains recorded. The integrated T/U
+checkpoint completes86/87 normal gates (bundle ceiling only) and87/87 mutation
+checks with exact source restoration. Final successor qualification remains pending.
 Candidate validation continues under the owner's optimization instruction.
 The release disposition remains pending.
+
+The successor now includes pending-only notification subscriptions from
+`14f18309c`. Terminal owners still queue their wake, then release both notification
+indexes; exact proofs, native requirements and registered operations remain.
+The isolated96-child comparison preserves all behavior and collection checks.
+At1,024 rollback episodes it removes525,824 terminal memberships in each index,
+reduces live whole-process heap by about39.8MiB, and lowers complete measured
+lifecycle CPU in all three pairs. Short-history CPU is mixed, including adverse
+32-episode samples. This measured change adds no public mode. Its19 focused,
+323 affected and7 mutation checks are not combined release qualification.
 
 The selected runtime removes unused preparation work and owner-path state,
 maintains the exact confirmed-ledger suffix, avoids discarded ordinary record

@@ -90,7 +90,12 @@ export function ownerTransition(owner:number,event:{kind:string;transactionId:nu
  cell.outcome=outcome;if(pending.delete(cell))pendingSnapshot=undefined;
  // Synchronous normal/recovery handle enrollment can still obtain this cell.
  const retired=cell;queueMicrotask(()=>{if(source.cells.get(retired.id)===retired&&retired.outcome!=='pending')source.cells.delete(retired.id);});
- ownerWake(cell);notifyOwnerTransition(cell);
+ // Queue the actual terminal wake before releasing subscription indexes.
+ // Proof/native/receipt state retains its original exact owner cells separately.
+ ownerWake(cell);
+ for(const op of cell.dependents)op.dependencies.delete(cell);
+ cell.dependents.clear();
+ notifyOwnerTransition(cell);
 }
 export function abandonOwnerSource(owner:number):void{
  const source=sources.get(owner);if(!source)return;
@@ -205,12 +210,16 @@ export function currentObligations(proof:Readonly<Proof>,relevance:CurrentReleva
  const input=Object.freeze((proof.input??[]).filter(keep)),validation=Object.freeze((proof.validation??[]).filter(keep));
  return {...proof,input,validation,owners:Object.freeze(proof.owners.filter(keep))};
 }
-function reconcileCurrentDependencies(op:Operation,proof:Readonly<Proof>,relevance:CurrentRelevance|undefined):void {
- if(!relevance?.size)return;
- const retained=new Set([...proof.owners,...(proof.possible??[])]);
- for(const cell of op.dependencies)if(relevance.has(cell)&&cell.outcome==='confirmed'&&!retained.has(cell)){
-  op.dependencies.delete(cell);cell.dependents.delete(op);
- }
+/** Subscription storage is distinct from exact proof/native owner evidence.
+ * Unknown unavailable sources remain pending and retain conservative listeners. */
+function pendingDependencies(cells:readonly OwnerCell[]):Set<OwnerCell>{
+ const result=new Set<OwnerCell>();
+ for(const cell of cells)if(cell.outcome==='pending')result.add(cell);
+ return result;
+}
+function subscribePending(op:Operation,cell:OwnerCell):void{
+ if(cell.outcome!=='pending')return;
+ op.dependencies.add(cell);cell.dependents.add(op);
 }
 /** Scalar-only construction; never installs listeners during preparation. */
 export function combineScalarNativeRequirements(parts:readonly NativeRequirement[],relevance?:CurrentRelevance):NativeRequirement {
@@ -395,10 +404,19 @@ export function prepareRevision(channel:object,revision:object,known:readonly Ow
  const required=uniqueOwners([...active.flatMap(frameOwners),...(invocationEvidence?.input??[]),...(invocationEvidence?.validation??[])]);
  // Native support is source evidence, not this recipient's declaration permission.
  // Without a native requirement retain the conservative enrollment window.
- const op:Operation={relevance,invocation:relevance?.size?invocation:undefined,declared:matches.length!==0,recipientWindow:[],incomplete:(!native&&matches.length===0)||unobservedAuthorship||active.some(frame=>frame.declaredOwners===undefined),projectionPending,native,coverageUnknown:unknown,channel,dependencies:new Set([...known,...required,...(nativeEvidence?.owners??[]),...(nativeEvidence?.possible??[]),...blockers]),revision,frames:new Set(),views:new Set(),started:false,surviving:false,noopFallbacks:new Map()};
+ const op:Operation={relevance,invocation:relevance?.size?invocation:undefined,declared:matches.length!==0,recipientWindow:[],incomplete:(!native&&matches.length===0)||unobservedAuthorship||active.some(frame=>frame.declaredOwners===undefined),projectionPending,native,coverageUnknown:unknown,channel,dependencies:pendingDependencies([...known,...required,...(nativeEvidence?.owners??[]),...(nativeEvidence?.possible??[]),...blockers]),revision,frames:new Set(),views:new Set(),started:false,surviving:false,noopFallbacks:new Map()};
  if(matches.length===0)op.proof={owners:Object.freeze([...known]),destination:Object.freeze([...known]),unknown:unknown||!native,invalid:false};
  writes.push({map:c.ops,key:revision,value:op});
- for(const cell of op.dependencies)adds.push({set:cell.dependents,value:op});
+ if(op.dependencies.size){
+  // A later preparer/finalizer can settle this exact cell. Check only that
+  // preselected subscription at installation; never select proof or targets.
+  const subscriptions={add(value:unknown){
+   const cell=value as OwnerCell;
+   if(cell.outcome==='pending')cell.dependents.add(op);
+   else op.dependencies.delete(cell);
+  }};
+  for(const cell of op.dependencies)adds.push({set:subscriptions,value:cell});
+ }
  for(const frame of active){
   const declared=frame.declaredOwners;
   if(declared!==undefined&&required.some(owner=>!declared.includes(owner)))adds.push({set:invalidFrames,value:frame});
@@ -462,7 +480,7 @@ export function decision(channel:object,revision:object):{early:boolean;pending:
  if(op.frames.size||op.projectionPending||!projectionReady(op))return {early:false,pending:true};
  const p=op.proof;if(!p)throw new Error('Ready publication has no proof');return {early:!p.invalid&&!p.unknown&&!(p.terminalRejectedRoles??0)&&p.owners.every(x=>x.outcome==='confirmed'),pending:[...p.owners,...(p.possible??[])].some(x=>x.outcome==='pending'||x.outcome==='abandoned')};
 }
-function retire(op:Operation):void{for(const cell of op.dependencies)cell.dependents.delete(op);}
+function retire(op:Operation):void{for(const cell of op.dependencies)cell.dependents.delete(op);op.dependencies.clear();}
 export function started(channel:object,revision:object,basis:'declared'|'surviving'='declared'):void{
  const op=connections.get(channel)?.ops.get(revision);if(!op)return;
  op.started=true;op.surviving=basis==='surviving';setOperationState(op,{state:'started',basis});
@@ -497,8 +515,7 @@ function finish(h:Horizon):void{
   op.frames.clear();
   const relevance=projectionReady(op)?op.relevance:undefined;
   op.proof=currentObligations(raw,relevance);
-  reconcileCurrentDependencies(op,op.proof,relevance);
-  for(const cell of [...op.proof.owners,...(op.proof.possible??[])]){op.dependencies.add(cell);cell.dependents.add(op);}
+  for(const cell of [...op.proof.owners,...(op.proof.possible??[])])subscribePending(op,cell);
   refresh(op);wake(op.channel);
  }
  for(const f of h.frames){f.ops.clear();f.installedOwners.clear();installedLast.delete(f);unknownFrames.delete(f);invalidFrames.delete(f);}
@@ -573,10 +590,9 @@ export function projectRevision(channel:object,revision:object,proof:Readonly<Pr
  const op=connections.get(channel)?.ops.get(revision);if(!op)return proof;
  const ready=projectionReady(op),relevance=ready?op.relevance:undefined;
  const selected=currentObligations(recipientProof(op,proof),relevance);
- reconcileCurrentDependencies(op,selected,relevance);
  if(ready){op.relevance=undefined;op.invocation=undefined;}
  op.projectionPending=projectionPending;op.proof=selected;
- for(const cell of [...selected.owners,...(selected.possible??[])]){op.dependencies.add(cell);cell.dependents.add(op);}
+ for(const cell of [...selected.owners,...(selected.possible??[])])subscribePending(op,cell);
  refresh(op);return selected;
 }
 
