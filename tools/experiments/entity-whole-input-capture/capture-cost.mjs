@@ -15,8 +15,8 @@ const captures = 20;
 const roles = ['owners', 'destination', 'input', 'validation', 'possible'];
 const frozenCommit = '5d04ff65d2eaab1986ed1b420cbc013edc01542b';
 const receiptHashes = {
-  baseline: '65ef8caf68f5729d528a4ce07a701999cd94ec9eaf0efcb6caac51f8edabc9b2',
-  candidate: 'd8cf778dfda32669dbff0c2287283af7f3e34ba1559a92b3632f97378eb544c5',
+  baseline: '5ee1968cb23a2c1b1c7b9cff60286f2ec169babba14d4fb1399740b4102f3c9f',
+  candidate: '506f04f4e28ddb3018e59c1b175db51cc0e1f7ce0d124bb8a349dbdbe8e4898c',
 };
 
 function packageFiles(root, directory = root) {
