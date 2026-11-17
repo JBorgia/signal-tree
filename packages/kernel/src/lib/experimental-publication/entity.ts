@@ -97,7 +97,7 @@ export const createEntityPublicationParticipant: () => EntityPublicationParticip
     placement:(id,view)=>view==='ordinary'?ordinaryPlacements.get(id)??missing:(physicalPlacements?physicalPlacements.get(id):placementAt(id))?.requirement??missing,
     keyMapping:(id,view)=>view==='ordinary'?(ordinaryMappings?ordinaryMappings.get(id):mappingAt(id))??missing:(physicalMappings?physicalMappings.get(id):mappingViewAt(id))?.requirement??missing,
   });
-  let acquisitions=0,retirements=0,inputVisits=0;
+  let acquisitions=0,retirements=0,inputVisits=0,wholeInputFactsRepresented=0;
   const physicalViews=(subject?:number,field?:string):View[]=>{
     if(subject!==undefined){
       const member=visibleAt(subject),row=views.get(subject);
@@ -110,6 +110,24 @@ export const createEntityPublicationParticipant: () => EntityPublicationParticip
     for(const [,fact]of retired?.entries()??[])result.push(fact.visible,fact.placement);
     for(const [id,row]of views)if(visibleAt(id)?.present!==false)result.push(...row.values());
     inputVisits+=result.length;return result;
+  };
+  const wholeInputRequirements=():Set<Requirement>=>{
+    const requirements=new Set<Requirement>();
+    let visits=0;
+    for(const view of visible.values()){requirements.add(view.requirement);visits++;}
+    for(const view of placementViews.values()){requirements.add(view.requirement);visits++;}
+    // Preserve first occurrence order, but do not expand exact repeated tuples
+    // merely to discard their duplicate requirement references immediately.
+    for(const fact of retired?.runValues()??[]){
+      requirements.add(fact.visible.requirement);requirements.add(fact.placement.requirement);visits+=2;
+    }
+    for(const [id,row]of views)if(visibleAt(id)?.present!==false)
+      for(const view of row.values()){requirements.add(view.requirement);visits++;}
+    inputVisits+=visits;
+    // Logical coverage is separate from executed iteration. captureViews still
+    // expands its View identities; addressed capture keeps its existing count.
+    wholeInputFactsRepresented+=visits+2*((retired?.size??0)-(retired?.runCount??0));
+    return requirements;
   };
   const nativeRequirement=(packet:EntityPublicationPacket,inspection:boolean)=>{
     const meta=getActiveWriteContext()??packet.meta,id=meta?.transactionId;
@@ -128,8 +146,13 @@ export const createEntityPublicationParticipant: () => EntityPublicationParticip
       for(const [id,fact]of retired?.entries()??[])result.set(id,fact.visible.requirement);
       return [...result];
     }}),
-    captureInput(subject,field){return {native:Object.freeze([...new Set(physicalViews(subject,field).map(view=>view.requirement))].map(lifecycle.captureNativeInput))};},
-    inspect(){return {rows:fields.size,fields:[...fields.values()].reduce((n,row)=>n+row.size,0),presence:members.size+(retired?.size??0),negativePresence:[...members.values()].filter(member=>!member.present).length+(retired?.size??0),placements:placements.size,viewRows:views.size,viewFields:[...views.values()].reduce((n,row)=>n+row.size,0),negativeViewFields:[...views.values()].reduce((n,row)=>n+[...row.values()].filter(view=>view.present===false).length,0),visible:visible.size+(retired?.size??0),negativeVisible:[...visible.values()].filter(view=>view.present===false).length+(retired?.size??0),placementViews:placementViews.size+(retired?.size??0),mappings:mappings.size+(retired?.size??0),mappingViews:mappingViews.size+(retired?.size??0),packedSubjects:retired?.size??0,packedRuns:retired?.runCount??0,unpackedSubjectFacets:members.size+visible.size+placementViews.size+mappings.size+mappingViews.size,preparedFieldEdits:acquisitions,retireCalls:retirements,inputFactVisits:inputVisits};},
+    captureInput(subject,field){
+      const requirements=subject===undefined?wholeInputRequirements():new Set(physicalViews(subject,field).map(view=>view.requirement));
+      // Select every reference before evaluating proof; each capture samples
+      // owner outcomes afresh and issues its own frozen inputs and owner arrays.
+      return {native:Object.freeze([...requirements].map(lifecycle.captureNativeInput))};
+    },
+    inspect(){return {rows:fields.size,fields:[...fields.values()].reduce((n,row)=>n+row.size,0),presence:members.size+(retired?.size??0),negativePresence:[...members.values()].filter(member=>!member.present).length+(retired?.size??0),placements:placements.size,viewRows:views.size,viewFields:[...views.values()].reduce((n,row)=>n+row.size,0),negativeViewFields:[...views.values()].reduce((n,row)=>n+[...row.values()].filter(view=>view.present===false).length,0),visible:visible.size+(retired?.size??0),negativeVisible:[...visible.values()].filter(view=>view.present===false).length+(retired?.size??0),placementViews:placementViews.size+(retired?.size??0),mappings:mappings.size+(retired?.size??0),mappingViews:mappingViews.size+(retired?.size??0),packedSubjects:retired?.size??0,packedRuns:retired?.runCount??0,unpackedSubjectFacets:members.size+visible.size+placementViews.size+mappings.size+mappingViews.size,preparedFieldEdits:acquisitions,retireCalls:retirements,inputFactVisits:inputVisits,wholeInputFactsRepresented};},
     expose(completion){exposeCompletion.get(completion)?.();},
     preparePoint(packet){
       const edit=packet.ordinary[0],physical=packet.physical[0],steps=packet.steps;

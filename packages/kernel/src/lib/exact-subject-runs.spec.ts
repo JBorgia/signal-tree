@@ -2,6 +2,21 @@ import { describe, expect, it } from 'vitest';
 import { ExactSubjectRuns } from './internals/exact-subject-runs';
 
 describe('exact subject runs', () => {
+  it('visits each stored run once, preserving gaps, split order and repeated values', () => {
+    const a = {}, b = {}, runs = new ExactSubjectRuns<object>(Object.is);
+    for (const [id, value] of [[1, a], [2, a], [3, a], [5, a], [7, b], [8, b]] as const)
+      expect(runs.tryAppend(id, value)).toBe(true);
+    expect([...runs.runValues()]).toEqual([a, a, b]);
+    expect(runs.delete(2)).toBe(true);
+    expect([...runs.runValues()]).toEqual([a, a, a, b]);
+    expect(runs.delete(7)).toBe(true);
+    expect([...runs.runValues()]).toEqual([a, a, a, b]);
+    expect(runs.delete(8)).toBe(true);
+    expect([...runs.runValues()]).toEqual([a, a, a]);
+    expect(runs.tryAppend(2, b)).toBe(false);
+    expect([...new Set(runs.runValues())]).toEqual([...new Set([...runs.entries()].map(([, value]) => value))]);
+    expect([...runs.runValues()]).toHaveLength(runs.runCount);
+  });
   it('joins ascending and descending batches by reference, preserving gaps and replacements', () => {
     const a = {}, b = {}, runs = new ExactSubjectRuns<object>(Object.is);
     for (let id = 20; id >= 1; id--) expect(runs.tryAppend(id, a)).toBe(true);

@@ -71,6 +71,13 @@ export class ExactSubjectRuns<T> {
       for (let subject = range.first; subject <= range.last; subject++) yield [subject, range.value];
   }
 
+  /** One representative per stored run, in the same order as entries().
+   * Values may repeat across disjoint runs; callers own any deduplication.
+   */
+  *runValues(): IterableIterator<T> {
+    for (const range of this.ranges) yield range.value;
+  }
+
   *keys(): IterableIterator<number> {
     for (const range of this.ranges)
       for (let subject = range.first; subject <= range.last; subject++) yield subject;
