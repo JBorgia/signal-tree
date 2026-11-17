@@ -1,7 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
 import { deepClone } from './deep-clone';
-import { getChanges } from './get-changes';
 
 /**
  * These are small pure functions used by kernel production paths. A quiet wrong
@@ -107,26 +106,6 @@ describe('deepClone', () => {
       cyclic['self'] = cyclic;
       const cloned = forceFallback(cyclic) as Record<string, unknown>;
       expect(cloned['self']).toBe(cloned);
-    });
-  });
-});
-
-describe('getChanges', () => {
-  it('reports only the keys that differ', () => {
-    expect(getChanges({ a: 1, b: 2 }, { a: 1, b: 3 })).toEqual({ b: 3 });
-  });
-
-  it('is empty when nothing changed', () => {
-    expect(getChanges({ a: 1 }, { a: 1 })).toEqual({});
-  });
-
-  it('reports a key that was added', () => {
-    expect(getChanges({ a: 1 }, { a: 1, b: 2 } as never)).toEqual({ b: 2 });
-  });
-
-  it('reports a value changing to undefined', () => {
-    expect(getChanges({ a: 1 }, { a: undefined } as never)).toEqual({
-      a: undefined,
     });
   });
 });

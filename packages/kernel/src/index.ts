@@ -118,10 +118,6 @@ export type {
 // shape no caller could produce. Exporting a type whose only constructor is gone
 // does not preserve compatibility — it advertises one.
 
-// Audit tracker — framework-agnostic tree change logging (moved from
-// @signaltree/ng-forms in v13, RFC 0006). Tree-shakeable: unused → not bundled.
-export {} from './lib/audit/audit';
-
 // Async-stream marker — DELETED in 14.0.0, along with its implementation and
 // tests. It sat here unexported for several releases while the API question (a
 // distinct `asyncStream` marker vs an `accumulate` option on `asyncSource`) went
