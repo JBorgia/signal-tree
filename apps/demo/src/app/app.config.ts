@@ -11,7 +11,6 @@ import { provideRouter, withInMemoryScrolling } from '@angular/router';
 
 import { appRoutes } from './app.routes';
 import { provideRouteMetadata } from './shared/route-metadata';
-import { provideAppTree } from './store';
 
 const ROUTE_SCROLL_OFFSET: [number, number] = [0, 80];
 
@@ -32,8 +31,6 @@ export const appConfig: ApplicationConfig = {
     ),
     provideRouteMetadata(),
     provideHttpClient(withXhr()),
-    // Provide the canonical SignalTree application tree (see store/)
-    ...provideAppTree(),
     provideAppInitializer(configureRouteScrolling),
   ],
 };

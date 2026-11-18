@@ -1,9 +1,15 @@
-import { inject, Injectable, InjectionToken, Provider } from '@angular/core';
+import {
+  inject,
+  Injectable,
+  InjectionToken,
+  Provider,
+  type OnDestroy,
+} from '@angular/core';
 
 import { AppTree, createAppTree } from './app-tree';
 
 /**
- * Injection token for the singleton application tree.
+ * Injection token for the tutorial owner's tree.
  *
  * Components and ops services should inject `APP_TREE` (not the holder service)
  * so they receive the typed `AppTree` directly.
@@ -11,20 +17,24 @@ import { AppTree, createAppTree } from './app-tree';
 export const APP_TREE = new InjectionToken<AppTree>('DemoAppTree');
 
 /**
- * Holds the single tree instance for the lifetime of the application.
+ * Holds one tree for the injector that owns this tutorial.
  * Constructed once via the `APP_TREE` provider factory below.
  */
-@Injectable({ providedIn: 'root' })
-export class AppTreeService {
+@Injectable()
+export class AppTreeService implements OnDestroy {
   readonly tree: AppTree = createAppTree();
+
+  ngOnDestroy(): void {
+    this.tree.destroy();
+  }
 }
 
 /**
- * Provider for the application tree.
+ * Provide at the feature owner, together with its facade and operations.
  *
  * @example
  * ```ts
- * // app.config.ts
+ * // feature.component.ts
  * providers: [
  *   ...provideAppTree(),
  * ];
@@ -32,6 +42,7 @@ export class AppTreeService {
  */
 export function provideAppTree(): Provider[] {
   return [
+    AppTreeService,
     {
       provide: APP_TREE,
       useFactory: () => inject(AppTreeService).tree,

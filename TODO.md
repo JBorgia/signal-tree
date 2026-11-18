@@ -1,5 +1,17 @@
 # TODO
 
+## Adoption and workflow implementation
+
+- [x] Reconcile versioned library and consumer AI guidance with installed types.
+- [x] Validate selected v15 in actual consumer session, ingress and editor flows.
+- [x] Execute ordinary migration behavior and v16-specific review/recovery checks.
+- [ ] Expand story-led demos and review all current demos for clarity and layout.
+- [ ] Fix avoidable eager demo loading and verify successful hosted deployments.
+- [x] Measure a bounded TanStack read-model/editing-session integration.
+- [x] Record a prioritized private consumer opportunity list, independent review
+      and exact-artifact evidence in the
+      [active protocol](docs/audits/2026-11-18-adoption-workflow/PROTOCOL.md).
+
 ## Startup cost, cross-version reuse and market economics
 
 - [x] Attribute both current release lines; independently review compatible

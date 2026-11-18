@@ -1,3 +1,24 @@
+# Adoption and workflow proof — validation and delivery
+
+The owner authorized implementation of all November 18 adoption recommendations.
+The [active protocol](docs/audits/2026-11-18-adoption-workflow/PROTOCOL.md) covers
+versioned AI guidance, private consumer validation, an executable v15/v16
+migration story, clearer demos, strict build/deployment repair and a bounded
+TanStack ecosystem experiment. Record candidate kernel identities separately from
+new demo and documentation artifacts. No new runtime tier, npm release or tag is
+selected. Private consumer findings remain outside the public delivery.
+
+The [implementation record](docs/audits/2026-11-18-adoption-workflow/README.md)
+contains the five-arm production AOT experiment, all raw results, independent
+review and limits. All five arms pass 23 workflow/query checks plus five fault
+controls; the first comparative cohort passes all 68 CPU/heap observations.
+The study preview also receives the narrowly scoped tutorial ownership/loading
+repair and passes its unchanged strict initial budget. Versioned demo branches
+carry the full story, guidance and route-clarity changes. Hosted verification is
+the remaining delivery predicate; earlier failed preview receipts remain history.
+
+---
+
 # Both-line startup and market economics — comparison complete
 
 The [current study](docs/audits/2026-11-18-startup-market-economics/README.md)

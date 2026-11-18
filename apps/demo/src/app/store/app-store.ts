@@ -17,7 +17,7 @@ import { APP_TREE } from './tree';
  * ops services into a single injectable. Cross-domain orchestration lives here
  * (e.g. `loadDashboard$` below); single-domain logic stays in its ops file.
  */
-@Injectable({ providedIn: 'root' })
+@Injectable()
 export class AppStore {
   private readonly tree = inject(APP_TREE);
   readonly $ = asReadonly(this.tree).$;
