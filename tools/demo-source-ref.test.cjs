@@ -50,3 +50,18 @@ test('absent, truncated, tag-shaped and URL-shaped identities cannot become misl
     );
   }
 });
+
+test('every Angular entry target generates source identity and deep-typing fixtures before compilation', () => {
+  const project = require('../apps/demo/project.json');
+  for (const name of ['build', 'serve', 'serve-static', 'extract-i18n', 'test']) {
+    for (const required of [
+      'generate-versions',
+      'generate-deep-typing-proofs',
+    ]) {
+      assert(
+        project.targets[name].dependsOn?.includes(required),
+        `${name} requires ${required}`
+      );
+    }
+  }
+});

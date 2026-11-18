@@ -119,6 +119,7 @@
       ]
     },
     "serve": {
+      "dependsOn": ["generate-versions", "generate-deep-typing-proofs"],
       "continuous": true,
       "executor": "@angular/build:dev-server",
       "defaultConfiguration": "development",
@@ -132,6 +133,7 @@
       }
     },
     "extract-i18n": {
+      "dependsOn": ["generate-versions", "generate-deep-typing-proofs"],
       "executor": "@angular/build:extract-i18n",
       "options": {
         "buildTarget": "demo:build"
@@ -165,6 +167,7 @@
       }
     },
     "serve-static": {
+      "dependsOn": ["generate-versions", "generate-deep-typing-proofs"],
       "continuous": true,
       "executor": "@nx/web:file-server",
       "options": {

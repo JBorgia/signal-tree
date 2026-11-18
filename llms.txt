@@ -4,7 +4,7 @@ This checkout documents the **16.0.0-dev development candidate**, not a publishe
 v16 release. Check the installed package manifest before generating code. V15
 uses `tree.transaction()`; this candidate uses `tree.transact()`. Do not combine
 guidance from the v14 `@signaltree/*` scope with `@signal-tree/*` APIs. Candidate
-qualification and publication are separate; see [the release controller](RELEASE-CURRENT.md).
+qualification and publication are separate; see [the release controller](https://github.com/JBorgia/signal-tree/blob/e21a471fed73dcda6d9d40df062aa250d98e7431/RELEASE-CURRENT.md).
 
 SignalTree is framework-neutral reactive application state with causal
 semantics. The construction model is
@@ -13,8 +13,8 @@ semantics. The construction model is
 
 ## Adopt one owned workflow
 
-Start with the [v16 adoption guide](docs/guides/adoption-v16.md) and
-[v15 migration checklist](docs/guides/migration-v15-v16.md). Use the application's
+Start with the [v16 adoption guide](https://github.com/JBorgia/signal-tree/blob/e21a471fed73dcda6d9d40df062aa250d98e7431/docs/guides/adoption-v16.md) and
+[v15 migration checklist](https://github.com/JBorgia/signal-tree/blob/e21a471fed73dcda6d9d40df062aa250d98e7431/docs/guides/migration-v15-v16.md). Use the application's
 framework facade consistently. Give each component, editor, route or session a
 defined owner and destroy its directly created tree at teardown. Choose entity
 collections and enhancers only when that workflow needs them; a new Lite package
@@ -23,7 +23,7 @@ is not required for a minimal setup.
 Keep fetched/accepted server truth in `external()` and request policy in the
 application. Keep transaction handles until settlement, including after a refused
 rollback. Test overlapping edits, replacement, late readers and owner teardown.
-The [executable review story](apps/demo/src/app/pages/independent-publication/independent-publication.component.ts)
+The [executable review story](https://github.com/JBorgia/signal-tree/blob/e21a471fed73dcda6d9d40df062aa250d98e7431/apps/demo/src/app/pages/independent-publication/independent-publication.component.ts)
 and its adjacent tests demonstrate current inspection, independent work and real
 refusal/recovery. Neither a local confirmation nor a Link receipt authorizes a
 server effect. Preserve backend authentication, approval, idempotency and durable
