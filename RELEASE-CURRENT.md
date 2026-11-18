@@ -1,3 +1,22 @@
+# 15.4.9 — authorized publication preparation
+
+The owner selected build, push and publication on November 18, including a
+separate provisional v16 test release. Target **15.4.9** on
+`codex/v15-15.4.9-release`. Stable v15 owns `latest`; v16 uses `rc`.
+See the [active publication record](docs/audits/2026-11-18-release-publication/README.md).
+
+This phase explicitly replaces the historical candidate-only size disposition
+below with a reviewed, measured release-line budget baseline. Preserve every old
+failure and artifact identity. Fresh limits, full strict qualification, planted
+growth controls, exact-tag CI and registry/deployment verification are required.
+No runtime feature or compatibility change is selected here. Local qualification
+now passes 91/91 normal gates, 91/91 mutation proofs with exact restoration, fresh
+installed consumers/AOT, the strict production demo and 179/179 browser checks.
+Publication remains pending exact-tag CI and registry verification; local checks
+are not proof that this release is published.
+
+---
+
 # V15 startup allocation follow-through — local qualification complete
 
 Qualified source `e45fd69616586cae6f7f9e8622c082199d0fded0` contains runtime

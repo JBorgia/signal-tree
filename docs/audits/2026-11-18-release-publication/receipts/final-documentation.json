@@ -1,0 +1,9 @@
+{
+  "command": [
+    "node",
+    "tools/verify-gates.mjs",
+    "--only=doc-links,source-controls,version-claims,documented-examples,publish-architecture"
+  ],
+  "exit": 0,
+  "seconds": 37.52
+}

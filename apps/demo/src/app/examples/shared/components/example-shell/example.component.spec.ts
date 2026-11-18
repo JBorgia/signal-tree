@@ -176,7 +176,9 @@ describe('ExampleComponent', () => {
     const button =
       element.querySelector<HTMLButtonElement>('.st-example__edit');
     expect(button?.disabled).toBe(true);
-    expect(element.textContent).toContain('This candidate is not published');
+    expect(element.textContent).toContain(
+      'Remote playgrounds are disabled for this prerelease build'
+    );
     expect(element.querySelector('.st-example__code')?.textContent).toContain(
       'const count = signal(0);'
     );

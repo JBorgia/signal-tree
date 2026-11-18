@@ -1,4 +1,4 @@
-## 15.4.9 (2026-11-12)
+## 15.4.9 (2026-11-18)
 
 - Long-lived EntityMap collections with `transactions()` or `restoration()`
   release eligible retired values after notification capture and ownership ends.
@@ -12,11 +12,41 @@
   Applications that request both IDs and values may retain both order arrays.
 - Active and absent entity lifetimes are rejected before retirement preparation
   enumerates their row metadata.
+- Confirmed-ledger retention trims only the relevant diagnostic suffix before
+  examining pending work and record IDs. Fractional retention and settlement
+  semantics remain unchanged; the benefit applies when retained history actually
+  exercises that scan.
+- Empty enhancer planning skips unnecessary setup. Observer and position
+  containers allocate on first use, reducing construction memory without a new
+  option or changing configured behavior.
+- Entity lifetimes use the existing implicit zero revision until a structural
+  change needs a stored revision. Ordinary leaves defer their observation record
+  until a consuming claim needs it; late registration and rearming retain their
+  identity and behavior.
+- Unreachable legacy audit and serialization implementations are removed. This
+  cleanup removes no supported public capability and changes no shipped runtime bytes.
+- The demo now teaches an executable order-edit workflow with external updates
+  and optional undo. Its tutorial owns its tree and request subscriptions at the
+  component boundary; closing the page cancels work and revisiting starts fresh.
+  DevTools counter replay records real commands and releases interrupted timers.
+  Mobile guide navigation, keyboard focus, framework examples and source links
+  are corrected. AI guidance starts with installed types and one owned feature.
 
 These maintenance changes preserve the v15 public API, transaction refusal,
 observer-delivery and settlement behavior, and supported framework peer ranges.
-See [the maintenance preparation record](docs/audits/2026-11-11-v15-maintenance-successor/README.md)
-for qualification status and the separate numerical bundle-budget disposition.
+The allocation changes save heap in the measured workloads; demanding every
+revision or observation record can consume that saving. CPU results are mixed,
+so this release does not claim a general speedup or zero-cost optional features.
+The demo's smaller initial code graph is distinct from its complete home-page
+load and from store construction cost.
+
+See the [maintenance preparation record](docs/audits/2026-11-11-v15-maintenance-successor/README.md),
+[construction study](docs/audits/2026-11-17-construction-followthrough/README.md),
+[startup allocation study](docs/audits/2026-11-18-startup-economics/README.md), and
+[current controller](RELEASE-CURRENT.md) for qualification, exact artifact
+identities and the separate numerical bundle-budget disposition. Historical
+qualification remains attached to its recorded source; release publication and
+its final archives require their own verification.
 
 ## 15.4.8 (2026-11-11)
 

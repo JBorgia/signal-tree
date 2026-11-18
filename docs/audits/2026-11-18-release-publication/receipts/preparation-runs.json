@@ -1,0 +1,11 @@
+[
+  {
+    "name": "publisher-controls",
+    "command": [
+      "node",
+      "scripts/check-publish-candidate.mjs"
+    ],
+    "exit": 1,
+    "seconds": 10.1
+  }
+]

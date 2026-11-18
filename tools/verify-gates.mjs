@@ -53,6 +53,7 @@ import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { RELEASE_PACKAGES } from '../scripts/release-plan.mjs';
+import { buildIntegrity } from '../scripts/publish-artifact-integrity.mjs';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const BUILD_PROJECTS = RELEASE_PACKAGES.join(',');
@@ -1720,7 +1721,35 @@ function buildOnceIfNeeded() {
   }
 }
 
-buildOnceIfNeeded();
+// The publisher has already built and sealed these artifacts. Explicitly skip
+// the wrapper's cached rebuild, and require every gate to preserve the seal.
+// Mutation proofs run separately, without this mode, before the final rebuild.
+const artifactArgs = process.argv.filter(
+  (arg) =>
+    arg === '--artifact-integrity' || arg.startsWith('--artifact-integrity=')
+);
+const artifactIntegrity = artifactArgs[0]?.slice(
+  '--artifact-integrity='.length
+);
+if (
+  artifactArgs.length > 1 ||
+  (artifactArgs.length &&
+    (!/^sha256-[a-f0-9]{64}$/.test(artifactIntegrity) || has('--self-test')))
+) {
+  throw new Error(
+    'Artifact integrity requires one SHA256 seal and non-mutation gates'
+  );
+}
+function assertArtifacts(label) {
+  if (
+    artifactIntegrity &&
+    buildIntegrity(ROOT, RELEASE_PACKAGES) !== artifactIntegrity
+  )
+    throw new Error(`Release artifacts changed ${label}`);
+}
+if (artifactIntegrity) assertArtifacts('before gates');
+else buildOnceIfNeeded();
+
 
 function run(gate) {
   try {
@@ -1728,6 +1757,8 @@ function run(gate) {
       cwd: ROOT,
       stdio: 'pipe',
       encoding: 'utf8',
+      // Full release diagnostics can exceed Node's 1 MiB default buffer.
+      maxBuffer: 20 * 1024 * 1024,
       // A gate may need its own environment — `retention-gc` needs
       // --expose-gc to reach vitest's forked workers, which a `node --expose-gc`
       // command line would NOT do.
@@ -1927,7 +1958,9 @@ if (has('--self-test')) {
   console.log(`\nRunning ${selected.length} gates\n`);
   for (const gate of selected) {
     process.stdout.write(`  · ${gate.name.padEnd(20)} `);
+    assertArtifacts(`before ${gate.name}`);
     const result = run(gate);
+    assertArtifacts(`after ${gate.name}`);
     const ok = result.code === 0;
     results.push({
       gate,

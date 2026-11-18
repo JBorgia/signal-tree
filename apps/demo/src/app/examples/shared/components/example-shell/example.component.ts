@@ -69,7 +69,7 @@ let nextSourceId = 0;
             {{
               playgroundAvailable
                 ? 'Edit in StackBlitz ↗'
-                : 'Playground needs a release'
+                : 'Prerelease source only'
             }}
           </button>
           } @if (code().length) {
@@ -88,8 +88,8 @@ let nextSourceId = 0;
 
       @if (stackblitz() && !playgroundAvailable) {
       <p>
-        This candidate is not published. The source stays available here; use
-        the checked local packages to run it.
+        Remote playgrounds are disabled for this prerelease build. The source
+        stays available here; use the checked local packages to run it.
       </p>
       }
       <div

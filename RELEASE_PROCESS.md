@@ -54,10 +54,14 @@ mutation self-tests, then deletes/rebuilds `dist` without cache and verifies the
 fresh tarball consumers. Only after that does it call:
 
 ```bash
-node scripts/publish-candidate.mjs --ci --prebuilt
+node scripts/publish-candidate.mjs --ci
 ```
 
-The engine prepares manifests, runs package/declaration/consumer checks, packs
+The engine refuses live prebuilt output and requires matching workflow, event,
+tag, source HEAD and provenance identities. It seals a fresh build, runs normal
+gates while enforcing that seal, executes mutation proofs separately, and
+requires an uncached post-mutation rebuild to match the gated bytes. It then
+verifies manifests and package/declaration/consumer checks and packs
 the ordered public artifacts from `scripts/release-plan.mjs`, records SHA-512
 integrity, and publishes those tarballs with provenance. A rerun skips an
 existing version only when registry integrity matches exactly; any mismatch or

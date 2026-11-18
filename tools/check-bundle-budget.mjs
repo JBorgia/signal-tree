@@ -472,8 +472,13 @@ const TARGETS = {
     // roughly 30 gzip bytes. This explicit policy allowance is not a size
     // optimization; all other ceilings and the oversized-artifact proof stay.
     // See docs/audits/2026-11-11-v15-maintenance-release/README.md.
-    devKB: 27.5,
-    prodKB: 24.7,
+    // 15.4.9: explicit November 18 release-cost baseline. The qualified
+    // memory/correctness improvements are retained; historical red ceilings and
+    // fresh byte measurements remain in the release-publication audit. Round up
+    // to the next 0.01 KiB only; fixtures and oversize mutation stay unchanged.
+    // See docs/audits/2026-11-18-release-publication/README.md.
+    devKB: 27.65,
+    prodKB: 24.78,
     code: `
       import { signalTree, entityMap } from ${JSON.stringify(CORE)};
       const t = signalTree({ count: 0, users: entityMap() });
@@ -525,7 +530,8 @@ for (const [id, { code, devKB, prodKB }] of Object.entries(TARGETS)) {
   console.log(
     `${id.padEnd(22)} ` +
       `${prodOk ? '✅' : '❌'} ${prod.toFixed(2)}/${prodKB}KB   ` +
-      `${devOk ? '✅' : '❌'} ${dev.toFixed(2)}/${devKB}KB`
+      `${devOk ? '✅' : '❌'} ${dev.toFixed(2)}/${devKB}KB ` +
+      `(prod ${Math.round(prod * 1024)} B; dev ${Math.round(dev * 1024)} B)`
   );
 }
 

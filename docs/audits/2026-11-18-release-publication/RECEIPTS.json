@@ -1,0 +1,174 @@
+{
+  "version": "15.4.9",
+  "scope": "Working-tree local qualification before final commit/tag; exact-tag CI and publication remain pending.",
+  "receipts": [
+    {
+      "path": "receipts/publisher-controls.log.gz",
+      "rawSha256": "3d4c6d062b4eab2d38268663bbec578e859f51220aa9bf98523ca54fd0239682",
+      "rawBytes": 6164,
+      "sha256": "4f87951b1c7c1f2ab5c364fcbdc7618f0950954f4e528f324b753c4189185638",
+      "bytes": 1096,
+      "encoding": "gzip; decompressed bytes equal original log"
+    },
+    {
+      "path": "receipts/publisher-controls-fixed.log.gz",
+      "rawSha256": "0e47043be77798bde91f531f9beefba3291b7d3cc015f5c51b936b7e69a8140e",
+      "rawBytes": 1874,
+      "sha256": "c798922006d2d6fcceeafe191cdde48c4dfafa591871c8e8ac0128fe94b725c5",
+      "bytes": 697,
+      "encoding": "gzip; decompressed bytes equal original log"
+    },
+    {
+      "path": "receipts/publication-architecture.log.gz",
+      "rawSha256": "222bf150d614038cce6436d856b4697ab31da103855332b47da114429327b23c",
+      "rawBytes": 71,
+      "sha256": "e4ad16a8c5db428880713251d7fc76fcb40f56549085867f04b4fed6f834462a",
+      "bytes": 84,
+      "encoding": "gzip; decompressed bytes equal original log"
+    },
+    {
+      "path": "receipts/fresh-build.log.gz",
+      "rawSha256": "c74e2d73e4f03be4b1db634c1714764823f3d72e8b1fce4b9a677d364135cd38",
+      "rawBytes": 8675,
+      "sha256": "19065c2f6ad94f2237593f08566050c777a89522651fe57c9fdec3858e60ad2e",
+      "bytes": 2178,
+      "encoding": "gzip; decompressed bytes equal original log"
+    },
+    {
+      "path": "receipts/old-bundle-budget-bytes.log.gz",
+      "rawSha256": "2074df265e953f56e72744c2974abd81833da542a7aa1f6b601ff633f40bd186",
+      "rawBytes": 1021,
+      "sha256": "4dde7faa12b0937fbf4a5cd0d49aac3d0b45808247d85a8f76082a76c3abea51",
+      "bytes": 499,
+      "encoding": "gzip; decompressed bytes equal original log"
+    },
+    {
+      "path": "receipts/runtime-continuity-packed.json",
+      "sha256": "69dddc1e572fd0efa5eb4f3fa5f4dc89297695059455abc72f29398af4570b85",
+      "bytes": 1438
+    },
+    {
+      "path": "receipts/full-normal-first.log.gz",
+      "rawSha256": "0c04e608984d8c761edce956e761e85f356a447d66e326e376ec4284c946cbf7",
+      "rawBytes": 13635,
+      "sha256": "d10a0f396db3892e1f439b98eb0d110ad7b0037cbcb7daa041b7232a9dafcb8a",
+      "bytes": 4961,
+      "encoding": "gzip; decompressed bytes equal original log"
+    },
+    {
+      "path": "receipts/full-normal-first.json",
+      "sha256": "a8dab1844818951bfe6762f3e0e33d4a04d868910f3df00fd054d8052bcb797f",
+      "bytes": 115
+    },
+    {
+      "path": "receipts/full-mutations-first.log.gz",
+      "rawSha256": "062adada8f40abb4c2e6db9c54834708da9ce932e9da14b137813dc19a4741c4",
+      "rawBytes": 9085,
+      "sha256": "8dea535286652ed5712894534b31833de425610741b9e8d93434a1241e083d9e",
+      "bytes": 1700,
+      "encoding": "gzip; decompressed bytes equal original log"
+    },
+    {
+      "path": "receipts/full-mutations-first.json",
+      "sha256": "bf361a11519a2ccbb7581a3846cf2766d23ab6d57cbaa08e95db9582a0a2e073",
+      "bytes": 189
+    },
+    {
+      "path": "receipts/post-mutation-runs.json",
+      "sha256": "b4375dd1cb0edbc15a8c9d99520284243f8fe415645ff488da630dcbaad4579c",
+      "bytes": 1465
+    },
+    {
+      "path": "receipts/post-mutation-build.log.gz",
+      "rawSha256": "39744dd464b3fe55d8bea4be78af6bafe597c77580b318ac676915f509a345ae",
+      "rawBytes": 8679,
+      "sha256": "27a58b17248994ee394751072c6ff275ece579a178b69049f6e356589e45b8cf",
+      "bytes": 2185,
+      "encoding": "gzip; decompressed bytes equal original log"
+    },
+    {
+      "path": "receipts/post-mutation-budgets.log.gz",
+      "rawSha256": "b0e6a96128212a708b8d150e94240dba456885ec8fb4d015fee3f2da3939c034",
+      "rawBytes": 478,
+      "sha256": "11c0fdbce3a60dca4279a35db08cd34a483335d234d885a5fe9198b4ba9b9956",
+      "bytes": 204,
+      "encoding": "gzip; decompressed bytes equal original log"
+    },
+    {
+      "path": "receipts/post-mutation-tarballs.log.gz",
+      "rawSha256": "141ef3ed7053d1e84a454073c419c1c1d7c685801bca01d6df8b1b79d057264b",
+      "rawBytes": 743,
+      "sha256": "fa8a4f4055f39a8a1e240c78715bf9939084d2d13e49e267d22004454af7ad1a",
+      "bytes": 238,
+      "encoding": "gzip; decompressed bytes equal original log"
+    },
+    {
+      "path": "receipts/post-mutation-strict-types.log.gz",
+      "rawSha256": "a773289051a58cf35d19065195c79fa3457480d3518e371785cbe0611ffd35c0",
+      "rawBytes": 271,
+      "sha256": "b99c3447615d4a2092b770c21e308a361e99bc4f28104afd47c176f0cdaae255",
+      "bytes": 198,
+      "encoding": "gzip; decompressed bytes equal original log"
+    },
+    {
+      "path": "receipts/post-mutation-angular-aot.log.gz",
+      "rawSha256": "8076ea766d301ae307069e3114a197e0f4bd02dcc0768c6ab14420c725d817ed",
+      "rawBytes": 213,
+      "sha256": "067569047688f3c484106e5258137a7bc346b337408c6a8206403e45312f1697",
+      "bytes": 164,
+      "encoding": "gzip; decompressed bytes equal original log"
+    },
+    {
+      "path": "receipts/production-demo-build.log.gz",
+      "rawSha256": "ccfdb5da4c0ce5e26d4fb9a1c47b4290405b13e5f7c274ca39c1c131d55e111f",
+      "rawBytes": 5018,
+      "sha256": "cc0224ea4f1482b5c3a465d9bcff941d23ff7e7a5d26bfb7672cef8d9d36ef54",
+      "bytes": 1429,
+      "encoding": "gzip; decompressed bytes equal original log"
+    },
+    {
+      "path": "receipts/production-demo-browser.log.gz",
+      "rawSha256": "ec79f0b23d6ded690b505754bfc3a783c1dcd5958912f7b82c7a4f3096cf2818",
+      "rawBytes": 24747,
+      "sha256": "db61bbb7af57db62136c15076a3b37f5a904d61659426a2b513463c58b693123",
+      "bytes": 3466,
+      "encoding": "gzip; decompressed bytes equal original log"
+    },
+    {
+      "path": "receipts/preparation-runs.json",
+      "sha256": "0015538f2b7699299389c4c6149af351e8468d097364fbb5d48ade82d81d85b0",
+      "bytes": 163
+    },
+    {
+      "path": "receipts/preparation-fixed-runs.json",
+      "sha256": "3531d9f7e614a09fc1160c276e6d59c2648ba3edff52bde8eb46d87a303bc5ed",
+      "bytes": 784
+    },
+    {
+      "path": "receipts/runtime-continuity.json",
+      "sha256": "42d3d45f2b38f09f574014ff63146d0b99a22c8df10b91f3f4282ed6192f7f21",
+      "bytes": 1436
+    },
+    {
+      "path": "receipts/final-documentation.json",
+      "sha256": "6411413fd591347e85aab6604047aaa308092a01c2198679f90ed2ca17f00df8",
+      "bytes": 193
+    },
+    {
+      "path": "receipts/final-documentation.log.gz",
+      "sha256": "4e48d2ffe5abc7924192d0d4924cd8181c7c2748044e981401197d861970860b",
+      "bytes": 478,
+      "rawSha256": "24cf7a930b923f372742f3b1a8ea646f805cadd76c77e9e6e932ff0e1ce9dd7c",
+      "rawBytes": 1045,
+      "encoding": "gzip; decompressed bytes equal original log"
+    },
+    {
+      "path": "receipts/final-workflow-controls.log.gz",
+      "sha256": "e4ad16a8c5db428880713251d7fc76fcb40f56549085867f04b4fed6f834462a",
+      "bytes": 84,
+      "rawSha256": "222bf150d614038cce6436d856b4697ab31da103855332b47da114429327b23c",
+      "rawBytes": 71,
+      "encoding": "gzip; decompressed bytes equal original log"
+    }
+  ]
+}

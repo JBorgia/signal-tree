@@ -1,0 +1,12 @@
+{
+  "command": [
+    "node",
+    "tools/verify-gates.mjs",
+    "--self-test",
+    "--release"
+  ],
+  "exit": 0,
+  "seconds": 314.85,
+  "sourceFiles": 1788,
+  "restorationDifferences": []
+}

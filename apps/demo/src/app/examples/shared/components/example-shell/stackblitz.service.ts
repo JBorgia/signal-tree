@@ -18,11 +18,10 @@ import type { StackblitzConfig } from './example.types';
  */
 @Injectable({ providedIn: 'root' })
 export class StackblitzService {
-  // The selected v15 controller has not published 15.4.9. A stable-looking
-  // version is not publication evidence; review this guard at its release.
-  readonly available =
-    !DEMO_LIBRARY_VERSIONS['signaltree'].includes('-') &&
-    DEMO_LIBRARY_VERSIONS['signaltree'] !== '15.4.9';
+  // Stable release builds enable remote sandboxes. Promote this demo only after
+  // verifying its exact npm version; this format check is not publication proof.
+  // Prerelease demos keep their checked source available locally.
+  readonly available = !DEMO_LIBRARY_VERSIONS['signaltree'].includes('-');
   /** Angular version line the sandbox pins to (kept close to the demo app). */
   private readonly ngVersion = '^20.3.0';
 

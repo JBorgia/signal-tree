@@ -1,0 +1,9 @@
+{
+  "command": [
+    "node",
+    "tools/verify-gates.mjs",
+    "--release"
+  ],
+  "exit": 0,
+  "seconds": 375.85
+}

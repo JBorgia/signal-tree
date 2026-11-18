@@ -6,7 +6,9 @@
 
 Use this index to navigate the documentation.
 
-**Development version:** 15.4.9. This index describes the package version shown here.
+**Development version:** 15.4.9. This source includes the prepared stable
+maintenance update. A source version does not establish registry publication;
+verify availability before installing that exact version.
 See [CHANGELOG](../CHANGELOG.md) for versioned changes and the
 [npm package page](https://www.npmjs.com/package/@signal-tree/kernel?activeTab=versions)
 for published versions.
@@ -17,6 +19,7 @@ for published versions.
 
 | Document                            | Description                                         |
 | ----------------------------------- | --------------------------------------------------- |
+| [First v15 feature](guides/first-feature-v15.md) | Executable order edits, incoming updates, optional undo and owner teardown |
 | [Overview](overview.md)             | High-level project overview and specifications      |
 | [Root README](../README.md)         | Main project README                                 |
 | [Repository Map](repository-map.md) | Source, validation, history, and artifact ownership |

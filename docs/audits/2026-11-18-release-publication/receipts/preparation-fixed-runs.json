@@ -1,0 +1,45 @@
+[
+  {
+    "name": "publisher-controls-fixed",
+    "command": [
+      "node",
+      "scripts/check-publish-candidate.mjs"
+    ],
+    "exit": 0,
+    "seconds": 7.21
+  },
+  {
+    "name": "publication-architecture",
+    "command": [
+      "node",
+      "scripts/verify-publish-architecture.mjs"
+    ],
+    "exit": 0,
+    "seconds": 4.97
+  },
+  {
+    "name": "fresh-build",
+    "command": [
+      "pnpm",
+      "exec",
+      "nx",
+      "run-many",
+      "-t",
+      "build",
+      "--projects=kernel,angular,react,vue,solid",
+      "--configuration=production",
+      "--skip-nx-cache"
+    ],
+    "exit": 0,
+    "seconds": 14.26
+  },
+  {
+    "name": "old-bundle-budget",
+    "command": [
+      "node",
+      "tools/check-bundle-budget.mjs"
+    ],
+    "exit": 1,
+    "seconds": 0.19
+  }
+]

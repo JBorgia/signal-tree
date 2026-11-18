@@ -19,7 +19,9 @@ name: Publish to npm (CI)
 #      unverified commit can be tagged for release.
 #
 # Usage: Actions → "Publish to npm (CI)" → Run workflow → enter the version
-# tag (e.g. v12.0.1). The `release: published` trigger also fires for a
+# tag (e.g. v12.0.1), selecting that SAME tag as the workflow's run ref.
+# A branch dispatch is refused: npm provenance must name the tagged commit.
+# The `release: published` trigger also fires for a
 # release published manually in the GitHub UI — but NOT for releases created
 # by release.yml (GITHUB_TOKEN events never trigger other workflows), so the
 # normal flow is: push signed tag → release.yml verifies + creates the
@@ -41,11 +43,9 @@ on:
 jobs:
   verify:
     name: Verify and publish tagged commit
-    # Keep the runner compatible with the locked Playwright browser install.
-    # The publication source remains the exact release_tag checkout below.
     runs-on: ubuntu-24.04
     container:
-      # Official Playwright 1.56.1 Noble image; includes matching system dependencies.
+      # Official Playwright 1.56.1 Noble image, pinned to the supported browser dependencies.
       image: mcr.microsoft.com/playwright@sha256:f1e7e01021efd65dd1a2c56064be399f3e4de00fd021ac561325f2bfbb2b837a
       options: --init --shm-size=1g
     defaults:
@@ -60,14 +60,22 @@ jobs:
     steps:
       - name: Resolve release tag
         id: release_tag
+        env:
+          INPUT_TAG: ${{ github.event.inputs.release_tag }}
+          EVENT_TAG: ${{ github.event.release.tag_name }}
         run: |
-          TAG_NAME="${{ github.event.inputs.release_tag }}"
+          TAG_NAME="$INPUT_TAG"
           if [[ -z "$TAG_NAME" ]]; then
-            TAG_NAME="${{ github.event.release.tag_name }}"
+            TAG_NAME="$EVENT_TAG"
           fi
 
-          if [[ "$TAG_NAME" != v* ]]; then
+          if [[ ! "$TAG_NAME" =~ ^v[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z]+(\.[0-9A-Za-z]+)*)?$ ]]; then
             echo "Expected a version tag like v12.0.1, got: ${TAG_NAME}"
+            exit 1
+          fi
+
+          if [[ "$GITHUB_REF" != "refs/tags/$TAG_NAME" ]]; then
+            echo "Run this workflow from the release tag itself: $TAG_NAME"
             exit 1
           fi
 
@@ -86,7 +94,7 @@ jobs:
           fetch-depth: 0
           fetch-tags: true
 
-      - name: Trust the mounted candidate checkout for container Git commands
+      - name: Trust and verify the mounted tagged checkout
         env:
           ST_RELEASE_TAG: ${{ steps.release_tag.outputs.tag_name }}
         run: |
@@ -108,7 +116,7 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile --ignore-scripts
 
-      - name: Verify matching packaged Chromium for packed Angular AOT gate
+      - name: Install Chromium for packed Angular AOT gate
         run: |
           node -e 'require("node:assert/strict").equal(require("playwright/package.json").version, "1.56.1")'
           pnpm exec playwright install chromium
@@ -133,8 +141,14 @@ jobs:
       - name: All release gates (including benchmark, memory, and package harnesses)
         run: pnpm run gates -- --release
 
-      - name: Prove every gate can still fail
-        run: pnpm run gates:self-test -- --release
+      - name: Prove release gates can still fail
+        run: node tools/verify-gates.mjs --self-test --release
+
+      - name: Rebuild clean artifacts after mutation proofs
+        run: |
+          git diff --exit-code
+          rm -rf dist/packages
+          pnpm exec nx run-many -t build --projects=kernel,angular,react,vue,solid --configuration=production --skip-nx-cache
 
       - name: Verify version claims
         run: node scripts/verify-version-claims.js
@@ -143,14 +157,8 @@ jobs:
         run: |
           node tools/verify-tarball-consumer.mjs --self-test
           node tools/verify-tarball-consumer.mjs
-
-      - name: Rebuild clean artifacts after all mutation checks
-        run: |
-          git diff --exit-code
-          rm -rf dist
-          pnpm exec nx run-many -t build --projects=kernel,angular,react,vue,solid --skip-nx-cache
-          node tools/verify-tarball-consumer.mjs
           node tools/verify-consumer-typecheck.mjs
+          node tools/verify-angular-aot-consumer.mjs
           git diff --exit-code
 
       - name: Verify CHANGELOG has an entry for this version
@@ -160,8 +168,22 @@ jobs:
           bash scripts/verify-changelog-entry.sh --self-test
           bash scripts/verify-changelog-entry.sh "$VERSION"
 
+      # The publisher reruns release checks and mutation proofs, then rebuilds
+      # without cache before packing, requiring identical gated artifact hashes.
+      # Prebuilt artifacts and mismatched event/checkout SHAs cannot publish.
       - name: Publish to npm
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
           NPM_CONFIG_PROVENANCE: 'true'
-        run: node scripts/publish-candidate.mjs --ci --prebuilt
+          RELEASE_TAG: ${{ steps.release_tag.outputs.tag_name }}
+        run: node scripts/publish-candidate.mjs --ci
+
+      - name: Preserve exact publication journal and archives
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-candidate-${{ steps.release_tag.outputs.tag_name }}
+          path: |
+            .release/candidates/*/candidate.json
+            .release/candidates/*/tarballs/*.tgz
+          if-no-files-found: warn

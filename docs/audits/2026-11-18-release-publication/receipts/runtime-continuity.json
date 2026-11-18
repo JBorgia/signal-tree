@@ -1,0 +1,45 @@
+{
+  "baselineCommit": "e45fd69616586cae6f7f9e8622c082199d0fded0",
+  "baselineVersion": "15.4.9",
+  "candidateVersion": "15.4.9",
+  "packages": [
+    {
+      "package": "@signal-tree/kernel",
+      "baselineArchiveIntegrity": "sha512-IUrtaZe8INGGiw7vxDE+UvKI1/35RKpGlYVAHDNR7Gsii3xjA+vmkFur5Fd6sW08ABZtqgGHNP9ml07oh+GRZA==",
+      "payloads": 104,
+      "differences": []
+    },
+    {
+      "package": "@signal-tree/angular",
+      "baselineArchiveIntegrity": "sha512-nYoswT4T12znPvzFLPNESwboQI6f0yywdrOGn9LdiZSArvNNN2mKJ2efbio8YEtqYadm9Gu0YcI9Wd3/j4VZTA==",
+      "payloads": 12,
+      "differences": [
+        "dist/index.d.ts"
+      ]
+    },
+    {
+      "package": "@signal-tree/react",
+      "baselineArchiveIntegrity": "sha512-sjosJkb258k/tv02ssqdeJgmkPJI6F3xRJFsbo3sRc3JIqJ19yNooX7BJaJ8V/Aw+nnEq+0RYGdkz/G1hsWHIQ==",
+      "payloads": 5,
+      "differences": [
+        "dist/index.d.ts"
+      ]
+    },
+    {
+      "package": "@signal-tree/vue",
+      "baselineArchiveIntegrity": "sha512-Hm6N9cnnoMcpXKO8SQ1wZh4g4jh6/syum57zJEU9qi1gsyoPEK0OrNTKhkUPNkSR83nu3EwIirKIQoEOfHySWA==",
+      "payloads": 8,
+      "differences": [
+        "dist/index.d.ts"
+      ]
+    },
+    {
+      "package": "@signal-tree/solid",
+      "baselineArchiveIntegrity": "sha512-ZiUYg2Qp8FRrjoACAnfcJlvLe7XBeFVi5KfLV8cJx01TsTvLX9UtpcPgY11EWnmAhvjelQwdNF4W3ye5Bwe0hQ==",
+      "payloads": 8,
+      "differences": [
+        "dist/index.d.ts"
+      ]
+    }
+  ]
+}
