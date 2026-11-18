@@ -33,7 +33,12 @@ small whole-process residuals do not establish universally zero retained cost.
 The original CPU cohort includes adverse differences. The seven-round follow-up
 is mixed and noisy. Select this for memory, not a general CPU speedup or proven
 CPU equivalence. The exact final kernel is byte-identical to the measured
-combined prototype. Full application comparisons are pending separately in the
+combined prototype. A fresh complete Angular application comparison independently
+finds 917,956 bytes less populated heap at 50,000 rows, with a paired median
+factory difference of −4.0 ms (range −5.9 to −1.2; A/A −0.9 to +3.3 ms).
+Smaller workloads have mixed/noise-scale timing differences; this does not
+establish a general CPU improvement. Full application results and their limits
+are recorded separately in the
 [central study](https://github.com/JBorgia/signal-tree/tree/codex/startup-market-economics/docs/audits/2026-11-18-startup-market-economics).
 
 The selected single-process Angular diagnostic profiles construction, population,
@@ -42,7 +47,7 @@ work is concentrated in subject creation, activation and ordered node creation.
 It omits initial marker materialization at first `$.rows` access between factory
 and population. The [identified follow-up](PROFILE-FOLLOWUP.json) passes with a
 continuous constructor-through-population profile, explicit first marker access
-and all 20 original assertions intact.
+and all original assertions intact.
 The original phases are not exhaustive startup attribution or a statistical
 before/after comparison. Required key, order and lifetime
 behavior does not establish that every current representation is irreducible.
@@ -59,7 +64,8 @@ The central evidence packet preserves the referenced raw outputs and generators.
   Source `e45fd6961` changes only
   that self-test's JSON whitespace; the parsed result is identical. Both affected
   checks pass after correction. This covers 90/91 gates, not one all-green run.
-- All 91 mutation checks pass on `e45fd6961`, including 15 companion proofs,
+- All 91 gates are proven able to fail on `e45fd6961`, 15 indirectly through
+  companion self-tests,
   with exact source restoration and no unproven, vacuous, blind or errored check.
 - Five fresh canonical archives join to 158 shipped payloads. All facade payloads,
   public declarations and package manifests remain unchanged. Only two kernel

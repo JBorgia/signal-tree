@@ -1,0 +1,18 @@
+{
+  "command": [
+    "node",
+    "tools/verify-gates.mjs",
+    "--only=doc-links,doc-links:self,documented-imports,documented-symbols,documented-examples,version-claims,release-claims"
+  ],
+  "cwd": "/Users/jonathanborgia/code/signaltree/.worktrees/v15-optimization-sweep",
+  "startedUTC": "2026-11-18T08:28:56.079549+00:00",
+  "head": "34ff22457b978e78e558e21535093318a4466ef8",
+  "status": "M  docs/audits/2026-11-18-startup-economics/README.md\n",
+  "patchSha256": "d924b2752b5cf4825beb3e9d119eeb7234762d02524432ec9355a4c1917e22fa",
+  "runnerSha256": "6e53606ad0deeb4c8a8f9710bb165d42fa45581c07ba6a9f68c0cd48ba470f18",
+  "node": "v24.15.0",
+  "exitCode": 0,
+  "seconds": 52.50963820889592,
+  "logSha256": "7e62ffaef3dd64d4e9d938f12caec03dca42166b62165ed2d8a73b9c95aacc3e",
+  "trackedPatchUnchanged": true
+}
