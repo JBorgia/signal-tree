@@ -61,17 +61,19 @@ export interface MutationCaptureRuntime {
 
 export function createMutationCaptureRuntime(): MutationCaptureRuntime {
   let activeCount = 0;
-  const entityListeners = new Set<(capture: CommittedEntityCapture) => void>();
-  const collectionOrderListeners = new Set<
-    (capture: CollectionOrderCapture) => void
-  >();
+  // Bare trees retain the activation seam, not empty subscriber containers.
+  // Once allocated, each Set retains its existing subscription semantics.
+  let entityListeners: Set<(capture: CommittedEntityCapture) => void> | undefined;
+  let collectionOrderListeners:
+    | Set<(capture: CollectionOrderCapture) => void>
+    | undefined;
 
   return {
     hasCommittedEntityObservers(): boolean {
-      return activeCount > 0 && entityListeners.size > 0;
+      return activeCount > 0 && (entityListeners?.size ?? 0) > 0;
     },
     publishCommittedEntity(capture): void {
-      if (activeCount === 0) return;
+      if (activeCount === 0 || !entityListeners) return;
       for (const listener of [...entityListeners]) {
         try {
           listener(capture);
@@ -81,9 +83,9 @@ export function createMutationCaptureRuntime(): MutationCaptureRuntime {
       }
     },
     subscribeCommittedEntity(listener): () => void {
-      entityListeners.add(listener);
+      (entityListeners ??= new Set()).add(listener);
       return () => {
-        entityListeners.delete(listener);
+        entityListeners?.delete(listener);
       };
     },
     isCaptureActive(): boolean {
@@ -103,7 +105,7 @@ export function createMutationCaptureRuntime(): MutationCaptureRuntime {
       };
     },
     publishCollectionOrder(capture): void {
-      if (activeCount === 0) {
+      if (activeCount === 0 || !collectionOrderListeners) {
         return;
       }
       for (const listener of [...collectionOrderListeners]) {
@@ -111,8 +113,8 @@ export function createMutationCaptureRuntime(): MutationCaptureRuntime {
       }
     },
     subscribeCollectionOrder(listener): () => void {
-      collectionOrderListeners.add(listener);
-      return () => collectionOrderListeners.delete(listener);
+      (collectionOrderListeners ??= new Set()).add(listener);
+      return () => collectionOrderListeners?.delete(listener);
     },
   };
 }

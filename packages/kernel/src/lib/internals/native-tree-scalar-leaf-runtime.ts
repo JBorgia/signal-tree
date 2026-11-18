@@ -226,7 +226,7 @@ export function createNativeTreeScalarLeafRuntime(
 ): TreeScalarLeafRuntime {
   const kernel = createTreeScalarSlotRuntime(physicalCommitClock);
   const publication = new NativeScalarSlotPublication(observation);
-  const leafByPositionId = new Map<PositionId, Location<unknown>>();
+  let leafByPositionId: Map<PositionId, Location<unknown>> | undefined;
   const liveness: { absence?: MemberAbsence } = {};
 
   return {
@@ -247,7 +247,7 @@ export function createNativeTreeScalarLeafRuntime(
         liveness
       );
       if (positionId !== undefined) {
-        leafByPositionId.set(positionId, leaf as Location<unknown>);
+        (leafByPositionId ??= new Map()).set(positionId, leaf as Location<unknown>);
       }
       return leaf;
     },
@@ -270,7 +270,7 @@ export function createNativeTreeScalarLeafRuntime(
       if (PRODUCTION_SUBSTRATE_STATS_ENABLED) {
         recordProductionSubstrateStat('positionResolutions');
       }
-      return leafByPositionId.get(positionId);
+      return leafByPositionId?.get(positionId);
     },
     revision(): number {
       return kernel.revision();

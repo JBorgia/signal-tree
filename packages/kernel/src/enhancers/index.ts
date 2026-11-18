@@ -64,6 +64,10 @@ export function resolveEnhancerOrder(
   availableCapabilities: Set<string> = new Set<string>(),
   debugMode = false
 ): EnhancerWithMeta<unknown>[] {
+  // No declaration can contribute an ordering or validation obligation. Return
+  // a fresh array: construction must not retain the caller's mutable list.
+  if (enhancers.length === 0) return [];
+
   // Build nodes with metadata
   const nodes = enhancers.map((e, idx) => ({
     fn: e,

@@ -263,13 +263,25 @@ function getEnhancerMeta(enhancer: unknown): EnhancerMeta | undefined {
 
 function buildTreePlan(
   enhancers: EnhancerWithMeta<unknown>[],
-  explicitCapabilities: readonly TreeCapability[] = []
+  explicitCapabilities?: readonly TreeCapability[]
 ): TreeBuildPlan {
+  // With neither declarations nor an explicit request there is no capability
+  // graph to resolve. Keep arrays tree-owned, as on the configured path.
+  // Explicit requests still use the ordinary resolver, including custom
+  // iterable arrays supplied by JavaScript callers.
+  if (enhancers.length === 0 && explicitCapabilities === undefined) {
+    return {
+      requestedCapabilities: [],
+      capabilities: [],
+      has: () => false,
+      leafMetadataStorage: 'property',
+    };
+  }
   const requestedCapabilities = collectRequestedTreeCapabilities([
     ...enhancers.map((enhancer) => getEnhancerMeta(enhancer)),
     // An explicit request is treated as one more declaration, so it goes
     // through the same dependency resolution rather than bypassing it.
-    { capabilities: [...explicitCapabilities] },
+    { capabilities: [...(explicitCapabilities ?? [])] },
   ]);
   // LAYOUT: 'property' is retained deliberately for now. The planned path used
   // 'sidecar', and switching both construction AND physical metadata layout in

@@ -128,7 +128,7 @@ export function createTreeScalarSlotRuntime(
 ): TreeScalarSlotRuntime {
   const values: unknown[] = [];
   const equalities: SlotEqualityFn[] = [];
-  const slotByPositionId = new Map<PositionId, SlotIndex>();
+  let slotByPositionId: Map<PositionId, SlotIndex> | undefined;
   let revision = 0;
 
   const getCommittedRevision = (): number =>
@@ -257,7 +257,7 @@ export function createTreeScalarSlotRuntime(
       equalities.push(equal as SlotEqualityFn);
 
       if (positionId !== undefined) {
-        slotByPositionId.set(positionId, slotIndex);
+        (slotByPositionId ??= new Map()).set(positionId, slotIndex);
       }
 
       return slotIndex;
@@ -295,7 +295,7 @@ export function createTreeScalarSlotRuntime(
       if (PRODUCTION_SUBSTRATE_STATS_ENABLED) {
         recordProductionSubstrateStat('positionResolutions');
       }
-      return slotByPositionId.get(positionId);
+      return slotByPositionId?.get(positionId);
     },
     revision(): number {
       return getCommittedRevision();

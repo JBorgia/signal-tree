@@ -104,8 +104,10 @@ class TreePositionRegistry implements PositionRegistry {
    */
   readonly id: TreeId = nextRegistryId++ as TreeId;
   private nextPositionId = 1;
-  private parents = new Map<PositionId, PositionId | undefined>();
-  private addresses = new Map<PositionId, readonly string[]>();
+  // Every tree needs its owner namespace; topology/address entries are needed
+  // only when a configured capability or a later observer acquires positions.
+  private parents?: Map<PositionId, PositionId | undefined>;
+  private addresses?: Map<PositionId, readonly string[]>;
 
   // Stored as given, not as a frozen copy (v16 freezes one; v15 15.4.4 does
   // not, 13 B of the entities budget): every producer builds a fresh array
@@ -114,31 +116,31 @@ class TreePositionRegistry implements PositionRegistry {
     position: PositionId,
     address: readonly string[]
   ): void {
-    this.addresses.set(position, address);
+    (this.addresses ??= new Map()).set(position, address);
   }
 
   addressFor(position: PositionId): readonly string[] | undefined {
-    return this.addresses.get(position);
+    return this.addresses?.get(position);
   }
 
-  private collectionPaths = new Map<PositionId, string>();
+  private collectionPaths?: Map<PositionId, string>;
 
   registerCollectionPath(position: PositionId, path: string): void {
-    this.collectionPaths.set(position, path);
+    (this.collectionPaths ??= new Map()).set(position, path);
   }
 
   collectionPathFor(position: PositionId): string | undefined {
-    return this.collectionPaths.get(position);
+    return this.collectionPaths?.get(position);
   }
 
   allocate(parent?: PositionId): PositionId {
     const positionId = this.nextPositionId++ as PositionId;
-    this.parents.set(positionId, parent);
+    (this.parents ??= new Map()).set(positionId, parent);
     return positionId;
   }
 
   parentOf(position: PositionId): PositionId | undefined {
-    return this.parents.get(position);
+    return this.parents?.get(position);
   }
 
   contains(authority: PositionId, participant: PositionId): boolean {
