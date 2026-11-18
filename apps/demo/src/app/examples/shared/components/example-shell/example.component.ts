@@ -63,9 +63,14 @@ let nextSourceId = 0;
           <button
             class="st-example__edit"
             type="button"
+            [disabled]="!playgroundAvailable"
             (click)="openStackblitz()"
           >
-            Edit in StackBlitz ↗
+            {{
+              playgroundAvailable
+                ? 'Edit in StackBlitz ↗'
+                : 'Playground needs a release'
+            }}
           </button>
           } @if (code().length) {
           <button
@@ -81,6 +86,12 @@ let nextSourceId = 0;
         </div>
       </div>
 
+      @if (stackblitz() && !playgroundAvailable) {
+      <p>
+        This candidate is not published. The source stays available here; use
+        the checked local packages to run it.
+      </p>
+      }
       <div
         class="st-example__workspace"
         [class.st-example__workspace--with-code]="code().length && showCode()"
@@ -131,6 +142,7 @@ let nextSourceId = 0;
 })
 export class ExampleComponent {
   private readonly stackblitz_ = inject(StackblitzService);
+  readonly playgroundAvailable = this.stackblitz_.available;
 
   readonly sourceId = `st-example-source-${nextSourceId++}`;
   readonly showCode = signal(true);

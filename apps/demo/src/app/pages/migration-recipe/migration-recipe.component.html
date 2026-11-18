@@ -3,37 +3,61 @@
     <p class="page-eyebrow">SignalTree 15 migration</p>
     <h1>Move concepts, not syntax.</h1>
     <p class="lede">
-      SignalTree 15 has one construction grammar and four public packages. A
-      migration should preserve domain ownership while replacing store
-      machinery, not recreate a legacy architecture behind new names.
+      SignalTree 15 has one kernel and four framework facades. A migration
+      should preserve domain ownership while replacing store machinery, not
+      recreate a legacy architecture behind new names.
     </p>
   </header>
 
   <section class="callout">
     <strong>Angular applications install and construct through:</strong>
-    <pre><code>npm install &#64;signal-tree/angular&#64;{{ signalTreeVersion }}</code></pre>
+    <pre><code>npm install &#64;signal-tree/angular&#64;15</code></pre>
+    <p>
+      This installs the published v15 line. This demo's source version is
+      {{ signalTreeVersion }}; that label does not establish publication. Check
+      the installed manifest and package guidance before migrating.
+    </p>
     <p>
       <code>&#64;signal-tree/angular</code> owns Angular observation, injection,
       lifecycle, and explicit native-signal views. It installs
-      <code>&#64;signal-tree/kernel</code> as an exact dependency. React observation lives in
-      <code>&#64;signal-tree/react</code>, and Vue applications construct through
-      <code>&#64;signal-tree/vue</code>.
+      <code>&#64;signal-tree/kernel</code> as an exact dependency. React
+      observation lives in <code>&#64;signal-tree/react</code>, and Vue
+      applications construct through <code>&#64;signal-tree/vue</code>. Solid
+      applications use <code>&#64;signal-tree/solid</code>.
     </p>
   </section>
 
   <nav class="toc" aria-label="Migration sections">
     <strong>Migration path:</strong>
     <ul>
-      <li><a href="#mapping">1. Map responsibilities</a></li>
-      <li><a href="#construct">2. Construct once</a></li>
-      <li><a href="#operations">3. Move writes to Ops</a></li>
-      <li><a href="#async">4. Keep async application-owned</a></li>
-      <li><a href="#collections">5. Normalize collections</a></li>
-      <li><a href="#removed">6. Delete retired concepts</a></li>
+      <li>
+        <a routerLink="/migrate" fragment="mapping">1. Map responsibilities</a>
+      </li>
+      <li>
+        <a routerLink="/migrate" fragment="construct">2. Construct once</a>
+      </li>
+      <li>
+        <a routerLink="/migrate" fragment="operations">3. Move writes to Ops</a>
+      </li>
+      <li>
+        <a routerLink="/migrate" fragment="async"
+          >4. Keep async application-owned</a
+        >
+      </li>
+      <li>
+        <a routerLink="/migrate" fragment="collections"
+          >5. Normalize collections</a
+        >
+      </li>
+      <li>
+        <a routerLink="/migrate" fragment="removed"
+          >6. Delete retired concepts</a
+        >
+      </li>
     </ul>
   </nav>
 
-  <section id="mapping">
+  <section id="mapping" tabindex="-1">
     <h2>1. Map responsibilities</h2>
     <div class="compare-grid example-grid">
       <div class="lib-pane">
@@ -61,7 +85,7 @@
     </div>
   </section>
 
-  <section id="construct">
+  <section id="construct" tabindex="-1">
     <h2>2. Construct state, capabilities, and derived values once</h2>
     <pre
       ngNonBindable
@@ -108,7 +132,7 @@ export const AppTree = defineStore(
     </p>
   </section>
 
-  <section id="operations">
+  <section id="operations" tabindex="-1">
     <h2>3. Move domain writes to explicit Ops services</h2>
     <pre ngNonBindable><code>&#64;Injectable(&#123; providedIn: 'root' &#125;)
 export class UserOps &#123;
@@ -130,7 +154,7 @@ export class UserOps &#123;
     </p>
   </section>
 
-  <section id="async">
+  <section id="async" tabindex="-1">
     <h2>4. Keep requests, cancellation, and persistence application-owned</h2>
     <pre ngNonBindable><code>async refresh(): Promise&lt;void&gt; &#123;
   const users = await this.api.list();
@@ -144,7 +168,7 @@ export class UserOps &#123;
     </p>
   </section>
 
-  <section id="collections">
+  <section id="collections" tabindex="-1">
     <h2>5. Use EntityMap when keyed identity earns it</h2>
     <pre ngNonBindable><code>tree.$.users.addOne(user);
 tree.$.users.updateOne(user.id, &#123; active: false &#125;);
@@ -156,7 +180,7 @@ tree.$.users.where(activeUser)();</code></pre>
     </p>
   </section>
 
-  <section id="removed">
+  <section id="removed" tabindex="-1">
     <h2>6. Delete concepts that do not survive v15</h2>
     <div class="callout">
       <ul>

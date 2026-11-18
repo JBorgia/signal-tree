@@ -46,14 +46,14 @@ describe('ExampleComponent', () => {
   let fixture: ComponentFixture<ExampleHostComponent>;
   let element: HTMLElement;
   const openStackblitz = jest.fn();
+  const playground = { available: true, open: openStackblitz };
 
   beforeEach(async () => {
     openStackblitz.mockReset();
+    playground.available = true;
     await TestBed.configureTestingModule({
       imports: [ExampleHostComponent],
-      providers: [
-        { provide: StackblitzService, useValue: { open: openStackblitz } },
-      ],
+      providers: [{ provide: StackblitzService, useValue: playground }],
     }).compileComponents();
     fixture = TestBed.createComponent(ExampleHostComponent);
     element = fixture.nativeElement;
@@ -162,6 +162,27 @@ describe('ExampleComponent', () => {
     fixture.detectChanges();
     query<HTMLButtonElement>('.st-example__edit').click();
     expect(openStackblitz).toHaveBeenCalledWith(config);
+  });
+
+  it('keeps source available while explaining an unavailable candidate playground', () => {
+    playground.available = false;
+    const candidate = TestBed.createComponent(ExampleHostComponent);
+    candidate.componentInstance.stackblitz.set({
+      title: 'Candidate',
+      files: {},
+    });
+    candidate.detectChanges();
+    const element: HTMLElement = candidate.nativeElement;
+    const button =
+      element.querySelector<HTMLButtonElement>('.st-example__edit');
+    expect(button?.disabled).toBe(true);
+    expect(element.textContent).toContain('This candidate is not published');
+    expect(element.querySelector('.st-example__code')?.textContent).toContain(
+      'const count = signal(0);'
+    );
+    button?.click();
+    expect(openStackblitz).not.toHaveBeenCalled();
+    candidate.destroy();
   });
 
   it('assigns separate source regions when multiple examples share a page', () => {

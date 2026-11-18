@@ -1,13 +1,43 @@
 # SignalTree
 
-This reference describes the 15.4.3 package version, with explicitly marked
-15.3.1 comparisons. Consult the [npm package page](https://www.npmjs.com/package/@signal-tree/kernel?activeTab=versions)
-for published versions.
+This reference describes the v15 API, with explicitly marked historical
+comparisons. Match examples to the installed package's manifest and declarations.
+This checkout's package version is not proof of publication; consult the
+[npm package page](https://www.npmjs.com/package/@signal-tree/kernel?activeTab=versions)
+for published versions. V16 examples and its `transact()` method are not v15 APIs.
 
 SignalTree keeps nested state, entity identity, transactions, undo, external
 updates and reactive publication consistent across frameworks. The v15 construction model is
 `signalTree(initialState, { derived, enhancers })`; state is read through
 `tree.$`.
+
+## Adopt one useful feature
+
+Start with the [checked first-feature recipe](docs/guides/first-feature-v15.md).
+Use native signals for a few local values when that is sufficient. A v15 tree
+can begin without enhancers; add EntityMap for keyed records and restoration
+only when the product has an Undo workflow. Importing, configuring and exercising
+a capability have different costs; omitted features do not promise zero shared
+runtime overhead. There is no separate Lite runtime.
+
+For Angular, use `@signal-tree/angular` consistently and `defineStore()` at an
+explicit owner boundary. The providing injector owns its cleanup. Directly
+created trees need `destroy()` at teardown. Keep incoming accepted server truth
+inside `external()`, and retain fetching, authorization, persistence and request
+ordering in the application's existing layer.
+
+Before adopting generated code, compile it against installed types and exercise
+overlapping edits, external updates, replacement, failure and owner teardown.
+V15 opens transactions with `transaction()`; do not generate v16's `transact()`,
+pending-handle `inspect()` or recoverable-refusal guarantees for a v15 consumer.
+An Undo refusal is not success: preserve the current view and explain recovery
+using the current [failure contract](docs/guides/transaction-failures-v15.md).
+Do not fix a compile error with broad casts or invent methods from an older guide.
+Resolve contradictory repository instructions against the actual installed line.
+
+The executable home story and its behavior tests accompany the recipe. Correct
+API text and passing examples do not by themselves establish AI-assisted adoption
+success or human understanding; those need their own task evaluation.
 
 ## What SignalTree is — and is not
 

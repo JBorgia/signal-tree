@@ -79,6 +79,17 @@ describe('HomeComponent', () => {
       element.querySelector('[data-order="102"] [data-status]')?.textContent
     ).toContain('Ready');
     expect(actions[2].disabled).toBe(true);
+    const events = element.querySelectorAll('.story-history li');
+    expect(events).toHaveLength(3);
+    expect(renderedText(events[0] as HTMLElement)).toContain(
+      'Made order 101 Rush'
+    );
+    expect(renderedText(events[1] as HTMLElement)).toContain(
+      'Reported order 101 Shipped'
+    );
+    expect(renderedText(events[2] as HTMLElement)).toContain(
+      'Shipping status stayed Shipped'
+    );
     actions[3].click();
     await settleTurn();
     fixture.detectChanges();
@@ -86,6 +97,43 @@ describe('HomeComponent', () => {
       element.querySelector('[data-order="101"] [data-status]')?.textContent
     ).toContain('Packing');
     expect(actions[2].disabled).toBe(true);
+    expect(element.querySelector('.story-history')).toBeNull();
+  });
+
+  it('explains each perspective without changing the operation or implying measured savings', async () => {
+    const fixture = TestBed.createComponent(HomeComponent);
+    fixture.detectChanges();
+    const element: HTMLElement = fixture.nativeElement;
+    fixture.componentInstance.prioritize();
+    await settleTurn();
+    fixture.detectChanges();
+    const choices = element.querySelectorAll<HTMLButtonElement>(
+      '.perspective-options button'
+    );
+    choices[1].click();
+    fixture.detectChanges();
+    expect(choices[1].getAttribute('aria-pressed')).toBe('true');
+    expect(element.querySelector('.perspective-copy')?.textContent).toContain(
+      'component owns this store'
+    );
+    expect(
+      element.querySelector('.perspective-copy a')?.getAttribute('href')
+    ).toBe('/docs?package=first-feature-v15');
+    choices[2].click();
+    fixture.detectChanges();
+    expect(choices[1].getAttribute('aria-pressed')).toBe('false');
+    expect(choices[2].getAttribute('aria-pressed')).toBe('true');
+    expect(element.querySelector('.perspective-copy')?.textContent).toContain(
+      'potential benefits to measure'
+    );
+    choices[0].click();
+    fixture.detectChanges();
+    expect(
+      element.querySelector('.perspective-copy a')?.getAttribute('href')
+    ).toBe('/owned-sessions');
+    expect(fixture.componentInstance.orders[0].priority()).toBe('Rush');
+    expect(fixture.componentInstance.orders[0].status()).toBe('Packing');
+    expect(fixture.componentInstance.storyEvents()).toHaveLength(1);
   });
 
   it('starts each visit with independently owned state', async () => {
@@ -111,7 +159,7 @@ describe('HomeComponent', () => {
       buttons[index].click();
       fixture.detectChanges();
       expect(element.querySelector('.install-panel code')?.textContent).toBe(
-        `npm install @signal-tree/${id}`
+        `npm install @signal-tree/${id}@15`
       );
       expect(
         element.querySelector('.install-panel a')?.getAttribute('href')

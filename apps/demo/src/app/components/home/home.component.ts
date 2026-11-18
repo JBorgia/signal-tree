@@ -7,40 +7,21 @@ import {
   signal,
 } from '@angular/core';
 import { RouterModule } from '@angular/router';
-import {
-  defineStore,
-  entityMap,
-  external,
-  restoration,
-  signalTree,
-  undoable,
-} from '@signal-tree/angular';
+import { defineStore, external, undoable } from '@signal-tree/angular';
 
 import {
   CodeTabsComponent,
   type CodeFile,
 } from '../../examples/shared/components/example-shell';
+import { createOrderEditTree } from './order-edit-recipe';
 
-interface Order {
-  id: number;
-  customer: string;
-  priority: string;
-  status: string;
+const DemoOrders = defineStore(createOrderEditTree);
+
+type Perspective = 'user' | 'developer' | 'business';
+interface StoryEvent {
+  actor: string;
+  result: string;
 }
-
-const DemoOrders = defineStore(() => {
-  const tree = signalTree(
-    { orders: entityMap<Order, number>({ selectId: (order) => order.id }) },
-    { enhancers: [restoration()] }
-  );
-  external(() =>
-    tree.$.orders.addMany([
-      { id: 101, customer: 'Ada', priority: 'Standard', status: 'Packing' },
-      { id: 102, customer: 'Lin', priority: 'Standard', status: 'Ready' },
-    ])
-  );
-  return tree;
-});
 
 @Component({
   selector: 'app-home',
@@ -66,19 +47,30 @@ export class HomeComponent {
   });
   readonly canUndo = signal(false);
   readonly message = signal('Try order 101. Order 102 stays unchanged.');
+  readonly perspective = signal<Perspective>('user');
+  readonly storyEvents = signal<readonly StoryEvent[]>([]);
+  readonly perspectives: readonly { id: Perspective; label: string }[] = [
+    { id: 'user', label: 'I use the app' },
+    { id: 'developer', label: 'I build the app' },
+    { id: 'business', label: 'I choose the product' },
+  ];
 
   readonly packages = [
     {
       label: 'Angular',
       id: 'angular',
-      command: 'npm install @signal-tree/angular',
+      command: 'npm install @signal-tree/angular@15',
     },
-    { label: 'React', id: 'react', command: 'npm install @signal-tree/react' },
-    { label: 'Vue', id: 'vue', command: 'npm install @signal-tree/vue' },
+    {
+      label: 'React',
+      id: 'react',
+      command: 'npm install @signal-tree/react@15',
+    },
+    { label: 'Vue', id: 'vue', command: 'npm install @signal-tree/vue@15' },
     {
       label: 'TypeScript',
       id: 'kernel',
-      command: 'npm install @signal-tree/kernel',
+      command: 'npm install @signal-tree/kernel@15',
     },
   ] as const;
   readonly selectedPackage = signal(
@@ -124,12 +116,17 @@ tree.undo();
   prioritize(): void {
     undoable(() => this.orders[0].priority.set('Rush'));
     this.message.set('Order 101 is Rush. Order 102 stays Standard.');
+    this.record('You', 'Made order 101 Rush. The other order stayed Standard.');
     this.refreshUndo();
   }
 
   receiveUpdate(): void {
     external(() => this.orders[0].status.set('Shipped'));
     this.message.set('Simulated server update: order 101 is Shipped.');
+    this.record(
+      'Shipping service',
+      'Reported order 101 Shipped. Priority stayed as it was.'
+    );
     this.refreshUndo();
   }
 
@@ -137,6 +134,10 @@ tree.undo();
     this.tree.undo();
     this.message.set(
       `Priority restored. Order 101 is still ${this.orders[0].status()}.`
+    );
+    this.record(
+      'You, undoing your edit',
+      `Restored Standard priority. Shipping status stayed ${this.orders[0].status()}.`
     );
     this.refreshUndo();
   }
@@ -149,7 +150,16 @@ tree.undo();
     this.tree.resetRestorationHistory();
     this.canUndo.set(false);
     this.message.set('Try order 101. Order 102 stays unchanged.');
+    this.storyEvents.set([]);
     this.refreshUndo();
+  }
+
+  private record(actor: string, result: string): void {
+    // A bounded explanation of this local demonstration, not a durable audit log.
+    this.storyEvents.update((events) => [
+      ...events.slice(-5),
+      { actor, result },
+    ]);
   }
 
   private refreshUndo(): void {

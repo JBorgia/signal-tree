@@ -13,7 +13,11 @@
       "inputs": [
         "production",
         "^production",
+        { "runtime": "node tools/demo-source-ref.cjs" },
+        "{workspaceRoot}/tools/demo-source-ref.cjs",
+        "{workspaceRoot}/tools/generate-version-env.cjs",
         "{workspaceRoot}/llms.txt",
+        "{workspaceRoot}/docs/guides/first-feature-v15.md",
         "{workspaceRoot}/docs/guides/composition-recipes.md",
         "{workspaceRoot}/docs/guides/owned-sessions.md",
         "{workspaceRoot}/docs/guides/persistence-guide.md",
@@ -59,6 +63,11 @@
             "glob": "README.md",
             "input": "packages/solid",
             "output": "assets/docs/solid"
+          },
+          {
+            "glob": "first-feature-v15.md",
+            "input": "docs/guides",
+            "output": "assets/docs/guides"
           },
           {
             "glob": "composition-recipes.md",
@@ -114,6 +123,7 @@
       }
     },
     "serve": {
+      "dependsOn": ["generate-versions", "generate-deep-typing-proofs"],
       "continuous": true,
       "executor": "@angular/build:dev-server",
       "defaultConfiguration": "development",
@@ -127,6 +137,7 @@
       }
     },
     "extract-i18n": {
+      "dependsOn": ["generate-versions", "generate-deep-typing-proofs"],
       "executor": "@angular/build:extract-i18n",
       "options": {
         "buildTarget": "demo:build"
@@ -138,7 +149,7 @@
     "test": {
       "executor": "@nx/jest:jest",
       "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
-      "dependsOn": ["generate-deep-typing-proofs"],
+      "dependsOn": ["generate-versions", "generate-deep-typing-proofs"],
       "options": {
         "jestConfig": "apps/demo/jest.config.ts",
         "passWithNoTests": true,
@@ -147,6 +158,7 @@
     },
     "generate-versions": {
       "executor": "nx:run-commands",
+      "cache": false,
       "options": {
         "command": "node tools/generate-version-env.cjs"
       }
@@ -159,6 +171,7 @@
       }
     },
     "serve-static": {
+      "dependsOn": ["generate-versions", "generate-deep-typing-proofs"],
       "continuous": true,
       "executor": "@nx/web:file-server",
       "options": {

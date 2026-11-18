@@ -1,3 +1,4 @@
+import { ViewportScroller } from '@angular/common';
 import { TestBed } from '@angular/core/testing';
 import { RouterModule } from '@angular/router';
 import { Component, ChangeDetectionStrategy } from '@angular/core';
@@ -31,6 +32,22 @@ describe('AppComponent', () => {
     const fixture = TestBed.createComponent(AppComponent);
     const app = fixture.componentInstance;
     expect(app).toBeTruthy();
+  });
+
+  it('moves focus locally without navigating away from the current route', () => {
+    const fixture = TestBed.createComponent(AppComponent);
+    fixture.detectChanges();
+    const scroll = jest.spyOn(
+      TestBed.inject(ViewportScroller),
+      'scrollToAnchor'
+    );
+    const event = new MouseEvent('click', { bubbles: true, cancelable: true });
+    fixture.nativeElement.querySelector('.skip-link').dispatchEvent(event);
+    expect(event.defaultPrevented).toBe(true);
+    expect(scroll).toHaveBeenCalledWith('main-content');
+    expect(fixture.nativeElement.querySelector('#main-content').tabIndex).toBe(
+      -1
+    );
   });
 
   it('should render navigation', () => {

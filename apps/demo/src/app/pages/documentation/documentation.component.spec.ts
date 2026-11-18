@@ -6,7 +6,7 @@ import {
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 
-import { SIGNALTREE_CORE_VERSION } from '../../version';
+import { SIGNALTREE_SOURCE_REF } from '../../source-ref.generated';
 
 import { DocumentationComponent } from './documentation.component';
 
@@ -77,6 +77,16 @@ describe('DocumentationComponent', () => {
     expect(links.length).toBe(component.quickLinks.length);
     expect(fixture.nativeElement.querySelector('aside')).toBeNull();
     expect(fixture.nativeElement.querySelector('.package-list')).toBeTruthy();
+    const jump = fixture.nativeElement.querySelector('.read-selected-guide');
+    expect(jump.getAttribute('href')).toBe(
+      '/docs?package=kernel#selected-guide'
+    );
+    expect(jump.textContent).toContain(component.selectedPackage().name);
+    expect(
+      fixture.nativeElement
+        .querySelector('#selected-guide')
+        .getAttribute('tabindex')
+    ).toBe('-1');
   });
 
   it('indexes current v15 docs and current demo routes only', () => {
@@ -149,6 +159,9 @@ describe('DocumentationComponent', () => {
 
     expect(component.selectedPackage().id).toBe(target.id);
     expect(buttons[index].classList.contains('active')).toBe(true);
+    expect(
+      fixture.nativeElement.querySelector('.read-selected-guide').textContent
+    ).toContain(target.name);
   });
   it.each(['kernel', 'angular', 'react', 'vue'])(
     'resolves %s documentation links from the source document and keeps anchors in the docs route',
@@ -182,10 +195,10 @@ describe('DocumentationComponent', () => {
       expect(href('Same document')).toBe(`/docs?package=${id}#ownership`);
       expect(href('Manifest')).toBe('/llms.txt');
       expect(href('Package metadata')).toBe(
-        `https://github.com/JBorgia/signal-tree/blob/v${SIGNALTREE_CORE_VERSION}/packages/angular/package.json`
+        `https://github.com/JBorgia/signal-tree/blob/${SIGNALTREE_SOURCE_REF}/packages/angular/package.json`
       );
       expect(href('License')).toBe(
-        `https://github.com/JBorgia/signal-tree/blob/v${SIGNALTREE_CORE_VERSION}/LICENSE`
+        `https://github.com/JBorgia/signal-tree/blob/${SIGNALTREE_SOURCE_REF}/LICENSE`
       );
       expect(href('React guide')).toBe('/docs?package=react#ownership');
       expect(href('External')).toBe('https://example.com/guide?q=1#setup');
@@ -196,7 +209,7 @@ describe('DocumentationComponent', () => {
       expect(
         root.querySelector('.markdown-content img')?.getAttribute('src')
       ).toBe(
-        `https://raw.githubusercontent.com/JBorgia/signal-tree/v${SIGNALTREE_CORE_VERSION}/packages/${id}/diagram.svg`
+        `https://raw.githubusercontent.com/JBorgia/signal-tree/${SIGNALTREE_SOURCE_REF}/packages/${id}/diagram.svg`
       );
     }
   );
@@ -218,7 +231,7 @@ describe('DocumentationComponent', () => {
         .querySelector('.markdown-content a')
         ?.getAttribute('href')
     ).toBe(
-      `https://github.com/JBorgia/signal-tree/blob/v${SIGNALTREE_CORE_VERSION}/docs/architecture/signaltree-architecture-guide.md`
+      `https://github.com/JBorgia/signal-tree/blob/${SIGNALTREE_SOURCE_REF}/docs/architecture/signaltree-architecture-guide.md`
     );
   });
 

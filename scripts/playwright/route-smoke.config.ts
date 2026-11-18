@@ -14,7 +14,9 @@ export default defineConfig({
   testDir: '.',
   testMatch: [
     'route-smoke.spec.ts',
+    'route-content-audit.spec.ts',
     'owned-sessions.spec.ts',
+    'adoption-story.spec.ts',
     'architecture-connectors.spec.ts',
     'benchmarks.spec.ts',
     'demo-production-bundle.spec.ts',

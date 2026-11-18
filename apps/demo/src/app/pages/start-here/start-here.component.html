@@ -7,13 +7,13 @@
       its store a clear owner, then test the interaction your users need.
     </p>
     <nav class="page-toc" aria-label="On this page">
-      <a href="#setup">1. Choose your framework</a>
-      <a href="#feature">2. Make one update</a>
-      <a href="#evaluate">3. Check the fit</a>
+      <a routerLink="/start" fragment="setup">1. Choose your framework</a>
+      <a routerLink="/start" fragment="feature">2. Make one update</a>
+      <a routerLink="/start" fragment="evaluate">3. Check the fit</a>
     </nav>
   </header>
 
-  <section id="setup" class="section">
+  <section id="setup" tabindex="-1" class="section">
     <h2 class="section-title">Choose your framework.</h2>
     <div class="next-steps-grid">
       @for (step of nextSteps; track step.package) {
@@ -32,7 +32,7 @@
     </div>
   </section>
 
-  <section id="feature" class="section section-alt">
+  <section id="feature" tabindex="-1" class="section section-alt">
     <h2 class="section-title">Make one update.</h2>
     <p class="section-intro">
       In Angular, declare your data and read or write its typed paths. Install
@@ -45,9 +45,16 @@
         >Follow the ownership and Ops guide</a
       >. Directly created trees need <code>destroy()</code> at teardown.
     </p>
+    <p class="section-aside">
+      Build the home-page story with the
+      <a routerLink="/docs" [queryParams]="{ package: 'first-feature-v15' }"
+        >checked first-feature recipe</a
+      >: a user edit, an incoming shipping update, and an undo that preserves
+      it. The guide links to the executable source and behavior tests.
+    </p>
   </section>
 
-  <section id="evaluate" class="section">
+  <section id="evaluate" tabindex="-1" class="section">
     <h2 class="section-title">Keep it if it removes work.</h2>
     <p class="section-intro">
       A few local values may need only native signals. SignalTree adds typed

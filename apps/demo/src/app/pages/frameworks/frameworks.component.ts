@@ -1,37 +1,25 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { RouterLink } from '@angular/router';
 
 interface FrameworkRealization {
   readonly id: string;
   readonly name: string;
   readonly realization: string;
   readonly primitive: string;
-  readonly memory: string;
   readonly install: string;
   readonly read: string;
   readonly write: string;
 }
 
-interface RoadmapEntry {
-  readonly name: string;
-  readonly when: string;
-  readonly note: string;
-}
-
 /**
- * The framework surface.
- *
- * The site previously presented SignalTree as kernel-and-TypeScript with the
- * framework entries collapsed into package-documentation links, which
- * understated what actually changed: each framework package is now a physical
- * realization layer, not a wrapper.
- *
- * Memory figures live HERE rather than on the landing page, and each carries
- * the qualifier that makes it honest. A released-residue number lifted out of
- * its methodology is how a benchmark becomes marketing.
+ * Choose the application facade before starting a feature. Historical residue
+ * figures remain in Git/audit records; they do not describe this candidate's
+ * application cost. Keep this page about current adoption and observable work.
  */
 @Component({
   selector: 'app-frameworks',
   standalone: true,
+  imports: [RouterLink],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './frameworks.component.html',
   styleUrl: './frameworks.component.scss',
@@ -43,8 +31,7 @@ export class FrameworksComponent {
       name: 'Angular',
       realization: 'Native Angular realization',
       primitive: 'signal() — callable, tracked, writable',
-      memory: '1,350 B/entity',
-      install: 'npm i @signal-tree/angular',
+      install: 'npm i @signal-tree/angular@15',
       read: 'tree.$.count()',
       write: 'tree.$.count.set(1)',
     },
@@ -53,8 +40,7 @@ export class FrameworksComponent {
       name: 'Vue',
       realization: 'Native Vue realization',
       primitive: 'shallowRef with a reader',
-      memory: '1,135 B/entity',
-      install: 'npm i @signal-tree/vue',
+      install: 'npm i @signal-tree/vue@15',
       read: 'tree.$.count.value',
       write: 'tree.$.count.value = 1',
     },
@@ -63,11 +49,7 @@ export class FrameworksComponent {
       name: 'Solid',
       realization: 'Native Solid realization',
       primitive: 'createSignal — tracked getter and setter',
-      // Deliberately not a number. Solid shipped on correctness and semantic
-      // conformance; its realization cost was not characterized, and inventing
-      // a figure to fill the column would be worse than an honest blank.
-      memory: 'Not yet characterized',
-      install: 'npm i @signal-tree/solid',
+      install: 'npm i @signal-tree/solid@15',
       read: 'tree.$.count()',
       write: 'tree.$.count.set(1)',
     },
@@ -75,58 +57,39 @@ export class FrameworksComponent {
       id: 'react',
       name: 'React',
       realization: 'Portable / external-store realization',
-      primitive: 'Subscription via useSyncExternalStore',
-      memory: '~1,748 B/entity',
-      install: 'npm i @signal-tree/react',
+      primitive: 'useSignalTree() selects a stable snapshot',
+      install: 'npm i @signal-tree/react@15',
       read: 'tree.$.count()',
-      write: 'tree.$.count.set(1)',
-    },
-  ];
-
-  readonly roadmap: readonly RoadmapEntry[] = [
-    {
-      name: 'Preact',
-      when: 'Next',
-      note: 'Standalone signal objects with tracked, writable .value — strong technical fit, unmeasured.',
-    },
-    {
-      name: 'Svelte',
-      when: 'Later',
-      note: 'Runes are compiler constructs; integration would go through createSubscriber.',
-    },
-    {
-      name: 'Qwik · Lit',
-      when: 'Demand-driven',
-      note: 'Promising primitives, different system constraints.',
+      write: 'tree.$.count(1)',
     },
   ];
 
   /** The same semantics, expressed in each framework's own idiom. */
   readonly semantics: readonly { name: string; detail: string }[] = [
     {
-      name: 'Stable subject identity',
+      name: 'Entity lifetime',
       detail:
-        'A held row belongs to a subject, not a key. Remove it and re-add the same id and the old reference stays gone rather than silently pointing at a different row.',
+        'A held record belongs to one entity lifetime. Removing it and adding a new record with the same ID does not redirect the old handle.',
     },
     {
-      name: 'Authored vs realized',
+      name: 'User edits and incoming truth',
       detail:
-        'A user edit and a server reconciliation are both writes, and the tree knows which is which.',
+        'The application designates user edits and accepted external updates. Optional undo can preserve unrelated incoming changes.',
     },
     {
       name: 'Transactions and rollback',
       detail:
-        'Speculative state is visible immediately; a rollback compensates through the same references your UI already holds.',
+        'Transaction changes are visible immediately. A successful rollback compensates through existing handles; the application must handle a refusal according to the v15 failure contract.',
     },
     {
       name: 'Restoration',
       detail:
-        'Restoring an earlier truth revives the same subject rather than creating a lookalike.',
+        'Opt in to restoration when the workflow needs undo. Test overlap, incoming updates and recovery with the actual feature.',
     },
     {
       name: 'External truth',
       detail:
-        'link() binds part of the tree to a source outside it, with the tree still owning what a write means.',
+        'external() lands accepted results. link() maintains an endpoint relationship. Fetching, authorization and persistence stay in the application and backend.',
     },
   ];
 }

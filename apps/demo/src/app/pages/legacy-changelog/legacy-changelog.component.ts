@@ -1,6 +1,8 @@
 import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { RouterLink } from '@angular/router';
 
+import { SIGNALTREE_SOURCE_REF } from '../../source-ref.generated';
+
 /**
  * Pre-15 release history, split out of the "What's New" example so the live
  * surface only carries the current (v15) release. Everything here describes
@@ -14,4 +16,9 @@ import { RouterLink } from '@angular/router';
   changeDetection: ChangeDetectionStrategy.OnPush,
   styleUrl: './legacy-changelog.component.scss',
 })
-export class LegacyChangelogComponent {}
+export class LegacyChangelogComponent {
+  readonly sourceRoot =
+    'https://github.com/JBorgia/signal-tree/blob/' +
+    SIGNALTREE_SOURCE_REF +
+    '/';
+}

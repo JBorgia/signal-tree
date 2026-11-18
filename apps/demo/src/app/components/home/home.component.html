@@ -5,8 +5,9 @@
         <p class="hero-eyebrow">SignalTree · Typed reactive state</p>
         <h1>Update one field. Keep the rest intact.</h1>
         <p class="hero-lede">
-          Work with nested data directly. Keep individual records reactive. Add
-          undo that preserves unrelated server updates.
+          A customer calls. You change an order. A shipping update arrives. Then
+          the customer changes their mind. Undo your edit while keeping the new
+          shipping status.
         </p>
         <div class="hero-actions">
           <a href="#try-it" class="action action-primary"
@@ -31,7 +32,7 @@
   <section id="try-it" class="home-section" aria-labelledby="try-title">
     <div class="content-shell">
       <header class="section-heading">
-        <p>One record. One direct update.</p>
+        <p>A working day, in three clicks</p>
         <h2 id="try-title">Try an order edit.</h2>
         <span
           >Make an order urgent, receive a shipping update, then undo only your
@@ -61,9 +62,6 @@
                   <dd data-status>{{ order.status() }}</dd>
                 </div>
               </dl>
-              <p class="reader-count">
-                Priority reader runs: {{ priorityReaders[index]().runs }}
-              </p>
             </article>
             }
           </div>
@@ -97,15 +95,111 @@
             </button>
           </div>
           <p class="demo-message" role="status">{{ message() }}</p>
-          <p class="reader-note">
-            Counts show computed reader evaluations, not browser rendering.
-          </p>
+          @if (storyEvents().length) {
+          <section class="story-history" aria-labelledby="story-history-title">
+            <h3 id="story-history-title">What happened</h3>
+            <ol>
+              @for (event of storyEvents(); track $index) {
+              <li>
+                <strong>{{ event.actor }}</strong
+                ><span>{{ event.result }}</span>
+              </li>
+              }
+            </ol>
+            <p>
+              This local story resets with the demo. It is not a saved audit
+              log.
+            </p>
+          </section>
+          }
           <a routerLink="/restoration" class="text-link"
             >How optional undo works <span aria-hidden="true">→</span></a
           >
         </div>
-        <st-code-tabs [files]="example" />
+        <aside class="story-perspective" aria-labelledby="perspective-title">
+          <h3 id="perspective-title">What does this change for you?</h3>
+          <div
+            class="perspective-options"
+            role="group"
+            aria-label="Choose your perspective"
+          >
+            @for (view of perspectives; track view.id) {
+            <button
+              type="button"
+              [attr.aria-pressed]="perspective() === view.id"
+              (click)="perspective.set(view.id)"
+            >
+              {{ view.label }}
+            </button>
+            }
+          </div>
+          <div class="perspective-copy">
+            @switch (perspective()) { @case ('user') {
+            <h4>Undo the part you meant to change.</h4>
+            <p>
+              You can change your mind without taking the shipping service back
+              in time. The second order stays untouched.
+            </p>
+            <p>
+              This example changes different fields. If newer work conflicts
+              with an undo, the application needs to explain the refusal and
+              offer recovery.
+            </p>
+            <a routerLink="/owned-sessions" class="text-link"
+              >Next: open two editors and try a stale save →</a
+            >
+            } @case ('developer') {
+            <h4>Make the boundaries visible in your code.</h4>
+            <p>
+              Use a keyed collection, designate the user's undoable edit, and
+              accept the shipping result as external truth. The component owns
+              this store and its cleanup.
+            </p>
+            <a
+              routerLink="/docs"
+              [queryParams]="{ package: 'first-feature-v15' }"
+              class="text-link"
+              >Build this feature from the checked recipe →</a
+            >
+            } @case ('business') {
+            <h4>Offer editing that works alongside live operations.</h4>
+            <p>
+              Customers can revise their work while operational updates
+              continue. Your product can offer undo and independent editors with
+              clear recovery when changes conflict.
+            </p>
+            <p>
+              Less rework and support effort are potential benefits to measure
+              in your workflow. This demo does not establish saved hours,
+              prevented incidents, or financial returns.
+            </p>
+            <a routerLink="/start" class="text-link"
+              >Evaluate one real feature first →</a
+            >
+            } }
+          </div>
+          <p class="story-boundary">
+            The shipping service is simulated. Your backend still owns
+            authorization, persistence, and actual shipment changes.
+          </p>
+        </aside>
       </div>
+      <details class="implementation-details">
+        <summary>See the code and what was measured</summary>
+        <st-code-tabs [files]="example" />
+        <p class="reader-note">
+          Computed priority reader evaluations: order 101
+          {{ priorityReaders[0]().runs }}, order 102
+          {{ priorityReaders[1]().runs }}. These counts are not browser renders
+          or a speed benchmark.
+        </p>
+        <a
+          routerLink="/docs"
+          [queryParams]="{ package: 'first-feature-v15' }"
+          class="text-link"
+          >Recipe, executable source, and behavior tests →</a
+        >
+      </details>
       <div class="benefits">
         <article>
           <h3>Write the field you mean</h3>
@@ -175,6 +269,10 @@
         </p>
       </div>
       <nav class="adoption-links" aria-label="Evaluate adoption">
+        <a routerLink="/docs" [queryParams]="{ package: 'first-feature-v15' }"
+          >First-feature recipe</a
+        >
+        <a routerLink="/owned-sessions">Independent editors</a>
         <a routerLink="/migrate">Migration</a>
         <a routerLink="/architecture-overview">Architecture</a>
         <a

@@ -6,7 +6,14 @@ import tsconfigPaths from 'vite-tsconfig-paths';
 
 export default defineConfig({
   root: import.meta.dirname,
-  plugins: [react(), tsconfigPaths()],
+  plugins: [
+    react(),
+    // Follow this project's lib/spec references; historical audit tsconfigs are
+    // evidence artifacts, not inputs to the live workspace graph.
+    tsconfigPaths({
+      projects: [fileURLToPath(new URL('./tsconfig.json', import.meta.url))],
+    }),
+  ],
   resolve: {
     alias: {
       '@signal-tree/kernel/adapter': fileURLToPath(

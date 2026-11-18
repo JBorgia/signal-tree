@@ -1,7 +1,9 @@
+import { createEnvironmentInjector, EnvironmentInjector } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 
 import { AppStore } from './app-store';
 import { APP_TREE, provideAppTree } from './tree';
+import { PostOps, UiOps, UserOps } from './ops';
 import type { Post, User } from './types';
 
 type NotOffered<T, K extends PropertyKey> = K extends keyof T ? false : true;
@@ -40,16 +42,14 @@ describe('AppStore production consumer', () => {
   let store: AppStore;
 
   beforeEach(async () => {
-    TestBed.configureTestingModule({ providers: [...provideAppTree()] });
+    TestBed.configureTestingModule({
+      providers: [...provideAppTree(), AppStore, PostOps, UiOps, UserOps],
+    });
     store = TestBed.inject(AppStore);
     store.ops.users.upsert(user);
     posts.forEach((post) => store.ops.posts.upsert(post));
     store.ops.users.setSelected(user.id);
     await Promise.resolve();
-  });
-
-  afterEach(() => {
-    TestBed.inject(APP_TREE).destroy();
   });
 
   it('reads nested, entity and derived state through a readonly facade', () => {
@@ -72,5 +72,28 @@ describe('AppStore production consumer', () => {
     expect(store.$.users.entities.byId(user.id)).toBeUndefined();
     expect(store.$.users.selected()).toBeNull();
     expect(store.$.ui.totals().users).toBe(0);
+  });
+
+  it('isolates tutorial owners and destroys only the tree belonging to the closed owner', () => {
+    const parent = TestBed.inject(EnvironmentInjector);
+    const providers = [...provideAppTree(), AppStore, PostOps, UiOps, UserOps];
+    const first = createEnvironmentInjector(providers, parent);
+    const second = createEnvironmentInjector(providers, parent);
+    const firstTree = first.get(APP_TREE);
+    const secondTree = second.get(APP_TREE);
+    try {
+      first.get(AppStore).ops.users.upsert(user);
+      expect(firstTree.$.users.entities.count()).toBe(1);
+      expect(secondTree.$.users.entities.count()).toBe(0);
+      first.destroy();
+      expect(firstTree.destroyed()).toBe(true);
+      expect(secondTree.destroyed()).toBe(false);
+      second.get(AppStore).ops.users.upsert(user);
+      expect(secondTree.$.users.entities.count()).toBe(1);
+    } finally {
+      if (!first.destroyed) first.destroy();
+      second.destroy();
+    }
+    expect(secondTree.destroyed()).toBe(true);
   });
 });

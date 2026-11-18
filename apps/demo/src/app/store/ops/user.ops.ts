@@ -12,7 +12,7 @@ import { APP_TREE } from '../tree';
  * on `store.$.users.*`; components call `store.ops.users.<method>()` for
  * anything that writes.
  */
-@Injectable({ providedIn: 'root' })
+@Injectable()
 export class UserOps {
   private readonly _api = inject(ApiService);
   private readonly _$ = inject(APP_TREE).$;

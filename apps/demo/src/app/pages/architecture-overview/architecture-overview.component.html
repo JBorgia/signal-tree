@@ -1,4 +1,4 @@
-<main class="architecture-overview">
+<article class="architecture-overview">
   <header class="architecture-hero">
     <div class="hero-copy">
       <p class="hero-eyebrow">Verified architecture · v15</p>
@@ -11,11 +11,19 @@
     </div>
 
     <nav class="architecture-nav" aria-label="Architecture sections">
-      <a href="#package-ownership">Ownership</a>
-      <a href="#accessor-grammar">State grammar</a>
-      <a href="#causal-authority">Causality</a>
-      <a href="#entity-identity">Identity</a>
-      <a href="#link">Link</a>
+      <a routerLink="/architecture-overview" fragment="package-ownership"
+        >Ownership</a
+      >
+      <a routerLink="/architecture-overview" fragment="accessor-grammar"
+        >State grammar</a
+      >
+      <a routerLink="/architecture-overview" fragment="causal-authority"
+        >Causality</a
+      >
+      <a routerLink="/architecture-overview" fragment="entity-identity"
+        >Identity</a
+      >
+      <a routerLink="/architecture-overview" fragment="link">Link</a>
     </nav>
   </header>
 
@@ -104,4 +112,4 @@
       <app-architecture-diagram [diagram]="projection" />
     </div>
   </section>
-</main>
+</article>

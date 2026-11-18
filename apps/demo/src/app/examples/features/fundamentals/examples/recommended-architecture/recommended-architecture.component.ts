@@ -6,8 +6,10 @@ import {
   inject,
   signal,
   ChangeDetectionStrategy,
+  DestroyRef,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 import {
   type CodeFile,
@@ -15,7 +17,13 @@ import {
   type StackblitzConfig,
   trackEmissions,
 } from '../../../../shared/components/example-shell';
-import { AppStore } from '../../../../../store';
+import {
+  AppStore,
+  PostOps,
+  UiOps,
+  UserOps,
+  provideAppTree,
+} from '../../../../../store';
 
 /** Which pillar the most recent interaction exercised — drives the diagram highlight. */
 type Pillar = 'read' | 'write' | 'react';
@@ -23,7 +31,7 @@ type Pillar = 'read' | 'write' | 'react';
 // ── Source shown in the st-example code panel (real store excerpts) ──────────
 
 const FACADE_SOURCE = `// store/app-store.ts — the one injectable components see
-@Injectable({ providedIn: 'root' })
+@Injectable()
 export class AppStore {
   private readonly tree = inject(APP_TREE);
   readonly $ = asReadonly(this.tree).$;  // READ  → no write path exposed
@@ -44,7 +52,7 @@ export class AppStore {
 }`;
 
 const OPS_SOURCE = `// store/ops/post.ops.ts — every write goes through here
-@Injectable({ providedIn: 'root' })
+@Injectable()
 export class PostOps {
   private readonly _api = inject(ApiService);
   private readonly _$ = inject(APP_TREE).$;
@@ -88,31 +96,37 @@ const tree = signalTree(createBaseState(), {
 });`;
 
 /** Self-contained single-file version of the pattern for the StackBlitz playground. */
-const PLAYGROUND_APP = `import { Component, computed, effect, inject, Injectable } from '@angular/core';
+const PLAYGROUND_APP = `import { Component, DestroyRef, effect, inject, Injectable, InjectionToken } from '@angular/core';
+import { JsonPipe } from '@angular/common';
 import { signalTree } from '@signal-tree/angular';
 
-// One tree per app, assembled once.
-const APP_TREE = signalTree(
-  {
-    count: 0,
-    history: [] as number[],
-  },
-  { derived: ($) => ({ doubled: () => $.count() * 2 }) }
-);
+function createCounter() {
+  return signalTree({ count: 0, history: [] as number[] }, {
+    derived: ($) => ({ doubled: () => $.count() * 2 }),
+  });
+}
+const COUNTER = new InjectionToken<ReturnType<typeof createCounter>>('Counter');
 
-// WRITE — mutations go through an ops service.
-@Injectable({ providedIn: 'root' })
+@Injectable()
 class CounterOps {
-  private $ = APP_TREE.$;
+  private $ = inject(COUNTER).$;
   increment() { this.$.count.update((count) => count + 1); }
   reset() { this.$.count.set(0); }
 }
 
 @Component({
   selector: 'app-root',
-  standalone: true,
+  imports: [JsonPipe],
+  providers: [
+    CounterOps,
+    { provide: COUNTER, useFactory: () => {
+      const tree = createCounter();
+      inject(DestroyRef).onDestroy(() => tree.destroy());
+      return tree;
+    } },
+  ],
   template: \`
-    <h1>READ / WRITE / REACT</h1>
+    <h1>One owned counter</h1>
     <p>count: {{ $.count() }} · doubled: {{ $.doubled() }}</p>
     <button (click)="ops.increment()">+1</button>
     <button (click)="ops.reset()">reset</button>
@@ -120,16 +134,16 @@ class CounterOps {
   \`,
 })
 export class AppComponent {
-  readonly $ = APP_TREE.$;            // READ
-  readonly ops = inject(CounterOps);  // WRITE
+  readonly $ = inject(COUNTER).$;
+  readonly ops = inject(CounterOps);
   constructor() {
-    // REACT — the state change IS the event. No actions, no dispatch.
     effect(() => {
       const n = this.$.count();
       this.$.history.update((history) => [...history, n].slice(-5));
     });
   }
-}`;
+}
+`;
 
 /**
  * Recommended Architecture Demo
@@ -150,12 +164,14 @@ export class AppComponent {
   selector: 'app-recommended-architecture',
   standalone: true,
   imports: [FormsModule, ExampleComponent, RouterLink],
+  providers: [...provideAppTree(), AppStore, PostOps, UiOps, UserOps],
   templateUrl: './recommended-architecture.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
   styleUrl: './recommended-architecture.component.scss',
 })
 export class RecommendedArchitectureComponent {
   readonly store = inject(AppStore);
+  private readonly destroyRef = inject(DestroyRef);
 
   /** The pillar exercised by the last interaction — highlights the diagram. */
   readonly lastPillar = signal<Pillar>('read');
@@ -214,6 +230,16 @@ export class RecommendedArchitectureComponent {
 
   /** Source tabs for the st-example code viewer. */
   readonly codeFiles: CodeFile[] = [
+    {
+      label: 'feature-owner.ts',
+      language: 'typescript',
+      source: `// Scope the tree, facade and all stateful operations to one owner.
+@Component({
+  providers: [...provideAppTree(), AppStore, PostOps, UiOps, UserOps],
+  // The AppTreeService holder destroys its tree in ngOnDestroy.
+})
+export class FeatureComponent { readonly store = inject(AppStore); }`,
+    },
     { label: 'app-store.ts', language: 'typescript', source: FACADE_SOURCE },
     { label: 'post.ops.ts', language: 'typescript', source: OPS_SOURCE },
     {
@@ -226,14 +252,13 @@ export class RecommendedArchitectureComponent {
   /** StackBlitz playground config. */
   readonly stackblitzConfig: StackblitzConfig = {
     title: 'SignalTree — READ / WRITE / REACT',
-    description: 'Shared application-state ownership, self-contained.',
+    description: 'One owned feature with explicit reads, writes and teardown.',
     files: { 'src/app/app.component.ts': PLAYGROUND_APP },
   };
 
   constructor() {
-    // First visit lands on an empty tree — load the dashboard so there's
-    // something live. `AppStore` is a root singleton, so on revisits the data
-    // is already there; don't refetch.
+    // This example owns its tree. Returning to the route creates a new owner,
+    // so the previous example's state and Links do not survive navigation.
     if (this.store.$.users.entities.all().length === 0) {
       this.loadDashboard();
     }
@@ -280,7 +305,10 @@ export class RecommendedArchitectureComponent {
 
   loadDashboard(): void {
     this.pillar('write');
-    this.store.loadDashboard$().subscribe();
+    this.store
+      .loadDashboard$()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe();
   }
 
   deleteSelectedUser(): void {
@@ -299,7 +327,10 @@ export class RecommendedArchitectureComponent {
     const post = this.selectedPost();
     if (!post) return;
     this.pillar('write');
-    this.store.ops.posts.publishPost$(post.id).subscribe();
+    this.store.ops.posts
+      .publishPost$(post.id)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe();
   }
 
   authorName(authorId: number): string {

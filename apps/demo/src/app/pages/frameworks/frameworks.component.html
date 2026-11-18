@@ -1,16 +1,14 @@
-<article class="frameworks">
+<article class="frameworks layout-frame">
   <header class="frameworks__intro">
     <h1>One semantic model. Native to your framework.</h1>
     <p class="frameworks__lede">
-      SignalTree gives Angular, Vue, Solid and React one model for identity,
-      causality, transactions, external truth and restoration — while each
-      framework realizes that model with its own reactive primitive.
+      Keep the framework your team already uses. Choose its SignalTree facade,
+      then build one feature with typed state, keyed records or optional undo.
     </p>
     <p>
-      The kernel owns meaning. A framework package owns only the cheapest
-      correct way to make that meaning observable. That is why these are
-      realization layers rather than wrappers, and why none of them forces the
-      others through a shared lowest common denominator.
+      Angular and Solid use callable signal reads, Vue uses ref values, and
+      React observes selected snapshots through its hook. The package guide
+      shows the complete setup, ownership and teardown rules.
     </p>
   </header>
 
@@ -19,7 +17,7 @@
     <div class="framework-card">
       <div class="framework-card__head">
         <h2>{{ framework.name }}</h2>
-        <span class="framework-card__badge">Shipping</span>
+        <span class="framework-card__badge">v15 facade</span>
       </div>
       <p class="framework-card__realization">{{ framework.realization }}</p>
       <dl>
@@ -35,43 +33,40 @@
         <dd>
           <code>{{ framework.write }}</code>
         </dd>
-        <dt>Entity realization memory</dt>
-        <dd>{{ framework.memory }}</dd>
       </dl>
       <pre
         class="framework-card__install"
       ><code>{{ framework.install }}</code></pre>
+      <a routerLink="/docs" [queryParams]="{ package: framework.id }"
+        >Open {{ framework.name }} setup →</a
+      >
     </div>
     }
   </section>
 
-  <section class="frameworks__note" aria-label="About the memory figures">
-    <h2>About those memory figures</h2>
+  <section class="frameworks__note" aria-label="Evaluate the feature">
+    <h2>Compare the feature you will ship.</h2>
     <p>
-      They are <strong>released entity-realization residue</strong> — what a
-      collection still retains per entity after realized rows are dropped —
-      measured on one harness, process-isolated, and reproduced at two entity
-      counts. They are not a general speed or footprint claim.
+      Check startup, live updates, rendering and teardown with your data sizes.
+      A retained-memory figure from an old isolated harness is not the cost of
+      your full application, and this page does not rank the frameworks.
     </p>
     <p>
-      <strong>CPU is unresolved.</strong> Differences could not be measured on
-      the available hardware under the preregistered methodology, so no claim is
-      made in either direction. Solid's realization cost has not been
-      characterized at all; it shipped on correctness and semantic conformance.
+      <a routerLink="/start">Start with one owned feature</a>, or
+      <a routerLink="/benchmarks">run the browser comparisons</a> and read their
+      workload and limits. Add only the capabilities your feature uses.
     </p>
     <p>
-      These numbers should not be compared against SignalTree v14. v14's keys
-      are identity, so a held node follows a fresh occupant of the same key —
-      materially weaker guarantees, and a comparison without that sentence
-      misrepresents both.
+      Check installed versions and current package documentation. A development
+      demo is not proof that its candidate version has been published.
     </p>
   </section>
 
   <section class="frameworks__semantics" aria-label="Shared semantics">
     <h2>The same semantics everywhere</h2>
     <p>
-      These are what the kernel guarantees regardless of which framework renders
-      them — and what a framework's own reactivity does not provide on its own.
+      These boundaries apply across the facades. Choose them for the behavior
+      your users need, then test the complete interaction.
     </p>
     <dl class="semantics-list">
       @for (item of semantics; track item.name) {
@@ -79,23 +74,5 @@
       <dd>{{ item.detail }}</dd>
       }
     </dl>
-  </section>
-
-  <section class="frameworks__roadmap" aria-label="Roadmap">
-    <h2>Roadmap</h2>
-    <p>
-      Listed because the adapter seam is public, not as a commitment to dates. A
-      framework earns a place by passing the same semantic conformance suite the
-      shipping ones did.
-    </p>
-    <ul>
-      @for (entry of roadmap; track entry.name) {
-      <li>
-        <strong>{{ entry.name }}</strong>
-        <span class="roadmap__when">{{ entry.when }}</span>
-        <span class="roadmap__note">{{ entry.note }}</span>
-      </li>
-      }
-    </ul>
   </section>
 </article>

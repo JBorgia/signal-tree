@@ -1,5 +1,9 @@
 import { CommonModule } from '@angular/common';
-import { Component, ChangeDetectionStrategy } from '@angular/core';
+import {
+  Component,
+  ChangeDetectionStrategy,
+  type OnDestroy,
+} from '@angular/core';
 import { entityMap, signalTree } from '@signal-tree/angular';
 
 import {
@@ -21,7 +25,7 @@ interface User {
   changeDetection: ChangeDetectionStrategy.OnPush,
   styleUrl: './markers-demo.component.scss',
 })
-export class MarkersDemoComponent {
+export class MarkersDemoComponent implements OnDestroy {
   readonly store = signalTree({
     users: {
       entities: entityMap<User, number>({ selectId: (user) => user.id }),
@@ -54,5 +58,9 @@ tree.$.users.entities.byId(1)?.();`,
 
   resetUsers(): void {
     this.store.$.users.entities.clear();
+  }
+
+  ngOnDestroy(): void {
+    this.store.destroy();
   }
 }

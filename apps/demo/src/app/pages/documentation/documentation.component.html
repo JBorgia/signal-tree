@@ -5,6 +5,13 @@
     <p class="docs-orientation">
       Choose your framework for setup, examples, and API guidance.
     </p>
+    <a
+      class="read-selected-guide"
+      routerLink="/docs"
+      [queryParams]="{ package: selectedPackage().id }"
+      fragment="selected-guide"
+      >Read {{ selectedPackage().name }} <span aria-hidden="true">↓</span></a
+    >
   </header>
 
   <nav class="package-list" aria-label="Documentation index">
@@ -31,7 +38,13 @@
     }
   </nav>
 
-  <section class="documentation-content" [attr.aria-busy]="loading()">
+  <section
+    id="selected-guide"
+    class="documentation-content"
+    tabindex="-1"
+    [attr.aria-label]="selectedPackage().name + ' guide'"
+    [attr.aria-busy]="loading()"
+  >
     @if (loading()) {
     <div class="documentation-loading" role="status">
       <div class="spinner" aria-hidden="true"></div>

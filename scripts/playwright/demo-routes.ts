@@ -1,6 +1,7 @@
 export const DEMO_ROUTES = [
   '/',
   '/start',
+  '/frameworks',
   '/owned-sessions',
   '/why-causality',
   '/external-truth',

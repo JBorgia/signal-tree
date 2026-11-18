@@ -1,5 +1,5 @@
 <div class="whats-new legacy-changelog layout-frame">
-  <h2>🗄️ Release history — v14.0.0 and earlier (<code>@signaltree/*</code>)</h2>
+  <h1>🗄️ Release history — v14.0.0 and earlier (<code>@signaltree/*</code>)</h1>
 
   <p class="historical-note">
     <strong>This is pre-15 release history, not current API guidance.</strong>
@@ -11,7 +11,7 @@
     and migrations route correctly. The current surface is the package READMEs,
     <code>CHANGELOG.md</code>, and the
     <a
-      href="https://github.com/JBorgia/signal-tree/blob/main/docs/guides/migration-v14-v15.md"
+      [href]="sourceRoot + 'docs/guides/migration-v14-v15.md'"
       target="_blank"
       rel="noopener"
       >v15 migration guide</a
@@ -778,10 +778,9 @@ customers: entityMap&lt;Customer, string, &#123; tenantId: string &#125;&gt;(&#1
   &#125;),
 &#125;),</code></pre>
     <p>
-      Try both live: the <a routerLink="/marker-zoo">marker zoo</a>'s
-      <code>idle()</code>/<code>settled()</code> panel, and the
-      <a routerLink="/entity-collection">entityMap showcase</a>'s scoped
-      <code>maxScopes</code> eviction panel.
+      The historical marker zoo demonstrated <code>idle()</code>/<code>settled()</code>,
+      and its entityMap showcase demonstrated scoped <code>maxScopes</code> eviction.
+      These pre-v15 examples belong to the <a href="/v14/">archived site</a>.
     </p>
   </div>
 
@@ -812,9 +811,10 @@ customers: entityMap&lt;Customer, string, &#123; tenantId: string &#125;&gt;(&#1
       </li>
     </ul>
     <p>
-      See the second, <code>nativeErrors: true</code> bridged form on the
-      <a routerLink="/signal-forms">Signal Forms demo</a> for the branded-error
-      shape side by side with the default.
+      That release's Signal Forms example compared a
+      <code>nativeErrors: true</code> bridged form with the default branded-error
+      shape. It is not a current v15 feature. The
+      <a href="/v14/">archived v14 site</a> preserves historical examples.
     </p>
   </div>
 
@@ -881,12 +881,10 @@ tree.$.plants.loading();    // Signal&lt;boolean&gt;
 await tree.$.plants.load(); // guarded — no-op while fresh / in-flight
 invalidateTag(tree, 'plants'); // marks every 'plants'-tagged collection stale</code></pre>
     <p>
-      Explore the <a routerLink="/entity-collection">interactive showcase</a> —
-      single-flight coalescing, the staleTime freshness ring, tag invalidation,
-      SWR, and offline-first, all visualized. Also see the
-      <a routerLink="/marker-zoo">marker zoo</a> for a live depth-4 example, and
-      <code>docs/guides/entity-collection-cookbook.md</code> for the full
-      walkthrough.
+      The historical showcase visualized single-flight coalescing, staleTime,
+      tag invalidation, SWR, and offline-first behavior. Its marker zoo included
+      a depth-4 example. See the <a href="/v14/">archived site</a> for pre-v15 material;
+      these are not features of the current collection demo.
     </p>
   </div>
 
@@ -1186,8 +1184,8 @@ tree.$.load.fail(err);      // equivalent (v10.2+)</code></pre>
           >import &#123; rxMethod &#125; from
           '&#64;signaltree/core/rxjs-interop'</code
         >
-        no longer resolves. <code>/rxmethod</code> demo route now 301-redirects
-        to <a routerLink="/async">/async</a>.
+        no longer resolved in that release. Its <code>/rxmethod</code> demo route
+        redirected to the historical <code>/async</code> example.
       </li>
     </ul>
     <h4>🔄 Migration</h4>
@@ -1238,7 +1236,7 @@ tree.$.load.fail(err);      // equivalent (v10.2+)</code></pre>
         <code>debounce → filter → distinctUntilChanged → switchMap</code>
         pipeline. Race conditions, cancellation, dedup all handled.
       </li>
-      <li><strong>Live demo:</strong> <a routerLink="/async">/async</a></li>
+      <li><strong>Historical demo:</strong> <code>/async</code>, from the <a href="/v14/">pre-v15 site</a>.</li>
     </ul>
     <p>
       <strong>v9.5.1</strong> shipped a
@@ -1265,7 +1263,7 @@ tree.$.load.fail(err);      // equivalent (v10.2+)</code></pre>
         <strong>NgRx SignalStore comparison page</strong> — honest axis-by-axis
         comparison at
         <a
-          href="https://github.com/JBorgia/signal-tree/blob/main/docs/compare/ngrx-signalstore.md"
+          [href]="sourceRoot + 'docs/compare/ngrx-signalstore.md'"
           >docs/compare/ngrx-signalstore.md</a
         >.
       </li>
@@ -1378,7 +1376,7 @@ tree.$.load.fail(err);      // equivalent (v10.2+)</code></pre>
     <p>
       See the
       <a
-        href="https://github.com/JBorgia/signal-tree/blob/main/docs/legacy/migration-v8-v9.md"
+        [href]="sourceRoot + 'docs/legacy/migration-v8-v9.md'"
         >v8 → v9 migration guide</a
       >
       for before/after code and the full list of changes.
@@ -1464,8 +1462,7 @@ tree.$.load.fail(err);      // equivalent (v10.2+)</code></pre>
     </ul>
     <p>
       See
-      <a href="/docs/UPGRADE_TO_V6.md">packages/core/UPGRADE_TO_V6.md</a> and
-      <a href="/docs/ENHANCER_TYPE_SYSTEM_V6.md">ENHANCER_TYPE_SYSTEM_V6.md</a>
+      <a [href]="sourceRoot + 'docs/archive/UPGRADE_TO_V6.md'">archived v6 migration guide</a>
       for the full migration guide and examples.
     </p>
   </div>
@@ -1544,7 +1541,7 @@ tree.$.load.fail(err);      // equivalent (v10.2+)</code></pre>
       <strong>Diff-based bulk updates</strong> in the enterprise enhancer. The
       "2–5x faster" figure originally published here has been withdrawn:
       <a
-        href="https://github.com/JBorgia/signal-tree/blob/main/docs/rfcs/0010-retiring-enterprise.md"
+        [href]="sourceRoot + 'docs/rfcs/0010-retiring-enterprise.md'"
         >RFC 0010</a
       >
       records that it was never measured against core, and the enterprise

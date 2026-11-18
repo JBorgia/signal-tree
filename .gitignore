@@ -133,3 +133,6 @@ vitest.config.*.timestamp*
 /apps/studio-devtools/
 /packages/studio-query/
 /packages/studio-adapter/
+
+# Demo build identity must not create a self-referential tracked commit change.
+/apps/demo/src/app/source-ref.generated.ts

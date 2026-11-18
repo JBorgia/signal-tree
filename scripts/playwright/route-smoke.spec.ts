@@ -107,6 +107,14 @@ test('/examples/fundamentals/recommended-architecture: ops update nested state',
   await expect(toggle).toContainText('light', { timeout: 20_000 });
   await toggle.click();
   await expect(toggle).toContainText('dark');
+  // Route navigation retains the Angular application but closes this owner.
+  const startLink = page.locator('.site-navigation a[href="/start"]').first();
+  await startLink.click();
+  await expect(
+    page.getByRole('heading', { name: 'Try one feature first.' })
+  ).toBeVisible();
+  await page.goBack();
+  await expect(toggle).toContainText('light');
 });
 
 test('/batching: grouped writes publish once without intermediate observations', async ({
