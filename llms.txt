@@ -13,7 +13,7 @@ updates and reactive publication consistent across frameworks. The v15 construct
 
 ## Adopt one useful feature
 
-Start with the [checked first-feature recipe](docs/guides/first-feature-v15.md).
+Start with the [checked first-feature recipe](https://github.com/JBorgia/signal-tree/blob/87647ca3c89449c99ef375a55cc08d1a650c8208/docs/guides/first-feature-v15.md).
 Use native signals for a few local values when that is sufficient. A v15 tree
 can begin without enhancers; add EntityMap for keyed records and restoration
 only when the product has an Undo workflow. Importing, configuring and exercising
@@ -31,7 +31,7 @@ overlapping edits, external updates, replacement, failure and owner teardown.
 V15 opens transactions with `transaction()`; do not generate v16's `transact()`,
 pending-handle `inspect()` or recoverable-refusal guarantees for a v15 consumer.
 An Undo refusal is not success: preserve the current view and explain recovery
-using the current [failure contract](docs/guides/transaction-failures-v15.md).
+using the current [failure contract](https://github.com/JBorgia/signal-tree/blob/87647ca3c89449c99ef375a55cc08d1a650c8208/docs/guides/transaction-failures-v15.md).
 Do not fix a compile error with broad casts or invent methods from an older guide.
 Resolve contradictory repository instructions against the actual installed line.
 
