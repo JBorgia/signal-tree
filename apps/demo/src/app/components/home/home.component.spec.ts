@@ -14,7 +14,7 @@ describe('HomeComponent', () => {
     }).compileComponents();
   });
 
-  it('opens with an explicitly unreleased review story and audience perspectives', () => {
+  it('opens with an explicitly prerelease review story and audience perspectives', () => {
     const fixture = TestBed.createComponent(HomeComponent);
     fixture.detectChanges();
     const text = renderedText(fixture.nativeElement);
@@ -27,7 +27,7 @@ describe('HomeComponent', () => {
         .querySelector('a[fragment="accessor-grammar"]')
         ?.getAttribute('href')
     ).toBe('/architecture-overview#accessor-grammar');
-    expect(text).toContain('v16 development preview · Unreleased');
+    expect(text).toContain('v16 release candidate · Evaluation prerelease');
     expect(text).toContain('Review proposed changes. Keep your work moving.');
     expect(text).toContain('For the person using the app');
     expect(text).toContain('For the developer');

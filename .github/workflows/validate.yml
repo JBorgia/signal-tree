@@ -13,7 +13,14 @@ on:
 jobs:
   validate:
     name: Lint, typecheck, test, build, verify
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
+    container:
+      # Official Playwright 1.56.1 Noble image, pinned to the supported browser dependencies.
+      image: mcr.microsoft.com/playwright@sha256:f1e7e01021efd65dd1a2c56064be399f3e4de00fd021ac561325f2bfbb2b837a
+      options: --init --shm-size=1g
+    defaults:
+      run:
+        shell: bash
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -25,6 +32,9 @@ jobs:
           # have.
           fetch-depth: 0
           fetch-tags: true
+
+      - name: Trust the mounted candidate checkout for container Git commands
+        run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v4 # version comes from package.json "packageManager"
@@ -39,7 +49,9 @@ jobs:
         run: pnpm install --frozen-lockfile --ignore-scripts
 
       - name: Install Chromium for packed Angular AOT gate
-        run: pnpm exec playwright install --with-deps chromium
+        run: |
+          node -e 'require("node:assert/strict").equal(require("playwright/package.json").version, "1.56.1")'
+          pnpm exec playwright install chromium
 
       # The gates read dist/ — barrels, bundle budgets, foldability, tarball
       # contents. `gates` verifies a build; it does not produce one.
@@ -52,9 +64,23 @@ jobs:
       - name: Prove every gate can still fail
         run: pnpm run gates:self-test
 
+      - name: Rebuild clean artifacts after mutation proofs
+        run: |
+          git diff --exit-code
+          rm -rf dist/packages
+          pnpm exec nx run-many -t build --projects=kernel,angular,react,vue,solid --configuration=production --skip-nx-cache
+
+
   demo-route-smoke:
     name: Demo route smoke (Playwright)
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
+    container:
+      # Official Playwright 1.56.1 Noble image, pinned to the supported browser dependencies.
+      image: mcr.microsoft.com/playwright@sha256:f1e7e01021efd65dd1a2c56064be399f3e4de00fd021ac561325f2bfbb2b837a
+      options: --init --shm-size=1g
+    defaults:
+      run:
+        shell: bash
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -66,6 +92,9 @@ jobs:
           # have.
           fetch-depth: 0
           fetch-tags: true
+
+      - name: Trust the mounted candidate checkout for container Git commands
+        run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
@@ -83,7 +112,9 @@ jobs:
         run: pnpm exec nx build demo --configuration=production
 
       - name: Install Playwright chromium
-        run: pnpm exec playwright install --with-deps chromium
+        run: |
+          node -e 'require("node:assert/strict").equal(require("playwright/package.json").version, "1.56.1")'
+          pnpm exec playwright install chromium
 
       - name: Route smoke (8 key routes, no console errors, visible h1/main)
         run: pnpm run smoke:routes

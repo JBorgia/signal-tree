@@ -1,5 +1,10 @@
 # `@signal-tree/kernel`
 
+This guide targets **16.0.0-rc.0**, an evaluation prerelease on npm’s `rc`
+channel. Stable v15 remains `latest`. Check the installed manifest and types;
+v15 uses `transaction()`, while this v16 line uses `transact()`. See the
+[v15 migration checklist](https://github.com/JBorgia/signal-tree/blob/v16.0.0-rc.0/docs/guides/migration-v15-v16.md).
+
 Framework-neutral SignalTree state: fields and entity collections,
 transactions and rollback, undo, external updates through `link()`, batching,
 and DevTools.
@@ -20,7 +25,7 @@ SignalTree import root.
 
 ## Semantic Guidance
 
-The canonical v15 model and composition guidance ships with this package as
+The v16 model and composition guidance ships with this package as
 [llms.txt](llms.txt). It explains the facade rule, `link()` relationships,
 persistence composition, and why human-readable causal explanations are
 projections rather than retained kernel facts.
@@ -28,7 +33,7 @@ projections rather than retained kernel facts.
 ## Install
 
 ```bash
-npm install @signal-tree/kernel
+npm install @signal-tree/kernel@16.0.0-rc.0
 ```
 
 ## Create A Tree

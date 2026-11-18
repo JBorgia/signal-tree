@@ -24,8 +24,9 @@ describe('MigrationRecipeComponent', () => {
     fixture.detectChanges();
     const text = fixture.nativeElement.textContent as string;
     expect(text).toContain('@signal-tree/angular');
-    expect(text).toContain('unreleased v16 candidate');
-    expect(text).toContain('not a claim');
+    expect(text).toContain('v16 evaluation prerelease');
+    expect(text).toContain('not a stable v16 release');
+    expect(text).toContain('npm install @signal-tree/angular@16.0.0-rc.0');
     expect(text).toContain('v15 to v16 checklist');
     expect(text).not.toContain('npm install @signal-tree/angular@16.0.0-dev');
     expect(text).toContain(

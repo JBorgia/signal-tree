@@ -6,9 +6,9 @@ export const appRoutes: Route[] = [
     loadComponent: () =>
       import('./components/home/home.component').then((c) => c.HomeComponent),
     data: {
-      title: 'Review proposed changes · v16 development preview',
+      title: 'Review proposed changes · v16 release candidate',
       description:
-        'Try pending review, independent work, refused rollback and explicit recovery with the unreleased v16 candidate.',
+        'Try pending review, independent work, refused rollback and explicit recovery with the v16 evaluation prerelease.',
     },
   },
 
@@ -89,7 +89,7 @@ export const appRoutes: Route[] = [
         './pages/independent-publication/independent-publication.component'
       ).then((c) => c.IndependentPublicationComponent),
     data: {
-      title: 'Independent publication · v16 development preview (unreleased)',
+      title: 'Independent publication · v16 release candidate (evaluation prerelease)',
       description:
         'Publish a literal note while a route proposal stays pending. Local state, admission receipts and an in-memory endpoint remain distinct.',
     },

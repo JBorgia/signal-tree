@@ -1,3 +1,27 @@
+# 16.0.0-rc.0 — authorized publication preparation
+
+The owner selected build, push and publication on November 18, including a
+separate provisional v16 test release. Target **16.0.0-rc.0** on
+`codex/v16-16.0.0-rc.0-release`. Stable v15 owns `latest`; v16 uses `rc`.
+See the [active publication record](docs/audits/2026-11-18-release-publication/README.md).
+
+Local qualification is complete: the full normal run's 85/87 result is followed
+by both corrected surface gates passing; all 87 mutation proofs pass with exact
+restoration. Fresh installed consumers, strict production demo and all 160 browser
+checks pass. The 168 shipped runtime/type payloads remain byte-identical to the
+qualified runtime. Independent closure finds no blocker to freezing the release
+commit. Signed-tag CI, registry and hosted verification remain pending; this is
+not a publication claim.
+
+This phase explicitly replaces the historical candidate-only size disposition
+below with a reviewed, measured release-line budget baseline. Preserve every old
+failure and artifact identity. Fresh limits, full strict qualification, planted
+growth controls, exact-tag CI and registry/deployment verification are required.
+No runtime feature or compatibility change is selected here. Publication remains
+pending; prior local qualification is not proof that this release is published.
+
+---
+
 # V16 startup and population follow-through — local qualification complete
 
 Qualified source `f8cf26e50193ca8aa5580da15b739129313f256e` on

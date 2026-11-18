@@ -21,9 +21,46 @@
 import { expect, test } from '@playwright/test';
 import { existsSync, readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
+import ts from 'typescript';
 
 import { DEMO_ROUTES } from './demo-routes';
-import { appRoutes } from '../../apps/demo/src/app/app.routes';
+
+// Read the app's route declaration as data. Importing executable application
+// code from this external browser harness crosses its Nx project boundary.
+// Reject unsupported declarations instead of silently losing route coverage.
+const routeSourcePath = resolve('apps/demo/src/app/app.routes.ts');
+const routeSource = ts.createSourceFile(
+  routeSourcePath,
+  readFileSync(routeSourcePath, 'utf8'),
+  ts.ScriptTarget.Latest,
+  true
+);
+const routeDeclaration = routeSource.statements
+  .filter(ts.isVariableStatement)
+  .flatMap((statement) => [...statement.declarationList.declarations])
+  .find((declaration) => declaration.name.getText(routeSource) === 'appRoutes');
+if (!routeDeclaration?.initializer || !ts.isArrayLiteralExpression(routeDeclaration.initializer)) {
+  throw new Error('Browser inventory requires an explicit appRoutes array');
+}
+const appRoutes = routeDeclaration.initializer.elements.map((element) => {
+  if (!ts.isObjectLiteralExpression(element)) {
+    throw new Error('Browser inventory requires explicit route objects');
+  }
+  if (element.properties.some((property) => ts.isSpreadAssignment(property))) {
+    throw new Error('Browser inventory does not accept spread route properties');
+  }
+  const property = (name: string) => element.properties.find(
+    (entry) => entry.name?.getText(routeSource) === name
+  );
+  const routePath = property('path');
+  if (!routePath || !ts.isPropertyAssignment(routePath) || !ts.isStringLiteral(routePath.initializer)) {
+    throw new Error('Browser inventory requires literal route paths');
+  }
+  if (property('children') || property('loadChildren')) {
+    throw new Error('Extend browser inventory before introducing nested routes');
+  }
+  return { path: routePath.initializer.text, loadComponent: !!property('loadComponent') };
+});
 
 const distRoot = resolve(
   process.cwd(),

@@ -148,9 +148,11 @@ When you are ready, see
 It is the scope/package migration target for v14 and earlier; the historical
 inter-version guides under [`legacy/`](legacy/README.md) are kept for provenance.
 
-For the unreleased v16 candidate, use the separate
-[v15 to v16 migration guide](guides/migration-v15-v16.md). Qualification and
-publication status come from [the current controller](../RELEASE-CURRENT.md).
+For v16 evaluation prereleases on npm’s `rc` channel, use the separate
+[v15 to v16 migration guide](guides/migration-v15-v16.md). Stable v15 remains
+`latest`; prerelease availability does not add a stable v16 support line.
+Qualification and publication receipts come from
+[the current controller](../RELEASE-CURRENT.md).
 
 ## Transaction failure policy
 

@@ -1,0 +1,10 @@
+{
+  "command": [
+    "node",
+    "tools/verify-gates.mjs",
+    "--release",
+    "--only=lint:budget,version-claims"
+  ],
+  "exit": 0,
+  "seconds": 40.98
+}

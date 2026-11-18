@@ -18,8 +18,9 @@ import type { StackblitzConfig } from './example.types';
  */
 @Injectable({ providedIn: 'root' })
 export class StackblitzService {
-  // A local development candidate cannot be resolved by a remote npm scaffold.
-  readonly available = !DEMO_LIBRARY_VERSIONS['signaltree'].includes('-dev');
+  // Prerelease publication alone does not verify the remote scaffold. Keep
+  // evaluation local until that version has a successful remote journey.
+  readonly available = !DEMO_LIBRARY_VERSIONS['signaltree'].includes('-');
   /** Angular version line the sandbox pins to (kept close to the demo app). */
   private readonly ngVersion = '^20.3.0';
 

@@ -206,7 +206,7 @@ export class IndependentPublicationComponent implements OnDestroy {
     this.tree.destroy();
   }
 
-  readonly example = `// v16 development preview (unreleased). Angular facade only.
+  readonly example = `// v16 release candidate (evaluation prerelease). Angular facade only.
 import { link, signalTree, transactions } from '@signal-tree/angular';
 
 export async function independentNote() {

@@ -21,7 +21,14 @@ on:
 jobs:
   verify:
     name: Verify tagged commit (full gate set)
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
+    container:
+      # Official Playwright 1.56.1 Noble image, pinned to the supported browser dependencies.
+      image: mcr.microsoft.com/playwright@sha256:f1e7e01021efd65dd1a2c56064be399f3e4de00fd021ac561325f2bfbb2b837a
+      options: --init --shm-size=1g
+    defaults:
+      run:
+        shell: bash
     outputs:
       tag_name: ${{ steps.release_tag.outputs.tag_name }}
     steps:
@@ -51,6 +58,15 @@ jobs:
           fetch-depth: 0
           fetch-tags: true
 
+      - name: Trust and verify the mounted tagged checkout
+        env:
+          ST_RELEASE_TAG: ${{ steps.release_tag.outputs.tag_name }}
+        run: |
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
+          ST_CHECKOUT_HEAD=$(git rev-parse --verify 'HEAD^{commit}')
+          ST_TAG_HEAD=$(git rev-parse --verify "${ST_RELEASE_TAG}^{commit}")
+          test "$ST_CHECKOUT_HEAD" = "$ST_TAG_HEAD"
+
       - name: Setup pnpm
         uses: pnpm/action-setup@v4 # version comes from package.json "packageManager"
 
@@ -64,7 +80,9 @@ jobs:
         run: pnpm install --frozen-lockfile --ignore-scripts
 
       - name: Install Chromium for packed Angular AOT gate
-        run: pnpm exec playwright install --with-deps chromium
+        run: |
+          node -e 'require("node:assert/strict").equal(require("playwright/package.json").version, "1.56.1")'
+          pnpm exec playwright install chromium
 
       - name: Build all packages
         run: pnpm run build:all
@@ -74,6 +92,12 @@ jobs:
 
       - name: Prove release gates can still fail
         run: node tools/verify-gates.mjs --self-test --release
+
+      - name: Rebuild clean artifacts after mutation proofs
+        run: |
+          git diff --exit-code
+          rm -rf dist/packages
+          pnpm exec nx run-many -t build --projects=kernel,angular,react,vue,solid --configuration=production --skip-nx-cache
 
       - name: Verify version claims
         run: node scripts/verify-version-claims.js
@@ -85,6 +109,9 @@ jobs:
         run: |
           node tools/verify-tarball-consumer.mjs --self-test
           node tools/verify-tarball-consumer.mjs
+          node tools/verify-consumer-typecheck.mjs
+          node tools/verify-angular-aot-consumer.mjs
+          git diff --exit-code
 
       - name: Verify CHANGELOG has an entry for this version
         run: |
@@ -95,7 +122,7 @@ jobs:
 
   release:
     needs: verify
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     permissions:
       contents: write
 

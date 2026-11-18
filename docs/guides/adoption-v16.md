@@ -1,9 +1,19 @@
 # Adopt one v16 workflow
 
-V16 is an unreleased development candidate. Use the exact selected candidate
-packages for evaluation; a version string in a source checkout does not establish
-registry publication. Read the installed types and use one framework facade.
-Stable v15 code uses `transaction()`; this line uses `transact()`.
+This guide targets **16.0.0-rc.0**, an evaluation prerelease on npm’s `rc`
+channel. Stable v15 remains `latest`; v16 is not yet a stable release. Install
+the exact version for the application’s framework, for example:
+
+```bash
+npm install @signal-tree/angular@16.0.0-rc.0
+```
+
+Use the matching React, Vue or Solid facade for those frameworks; use the kernel
+directly only for intentionally neutral code. Read the installed manifest and
+types before generating code. Stable v15 uses `transaction()`; this line uses
+`transact()`. The [release controller](../../RELEASE-CURRENT.md) records exact
+qualification and publication receipts; a source version string alone proves
+neither.
 
 ## Begin with the user's experience
 
@@ -75,6 +85,11 @@ When a Link declaration claims independence, establish that no pending-owner
 inputs contributed, including saved values or caches. Declare every contributing
 owner for dependent work; use unknown completeness when it is unknown. Hiding a
 read outside the callback does not make the output independent.
+
+The shipped native facades keep retained SignalTree readers current on direct
+reads, including during nested writes. Application-created computed values still
+follow their framework’s scheduling; do not promise that every computed consumer
+refreshes synchronously. Verify both current state and the UI’s actual timing.
 
 ## Keep responsibilities explicit
 

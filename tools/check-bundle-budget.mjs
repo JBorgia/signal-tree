@@ -208,8 +208,13 @@ const TARGETS = {
     // Owner approved October 18: whole-value new-key correctness cost.
     // Exact attribution, reductions, uncertainty and preserved headroom:
     // docs/audits/2026-10-17-incumbent-readiness/ARTIFACT-ACCEPTANCE.md.
-    devKB: 14.79,
-    prodKB: 12.41,
+    // 16.0.0-rc.0: explicit November 18 release-cost baseline. The qualified
+    // memory/correctness improvements are retained; historical red ceilings and
+    // fresh byte measurements remain in the release-publication audit. Round up
+    // to the next 0.01 KiB only; fixtures and oversize mutation stay unchanged.
+    // See docs/audits/2026-11-18-release-publication/README.md.
+    devKB: 20.28,
+    prodKB: 17.96,
     code: `
       import { signalTree } from ${JSON.stringify(CORE)};
       const t = signalTree({ count: 0, user: { name: 'a' } });
@@ -383,8 +388,13 @@ const TARGETS = {
     // growth above. Same disposition and same reason.
     // Same v16 approval; keeps diagnostics and correctness intact.
     // Same October 18 artifact-only approval; no performance-neutrality claim.
-    devKB: 28.98,
-    prodKB: 26.16,
+    // 16.0.0-rc.0: explicit November 18 release-cost baseline. The qualified
+    // memory/correctness improvements are retained; historical red ceilings and
+    // fresh byte measurements remain in the release-publication audit. Round up
+    // to the next 0.01 KiB only; fixtures and oversize mutation stay unchanged.
+    // See docs/audits/2026-11-18-release-publication/README.md.
+    devKB: 48.40,
+    prodKB: 44.77,
     code: `
       import { signalTree, entityMap } from ${JSON.stringify(CORE)};
       const t = signalTree({ count: 0, users: entityMap() });
@@ -436,7 +446,8 @@ for (const [id, { code, devKB, prodKB }] of Object.entries(TARGETS)) {
   console.log(
     `${id.padEnd(22)} ` +
       `${prodOk ? '✅' : '❌'} ${prod.toFixed(2)}/${prodKB}KB   ` +
-      `${devOk ? '✅' : '❌'} ${dev.toFixed(2)}/${devKB}KB`
+      `${devOk ? '✅' : '❌'} ${dev.toFixed(2)}/${devKB}KB ` +
+      `(prod ${Math.round(prod * 1024)} B; dev ${Math.round(dev * 1024)} B)`
   );
 }
 

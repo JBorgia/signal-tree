@@ -1,17 +1,22 @@
 # `@signal-tree/vue`
 
+This guide targets **16.0.0-rc.0**, an evaluation prerelease on npm’s `rc`
+channel. Stable v15 remains `latest`. Check the installed manifest and types;
+v15 uses `transaction()`, while this v16 line uses `transact()`. See the
+[v15 migration checklist](https://github.com/JBorgia/signal-tree/blob/v16.0.0-rc.0/docs/guides/migration-v15-v16.md).
+
 Vue-native SignalTree realization. State remains owned by the framework-neutral
 kernel; terminal leaves are Vue refs and derived values are computed refs.
 
 ## Install
 
 ```bash
-npm install @signal-tree/vue
+npm install @signal-tree/vue@16.0.0-rc.0
 ```
 
 Vue 3.5 or newer is required as a peer dependency.
 
-The canonical v15 model and composition guidance ships with this package as
+The v16 model and composition guidance ships with this package as
 [llms.txt](llms.txt).
 
 ## Use

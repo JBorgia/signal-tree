@@ -12,6 +12,12 @@
   </p>
 </div>
 
+**This checkout targets v16.0.0-rc.0 for evaluation.** The npm `rc` channel is
+separate from stable v15 on `latest`. Follow the exact versioned installs below
+and the [v15 migration checklist](docs/guides/migration-v15-v16.md). A prerelease
+is not a stable v16 release; [the controller](RELEASE-CURRENT.md) records exact
+qualification and publication receipts.
+
 ## See the difference
 
 Read and edit a field at the same typed path. Here is Angular; [React](packages/react/README.md), [Vue](packages/vue/README.md), and [plain TypeScript](packages/kernel/README.md) have their own entry points.
@@ -62,13 +68,13 @@ Already comfortable with `signal()` and `computed()`? [See what SignalTree adds]
 
 Install the package for your framework:
 
-| Runtime                      | Install                            | Guide                                                   |
-| ---------------------------- | ---------------------------------- | ------------------------------------------------------- |
-| Angular 20, 21, or 22        | `npm install @signal-tree/angular` | [First store and ownership](packages/angular/README.md) |
-| React 18–19                  | `npm install @signal-tree/react`   | [Subscriptions and ownership](packages/react/README.md) |
-| Vue 3.5+                     | `npm install @signal-tree/vue`     | [Refs and scope disposal](packages/vue/README.md)       |
-| Solid 1.9+                   | `npm install @signal-tree/solid`   | [Accessors and root disposal](packages/solid/README.md) |
-| Framework-neutral TypeScript | `npm install @signal-tree/kernel`  | [Kernel API](packages/kernel/README.md)                 |
+| Runtime                      | Install                                        | Guide                                                  |
+| ---------------------------- | ---------------------------------------------- | ------------------------------------------------------ |
+| Angular 20, 21, or 22         | `npm install @signal-tree/angular@16.0.0-rc.0` | [First store and ownership](packages/angular/README.md) |
+| React 18–19                  | `npm install @signal-tree/react@16.0.0-rc.0`   | [Subscriptions and ownership](packages/react/README.md) |
+| Vue 3.5+                     | `npm install @signal-tree/vue@16.0.0-rc.0`     | [Refs and scope disposal](packages/vue/README.md)        |
+| Solid 1.9+                   | `npm install @signal-tree/solid@16.0.0-rc.0`   | [Accessors and root disposal](packages/solid/README.md)  |
+| Framework-neutral TypeScript | `npm install @signal-tree/kernel@16.0.0-rc.0`  | [Kernel API](packages/kernel/README.md)                  |
 
 `@signal-tree/angular` requires Angular 20, 21, or 22 (see `peerDependencies`
 in [`packages/angular/package.json`](packages/angular/package.json)).

@@ -1,0 +1,211 @@
+{
+  "version": "16.0.0-rc.0",
+  "scope": "Working-tree local qualification before final commit/tag; exact-tag CI and publication remain pending. First full normal run85/87; both corrected gates pass separately.",
+  "receipts": [
+    {
+      "path": "receipts/preparation-runs.json",
+      "sha256": "452f3cccfed65f3532a9b60d5a08c60957af81f15fbddab37930932a322397b0",
+      "bytes": 609
+    },
+    {
+      "path": "receipts/publisher-controls.log.gz",
+      "sha256": "75e969e0d14cbffe7b69d3745adb1906dd20e40163df4c11ccca14e09458dc37",
+      "bytes": 801,
+      "rawSha256": "785bbf9f3682bc8e9027a48ec7f6cd5a68c41770a207731f316ce770716bf5e2",
+      "rawBytes": 2635,
+      "encoding": "gzip; decompressed bytes equal original evidence"
+    },
+    {
+      "path": "receipts/fresh-build.log.gz",
+      "sha256": "8ab91872c24e524971e95e6a52c8b799b4ea67b49b70daeea40d243a6c92273b",
+      "bytes": 3428,
+      "rawSha256": "a1d0e075858daddd0995b0ca65a33c7f3f2ba28e564ca1f7bdbfea309998b018",
+      "rawBytes": 17134,
+      "encoding": "gzip; decompressed bytes equal original evidence"
+    },
+    {
+      "path": "receipts/old-bundle-budget.log.gz",
+      "sha256": "0d6dfc5927e84e928225cc5d1c3c01300fddf1ac2fc236995dbd99328a2816e6",
+      "bytes": 532,
+      "rawSha256": "7ebd64976bbc68feb234e5b3d1f9e41b5a5ae422d83a49ad96f379f0429b12de",
+      "rawBytes": 1117,
+      "encoding": "gzip; decompressed bytes equal original evidence"
+    },
+    {
+      "path": "receipts/runtime-continuity-packed.json",
+      "sha256": "a2b2f7963bc1a03f090add87a48a18244b71544c5f84bcf4f9b24053afc582ae",
+      "bytes": 1447
+    },
+    {
+      "path": "receipts/full-normal-first.log.gz",
+      "sha256": "50fb6e69cba1ed7e532f63ea7082a0a267d25585985f2b3599e6d0e03785edbb",
+      "bytes": 5343,
+      "rawSha256": "9db2a6f6b474990bf9fe526ee0e8050cd262751fb9efb09bd6f9894e86ccb4e8",
+      "rawBytes": 14355,
+      "encoding": "gzip; decompressed bytes equal original evidence"
+    },
+    {
+      "path": "receipts/full-normal-first.json",
+      "sha256": "bc63ad0605950a1f2af5d25fc82e69a7d9c1066280f5bc78e5bae4428d403f7e",
+      "bytes": 115
+    },
+    {
+      "path": "receipts/lint-diagnostic-first.json.gz",
+      "sha256": "3b4c7a9114f1c3d10b9017dc9d143296a58fdb81ddf1193f17ea59b8243c4a1a",
+      "bytes": 46185,
+      "rawSha256": "daf99cab2e01478f027533b3b9f062b15543f7d425cde16defd1624f1b1dc565",
+      "rawBytes": 1139972,
+      "encoding": "gzip; decompressed bytes equal original evidence"
+    },
+    {
+      "path": "receipts/surface-corrections.log.gz",
+      "sha256": "93995ad24b315ae51120270555e39e8836ec5f82a14c108f5a2e91cb8ab3a848",
+      "bytes": 231,
+      "rawSha256": "57caa42fe274935ab1538e5cded125f4d70834dfe13124a908d74f47c4d03d14",
+      "rawBytes": 525,
+      "encoding": "gzip; decompressed bytes equal original evidence"
+    },
+    {
+      "path": "receipts/surface-corrections.json",
+      "sha256": "5b6d8509df3de13986a5ef8fe0e015f6ce5fbbbe51cc386e02662709ffc79711",
+      "bytes": 155
+    },
+    {
+      "path": "receipts/route-inventory-controls.json",
+      "sha256": "7c88689245f55b53858b650598d68216a1a6bac447d74bcb849be2b2d7969c28",
+      "bytes": 1072
+    },
+    {
+      "path": "receipts/route-inventory-clean.log.gz",
+      "sha256": "b8161ffddc659daca8669b431aa0f2a0410bbd90263ba144cd9b522bd8348818",
+      "bytes": 276,
+      "rawSha256": "8f3cf7ab7686e3f2b2e9616e77442e9290ef93aa008962246304c055ae531bed",
+      "rawBytes": 507,
+      "encoding": "gzip; decompressed bytes equal original evidence"
+    },
+    {
+      "path": "receipts/route-inventory-missing-control.log.gz",
+      "sha256": "6f0a44ca5e425836620e0f8a322104da2ea04ecaeeddfc8561e498f36ac06f3b",
+      "bytes": 670,
+      "rawSha256": "e015665820dc5cc0c89e08f3df2efb03ea9be517c309136fefe306742f92abf9",
+      "rawBytes": 1660,
+      "encoding": "gzip; decompressed bytes equal original evidence"
+    },
+    {
+      "path": "receipts/route-inventory-restored.log.gz",
+      "sha256": "ada7560ac5f3bb6acfc8e8a7a9bc55160baacd8096153e7823b3918897e69b86",
+      "bytes": 276,
+      "rawSha256": "92778e1b6c6e168d3117d3afae81086a5c5791687ca72fe580b4abd282f41417",
+      "rawBytes": 507,
+      "encoding": "gzip; decompressed bytes equal original evidence"
+    },
+    {
+      "path": "receipts/full-mutations-first.log.gz",
+      "sha256": "78ba9cd9ae60d5fa0724cf7acdb27529fffeac2ec72de6d85d725615d01475fa",
+      "bytes": 1685,
+      "rawSha256": "0e843b44ff2a29d93f30305b03ef5aa565af3ff419bf508dd35da531e1116f06",
+      "rawBytes": 8811,
+      "encoding": "gzip; decompressed bytes equal original evidence"
+    },
+    {
+      "path": "receipts/full-mutations-first.json",
+      "sha256": "b5ef399c6503611d2545d5fd3b2bce5d7522ae7fcc731b707488c430975ab380",
+      "bytes": 178
+    },
+    {
+      "path": "receipts/mutation-source-before.json.gz",
+      "sha256": "822581d5578ccfb181f0dd293e80338d7a77751b6051a442957aca7f388b1dd4",
+      "bytes": 193732,
+      "rawSha256": "116973d49f802a7bba0cc8cf5bd2c9ea0c60031625b07a397f3f377edec11fa5",
+      "rawBytes": 534637,
+      "encoding": "gzip; decompressed bytes equal original evidence"
+    },
+    {
+      "path": "receipts/mutation-source-after.json.gz",
+      "sha256": "822581d5578ccfb181f0dd293e80338d7a77751b6051a442957aca7f388b1dd4",
+      "bytes": 193732,
+      "rawSha256": "116973d49f802a7bba0cc8cf5bd2c9ea0c60031625b07a397f3f377edec11fa5",
+      "rawBytes": 534637,
+      "encoding": "gzip; decompressed bytes equal original evidence"
+    },
+    {
+      "path": "receipts/post-mutation-runs.json",
+      "sha256": "d042d726fd3920171b7fdef8ca128ad3453a9aadac76dc049726c47cc2a2b951",
+      "bytes": 1465
+    },
+    {
+      "path": "receipts/post-mutation-build.log.gz",
+      "sha256": "1b9022545223c944aceded440012077d87641a9295860adf53c3eb24296fa44d",
+      "bytes": 3266,
+      "rawSha256": "1667c71024ff1b55e3dadf4117223157d0c0bd4b72cbfa4f734b13ad0f81d457",
+      "rawBytes": 16778,
+      "encoding": "gzip; decompressed bytes equal original evidence"
+    },
+    {
+      "path": "receipts/post-mutation-budgets.log.gz",
+      "sha256": "4d30c7b0f906095389d8512fd35b26972360fb6272c52557cfcc2889f54ea1e6",
+      "bytes": 205,
+      "rawSha256": "e0eb89fe54cce5c623c52af1865e9ea678d91fe544d8da581cd0e759b5097615",
+      "rawBytes": 479,
+      "encoding": "gzip; decompressed bytes equal original evidence"
+    },
+    {
+      "path": "receipts/post-mutation-tarballs.log.gz",
+      "sha256": "fa8a4f4055f39a8a1e240c78715bf9939084d2d13e49e267d22004454af7ad1a",
+      "bytes": 238,
+      "rawSha256": "141ef3ed7053d1e84a454073c419c1c1d7c685801bca01d6df8b1b79d057264b",
+      "rawBytes": 743,
+      "encoding": "gzip; decompressed bytes equal original evidence"
+    },
+    {
+      "path": "receipts/post-mutation-strict-types.log.gz",
+      "sha256": "b99c3447615d4a2092b770c21e308a361e99bc4f28104afd47c176f0cdaae255",
+      "bytes": 198,
+      "rawSha256": "a773289051a58cf35d19065195c79fa3457480d3518e371785cbe0611ffd35c0",
+      "rawBytes": 271,
+      "encoding": "gzip; decompressed bytes equal original evidence"
+    },
+    {
+      "path": "receipts/post-mutation-angular-aot.log.gz",
+      "sha256": "067569047688f3c484106e5258137a7bc346b337408c6a8206403e45312f1697",
+      "bytes": 164,
+      "rawSha256": "8076ea766d301ae307069e3114a197e0f4bd02dcc0768c6ab14420c725d817ed",
+      "rawBytes": 213,
+      "encoding": "gzip; decompressed bytes equal original evidence"
+    },
+    {
+      "path": "receipts/production-demo-build.log.gz",
+      "sha256": "8b4fca54560bbe0fd6cd56d4dbf5080251b689ac1c1527b44d213d0880fb4ab0",
+      "bytes": 1440,
+      "rawSha256": "f87ac62297a9c00bf2ff3b86d342da80f05e65b14cffd23b520e5cb43c5abe92",
+      "rawBytes": 5023,
+      "encoding": "gzip; decompressed bytes equal original evidence"
+    },
+    {
+      "path": "receipts/production-demo-browser.log.gz",
+      "sha256": "cd1cfe227b5238d836ba721045f4b580d676cd60d32e1ce337b76956fc14051d",
+      "bytes": 3316,
+      "rawSha256": "bdfb0adb3613a52eb79b5cda247cbef999b261a5feea2573b55404733f2780ad",
+      "rawBytes": 22075,
+      "encoding": "gzip; decompressed bytes equal original evidence"
+    },
+    {
+      "path": "receipts/post-mutation-runtime-continuity.json",
+      "sha256": "53b3ca3413c844a2d317b0d000fcfcbe57f60649d6232ed6ccd114c60e377d68",
+      "bytes": 1492
+    },
+    {
+      "path": "receipts/final-documentation.log.gz",
+      "sha256": "4e48d2ffe5abc7924192d0d4924cd8181c7c2748044e981401197d861970860b",
+      "bytes": 478,
+      "rawSha256": "24cf7a930b923f372742f3b1a8ea646f805cadd76c77e9e6e932ff0e1ce9dd7c",
+      "rawBytes": 1045,
+      "encoding": "gzip; decompressed bytes equal original evidence"
+    },
+    {
+      "path": "receipts/final-documentation.json",
+      "sha256": "72b57a0efe50f9911de4c0014df91587260dfc20cbab1e5b625987eb19ac1683",
+      "bytes": 210
+    }
+  ]
+}

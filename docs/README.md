@@ -6,12 +6,16 @@
 
 Use this index to navigate the documentation.
 
-**Publication status:** v16 is unreleased. The qualified baseline and authorized
-follow-through work are recorded in [RELEASE-CURRENT](../RELEASE-CURRENT.md).
-See [CHANGELOG](../CHANGELOG.md) for behavior and migration changes.
+**Publication status:** this v16 evaluation prerelease targets npm’s `rc` channel;
+`latest` remains the stable v15 line. Pin `16.0.0-rc.0` when following this
+checkout’s examples. [RELEASE-CURRENT](../RELEASE-CURRENT.md) records qualification
+and preparation. Check the [GitHub release](https://github.com/JBorgia/signal-tree/releases/tag/v16.0.0-rc.0)
+and [npm version](https://www.npmjs.com/package/@signal-tree/kernel/v/16.0.0-rc.0)
+for publication evidence. See [CHANGELOG](../CHANGELOG.md)
+for behavior and migration changes.
 
-**Workspace version:** 16.0.0-dev — development only. The workspace version does
-NOT establish that 16.0.0 was published or is safe to release.
+**Workspace version:** 16.0.0-rc.0 — prerelease evaluation. A source version string
+does not establish registry publication or a stable v16 release.
 
 ---
 

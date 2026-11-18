@@ -1,4 +1,12 @@
-## 16.0.0-dev (unreleased)
+## 16.0.0-rc.0 (2026-11-18)
+
+### Evaluation channel
+
+The first v16 release candidate is evaluated through npm’s `rc` channel. Stable
+v15 remains `latest`. Use exact prerelease versions and the installed declarations;
+see the [adoption guide](docs/guides/adoption-v16.md) and
+[v15 migration checklist](docs/guides/migration-v15-v16.md). The release candidate
+does not establish stable v16 support or backend authorization and durability.
 
 ### Conditional publication declarations
 

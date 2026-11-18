@@ -1747,6 +1747,8 @@ function run(gate) {
       cwd: ROOT,
       stdio: 'pipe',
       encoding: 'utf8',
+      // Full release diagnostics can exceed Node's 1 MiB default buffer.
+      maxBuffer: 20 * 1024 * 1024,
       // A gate may need its own environment — `retention-gc` needs
       // --expose-gc to reach vitest's forked workers, which a `node --expose-gc`
       // command line would NOT do.

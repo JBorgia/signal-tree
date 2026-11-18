@@ -42,7 +42,7 @@ describe('StartHereComponent', () => {
 
   it('teaches owned minimal state and keeps v15/v16/backend boundaries explicit', () => {
     const text = fixture.nativeElement.textContent as string;
-    expect(text).toContain('v16 development preview · Unreleased');
+    expect(text).toContain('v16 release candidate · Evaluation prerelease');
     expect(text).toContain('transaction()');
     expect(text).toContain('transact()');
     expect(text).toContain('destroy: () => tree.destroy()');

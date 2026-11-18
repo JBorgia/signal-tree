@@ -1,6 +1,6 @@
 {
   "name": "@signal-tree/solid",
-  "version": "16.0.0-dev",
+  "version": "16.0.0-rc.0",
   "description": "Solid observation for SignalTree.",
   "license": "Apache-2.0",
   "type": "module",

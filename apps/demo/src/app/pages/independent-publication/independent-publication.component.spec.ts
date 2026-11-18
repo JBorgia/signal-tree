@@ -238,7 +238,7 @@ describe('IndependentPublicationComponent (v16 preview)', () => {
       /\s+/g,
       ' '
     );
-    expect(text).toContain('v16 development preview · Unreleased');
+    expect(text).toContain('v16 release candidate · Evaluation prerelease');
     expect(text).toContain('not stable v15 guidance');
     expect(text).toContain('Admission snapshot');
     expect(text).toContain('In-memory endpoint');

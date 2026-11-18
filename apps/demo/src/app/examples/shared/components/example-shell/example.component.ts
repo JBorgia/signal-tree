@@ -84,15 +84,16 @@ import { StateInspectorComponent } from './state-inspector.component';
             {{
               playgroundAvailable
                 ? 'Edit in StackBlitz ↗'
-                : 'Playground needs a release'
+                : 'Evaluate prerelease locally'
             }}
           </button>
           }
         </div>
         @if (stackblitz() && !playgroundAvailable) {
         <p>
-          Unreleased candidate: copy the checked source below and use the
-          qualified local packages.
+          The prerelease remote playground has not been verified. Follow the
+          <a href="/start">versioned local setup</a>, then copy the checked
+          source below into your application.
         </p>
         }
         <st-code-tabs [files]="code()" />

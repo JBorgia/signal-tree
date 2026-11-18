@@ -1,0 +1,38 @@
+{
+  "method": "npm pack --dry-run --json selects shipped .js/.mjs/.d.ts/.d.mts; SHA256 compared to integrity-verified frozen archives after mutation restoration and clean rebuild",
+  "baselineCommit": "f8cf26e50193ca8aa5580da15b739129313f256e",
+  "baselineVersion": "16.0.0-dev",
+  "candidateVersion": "16.0.0-rc.0",
+  "packages": [
+    {
+      "package": "@signal-tree/kernel",
+      "baselineArchiveIntegrity": "sha512-/Kjdh5OOELbWDesoUbnAHU/4RwQCm/A/96nCo9RCUMdl7VQA2Qj/79WA58XPsb/xhYYQ1aZ3WF/84ZLTL9vo/w==",
+      "payloads": 139,
+      "differences": []
+    },
+    {
+      "package": "@signal-tree/angular",
+      "baselineArchiveIntegrity": "sha512-9Tudhcb40XMXeXj+2yb5c82HWk/v9oz1OxX1Rag6IOWQDS0GOgpc8XVaBOlV24y7CX2PrAZ3n4vGTx8XntgKrQ==",
+      "payloads": 11,
+      "differences": []
+    },
+    {
+      "package": "@signal-tree/react",
+      "baselineArchiveIntegrity": "sha512-UXqai8Ny13/8J7hp76k85Bnwpjw4JxsrRBw2ORI5OrRdN1U83uL1Jzd9s5UjXADq52i3mPcbDhqujMhwSV8/Yg==",
+      "payloads": 4,
+      "differences": []
+    },
+    {
+      "package": "@signal-tree/vue",
+      "baselineArchiveIntegrity": "sha512-TtSH5JeLuIcrQVAVrSUzOUwrfoCv4FlB20ZMTSP2gvJpeZgOls9VWDl7CsPsUi0SINqYhSiUvG7Zx621LbQr8g==",
+      "payloads": 7,
+      "differences": []
+    },
+    {
+      "package": "@signal-tree/solid",
+      "baselineArchiveIntegrity": "sha512-2NcDsjgberXOT3QHxvkHHoGwxPHDyM9DTsY23rwHdPU+Hl0apvWwHv6RAkICVp35zYHli/txnLq4kDHZCApoAQ==",
+      "payloads": 7,
+      "differences": []
+    }
+  ]
+}

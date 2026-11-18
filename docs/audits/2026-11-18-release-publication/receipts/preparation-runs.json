@@ -1,0 +1,36 @@
+[
+  {
+    "name": "publisher-controls",
+    "command": [
+      "node",
+      "scripts/check-publish-candidate.mjs"
+    ],
+    "exit": 0,
+    "seconds": 29.41
+  },
+  {
+    "name": "fresh-build",
+    "command": [
+      "pnpm",
+      "exec",
+      "nx",
+      "run-many",
+      "-t",
+      "build",
+      "--projects=kernel,angular,react,vue,solid",
+      "--configuration=production",
+      "--skip-nx-cache"
+    ],
+    "exit": 0,
+    "seconds": 14.48
+  },
+  {
+    "name": "old-bundle-budget",
+    "command": [
+      "node",
+      "tools/check-bundle-budget.mjs"
+    ],
+    "exit": 1,
+    "seconds": 0.18
+  }
+]

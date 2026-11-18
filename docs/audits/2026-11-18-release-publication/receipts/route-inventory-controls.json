@@ -1,0 +1,41 @@
+{
+  "runs": [
+    {
+      "name": "route-inventory-clean",
+      "command": [
+        "pnpm",
+        "exec",
+        "playwright",
+        "test",
+        "--config=/Users/jonathanborgia/code/signaltree/.worktrees/v16-optimization-sweep/artifacts/release-16.0.0-rc.0/inventory-control.config.ts"
+      ],
+      "exit": 0,
+      "seconds": 1.46
+    },
+    {
+      "name": "route-inventory-missing-control",
+      "command": [
+        "pnpm",
+        "exec",
+        "playwright",
+        "test",
+        "--config=/Users/jonathanborgia/code/signaltree/.worktrees/v16-optimization-sweep/artifacts/release-16.0.0-rc.0/inventory-control.config.ts"
+      ],
+      "exit": 1,
+      "seconds": 0.92
+    },
+    {
+      "name": "route-inventory-restored",
+      "command": [
+        "pnpm",
+        "exec",
+        "playwright",
+        "test",
+        "--config=/Users/jonathanborgia/code/signaltree/.worktrees/v16-optimization-sweep/artifacts/release-16.0.0-rc.0/inventory-control.config.ts"
+      ],
+      "exit": 0,
+      "seconds": 1.11
+    }
+  ],
+  "sourceRestored": true
+}

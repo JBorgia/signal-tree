@@ -16,13 +16,16 @@ describe('StackblitzService', () => {
     jest.clearAllMocks();
   });
 
-  it('does not offer an unresolved development candidate as a runnable remote project', () => {
-    DEMO_LIBRARY_VERSIONS['signaltree'] = '16.0.0-dev';
-    const service = new StackblitzService();
-    expect(service.available).toBe(false);
-    service.open({ title: 'Candidate', files: {} });
-    expect(sdk.openProject).not.toHaveBeenCalled();
-  });
+  it.each(['16.0.0-dev', '16.0.0-rc.0', '16.0.0-beta.1'])(
+    'keeps prerelease %s local until its remote scaffold is verified',
+    (version) => {
+      DEMO_LIBRARY_VERSIONS['signaltree'] = version;
+      const service = new StackblitzService();
+      expect(service.available).toBe(false);
+      service.open({ title: 'Candidate', files: {} });
+      expect(sdk.openProject).not.toHaveBeenCalled();
+    }
+  );
   it('opens a zoneless Angular project without a Zone.js runtime dependency', () => {
     // Fixture models a published version; candidate access is tested separately.
     DEMO_LIBRARY_VERSIONS['signaltree'] = '15.4.8';

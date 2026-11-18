@@ -2,8 +2,11 @@
 
 v16 retains the `@signal-tree/*` package scope and the kernel plus Angular,
 React, Vue and Solid facades. Use one framework facade for application state.
-The candidate remains unreleased; consult [the release controller](../../RELEASE-CURRENT.md)
-for the exact qualified version and current follow-through work.
+Evaluate **16.0.0-rc.0** explicitly, for example
+`npm install @signal-tree/angular@16.0.0-rc.0`. The `rc` channel is separate
+from stable v15 on `latest`; an unversioned install does not select this guide’s
+v16 APIs. Consult [the release controller](../../RELEASE-CURRENT.md) for exact
+qualification and publication receipts. This prerelease is not stable v16.
 
 Start with [one owned workflow](adoption-v16.md). The executable
 [route-review story](../../apps/demo/src/app/pages/independent-publication/independent-publication.component.ts)
@@ -55,7 +58,8 @@ Use the installed adapter declarations and current-reader conformance tests for
 your factory; do not copy framework-specific scheduling into kernel ownership.
 Applications using the shipped facades do not implement this SDK method.
 
-Entity field factories now run when the field is first acquired. A whole-row
+As in v15.4.8 and later, entity field factories run when the field is first
+acquired. A whole-row
 handle still exposes its original field keys and descriptors, but acquiring that
 row no longer constructs every field carrier. Custom adapters must initialize
 from current values at field acquisition and must not depend on eager factory
