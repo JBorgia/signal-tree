@@ -1,0 +1,7 @@
+{
+  "workflow": "test-packages.yml",
+  "ref": "v16.0.0-rc.0",
+  "purpose": "Preserve untruncated package test diagnostics for failed exact-tag release run",
+  "time": "2026-11-18T17:07:33.266340+00:00",
+  "output": ""
+}

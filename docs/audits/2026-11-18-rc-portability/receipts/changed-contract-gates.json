@@ -1,0 +1,9 @@
+{
+  "command": [
+    "node",
+    "tools/verify-gates.mjs",
+    "--only=spec-types,lint:budget"
+  ],
+  "exit": 0,
+  "seconds": 27.89
+}

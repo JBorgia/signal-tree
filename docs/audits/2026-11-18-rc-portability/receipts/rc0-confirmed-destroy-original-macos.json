@@ -1,0 +1,14 @@
+{
+  "command": [
+    "pnpm",
+    "nx",
+    "test",
+    "kernel",
+    "--testFile=src/enhancers/transactions/confirmed-destroy.spec.ts",
+    "--maxWorkers=1",
+    "--skip-nx-cache"
+  ],
+  "exit": 0,
+  "seconds": 4.96,
+  "sourceCommit": "adf3937459f88260c276c1486357d94ab886cd07"
+}

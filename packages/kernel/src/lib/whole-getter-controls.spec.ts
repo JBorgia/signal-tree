@@ -1,4 +1,6 @@
 import {writeFileSync} from 'node:fs';
+import {tmpdir} from 'node:os';
+import {join} from 'node:path';
 import {expect,it,afterAll} from 'vitest';
 import {entityMap,signalTree,link,transactions} from '../index';
 import {getEntityPublicationBinding} from './internals/entity-publication';
@@ -6,7 +8,7 @@ import {getPathNotifier} from './path-notifier';
 type Declared=ReturnType<typeof link>&{declare(d:{kind:'independent'},work:()=>void):unknown};
 const results:unknown[]=[];
 const flush=async()=>{getPathNotifier().flushSync();for(let i=0;i<100;i++)await Promise.resolve();};
-afterAll(()=>{writeFileSync(process.env.TMPDIR+'/whole-getters.json',JSON.stringify(results,null,2));});
+afterAll(()=>{writeFileSync(join(tmpdir(),'whole-getters.json'),JSON.stringify(results,null,2));});
 for(const route of ['setAll','replaceOne','row'] as const)for(const scenario of ['stable','first-throw','reentry'] as const)
 it(`whole getter ${route} ${scenario}`,async()=>{
  const t=signalTree({rows:entityMap<{id:string;x:number},string>(),inner:0},{enhancers:[transactions()]});t.$.rows.addOne({id:'a',x:7});await flush();const rows=t.$.rows,row=rows.byIdOrFail('a');const sent:unknown[]=[];const c=link(rows,{set:v=>{sent.push(v);}}) as Declared;

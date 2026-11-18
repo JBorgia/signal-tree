@@ -7,14 +7,14 @@
 Use this index to navigate the documentation.
 
 **Publication status:** this v16 evaluation prerelease targets npm’s `rc` channel;
-`latest` remains the stable v15 line. Pin `16.0.0-rc.0` when following this
+`latest` remains the stable v15 line. Pin `16.0.0-rc.1` when following this
 checkout’s examples. [RELEASE-CURRENT](../RELEASE-CURRENT.md) records qualification
-and preparation. Check the [GitHub release](https://github.com/JBorgia/signal-tree/releases/tag/v16.0.0-rc.0)
-and [npm version](https://www.npmjs.com/package/@signal-tree/kernel/v/16.0.0-rc.0)
+and preparation. Check the [GitHub release](https://github.com/JBorgia/signal-tree/releases/tag/v16.0.0-rc.1)
+and [npm version](https://www.npmjs.com/package/@signal-tree/kernel/v/16.0.0-rc.1)
 for publication evidence. See [CHANGELOG](../CHANGELOG.md)
 for behavior and migration changes.
 
-**Workspace version:** 16.0.0-rc.0 — prerelease evaluation. A source version string
+**Workspace version:** 16.0.0-rc.1 — prerelease evaluation. A source version string
 does not establish registry publication or a stable v16 release.
 
 ---

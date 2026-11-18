@@ -1,4 +1,20 @@
-## 16.0.0-rc.0 (2026-11-18)
+## 16.0.0-rc.1 (2026-11-18)
+
+This evaluation candidate retains the v16 behavior described below. A GC test
+launcher now sends its bundled program through stdin instead of one oversized
+command-line argument, preserving both fresh subprocesses and every ownership
+assertion across macOS and Linux. No runtime or public API behavior changes.
+Two diagnostic writers also use Node's portable temporary-directory lookup when
+`TMPDIR` is unset, retaining their output and behavior assertions.
+The release gate runner preserves complete bounded failure output and drains
+piped diagnostics before exiting; failures still return a failing status.
+
+The signed rc.0 preparation was not published: Linux qualification failed before
+registry publication. Its tag and failure evidence remain intact. The successor
+must pass exact-tag normal/mutation qualification and canonical publication;
+stable v15.4.9 continues to own `latest`.
+
+## 16.0.0-rc.0 (2026-11-18; unpublished preparation)
 
 ### Evaluation channel
 

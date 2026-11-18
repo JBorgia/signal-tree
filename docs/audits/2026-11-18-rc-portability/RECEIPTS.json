@@ -1,0 +1,307 @@
+{
+  "version": "16.0.0-rc.1",
+  "scope": "Working-tree successor preparation plus preserved original signed rc.0 Linux failures. Exact successor tag qualification and publication remain pending.",
+  "predecessorCommit": "adf3937459f88260c276c1486357d94ab886cd07",
+  "receipts": [
+    {
+      "path": "receipts/angular-aot.log.gz",
+      "source": "artifacts/release-16.0.0-rc.1/angular-aot.log",
+      "bytes": 164,
+      "sha256": "067569047688f3c484106e5258137a7bc346b337408c6a8206403e45312f1697",
+      "rawBytes": 213,
+      "rawSha256": "8076ea766d301ae307069e3114a197e0f4bd02dcc0768c6ab14420c725d817ed",
+      "encoding": "gzip; decompressed bytes equal original log"
+    },
+    {
+      "path": "receipts/batching-detachment.log.gz",
+      "source": "artifacts/release-16.0.0-rc.1/batching-detachment.log",
+      "bytes": 600,
+      "sha256": "054dd69ef8a7e5ab0210837d86c40d11a1ee0a82af8573f20f722f1d7f4a2a10",
+      "rawBytes": 1353,
+      "rawSha256": "4d4da612431e9997f3e6288a55958ef219d23ae3bc3b6f2a088a8bdc9b27a5ee",
+      "encoding": "gzip; decompressed bytes equal original log"
+    },
+    {
+      "path": "receipts/browser.log.gz",
+      "source": "artifacts/release-16.0.0-rc.1/browser.log",
+      "bytes": 3338,
+      "sha256": "91100109585acab6c80121fc589a4ee6b0627ab0346a5fe79ad42bc426a15ba9",
+      "rawBytes": 22075,
+      "rawSha256": "d1d9b980008d07ed60dcb89e3f68698d9b150461214b762cc7999d174674d4f7",
+      "encoding": "gzip; decompressed bytes equal original log"
+    },
+    {
+      "path": "receipts/budgets.log.gz",
+      "source": "artifacts/release-16.0.0-rc.1/budgets.log",
+      "bytes": 205,
+      "sha256": "4d30c7b0f906095389d8512fd35b26972360fb6272c52557cfcc2889f54ea1e6",
+      "rawBytes": 479,
+      "rawSha256": "e0eb89fe54cce5c623c52af1865e9ea678d91fe544d8da581cd0e759b5097615",
+      "encoding": "gzip; decompressed bytes equal original log"
+    },
+    {
+      "path": "receipts/changed-contract-gates.json",
+      "source": "artifacts/release-16.0.0-rc.1/changed-contract-gates.json",
+      "bytes": 134,
+      "sha256": "20dbc1157336c888c0e1144aae97a99f3ac77c1723bad472103b0d6b1d3ca2f3"
+    },
+    {
+      "path": "receipts/changed-contract-gates.log.gz",
+      "source": "artifacts/release-16.0.0-rc.1/changed-contract-gates.log",
+      "bytes": 281,
+      "sha256": "0a8ae763b4ccd87b60afb2dd1f575ca614596770522c09e7171f4e3f6e472e29",
+      "rawBytes": 605,
+      "rawSha256": "d4811eb73173f770e5ba64b65c1c7160a17c4897c371d683d340542cbd22d8e9",
+      "encoding": "gzip; decompressed bytes equal original log"
+    },
+    {
+      "path": "receipts/confirmed-destroy-stdin.log.gz",
+      "source": "artifacts/release-16.0.0-rc.1/confirmed-destroy-stdin.log",
+      "bytes": 709,
+      "sha256": "a7c344da0cf6cb5054afafdea96d76f8f11467e45676f2a994947757658a1cba",
+      "rawBytes": 1619,
+      "rawSha256": "04046347f7d59109c41e16d66cb90fca31eb8ae5d7dc17ade7115ce956d8eb75",
+      "encoding": "gzip; decompressed bytes equal original log"
+    },
+    {
+      "path": "receipts/demo-unit.log.gz",
+      "source": "artifacts/release-16.0.0-rc.1/demo-unit.log",
+      "bytes": 1017,
+      "sha256": "a338a7d0bc8536310abad9085c7ed1f469a1055800130d2eaed40295f40e0440",
+      "rawBytes": 2212,
+      "rawSha256": "22bffb30a1e515a11129d950d272022cd3d5d78f9fb0864287143d166d1702dd",
+      "encoding": "gzip; decompressed bytes equal original log"
+    },
+    {
+      "path": "receipts/diagnostic-failure-preload.cjs",
+      "source": "artifacts/release-16.0.0-rc.1/diagnostic-failure-preload.cjs",
+      "bytes": 581,
+      "sha256": "88cdf833a8aa5782da9dca1b7fbd52370045da28bd6a974a5aecc4d1e77ffaf2"
+    },
+    {
+      "path": "receipts/documentation.log.gz",
+      "source": "artifacts/release-16.0.0-rc.1/documentation.log",
+      "bytes": 478,
+      "sha256": "4e48d2ffe5abc7924192d0d4924cd8181c7c2748044e981401197d861970860b",
+      "rawBytes": 1045,
+      "rawSha256": "24cf7a930b923f372742f3b1a8ea646f805cadd76c77e9e6e932ff0e1ce9dd7c",
+      "encoding": "gzip; decompressed bytes equal original log"
+    },
+    {
+      "path": "receipts/focused-runs.json",
+      "source": "artifacts/release-16.0.0-rc.1/focused-runs.json",
+      "bytes": 713,
+      "sha256": "2b90f988d9a78587743b338e2be5bde27cab5e8e22721b8edcf28d79eb4a0683"
+    },
+    {
+      "path": "receipts/fresh-build.log.gz",
+      "source": "artifacts/release-16.0.0-rc.1/fresh-build.log",
+      "bytes": 3262,
+      "sha256": "26c84b116f093816ff5436c6fb51b49154c684f0b71e2f413512ce436f99f6e5",
+      "rawBytes": 16776,
+      "rawSha256": "c2356148027e0878ab2ab0ebb8fa8ecc5adc309d8fdc2439b0e14707adb6a184",
+      "encoding": "gzip; decompressed bytes equal original log"
+    },
+    {
+      "path": "receipts/gate-diagnostics-after.json",
+      "source": "artifacts/release-16.0.0-rc.1/gate-diagnostics-after.json",
+      "bytes": 453,
+      "sha256": "2eb21ba440f073508421195a465c31440d82549d3a8653a7508ec04f263bff08"
+    },
+    {
+      "path": "receipts/gate-diagnostics-after.log.gz",
+      "source": "artifacts/release-16.0.0-rc.1/gate-diagnostics-after.log",
+      "bytes": 434,
+      "sha256": "41f13c9d6fe311b79fe5db8201318724229e054f599bd250d629060e44a1ec54",
+      "rawBytes": 200447,
+      "rawSha256": "63f188b166447f24e4bc4e53d37b74cfc287dfa436ad335a1c07f0bfc6a1bfee",
+      "encoding": "gzip; decompressed bytes equal original log"
+    },
+    {
+      "path": "receipts/gate-diagnostics-before.json",
+      "source": "artifacts/release-16.0.0-rc.1/gate-diagnostics-before.json",
+      "bytes": 455,
+      "sha256": "6a21318c488071831005bdaae4e8085de08583cdefdbe816cbff31f9236b50f9"
+    },
+    {
+      "path": "receipts/gate-diagnostics-before.log.gz",
+      "source": "artifacts/release-16.0.0-rc.1/gate-diagnostics-before.log",
+      "bytes": 220,
+      "sha256": "1ccc24930cc01d01edce8057b1486d8ffc2359add3916765ea044b76ca52430e",
+      "rawBytes": 65667,
+      "rawSha256": "63653f730a22b483e918c5b04affa3112832e74b33423e075b4e0fe9a6528408",
+      "encoding": "gzip; decompressed bytes equal original log"
+    },
+    {
+      "path": "receipts/gate-diagnostics-clean.log.gz",
+      "source": "artifacts/release-16.0.0-rc.1/gate-diagnostics-clean.log",
+      "bytes": 160,
+      "sha256": "707be69ccfefa8cbe250147b5b634eb9771201578ca9498d3ae608ab1454fe37",
+      "rawBytes": 395,
+      "rawSha256": "1a15c907d536feeb6f59eeb2b9f7e0902360fc7c34561ad6846697b5c5ada015",
+      "encoding": "gzip; decompressed bytes equal original log"
+    },
+    {
+      "path": "receipts/preparation-runs.json",
+      "source": "artifacts/release-16.0.0-rc.1/preparation-runs.json",
+      "bytes": 1854,
+      "sha256": "a143db532203b1c738acc799eb404c5de3a59baf59762559d454f51ee9312be3"
+    },
+    {
+      "path": "receipts/production-demo.log.gz",
+      "source": "artifacts/release-16.0.0-rc.1/production-demo.log",
+      "bytes": 1439,
+      "sha256": "0795116de179933e5d5e4edeb28a2398eea6201f46dd193f91df757ae740187e",
+      "rawBytes": 5023,
+      "rawSha256": "eb23563e024d68b220f50082edced725f347806f2fa081ecbe348db44b0293a3",
+      "encoding": "gzip; decompressed bytes equal original log"
+    },
+    {
+      "path": "receipts/runtime-continuity.json",
+      "source": "artifacts/release-16.0.0-rc.1/runtime-continuity.json",
+      "bytes": 33633,
+      "sha256": "a58beea0f0dda9f8572f022a97cbe9bd4001857090056b2f3ae63f02ab7116c6"
+    },
+    {
+      "path": "receipts/strict-types.log.gz",
+      "source": "artifacts/release-16.0.0-rc.1/strict-types.log",
+      "bytes": 198,
+      "sha256": "b99c3447615d4a2092b770c21e308a361e99bc4f28104afd47c176f0cdaae255",
+      "rawBytes": 271,
+      "rawSha256": "a773289051a58cf35d19065195c79fa3457480d3518e371785cbe0611ffd35c0",
+      "encoding": "gzip; decompressed bytes equal original log"
+    },
+    {
+      "path": "receipts/tarball-consumers.log.gz",
+      "source": "artifacts/release-16.0.0-rc.1/tarball-consumers.log",
+      "bytes": 238,
+      "sha256": "fa8a4f4055f39a8a1e240c78715bf9939084d2d13e49e267d22004454af7ad1a",
+      "rawBytes": 743,
+      "rawSha256": "141ef3ed7053d1e84a454073c419c1c1d7c685801bca01d6df8b1b79d057264b",
+      "encoding": "gzip; decompressed bytes equal original log"
+    },
+    {
+      "path": "receipts/tmpdir-after.json",
+      "source": "artifacts/release-16.0.0-rc.1/tmpdir-after.json",
+      "bytes": 770,
+      "sha256": "9c59bf1fe2017431403637405ad90424181ec21aed67e153d18fc4bfb61ecd79"
+    },
+    {
+      "path": "receipts/tmpdir-before.json",
+      "source": "artifacts/release-16.0.0-rc.1/tmpdir-before.json",
+      "bytes": 879,
+      "sha256": "d6efdeecc437a19dcc0cd8fde2a1f503cb776338900fbe72df8e4d0b9b24bfb0"
+    },
+    {
+      "path": "receipts/version-env.log.gz",
+      "source": "artifacts/release-16.0.0-rc.1/version-env.log",
+      "bytes": 108,
+      "sha256": "aab42af26061b3cd3f50896b73b19595e525c231191c2d76428db78576bf90ce",
+      "rawBytes": 144,
+      "rawSha256": "ccfcd1dbe77b3e941a39025a18cb07f70fe8ca63f6639a4741bf37060f710eed",
+      "encoding": "gzip; decompressed bytes equal original log"
+    },
+    {
+      "path": "receipts/whole-bounded-qualification-missing-tmpdir-after.log.gz",
+      "source": "artifacts/release-16.0.0-rc.1/whole-bounded-qualification-missing-tmpdir-after.log",
+      "bytes": 604,
+      "sha256": "f7906f624d4eb6455cd46806481c6129188620833d3e24aa25440be4743e6bb8",
+      "rawBytes": 1342,
+      "rawSha256": "750cf39e2b419b94dab9a732a79e77912f564e5653e2d466699dbfa7ae03a829",
+      "encoding": "gzip; decompressed bytes equal original log"
+    },
+    {
+      "path": "receipts/whole-bounded-qualification-missing-tmpdir-before.log.gz",
+      "source": "artifacts/release-16.0.0-rc.1/whole-bounded-qualification-missing-tmpdir-before.log",
+      "bytes": 1090,
+      "sha256": "3223fb3cb1c27e7f47efd3fda7ed1778b4c11ead28f23cb86bf245d3bbddbd3d",
+      "rawBytes": 2486,
+      "rawSha256": "ae9584ce663b3871f7d6c3599a5ad674375b71f4afb90ee4dc7d14d01ec34ed0",
+      "encoding": "gzip; decompressed bytes equal original log"
+    },
+    {
+      "path": "receipts/whole-getter-controls-missing-tmpdir-after.log.gz",
+      "source": "artifacts/release-16.0.0-rc.1/whole-getter-controls-missing-tmpdir-after.log",
+      "bytes": 600,
+      "sha256": "7352e5907f5803e5b66a6f480cb0851dc4b7cfc1bb2fe635495d12c1ad913080",
+      "rawBytes": 1328,
+      "rawSha256": "d3ab10d7c251bdfe2a0dc274cfe8ec7c61cb6caf3e6f76ff94e22483ae5c8ecb",
+      "encoding": "gzip; decompressed bytes equal original log"
+    },
+    {
+      "path": "receipts/whole-getter-controls-missing-tmpdir-before.log.gz",
+      "source": "artifacts/release-16.0.0-rc.1/whole-getter-controls-missing-tmpdir-before.log",
+      "bytes": 1021,
+      "sha256": "76c727553a82cb30332555cff29815c296b1c442a581ae993c6f7116a6b1a32b",
+      "rawBytes": 2340,
+      "rawSha256": "81855681bb41b0674c9623813a71914e6d842bdb4e3506a4ee7dfd19614f896b",
+      "encoding": "gzip; decompressed bytes equal original log"
+    },
+    {
+      "path": "receipts/rc0-github-tag-run.json",
+      "source": "artifacts/release-16.0.0-rc.0/github-tag-run.json",
+      "bytes": 6632,
+      "sha256": "f941c6ef834ac1b2726a928ac9c675375fc5cb6edad23154de0a3dd8a9e4055d"
+    },
+    {
+      "path": "receipts/rc0-github-tag-ci.log.gz",
+      "source": "artifacts/release-16.0.0-rc.0/github-tag-ci.log",
+      "bytes": 27801,
+      "sha256": "7b291db4271743379dde9186dfb28e5eca8d6b68dd84a4863fe02d9e4f750b0d",
+      "rawBytes": 242199,
+      "rawSha256": "666efbd72628e0f96a4dc6d431656596f34ba009add02c3d4cc7a1cfb857c007",
+      "encoding": "gzip; decompressed bytes equal original log"
+    },
+    {
+      "path": "receipts/rc0-diagnostic-dispatch.json",
+      "source": "artifacts/release-16.0.0-rc.0/diagnostic-dispatch.json",
+      "bytes": 220,
+      "sha256": "b3d3771c5c790c1da14950a6b299244a90d0ba641d3b82cd402166cc594f1364"
+    },
+    {
+      "path": "receipts/rc0-diagnostic-run.json",
+      "source": "artifacts/release-16.0.0-rc.0/diagnostic-run.json",
+      "bytes": 7378,
+      "sha256": "57f85569a5c1171103632d8453664af2901c555fca4909283b00ca56edf8bd43"
+    },
+    {
+      "path": "receipts/rc0-diagnostic-kernel.log.gz",
+      "source": "artifacts/release-16.0.0-rc.0/diagnostic-kernel.log",
+      "bytes": 95029,
+      "sha256": "51e875a5bbeb47bb2afb5ff3e8d42640e0f9ad265fe26bc1d75d04caa27ae051",
+      "rawBytes": 735316,
+      "rawSha256": "fece5df65f7500dbbfe30acf3b1c527c7bb5f66350531613c65a68dfb870b004",
+      "encoding": "gzip; decompressed bytes equal original log"
+    },
+    {
+      "path": "receipts/rc0-confirmed-destroy-original-macos.json",
+      "source": "artifacts/release-16.0.0-rc.0/confirmed-destroy-original-macos.json",
+      "bytes": 280,
+      "sha256": "170460ad015694c45c4b2ecfa035502003fca4fbe0dd3978325fa7ab9fc99531"
+    },
+    {
+      "path": "receipts/rc0-confirmed-destroy-original-macos.log.gz",
+      "source": "artifacts/release-16.0.0-rc.0/confirmed-destroy-original-macos.log",
+      "bytes": 606,
+      "sha256": "4f720e5e9625c80be17f8e4cec6d89449d5e219373e447c81f847eb53698328b",
+      "rawBytes": 1355,
+      "rawSha256": "829f0949f40e8d40f7142551dadb9e4c1c968b192071ab2f9db83db5944d59d3",
+      "encoding": "gzip; decompressed bytes equal original log"
+    },
+    {
+      "path": "receipts/rc0-signed-tag-verification.log.gz",
+      "source": "artifacts/release-16.0.0-rc.0/signed-tag-verification.log",
+      "bytes": 275,
+      "sha256": "bf06663f0ed5202a5e96b7c6e814b3f522f6dd76e5837e6633853c7ede590768",
+      "rawBytes": 324,
+      "rawSha256": "984a2ca06da717cbe4282bf14f973457d56705a3655052f43d1f8dfc6a6dfcc7",
+      "encoding": "gzip; decompressed bytes equal original log"
+    },
+    {
+      "path": "receipts/rc0-candidate.json",
+      "source": ".release/candidates/16.0.0-rc.0/candidate.json",
+      "bytes": 1606,
+      "sha256": "908be2461710b78242a28690e934047ebcc319fc78fc5a9b40ab87ca60c050c0"
+    }
+  ]
+}

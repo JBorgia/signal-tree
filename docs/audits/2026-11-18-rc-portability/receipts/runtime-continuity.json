@@ -1,0 +1,884 @@
+{
+  "scope": "Fresh rc.1 working-tree production build versus integrity-verified canonical rc.0 archives; manifests/guidance intentionally versioned separately.",
+  "priorCommit": "adf3937459f88260c276c1486357d94ab886cd07",
+  "version": "16.0.0-rc.1",
+  "command": [
+    "npm",
+    "pack",
+    "--dry-run",
+    "--json",
+    "--ignore-scripts"
+  ],
+  "packages": [
+    {
+      "name": "@signal-tree/kernel",
+      "priorIntegrity": "sha512-vtm8pkbFko9bfPhHh2VkNFGV3RrPQhuH2hJpUmdhuAgcwUH6G+ZS35uVgMYVDTyed4YCjenf8XWpqctHcFqYLQ==",
+      "files": [
+        {
+          "path": "dist/_adapter-Cp5WVkcj.d.ts",
+          "bytes": 65866,
+          "sha256": "9cd8c8d32fdee02184e04bb0a38274ad0ec6cdb42151effe97d935d6cbad4d1e"
+        },
+        {
+          "path": "dist/_position-registry-D8dCXLAS.d.ts",
+          "bytes": 1205,
+          "sha256": "5fa73d43d0525919b2731e54adbe1a2cb1adaafc6fe014c536b4dc75a69bfab6"
+        },
+        {
+          "path": "dist/adapter.d.ts",
+          "bytes": 697,
+          "sha256": "6bf35e1e1860606f6c777788bea636ac44ed781e3b4b0e064102a53eb25e9683"
+        },
+        {
+          "path": "dist/adapter.js",
+          "bytes": 1864,
+          "sha256": "7d92f397a047983c78ae21b1e0eb759332297fb515acf8078df6e90d1eada4d1"
+        },
+        {
+          "path": "dist/enhancers/batching/batching.js",
+          "bytes": 6083,
+          "sha256": "f266af789c5f4212b90bacb20657c4fc6a10da3200d7be6246b701946106ffce"
+        },
+        {
+          "path": "dist/enhancers/devtools/devtools-impl.js",
+          "bytes": 30363,
+          "sha256": "6db65cd985bc1116b11d9ebb3f99ac6117b743ad10f20f33da705e001ce4e64c"
+        },
+        {
+          "path": "dist/enhancers/devtools/devtools.js",
+          "bytes": 538,
+          "sha256": "b3c05a3a89706751807e85bf96c184c0f26a82a399d980966301162572fbe678"
+        },
+        {
+          "path": "dist/enhancers/index.js",
+          "bytes": 2177,
+          "sha256": "2101af7fc02fd5d38b59084e760d5b51bff5128eb854e14081f4912873da1425"
+        },
+        {
+          "path": "dist/enhancers/restoration/order-boundary-evidence.js",
+          "bytes": 5904,
+          "sha256": "7d914140e91edcecea26ffb2be8b6b487777a8a939affaf217e9a37189069d44"
+        },
+        {
+          "path": "dist/enhancers/restoration/restoration.js",
+          "bytes": 89541,
+          "sha256": "0bf5c97523e806fd67b948458e54d863d5251e94cb76bb0104aa94de103c142d"
+        },
+        {
+          "path": "dist/enhancers/transactions/occupancy-composition.js",
+          "bytes": 1222,
+          "sha256": "4021671e1f2ff5eeba117b279e17a605a9664dddfbd0e22446e5376496a76f50"
+        },
+        {
+          "path": "dist/enhancers/transactions/transactions.js",
+          "bytes": 96644,
+          "sha256": "34b560645cb8634e4637d02f7062b941835e82645c2dd3b34ac6fc5b1aae599f"
+        },
+        {
+          "path": "dist/index.d.ts",
+          "bytes": 35822,
+          "sha256": "d6718f35d6cd5179dcf54cae33b02f578a8a74954b7f6495fb821a69293a0418"
+        },
+        {
+          "path": "dist/index.js",
+          "bytes": 802,
+          "sha256": "77ecf6d8f685069a3620b8f54119dd33df27d417782c40ca79fb2145ae1f0559"
+        },
+        {
+          "path": "dist/internals.d.ts",
+          "bytes": 31782,
+          "sha256": "75ea10e60200a72de95e7df66acc71f6139ad0a8236bb7818eb21ab027d24f4a"
+        },
+        {
+          "path": "dist/internals.js",
+          "bytes": 2563,
+          "sha256": "f0bd6c8036404f0e202eed089fa0d70224e430eb032b6dcc44560709b8d95415"
+        },
+        {
+          "path": "dist/lib/constants.js",
+          "bytes": 236,
+          "sha256": "9e550635ca6aa3ec4e977b312ddc30af682ed5eb6f1d960df828b2528054fed3"
+        },
+        {
+          "path": "dist/lib/enhancer-types.js",
+          "bytes": 78,
+          "sha256": "38a55eaafc23f76cda0cc9eb313aa3fda1ebfa01237f815f54e2cb1fafaf5bbe"
+        },
+        {
+          "path": "dist/lib/entity-signal.js",
+          "bytes": 111697,
+          "sha256": "f5e431c05d929f6476adf85dd7379c49e8ce6a41aba89b015a6784fc7a314b07"
+        },
+        {
+          "path": "dist/lib/experimental-publication/entity.js",
+          "bytes": 28908,
+          "sha256": "eeb0982f1d5d55fef193de08c425d1cb07e7247bd861b14905666b0cc586234e"
+        },
+        {
+          "path": "dist/lib/experimental-publication/lifecycle.js",
+          "bytes": 28323,
+          "sha256": "6eeca8aed2380276577abd1e63a24be8389d6eda9a1231ed0bf1761dc38a33c6"
+        },
+        {
+          "path": "dist/lib/experimental-publication/packed-field-row.js",
+          "bytes": 1162,
+          "sha256": "74e6513a84331fbebc6e604d65b52cd3c52791f59ee064e4679b593564cc0bfe"
+        },
+        {
+          "path": "dist/lib/experimental-publication/private.js",
+          "bytes": 44603,
+          "sha256": "fb88d31ec0f560f961d0b22e814b74c769e4699b1fe50aa777f752ca81384625"
+        },
+        {
+          "path": "dist/lib/experimental-publication/projection.js",
+          "bytes": 712,
+          "sha256": "5821c9ff89122ef56f9ed9563f4aad4c7df3129de9fedb52899aa37b8cc6c8e0"
+        },
+        {
+          "path": "dist/lib/experimental-publication/recipient-occurrence.js",
+          "bytes": 7688,
+          "sha256": "7dd6e51e06f8d7f98cd1a8141c1104ff6cb6ac5224953b0437bf2fba890248a5"
+        },
+        {
+          "path": "dist/lib/external.js",
+          "bytes": 819,
+          "sha256": "a43be60d2a89d982209a55ce20246ecd7b65e869c908178683a0b12a95351081"
+        },
+        {
+          "path": "dist/lib/internals/canonical-snapshot.js",
+          "bytes": 220,
+          "sha256": "4ccacb2bc2e4c73b5daad34987c21628d8a8fe267c70f0faf16863234ce4b119"
+        },
+        {
+          "path": "dist/lib/internals/causal-runtime/applied-turn-projection.js",
+          "bytes": 5631,
+          "sha256": "c52212b5f2cabac82911f05e341eeb02e405b67e0d680aa4442df2bb9a97abd9"
+        },
+        {
+          "path": "dist/lib/internals/causal-runtime/ordinary-realization.js",
+          "bytes": 1428,
+          "sha256": "a735745e968627526ed958f596ab3f5a8918079d5d131c40a8ddf81018ca367d"
+        },
+        {
+          "path": "dist/lib/internals/causal-runtime/pending-rollback.js",
+          "bytes": 9093,
+          "sha256": "50863a86f1ca0cf81a29f633937089ca08c335c38bdeeacba94cbfa744dfa3e9"
+        },
+        {
+          "path": "dist/lib/internals/causal-runtime/post-application-failure.js",
+          "bytes": 852,
+          "sha256": "9b85af135f97a976e5cc3e6ef33661db2873f987078c14599074e8a38a3df240"
+        },
+        {
+          "path": "dist/lib/internals/causal-runtime/realization-context.js",
+          "bytes": 2386,
+          "sha256": "6dbd74416fe572ebc63bc74bf81eddf86d570b9f53309dfdc77c6fc8f2a90208"
+        },
+        {
+          "path": "dist/lib/internals/causal-runtime/scoped-value-addressing.js",
+          "bytes": 222,
+          "sha256": "0c8a4d03b88f7dc0cc845c22b731fc8f8de86c10e247334ea0b9dac00c5f91f8"
+        },
+        {
+          "path": "dist/lib/internals/causal-runtime/target-transition.js",
+          "bytes": 21998,
+          "sha256": "a1af1a8014b4b951a0ff6bbbd9a56a3eacf26e2ffdcc7f6f2e90aaa40dc118f5"
+        },
+        {
+          "path": "dist/lib/internals/causal-runtime/transaction-lifecycle.js",
+          "bytes": 1922,
+          "sha256": "e6830837e4288560926c39edc188c66f994348eb8bda2e4482ee8b8c394f1cd1"
+        },
+        {
+          "path": "dist/lib/internals/causal-runtime/transient-rows.js",
+          "bytes": 1448,
+          "sha256": "d705adc9d4269f8ca577e796071f30c13ff2a5241af43bb9c2d4781a888fae87"
+        },
+        {
+          "path": "dist/lib/internals/causal-runtime/tree-realization-adapter.js",
+          "bytes": 66579,
+          "sha256": "81147696330715b2229aece93fd31a99f39011011a7d09b6d0daaf1187cd3708"
+        },
+        {
+          "path": "dist/lib/internals/causal-runtime/turn-store.js",
+          "bytes": 7142,
+          "sha256": "9c0692505988d4276c5bfe0355a055b90a276ff4dc08f2fb0bad5cf74f2955df"
+        },
+        {
+          "path": "dist/lib/internals/cell-identity.js",
+          "bytes": 301,
+          "sha256": "2b1845cdfc9a5428490df81fedb26fa3acff824379c833384959942b9843b83b"
+        },
+        {
+          "path": "dist/lib/internals/commit-consequence.js",
+          "bytes": 3490,
+          "sha256": "0cef50047fc80e20c5d93b98222d14a365d433ce0dfd1cf35642c22b321b3bad"
+        },
+        {
+          "path": "dist/lib/internals/confirmed-turn-view.js",
+          "bytes": 386,
+          "sha256": "f67861a6ea9a88888d8dbaf88a71561705063f24f73bfa0126667eaa2fc36067"
+        },
+        {
+          "path": "dist/lib/internals/construction-allocation.js",
+          "bytes": 770,
+          "sha256": "9ef45cf16700e2a0b6a6acd829e0927f7fd25575d87812057d929ace4bd3d946"
+        },
+        {
+          "path": "dist/lib/internals/construction-branch.js",
+          "bytes": 406,
+          "sha256": "fb6491c0318fae2b08f9274e3a648c1675ca71ccfdb2fdb2770402f0a89cd4c3"
+        },
+        {
+          "path": "dist/lib/internals/entity-contributor-map.js",
+          "bytes": 1084,
+          "sha256": "39b8682bfbf49975556dbf3bd127b9064eeed4a105e5551cc389be695ec95b64"
+        },
+        {
+          "path": "dist/lib/internals/entity-egress-keys.js",
+          "bytes": 1038,
+          "sha256": "0945f2ea2b40f7372e8362d7dfd152ad6f9b74002622f5574273d2cbe0e95c97"
+        },
+        {
+          "path": "dist/lib/internals/entity-egress-projection.js",
+          "bytes": 11480,
+          "sha256": "0cd8fb159b5288143dbf3f67c31b82f5bab3939ba3add26f068bb24e775c12a9"
+        },
+        {
+          "path": "dist/lib/internals/entity-membership-inventory.js",
+          "bytes": 5330,
+          "sha256": "b694227478a492f0f6c3e8ca8e71d6094fb7011b34b36ea6da63dcc7774d7b49"
+        },
+        {
+          "path": "dist/lib/internals/entity-membership-source.js",
+          "bytes": 825,
+          "sha256": "f484bc5ab09ccbc02c984e12992195099dd5b9ab8ec48c9deae445c626190546"
+        },
+        {
+          "path": "dist/lib/internals/entity-membership-view.js",
+          "bytes": 4566,
+          "sha256": "efa8c0cc14ff6826d6702e2bbbfdfd2bd9c6e974d89c974772c9311d53f178d8"
+        },
+        {
+          "path": "dist/lib/internals/entity-preparation-reader.js",
+          "bytes": 549,
+          "sha256": "932b78bdb57aa8c357bdc6b715cc847d6f76fd9d5a0fd9fa28802899cc0275fc"
+        },
+        {
+          "path": "dist/lib/internals/entity-projection-seed.js",
+          "bytes": 805,
+          "sha256": "6f91549be085973cac62227e01d2d9a1aed16552da11e45b3be7cc7d11f46234"
+        },
+        {
+          "path": "dist/lib/internals/entity-publication.js",
+          "bytes": 13718,
+          "sha256": "526fd2e65ba628525e41cd58822cd3a6efa28effb959507292390fed80f99d14"
+        },
+        {
+          "path": "dist/lib/internals/entity-value-transition.js",
+          "bytes": 1824,
+          "sha256": "66c80a46f5a2839c72aef505c284eee26a4b2f319c3a86b002425c1fd4b39133"
+        },
+        {
+          "path": "dist/lib/internals/error-reporter.js",
+          "bytes": 2229,
+          "sha256": "4e3df8672ad2fc6c94b0aec0bc95edca2fcfe5bb192afc36f5e18d8e9a866cff"
+        },
+        {
+          "path": "dist/lib/internals/exact-subject-runs.js",
+          "bytes": 1863,
+          "sha256": "5f71c4060000c0869ccc66d290ed501b0d214cb35935a353155aba6d007768ff"
+        },
+        {
+          "path": "dist/lib/internals/exposed-publication.js",
+          "bytes": 452,
+          "sha256": "ec41990873df8ce007d38c385a22c13c02adf57a79fde81ed0252d5b75929a75"
+        },
+        {
+          "path": "dist/lib/internals/intercept-leaf-signals.js",
+          "bytes": 6832,
+          "sha256": "b831beda28185623972e3b5de0581751ee76479d5397097c938f92ea81e25253"
+        },
+        {
+          "path": "dist/lib/internals/intrinsic-mutation.js",
+          "bytes": 8918,
+          "sha256": "4b1f5ef7501a4e6d108ca67dc05917fb3e76b8bac33df2770b91f90f2fdd6373"
+        },
+        {
+          "path": "dist/lib/internals/link-state-source.js",
+          "bytes": 559,
+          "sha256": "e1703ca459b2b5d8a68e4e5d43edd0c7b2c52120b011920b686195a4efcd9a7e"
+        },
+        {
+          "path": "dist/lib/internals/link-state-view.js",
+          "bytes": 2458,
+          "sha256": "09decebd532286f9dd857cdda811e63538696ba5f04447b8106daa472a21a3b2"
+        },
+        {
+          "path": "dist/lib/internals/location-runtime.js",
+          "bytes": 14561,
+          "sha256": "b74ec8726e2aefc65b7644369ffb74a97f37e3b88d7592bea852494bbb1ab3b0"
+        },
+        {
+          "path": "dist/lib/internals/materialize-markers.js",
+          "bytes": 10274,
+          "sha256": "55c32943ca582f95327db4f9e8f14b315d8f408bedaef8f85c91869afd35216a"
+        },
+        {
+          "path": "dist/lib/internals/member-membership.js",
+          "bytes": 14744,
+          "sha256": "b79d421680674816b00e19b08a8c212dee9c1fdae5b1e89cd00736a9570e5f60"
+        },
+        {
+          "path": "dist/lib/internals/merge-derived.js",
+          "bytes": 1607,
+          "sha256": "125abd6c055f48c05797b8a9323e62f838e210bcd2aa1e744b7b1e60c7869643"
+        },
+        {
+          "path": "dist/lib/internals/mutation-capture-runtime.js",
+          "bytes": 3032,
+          "sha256": "25661669ac4fb0a2cca48e8f946da7099aec79c2fa44d6f393a6c89ecf7ffe95"
+        },
+        {
+          "path": "dist/lib/internals/native-field-selection.js",
+          "bytes": 551,
+          "sha256": "e8fc38c7d664bdb2c20486482c42d218cc7d3fabfad9c701394df5b4318856b7"
+        },
+        {
+          "path": "dist/lib/internals/native-location-realization.js",
+          "bytes": 5486,
+          "sha256": "8781641e30c49b9ba465754ad24b6c2807e547a2b1d8366254280ada46aa9dc5"
+        },
+        {
+          "path": "dist/lib/internals/native-occurrence.js",
+          "bytes": 3865,
+          "sha256": "bd4ad75effd644313888ef79eafe3f84921692dc2aa99e3a1c8bee9bcc4d97e3"
+        },
+        {
+          "path": "dist/lib/internals/native-scalar-selection.js",
+          "bytes": 702,
+          "sha256": "38656d2be8648ae49928e42b187b1744c16a7ef3cdace12c8066e0c73d336c75"
+        },
+        {
+          "path": "dist/lib/internals/native-tree-scalar-leaf-runtime.js",
+          "bytes": 8967,
+          "sha256": "9a957cd5492c20fcf87fd926902a633da956628bdff5f07944dd028967d94da6"
+        },
+        {
+          "path": "dist/lib/internals/node-shape.js",
+          "bytes": 620,
+          "sha256": "a59d861653779f6e7e6580b709badce8e7803be5f5cfb607828cb179a53d39a8"
+        },
+        {
+          "path": "dist/lib/internals/observation-adapter.js",
+          "bytes": 211,
+          "sha256": "1907fca8d5bd4ba4c847ccc375de01b0921752185d8f491efffa8e12befcee7e"
+        },
+        {
+          "path": "dist/lib/internals/observation-substrate.js",
+          "bytes": 2958,
+          "sha256": "7de37183a5b9bf6c2925d2038169d7a4933a69f85b330bd790965739b3106133"
+        },
+        {
+          "path": "dist/lib/internals/ordinary-entity-entries.js",
+          "bytes": 544,
+          "sha256": "5df1c2683c5b4f13002faae6a885d1ee69172d73eb7a4073aaadf477997a894b"
+        },
+        {
+          "path": "dist/lib/internals/owned-metadata.js",
+          "bytes": 979,
+          "sha256": "66dd3a5beb7db830728ec11a01064a6cf8db5c818ddbd8e0c63ac67411dab301"
+        },
+        {
+          "path": "dist/lib/internals/owned-mutation.js",
+          "bytes": 3555,
+          "sha256": "40bc80042af7c68ffc1e5b710fbbe0bdeeed9d4c238460f6f632d9cba238a6f8"
+        },
+        {
+          "path": "dist/lib/internals/owner-invalidation-port.js",
+          "bytes": 428,
+          "sha256": "ca1a7cb729f0f6a270e5de59a590aab755645c6a218abba9163be09a37132957"
+        },
+        {
+          "path": "dist/lib/internals/owner-invalidation.js",
+          "bytes": 2428,
+          "sha256": "867aebe08f2dc3bcf70ae4ab1cd332d8ece089e9e6e2ed22d460ebda6b111e37"
+        },
+        {
+          "path": "dist/lib/internals/path-observation-port.js",
+          "bytes": 935,
+          "sha256": "d243c91aa1c394a94d1f0ec1e692ba5b641ed0b54acb4a06411a85621d988ec9"
+        },
+        {
+          "path": "dist/lib/internals/physical-commit-clock.js",
+          "bytes": 727,
+          "sha256": "e549fe6fc4b6f0bae4d956d4656cda037150f3571bbb991fa66e0d539bcb4755"
+        },
+        {
+          "path": "dist/lib/internals/physical-rows.js",
+          "bytes": 164,
+          "sha256": "af313f1b250cb2d02dd094e231e52969bceadfa95e0c437a5a0ef000740ed86d"
+        },
+        {
+          "path": "dist/lib/internals/plain-branch-membership.js",
+          "bytes": 22385,
+          "sha256": "1e46bf1c573d976c8637fa2b7fe2cbdba71342a690c7fb63ed7ac2da960a6e65"
+        },
+        {
+          "path": "dist/lib/internals/position-registry.js",
+          "bytes": 2236,
+          "sha256": "052b686674ccf0866b0bf4f37111eb038f7f7c115e5da9ed8f15e1952c047e16"
+        },
+        {
+          "path": "dist/lib/internals/predicate-churn-warning.js",
+          "bytes": 1296,
+          "sha256": "403104a70d67efa686f82aec462f330df03e5f240f3224613bd0d463c0d7337a"
+        },
+        {
+          "path": "dist/lib/internals/production-substrate-stats.prod.js",
+          "bytes": 98,
+          "sha256": "750a59ce80f35e04900b1dfc90b18d4caf3dc5b84d4ab93301c338971bc7648c"
+        },
+        {
+          "path": "dist/lib/internals/publication-preparation.js",
+          "bytes": 507,
+          "sha256": "5fb75d5b2075da0044417e8e5146e7dfc9bb52b1db42900e90527a06127db03e"
+        },
+        {
+          "path": "dist/lib/internals/restoration-eligibility.js",
+          "bytes": 1220,
+          "sha256": "a16e07468f9bb68d5ac56c5cd42476bbc10b310b02c0aa0b07e02f6b1fc6b739"
+        },
+        {
+          "path": "dist/lib/internals/restoration-reader.js",
+          "bytes": 2597,
+          "sha256": "6a970c19cb257042282e5d1ce46d47e7053b3bb93fcb3868a5eea500abeb4204"
+        },
+        {
+          "path": "dist/lib/internals/restoration-source.js",
+          "bytes": 468,
+          "sha256": "5263d1feb5fc9456bd5522104a471dc7ba2fb1007cd19fa33ca183a4576f5df6"
+        },
+        {
+          "path": "dist/lib/internals/root-source.js",
+          "bytes": 495,
+          "sha256": "fd3f6454a5b4d80c2912604e68e95e7cff15d7ccd598130c1b6a191f1f533106"
+        },
+        {
+          "path": "dist/lib/internals/runtime-tree-plan.js",
+          "bytes": 310,
+          "sha256": "05d31fdf6efa5ef49f08ff271c87b74f541cf62098a028015045dc9a4cab703e"
+        },
+        {
+          "path": "dist/lib/internals/scalar-admission-metadata.js",
+          "bytes": 210,
+          "sha256": "69b93055612a170ddc1628bb413177f692f2206266b4bd7c2cc9193d014b53b1"
+        },
+        {
+          "path": "dist/lib/internals/scalar-publication-coverage.js",
+          "bytes": 1555,
+          "sha256": "8902f08cb466fc541fa8256c9f6cc1b89e18071075a636e618aa7021b888eae4"
+        },
+        {
+          "path": "dist/lib/internals/scalar-responsibility-attachment.js",
+          "bytes": 1338,
+          "sha256": "006b1b22aaf665979e78a3dc018baa178b5211199bf5164e93fd0b24c9d219d0"
+        },
+        {
+          "path": "dist/lib/internals/selected-entity-disposition.js",
+          "bytes": 466,
+          "sha256": "1ab8014533eb432bc4e3d3a4f59d4523f1ae0c2ec9a890629da4b332e17560ad"
+        },
+        {
+          "path": "dist/lib/internals/selected-write-operation.js",
+          "bytes": 1348,
+          "sha256": "1142b166b55e0ff046ef4e12b78cd19c3cb02430a77b2d192a063a08cc633487"
+        },
+        {
+          "path": "dist/lib/internals/snapshot-authority.js",
+          "bytes": 3192,
+          "sha256": "7592bdbd308acec391b11d139195d19fa83f9037ca97d8eda5696ac4d24c12c8"
+        },
+        {
+          "path": "dist/lib/internals/snapshot-installation.js",
+          "bytes": 863,
+          "sha256": "d0a8ee96c181d849cd45ea821f44e5fd0a0e9d0a94c4ae5ca3cd78d4bc42dc89"
+        },
+        {
+          "path": "dist/lib/internals/source-mutation.js",
+          "bytes": 1947,
+          "sha256": "8942be662428ec984e1ac56f3317c5ed29fab6c1e41a1f58a0532b62c1ae1377"
+        },
+        {
+          "path": "dist/lib/internals/state-location-view.js",
+          "bytes": 2562,
+          "sha256": "1d5639f0ac110ceb7bb6d3e9f12171f79fa1203e9bab2bfe68f04fc3db47b7b7"
+        },
+        {
+          "path": "dist/lib/internals/subject-reclamation-sink.js",
+          "bytes": 3037,
+          "sha256": "28b49cd54980912635a39054b2d835a4a6a7afb1aa6fe5af4f77911e59afc084"
+        },
+        {
+          "path": "dist/lib/internals/subject-restoration-claims.js",
+          "bytes": 2317,
+          "sha256": "821f04b20d744b9469134fb0ee079cdfda567c25cd6113eecc8d2f4f026c6a3b"
+        },
+        {
+          "path": "dist/lib/internals/tooling-tree.js",
+          "bytes": 101,
+          "sha256": "7c5d2da645e0586f5aee8b9681dda818e32944375a4acd7fa05616718d2e5d33"
+        },
+        {
+          "path": "dist/lib/internals/transaction-lifecycle-source.js",
+          "bytes": 264,
+          "sha256": "c1267d31cdbc6053f8dc8b07a7b3c3cbb5b9ba91dfd1c773b8b825f73b4bc58e"
+        },
+        {
+          "path": "dist/lib/internals/transaction-lifecycle-view.js",
+          "bytes": 2927,
+          "sha256": "3d7e04e96dce625ab6148bfd827501e00df72333b35d5aff94f3afd4a10b959a"
+        },
+        {
+          "path": "dist/lib/internals/tree-capabilities.js",
+          "bytes": 2167,
+          "sha256": "05c762d6f35f3bc7918cd708a5f1c4ce4570a48c2c877b479c67606b22eb2dbf"
+        },
+        {
+          "path": "dist/lib/internals/tree-scalar-leaf-runtime.js",
+          "bytes": 4815,
+          "sha256": "1ee4c3fbed751adac26ce46cdd0d97f498095b60430e1d0e94094a7b8e88f2be"
+        },
+        {
+          "path": "dist/lib/internals/tree-scalar-slot-port.js",
+          "bytes": 529,
+          "sha256": "1c16b191969ecb579f55c789f1480065853609251822bf44f982737c739bfd52"
+        },
+        {
+          "path": "dist/lib/internals/tree-scalar-slot-runtime.js",
+          "bytes": 9027,
+          "sha256": "5987058cd43d33ae6a00d92ffffa0bc798750d7bf7749a377725d1f7398560ab"
+        },
+        {
+          "path": "dist/lib/internals/utilities/append-all.js",
+          "bytes": 105,
+          "sha256": "dc3bb31df5084ca8675c9fd73ffd807622fd09a0a16c322acb3a651f68cc6257"
+        },
+        {
+          "path": "dist/lib/internals/utilities/deep-clone.js",
+          "bytes": 1907,
+          "sha256": "db45f96fa0d840c58321c217c953f8a08a4157df055fd28a9c8e75a79a081e5f"
+        },
+        {
+          "path": "dist/lib/internals/utilities/deep-equal.js",
+          "bytes": 1973,
+          "sha256": "bf31d23598305cbf68909395a8eef505d73807e1af01078d0bb7aca888c2cc67"
+        },
+        {
+          "path": "dist/lib/internals/utilities/is-built-in-object.js",
+          "bytes": 1433,
+          "sha256": "48b9269302bcc03d18147c399f105c968f7cb6285a182c4d43ccd62850cf8dee"
+        },
+        {
+          "path": "dist/lib/internals/visit-tree.js",
+          "bytes": 645,
+          "sha256": "4a0f98ac82f24a0f2ac20ef3942b0cbc7ba1404fd2f70012bbeb66556e8e5c0c"
+        },
+        {
+          "path": "dist/lib/internals/write-observation-scope.js",
+          "bytes": 1516,
+          "sha256": "4dc4f650e78d56ae6172f5a769c62b0083a070c6b8df1d808fc9019d3d9a0d99"
+        },
+        {
+          "path": "dist/lib/internals/write-observation.js",
+          "bytes": 528,
+          "sha256": "e4224471cfbac2b091d97ac8a2812830e879cd294d222f11923f543c0de0c6cc"
+        },
+        {
+          "path": "dist/lib/leaf.js",
+          "bytes": 521,
+          "sha256": "d8b4384510c497d4073d43c4b8941f4e6ee8845e25f99984e949f8ecb225ec76"
+        },
+        {
+          "path": "dist/lib/link.js",
+          "bytes": 19193,
+          "sha256": "f953213504ce63dd25811a1bd0017d8116355867f7d914bdffd36761816b8566"
+        },
+        {
+          "path": "dist/lib/markers/entity-map.js",
+          "bytes": 3686,
+          "sha256": "ccdc38189622e0fbd8b6143502d38cac68adb94adf8b45341201c866aad5efd5"
+        },
+        {
+          "path": "dist/lib/path-notifier.js",
+          "bytes": 13239,
+          "sha256": "f3fa6c4a15c340059f46070d71d6333ba17644236842125fde968879b4ae9dbf"
+        },
+        {
+          "path": "dist/lib/physical/entity-handle-resolution.js",
+          "bytes": 479,
+          "sha256": "ce90278c24c0708532055390e4d4fc4609017471df2aefdabbdcaa85cefb2c37"
+        },
+        {
+          "path": "dist/lib/physical/entity-mutation-frame.js",
+          "bytes": 7627,
+          "sha256": "a60f6d891c4806ad5674f70da3a5e339082f007b0b084bc98d2205d9f1fd1df7"
+        },
+        {
+          "path": "dist/lib/physical/entity-ordinary-topology.js",
+          "bytes": 2959,
+          "sha256": "f0dcd9d45bb96d589238c3bc8d86b3ff760f384bb65cb3d742e1e2da865b582c"
+        },
+        {
+          "path": "dist/lib/physical/entity-placement-stage.js",
+          "bytes": 2785,
+          "sha256": "1c7c6b1e11ff1127d03c081b01d80c4d4cd46d328abbe4a302a3717b46348dc0"
+        },
+        {
+          "path": "dist/lib/physical/entity-value-store.js",
+          "bytes": 4016,
+          "sha256": "3626cfae31e8d7829b3d494bc03ec1edc955a192961d9d6dbbabdf8475b51e8f"
+        },
+        {
+          "path": "dist/lib/physical/order-restores-for-placement.js",
+          "bytes": 2004,
+          "sha256": "d581790fcd22463df74e571c3b133219237cf7a475978d80656ac677314f9640"
+        },
+        {
+          "path": "dist/lib/physical/ordinary-key-evidence.js",
+          "bytes": 349,
+          "sha256": "94774122a140c9051153c83240449227cf8690e53c0a166b5eea48425df79d96"
+        },
+        {
+          "path": "dist/lib/physical/ordinary-restoration-placement.js",
+          "bytes": 1311,
+          "sha256": "bd4ed04ec35e7de075cc6989e4fadb376c154a80229942731715155d3ee8bc9a"
+        },
+        {
+          "path": "dist/lib/physical/prepare-entity-target.js",
+          "bytes": 6117,
+          "sha256": "f9c27850208a772a619fdf3bc1088382616727e1d81e3be94edde447cb064f81"
+        },
+        {
+          "path": "dist/lib/physical/prepare-structural-target.js",
+          "bytes": 1969,
+          "sha256": "2bd50c7f15a197b3746d74cde5d8d4d01dd10a7cb87c97f80d8cfb0c35f4fe7a"
+        },
+        {
+          "path": "dist/lib/physical/prepared-placement-visibility.js",
+          "bytes": 2517,
+          "sha256": "06f43b4e25a64d2526da327ce87fe4f1b1cc0abb7dff871686e49aa0a0eeee6e"
+        },
+        {
+          "path": "dist/lib/physical/structural-store.js",
+          "bytes": 11108,
+          "sha256": "38d0c9b5a29b6626c01a886655cf98a5b5ce0d88291ac044042c018aedf5c8ba"
+        },
+        {
+          "path": "dist/lib/readonly.js",
+          "bytes": 69,
+          "sha256": "99a42cd7d0ea2b78d8b348e68149d6a8e04227298e8372e8406342aafe01b364"
+        },
+        {
+          "path": "dist/lib/signal-tree.js",
+          "bytes": 33556,
+          "sha256": "d04274fc3935d254795fb56ffe4f02bff1abf3f676d118fe0e1ca80c4591dc17"
+        },
+        {
+          "path": "dist/lib/types.js",
+          "bytes": 345,
+          "sha256": "b6d98bc9167425df63e74e67d140a89c6c5e985e241b77e54f19904fb4aeb4b8"
+        },
+        {
+          "path": "dist/lib/undoable.js",
+          "bytes": 171,
+          "sha256": "1b6bd2bd39c95e3d595ed1e7a87117a731bf64736fa849d33d8c1167be32320a"
+        },
+        {
+          "path": "dist/lib/utils.js",
+          "bytes": 5821,
+          "sha256": "37e05c1e4c8bd2bbd29d55cbf4795feaf44b0d8f43519fb38f94335fa67c92c9"
+        },
+        {
+          "path": "dist/lib/write-context.js",
+          "bytes": 251,
+          "sha256": "0e5accd045f855e65ea5dcfc72b34085cab7fa4623ed8a64f4fd4ecef650f975"
+        },
+        {
+          "path": "dist/lib/write-participation.js",
+          "bytes": 270,
+          "sha256": "01f57ab1e693a6f2c75ce1e106466c3e1553519387db5d6ec41920d1669dc6d9"
+        }
+      ]
+    },
+    {
+      "name": "@signal-tree/angular",
+      "priorIntegrity": "sha512-ShSBYdA+uU9RCb88hZl1EH3SMYIhMvPsy21S5h3U2fxeuBzy84jFdCV47qrgci09Fcdfjw2lJWat0SBsnnFYhg==",
+      "files": [
+        {
+          "path": "dist/index.js",
+          "bytes": 671,
+          "sha256": "c787c9c2e19d5aaf53e51c2923632abb05efb369e9ed9890e629cbaa88980676"
+        },
+        {
+          "path": "dist/lib/construction-input.js",
+          "bytes": 1015,
+          "sha256": "c7748a98e9cfe5d6500b8c9572be8f199aba68efd8555ea5de17800d0fa8d533"
+        },
+        {
+          "path": "dist/lib/define-store.js",
+          "bytes": 718,
+          "sha256": "769dd2cf2561aa96df71a312e9c310d646c4792d863a5e6ed65bde3952d80730"
+        },
+        {
+          "path": "dist/lib/observation-adapter.js",
+          "bytes": 1575,
+          "sha256": "ac5072658140ff929aa0e822334afbd68d1cc4c556254035d51c5ae8127e2332"
+        },
+        {
+          "path": "dist/lib/to-writable-signal.js",
+          "bytes": 1059,
+          "sha256": "2cb663c8826e368e54f61d0b2a727144c77cd8f4ea679dc9eefaf4bbf0339332"
+        },
+        {
+          "path": "src/index.d.ts",
+          "bytes": 1631,
+          "sha256": "2daf5ab5a11970ee0ee2265124de7a91e507b60ee851eb3b0b43c35345144b38"
+        },
+        {
+          "path": "src/lib/carrier.d.ts",
+          "bytes": 435,
+          "sha256": "2f288f2515523b91f92a8443986d4e5a91ece9c3852121bb7c7b9376ce3472a3"
+        },
+        {
+          "path": "src/lib/construction-input.d.ts",
+          "bytes": 517,
+          "sha256": "c48903a8e799c49f3a67b79dc5355f4166fbb8f9e3cdb5cba588ba44da689804"
+        },
+        {
+          "path": "src/lib/define-store.d.ts",
+          "bytes": 4720,
+          "sha256": "c363131c635463bf9a4fe497c88db5c8a91bc2373a2f30b3bce880ed6879ef17"
+        },
+        {
+          "path": "src/lib/observation-adapter.d.ts",
+          "bytes": 204,
+          "sha256": "4a1c38eacb6b3d10ee268268924966944682d904197299b9ff32ccbe2879ab9f"
+        },
+        {
+          "path": "src/lib/to-writable-signal.d.ts",
+          "bytes": 2957,
+          "sha256": "a0b9327dcbce2fbf5306f5e6b3290adb70ce8ce9a6e0e8876922efc9e03ec77d"
+        }
+      ]
+    },
+    {
+      "name": "@signal-tree/react",
+      "priorIntegrity": "sha512-9jcOpAw/ULBMeQVI0SdyCTDI3G9QiZOscyxGuUYltc5udxyLdoJHY1KVUck3+diFdF3C4T2gOqS8LDJBPSq4CQ==",
+      "files": [
+        {
+          "path": "dist/index.js",
+          "bytes": 91,
+          "sha256": "bb8ffa1d700ae2e26d5c59cdbe02acb7c9b4d777339ece3949729b804a649171"
+        },
+        {
+          "path": "dist/use-signal-tree.js",
+          "bytes": 397,
+          "sha256": "6ecfd5684a1a792584d45ff41395fd977533eef1fb313bb341c420303b69a331"
+        },
+        {
+          "path": "src/index.d.ts",
+          "bytes": 473,
+          "sha256": "9ce57017a5bd4b15a7b23fcd72522e53054d1a07eb9bcf5b73cf715527f4a5d1"
+        },
+        {
+          "path": "src/use-signal-tree.d.ts",
+          "bytes": 637,
+          "sha256": "7aad01ae6cdc339cef4d8440eeef664867dd4c69f0350879593379bb1aa90ee8"
+        }
+      ]
+    },
+    {
+      "name": "@signal-tree/vue",
+      "priorIntegrity": "sha512-yzGVpQhixDOpFSb/xXI/17C7xXiXKsyAskClGEKT9zGGcIyhgtT+lssCUNS22KftVNRlY/83Ai4U2TmYNAp16Q==",
+      "files": [
+        {
+          "path": "dist/index.js",
+          "bytes": 493,
+          "sha256": "853f78a32a354f28448245c3573f1c8bb36594bf019ad7a47b88ec4ef24f8860"
+        },
+        {
+          "path": "dist/lib/construction-input.js",
+          "bytes": 1027,
+          "sha256": "3489fb1b3ff53b5141ff9e952626455da4380759cb3b4e0a85370d3ace6af1cc"
+        },
+        {
+          "path": "dist/lib/vue-observation.js",
+          "bytes": 2723,
+          "sha256": "2e64872446f0b01b9af6b9628f3c785b924bdc5c8e0a65f77494cf3b686de125"
+        },
+        {
+          "path": "src/index.d.ts",
+          "bytes": 1570,
+          "sha256": "17ae4feda5d1dd047831b5063db4f19da6cd101c35ac30cc4c2eacd94a7c90aa"
+        },
+        {
+          "path": "src/lib/carrier.d.ts",
+          "bytes": 346,
+          "sha256": "2a2fde3319ea3836caf069c8d5a7048f71c6acc778fe75ed3c1ac3df58b986d7"
+        },
+        {
+          "path": "src/lib/construction-input.d.ts",
+          "bytes": 497,
+          "sha256": "6251df16aeba37e923d2374708386bc9a2fd32c2114ad133cdc8f3884e27a523"
+        },
+        {
+          "path": "src/lib/vue-observation.d.ts",
+          "bytes": 147,
+          "sha256": "410c2ede972d45164ce942e4bf54d8fabb57d6522fd6fde6dc2bc5935af4b46e"
+        }
+      ]
+    },
+    {
+      "name": "@signal-tree/solid",
+      "priorIntegrity": "sha512-EVH4JEpmXAwdmZBmoPGgsTosT+Y6VwBcmB1YTz9h9ze+tL6y3bSlSQtnZJW/BNCm0bYmXY8IQCOHMJSUZc7rVQ==",
+      "files": [
+        {
+          "path": "dist/index.js",
+          "bytes": 632,
+          "sha256": "73d4884f3313a96e9038e8571e6822c81ab22ee9ca8774a691f005ed7f864a24"
+        },
+        {
+          "path": "dist/lib/construction-input.js",
+          "bytes": 724,
+          "sha256": "ff65786116f7bd380b8a043d3534accdc15e57046033e2126fc55512f205d8ba"
+        },
+        {
+          "path": "dist/lib/solid-observation.js",
+          "bytes": 1659,
+          "sha256": "2fa640ef27dfeea9a811596fbdec46276a1dd8efa072cec5f582e3a96a421f28"
+        },
+        {
+          "path": "src/index.d.ts",
+          "bytes": 1608,
+          "sha256": "96a28b7c9d9ab7e00433f54de3e5f213d95298668834a69372baf578b1d71aee"
+        },
+        {
+          "path": "src/lib/carrier.d.ts",
+          "bytes": 585,
+          "sha256": "3b018bddaf82a8b6b9a2e55a921ff80c6e22c17a890c72c05f6e30344a8097e2"
+        },
+        {
+          "path": "src/lib/construction-input.d.ts",
+          "bytes": 514,
+          "sha256": "84e4b8b6f9f5ed7170d9d16daa55bcabdce51756e87c2b64c320eb170095f1fc"
+        },
+        {
+          "path": "src/lib/solid-observation.d.ts",
+          "bytes": 758,
+          "sha256": "c8d66235153b6b83d926d7c7f37a796d288e77ec611acaa73de7d3cc6a83634d"
+        }
+      ]
+    }
+  ]
+}

@@ -1,9 +1,9 @@
 # `@signal-tree/angular`
 
-This guide targets **16.0.0-rc.0**, an evaluation prerelease on npm’s `rc`
+This guide targets **16.0.0-rc.1**, an evaluation prerelease on npm’s `rc`
 channel. Stable v15 remains `latest`. Check the installed manifest and types;
 v15 uses `transaction()`, while this v16 line uses `transact()`. See the
-[v15 migration checklist](https://github.com/JBorgia/signal-tree/blob/v16.0.0-rc.0/docs/guides/migration-v15-v16.md).
+[v15 migration checklist](https://github.com/JBorgia/signal-tree/blob/v16.0.0-rc.1/docs/guides/migration-v15-v16.md).
 
 Angular-native SignalTree realization. State, identity, entity behavior, and
 causal semantics remain in `@signal-tree/kernel`; terminal leaves are native
@@ -19,7 +19,7 @@ rather than retained kernel facts.
 ## Install
 
 ```bash
-npm install @signal-tree/angular@16.0.0-rc.0
+npm install @signal-tree/angular@16.0.0-rc.1
 ```
 
 `@signal-tree/angular` installs `@signal-tree/kernel` as an exact dependency.

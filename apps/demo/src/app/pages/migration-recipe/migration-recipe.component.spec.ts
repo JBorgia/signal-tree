@@ -26,7 +26,7 @@ describe('MigrationRecipeComponent', () => {
     expect(text).toContain('@signal-tree/angular');
     expect(text).toContain('v16 evaluation prerelease');
     expect(text).toContain('not a stable v16 release');
-    expect(text).toContain('npm install @signal-tree/angular@16.0.0-rc.0');
+    expect(text).toContain('npm install @signal-tree/angular@16.0.0-rc.1');
     expect(text).toContain('v15 to v16 checklist');
     expect(text).not.toContain('npm install @signal-tree/angular@16.0.0-dev');
     expect(text).toContain(

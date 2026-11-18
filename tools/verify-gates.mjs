@@ -2019,9 +2019,9 @@ if (has('--self-test')) {
     );
     if (!ok && result.output.trim()) {
       const diagnostic = result.output.trim();
-      console.log(
-        `\n${diagnostic.slice(Math.max(0, diagnostic.length - 100000))}\n`
-      );
+      // Capture is already bounded in run(). Keep the failure header as well
+      // as its tail: a large child argument can otherwise hide the actual error.
+      console.log(`\n${diagnostic}\n`);
     }
   }
 }
@@ -2061,7 +2061,8 @@ if (has('--self-test')) {
   // documented exemption, because nothing in this file grants one. Leaving it
   // out of `bad` is what let RC2 report 1 unproven at exit 0.
   const bad = count('unproven') + count('blind') + count('error');
-  process.exit(bad > 0 ? 1 : 0);
+  // Let piped diagnostics drain before Node exits.
+  process.exitCode = bad > 0 ? 1 : 0;
 } else {
   console.log(
     `${count('pass')}/${selected.length} passed, ` +
@@ -2079,5 +2080,5 @@ if (has('--self-test')) {
       `  --fast SKIPPED: ${skipped.join(', ')} — this run did not cover them.`
     );
   }
-  process.exit(count('fail') > 0 ? 1 : 0);
+  process.exitCode = count('fail') > 0 ? 1 : 0;
 }

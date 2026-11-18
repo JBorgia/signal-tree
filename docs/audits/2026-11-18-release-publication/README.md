@@ -1,5 +1,11 @@
 # 16.0.0-rc.0 publication preparation
 
+**Historical preparation; not published.** Signed source
+`adf3937459f88260c276c1486357d94ab886cd07` subsequently failed exact-tag Linux
+qualification in `test:all`. The local receipts below retain their original
+scope. The [rc.1 portability successor](../2026-11-18-rc-portability/README.md)
+preserves the failed tag and repairs the GC test launcher before publication.
+
 The owner authorized builds, pushes, publication and a provisional v16 test
 release on November 18, 2026. This phase selects 16.0.0-rc.0; stable v15 uses
 `latest`, while the v16 prerelease uses `rc` and must not replace `latest`.

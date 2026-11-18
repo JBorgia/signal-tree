@@ -1,11 +1,11 @@
 # Adopt one v16 workflow
 
-This guide targets **16.0.0-rc.0**, an evaluation prerelease on npm’s `rc`
+This guide targets **16.0.0-rc.1**, an evaluation prerelease on npm’s `rc`
 channel. Stable v15 remains `latest`; v16 is not yet a stable release. Install
 the exact version for the application’s framework, for example:
 
 ```bash
-npm install @signal-tree/angular@16.0.0-rc.0
+npm install @signal-tree/angular@16.0.0-rc.1
 ```
 
 Use the matching React, Vue or Solid facade for those frameworks; use the kernel

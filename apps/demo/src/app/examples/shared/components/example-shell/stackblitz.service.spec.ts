@@ -16,7 +16,7 @@ describe('StackblitzService', () => {
     jest.clearAllMocks();
   });
 
-  it.each(['16.0.0-dev', '16.0.0-rc.0', '16.0.0-beta.1'])(
+  it.each(['16.0.0-dev', '16.0.0-rc.1', '16.0.0-beta.1'])(
     'keeps prerelease %s local until its remote scaffold is verified',
     (version) => {
       DEMO_LIBRARY_VERSIONS['signaltree'] = version;

@@ -1,0 +1,106 @@
+[
+  {
+    "name": "fresh-build",
+    "command": [
+      "pnpm",
+      "exec",
+      "nx",
+      "run-many",
+      "-t",
+      "build",
+      "--projects=kernel,angular,react,vue,solid",
+      "--configuration=production",
+      "--skip-nx-cache"
+    ],
+    "exit": 0,
+    "seconds": 14.15
+  },
+  {
+    "name": "budgets",
+    "command": [
+      "node",
+      "tools/check-bundle-budget.mjs"
+    ],
+    "exit": 0,
+    "seconds": 0.22
+  },
+  {
+    "name": "tarball-consumers",
+    "command": [
+      "node",
+      "tools/verify-tarball-consumer.mjs"
+    ],
+    "exit": 0,
+    "seconds": 2.66
+  },
+  {
+    "name": "strict-types",
+    "command": [
+      "node",
+      "tools/verify-consumer-typecheck.mjs"
+    ],
+    "exit": 0,
+    "seconds": 9.68
+  },
+  {
+    "name": "angular-aot",
+    "command": [
+      "node",
+      "tools/verify-angular-aot-consumer.mjs"
+    ],
+    "exit": 0,
+    "seconds": 26.46
+  },
+  {
+    "name": "demo-unit",
+    "command": [
+      "pnpm",
+      "nx",
+      "test",
+      "demo",
+      "--runInBand",
+      "--skip-nx-cache",
+      "--passWithNoTests=false"
+    ],
+    "exit": 0,
+    "seconds": 13.28
+  },
+  {
+    "name": "production-demo",
+    "command": [
+      "pnpm",
+      "exec",
+      "nx",
+      "build",
+      "demo",
+      "--configuration=production",
+      "--skip-nx-cache"
+    ],
+    "exit": 0,
+    "seconds": 8.49
+  },
+  {
+    "name": "browser",
+    "command": [
+      "pnpm",
+      "exec",
+      "playwright",
+      "test",
+      "--config=scripts/playwright/route-smoke.config.ts",
+      "--workers=2",
+      "--retries=0"
+    ],
+    "exit": 0,
+    "seconds": 52.94
+  },
+  {
+    "name": "documentation",
+    "command": [
+      "node",
+      "tools/verify-gates.mjs",
+      "--only=version-claims,source-controls,documented-examples,doc-links,publish-architecture"
+    ],
+    "exit": 0,
+    "seconds": 90.34
+  }
+]

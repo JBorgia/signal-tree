@@ -13,7 +13,8 @@ const {buildSync}=require('esbuild');
 const {execFileSync}=require('node:child_process');
 const code=buildSync({entryPoints:[process.argv[1]],bundle:true,write:false,platform:'node',format:'esm',target:'node24'}).outputFiles[0].text;
 const suffix='\\nconsole.log(JSON.stringify(await run('+JSON.stringify(process.argv[2])+')));';
-process.stdout.write(execFileSync(process.execPath,['--expose-gc','--input-type=module','-e',code+suffix],{encoding:'utf8'}));
+// Linux limits a single argv value; stdin keeps the bundled probe portable.
+process.stdout.write(execFileSync(process.execPath,['--expose-gc','--input-type=module'],{input:code+suffix,encoding:'utf8'}));
 `;
 
 describe('confirmed record ownership ends at destroy', () => {

@@ -1,0 +1,15 @@
+{
+  "command": [
+    "node",
+    "--require",
+    "/Users/jonathanborgia/code/signaltree/.worktrees/v16-optimization-sweep/artifacts/release-16.0.0-rc.1/diagnostic-failure-preload.cjs",
+    "tools/verify-gates.mjs",
+    "--only=source-controls"
+  ],
+  "exit": 1,
+  "stdoutBytes": 200447,
+  "startPreserved": true,
+  "endPreserved": true,
+  "summaryPreserved": true,
+  "runnerSha256": "adf6f741efe1b772173ab80a3036d129e28d4c54e156d0eefcf98e4a3bb8f5c1"
+}

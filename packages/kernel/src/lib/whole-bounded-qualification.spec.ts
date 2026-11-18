@@ -1,4 +1,6 @@
 import {writeFileSync} from 'node:fs';
+import {tmpdir} from 'node:os';
+import {join} from 'node:path';
 import {afterAll,expect,it,vi} from 'vitest';
 import {entityMap,link,signalTree,transactions} from '../index';
 import {getEntityPublicationBinding} from './internals/entity-publication';
@@ -6,7 +8,7 @@ import * as life from './experimental-publication/lifecycle';
 import {getPathNotifier} from './path-notifier';
 type Declared=ReturnType<typeof link>&{declare(d:{kind:'independent'},work:()=>void):unknown};
 const flush=async()=>{getPathNotifier().flushSync();for(let i=0;i<120;i++)await Promise.resolve();};
-const traces:unknown[]=[];afterAll(()=>writeFileSync(process.env.TMPDIR+'/whole-qualification.json',JSON.stringify(traces,null,2)));
+const traces:unknown[]=[];afterAll(()=>writeFileSync(join(tmpdir(),'whole-qualification.json'),JSON.stringify(traces,null,2)));
 function evidence(row:object,key:string){const b=getEntityPublicationBinding(row)!;return b.source.evidence()!.field(b.subject!,key,'ordinary') as life.NativeRequirement;}
 for(const route of ['setAll','replaceOne','row'] as const)for(const pending of [false,true])it(`post-install whole error ${route} pending=${pending}`,async()=>{
  const t=signalTree({rows:entityMap<{id:string;x:number},string>()},{enhancers:[transactions()]}),foreign=signalTree({z:0},{enhancers:[transactions()]});const rows=t.$.rows;rows.addOne({id:'a',x:7});await flush();const row=rows.byIdOrFail('a'),before=evidence(row,'x');const sent:unknown[]=[];const c=link(rows,{set:v=>{sent.push(v);}}) as Declared;const off=row.x.subscribe(()=>{/* Keep the field subscribed without observing its value here. */}),starts=vi.spyOn(life,'started');const q=pending?foreign.transact(()=>foreign.$.z(9)):undefined;const inspection=q?.inspect();let calls=0,atThrow:life.NativeRequirement|undefined,caught:unknown;const sentinel=Error('post-install getter');const supplied={id:'a',get x(){if(++calls===7){atThrow=evidence(row,'x');throw sentinel;}return 7;}};

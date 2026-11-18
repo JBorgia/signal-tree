@@ -1,0 +1,39 @@
+[
+  {
+    "name": "version-env",
+    "command": [
+      "node",
+      "tools/generate-version-env.cjs"
+    ],
+    "exit": 0,
+    "seconds": 0.05
+  },
+  {
+    "name": "confirmed-destroy-stdin",
+    "command": [
+      "pnpm",
+      "nx",
+      "test",
+      "kernel",
+      "--testFile=src/enhancers/transactions/confirmed-destroy.spec.ts",
+      "--maxWorkers=1",
+      "--skip-nx-cache"
+    ],
+    "exit": 0,
+    "seconds": 5.55
+  },
+  {
+    "name": "batching-detachment",
+    "command": [
+      "pnpm",
+      "nx",
+      "test",
+      "kernel",
+      "--testFile=src/enhancers/batching/batching-detachment.spec.ts",
+      "--maxWorkers=1",
+      "--skip-nx-cache"
+    ],
+    "exit": 0,
+    "seconds": 2.58
+  }
+]

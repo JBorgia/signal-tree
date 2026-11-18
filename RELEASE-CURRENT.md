@@ -1,4 +1,30 @@
-# 16.0.0-rc.0 — authorized publication preparation
+# 16.0.0-rc.1 — portable qualification successor
+
+Continue the owner's authorized provisional publication on
+`codex/v16-16.0.0-rc.1-release`. Stable 15.4.9 retains `latest`; v16 publishes
+only under `rc`. Signed rc.0 source `adf3937459f88260c276c1486357d94ab886cd07`
+failed Linux `test:all` before publication. Preserve that tag and its receipts.
+
+The narrow correction transports the confirmed-record GC probe through stdin
+instead of an oversized single argv value. Both subprocess boundaries, all five
+cases, the collection fixture and assertions remain intact. Two test diagnostic
+writers also use Node's portable temporary-directory lookup instead of assuming
+`TMPDIR` exists. The original-tag diagnostic confirms both failures. Gate failure
+output now retains its header and drains before exit without changing verdicts
+or capture limits. Versioned consumer
+guidance follows rc.1; runtime payloads must remain identical to the qualified
+predecessor. The numerical release-cost baseline is unchanged.
+
+Local checks target the changed launcher, related GC control, versioned examples,
+fresh artifacts/consumers and the production demo. Full normal/mutation checks
+and clean consumer rebuilds must then pass on the exact signed successor in CI
+and through the canonical publisher before any registry publication. Do not
+relabel the predecessor's local runs as rc.1 execution. See the
+[portability record](docs/audits/2026-11-18-rc-portability/README.md).
+
+---
+
+# Historical 16.0.0-rc.0 preparation — not published
 
 The owner selected build, push and publication on November 18, including a
 separate provisional v16 test release. Target **16.0.0-rc.0** on

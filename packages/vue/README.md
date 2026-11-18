@@ -1,9 +1,9 @@
 # `@signal-tree/vue`
 
-This guide targets **16.0.0-rc.0**, an evaluation prerelease on npm’s `rc`
+This guide targets **16.0.0-rc.1**, an evaluation prerelease on npm’s `rc`
 channel. Stable v15 remains `latest`. Check the installed manifest and types;
 v15 uses `transaction()`, while this v16 line uses `transact()`. See the
-[v15 migration checklist](https://github.com/JBorgia/signal-tree/blob/v16.0.0-rc.0/docs/guides/migration-v15-v16.md).
+[v15 migration checklist](https://github.com/JBorgia/signal-tree/blob/v16.0.0-rc.1/docs/guides/migration-v15-v16.md).
 
 Vue-native SignalTree realization. State remains owned by the framework-neutral
 kernel; terminal leaves are Vue refs and derived values are computed refs.
@@ -11,7 +11,7 @@ kernel; terminal leaves are Vue refs and derived values are computed refs.
 ## Install
 
 ```bash
-npm install @signal-tree/vue@16.0.0-rc.0
+npm install @signal-tree/vue@16.0.0-rc.1
 ```
 
 Vue 3.5 or newer is required as a peer dependency.

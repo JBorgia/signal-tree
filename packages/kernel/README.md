@@ -1,9 +1,9 @@
 # `@signal-tree/kernel`
 
-This guide targets **16.0.0-rc.0**, an evaluation prerelease on npm’s `rc`
+This guide targets **16.0.0-rc.1**, an evaluation prerelease on npm’s `rc`
 channel. Stable v15 remains `latest`. Check the installed manifest and types;
 v15 uses `transaction()`, while this v16 line uses `transact()`. See the
-[v15 migration checklist](https://github.com/JBorgia/signal-tree/blob/v16.0.0-rc.0/docs/guides/migration-v15-v16.md).
+[v15 migration checklist](https://github.com/JBorgia/signal-tree/blob/v16.0.0-rc.1/docs/guides/migration-v15-v16.md).
 
 Framework-neutral SignalTree state: fields and entity collections,
 transactions and rollback, undo, external updates through `link()`, batching,
@@ -33,7 +33,7 @@ projections rather than retained kernel facts.
 ## Install
 
 ```bash
-npm install @signal-tree/kernel@16.0.0-rc.0
+npm install @signal-tree/kernel@16.0.0-rc.1
 ```
 
 ## Create A Tree

@@ -1,0 +1,34 @@
+[
+  {
+    "name": "whole-bounded-qualification",
+    "command": [
+      "pnpm",
+      "nx",
+      "test",
+      "kernel",
+      "--testFile=src/lib/whole-bounded-qualification.spec.ts",
+      "--maxWorkers=1",
+      "--skip-nx-cache"
+    ],
+    "TMPDIR": "unset",
+    "sourceSha256": "924f44d01fe03248742d370a620a127102f87c25016c5692fc737685cc32a857",
+    "exit": 0,
+    "seconds": 5.26
+  },
+  {
+    "name": "whole-getter-controls",
+    "command": [
+      "pnpm",
+      "nx",
+      "test",
+      "kernel",
+      "--testFile=src/lib/whole-getter-controls.spec.ts",
+      "--maxWorkers=1",
+      "--skip-nx-cache"
+    ],
+    "TMPDIR": "unset",
+    "sourceSha256": "fb7b28bfa7010de70ecd65e9f7affb69c6c5c48f63b3f02fd1aab7442601073d",
+    "exit": 0,
+    "seconds": 2.7
+  }
+]

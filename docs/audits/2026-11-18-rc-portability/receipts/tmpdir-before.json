@@ -1,0 +1,34 @@
+[
+  {
+    "name": "whole-bounded-qualification",
+    "command": [
+      "pnpm",
+      "nx",
+      "test",
+      "kernel",
+      "--testFile=src/lib/whole-bounded-qualification.spec.ts",
+      "--maxWorkers=1",
+      "--skip-nx-cache"
+    ],
+    "TMPDIR": "unset",
+    "sourceSha256": "b54e343ef51923d62d8db9c02d86a3f3b97dfa4aba1bdace9f0be7d0c3fa523a",
+    "exit": 1,
+    "expectedFailure": "afterAll diagnostic output uses undefined TMPDIR"
+  },
+  {
+    "name": "whole-getter-controls",
+    "command": [
+      "pnpm",
+      "nx",
+      "test",
+      "kernel",
+      "--testFile=src/lib/whole-getter-controls.spec.ts",
+      "--maxWorkers=1",
+      "--skip-nx-cache"
+    ],
+    "TMPDIR": "unset",
+    "sourceSha256": "c13477f73723c6c34aae2f0efa1000a143155ef9f39c3fbe6cc1f2a627705932",
+    "exit": 1,
+    "expectedFailure": "afterAll diagnostic output uses undefined TMPDIR"
+  }
+]

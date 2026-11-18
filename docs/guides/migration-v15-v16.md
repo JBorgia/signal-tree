@@ -2,8 +2,8 @@
 
 v16 retains the `@signal-tree/*` package scope and the kernel plus Angular,
 React, Vue and Solid facades. Use one framework facade for application state.
-Evaluate **16.0.0-rc.0** explicitly, for example
-`npm install @signal-tree/angular@16.0.0-rc.0`. The `rc` channel is separate
+Evaluate **16.0.0-rc.1** explicitly, for example
+`npm install @signal-tree/angular@16.0.0-rc.1`. The `rc` channel is separate
 from stable v15 on `latest`; an unversioned install does not select this guide’s
 v16 APIs. Consult [the release controller](../../RELEASE-CURRENT.md) for exact
 qualification and publication receipts. This prerelease is not stable v16.

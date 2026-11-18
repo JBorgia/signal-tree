@@ -1,9 +1,9 @@
 # @signal-tree/solid
 
-This guide targets **16.0.0-rc.0**, an evaluation prerelease on npm’s `rc`
+This guide targets **16.0.0-rc.1**, an evaluation prerelease on npm’s `rc`
 channel. Stable v15 remains `latest`. Check the installed manifest and types;
 v15 uses `transaction()`, while this v16 line uses `transact()`. See the
-[v15 migration checklist](https://github.com/JBorgia/signal-tree/blob/v16.0.0-rc.0/docs/guides/migration-v15-v16.md).
+[v15 migration checklist](https://github.com/JBorgia/signal-tree/blob/v16.0.0-rc.1/docs/guides/migration-v15-v16.md).
 
 SignalTree state, using Solid's own reactivity.
 
@@ -18,7 +18,7 @@ its physical realization; see the
 [glossary](../../docs/glossary.md) if you meet that vocabulary elsewhere.)
 
 ```bash
-npm i @signal-tree/solid@16.0.0-rc.0 solid-js
+npm i @signal-tree/solid@16.0.0-rc.1 solid-js
 ```
 
 Solid 1.9 or newer is required as a peer dependency.
