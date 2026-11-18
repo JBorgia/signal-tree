@@ -1,0 +1,11 @@
+{
+  "original": "/Users/jonathanborgia/code/signaltree/artifacts/oversight-peer-refresh-2026-11-17/run-1/comparison-tables.md",
+  "originalSha256": "61da10879bb9763f3d9b40defd7ed55e2b0b4cb72b07785b8ca82d7dc6551917",
+  "output": "COMPARISON.md",
+  "outputSha256": "0a2b3d66e261545c5c2ec8c14bb349aec37959abc8755e41b7e27cf980edad7e",
+  "scope": "Replay instructions only. All numerical tables, identities and limits unchanged.",
+  "replacement": {
+    "before": "`tools/optimization-sweep/application/analyze.mjs`. This table renderer is:\n\n```sh\npython3 tools/optimization-sweep/application-report.py SUMMARY_JSON DRIVER_RESULTS_JSON NEW_OUTPUT_MD\n```",
+    "after": "`tools/optimization-sweep/application/analyze.mjs`. The base numerical table\nsource is `tools/optimization-sweep/application-report.py`.\n`tools/oversight-peer-refresh/render.py` applied the recorded identity-only\nsubstitutions; its actual command and derivation are preserved in the evidence.\nAfter extracting that archive into the working directory, regenerate the tables\nwith the preserved derived renderer (choose a new output file):\n\n```sh\npython3 runs/oversight-peer-refresh-run-1/renderer/application-report-identified.py SUMMARY_JSON DRIVER_RESULTS_JSON NEW_OUTPUT_MD\n```"
+  }
+}

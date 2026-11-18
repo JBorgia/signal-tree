@@ -1,0 +1,11 @@
+Traceback (most recent call last):
+  File "<string>", line 10, in <module>
+    runpy.run_path(script,run_name='__main__')
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<frozen runpy>", line 294, in run_path
+  File "<frozen runpy>", line 98, in _run_module_code
+  File "<frozen runpy>", line 88, in _run_code
+  File "/private/tmp/st-oversight-evidence-checks-1/verify-evidence.py", line 27, in <module>
+    assert hashlib.sha256(payload).hexdigest() == expected[member.name]['sha256']
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError

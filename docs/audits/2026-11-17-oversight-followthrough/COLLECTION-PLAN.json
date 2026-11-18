@@ -1,0 +1,208 @@
+{
+  "publicRoot": "/Users/jonathanborgia/code/signaltree",
+  "entries": [
+    {
+      "source": "/Users/jonathanborgia/code/signaltree/.worktrees/agent-collaboration-evaluation/tools/agent-oversight-lab/application",
+      "destination": "source/tools/agent-oversight-lab/application"
+    },
+    {
+      "source": "/Users/jonathanborgia/code/signaltree/.worktrees/agent-collaboration-evaluation/tools/agent-oversight-lab/durable-authority",
+      "destination": "source/tools/agent-oversight-lab/durable-authority"
+    },
+    {
+      "source": "/Users/jonathanborgia/code/signaltree/.worktrees/agent-collaboration-evaluation/tools/v15-construction-cost",
+      "destination": "source/tools/v15-construction-cost"
+    },
+    {
+      "source": "/Users/jonathanborgia/code/signaltree/.worktrees/agent-collaboration-evaluation/tools/oversight-peer-refresh",
+      "destination": "source/tools/oversight-peer-refresh"
+    },
+    {
+      "source": "/Users/jonathanborgia/code/signaltree/artifacts/v15-oversight-cost-2026-11-17",
+      "destination": "runs/v15-oversight-cost-2026-11-17"
+    },
+    {
+      "source": "/Users/jonathanborgia/code/signaltree/artifacts/agent-oversight-durable-2026-11-17-controls-1",
+      "destination": "runs/agent-oversight-durable-2026-11-17-controls-1"
+    },
+    {
+      "source": "/Users/jonathanborgia/code/signaltree/artifacts/agent-oversight-durable-2026-11-17-run-1",
+      "destination": "runs/agent-oversight-durable-2026-11-17-run-1"
+    },
+    {
+      "source": "/Users/jonathanborgia/code/signaltree/artifacts/agent-oversight-durable-2026-11-17-run-2",
+      "destination": "runs/agent-oversight-durable-2026-11-17-run-2"
+    },
+    {
+      "source": "/Users/jonathanborgia/code/signaltree/artifacts/agent-oversight-durable-2026-11-17-run-3",
+      "destination": "runs/agent-oversight-durable-2026-11-17-run-3"
+    },
+    {
+      "source": "/Users/jonathanborgia/code/signaltree/artifacts/oversight-application-2026-11-17-build-1",
+      "destination": "runs/oversight-application-2026-11-17-build-1"
+    },
+    {
+      "source": "/Users/jonathanborgia/code/signaltree/artifacts/oversight-application-2026-11-17-build-2",
+      "destination": "runs/oversight-application-2026-11-17-build-2"
+    },
+    {
+      "source": "/Users/jonathanborgia/code/signaltree/artifacts/oversight-application-2026-11-17-build-3",
+      "destination": "runs/oversight-application-2026-11-17-build-3"
+    },
+    {
+      "source": "/Users/jonathanborgia/code/signaltree/artifacts/oversight-application-2026-11-17-browser-1",
+      "destination": "runs/oversight-application-2026-11-17-browser-1"
+    },
+    {
+      "source": "/Users/jonathanborgia/code/signaltree/artifacts/oversight-application-2026-11-17-browser-2",
+      "destination": "runs/oversight-application-2026-11-17-browser-2"
+    },
+    {
+      "source": "/Users/jonathanborgia/code/signaltree/artifacts/oversight-application-2026-11-17-browser-3",
+      "destination": "runs/oversight-application-2026-11-17-browser-3"
+    },
+    {
+      "source": "/Users/jonathanborgia/code/signaltree/artifacts/oversight-application-2026-11-17-controls-1",
+      "destination": "runs/oversight-application-2026-11-17-controls-1"
+    },
+    {
+      "source": "/Users/jonathanborgia/code/signaltree/artifacts/oversight-application-2026-11-17-controls-2",
+      "destination": "runs/oversight-application-2026-11-17-controls-2"
+    },
+    {
+      "source": "/Users/jonathanborgia/code/signaltree/artifacts/oversight-investigator-pilot-1",
+      "destination": "runs/oversight-investigator-pilot-1"
+    },
+    {
+      "source": "/Users/jonathanborgia/code/signaltree/artifacts/agent-oversight-2026-11-17-v16-packet-3/config.json",
+      "destination": "inputs/v16/config.json"
+    },
+    {
+      "source": "/Users/jonathanborgia/code/signaltree/artifacts/agent-oversight-2026-11-17-v16-packet-3/plan.json",
+      "destination": "inputs/v16/plan.json"
+    },
+    {
+      "source": "/Users/jonathanborgia/code/signaltree/artifacts/publication-activation-2026-11-17/v16-final-packages",
+      "destination": "inputs/v16-qualified-five-packages"
+    },
+    {
+      "source": "/Users/jonathanborgia/code/signaltree/.worktrees/agent-collaboration-evaluation/tools/optimization-sweep/bundle-economics.py",
+      "destination": "source/tools/optimization-sweep/bundle-economics.py"
+    },
+    {
+      "source": "/Users/jonathanborgia/code/signaltree/.worktrees/agent-collaboration-evaluation/tools/optimization-sweep/application",
+      "destination": "source/tools/optimization-sweep/application"
+    },
+    {
+      "source": "/Users/jonathanborgia/code/signaltree/.worktrees/agent-collaboration-evaluation/tools/optimization-sweep/application-prepare.mjs",
+      "destination": "source/tools/optimization-sweep/application-prepare.mjs"
+    },
+    {
+      "source": "/Users/jonathanborgia/code/signaltree/.worktrees/agent-collaboration-evaluation/tools/optimization-sweep/application-report.py",
+      "destination": "source/tools/optimization-sweep/application-report.py"
+    },
+    {
+      "source": "/Users/jonathanborgia/code/signaltree/.worktrees/agent-collaboration-evaluation/tools/application-lab",
+      "destination": "source/tools/application-lab"
+    },
+    {
+      "source": "/Users/jonathanborgia/code/signaltree/artifacts/oversight-peer-refresh-2026-11-17/run-1",
+      "destination": "runs/oversight-peer-refresh-run-1"
+    },
+    {
+      "source": "/Users/jonathanborgia/code/signaltree/artifacts/oversight-application-2026-11-17-final-4",
+      "destination": "runs/oversight-application-final-4"
+    },
+    {
+      "source": "/Users/jonathanborgia/code/signaltree/.worktrees/v15-optimization-sweep/docs/audits/2026-11-17-construction-followthrough",
+      "destination": "source/v15-construction-audit"
+    },
+    {
+      "source": "/Users/jonathanborgia/code/signaltree/artifacts/oversight-application-2026-11-17-build-4",
+      "destination": "runs/oversight-application-2026-11-17-build-4"
+    },
+    {
+      "source": "/Users/jonathanborgia/code/signaltree/artifacts/oversight-application-2026-11-17-browser-4",
+      "destination": "runs/oversight-application-2026-11-17-browser-4"
+    },
+    {
+      "source": "/Users/jonathanborgia/code/signaltree/artifacts/oversight-application-2026-11-17-controls-3",
+      "destination": "runs/oversight-application-2026-11-17-controls-3"
+    },
+    {
+      "source": "/Users/jonathanborgia/code/signaltree/artifacts/oversight-followthrough-doc-checks",
+      "destination": "runs/closure-prearchive"
+    },
+    {
+      "source": "/Users/jonathanborgia/code/signaltree/.worktrees/agent-collaboration-evaluation/tools/check-source-controls.mjs",
+      "destination": "source/tools/check-source-controls.mjs"
+    },
+    {
+      "source": "/Users/jonathanborgia/code/signaltree/.worktrees/agent-collaboration-evaluation/tools/check-source-controls.spec.mjs",
+      "destination": "source/tools/check-source-controls.spec.mjs"
+    },
+    {
+      "source": "/Users/jonathanborgia/code/signaltree/.worktrees/agent-collaboration-evaluation/docs/audits/2026-11-17-oversight-followthrough/PROTOCOL.md",
+      "destination": "study/PROTOCOL.md"
+    },
+    {
+      "source": "/Users/jonathanborgia/code/signaltree/.worktrees/agent-collaboration-evaluation/docs/audits/2026-11-17-oversight-followthrough/DECISIONS.md",
+      "destination": "study/DECISIONS.md"
+    },
+    {
+      "source": "/Users/jonathanborgia/code/signaltree/.worktrees/agent-collaboration-evaluation/docs/audits/2026-11-17-oversight-followthrough/REVIEW.md",
+      "destination": "study/REVIEW.md"
+    },
+    {
+      "source": "/Users/jonathanborgia/code/signaltree/.worktrees/agent-collaboration-evaluation/docs/audits/2026-11-17-oversight-followthrough/RESULTS.json",
+      "destination": "study/RESULTS.json"
+    },
+    {
+      "source": "/Users/jonathanborgia/code/signaltree/.worktrees/agent-collaboration-evaluation/docs/audits/2026-11-17-oversight-followthrough/COMPARISON.md",
+      "destination": "study/COMPARISON.md"
+    },
+    {
+      "source": "/Users/jonathanborgia/code/signaltree/.worktrees/agent-collaboration-evaluation/docs/audits/2026-11-17-oversight-followthrough/COMPARISON-DERIVATION.json",
+      "destination": "study/COMPARISON-DERIVATION.json"
+    },
+    {
+      "source": "/Users/jonathanborgia/code/signaltree/.worktrees/agent-collaboration-evaluation/docs/audits/2026-11-17-oversight-followthrough/COMPLETED-COUNTS.json",
+      "destination": "study/COMPLETED-COUNTS.json"
+    },
+    {
+      "source": "/Users/jonathanborgia/code/signaltree/.worktrees/agent-collaboration-evaluation/docs/audits/2026-11-17-oversight-followthrough/RUNTIME-IDENTITIES.json",
+      "destination": "study/RUNTIME-IDENTITIES.json"
+    },
+    {
+      "source": "/Users/jonathanborgia/code/signaltree/.worktrees/v15-optimization-sweep/tools/check-bundle-budget.mjs",
+      "destination": "source/v15-tools/check-bundle-budget.mjs"
+    },
+    {
+      "source": "/Users/jonathanborgia/code/signaltree/.worktrees/v15-optimization-sweep/tools/verify-gates.mjs",
+      "destination": "source/v15-tools/verify-gates.mjs"
+    }
+  ],
+  "excludeDirectories": [
+    "node_modules",
+    "cache",
+    ".cache",
+    ".angular",
+    ".nx",
+    "__pycache__",
+    ".git"
+  ],
+  "excludeSuffixes": [
+    ".sqlite",
+    ".sqlite-journal",
+    ".db",
+    ".db-journal",
+    ".pyc",
+    ".DS_Store"
+  ],
+  "limits": [
+    "Selected public source, raw records, first failures and exact artifacts; private Studio source and raw evidence are excluded.",
+    "Fixture SQLite files and external tool/dependency installations are omitted. This archive establishes supplied payload integrity, not repository-history completeness or offline reproducibility of every test.",
+    "Original absolute paths record execution provenance. Portable file contents are indexed by archive-relative names.",
+    "Frozen v15 qualification, v16 package inputs, final application and fresh peer cohorts are included. Later archive verification and final documentation closure are separately recorded beside the archive."
+  ]
+}

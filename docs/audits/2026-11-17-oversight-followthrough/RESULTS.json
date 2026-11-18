@@ -1,0 +1,799 @@
+{
+  "generator": {
+    "command": [
+      "/Library/Frameworks/Python.framework/Versions/3.14/bin/python3",
+      "tools/agent-oversight-lab/application/collect-results.py",
+      "/Users/jonathanborgia/code/signaltree/artifacts",
+      "docs/audits/2026-11-17-oversight-followthrough/RESULTS.json"
+    ],
+    "sha256": "394fa19c9f928545ed19d580fb2adf3f64d974824e0e2ed330996fcf106a8e4d"
+  },
+  "scope": "Completed bounded application proof, local v15 qualification and pinned peer refresh; no publication.",
+  "sourceIdentities": {
+    "v15": {
+      "head": "4e791f32238fa7bdde480c5408a23dc4a4bca804",
+      "qualificationSha256": "f25f4aef28ba73f0fd7234f856110231895f66813f9afdac9497992569f8c04a"
+    },
+    "v16": {
+      "head": "5801008ea4ca591b3be483e8bbb0aa02e15f59ed",
+      "sourceSeal": "9e88629aecfbd59014940bca99650c353e8d72817b869a47d838bda54575bf78",
+      "buildReceiptSha256": "54a67797f498c281b8f00f5712ae56547d3f60a9d168a09091625313a2ff1b18"
+    }
+  },
+  "backend": {
+    "passedCases": 15,
+    "controlsDetected": 2,
+    "command": [
+      "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+      "--test",
+      "--test-concurrency=1",
+      "/Users/jonathanborgia/code/signaltree/.worktrees/agent-collaboration-evaluation/tools/agent-oversight-lab/durable-authority/backend.checks.mjs"
+    ],
+    "limits": "Local authenticated fixture identities and SQLite-owned effects; SIGKILL process durability, not power-loss or arbitrary external exactly-once guarantees."
+  },
+  "application": {
+    "buildCommand": [
+      "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+      "/Users/jonathanborgia/code/signaltree/.worktrees/agent-collaboration-evaluation/tools/agent-oversight-lab/application/build.mjs",
+      "/Users/jonathanborgia/code/signaltree/artifacts/agent-oversight-2026-11-17-v16-packet-3/config.json",
+      "/Users/jonathanborgia/code/signaltree/artifacts/oversight-application-2026-11-17-build-4"
+    ],
+    "browserCommand": [
+      "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+      "/Users/jonathanborgia/code/signaltree/.worktrees/agent-collaboration-evaluation/tools/agent-oversight-lab/application/run.mjs",
+      "/Users/jonathanborgia/code/signaltree/artifacts/oversight-application-2026-11-17-build-4/manifest.json",
+      "/Users/jonathanborgia/code/signaltree/artifacts/oversight-application-2026-11-17-browser-4"
+    ],
+    "controlCommand": [
+      "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+      "/Users/jonathanborgia/code/signaltree/.worktrees/agent-collaboration-evaluation/tools/agent-oversight-lab/application/controls.mjs",
+      "/Users/jonathanborgia/code/signaltree/artifacts/oversight-application-2026-11-17-build-4/manifest.json",
+      "/Users/jonathanborgia/code/signaltree/artifacts/oversight-application-2026-11-17-controls-3"
+    ],
+    "cases": [
+      {
+        "id": "independent-approved-effect",
+        "passed": true,
+        "wallMs": 1467.0755000000001,
+        "details": {
+          "proposer": "agent-owner",
+          "reviewer": "human-reviewer",
+          "effects": 1,
+          "owners": []
+        },
+        "browserErrors": []
+      },
+      {
+        "id": "concurrent-reverse-completion",
+        "passed": true,
+        "wallMs": 1738.3249579999997,
+        "details": {
+          "originalOwners": [
+            1,
+            2
+          ],
+          "completionOrder": [
+            "window",
+            "route"
+          ],
+          "effects": 1,
+          "independentProgress": 1
+        },
+        "browserErrors": []
+      },
+      {
+        "id": "approval-revoked-before-delivery",
+        "passed": true,
+        "wallMs": 991.706083,
+        "details": {
+          "staleUiAuthorizedEffect": false
+        },
+        "browserErrors": []
+      },
+      {
+        "id": "preparation-refresh-registration-isolation",
+        "passed": true,
+        "wallMs": 635.7796669999998,
+        "details": {
+          "actualServerRepliesDelayed": true,
+          "proposals": 1,
+          "owners": 1,
+          "deliveriesRemainIndependent": "covered by concurrent-reverse-completion"
+        },
+        "browserErrors": []
+      },
+      {
+        "id": "old-snapshot-and-late-duplicate-reply",
+        "passed": true,
+        "wallMs": 1059.1438749999998,
+        "details": {
+          "staleSnapshotIgnored": true,
+          "receiptCheckedDuringDelivery": true,
+          "repeatedReceiptDidNotReclassifySettlement": true,
+          "effects": 1
+        },
+        "browserErrors": []
+      },
+      {
+        "id": "same-session-reload-reconstructs-explicit-owner",
+        "passed": true,
+        "wallMs": 936.9895420000012,
+        "details": {
+          "immutableReviewPreserved": true,
+          "reconstructionDisclosed": true,
+          "effects": 1
+        },
+        "browserErrors": []
+      },
+      {
+        "id": "aged-terminal-review-retains-pending-owner",
+        "passed": true,
+        "wallMs": 2661.745500000001,
+        "details": {
+          "terminalHistoryBound": 64,
+          "usefulEffects": 73,
+          "originalOwnerRetained": true
+        },
+        "browserErrors": []
+      },
+      {
+        "id": "replacement-refusal-and-explicit-recovery",
+        "passed": true,
+        "wallMs": 1053.0614579999983,
+        "details": {
+          "refused": true,
+          "explicitRecovery": true,
+          "rejectedReceiptPreserved": true
+        },
+        "browserErrors": []
+      },
+      {
+        "id": "postcommit-crash-reload-reconciliation",
+        "passed": true,
+        "wallMs": 1077.9040420000001,
+        "details": {
+          "oldPid": 29623,
+          "restartedPid": 29626,
+          "effects": 1,
+          "nativeOwnerReused": false
+        },
+        "browserErrors": []
+      },
+      {
+        "id": "page-close-late-response-and-new-session",
+        "passed": true,
+        "wallMs": 954.9997919999987,
+        "details": {
+          "newEpoch": 2,
+          "oldOutcomeLookup": true,
+          "inheritedOwner": false
+        },
+        "browserErrors": []
+      },
+      {
+        "id": "stop-new-work-preserves-applied-outcome",
+        "passed": true,
+        "wallMs": 890.9657079999997,
+        "details": {
+          "stoppedFutureWork": true,
+          "appliedEffectRemains": true
+        },
+        "browserErrors": []
+      },
+      {
+        "id": "redacted-gap-aware-bounded-investigation",
+        "passed": true,
+        "wallMs": 1605.7798329999987,
+        "details": {
+          "serverRetention": 256,
+          "renderedRetention": 64,
+          "gapVisible": true,
+          "canariesAbsent": true,
+          "nativeOutcome": "confirmed"
+        },
+        "browserErrors": []
+      }
+    ],
+    "controls": [
+      {
+        "id": "native-false-success",
+        "expected": "ORACLE:native-owner-not-settled",
+        "detected": true
+      },
+      {
+        "id": "hidden-history-gap",
+        "expected": "ORACLE:missing-gap-warning",
+        "detected": true
+      },
+      {
+        "id": "ignored-entity-lifetime",
+        "expected": "ORACLE:entity-lifetime-rejection",
+        "detected": true
+      }
+    ],
+    "limits": [
+      "Host-provisioned identities, not production IdP integration.",
+      "Browser functional cases are not human comprehension evidence.",
+      "Process restart with SQLite-owned effects is not arbitrary external exactly-once or power-loss certification."
+    ]
+  },
+  "v15Qualification": {
+    "head": "4e791f32238fa7bdde480c5408a23dc4a4bca804",
+    "branch": "codex/v15-oversight-cost-followthrough",
+    "sourceUnchanged": true,
+    "sourceFinal": "/Users/jonathanborgia/code/signaltree/artifacts/v15-oversight-cost-2026-11-17/qualification/source-final.json",
+    "sourceFinalSha256": "6d071938a568bbe77a98af402fdec9da04505b1d6a85b474c69484f91e57159a",
+    "receipts": {
+      "normal-release-host-1": {
+        "path": "/Users/jonathanborgia/code/signaltree/artifacts/v15-oversight-cost-2026-11-17/qualification/normal-release-host-1/receipt.json",
+        "sha256": "0fa2079ccbe896762beb3eaf1c75304fe82480d9a9f5498469c4192c97b150aa",
+        "exitCode": 1
+      },
+      "mutation-release-host-1": {
+        "path": "/Users/jonathanborgia/code/signaltree/artifacts/v15-oversight-cost-2026-11-17/qualification/mutation-release-host-1/receipt.json",
+        "sha256": "10d86b843a7d2bb703d6020df4d0bbd845c51f94c69628070ac8aeb3c02e3bb7",
+        "exitCode": 0
+      },
+      "fresh-five-package-build-1": {
+        "path": "/Users/jonathanborgia/code/signaltree/artifacts/v15-oversight-cost-2026-11-17/qualification/fresh-five-package-build-1/receipt.json",
+        "sha256": "6261d256afefa1236e8dc2943e67dd47aeabe6d420238ea0d638656a5c7493f9",
+        "exitCode": 0
+      },
+      "bundle-economics-run-1": {
+        "path": "/Users/jonathanborgia/code/signaltree/artifacts/v15-oversight-cost-2026-11-17/qualification/bundle-economics-run-1/receipt.json",
+        "sha256": "0c1467eba704bbf4d34020fa912d64e5b91d80717ed7225a9ae953ea2433261d",
+        "exitCode": 0
+      },
+      "canonical-prepare-only-1": {
+        "path": "/Users/jonathanborgia/code/signaltree/artifacts/v15-oversight-cost-2026-11-17/qualification/canonical-prepare-only-1/receipt.json",
+        "sha256": "8e0da992c0de77ca9b93fe60becb392e0885516a0bede417d3ed66d95f476554",
+        "exitCode": 0
+      },
+      "angular-aot-consumer-1": {
+        "path": "/Users/jonathanborgia/code/signaltree/artifacts/v15-oversight-cost-2026-11-17/qualification/angular-aot-consumer-1/receipt.json",
+        "sha256": "40a3bfb7690c45887b56005b22a9bc0f4ec2b22f01aa0f9dbb567f771c93bec2",
+        "exitCode": 0
+      },
+      "strict-demo-production-1": {
+        "path": "/Users/jonathanborgia/code/signaltree/artifacts/v15-oversight-cost-2026-11-17/qualification/strict-demo-production-1/receipt.json",
+        "sha256": "b412d5b7108fcae7068433338c383030947927fc5bf4a76ca1aee09a09ab9a53",
+        "exitCode": 0
+      },
+      "demo-route-smoke-1": {
+        "path": "/Users/jonathanborgia/code/signaltree/artifacts/v15-oversight-cost-2026-11-17/qualification/demo-route-smoke-1/receipt.json",
+        "sha256": "4337d39c7d7f9ce46152a01ddf7ac09723a53b27fb7a34c64c4d93ed804bf837",
+        "exitCode": 0
+      },
+      "version-claims-1": {
+        "path": "/Users/jonathanborgia/code/signaltree/artifacts/v15-oversight-cost-2026-11-17/qualification/version-claims-1/receipt.json",
+        "sha256": "15fceb01c63d0ac72ae9ba694dd9bd29def6474482548fdd50587995a1ca84bd",
+        "exitCode": 0
+      },
+      "release-state-1": {
+        "path": "/Users/jonathanborgia/code/signaltree/artifacts/v15-oversight-cost-2026-11-17/qualification/release-state-1/receipt.json",
+        "sha256": "652601c5ea486f40dc1c848de8d039726fbb2a2f29bdb4a4078e44c38f5cf853",
+        "exitCode": 0
+      },
+      "changelog-1": {
+        "path": "/Users/jonathanborgia/code/signaltree/artifacts/v15-oversight-cost-2026-11-17/qualification/changelog-1/receipt.json",
+        "sha256": "5a67a7a858357309277629a5164de7414111a82a5b307f23e137e3bacc02f0c2",
+        "exitCode": 0
+      },
+      "diff-check-1": {
+        "path": "/Users/jonathanborgia/code/signaltree/artifacts/v15-oversight-cost-2026-11-17/qualification/diff-check-1/receipt.json",
+        "sha256": "858ef81336ef9b4bc3113e8fa16089b445ff706cca7749f6a6d76faac454665b",
+        "exitCode": 0
+      }
+    },
+    "normal": {
+      "passed": 90,
+      "failed": 1,
+      "knownRed": 0,
+      "failure": "bundle-budget; bare production/development and entity production/development exceed unchanged ceilings"
+    },
+    "mutations": {
+      "proven": 91,
+      "indirect": 15,
+      "unproven": 0,
+      "vacuous": 0,
+      "blind": 0,
+      "errored": 0
+    },
+    "routeStats": {
+      "startTime": "2026-11-18T03:40:57.516Z",
+      "duration": 42117.905,
+      "expected": 146,
+      "skipped": 0,
+      "unexpected": 0,
+      "flaky": 0
+    },
+    "routeReportSha256": "ba673ba0047de45ef3fbcc84911259f2f89fdae6f92e97a56c97e52d444db470",
+    "canonicalPacking": {
+      "result": "/Users/jonathanborgia/code/signaltree/artifacts/v15-oversight-cost-2026-11-17/qualification/final-packed/result.json",
+      "sha256": "43ee15f38594059b66dece4074924ac217f9730ca9327662929a470cf1f9292c",
+      "packages": 5,
+      "shippedPayloads": 158
+    },
+    "budgets": {
+      "result": "/Users/jonathanborgia/code/signaltree/artifacts/v15-oversight-cost-2026-11-17/qualification/bundle-economics-1/result.json",
+      "sha256": "82bdc08bb35d3f3228c3843f4a74c61a3c278c1527f5602f646a552218a1103e",
+      "numericPassed": false
+    },
+    "artifactState": "/Users/jonathanborgia/code/signaltree/artifacts/v15-oversight-cost-2026-11-17/qualification/final-artifact-state.json",
+    "artifactStateSha256": "c1723bbe044ffa0cf251325beeb9d76e19bb38f70178b04af7102433805d6939",
+    "checksComplete": true,
+    "publication": false,
+    "limits": "Local exact-source qualification with four numerical budget misses retained as failures; owner-specific cost disposition is separate. No Linux exact-tag qualification, tag, publication, deployment or universal speedup/no-leak claim."
+  },
+  "peerRefresh": {
+    "planCommand": [
+      "/Library/Frameworks/Python.framework/Versions/3.14/bin/python3",
+      "tools/oversight-peer-refresh/refresh.py",
+      "plan",
+      "/Users/jonathanborgia/code/signaltree/artifacts/v15-oversight-cost-2026-11-17/qualification/final-packed/packages",
+      "/Users/jonathanborgia/code/signaltree/artifacts/oversight-peer-refresh-2026-11-17/run-1"
+    ],
+    "steps": [
+      {
+        "name": "prepare",
+        "command": [
+          "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+          "/Users/jonathanborgia/code/signaltree/.worktrees/agent-collaboration-evaluation/tools/optimization-sweep/application-prepare.mjs",
+          "/Users/jonathanborgia/code/signaltree/artifacts/oversight-peer-refresh-2026-11-17/run-1/config.json",
+          "/Users/jonathanborgia/code/signaltree/artifacts/oversight-peer-refresh-2026-11-17/run-1/packet"
+        ],
+        "cwd": "/Users/jonathanborgia/code/signaltree/.worktrees/agent-collaboration-evaluation",
+        "startedUTC": "2026-11-18T03:49:47.824980+00:00",
+        "planSha256": "d2f424a1af4e78f2c0f1e92ff057b015d9e47a108fc88cf26d5a21a30701a214",
+        "environment": {
+          "NX_DAEMON": "false",
+          "NX_ISOLATE_PLUGINS": "false",
+          "CI": "true",
+          "NG_BUILD_MAX_WORKERS": "1"
+        },
+        "hostLoadBefore": [
+          11.771484375,
+          10.8818359375,
+          10.85498046875
+        ],
+        "exitCode": 0,
+        "seconds": 8.79235962498933,
+        "finishedUTC": "2026-11-18T03:49:56.618523+00:00",
+        "logSha256": "edf5241470e381f5422f8e27ce16b72c7585d4ded71d7e912a8fed26ac6824fb",
+        "hostLoadAfter": [
+          13.25390625,
+          11.24365234375,
+          10.98388671875
+        ]
+      },
+      {
+        "name": "build",
+        "command": [
+          "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+          "/Users/jonathanborgia/code/signaltree/.worktrees/agent-collaboration-evaluation/tools/application-lab/lab.mjs",
+          "build-dispatch",
+          "/Users/jonathanborgia/code/signaltree/artifacts/oversight-peer-refresh-2026-11-17/run-1/packet"
+        ],
+        "cwd": "/Users/jonathanborgia/code/signaltree/.worktrees/agent-collaboration-evaluation",
+        "startedUTC": "2026-11-18T03:49:57.136724+00:00",
+        "planSha256": "d2f424a1af4e78f2c0f1e92ff057b015d9e47a108fc88cf26d5a21a30701a214",
+        "environment": {
+          "NX_DAEMON": "false",
+          "NX_ISOLATE_PLUGINS": "false",
+          "CI": "true",
+          "NG_BUILD_MAX_WORKERS": "1"
+        },
+        "hostLoadBefore": [
+          13.25390625,
+          11.24365234375,
+          10.98388671875
+        ],
+        "exitCode": 0,
+        "seconds": 55.9981104999315,
+        "finishedUTC": "2026-11-18T03:50:53.135735+00:00",
+        "logSha256": "0e25284ef0d2e20e4bcf3db0c0dc6443764465438248bf30ea7c02fe24c2578d",
+        "hostLoadAfter": [
+          10.8359375,
+          10.81005859375,
+          10.83154296875
+        ]
+      },
+      {
+        "name": "conformance",
+        "command": [
+          "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+          "/Users/jonathanborgia/code/signaltree/.worktrees/agent-collaboration-evaluation/tools/application-lab/dispatch-check.mjs",
+          "/Users/jonathanborgia/code/signaltree/artifacts/oversight-peer-refresh-2026-11-17/run-1/packet"
+        ],
+        "cwd": "/Users/jonathanborgia/code/signaltree/.worktrees/agent-collaboration-evaluation",
+        "startedUTC": "2026-11-18T03:50:53.886143+00:00",
+        "planSha256": "d2f424a1af4e78f2c0f1e92ff057b015d9e47a108fc88cf26d5a21a30701a214",
+        "environment": {
+          "NX_DAEMON": "false",
+          "NX_ISOLATE_PLUGINS": "false",
+          "CI": "true",
+          "NG_BUILD_MAX_WORKERS": "1"
+        },
+        "hostLoadBefore": [
+          10.8359375,
+          10.81005859375,
+          10.83154296875
+        ],
+        "exitCode": 0,
+        "seconds": 278.42385974992067,
+        "finishedUTC": "2026-11-18T03:55:32.312605+00:00",
+        "logSha256": "6a9b36e9451e633ed6f2424916ca448441574a996a1210b796b98c455a81faaf",
+        "hostLoadAfter": [
+          9.39599609375,
+          10.33984375,
+          10.6455078125
+        ]
+      },
+      {
+        "name": "context-controls",
+        "command": [
+          "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+          "/Users/jonathanborgia/code/signaltree/.worktrees/agent-collaboration-evaluation/tools/optimization-sweep/application/context-controls.mjs",
+          "/Users/jonathanborgia/code/signaltree/artifacts/oversight-peer-refresh-2026-11-17/run-1/packet",
+          "/Users/jonathanborgia/code/signaltree/artifacts/oversight-peer-refresh-2026-11-17/run-1/packet/optimization-context-controls"
+        ],
+        "cwd": "/Users/jonathanborgia/code/signaltree/.worktrees/agent-collaboration-evaluation",
+        "startedUTC": "2026-11-18T03:55:32.739539+00:00",
+        "planSha256": "d2f424a1af4e78f2c0f1e92ff057b015d9e47a108fc88cf26d5a21a30701a214",
+        "environment": {
+          "NX_DAEMON": "false",
+          "NX_ISOLATE_PLUGINS": "false",
+          "CI": "true",
+          "NG_BUILD_MAX_WORKERS": "1"
+        },
+        "hostLoadBefore": [
+          9.39599609375,
+          10.33984375,
+          10.6455078125
+        ],
+        "exitCode": 0,
+        "seconds": 9.29236420802772,
+        "finishedUTC": "2026-11-18T03:55:42.033351+00:00",
+        "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "hostLoadAfter": [
+          10.14501953125,
+          10.47509765625,
+          10.68994140625
+        ]
+      },
+      {
+        "name": "metric-controls",
+        "command": [
+          "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+          "/Users/jonathanborgia/code/signaltree/.worktrees/agent-collaboration-evaluation/tools/optimization-sweep/application/measure.mjs",
+          "controls",
+          "/Users/jonathanborgia/code/signaltree/artifacts/oversight-peer-refresh-2026-11-17/run-1/packet",
+          "/Users/jonathanborgia/code/signaltree/artifacts/oversight-peer-refresh-2026-11-17/run-1/metric-controls"
+        ],
+        "cwd": "/Users/jonathanborgia/code/signaltree/.worktrees/agent-collaboration-evaluation",
+        "startedUTC": "2026-11-18T03:55:42.444895+00:00",
+        "planSha256": "d2f424a1af4e78f2c0f1e92ff057b015d9e47a108fc88cf26d5a21a30701a214",
+        "environment": {
+          "NX_DAEMON": "false",
+          "NX_ISOLATE_PLUGINS": "false",
+          "CI": "true",
+          "NG_BUILD_MAX_WORKERS": "1"
+        },
+        "hostLoadBefore": [
+          10.14501953125,
+          10.47509765625,
+          10.68994140625
+        ],
+        "exitCode": 0,
+        "seconds": 7.03508066595532,
+        "finishedUTC": "2026-11-18T03:55:49.481293+00:00",
+        "logSha256": "00bf6fd25e03a208e3cb375c27dd825a99504eb678e4fa3ff2f41ecc1d90e862",
+        "hostLoadAfter": [
+          9.65283203125,
+          10.3671875,
+          10.650390625
+        ]
+      },
+      {
+        "name": "calibration",
+        "command": [
+          "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+          "/Users/jonathanborgia/code/signaltree/.worktrees/agent-collaboration-evaluation/tools/optimization-sweep/application/measure.mjs",
+          "calibrate",
+          "/Users/jonathanborgia/code/signaltree/artifacts/oversight-peer-refresh-2026-11-17/run-1/packet",
+          "/Users/jonathanborgia/code/signaltree/artifacts/oversight-peer-refresh-2026-11-17/run-1/calibration"
+        ],
+        "cwd": "/Users/jonathanborgia/code/signaltree/.worktrees/agent-collaboration-evaluation",
+        "startedUTC": "2026-11-18T03:55:49.899174+00:00",
+        "planSha256": "d2f424a1af4e78f2c0f1e92ff057b015d9e47a108fc88cf26d5a21a30701a214",
+        "environment": {
+          "NX_DAEMON": "false",
+          "NX_ISOLATE_PLUGINS": "false",
+          "CI": "true",
+          "NG_BUILD_MAX_WORKERS": "1"
+        },
+        "hostLoadBefore": [
+          9.65283203125,
+          10.3671875,
+          10.650390625
+        ],
+        "exitCode": 0,
+        "seconds": 28.87941754097119,
+        "finishedUTC": "2026-11-18T03:56:18.780244+00:00",
+        "logSha256": "3c52e052ca87a676d9c61ab3d551bd625f8e1f1c39c2207d685a594982dfdc21",
+        "hostLoadAfter": [
+          8.794921875,
+          10.1044921875,
+          10.544921875
+        ]
+      },
+      {
+        "name": "comparison",
+        "command": [
+          "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+          "/Users/jonathanborgia/code/signaltree/.worktrees/agent-collaboration-evaluation/tools/optimization-sweep/application/measure.mjs",
+          "compare",
+          "/Users/jonathanborgia/code/signaltree/artifacts/oversight-peer-refresh-2026-11-17/run-1/packet",
+          "/Users/jonathanborgia/code/signaltree/artifacts/oversight-peer-refresh-2026-11-17/run-1/comparison",
+          "/Users/jonathanborgia/code/signaltree/artifacts/oversight-peer-refresh-2026-11-17/run-1/metric-controls/results.json",
+          "/Users/jonathanborgia/code/signaltree/artifacts/oversight-peer-refresh-2026-11-17/run-1/calibration/results.json"
+        ],
+        "cwd": "/Users/jonathanborgia/code/signaltree/.worktrees/agent-collaboration-evaluation",
+        "startedUTC": "2026-11-18T03:56:19.281964+00:00",
+        "planSha256": "d2f424a1af4e78f2c0f1e92ff057b015d9e47a108fc88cf26d5a21a30701a214",
+        "environment": {
+          "NX_DAEMON": "false",
+          "NX_ISOLATE_PLUGINS": "false",
+          "CI": "true",
+          "NG_BUILD_MAX_WORKERS": "1"
+        },
+        "hostLoadBefore": [
+          8.794921875,
+          10.1044921875,
+          10.544921875
+        ],
+        "exitCode": 0,
+        "seconds": 335.0017992919311,
+        "finishedUTC": "2026-11-18T04:01:54.286951+00:00",
+        "logSha256": "df21d5d52d89f36ff53652a93f0dc4e0750161b5c0e32247558d60c39366635a",
+        "hostLoadAfter": [
+          6.50390625,
+          8.220703125,
+          9.55517578125
+        ]
+      },
+      {
+        "name": "analysis",
+        "command": [
+          "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+          "/Users/jonathanborgia/code/signaltree/.worktrees/agent-collaboration-evaluation/tools/optimization-sweep/application/analyze.mjs",
+          "/Users/jonathanborgia/code/signaltree/artifacts/oversight-peer-refresh-2026-11-17/run-1/comparison",
+          "/Users/jonathanborgia/code/signaltree/artifacts/oversight-peer-refresh-2026-11-17/run-1/analysis"
+        ],
+        "cwd": "/Users/jonathanborgia/code/signaltree/.worktrees/agent-collaboration-evaluation",
+        "startedUTC": "2026-11-18T04:01:55.234221+00:00",
+        "planSha256": "d2f424a1af4e78f2c0f1e92ff057b015d9e47a108fc88cf26d5a21a30701a214",
+        "environment": {
+          "NX_DAEMON": "false",
+          "NX_ISOLATE_PLUGINS": "false",
+          "CI": "true",
+          "NG_BUILD_MAX_WORKERS": "1"
+        },
+        "hostLoadBefore": [
+          6.50390625,
+          8.220703125,
+          9.55517578125
+        ],
+        "exitCode": 0,
+        "seconds": 1.7083926249761134,
+        "finishedUTC": "2026-11-18T04:01:56.944760+00:00",
+        "logSha256": "9ed7e7e77b90eecd45d98611afec0d9a9374f9643bc5471ca3d20dfdccfb26e6",
+        "hostLoadAfter": [
+          7.02392578125,
+          8.2998046875,
+          9.5751953125
+        ]
+      },
+      {
+        "name": "admission-controls",
+        "command": [
+          "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+          "/Users/jonathanborgia/code/signaltree/.worktrees/agent-collaboration-evaluation/tools/optimization-sweep/application/analyzer-controls.mjs",
+          "/Users/jonathanborgia/code/signaltree/artifacts/oversight-peer-refresh-2026-11-17/run-1/comparison",
+          "/Users/jonathanborgia/code/signaltree/artifacts/oversight-peer-refresh-2026-11-17/run-1/admission-controls"
+        ],
+        "cwd": "/Users/jonathanborgia/code/signaltree/.worktrees/agent-collaboration-evaluation",
+        "startedUTC": "2026-11-18T04:01:57.600051+00:00",
+        "planSha256": "d2f424a1af4e78f2c0f1e92ff057b015d9e47a108fc88cf26d5a21a30701a214",
+        "environment": {
+          "NX_DAEMON": "false",
+          "NX_ISOLATE_PLUGINS": "false",
+          "CI": "true",
+          "NG_BUILD_MAX_WORKERS": "1"
+        },
+        "hostLoadBefore": [
+          7.02392578125,
+          8.2998046875,
+          9.5751953125
+        ],
+        "exitCode": 0,
+        "seconds": 6.774266249965876,
+        "finishedUTC": "2026-11-18T04:02:04.375007+00:00",
+        "logSha256": "7b5da526241581c3a87a5c03ce7d1f341cf855fe56288ff48e639af5ac8d5dcb",
+        "hostLoadAfter": [
+          8.54345703125,
+          8.59326171875,
+          9.67138671875
+        ]
+      }
+    ],
+    "completedCounts": {
+      "counts": {
+        "dispatch": 88,
+        "context": 32,
+        "metric": 9,
+        "calibration": 16,
+        "comparison": 176,
+        "analyzer": 12
+      },
+      "receipts": {
+        "dispatch": {
+          "path": "/Users/jonathanborgia/code/signaltree/artifacts/oversight-peer-refresh-2026-11-17/run-1/packet/dispatch-conformance/results.json",
+          "sha256": "74e2e44aefd0c5023cbcb767d0a0205d68ad105a977e01185df1ead4fa0e5fb2",
+          "completed": 88
+        },
+        "context": {
+          "path": "/Users/jonathanborgia/code/signaltree/artifacts/oversight-peer-refresh-2026-11-17/run-1/packet/optimization-context-controls/results.json",
+          "sha256": "aaeb07576ce12d831426c5523b417aa751f1313a9120a6536189ff8e8339ecd9",
+          "completed": 32
+        },
+        "metric": {
+          "path": "/Users/jonathanborgia/code/signaltree/artifacts/oversight-peer-refresh-2026-11-17/run-1/metric-controls/results.json",
+          "sha256": "012a899c9e3b9d1b71f68037cc3f27023ab3560113b126da4d76706c2105e9a7",
+          "completed": 9
+        },
+        "calibration": {
+          "path": "/Users/jonathanborgia/code/signaltree/artifacts/oversight-peer-refresh-2026-11-17/run-1/calibration/results.json",
+          "sha256": "0fb4672ed158e3fe7ed8e22f2c03c3ad4f5b9267848e3209b6e068c236c1be97",
+          "completed": 16
+        },
+        "comparison": {
+          "path": "/Users/jonathanborgia/code/signaltree/artifacts/oversight-peer-refresh-2026-11-17/run-1/comparison/results.json",
+          "sha256": "6bbf34d01d0793749a9f0c4be7fe362ee8c88044fb67eee4e0d4bcd3e2ed9d7b",
+          "completed": 176
+        },
+        "analyzer": {
+          "path": "/Users/jonathanborgia/code/signaltree/artifacts/oversight-peer-refresh-2026-11-17/run-1/admission-controls/results.json",
+          "sha256": "4e96b1e9d92b31b345a9d0312323a9d8287301496e79dba477f63ed8472f5221",
+          "completed": 12
+        }
+      },
+      "limits": "Completed fresh receipts, not planned counts."
+    },
+    "identities": {
+      "v15": {
+        "kernel": {
+          "manifest": "/Users/jonathanborgia/code/signaltree/artifacts/v15-oversight-cost-2026-11-17/qualification/final-packed/packages/kernel.json",
+          "manifestSha256": "31b22d5b5b1fe50b6c5223ae1cb5c523b646fce8a27bfd394e71894883f730ca",
+          "head": "4e791f32238fa7bdde480c5408a23dc4a4bca804",
+          "sourceSeal": "aba6872e95102a814a3930bb8040e0454ecde1c8e040ced6ddeba8c7269e450d",
+          "buildReceipt": "/Users/jonathanborgia/code/signaltree/artifacts/v15-oversight-cost-2026-11-17/v15-final-packages/build-receipt.json",
+          "buildReceiptSha256": "db88290055f68c52580c2d0b2ae9308f7400f3ed721bcbf5010277381fd9b062"
+        },
+        "angular": {
+          "manifest": "/Users/jonathanborgia/code/signaltree/artifacts/v15-oversight-cost-2026-11-17/qualification/final-packed/packages/angular.json",
+          "manifestSha256": "e893c71f2873ede9ba25583acc698b1aae03c6be5a3880667820dbbc3730815b",
+          "head": "4e791f32238fa7bdde480c5408a23dc4a4bca804",
+          "sourceSeal": "aba6872e95102a814a3930bb8040e0454ecde1c8e040ced6ddeba8c7269e450d",
+          "buildReceipt": "/Users/jonathanborgia/code/signaltree/artifacts/v15-oversight-cost-2026-11-17/v15-final-packages/build-receipt.json",
+          "buildReceiptSha256": "db88290055f68c52580c2d0b2ae9308f7400f3ed721bcbf5010277381fd9b062"
+        },
+        "react": {
+          "manifest": "/Users/jonathanborgia/code/signaltree/artifacts/v15-oversight-cost-2026-11-17/qualification/final-packed/packages/react.json",
+          "manifestSha256": "2fed1eb79e97f06b15ce4414903555b647dfcb19e9fd562cd3cc99e974023903",
+          "head": "4e791f32238fa7bdde480c5408a23dc4a4bca804",
+          "sourceSeal": "aba6872e95102a814a3930bb8040e0454ecde1c8e040ced6ddeba8c7269e450d",
+          "buildReceipt": "/Users/jonathanborgia/code/signaltree/artifacts/v15-oversight-cost-2026-11-17/v15-final-packages/build-receipt.json",
+          "buildReceiptSha256": "db88290055f68c52580c2d0b2ae9308f7400f3ed721bcbf5010277381fd9b062"
+        },
+        "vue": {
+          "manifest": "/Users/jonathanborgia/code/signaltree/artifacts/v15-oversight-cost-2026-11-17/qualification/final-packed/packages/vue.json",
+          "manifestSha256": "c310460f8f60c32d44ef010ba19ba24767e491fe0abd4481e5302d09ef05957d",
+          "head": "4e791f32238fa7bdde480c5408a23dc4a4bca804",
+          "sourceSeal": "aba6872e95102a814a3930bb8040e0454ecde1c8e040ced6ddeba8c7269e450d",
+          "buildReceipt": "/Users/jonathanborgia/code/signaltree/artifacts/v15-oversight-cost-2026-11-17/v15-final-packages/build-receipt.json",
+          "buildReceiptSha256": "db88290055f68c52580c2d0b2ae9308f7400f3ed721bcbf5010277381fd9b062"
+        },
+        "solid": {
+          "manifest": "/Users/jonathanborgia/code/signaltree/artifacts/v15-oversight-cost-2026-11-17/qualification/final-packed/packages/solid.json",
+          "manifestSha256": "6932ef0e97973909dd6d96b410963a333e31e225be28e6ed4253ef03f5017856",
+          "head": "4e791f32238fa7bdde480c5408a23dc4a4bca804",
+          "sourceSeal": "aba6872e95102a814a3930bb8040e0454ecde1c8e040ced6ddeba8c7269e450d",
+          "buildReceipt": "/Users/jonathanborgia/code/signaltree/artifacts/v15-oversight-cost-2026-11-17/v15-final-packages/build-receipt.json",
+          "buildReceiptSha256": "db88290055f68c52580c2d0b2ae9308f7400f3ed721bcbf5010277381fd9b062"
+        }
+      },
+      "v16": {
+        "kernel": {
+          "manifest": "/Users/jonathanborgia/code/signaltree/artifacts/publication-activation-2026-11-17/v16-final-packages/kernel.json",
+          "manifestSha256": "f8f2d7e47e91e4ff533a66965c3b9865292070e2ebcd54de240648da675e0edf",
+          "head": "5801008ea4ca591b3be483e8bbb0aa02e15f59ed",
+          "sourceSeal": "9e88629aecfbd59014940bca99650c353e8d72817b869a47d838bda54575bf78",
+          "buildReceipt": "/Users/jonathanborgia/code/signaltree/artifacts/publication-activation-2026-11-17/v16-final-packages/build-receipt.json",
+          "buildReceiptSha256": "54a67797f498c281b8f00f5712ae56547d3f60a9d168a09091625313a2ff1b18"
+        },
+        "angular": {
+          "manifest": "/Users/jonathanborgia/code/signaltree/artifacts/publication-activation-2026-11-17/v16-final-packages/angular.json",
+          "manifestSha256": "5bf8a15da349df2886d41a24bd1d3a28c65bd0c96f0ad00a1c7b2309ae0d1a7e",
+          "head": "5801008ea4ca591b3be483e8bbb0aa02e15f59ed",
+          "sourceSeal": "9e88629aecfbd59014940bca99650c353e8d72817b869a47d838bda54575bf78",
+          "buildReceipt": "/Users/jonathanborgia/code/signaltree/artifacts/publication-activation-2026-11-17/v16-final-packages/build-receipt.json",
+          "buildReceiptSha256": "54a67797f498c281b8f00f5712ae56547d3f60a9d168a09091625313a2ff1b18"
+        },
+        "react": {
+          "manifest": "/Users/jonathanborgia/code/signaltree/artifacts/publication-activation-2026-11-17/v16-final-packages/react.json",
+          "manifestSha256": "a4ee38d4892fd737b6db8c012c8c96459b9118abd463253d7ba8e4414fb870cd",
+          "head": "5801008ea4ca591b3be483e8bbb0aa02e15f59ed",
+          "sourceSeal": "9e88629aecfbd59014940bca99650c353e8d72817b869a47d838bda54575bf78",
+          "buildReceipt": "/Users/jonathanborgia/code/signaltree/artifacts/publication-activation-2026-11-17/v16-final-packages/build-receipt.json",
+          "buildReceiptSha256": "54a67797f498c281b8f00f5712ae56547d3f60a9d168a09091625313a2ff1b18"
+        },
+        "vue": {
+          "manifest": "/Users/jonathanborgia/code/signaltree/artifacts/publication-activation-2026-11-17/v16-final-packages/vue.json",
+          "manifestSha256": "25b0934cc7f1afdf02eec884838ed5d63f8736aaf89ec6e111c28ed8a5bc6988",
+          "head": "5801008ea4ca591b3be483e8bbb0aa02e15f59ed",
+          "sourceSeal": "9e88629aecfbd59014940bca99650c353e8d72817b869a47d838bda54575bf78",
+          "buildReceipt": "/Users/jonathanborgia/code/signaltree/artifacts/publication-activation-2026-11-17/v16-final-packages/build-receipt.json",
+          "buildReceiptSha256": "54a67797f498c281b8f00f5712ae56547d3f60a9d168a09091625313a2ff1b18"
+        },
+        "solid": {
+          "manifest": "/Users/jonathanborgia/code/signaltree/artifacts/publication-activation-2026-11-17/v16-final-packages/solid.json",
+          "manifestSha256": "ead3b8d0c036244eddbb8d08c3c8f1033207da1412c1fe98831142e8bcc7a4b7",
+          "head": "5801008ea4ca591b3be483e8bbb0aa02e15f59ed",
+          "sourceSeal": "9e88629aecfbd59014940bca99650c353e8d72817b869a47d838bda54575bf78",
+          "buildReceipt": "/Users/jonathanborgia/code/signaltree/artifacts/publication-activation-2026-11-17/v16-final-packages/build-receipt.json",
+          "buildReceiptSha256": "54a67797f498c281b8f00f5712ae56547d3f60a9d168a09091625313a2ff1b18"
+        }
+      }
+    },
+    "crossProofPayloadJoin": {
+      "kernel": {
+        "applicationArchiveSha256": "7fc83a413d3a9d654a7203dbec73392b49a8c727c97e576d1229536a713a801b",
+        "peerArchiveSha256": "f65cb0336f3d2518f8e94482475803ec25b531bd9942c8076c6a5f35a3f1e081",
+        "identicalSharedPayloads": 144,
+        "peerOnlyNonExportedBuildFiles": []
+      },
+      "angular": {
+        "applicationArchiveSha256": "74224b15095ec37dfe60d3e52a83f292a17a77ff0e27e22a5964709b346110a6",
+        "peerArchiveSha256": "2c568c13f63fdc6739a6686b84760e75d9aa8ec0bd448ff3106050f3ea40b071",
+        "identicalSharedPayloads": 16,
+        "peerOnlyNonExportedBuildFiles": [
+          "package/dist/index.d.ts"
+        ]
+      }
+    },
+    "limits": [
+      "Fresh local Angular application evidence, not release qualification or deployment.",
+      "Before/after pairs measure cumulative changes against the original baseline.",
+      "Prior pre-activation v16 results remain historical and are not relabelled.",
+      "Common application coordination is not the full native v16 guarantee workflow.",
+      "Five paired rounds and v15 A/A bands are descriptive, not confidence intervals.",
+      "Whole application heap includes framework and command-service state."
+    ]
+  },
+  "privateStudio": "Separate private delivery; private source, raw results and detailed cost interpretation excluded.",
+  "humanParticipants": 0,
+  "bindings": {
+    "/Users/jonathanborgia/code/signaltree/artifacts/agent-oversight-durable-2026-11-17-run-3/receipt.json": "4faf6d4434f3194ff8ccc0a8b503c64956ddf61b8841bfa96df0a708c0849b2f",
+    "/Users/jonathanborgia/code/signaltree/artifacts/agent-oversight-durable-2026-11-17-controls-1/receipt.json": "1ee1dd2ba465ba7173a5ecc9b0dfcb79cc26b88f18d54d34da3c8c56d2aab46e",
+    "/Users/jonathanborgia/code/signaltree/artifacts/oversight-application-2026-11-17-build-4/manifest.json": "d07d34704a262a6c39117df70448747083b4435f8f4f0cef61e10fbc03c107cf",
+    "/Users/jonathanborgia/code/signaltree/artifacts/oversight-application-2026-11-17-browser-4/manifest.json": "dbf6bc3e729f44e7ab0483c5615911fb874db76a51acda4719a41274cd6c65b8",
+    "/Users/jonathanborgia/code/signaltree/artifacts/oversight-application-2026-11-17-controls-3/receipt.json": "7166e5acdf98f4795fc76b77a770d341f003545aa342a58b2a112918a4e44f0e",
+    "/Users/jonathanborgia/code/signaltree/artifacts/v15-oversight-cost-2026-11-17/qualification/result.json": "f25f4aef28ba73f0fd7234f856110231895f66813f9afdac9497992569f8c04a",
+    "/Users/jonathanborgia/code/signaltree/artifacts/oversight-peer-refresh-2026-11-17/run-1/driver-results.json": "04f1d9d90498afbb7a8b9ca9dc19f9240f7c31b4546f2d1d282d9ed10d8b7292",
+    "/Users/jonathanborgia/code/signaltree/artifacts/oversight-peer-refresh-2026-11-17/run-1/plan.json": "d2f424a1af4e78f2c0f1e92ff057b015d9e47a108fc88cf26d5a21a30701a214",
+    "/Users/jonathanborgia/code/signaltree/artifacts/oversight-peer-refresh-2026-11-17/run-1/package-identities.json": "30296a47fffee96e7768ebc08ceb48d310e539105b0ffa5a539da11a4cd66698",
+    "/Users/jonathanborgia/code/signaltree/artifacts/oversight-peer-refresh-2026-11-17/run-1/runtime-identities.json": "6f0afdf5bdd725111ababb4f4560574276d2eeca5cd965e2681219461e59bf68",
+    "/Users/jonathanborgia/code/signaltree/artifacts/oversight-peer-refresh-2026-11-17/run-1/completed-counts.json": "6e01123cb3260a015a5ab617873ee8812940f31075ea2c66582591a628740b7a"
+  }
+}

@@ -1,0 +1,43 @@
+{
+  "counts": {
+    "dispatch": 88,
+    "context": 32,
+    "metric": 9,
+    "calibration": 16,
+    "comparison": 176,
+    "analyzer": 12
+  },
+  "receipts": {
+    "dispatch": {
+      "path": "/Users/jonathanborgia/code/signaltree/artifacts/oversight-peer-refresh-2026-11-17/run-1/packet/dispatch-conformance/results.json",
+      "sha256": "74e2e44aefd0c5023cbcb767d0a0205d68ad105a977e01185df1ead4fa0e5fb2",
+      "completed": 88
+    },
+    "context": {
+      "path": "/Users/jonathanborgia/code/signaltree/artifacts/oversight-peer-refresh-2026-11-17/run-1/packet/optimization-context-controls/results.json",
+      "sha256": "aaeb07576ce12d831426c5523b417aa751f1313a9120a6536189ff8e8339ecd9",
+      "completed": 32
+    },
+    "metric": {
+      "path": "/Users/jonathanborgia/code/signaltree/artifacts/oversight-peer-refresh-2026-11-17/run-1/metric-controls/results.json",
+      "sha256": "012a899c9e3b9d1b71f68037cc3f27023ab3560113b126da4d76706c2105e9a7",
+      "completed": 9
+    },
+    "calibration": {
+      "path": "/Users/jonathanborgia/code/signaltree/artifacts/oversight-peer-refresh-2026-11-17/run-1/calibration/results.json",
+      "sha256": "0fb4672ed158e3fe7ed8e22f2c03c3ad4f5b9267848e3209b6e068c236c1be97",
+      "completed": 16
+    },
+    "comparison": {
+      "path": "/Users/jonathanborgia/code/signaltree/artifacts/oversight-peer-refresh-2026-11-17/run-1/comparison/results.json",
+      "sha256": "6bbf34d01d0793749a9f0c4be7fe362ee8c88044fb67eee4e0d4bcd3e2ed9d7b",
+      "completed": 176
+    },
+    "analyzer": {
+      "path": "/Users/jonathanborgia/code/signaltree/artifacts/oversight-peer-refresh-2026-11-17/run-1/admission-controls/results.json",
+      "sha256": "4e96b1e9d92b31b345a9d0312323a9d8287301496e79dba477f63ed8472f5221",
+      "completed": 12
+    }
+  },
+  "limits": "Completed fresh receipts, not planned counts."
+}

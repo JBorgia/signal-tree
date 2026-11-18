@@ -9,17 +9,23 @@
       evidence and run common v15/v16 authority, concurrency, observation,
       uncertainty and real refusal-publication probes. See the
       [oversight evaluation](docs/audits/2026-11-17-agent-oversight/README.md).
-- [ ] Next application proof: concurrent browser approvals; actual restart after
+- [x] Complete the application proof: concurrent browser approvals; actual restart after
       effect-before-receipt failure; navigation/session isolation; authenticated
       principal, tenant and destination binding. Keep durable authority in the
       backend and preserve the public-library/private-Studio boundary.
-- [ ] Evaluate redacted, gap-aware oversight presentation and investigator tasks,
+- [x] Evaluate redacted, gap-aware oversight presentation and investigator tasks,
       including recorder disconnect/backpressure and overhead with observation
       off, minimal metadata and chosen history enabled. Do not infer human
-      understanding from an automated DOM pass.
-- [ ] Bound v15 optimization experiments for empty enhancer planning and lazy
+      understanding from an automated DOM pass. Independent simulated-agent
+      reviews and prepared human-study kits are complete; no human participants
+      or real-user comprehension result is claimed.
+- [x] Bound v15 optimization experiments for empty enhancer planning and lazy
       empty runtime containers; measure before adopting. EntityMap method-level
-      separation needs equivalent-work cost evidence and compatibility review.
+      separation has equivalent-work cost evidence and compatibility review;
+      the larger method-split prototype is rejected.
+- [x] Finish the fresh pinned peer comparison and portable public evidence for
+      the settled candidates. See the
+      [follow-through record](docs/audits/2026-11-17-oversight-followthrough/README.md).
 
 ## Legacy scope and publication activation
 

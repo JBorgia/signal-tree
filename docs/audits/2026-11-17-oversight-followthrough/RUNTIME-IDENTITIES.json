@@ -1,0 +1,125 @@
+{
+  "packetPlan": "/Users/jonathanborgia/code/signaltree/artifacts/oversight-peer-refresh-2026-11-17/run-1/packet/plan.json",
+  "packetPlanSha256": "05f11f7ab3d744e64b585f160093a3c04181f2cd8fcc8dd6a6352387b0476c62",
+  "identities": {
+    "v15-before": {
+      "kernel": {
+        "archive": "/Users/jonathanborgia/code/signaltree/artifacts/oversight-peer-refresh-2026-11-17/run-1/packet/archives/v15-before-kernel.tgz",
+        "integrity": "sha512-G+vSFs2BVHH6Z4u8p+A1bOJNB/W1Lq66yhPBRRi5U60Rswi4fGAv42568ntCsiVmSZ8+sl4j/DPUtl1f3og2zw==",
+        "sourceIdentity": {
+          "commit": "da2e92ccab46747471cae810fb9221f563d0a906",
+          "version": "15.4.9",
+          "sourceSeal": "e31dab97acd9fe4d3a88e36a0d7f6b2ca68c23721c6abaf23872a2218e54fe0c",
+          "publication": "local preparation only; fresh archives equal historical canonical archives"
+        },
+        "unpublished": true,
+        "archiveSha256": "2d4ea6568a04bfc849ad0d3a909a926fadb3bc01e3e57cb297a5b71580f1e1ad"
+      },
+      "angular": {
+        "archive": "/Users/jonathanborgia/code/signaltree/artifacts/oversight-peer-refresh-2026-11-17/run-1/packet/archives/v15-before-angular.tgz",
+        "integrity": "sha512-HiWcBdKKPFKC9VqWieR/0UzaETGaKkTYYf7ExjpB6xk36SKTKIuQDwsHZ8b3/a96Di0nuvVqX7FsLrfE65dBvA==",
+        "sourceIdentity": {
+          "commit": "da2e92ccab46747471cae810fb9221f563d0a906",
+          "version": "15.4.9",
+          "sourceSeal": "e31dab97acd9fe4d3a88e36a0d7f6b2ca68c23721c6abaf23872a2218e54fe0c",
+          "publication": "local preparation only; fresh archives equal historical canonical archives"
+        },
+        "unpublished": true,
+        "archiveSha256": "da914bc4f657434a74761444559534cfc52478f90611a18184af9c72e6388145"
+      }
+    },
+    "v15": {
+      "kernel": {
+        "archive": "/Users/jonathanborgia/code/signaltree/artifacts/oversight-peer-refresh-2026-11-17/run-1/packet/archives/v15-kernel.tgz",
+        "integrity": "sha512-mGZAE1VPLbxAJi+sq7O8F/Ewb5KZp3/8ZZ8x7iEsL7eA31asbAuu1hTwC/RQLW8jgfHzng4+fkoLwF1eAyqIrQ==",
+        "sourceIdentity": {
+          "manifest": "/Users/jonathanborgia/code/signaltree/artifacts/v15-oversight-cost-2026-11-17/qualification/final-packed/packages/kernel.json",
+          "manifestSha256": "31b22d5b5b1fe50b6c5223ae1cb5c523b646fce8a27bfd394e71894883f730ca",
+          "head": "4e791f32238fa7bdde480c5408a23dc4a4bca804",
+          "sourceSeal": "aba6872e95102a814a3930bb8040e0454ecde1c8e040ced6ddeba8c7269e450d",
+          "publication": "unpublished optimization candidate"
+        },
+        "unpublished": true,
+        "archiveSha256": "59087ab5b467ea0bb249ca7b9d4b7a3b33bb1f4275f2ba9cda85d5d77612a798"
+      },
+      "angular": {
+        "archive": "/Users/jonathanborgia/code/signaltree/artifacts/oversight-peer-refresh-2026-11-17/run-1/packet/archives/v15-angular.tgz",
+        "integrity": "sha512-bIwZhGNCGKGK4+njXyMEfYmGE48gc2ldim6V5cuVDG+w1PawMgbi9uvOABDzuhnFXpqzpXoDaZoEqilxVQWsPg==",
+        "sourceIdentity": {
+          "manifest": "/Users/jonathanborgia/code/signaltree/artifacts/v15-oversight-cost-2026-11-17/qualification/final-packed/packages/angular.json",
+          "manifestSha256": "e893c71f2873ede9ba25583acc698b1aae03c6be5a3880667820dbbc3730815b",
+          "head": "4e791f32238fa7bdde480c5408a23dc4a4bca804",
+          "sourceSeal": "aba6872e95102a814a3930bb8040e0454ecde1c8e040ced6ddeba8c7269e450d",
+          "publication": "unpublished optimization candidate"
+        },
+        "unpublished": true,
+        "archiveSha256": "aaf75bf69ccdf26d5719056d4368a585da43653da36fc050e73bd6944812ac21"
+      }
+    },
+    "v16-before": {
+      "kernel": {
+        "archive": "/Users/jonathanborgia/code/signaltree/artifacts/oversight-peer-refresh-2026-11-17/run-1/packet/archives/v16-before-kernel.tgz",
+        "integrity": "sha512-S/tXWAoJ1i6bwVptk33qJg7SmsFtcL59T8VYR6x77QLvBkaIGRWL4qRX9XdtYUeVgaEKJIJuZqvPEVnwz0SaHA==",
+        "sourceIdentity": {
+          "commit": "2c439198b13a93ede29e7bece69a07a534f30797",
+          "candidate": "direct ordered whole-input collector",
+          "sourceReceiptSha256": "aa7130c248273ec747caf598b25aea6baece3b1c08e2e231e0fb6f52b2de5ad5",
+          "publication": "unpublished review branch"
+        },
+        "unpublished": true,
+        "archiveSha256": "4bd5f4f2e3019e5b9b9e0110943f1a205876c31d96f19c9a495b8e12b475222e"
+      },
+      "angular": {
+        "archive": "/Users/jonathanborgia/code/signaltree/artifacts/oversight-peer-refresh-2026-11-17/run-1/packet/archives/v16-before-angular.tgz",
+        "integrity": "sha512-HacSGOYQZBgyTbLLrTsm5ZLgqcmIIuYkgND1HBkmMaaoE+Dd0Z4LY6jKUXHOwWQ1XK1yeHXux3VDEhSxT7TRgQ==",
+        "sourceIdentity": {
+          "originalArtifact": {
+            "archive": "/private/tmp/st-final-application-packet/archives/v16-angular.tgz",
+            "integrity": "sha512-9Tudhcb40XMXeXj+2yb5c82HWk/v9oz1OxX1Rag6IOWQDS0GOgpc8XVaBOlV24y7CX2PrAZ3n4vGTx8XntgKrQ==",
+            "sourceSeal": "sha256-ba5c01b75cd74e50293262f2a324cfe4072353dc845211e5c95e19948b126e05"
+          },
+          "note": "Same16packagedfacadepayloads; sourceunchanged bykernel-onlycandidate"
+        },
+        "unpublished": true,
+        "archiveSha256": "52208c878f291ad7dc9250a17fbad9a60c3e5adc4b503727c35f42ddd7e39f80"
+      }
+    },
+    "v16": {
+      "kernel": {
+        "archive": "/Users/jonathanborgia/code/signaltree/artifacts/oversight-peer-refresh-2026-11-17/run-1/packet/archives/v16-kernel.tgz",
+        "integrity": "sha512-mEBABXjWrcM8vac35wtdkvsHojbb6fCFQh7CPDZDVpS7KcGLRHzjAdza3NePn1Km2+/MXbOVTdvrywzBegj8TQ==",
+        "sourceIdentity": {
+          "manifest": "/Users/jonathanborgia/code/signaltree/artifacts/publication-activation-2026-11-17/v16-final-packages/kernel.json",
+          "manifestSha256": "f8f2d7e47e91e4ff533a66965c3b9865292070e2ebcd54de240648da675e0edf",
+          "head": "5801008ea4ca591b3be483e8bbb0aa02e15f59ed",
+          "sourceSeal": "9e88629aecfbd59014940bca99650c353e8d72817b869a47d838bda54575bf78",
+          "publication": "unpublished optimization candidate"
+        },
+        "unpublished": true,
+        "archiveSha256": "f65cb0336f3d2518f8e94482475803ec25b531bd9942c8076c6a5f35a3f1e081"
+      },
+      "angular": {
+        "archive": "/Users/jonathanborgia/code/signaltree/artifacts/oversight-peer-refresh-2026-11-17/run-1/packet/archives/v16-angular.tgz",
+        "integrity": "sha512-KNyp/cn17SLSgEZxYOt5OjI8yJnHfRU5xSCg2QMgRsETkROm2goqWKKfXF8HZfXExaa6i5mLK77gZPTG9Jzg1g==",
+        "sourceIdentity": {
+          "manifest": "/Users/jonathanborgia/code/signaltree/artifacts/publication-activation-2026-11-17/v16-final-packages/angular.json",
+          "manifestSha256": "5bf8a15da349df2886d41a24bd1d3a28c65bd0c96f0ad00a1c7b2309ae0d1a7e",
+          "head": "5801008ea4ca591b3be483e8bbb0aa02e15f59ed",
+          "sourceSeal": "9e88629aecfbd59014940bca99650c353e8d72817b869a47d838bda54575bf78",
+          "publication": "unpublished optimization candidate"
+        },
+        "unpublished": true,
+        "archiveSha256": "2c568c13f63fdc6739a6686b84760e75d9aa8ec0bd448ff3106050f3ea40b071"
+      }
+    }
+  },
+  "beforeOrigin": {
+    "plan": "/Users/jonathanborgia/code/signaltree/artifacts/agent-collaboration-2026-11-16/application-packet/plan.json",
+    "sha256": "418ff46ecfd96961d565c9c3a480490c836d22e3bbd18f69f3a96cdf5ee00fe2"
+  },
+  "limits": [
+    "Before/after means cumulative frozen-Nov16-to-current runtime changes, not isolated lazy-map or publication-activation cost.",
+    "v16-before facade has inherited payload provenance, separate from the later kernel-only collector commit.",
+    "This common application strategy does not measure all native v16 guarantees."
+  ]
+}

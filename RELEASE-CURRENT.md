@@ -1,9 +1,63 @@
-# Current release — v15 maintenance preparation and agent collaboration evaluation
+# Current release — qualified candidates and oversight follow-through
 
-Updated November 17, 2026 UTC. This is the single active acceptance ledger. Historical
+Updated November 18, 2026 UTC. This is the single active acceptance ledger. Historical
 first failures and sealed predecessors remain evidence, not competing queues.
 
 ## Active owner instruction
+
+### November 17 oversight application and construction follow-through — complete
+
+The owner directs uninterrupted completion of the proposed work. The
+[completed study](docs/audits/2026-11-17-oversight-followthrough/README.md) records
+implementation, rejected alternatives, independent scrutiny, exact identities
+and fresh comparisons. The study branch is `codex/oversight-application-proof`;
+private Studio source and raw evidence remain in a separate private delivery.
+
+V15 runtime `4e791f32238fa7bdde480c5408a23dc4a4bca804` on
+`codex/v15-oversight-cost-followthrough` is locally release-qualified with a new,
+explicit size-cost acceptance. Empty planning and lazy containers save memory
+without a public API or configuration change. CPU is mixed. The EntityMap method
+split is rejected because it increases delivered size. Qualification completes
+90/91 normal gates (bundle budget failed), all 91 mutation checks with exact
+restoration, a separate nonvacuous 0/1/0 budget control, five canonical archives
+and 158 shipped payloads, strict installed consumers/AOT/facade/SSR, strict
+production demo and 146 browser checks without skips, unexpected or flaky results.
+Documentation successor `fd7593f93df8055223b60d847cb47e2292d337a3` retains that
+frozen runtime identity. Independent source/log/archive review finds no additional
+blocker; it does not claim to have rerun the implementer's tests.
+
+The new canonical gzip costs are bare 11,071/13,222 and entities 25,392/28,339
+production/development bytes: increases 60/63 and 59/66 bytes respectively. The
+four unchanged ceilings are exceeded by 11.8/12.4 and 99.2/179 bytes. Accept this
+identified cost for the demonstrated memory benefit under the owner's
+cost/feasibility direction. All numerical misses remain failed; the previous
+unchanged-entity exception is not inherited and no ceiling changes.
+
+V16 runtime `5801008ea4ca591b3be483e8bbb0aa02e15f59ed` remains unchanged on
+`codex/v16-publication-activation`. The new installed-Angular application and
+real child HTTP/SQLite authority pass 15 backend scenarios, 12 browser scenarios,
+two backend and three browser planted-defect controls. Actual process kills,
+concurrent approvals/responses, revocation, session/navigation recovery, entity
+replacement and explicit evidence gaps are exercised. Backend authority,
+application reconciliation, native coordination and optional private recording
+remain separate responsibilities. This is not production IdP integration,
+arbitrary remote exactly-once execution, power-loss or model-quality certification.
+
+The fresh eight-arm application comparison passes all nine phases, including
+176 timing/heap children and independent raw-summary verification. Steady checked
+work is broadly similar; v16's 10,000-row factory remains about 167 ms versus
+v15's 11.8 ms, and its native guarantees are evaluated separately from the common
+peer coordinator. These costs remain visible. Private monitoring's bounded
+notification lane and opt-in filtering are implemented, measured and checked;
+privacy is not called a memory or speed optimization. Independent rendered-view
+findings are corrected, including a misleading old-value animation.
+
+Human-study kits are prepared; zero real human participants are claimed. The
+public evidence and branch sharing close this phase. No new tag, merge, npm
+publication or Vercel deployment is selected. The next selected publication phase
+still requires its own exact-tag/registry checks; this study grants no blanket
+exception for future bytes or untested workloads.
+
 
 ### November 17 broader optimization sweep — complete
 

@@ -1,0 +1,45 @@
+{
+  "archiveSha256": "8617256c51dadb9dc4223de64f6396db4d33e5de27b70beed842ea122d1ecfc7",
+  "indexSha256": "5cfd2414b392a8d09ad135d34349e240577b7d62a1b2194f8b402ac57d1d8f5b",
+  "generatorSha256": "833055570180876b8cc814fe3549468f0d5461df32da3d1b7c9851e51e2a5799",
+  "verifierSha256": "ae79e507fd6720e1bc8bebdda134b2fa422f6e34b98f4dafd9b02836d7aafd15",
+  "command": [
+    "/Library/Frameworks/Python.framework/Versions/3.14/bin/python3",
+    "tools/agent-oversight-lab/application/verify-evidence-controls.py",
+    "/Users/jonathanborgia/code/signaltree/artifacts/oversight-followthrough-evidence-final-1/EVIDENCE.json",
+    "/private/tmp/st-oversight-evidence-checks-1"
+  ],
+  "originalRepositoryReadsDenied": true,
+  "containerHashesRecomputedForPayloadControls": true,
+  "originalArchiveUnchanged": true,
+  "results": [
+    {
+      "mode": "intact",
+      "exitCode": 0,
+      "expectedExitCode": 0,
+      "victim": null,
+      "logSha256": "9ca0e44ab9ae31acdbfd82d893285acbfdce72e0267e48fef67f7011c04cfca2"
+    },
+    {
+      "mode": "corrupt-payload",
+      "exitCode": 1,
+      "expectedExitCode": 1,
+      "victim": "inputs/v16-qualified-five-packages/angular.json",
+      "logSha256": "b0d193cb33ddff07654d6445b1880ce9367420e88f31fd521fd16406f133528c"
+    },
+    {
+      "mode": "missing-payload",
+      "exitCode": 1,
+      "expectedExitCode": 1,
+      "victim": "inputs/v16-qualified-five-packages/angular.json",
+      "logSha256": "d246422e286913d23e904886174000d27e76fca01a37d269f8cabb6e2b176c26"
+    },
+    {
+      "mode": "intact-after-controls",
+      "exitCode": 0,
+      "expectedExitCode": 0,
+      "victim": null,
+      "logSha256": "9ca0e44ab9ae31acdbfd82d893285acbfdce72e0267e48fef67f7011c04cfca2"
+    }
+  ]
+}

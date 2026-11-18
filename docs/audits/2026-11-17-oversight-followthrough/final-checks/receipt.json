@@ -1,0 +1,167 @@
+{
+  "results": [
+    {
+      "name": "lint",
+      "command": [
+        "pnpm",
+        "exec",
+        "eslint",
+        "tools/agent-oversight-lab/application/checks.mjs",
+        "tools/agent-oversight-lab/application/run.mjs",
+        "tools/agent-oversight-lab/application/controls.mjs",
+        "tools/agent-oversight-lab/application/build.mjs",
+        "tools/agent-oversight-lab/application/main.ts",
+        "tools/agent-oversight-lab/application/app.ts",
+        "tools/agent-oversight-lab/application/model.ts",
+        "tools/agent-oversight-lab/durable-authority/run-tests.mjs",
+        "tools/agent-oversight-lab/durable-authority/process.mjs",
+        "tools/agent-oversight-lab/durable-authority/store.mjs",
+        "tools/agent-oversight-lab/durable-authority/server.mjs",
+        "tools/agent-oversight-lab/durable-authority/run-controls.mjs",
+        "tools/agent-oversight-lab/durable-authority/backend.checks.mjs",
+        "tools/agent-oversight-lab/durable-authority/control-oracle.mjs",
+        "tools/v15-construction-cost/run.mjs",
+        "tools/v15-construction-cost/entity-query-separation.mjs",
+        "tools/v15-construction-cost/common.mjs",
+        "tools/v15-construction-cost/child.mjs",
+        "tools/v15-construction-cost/workload.mjs",
+        "tools/v15-construction-cost/repeated-lifetimes-child.mjs",
+        "tools/v15-construction-cost/repeated-lifetimes.mjs",
+        "tools/v15-construction-cost/analyze.mjs",
+        "tools/v15-construction-cost/analyze-repeated-lifetimes.mjs",
+        "tools/check-source-controls.mjs",
+        "tools/check-source-controls.spec.mjs",
+        "--max-warnings=0"
+      ],
+      "cwd": "/Users/jonathanborgia/code/signaltree/.worktrees/agent-collaboration-evaluation",
+      "exitCode": 0,
+      "seconds": 2.46876124991104,
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "source-controls",
+      "command": [
+        "node",
+        "tools/check-source-controls.mjs",
+        "--verify-classification"
+      ],
+      "cwd": "/Users/jonathanborgia/code/signaltree/.worktrees/agent-collaboration-evaluation",
+      "exitCode": 0,
+      "seconds": 5.77992770797573,
+      "logSha256": "dd7de6209b4ffb24087edbe9713e7c6e589d061dedb77b2e7cfefef6b3d7867c"
+    },
+    {
+      "name": "links",
+      "command": [
+        "node",
+        "tools/check-doc-links.mjs"
+      ],
+      "cwd": "/Users/jonathanborgia/code/signaltree/.worktrees/agent-collaboration-evaluation",
+      "exitCode": 0,
+      "seconds": 0.5323307919315994,
+      "logSha256": "858704a09d09dcfb211db81aed50da4036f4d2a91e676c334aa3ce1c9ec99540"
+    },
+    {
+      "name": "readme",
+      "command": [
+        "node",
+        "scripts/lint-readme-apis.mjs"
+      ],
+      "cwd": "/Users/jonathanborgia/code/signaltree/.worktrees/agent-collaboration-evaluation",
+      "exitCode": 0,
+      "seconds": 0.512983291875571,
+      "logSha256": "1520e810dc2a9395fa089fa57cfbfff30687bf2e08b3a7c394a2b540fd13be62"
+    },
+    {
+      "name": "numeric",
+      "command": [
+        "node",
+        "tools/check-numeric-claims.mjs"
+      ],
+      "cwd": "/Users/jonathanborgia/code/signaltree/.worktrees/agent-collaboration-evaluation",
+      "exitCode": 0,
+      "seconds": 0.04338608309626579,
+      "logSha256": "17ece605eccacbbf0b5397839e0d98e0d3f12da2c9e92084f174f09f4433dddc"
+    },
+    {
+      "name": "docs",
+      "command": [
+        "bash",
+        "scripts/validate-docs.sh"
+      ],
+      "cwd": "/Users/jonathanborgia/code/signaltree/.worktrees/agent-collaboration-evaluation",
+      "exitCode": 0,
+      "seconds": 0.32344783400185406,
+      "logSha256": "72ca3e9ec30dcaab313439f93e04371de3796c9fdade2bff2994e4a0b3c0aa6c"
+    },
+    {
+      "name": "versions",
+      "command": [
+        "node",
+        "scripts/verify-version-claims.js"
+      ],
+      "cwd": "/Users/jonathanborgia/code/signaltree/.worktrees/agent-collaboration-evaluation",
+      "exitCode": 0,
+      "seconds": 0.03230129205621779,
+      "logSha256": "b361a9e8656f756995349803be9fbc822daa18a80ad6fadd42afb849bc069b01"
+    },
+    {
+      "name": "release",
+      "command": [
+        "node",
+        "scripts/verify-release-state.js"
+      ],
+      "cwd": "/Users/jonathanborgia/code/signaltree/.worktrees/agent-collaboration-evaluation",
+      "exitCode": 0,
+      "seconds": 0.10695016686804593,
+      "logSha256": "3529b79aa18d3a0835b3fd14e12bcacfbb15354157132635dae1de817b4116df"
+    },
+    {
+      "name": "staged-diff",
+      "command": [
+        "git",
+        "diff",
+        "--cached",
+        "--check"
+      ],
+      "cwd": "/Users/jonathanborgia/code/signaltree/.worktrees/agent-collaboration-evaluation",
+      "exitCode": 0,
+      "seconds": 0.026113416999578476,
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "parsedPython": [
+    {
+      "path": "tools/agent-oversight-lab/application/verify-evidence-controls.py",
+      "sha256": "833055570180876b8cc814fe3549468f0d5461df32da3d1b7c9851e51e2a5799"
+    },
+    {
+      "path": "tools/agent-oversight-lab/application/collect-results.py",
+      "sha256": "394fa19c9f928545ed19d580fb2adf3f64d974824e0e2ed330996fcf106a8e4d"
+    },
+    {
+      "path": "tools/agent-oversight-lab/application/verify-evidence.py",
+      "sha256": "ae79e507fd6720e1bc8bebdda134b2fa422f6e34b98f4dafd9b02836d7aafd15"
+    },
+    {
+      "path": "tools/agent-oversight-lab/application/collect-evidence.py",
+      "sha256": "f58bd727c0a1baf050c4b7a50f3ac4d0c1f37f1454c0178d75f9d7320819b814"
+    },
+    {
+      "path": "tools/v15-construction-cost/capture-packed.py",
+      "sha256": "1e6c7e972cacbaba6253ac6d49d955479c9009af3d9542dfb8f93871aa002fc0"
+    },
+    {
+      "path": "tools/v15-construction-cost/freeze-source.py",
+      "sha256": "89595e05c218c78e1064cba2a3307cc697bc23b14ec2df548cfb132cf923e91f"
+    },
+    {
+      "path": "tools/oversight-peer-refresh/render.py",
+      "sha256": "fc2ac50169afd8ddb22c394b8e4aa49cf6d179c9de16092f3261bf4d4c2d37b8"
+    },
+    {
+      "path": "tools/oversight-peer-refresh/refresh.py",
+      "sha256": "a33efb635d0cf9fb7c0a3f69f064b6a23fb888525ccda2664a172db339a990fd"
+    }
+  ]
+}

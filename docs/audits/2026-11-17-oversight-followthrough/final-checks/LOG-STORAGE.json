@@ -1,0 +1,50 @@
+{
+  "reason": "Raw numeric-check output ends in an intentional extra newline, rejected as new source whitespace by git diff --check. Preserve exact raw logs with lossless gzip storage rather than editing output or weakening the gate.",
+  "logs": {
+    "links.log": {
+      "stored": "links.log.gz",
+      "payloadSha256": "858704a09d09dcfb211db81aed50da4036f4d2a91e676c334aa3ce1c9ec99540",
+      "archiveSha256": "81e715e708a7a31aa807f98dfe47539c6de47ac2f7ab68e2f16c9e70d1f11cbc"
+    },
+    "release.log": {
+      "stored": "release.log.gz",
+      "payloadSha256": "3529b79aa18d3a0835b3fd14e12bcacfbb15354157132635dae1de817b4116df",
+      "archiveSha256": "8b8ed1d363a02b2e7af370309c2a156dab1c39c14251f3923a9864704cf6b887"
+    },
+    "source-controls.log": {
+      "stored": "source-controls.log.gz",
+      "payloadSha256": "dd7de6209b4ffb24087edbe9713e7c6e589d061dedb77b2e7cfefef6b3d7867c",
+      "archiveSha256": "754bf36d88a81ab5e6e7c71102ce4b2190031355f0989d8066e3c24ad085c33c"
+    },
+    "readme.log": {
+      "stored": "readme.log.gz",
+      "payloadSha256": "1520e810dc2a9395fa089fa57cfbfff30687bf2e08b3a7c394a2b540fd13be62",
+      "archiveSha256": "3626dabf29587559c00267e2d9f9753b5bcbc58d391597dd8102ec980bf68dd4"
+    },
+    "staged-diff.log": {
+      "stored": "staged-diff.log.gz",
+      "payloadSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "archiveSha256": "9ceffb7310338057cfe71a4ae1e2c98d2c485d81cdef906532a801f457a38d64"
+    },
+    "lint.log": {
+      "stored": "lint.log.gz",
+      "payloadSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "archiveSha256": "9ceffb7310338057cfe71a4ae1e2c98d2c485d81cdef906532a801f457a38d64"
+    },
+    "numeric.log": {
+      "stored": "numeric.log.gz",
+      "payloadSha256": "17ece605eccacbbf0b5397839e0d98e0d3f12da2c9e92084f174f09f4433dddc",
+      "archiveSha256": "50bef1364227a4e9866818aff50fbb2a58d51c43df6c7c7faaafc8325f7ada26"
+    },
+    "docs.log": {
+      "stored": "docs.log.gz",
+      "payloadSha256": "72ca3e9ec30dcaab313439f93e04371de3796c9fdade2bff2994e4a0b3c0aa6c",
+      "archiveSha256": "ceeeaaa58eb32263845e88f8a809716acdc4c4b290e0fa75005abe0ef1becfdb"
+    },
+    "versions.log": {
+      "stored": "versions.log.gz",
+      "payloadSha256": "b361a9e8656f756995349803be9fbc822daa18a80ad6fadd42afb849bc069b01",
+      "archiveSha256": "b783ce4b69fd5ec34642d04267ed4b56cdbbb35734a8ea31418721761c0ec136"
+    }
+  }
+}
