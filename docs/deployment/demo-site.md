@@ -33,5 +33,16 @@ succeeded — GitHub Pages was never enabled for the repository
 (`has_pages=false`), so `actions/configure-pages` failed with `HttpError: Not
 Found` on all 30 of its most recent runs while Vercel served the real site.
 
+The hosting build makes one explicit presentation adaptation in that temporary
+archive checkout: its banner link says **“Open the current site”** instead of
+“Open the current v15 site,” because the host root can also be a v16 preview.
+Before replacement, the build verifies the pinned `apps/demo/src/app/app.ts`
+SHA-256 (`6e4591a28b394fc8d8121af02752e244833ee4cd9af024347955af4665d3b10a`)
+and exactly one matching label. It preserves the historical v15 explanation,
+root destination, arrow and all API content, then compiles normally so emitted
+asset names reflect the adapted content. The frozen Git revision and archive
+repository remain unchanged; hosted output is deliberately **not byte-identical**
+to an unadapted archive build. There is no additional client script or observer.
+
 Changing the archive pin is a separate reviewed change; do not replace it with a
 moving branch.

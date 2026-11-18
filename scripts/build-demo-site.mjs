@@ -2,7 +2,15 @@
 /** Compose the current public demo and the immutable v14 archive for hosting. */
 import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
-import { cpSync, existsSync, mkdtempSync, readFileSync, rmSync } from 'node:fs';
+import { createHash } from 'node:crypto';
+import {
+  cpSync,
+  existsSync,
+  mkdtempSync,
+  readFileSync,
+  rmSync,
+  writeFileSync,
+} from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -65,6 +73,26 @@ try {
   });
   assert.equal(actualCommit.status, 0);
   assert.equal(actualCommit.stdout.trim(), archiveCommit);
+
+  // Hosting-only label adaptation in the disposable checkout. Keep the pinned
+  // archive's history/API prose, root href and arrow; the current host can be
+  // either v15 or a v16 preview. Rebuild after editing so asset hashes stay true.
+  const archiveShell = join(temporaryRoot, 'apps/demo/src/app/app.ts');
+  const originalShell = readFileSync(archiveShell, 'utf8');
+  assert.equal(
+    createHash('sha256').update(originalShell).digest('hex'),
+    '6e4591a28b394fc8d8121af02752e244833ee4cd9af024347955af4665d3b10a',
+    'Pinned archive shell changed; review its hosting adaptation explicitly.'
+  );
+  const previousLabel = 'Open the current v15 site';
+  assert.equal(originalShell.split(previousLabel).length - 1, 1);
+  writeFileSync(
+    archiveShell,
+    originalShell.replace(previousLabel, 'Open the current site')
+  );
+  console.log(
+    'Archive hosting adaptation: version-neutral current-site link; frozen source repository unchanged.'
+  );
 
   run(
     'pnpm',
