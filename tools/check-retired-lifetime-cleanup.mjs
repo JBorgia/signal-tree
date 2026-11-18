@@ -952,4 +952,6 @@ try {
   report.error = error.stack ?? String(error);
   process.exitCode = 2;
 }
-console.log(JSON.stringify(report, null, 2));
+// Self-test nests every control/mutant/restored receipt. Keep all evidence while
+// fitting verify-gates' default child-output buffer; normal probes stay readable.
+console.log(JSON.stringify(report, null, report.mode === 'self-test' ? 0 : 2));
