@@ -1,18 +1,36 @@
-# v16 publication activation — candidate validation in progress
+# v16 publication activation — local qualification complete
 
-The current `codex/v16-publication-activation` candidate retains automatic deferred
-entity publication allocation, the independently reproduced wide-snapshot repair
-`7d51fb13b`, and legacy cleanup `dd0702f69`. The
-[implementation/cost decision](docs/audits/2026-11-17-publication-activation/README.md)
-records the preserved guarantees, first-activation cost and bounded performance
-claims. No public switch or package split is introduced.
+The qualified source is `5801008ea4ca591b3be483e8bbb0aa02e15f59ed` on
+`codex/v16-publication-activation`; this controller is a documentation-only
+successor. All 144 fresh kernel payloads are byte-identical to the measured
+candidate. The [implementation/cost decision](docs/audits/2026-11-17-publication-activation/README.md)
+retains automatic deferred entity evidence, the wide-snapshot repair and legacy
+cleanup. No public switch, export or package split is introduced. Ordinary scalar
+publication keeps its existing path.
 
-The runtime has passed its full development kernel suite and identified-artifact
-cost/semantic controls. Fresh committed-candidate release gates, mutation checks,
-canonical packages, consumers and production demo checks follow. Qualification
-below applies to its named earlier runtime; it does not automatically qualify
-this candidate. Numerical ceilings remain unchanged. No tag, registry publication
-or deployment is selected by this work.
+The normal registry plus documented corrections covers 86/87 passing gates;
+all 87 mutation checks pass with exact restoration. Five canonical packages and
+193 shipped payloads verify, including strict installed consumers, Angular AOT
+and facade/SSR. All 137 browser behavior checks pass. The strict demo build and
+one browser bundle-size assertion remain numerically failed. A temporary,
+exactly restored budget override emits the production artifact for behavior
+review; it does not turn those failures into passes.
+
+**Decision: retain the targeted optimization; local qualification is complete
+with specific numerical-size exceptions.** Against the corrected eager reference,
+canonical entity gzip grows 351 bytes to 45,595 production / 49,365 development;
+bare gzip is effectively unchanged at 18,407 / 20,785 bytes. Existing ceilings
+remain failed. The production demo initial total is 827.15 kB and main script is
+801,461 bytes against its 570,000-byte assertion. Passing/grown/restored bundle
+controls return 0/1/0. These costs are accepted under the owner's cost/feasibility
+instruction for this artifact only; no numerical predicate is weakened.
+
+Cold-store savings and first-use cost are measured. Active wide-store CPU and
+heap observations remain mixed/adverse with substantial same-artifact variation;
+no universal speedup, permanent heap saving or active-path nonregression is
+claimed. The [central study](https://github.com/JBorgia/signal-tree/blob/codex/publication-activation-study/docs/audits/2026-11-17-publication-activation/README.md)
+retains exact evidence and limits. No tag, registry publication or deployment is
+selected by this work.
 
 ---
 

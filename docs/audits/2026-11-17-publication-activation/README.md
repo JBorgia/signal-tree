@@ -68,3 +68,35 @@ controls, failed attempts and independent interpretation are recorded in the
 The corrected development kernel suite passed 686 files with 7,395 passing tests,
 five expected failures and twelve skips. Final committed-candidate qualification
 is recorded separately. No tag, registry publication or deployment is selected.
+
+## Final qualification and exact costs
+
+Qualified source: `5801008ea4ca591b3be483e8bbb0aa02e15f59ed`. The initial normal
+registry at `e48c8fcf2` passed 83/87 gates. Focused corrections resolve three lint
+warnings, explicit allocation in the active-evidence GC test, and the emitted
+registration mutation anchor. Spec types and the new cold-source pin/release case
+pass. Covered normal scope is 86/87; the bundle ceiling remains failed. All 87
+mutation checks pass with exact restoration. These are recorded runs plus
+corrections, not a fabricated single all-green run.
+
+Fresh five-package construction and canonical packing join all 193 shipped
+payloads to the build and archive journal. Strict installed types, Angular AOT
+and facade/SSR pass. All 144 final kernel payloads equal the measured candidate's
+bytes. Against the corrected eager reference, only five kernel JavaScript files
+change (+5,316 raw package bytes); declarations, manifests and four facades are
+unchanged. Canonical gzip is bare 18,407 production / 20,785 development bytes
+(−2 / 0 versus reference), entities 45,595 / 49,365 (+351 / +351). The broader
+loaded neutral-workflow consumer grows 884 gzip bytes; fixture compositions differ.
+
+All 137 demo behavior checks pass without skips or flakes. The strict production
+build remains numerically failed at 827.15 kB initial total, and the browser size
+assertion fails at 801,461 main-script bytes versus 570,000. A temporary budget-only
+override emitted the behavior-review artifact and was restored byte-for-byte.
+Both lines' passing/grown/restored fixture controls return 0/1/0; malformed packed
+receipt controls are rejected. No gate ceiling or semantic test is weakened.
+
+Retain this artifact with its specific cost exception under the owner's
+cost/feasibility instruction. This is completed local qualification with explicit
+numerical failures, not an all-green release-gate claim or npm publication.
+The central study preserves first failures, source identities, fresh logs and raw
+measurements. Documentation-only successors do not replace the artifact identity.

@@ -1,5 +1,14 @@
 # TODO
 
+## Completed publication activation and legacy cleanup
+
+- [x] Remove unreachable audit source while preserving live behavior coverage.
+- [x] Measure and qualify automatic per-collection publication activation, including
+  cold population, first demand, active histories and late-reader/lifetime contracts.
+- [x] Complete exact package, consumer, mutation and production-browser checks; retain
+  numerical failures and the bounded [cost decision](docs/audits/2026-11-17-publication-activation/README.md).
+  No public configuration or package split is introduced.
+
 The completed v16 repair and qualification decision is in
 [RELEASE-CURRENT.md](RELEASE-CURRENT.md#active-owner-instruction).
 The [readiness audit](docs/audits/2026-11-10-release-readiness/README.md)
