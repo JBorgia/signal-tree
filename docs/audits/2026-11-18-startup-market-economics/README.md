@@ -28,6 +28,11 @@ adoption. Those interpretations are not new device or human-study measurements.
 The register also preserves the dated post-push preview results: v15 Ready,
 v16 and the study branch failing their unchanged strict demo size budgets.
 
+The [adoption and positioning follow-up](ADOPTION-AND-POSITIONING.md) evaluates
+AI-guidance freshness, TanStack's query capabilities, v15-to-v16 migration,
+mixed-major limits, Lite/edition proposals and a richer demo story. It records
+source findings and recommendations without selecting new APIs or product tiers.
+
 ## What changed and why
 
 Both lines omit stored zero revisions because the accessor already returns zero

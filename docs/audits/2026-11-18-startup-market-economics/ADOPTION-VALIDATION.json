@@ -1,0 +1,60 @@
+{
+  "scope": "Advisory documentation only; outside the frozen measurement archive. No runtime, AI-guidance or consumer application changes.",
+  "inputFiles": {
+    "docs/audits/2026-11-18-startup-market-economics/ADOPTION-AND-POSITIONING.md": "755b342e944792904154c5e6850eb8cbc5a0db524af26f6e4342f44029e4e5b4",
+    "docs/audits/2026-11-18-startup-market-economics/README.md": "0f07f0a76318321294da4ff5659ec223c6f3db6359c9fc36f866a95150afc580"
+  },
+  "checks": [
+    {
+      "receipt": {
+        "command": [
+          "node",
+          "tools/verify-gates.mjs",
+          "--only=doc-links,doc-links:self,documented-imports,documented-symbols,documented-examples,version-claims,release-claims"
+        ],
+        "cwd": "/Users/jonathanborgia/code/signaltree/.worktrees/agent-collaboration-evaluation",
+        "startedUTC": "2026-11-18T11:45:54.247513+00:00",
+        "head": "0af73afa7f5b75bfd357d61ea76e591a7d0bad28",
+        "status": "A  docs/audits/2026-11-18-startup-market-economics/ADOPTION-AND-POSITIONING.md\nM  docs/audits/2026-11-18-startup-market-economics/README.md\n",
+        "patchSha256": "c54227f989141b7a6bb7086d0f70e327fdb29e440048048a46d77abf24fb04ac",
+        "runnerSha256": "6e53606ad0deeb4c8a8f9710bb165d42fa45581c07ba6a9f68c0cd48ba470f18",
+        "node": "v24.15.0",
+        "exitCode": 0,
+        "seconds": 41.007417290937155,
+        "logSha256": "7e62ffaef3dd64d4e9d938f12caec03dca42166b62165ed2d8a73b9c95aacc3e",
+        "trackedPatchUnchanged": true
+      },
+      "preservedLog": "adoption-documentation.log"
+    },
+    {
+      "receipt": {
+        "command": [
+          "pnpm",
+          "nx",
+          "build",
+          "demo",
+          "--configuration=production",
+          "--base-href=/",
+          "--skip-nx-cache"
+        ],
+        "cwd": "/Users/jonathanborgia/code/signaltree/.worktrees/agent-collaboration-evaluation",
+        "startedUTC": "2026-11-18T11:47:06.111481+00:00",
+        "head": "0af73afa7f5b75bfd357d61ea76e591a7d0bad28",
+        "status": "A  docs/audits/2026-11-18-startup-market-economics/ADOPTION-AND-POSITIONING.md\nM  docs/audits/2026-11-18-startup-market-economics/README.md\n",
+        "patchSha256": "c54227f989141b7a6bb7086d0f70e327fdb29e440048048a46d77abf24fb04ac",
+        "runnerSha256": "6e53606ad0deeb4c8a8f9710bb165d42fa45581c07ba6a9f68c0cd48ba470f18",
+        "node": "v24.15.0",
+        "exitCode": 1,
+        "seconds": 10.874849749961868,
+        "logSha256": "766592390bfc734353f222526acb8ad0e607796af9435f6d1b7be8d6994e880d",
+        "trackedPatchUnchanged": true
+      },
+      "preservedLog": "adoption-production-demo.log"
+    }
+  ],
+  "disposition": {
+    "documentation": "All seven pass.",
+    "productionDemo": "Inherited study runtime strict build fails at 815.62 kB versus unchanged 570.00 kB ceiling; no new runtime or deployment qualification.",
+    "review": "Separate independent premise and interpretation source reviews, with no new runtime experiments. Private consumer review remains excluded from public delivery."
+  }
+}

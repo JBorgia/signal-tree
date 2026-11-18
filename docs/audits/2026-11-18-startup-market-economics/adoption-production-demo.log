@@ -1,0 +1,73 @@
+
+ NX   Running target build for project demo and 2 tasks it depends on:
+
+
+
+> nx run demo:generate-deep-typing-proofs
+
+> node tools/generate-deep-typing-proofs.mjs
+
+
+> nx run demo:generate-versions
+
+> node tools/generate-version-env.cjs
+
+✔ Wrote versions to apps/demo/src/app/version.ts: kernel=16.0.0-dev
+✔ Wrote demo library versions to apps/demo/src/app/library-versions.ts
+Generated deep-typing proofs for depths 1-40.
+(node:75595) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+> nx run demo:build:production --base-href=/
+
+(node:75600) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+[33m❯[39m Building...
+(node:75600) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+[32m✔[39m Building...
+[1mInitial chunk files[22m[2m | [22m[1mNames[22m                                [2m | [22m [1mRaw size[22m[2m | [22m[1mEstimated transfer size[22m
+[32mmain-ZGIBGNFS.js[39m   [2m | [22m[2mmain[22m                                 [2m | [22m[36m789.92 kB[39m[2m | [22m              [36m201.94 kB[39m
+[32mstyles-ACDZXSLE.css[39m[2m | [22m[2mstyles[22m                               [2m | [22m [36m25.69 kB[39m[2m | [22m                [36m4.66 kB[39m
+[1m [22m                  [2m | [22m[1mInitial total[22m                        [2m | [22m[1m[91m815.62 kB[39m[22m[2m | [22m              [1m206.60 kB[22m
+[1mLazy chunk files[22m   [2m | [22m[1mNames[22m                                [2m | [22m [1mRaw size[22m[2m | [22m[1mEstimated transfer size[22m
+[32mchunk-DNSHwr-P.js[39m  [2m | [22m[2mv15-benchmarks-component[22m             [2m | [22m[36m199.41 kB[39m[2m | [22m               [36m46.33 kB[39m
+[32mchunk-B8-ERkcF.js[39m  [2m | [22m[2m-[22m                                    [2m | [22m[36m194.87 kB[39m[2m | [22m               [36m16.46 kB[39m
+[32mchunk-dSbnMvBo.js[39m  [2m | [22m[2mlegacy-changelog-component[22m           [2m | [22m[36m112.78 kB[39m[2m | [22m               [36m25.95 kB[39m
+[32mchunk-DkiSIioJ.js[39m  [2m | [22m[2mdocumentation-component[22m              [2m | [22m [36m55.83 kB[39m[2m | [22m               [36m15.24 kB[39m
+[32mchunk-xCVM_6gL.js[39m  [2m | [22m[2mrecommended-architecture-component[22m   [2m | [22m [36m55.06 kB[39m[2m | [22m                [36m9.23 kB[39m
+[32mchunk-BraROKj6.js[39m  [2m | [22m[2mwhy-causality-component[22m              [2m | [22m [36m50.96 kB[39m[2m | [22m               [36m11.42 kB[39m
+[32mchunk-Bm69Ebrt.js[39m  [2m | [22m[2marchitecture-overview-component[22m      [2m | [22m [36m46.56 kB[39m[2m | [22m               [36m11.55 kB[39m
+[32mchunk-B4VnEIHc.js[39m  [2m | [22m[2mrealistic-benchmark-history-component[22m[2m | [22m [36m46.48 kB[39m[2m | [22m               [36m10.54 kB[39m
+[32mchunk-Chfruct5.js[39m  [2m | [22m[2m-[22m                                    [2m | [22m [36m38.63 kB[39m[2m | [22m               [36m11.47 kB[39m
+[32mchunk-BFVsSs1r.js[39m  [2m | [22m[2m-[22m                                    [2m | [22m [36m36.65 kB[39m[2m | [22m                [36m8.15 kB[39m
+[32mchunk-BMnrmGFR.js[39m  [2m | [22m[2mdevtools-demo-component[22m              [2m | [22m [36m27.84 kB[39m[2m | [22m                [36m6.30 kB[39m
+[32mchunk-Dp33sivM.js[39m  [2m | [22m[2mbatching-demo-component[22m              [2m | [22m [36m26.69 kB[39m[2m | [22m                [36m5.45 kB[39m
+[32mchunk-B6YZKGhv.js[39m  [2m | [22m[2mentities-demo-component[22m              [2m | [22m [36m24.50 kB[39m[2m | [22m                [36m5.30 kB[39m
+[32mchunk-B-eDpM-x.js[39m  [2m | [22m[2mrestoration-demo-component[22m           [2m | [22m [36m22.30 kB[39m[2m | [22m                [36m5.67 kB[39m
+[32mchunk-DxYgMP3W.js[39m  [2m | [22m[2mhome-component[22m                       [2m | [22m [36m19.94 kB[39m[2m | [22m                [36m4.80 kB[39m
+[2m...and 10 more lazy chunks files. Use "--verbose" to show all the files.[22m
+Application bundle generation failed. [6.593 seconds] - 2026-11-18T11:47:16.949Z
+[33m▲ [43;33m[[43;30mWARNING[43;33m][0m [1mbundle initial exceeded maximum budget. Budget 525.00 kB was not met by 290.62 kB with a total of 815.62 kB.[0m
+[31m✘ [41;31m[[41;97mERROR[41;31m][0m [1mbundle initial exceeded maximum budget. Budget 570.00 kB was not met by 245.62 kB with a total of 815.62 kB.[0m
+
+
+
+ NX   Running target build for project demo and 2 tasks it depends on failed
+
+Failed tasks:
+
+- demo:build:production
+
+Hint: run the command with --verbose for more details.
+
+  Run duration:      8.1s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     8.1s (2 tasks)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        demo:build:production                7.5s
+        demo:generate-deep-typing-proofs    573ms
