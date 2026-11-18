@@ -1,3 +1,38 @@
+# V15 construction follow-through — local qualification complete
+
+Updated November 18, 2026 UTC. The qualified runtime is
+`4e791f32238fa7bdde480c5408a23dc4a4bca804` on
+`codex/v15-oversight-cost-followthrough`; this controller is a documentation-only
+successor. The [completed audit](docs/audits/2026-11-17-construction-followthrough/README.md)
+records empty planning and lazy-container changes, exact artifacts and controls.
+The public API and existing supported behavior remain intact. The memory benefit
+is bounded to measured cohorts; CPU is mixed and no general speedup is claimed.
+The tested EntityMap method extraction is rejected because delivered size grew.
+
+Qualification completes 90/91 normal release gates, 91/91 mutation checks with
+exact restoration, five canonical archives and 158 shipped payloads, strict
+installed consumers, Angular AOT, facade/React SSR, the strict production demo,
+and all 146 browser checks without skips, flaky outcomes or retries. Independent
+source/log/archive review finds no additional blocker. The separate budget
+sensitivity control passes, rejects planted growth, and passes after exact
+restoration. All 109 fresh kernel payloads match the measured combined candidate.
+
+**Decision: retain the compatible memory improvement; local release preparation
+is qualified with the following new candidate-specific size acceptance.** Bare
+gzip grows 60 production / 63 development bytes; entities grow 59 / 66 bytes.
+Selected bare bytes are 11,071 / 13,222, exceeding unchanged ceilings by
+11.8 / 12.4 bytes. Selected entity bytes are 25,392 / 28,339, exceeding ceilings
+by 99.2 / 179 bytes. Accept that cost for the demonstrated construction memory
+saving under the owner's cost/feasibility instruction. These four numerical
+misses remain failed; the prior entity-only exception is not inherited and no
+ceiling changes. The receipt index and central study preserve the first failures.
+
+This phase selects no tag, merge, npm publication, exact-tag Linux run or demo
+deployment. Runtime qualification stays bound to the frozen source above;
+documentation successors and subsequent comparison reports have separate identities.
+
+---
+
 # v15 legacy cleanup — local qualification complete
 
 The qualified source is `891159222d40ccb8f55da038334b9197e0bc3432` on

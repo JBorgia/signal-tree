@@ -2,6 +2,17 @@
 
 Work that is decided and not yet done. **This is not an RFC list.**
 
+## Construction memory follow-through
+
+- [x] Measure empty planning and lazy internal containers across neutral/Angular
+  profiles, late observation, held writers and configured transactions; retain
+  the compatible memory improvement with explicit mixed CPU findings.
+- [x] Test EntityMap method separation with equivalent consumers; reject the
+  larger delivered output without changing the supported API.
+- [x] Complete exact source/artifact qualification and independent review. See
+  [the audit](docs/audits/2026-11-17-construction-followthrough/README.md) for the
+  new candidate-specific size acceptance, raw evidence and publication limits.
+
 ## Studio commercial separation
 
 Studio development and its complete implementation/evaluation ledger now live

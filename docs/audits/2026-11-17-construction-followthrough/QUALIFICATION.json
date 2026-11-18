@@ -1,0 +1,108 @@
+{
+  "head": "4e791f32238fa7bdde480c5408a23dc4a4bca804",
+  "branch": "codex/v15-oversight-cost-followthrough",
+  "sourceUnchanged": true,
+  "sourceFinal": "/Users/jonathanborgia/code/signaltree/artifacts/v15-oversight-cost-2026-11-17/qualification/source-final.json",
+  "sourceFinalSha256": "6d071938a568bbe77a98af402fdec9da04505b1d6a85b474c69484f91e57159a",
+  "receipts": {
+    "normal-release-host-1": {
+      "path": "/Users/jonathanborgia/code/signaltree/artifacts/v15-oversight-cost-2026-11-17/qualification/normal-release-host-1/receipt.json",
+      "sha256": "0fa2079ccbe896762beb3eaf1c75304fe82480d9a9f5498469c4192c97b150aa",
+      "exitCode": 1
+    },
+    "mutation-release-host-1": {
+      "path": "/Users/jonathanborgia/code/signaltree/artifacts/v15-oversight-cost-2026-11-17/qualification/mutation-release-host-1/receipt.json",
+      "sha256": "10d86b843a7d2bb703d6020df4d0bbd845c51f94c69628070ac8aeb3c02e3bb7",
+      "exitCode": 0
+    },
+    "fresh-five-package-build-1": {
+      "path": "/Users/jonathanborgia/code/signaltree/artifacts/v15-oversight-cost-2026-11-17/qualification/fresh-five-package-build-1/receipt.json",
+      "sha256": "6261d256afefa1236e8dc2943e67dd47aeabe6d420238ea0d638656a5c7493f9",
+      "exitCode": 0
+    },
+    "bundle-economics-run-1": {
+      "path": "/Users/jonathanborgia/code/signaltree/artifacts/v15-oversight-cost-2026-11-17/qualification/bundle-economics-run-1/receipt.json",
+      "sha256": "0c1467eba704bbf4d34020fa912d64e5b91d80717ed7225a9ae953ea2433261d",
+      "exitCode": 0
+    },
+    "canonical-prepare-only-1": {
+      "path": "/Users/jonathanborgia/code/signaltree/artifacts/v15-oversight-cost-2026-11-17/qualification/canonical-prepare-only-1/receipt.json",
+      "sha256": "8e0da992c0de77ca9b93fe60becb392e0885516a0bede417d3ed66d95f476554",
+      "exitCode": 0
+    },
+    "angular-aot-consumer-1": {
+      "path": "/Users/jonathanborgia/code/signaltree/artifacts/v15-oversight-cost-2026-11-17/qualification/angular-aot-consumer-1/receipt.json",
+      "sha256": "40a3bfb7690c45887b56005b22a9bc0f4ec2b22f01aa0f9dbb567f771c93bec2",
+      "exitCode": 0
+    },
+    "strict-demo-production-1": {
+      "path": "/Users/jonathanborgia/code/signaltree/artifacts/v15-oversight-cost-2026-11-17/qualification/strict-demo-production-1/receipt.json",
+      "sha256": "b412d5b7108fcae7068433338c383030947927fc5bf4a76ca1aee09a09ab9a53",
+      "exitCode": 0
+    },
+    "demo-route-smoke-1": {
+      "path": "/Users/jonathanborgia/code/signaltree/artifacts/v15-oversight-cost-2026-11-17/qualification/demo-route-smoke-1/receipt.json",
+      "sha256": "4337d39c7d7f9ce46152a01ddf7ac09723a53b27fb7a34c64c4d93ed804bf837",
+      "exitCode": 0
+    },
+    "version-claims-1": {
+      "path": "/Users/jonathanborgia/code/signaltree/artifacts/v15-oversight-cost-2026-11-17/qualification/version-claims-1/receipt.json",
+      "sha256": "15fceb01c63d0ac72ae9ba694dd9bd29def6474482548fdd50587995a1ca84bd",
+      "exitCode": 0
+    },
+    "release-state-1": {
+      "path": "/Users/jonathanborgia/code/signaltree/artifacts/v15-oversight-cost-2026-11-17/qualification/release-state-1/receipt.json",
+      "sha256": "652601c5ea486f40dc1c848de8d039726fbb2a2f29bdb4a4078e44c38f5cf853",
+      "exitCode": 0
+    },
+    "changelog-1": {
+      "path": "/Users/jonathanborgia/code/signaltree/artifacts/v15-oversight-cost-2026-11-17/qualification/changelog-1/receipt.json",
+      "sha256": "5a67a7a858357309277629a5164de7414111a82a5b307f23e137e3bacc02f0c2",
+      "exitCode": 0
+    },
+    "diff-check-1": {
+      "path": "/Users/jonathanborgia/code/signaltree/artifacts/v15-oversight-cost-2026-11-17/qualification/diff-check-1/receipt.json",
+      "sha256": "858ef81336ef9b4bc3113e8fa16089b445ff706cca7749f6a6d76faac454665b",
+      "exitCode": 0
+    }
+  },
+  "normal": {
+    "passed": 90,
+    "failed": 1,
+    "knownRed": 0,
+    "failure": "bundle-budget; bare production/development and entity production/development exceed unchanged ceilings"
+  },
+  "mutations": {
+    "proven": 91,
+    "indirect": 15,
+    "unproven": 0,
+    "vacuous": 0,
+    "blind": 0,
+    "errored": 0
+  },
+  "routeStats": {
+    "startTime": "2026-11-18T03:40:57.516Z",
+    "duration": 42117.905,
+    "expected": 146,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0
+  },
+  "routeReportSha256": "ba673ba0047de45ef3fbcc84911259f2f89fdae6f92e97a56c97e52d444db470",
+  "canonicalPacking": {
+    "result": "/Users/jonathanborgia/code/signaltree/artifacts/v15-oversight-cost-2026-11-17/qualification/final-packed/result.json",
+    "sha256": "43ee15f38594059b66dece4074924ac217f9730ca9327662929a470cf1f9292c",
+    "packages": 5,
+    "shippedPayloads": 158
+  },
+  "budgets": {
+    "result": "/Users/jonathanborgia/code/signaltree/artifacts/v15-oversight-cost-2026-11-17/qualification/bundle-economics-1/result.json",
+    "sha256": "82bdc08bb35d3f3228c3843f4a74c61a3c278c1527f5602f646a552218a1103e",
+    "numericPassed": false
+  },
+  "artifactState": "/Users/jonathanborgia/code/signaltree/artifacts/v15-oversight-cost-2026-11-17/qualification/final-artifact-state.json",
+  "artifactStateSha256": "c1723bbe044ffa0cf251325beeb9d76e19bb38f70178b04af7102433805d6939",
+  "checksComplete": true,
+  "publication": false,
+  "limits": "Local exact-source qualification with four numerical budget misses retained as failures; owner-specific cost disposition is separate. No Linux exact-tag qualification, tag, publication, deployment or universal speedup/no-leak claim."
+}
