@@ -1,5 +1,16 @@
 # TODO
 
+## Legacy scope and publication activation
+
+- [x] Audit v15's supported responsibilities and remove unreachable legacy
+      implementations while preserving surviving behavior coverage.
+- [x] Investigate automatic v16 entity publication activation, measure cold,
+      first-use and active costs, and preserve late-reader, reentry, retirement
+      and the original point-work contracts.
+- [x] Complete both candidates' artifact qualification, publish the bounded
+      [study record](docs/audits/2026-11-17-publication-activation/README.md) and
+      share the authorized branches. No tag, npm publication or deployment.
+
 ## Completed optimization sweep
 
 - [x] Complete the [coverage and candidate ledger](docs/audits/2026-11-17-optimization-sweep/CANDIDATES.md), inspecting relevant history and independently challenging consequential premises.

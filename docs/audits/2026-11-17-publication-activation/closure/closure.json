@@ -1,0 +1,35 @@
+{
+  "sourceBindings": {
+    "TODO.md": "f0ccaced64828d8152dbba283e68864a254238fb5111f0b5c8993332ecd48032",
+    "eslint.config.mjs": "89500a5064891fc73a184015b8a3c232b4174d836b662ad6457bb7b1fc348436",
+    "docs/audits/2026-11-17-publication-activation/README.md": "8c0d8f8f25c59256013de7369d35fab7c9904326212f3cc585bdb69124c9e930",
+    "tools/publication-activation/README.md": "a84ab0b5539d2b4444ffbe388c7e2092abe06ad9c73bf96f6dbafd72174fa4ad",
+    "tools/publication-activation/check-cleanup-errors.mjs": "2e13389b0963043d58b5f0c56b968695c4d9d592e8219fef4f45516632b2af44",
+    "tools/publication-activation/common.mjs": "106d12d7f814805f9a35324fe077f07c0922a264bb5da0666bafdb8c0b42201f",
+    "tools/publication-activation/compare-built-payloads.py": "19bdcd66076411c151b21fbc18c45d0c135e6fb199af05ce2acb4801f6a01405",
+    "tools/publication-activation/config.example.json": "596ab9588035e5e65532ef1fdf3d88a9c6eac1caafefdd02bc5ecbb182cd3b88",
+    "tools/publication-activation/export-evidence.py": "b7d2c9329ca0aea8105642a899e89b7c6c7a90fc19153f0068851cd6ef370e30",
+    "tools/publication-activation/profile-active.mjs": "6532cdfbf71705f0f1cabc6b7c645bfbcf94d6b7496c5258e5d7d69ae9d0538c",
+    "tools/publication-activation/run-command.py": "6e53606ad0deeb4c8a8f9710bb165d42fa45581c07ba6a9f68c0cd48ba470f18",
+    "tools/publication-activation/run.mjs": "00e3dedd89f667c1c11ce8b0481d573d87330d788f9dfc49d241afc46602249d",
+    "tools/publication-activation/same-artifact.py": "a6d052fb558909fe0ad9ab25848ceb82dcb5e138a378aec479a82938ac342c82",
+    "tools/publication-activation/verify-evidence.py": "bfd95434ddf9d952ca9a0bc5c0fa5deb53e6f1baf7039091150a8f913673e45d",
+    "tools/publication-activation/verify-measured-kernel.py": "2307cc9c24c0dca0db0394a6d246c524e11990f22a726d8d5c86d3d2b221c477",
+    "tools/publication-activation/workload.mjs": "6aba7e1bb981d8e83ad0db5d4d0ae2852d27f4ea63371625bebd31a8c60c3286"
+  },
+  "archiveSha256": "10174a842484b31254274bc6625a63fbade88e377f5532bcba8c855db6b75a21",
+  "archiveFilePayloads": 12834,
+  "indexSha256": "49b2336ae33728910d9c20533c904d3a4d0a1974391be85514a5e71c29907c36",
+  "documentationGates": {
+    "exitCode": 0,
+    "commandLogSha256": "e144aa1f43b7968b028249a22f66d5b2f79371f0182a8f63de7fd29f4274f3a3"
+  },
+  "limits": "Final study documentation check follows archive freeze. Closure records are adjacent to, not inside, the frozen archive. No publication or new performance measurement.",
+  "sourcePatch": {
+    "file": "source.patch.gz",
+    "encoding": "gzip",
+    "decodedSha256": "4a706934588fddab60d02f611e85b518fb6e7be88bc99cb682308bd91ba680c2",
+    "encodedSha256": "572592318e6347c2287980935f2c8f72e86fc44f873b08a3e4ea9f062c0b42e2",
+    "reason": "Preserve exact diff bytes without treating patch context markers as source trailing whitespace."
+  }
+}

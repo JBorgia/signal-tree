@@ -211,6 +211,15 @@ export default [
     },
   },
   {
+    // Frozen measurement runner: cleanup records its error, then throws only
+    // when the body did NOT fail. This preserves the first failure while also
+    // rejecting cleanup failure after otherwise successful work. The syntactic
+    // no-unsafe-finally rule cannot recognize that guard. Keep this exception
+    // scoped to the exact runner; cleanup-error controls exercise both branches.
+    files: ['tools/publication-activation/workload.mjs'],
+    rules: { 'no-unsafe-finally': 'off' },
+  },
+  {
     // KERNEL NEUTRALITY GATE.
     //
     // "SignalTree owns truth. Angular owns observation." That rule is currently

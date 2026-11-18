@@ -1,0 +1,18 @@
+{
+  "command": [
+    "node",
+    "tools/verify-gates.mjs",
+    "--only=doc-links,doc-links:self"
+  ],
+  "cwd": "/Users/jonathanborgia/code/signaltree/.worktrees/agent-collaboration-evaluation",
+  "startedUTC": "2026-11-18T00:07:57.411283+00:00",
+  "head": "53b36fc6b42cc9f5435d33223f20a4927ece3272",
+  "status": " M TODO.md\n M eslint.config.mjs\n?? docs/audits/2026-11-17-publication-activation/\n?? tools/publication-activation/\n",
+  "patchSha256": "4a706934588fddab60d02f611e85b518fb6e7be88bc99cb682308bd91ba680c2",
+  "runnerSha256": "6e53606ad0deeb4c8a8f9710bb165d42fa45581c07ba6a9f68c0cd48ba470f18",
+  "node": "v24.15.0",
+  "exitCode": 0,
+  "seconds": 3.3273447919636965,
+  "logSha256": "e144aa1f43b7968b028249a22f66d5b2f79371f0182a8f63de7fd29f4274f3a3",
+  "trackedPatchUnchanged": true
+}

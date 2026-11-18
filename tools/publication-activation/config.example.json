@@ -1,0 +1,28 @@
+{
+  "kind": "publication-activation-config-v1",
+  "baseline": {
+    "manifest": "/Users/jonathanborgia/code/signaltree/artifacts/publication-activation-2026-11-17/v16-baseline/kernel.json",
+    "manifestSha256": "FILL_FROM_FROZEN_MANIFEST"
+  },
+  "candidate": {
+    "manifest": "FILL_FROM_CANDIDATE_BUILD",
+    "manifestSha256": "FILL_FROM_FROZEN_MANIFEST"
+  },
+  "cpuRounds": 3,
+  "heapRounds": 2,
+  "timeoutMs": 180000,
+  "profiles": [
+    { "id": "entity-1k8-cold", "shape": "entity", "trees": 1, "rows": 1000, "width": 8, "enhancer": "none", "link": "unrelated", "history": 4 },
+    { "id": "entity-10k8-cold", "shape": "entity", "trees": 1, "rows": 10000, "width": 8, "enhancer": "none", "link": "unrelated", "history": 4 },
+    { "id": "entity-10k32-cold", "shape": "entity", "trees": 1, "rows": 10000, "width": 32, "enhancer": "none", "link": "unrelated", "history": 4 },
+    { "id": "entity-1k8-initial", "shape": "entity", "trees": 1, "rows": 1000, "width": 8, "enhancer": "none", "link": "initial", "history": 4 },
+    { "id": "entity-1k8-late", "shape": "entity", "trees": 1, "rows": 1000, "width": 8, "enhancer": "none", "link": "late", "history": 4 },
+    { "id": "entity-1k8-transactions", "shape": "entity", "trees": 1, "rows": 1000, "width": 8, "enhancer": "transactions", "link": "late", "history": 4 },
+    { "id": "entity-1k8-restoration", "shape": "entity", "trees": 1, "rows": 1000, "width": 8, "enhancer": "restoration", "link": "late", "history": 4 },
+    { "id": "entity-1k8-both", "shape": "entity", "trees": 1, "rows": 1000, "width": 8, "enhancer": "both", "link": "initial", "history": 4 },
+    { "id": "small-entity", "shape": "entity", "trees": 256, "rows": 4, "width": 8, "enhancer": "none", "link": "unrelated", "history": 2 },
+    { "id": "small-ordinary", "shape": "ordinary", "trees": 256, "rows": 1, "width": 8, "enhancer": "none", "link": "unrelated", "history": 2 },
+    { "id": "ordinary-transactions", "shape": "ordinary", "trees": 1, "rows": 1, "width": 128, "enhancer": "transactions", "link": "late", "history": 4 },
+    { "id": "entity-10k8-no-link", "shape": "entity", "trees": 1, "rows": 10000, "width": 8, "enhancer": "none", "link": "absent", "history": 4 }
+  ]
+}
