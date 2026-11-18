@@ -1,4 +1,9 @@
-<a class="skip-link" href="#main-content">Skip to content</a>
+<a
+  class="skip-link"
+  href="#main-content"
+  (click)="skipToContent($event)"
+  >Skip to content</a
+>
 
 <div class="app-shell">
 	<header class="app-topbar">
@@ -32,7 +37,7 @@
 
 	<app-navigation />
 
-	<main id="main-content" class="main-content">
+	<main id="main-content" tabindex="-1" class="main-content">
 		<router-outlet />
 	</main>
 </div>

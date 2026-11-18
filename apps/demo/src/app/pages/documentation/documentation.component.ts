@@ -20,6 +20,8 @@ import typescript from 'highlight.js/lib/languages/typescript';
 import { marked } from 'marked';
 import { lastValueFrom } from 'rxjs';
 
+import { SIGNALTREE_SOURCE_REF } from '../../source-ref.generated';
+
 /**
  * The heading-anchor slug rule, shared by everything that needs to agree on
  * what `#ownership` means. Kept at module scope because the anchors are now
@@ -104,6 +106,20 @@ export class DocumentationComponent implements OnInit {
       description: 'Native Solid accessor leaves with root-scoped disposal',
       readmePath: 'assets/docs/solid/README.md',
       repositoryPath: 'packages/solid/README.md',
+    },
+    {
+      id: 'adoption-v16',
+      name: 'First v16 Workflow',
+      description: 'Owned state, local review, refused rollback and recovery',
+      readmePath: 'assets/docs/guides/adoption-v16.md',
+      repositoryPath: 'docs/guides/adoption-v16.md',
+    },
+    {
+      id: 'migration-v15-v16',
+      name: 'v15 to v16',
+      description: 'Preserve ordinary behavior before enabling pending review',
+      readmePath: 'assets/docs/guides/migration-v15-v16.md',
+      repositoryPath: 'docs/guides/migration-v15-v16.md',
     },
     {
       id: 'composition-recipes',
@@ -270,7 +286,8 @@ export class DocumentationComponent implements OnInit {
     // Markdown comes from copied assets, but relative links belong to the
     // original repository document. Package llms.txt is a generated copy of
     // the shared root manifest; it is also served directly by the demo.
-    const repositoryRoot = 'https://github.com/JBorgia/signal-tree/blob/main/';
+    // Bind candidate documentation to its actual source, even without a release tag.
+    const repositoryRoot = `https://github.com/JBorgia/signal-tree/blob/${SIGNALTREE_SOURCE_REF}/`;
     const sourceUrl = new URL(pkg.repositoryPath, repositoryRoot);
     const routeTo = (target: DocPackage, fragment: string) =>
       this.router.serializeUrl(
@@ -309,7 +326,7 @@ export class DocumentationComponent implements OnInit {
       if (src && !/^(?:[a-z][a-z\d+.-]*:|\/)/i.test(src)) {
         const base = new URL(
           pkg.repositoryPath,
-          'https://raw.githubusercontent.com/JBorgia/signal-tree/main/'
+          `https://raw.githubusercontent.com/JBorgia/signal-tree/${SIGNALTREE_SOURCE_REF}/`
         );
         image.setAttribute('src', new URL(src, base).href);
       }

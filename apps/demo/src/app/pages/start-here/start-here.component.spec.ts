@@ -40,9 +40,13 @@ describe('StartHereComponent', () => {
     });
   });
 
-  it('NgRx vs SignalTree comparison panes both render their code samples', () => {
+  it('teaches owned minimal state and keeps v15/v16/backend boundaries explicit', () => {
     const text = fixture.nativeElement.textContent as string;
-    expect(text).toContain('createReducer');
-    expect(text).toContain('counterTree.$.count.update((count) => count + 1)');
+    expect(text).toContain('v16 development preview · Unreleased');
+    expect(text).toContain('transaction()');
+    expect(text).toContain('transact()');
+    expect(text).toContain('destroy: () => tree.destroy()');
+    expect(text).toContain('state: asReadonly(tree).$');
+    expect(text).toContain('A local confirmation is not backend approval.');
   });
 });

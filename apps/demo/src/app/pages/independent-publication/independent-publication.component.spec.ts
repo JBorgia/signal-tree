@@ -17,7 +17,9 @@ describe('IndependentPublicationComponent (v16 preview)', () => {
   afterEach(() => fixture.destroy());
 
   function button(host: HTMLElement, action: string): HTMLButtonElement {
-    const control = host.querySelector<HTMLButtonElement>(`[data-action="${action}"]`);
+    const control = host.querySelector<HTMLButtonElement>(
+      `[data-action="${action}"]`
+    );
     if (!control) throw new Error(`Missing ${action} button`);
     return control;
   }
@@ -87,9 +89,7 @@ describe('IndependentPublicationComponent (v16 preview)', () => {
       expect(page.tree.$.route()).toBe('west');
       const reject = button(host, 'reject');
       expect(reject.disabled).toBe(false);
-      expect(
-        button(host, 'confirm').disabled
-      ).toBe(false);
+      expect(button(host, 'confirm').disabled).toBe(false);
       reject.click();
       fixture.detectChanges();
       expect(page.hasPending()).toBe(false);
@@ -113,6 +113,96 @@ describe('IndependentPublicationComponent (v16 preview)', () => {
     expect(page.hasPending()).toBe(true);
     page.reject();
     expect(page.tree.$.route()).toBe('north');
+  });
+
+  it('keeps a refused proposal pending and recovers newest first without losing external work', async () => {
+    const page = fixture.componentInstance;
+    page.proposeWest();
+    expect(page.review()).toEqual([
+      expect.objectContaining({ path: 'route', status: 'current' }),
+    ]);
+    page.receiveShipment();
+    await page.publishIndependentNote();
+    page.proposeEast();
+    expect(page.review()).toEqual([
+      expect.objectContaining({ path: 'route', status: 'superseded' }),
+    ]);
+    page.reject();
+    // A real SignalTreeRollbackError is handled. Both handles must survive;
+    // replacing this with a successful-rejection message makes the test fail.
+    expect(page.decision()).toBe('Still pending · rejection refused');
+    expect(page.hasPending()).toBe(true);
+    expect(page.hasNewerPending()).toBe(true);
+    expect(page.tree.$.route()).toBe('east');
+    await new Promise<void>((resolve) => setTimeout(resolve, 0));
+    expect(page.deliveredRoutes()).toEqual([]);
+    expect(page.deliveredNotes()).toEqual(['dispatch-ready']);
+
+    page.rejectNewer();
+    expect(page.tree.$.route()).toBe('west');
+    expect(page.hasPending()).toBe(true);
+    expect(page.hasNewerPending()).toBe(false);
+    page.reject();
+    await page.routeConnection.settled();
+    expect(page.hasPending()).toBe(false);
+    expect(page.tree.$.route()).toBe('north');
+    expect(page.tree.$.shipment()).toBe('Shipped');
+    expect(page.tree.$.note()).toBe('dispatch-ready');
+    expect(page.recovery()).toBe('Review complete; unrelated work remains');
+  });
+
+  it('does not create an unchanged west proposal after confirming the previous one', async () => {
+    const page = fixture.componentInstance;
+    page.proposeWest();
+    page.confirm();
+    await page.routeConnection.settled();
+    fixture.detectChanges();
+    expect(page.tree.$.route()).toBe('west');
+    expect(button(fixture.nativeElement, 'propose').disabled).toBe(true);
+    page.proposeWest();
+    page.proposeEast();
+    page.reject();
+    expect(page.hasPending()).toBe(false);
+    expect(page.hasNewerPending()).toBe(false);
+    expect(page.tree.$.route()).toBe('west');
+  });
+
+  it('resets only a settled scenario and preserves real refusal on its second run', async () => {
+    const page = fixture.componentInstance;
+    page.proposeWest();
+    page.confirm();
+    await page.resetScenario();
+    expect(page.tree.$.route()).toBe('north');
+    expect(page.deliveredRoutes()).toEqual([]);
+    page.proposeWest();
+    page.receiveShipment();
+    await page.publishIndependentNote();
+    page.proposeEast();
+    await page.resetScenario();
+    expect(page.tree.$.route()).toBe('east');
+    expect(page.hasPending()).toBe(true);
+    expect(page.hasNewerPending()).toBe(true);
+    page.reject();
+    expect(page.decision()).toBe('Still pending · rejection refused');
+    expect(page.hasPending()).toBe(true);
+    expect(page.hasNewerPending()).toBe(true);
+    expect(page.deliveredRoutes()).toEqual([]);
+    page.rejectNewer();
+    page.reject();
+    expect(page.tree.$.route()).toBe('north');
+    expect(page.tree.$.shipment()).toBe('Shipped');
+    expect(page.tree.$.note()).toBe('dispatch-ready');
+    expect(page.deliveredNotes()).toEqual(['dispatch-ready']);
+    expect(page.hasPending()).toBe(false);
+  });
+
+  it('publishes an explicitly confirmed route to its real in-memory endpoint', async () => {
+    const page = fixture.componentInstance;
+    page.proposeWest();
+    expect(page.deliveredRoutes()).toEqual([]);
+    page.confirm();
+    await page.routeConnection.settled();
+    expect(page.deliveredRoutes()).toEqual(['west']);
   });
 
   it('disposes the Link before destroying the tree, including an in-flight action', async () => {

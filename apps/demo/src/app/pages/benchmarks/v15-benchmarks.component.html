@@ -9,10 +9,12 @@
     <p class="eyebrow">Long-lived consequential state</p>
     <h1>Recurring application-state performance</h1>
     <p class="hero-copy">
-      Three recurring v15 tasks run across framework-specific and
+      Three recurring ordinary-state tasks run across framework-specific and
       framework-neutral state-library runtimes after construction and population
       are complete. Every timed run must produce the expected final state or the
-      comparison fails instead of publishing a number.
+      comparison fails instead of publishing a number. The SignalTree arm is the
+      candidate version named in the results; this page does not measure v16
+      pending review, refused rollback or independent publication.
     </p>
     <p class="comparability-note">
       Every ranked row satisfies the same capability floor through the measured
@@ -157,8 +159,12 @@
         <strong role="cell" data-label="Operation">{{ row.operation }}</strong>
         <span role="cell" data-label="Universal">{{ row.universal }}</span>
         <span role="cell" data-label="Native">{{ row.native }}</span>
-        <span role="cell" data-label="Paired median">{{ row.pairedDelta }}</span>
-        <span role="cell" data-label="Paired p10-p90">{{ row.pairedRange }}</span>
+        <span role="cell" data-label="Paired median">{{
+          row.pairedDelta
+        }}</span>
+        <span role="cell" data-label="Paired p10-p90">{{
+          row.pairedRange
+        }}</span>
         <span role="cell" data-label="A/A p10-p90">{{ row.controlRange }}</span>
         <span role="cell" data-label="Reading">{{ row.interpretation }}</span>
       </div>
@@ -179,7 +185,9 @@
       </div>
       @for (row of angularLeafMemoryRows; track row.observation) {
       <div class="callable-result-row" role="row">
-        <strong role="cell" data-label="Density arm">{{ row.observation }}</strong>
+        <strong role="cell" data-label="Density arm">{{
+          row.observation
+        }}</strong>
         <span role="cell" data-label="Universal">{{ row.universal }}</span>
         <span role="cell" data-label="Native">{{ row.native }}</span>
         <span role="cell" data-label="Native delta">{{ row.delta }}</span>
@@ -191,26 +199,36 @@
     <footer>
       <p>
         A row is called different only when its paired p10-p90 interval stays on
-        one side of zero and clears the A/A interval. Scalar paths, fan-out 1/10,
-        and the diamond are clear native wins; fan-out 100, chain depth 10, and
-        smaller construction rows remain inconclusive, while 1,000-leaf
+        one side of zero and clears the A/A interval. Scalar paths, fan-out
+        1/10, and the diamond are clear native wins; fan-out 100, chain depth
+        10, and smaller construction rows remain inconclusive, while 1,000-leaf
         construction is a clear loss.
       </p>
       <nav aria-label="Angular leaf benchmark evidence">
         <a
-          [href]="repositorySourceUrl('tools/bench-angular-leaf-strategies.mjs')"
+          [href]="
+            repositorySourceUrl('tools/bench-angular-leaf-strategies.mjs')
+          "
           target="_blank"
           rel="noreferrer"
-        >Harness source</a>
+          >Harness source</a
+        >
         <a
-          [href]="repositorySourceUrl('docs/performance/framework-native-leaves.md')"
+          [href]="
+            repositorySourceUrl('docs/performance/framework-native-leaves.md')
+          "
           target="_blank"
           rel="noreferrer"
-        >Method and interpretation</a>
-        <a href="benchmarks/angular-native-vs-universal.json">Raw comparison JSON</a>
+          >Method and interpretation</a
+        >
+        <a href="benchmarks/angular-native-vs-universal.json"
+          >Raw comparison JSON</a
+        >
         <a href="benchmarks/angular-native-aa.json">Raw A/A JSON</a>
         <a href="benchmarks/angular-native-memory.json">Raw memory JSON</a>
-        <a href="benchmarks/angular-native-vs-historical.json">Historical native JSON</a>
+        <a href="benchmarks/angular-native-vs-historical.json"
+          >Historical native JSON</a
+        >
       </nav>
     </footer>
   </section>

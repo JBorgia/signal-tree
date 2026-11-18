@@ -1,11 +1,12 @@
 <div class="publication-page layout-frame">
   <header class="page-header">
     <p class="page-eyebrow">v16 development preview · Unreleased</p>
-    <h1>Publish a note while a route is still under review.</h1>
+    <h1>Keep working while a proposed route is under review.</h1>
     <p class="page-lede">
-      A route proposal can stay pending while an independently authored note
-      reaches its own endpoint. This tutorial uses the v16 development API; it
-      is not stable v15 guidance.
+      An agent proposes west. A dispatcher receives a shipment update and sends
+      an unrelated note. Review the proposal, then try a conflicting edit and
+      recover without pretending rejection succeeded. This tutorial uses the v16
+      development API; it is not stable v15 guidance.
     </p>
   </header>
 
@@ -20,8 +21,9 @@
         review ends.
       </li>
       <li>
-        Reject the route to restore its previous value (north on the first
-        proposal), or confirm it to keep west. The note remains.
+        Reject the route to restore north, or confirm it to keep west. The note
+        remains. After confirming, reset the local scenario before trying
+        another west proposal.
       </li>
     </ol>
     <div class="actions">
@@ -29,7 +31,7 @@
         type="button"
         data-action="propose"
         (click)="proposeWest()"
-        [disabled]="hasPending() || publishing()"
+        [disabled]="hasPending() || publishing() || tree.$.route() !== 'north'"
       >
         1. Propose west
       </button>
@@ -53,11 +55,31 @@
         type="button"
         data-action="confirm"
         (click)="confirm()"
-        [disabled]="!hasPending() || publishing()"
+        [disabled]="!hasPending() || publishing() || hasNewerPending()"
       >
         3. Confirm route locally
       </button>
     </div>
+    <p>
+      <button
+        type="button"
+        data-action="reset"
+        (click)="resetScenario()"
+        [disabled]="hasPending() || hasNewerPending() || publishing()"
+      >
+        Reset local scenario
+      </button>
+      Reset clears this demonstration's state and delivery log only after every
+      pending proposal has settled. It does not undo an external business
+      effect.
+    </p>
+    @if (!hasPending() && tree.$.route() !== 'north') {
+    <p data-testid="reset-needed" role="status">
+      West is already confirmed. Reset to north before proposing west again;
+      writing the same value would not create the overlapping change shown
+      below.
+    </p>
+    }
     <div class="state-grid" aria-live="polite" aria-atomic="true">
       <article class="state-card">
         <h3>Visible tree state</h3>
@@ -66,6 +88,8 @@
           <dd data-testid="route">{{ tree.$.route() }}</dd>
           <dt>Proposal</dt>
           <dd data-testid="proposal">{{ decision() }}</dd>
+          <dt>Shipment from server</dt>
+          <dd data-testid="shipment">{{ tree.$.shipment() }}</dd>
           <dt>Note</dt>
           <dd>{{ tree.$.note() || 'No note yet' }}</dd>
         </dl>
@@ -91,12 +115,13 @@
           Delivered notes: <strong>{{ deliveredNotes().length }}</strong>
         </p>
         <p>
-          This list changes only when the Link endpoint's <code>set</code> runs.
+          This log records the Link endpoint's <code>set</code> calls. Reset
+          clears the demonstration log.
         </p>
       </article>
     </div>
     @if (publishing()) {
-    <p role="status">Waiting for the note Link to settle…</p>
+    <p role="status">Waiting for the demonstration Links to settle…</p>
     } @if (error(); as message) {
     <p role="alert">Note publication failed: {{ message }}</p>
     }
@@ -104,6 +129,107 @@
       Publish the same literal again while review is pending: the receipt can
       report <code>no-write</code> without another endpoint delivery.
     </p>
+  </section>
+
+  <section aria-labelledby="overlap-heading">
+    <h2 id="overlap-heading">When another edit arrives before review ends</h2>
+    <p>
+      Start a west proposal above. Receive the shipment update, then propose
+      east as a newer overlapping edit. Trying to reject west now must leave
+      both proposals pending. Resolve east first, then retry west. The shipment
+      update and independently sent note survive.
+    </p>
+    <div class="actions">
+      <button
+        type="button"
+        data-action="shipment"
+        (click)="receiveShipment()"
+        [disabled]="publishing() || tree.$.shipment() === 'Shipped'"
+      >
+        Receive server shipment update
+      </button>
+      <button
+        type="button"
+        data-action="overlap"
+        (click)="proposeEast()"
+        [disabled]="!hasPending() || hasNewerPending() || publishing()"
+      >
+        Propose east as a newer edit
+      </button>
+      <button
+        type="button"
+        data-action="reject-newer"
+        (click)="rejectNewer()"
+        [disabled]="!hasNewerPending() || publishing()"
+      >
+        Reject newer edit first
+      </button>
+    </div>
+    <div class="state-grid" aria-live="polite" aria-atomic="true">
+      <article class="state-card">
+        <h3>Original proposal inspection</h3>
+        @for (change of review(); track $index) {
+        <p data-testid="review-change">
+          {{ change.path }}: {{ change.status }}
+        </p>
+        } @empty {
+        <p>No original proposal remains pending.</p>
+        }
+        <p>
+          Current or superseded describes a contribution. It is not approval.
+        </p>
+      </article>
+      <article class="state-card">
+        <h3>Recovery status</h3>
+        <p data-testid="recovery">{{ recovery() }}</p>
+        <p data-testid="newer-proposal">
+          {{
+            hasNewerPending()
+              ? 'Newer proposal pending'
+              : 'No newer proposal pending'
+          }}
+        </p>
+      </article>
+      <article class="state-card">
+        <h3>Route endpoint</h3>
+        <p data-testid="route-endpoint">
+          {{ deliveredRoutes().at(-1) ?? 'No route delivery yet' }}
+        </p>
+        <p>
+          While review is unresolved, a local route value is not a delivered
+          instruction.
+        </p>
+      </article>
+    </div>
+  </section>
+
+  <section aria-labelledby="perspectives-heading">
+    <h2 id="perspectives-heading">One workflow, three useful views</h2>
+    <div class="state-grid">
+      <article class="state-card">
+        <h3>For the person using the app</h3>
+        <p>
+          Your shipment update survives. An unresolved proposal stays visible,
+          and a refused rejection gives you a next step.
+        </p>
+      </article>
+      <article class="state-card">
+        <h3>For the developer</h3>
+        <p>
+          Keep each pending handle until it settles. Inspect current changes,
+          classify external updates, and declare genuinely independent work.
+          Destroy the owned tree when the editor closes.
+        </p>
+      </article>
+      <article class="state-card">
+        <h3>For the business</h3>
+        <p>
+          This is a foundation for reviewable automation while ordinary work
+          continues. Reduced rework and faster reviews are benefits to measure
+          with users, not savings proved by this demonstration.
+        </p>
+      </article>
+    </div>
   </section>
 
   <section class="boundary" aria-labelledby="boundary-heading">

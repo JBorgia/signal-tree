@@ -1,8 +1,10 @@
 export const DEMO_ROUTES = [
   '/',
   '/start',
+  '/frameworks',
   '/why-causality',
   '/external-truth',
+  '/independent-publication',
   '/examples/fundamentals',
   '/batching',
   '/entities',

@@ -2,12 +2,14 @@
   <section class="home-hero">
     <div class="hero-inner">
       <div class="hero-copy">
-        <p class="hero-eyebrow">SignalTree v15</p>
-        <h1>State authority without state ceremony</h1>
+        <p class="hero-eyebrow">
+          SignalTree v16 development preview · Unreleased
+        </p>
+        <h1>Review proposed changes. Keep your work moving.</h1>
         <p class="hero-lede">
-          A framework-neutral causal state kernel with framework-native
-          observation. Keep state, identity, authority, and coherent operations
-          in one model without making a framework realization another store.
+          An agent suggests a new route while a dispatcher receives an update.
+          See what is still proposed, keep independent work flowing, and recover
+          honestly when a rejection cannot safely complete.
         </p>
         <aside class="rewrite-note" aria-label="SignalTree version guidance">
           <p>
@@ -20,8 +22,8 @@
           >
         </aside>
         <div class="hero-actions">
-          <a routerLink="/start" class="action action-primary"
-            >Start building</a
+          <a routerLink="/independent-publication" class="action action-primary"
+            >Try review and recovery</a
           >
           <a routerLink="/why-causality" class="action action-secondary">
             Why causality matters
@@ -38,34 +40,35 @@
   <section class="authority-band" aria-labelledby="authority-title">
     <div class="content-shell">
       <header class="section-heading section-heading-compact">
-        <p>One state authority, three distinct questions</p>
-        <h2 id="authority-title">Know who decided and what observes</h2>
+        <p>One working story, three perspectives</p>
+        <h2 id="authority-title">Understand what the behavior gives you</h2>
       </header>
 
       <div class="authority-grid">
         <article class="authority-item authority-item-authored">
           <p class="item-number">01</p>
-          <h3>Authored work</h3>
+          <h3>For the person using the app</h3>
           <p>
-            Ordinary application writes belong to the operation that made the
-            decision. Restoration designation is optional and separate.
+            A server update survives a local review. A proposal that could not
+            be rejected stays visibly pending, with a recovery step.
           </p>
         </article>
         <article class="authority-item authority-item-external">
           <p class="item-number">02</p>
-          <h3>External truth</h3>
+          <h3>For the developer</h3>
           <p>
-            <code>external()</code> marks values whose decision belonged to
-            another authority. They remain visible and causally relevant.
+            Give each editor an owner. Keep authored changes and external truth
+            explicit, retain pending handles, and test failures as well as
+            success.
           </p>
         </article>
         <article class="authority-item authority-item-framework">
           <p class="item-number">03</p>
-          <h3>Framework-native observation</h3>
+          <h3>For the business</h3>
           <p>
-            Framework realizations receive invalidation and reread canonical
-            truth. They connect the kernel to observation; they do not mirror
-            its state.
+            Build reviewable automation into an operational workflow. Validate
+            reduced rework with real users; this demo does not prove financial
+            savings.
           </p>
         </article>
       </div>
@@ -76,10 +79,11 @@
     <div class="content-shell">
       <header class="section-heading">
         <p>Choose an entry point</p>
-        <h2 id="paths-title">Move from model to evidence</h2>
+        <h2 id="paths-title">Try the behavior, then inspect how it works</h2>
         <span>
-          Start with the question you need answered. Current guidance stays
-          separate from historical release material.
+          Use the working story, read its code and tests, and decide which
+          guarantees your application needs. This preview does not replace v15
+          guidance.
         </span>
       </header>
 
@@ -113,7 +117,7 @@
           <code>.update()</code>; <code>leaf(value)</code> declares where
           traversal stops.
         </p>
-        <a routerLink="/architecture-overview#accessor-grammar">
+        <a routerLink="/architecture-overview" fragment="accessor-grammar">
           See the complete state grammar <span aria-hidden="true">→</span>
         </a>
       </div>

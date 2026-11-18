@@ -1,16 +1,20 @@
 <div class="markers-demo layout-frame">
   <div class="demo-header">
-    <h1>Markers Demo</h1>
+    <h1>Build a keyed collection.</h1>
     <p class="subtitle">
-      The RC public marker surface is intentionally narrow. <code>entityMap()</code>
-      remains public; removed persistence markers are no longer shown as live APIs.
+      Load the sample users to see <code>entityMap()</code> turn keyed records
+      into readable, writable state. Reset clears the collection; the live
+      inspector shows the count and records after each action.
     </p>
   </div>
 
   <st-example
     heading="entityMap() Marker"
     intro="Normalized collection state with granular reads and mutations."
-    [state]="{ count: store.$.users.entities.count(), users: store.$.users.entities.all() }"
+    [state]="{
+      count: store.$.users.entities.count(),
+      users: store.$.users.entities.all()
+    }"
     stateLabel="Collection State"
     [code]="entityMapCodeFiles"
   >
@@ -26,11 +30,11 @@
         </div>
 
         @if (store.$.users.entities.count() > 0) {
-          <ul>
-            @for (user of store.$.users.entities.all(); track user.id) {
-              <li>{{ user.name }} - {{ user.email }}</li>
-            }
-          </ul>
+        <ul>
+          @for (user of store.$.users.entities.all(); track user.id) {
+          <li>{{ user.name }} - {{ user.email }}</li>
+          }
+        </ul>
         }
       </div>
     </div>

@@ -63,7 +63,7 @@ export class NavigationComponent {
         },
         {
           id: 'migration',
-          title: 'Upgrade to v15',
+          title: 'Migration paths',
           route: '/migrate',
         },
       ],
@@ -101,7 +101,7 @@ export class NavigationComponent {
         },
         {
           id: 'independent-publication',
-          title: 'Independent publication · v16 preview',
+          title: 'Review and recovery · v16 preview',
           route: '/independent-publication',
         },
       ],

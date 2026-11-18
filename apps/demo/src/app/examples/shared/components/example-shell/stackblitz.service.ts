@@ -18,10 +18,13 @@ import type { StackblitzConfig } from './example.types';
  */
 @Injectable({ providedIn: 'root' })
 export class StackblitzService {
+  // A local development candidate cannot be resolved by a remote npm scaffold.
+  readonly available = !DEMO_LIBRARY_VERSIONS['signaltree'].includes('-dev');
   /** Angular version line the sandbox pins to (kept close to the demo app). */
   private readonly ngVersion = '^20.3.0';
 
   open(config: StackblitzConfig): void {
+    if (!this.available) return;
     const files = { ...this.baseFiles(config.dependencies), ...config.files };
     sdk.openProject(
       {
@@ -133,7 +136,7 @@ import { AppComponent } from './app/app.component';
       'src/index.html': `<app-root></app-root>`,
       'src/styles.css': `body { font-family: system-ui, sans-serif; margin: 2rem; }`,
       // Sensible placeholder; demos override src/app/app.component.ts.
-      'src/app/app.component.ts': `import { Component } from '@angular/core';
+      'src/app/app.component.ts': `import { Component, DestroyRef, inject } from '@angular/core';
 import { signalTree } from '@signal-tree/angular';
 
 @Component({
@@ -144,6 +147,7 @@ import { signalTree } from '@signal-tree/angular';
 })
 export class AppComponent {
   tree = signalTree({ count: 0 });
+  constructor() { inject(DestroyRef).onDestroy(() => this.tree.destroy()); }
 }
 `,
     };

@@ -2,6 +2,7 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import tsconfigPaths from 'vite-tsconfig-paths';
+import { fileURLToPath } from 'node:url';
 
 export default defineConfig(() => ({
   root: import.meta.dirname,
@@ -28,7 +29,13 @@ export default defineConfig(() => ({
     port: 4200,
     host: 'localhost',
   },
-  plugins: [react(), tsconfigPaths()],
+  plugins: [
+    react(),
+    // Resolve app/spec references without scanning archived audit configs.
+    tsconfigPaths({
+      projects: [fileURLToPath(new URL('./tsconfig.json', import.meta.url))],
+    }),
+  ],
   build: {
     outDir: '../../dist/apps/react-reference',
     emptyOutDir: true,

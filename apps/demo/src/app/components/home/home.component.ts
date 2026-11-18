@@ -32,6 +32,14 @@ interface PackageEntry {
 export class HomeComponent {
   readonly paths: readonly HomeLink[] = [
     {
+      eyebrow: 'See the user experience',
+      title: 'Review a route proposal',
+      description:
+        'Receive an update, send an independent note, encounter a real refusal and recover newest-first.',
+      route: '/independent-publication',
+      action: 'Try the working story',
+    },
+    {
       eyebrow: 'New to SignalTree',
       title: 'Learn the model',
       description:
@@ -67,7 +75,7 @@ export class HomeComponent {
       eyebrow: 'Working from existing code',
       title: 'Plan the migration',
       description:
-        'Map current application responsibilities onto the v15 ownership model without recreating legacy architecture.',
+        'Map application responsibilities to owned state before choosing a version and validating its recovery behavior.',
       route: '/migrate',
       action: 'Open the migration guide',
     },

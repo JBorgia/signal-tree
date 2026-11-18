@@ -55,6 +55,21 @@
             "glob": "persistence-guide.md",
             "input": "docs/guides",
             "output": "assets/docs/guides"
+          },
+          {
+            "glob": "adoption-v16.md",
+            "input": "docs/guides",
+            "output": "assets/docs/guides"
+          },
+          {
+            "glob": "migration-v15-v16.md",
+            "input": "docs/guides",
+            "output": "assets/docs/guides"
+          },
+          {
+            "glob": "llms.txt",
+            "input": ".",
+            "output": ""
           }
         ],
         "styles": ["apps/demo/src/styles.scss"]
@@ -87,7 +102,21 @@
           "extractLicenses": false,
           "sourceMap": true
         }
-      }
+      },
+      "inputs": [
+        "production",
+        "^production",
+        {
+          "runtime": "node tools/demo-source-ref.cjs"
+        },
+        "{workspaceRoot}/tools/demo-source-ref.cjs",
+        "{workspaceRoot}/tools/generate-version-env.cjs",
+        "{workspaceRoot}/llms.txt",
+        "{workspaceRoot}/docs/guides/adoption-v16.md",
+        "{workspaceRoot}/docs/guides/migration-v15-v16.md",
+        "{workspaceRoot}/docs/guides/composition-recipes.md",
+        "{workspaceRoot}/docs/guides/persistence-guide.md"
+      ]
     },
     "serve": {
       "continuous": true,
@@ -114,7 +143,7 @@
     "test": {
       "executor": "@nx/jest:jest",
       "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
-      "dependsOn": ["generate-deep-typing-proofs"],
+      "dependsOn": ["generate-versions", "generate-deep-typing-proofs"],
       "options": {
         "jestConfig": "apps/demo/jest.config.ts",
         "passWithNoTests": true,
@@ -125,7 +154,8 @@
       "executor": "nx:run-commands",
       "options": {
         "command": "node tools/generate-version-env.cjs"
-      }
+      },
+      "cache": false
     },
     "generate-deep-typing-proofs": {
       "executor": "nx:run-commands",

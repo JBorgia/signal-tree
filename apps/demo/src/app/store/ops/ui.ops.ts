@@ -8,7 +8,7 @@ import { APP_TREE } from '../tree';
  * Pure-sync mutations for cross-cutting UI flags. Kept as an ops service so
  * components stay consistent — every write goes through `store.ops.*`.
  */
-@Injectable({ providedIn: 'root' })
+@Injectable()
 export class UiOps {
   private readonly _$ = inject(APP_TREE).$;
 

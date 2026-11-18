@@ -64,9 +64,15 @@
         </p>
       </div>
       <div class="direction-ledger">
-        <div><span>Application</span><strong>fetch / switchMap / retry</strong></div>
-        <div><span>Boundary</span><strong>external(() =&gt; write)</strong></div>
-        <div><span>SignalTree</span><strong>records external ingress</strong></div>
+        <div>
+          <span>Application</span><strong>fetch / switchMap / retry</strong>
+        </div>
+        <div>
+          <span>Boundary</span><strong>external(() =&gt; write)</strong>
+        </div>
+        <div>
+          <span>SignalTree</span><strong>records external ingress</strong>
+        </div>
       </div>
     </st-example>
 
@@ -83,27 +89,50 @@
         </p>
       </div>
       <div class="link-map" aria-label="Link directions">
-        <div><strong>State location</strong><code>tree.$.preferences</code></div>
-        <div class="link-node"><strong>Link</strong><span>authority-preserving</span></div>
+        <div>
+          <strong>State location</strong><code>tree.$.preferences</code>
+        </div>
+        <div class="link-node">
+          <strong>Link</strong><span>authority-preserving</span>
+        </div>
         <div><strong>Endpoint</strong><code>API / storage / socket</code></div>
       </div>
       <dl class="link-directions">
-        <div><dt>get</dt><dd>endpoint &rarr; state through <code>retrieve()</code></dd></div>
-        <div><dt>set</dt><dd>state &rarr; endpoint after settled turns</dd></div>
-        <div><dt>subscribe</dt><dd>endpoint &rarr; state as live pushes arrive</dd></div>
+        <div>
+          <dt>get</dt>
+          <dd>endpoint &rarr; state through <code>retrieve()</code></dd>
+        </div>
+        <div>
+          <dt>set</dt>
+          <dd>state &rarr; endpoint after settled turns</dd>
+        </div>
+        <div>
+          <dt>subscribe</dt>
+          <dd>endpoint &rarr; state as live pushes arrive</dd>
+        </div>
       </dl>
       <p class="handle-contract">
-        The Link handle is deliberately small: <code>retrieve()</code>,
-        <code>settled()</code>, and <code>dispose()</code>. Retry, backoff, and
-        status APIs are not part of it.
+        The Link handle offers <code>retrieve()</code>,
+        <code>settled()</code> and <code>dispose()</code>. In this v16 preview,
+        <code>declare()</code>
+        also makes publication inputs explicit; its receipt is readable status,
+        not a backend acknowledgment. Try the
+        <a href="/independent-publication"
+          >review and independent-publication story</a
+        >. Retry and backoff remain application policy.
       </p>
     </st-example>
   </section>
 
-  <section class="orchestration-section" aria-labelledby="orchestration-heading">
+  <section
+    class="orchestration-section"
+    aria-labelledby="orchestration-heading"
+  >
     <header>
       <p class="eyebrow">Application-owned orchestration</p>
-      <h2 id="orchestration-heading">HTTP policy does not move into the tree.</h2>
+      <h2 id="orchestration-heading">
+        HTTP policy does not move into the tree.
+      </h2>
       <p>
         Debounce, deduplication, cancellation, latest-wins behavior, retries,
         loading state, and error presentation remain application concerns.
@@ -111,7 +140,11 @@
         the resulting state transition.
       </p>
     </header>
-    <st-example heading="Input-driven search" [headingLevel]="2" [code]="orchestrationCode">
+    <st-example
+      heading="Input-driven search"
+      [headingLevel]="2"
+      [code]="orchestrationCode"
+    >
       <div class="pipeline" aria-label="Search ownership pipeline">
         <span>User input</span>
         <span>debounceTime</span>

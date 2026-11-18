@@ -1,4 +1,8 @@
-import { Component, ChangeDetectionStrategy } from '@angular/core';
+import {
+  Component,
+  ChangeDetectionStrategy,
+  type OnDestroy,
+} from '@angular/core';
 import { entityMap, signalTree } from '@signal-tree/angular';
 
 import { ExampleComponent } from '../../../../shared/components/example-shell';
@@ -29,39 +33,39 @@ interface LeaderboardState {
   imports: [ExampleComponent],
   template: `
     <div class="layout-frame">
-    <st-example
-      heading="Auto-sorted collection — sortComparer"
-      [headingLevel]="1"
-    >
-      <p intro class="muted">
-        <code
-          >entityMap&lt;Player&gt;({{ '{' }} sortComparer: (a, b) =&gt; b.score
-          - a.score {{ '}' }})</code
-        >
-        keeps <code>all()</code> highest-score-first on every read.
-      </p>
-
-      <div class="demo">
-        <div class="controls">
-          <button type="button" (click)="addRandom()">+ Add player</button>
-          <button type="button" (click)="bumpRandom()">↑ Bump a score</button>
-          <button type="button" (click)="reset()">Reset</button>
-        </div>
-
-        <ol class="board">
-          @for (p of players(); track p.id) {
-          <li>
-            <span class="rank">#{{ $index + 1 }}</span>
-            <span class="name">{{ p.name }}</span>
-            <span class="score">{{ p.score }}</span>
-          </li>
-          }
-        </ol>
-        <p class="muted">
-          Rows reorder automatically — no manual sort runs after mutations.
+      <st-example
+        heading="Auto-sorted collection — sortComparer"
+        [headingLevel]="1"
+      >
+        <p intro class="muted">
+          <code
+            >entityMap&lt;Player&gt;({{ '{' }} sortComparer: (a, b) =&gt;
+            b.score - a.score {{ '}' }})</code
+          >
+          keeps <code>all()</code> highest-score-first on every read.
         </p>
-      </div>
-    </st-example>
+
+        <div class="demo">
+          <div class="controls">
+            <button type="button" (click)="addRandom()">+ Add player</button>
+            <button type="button" (click)="bumpRandom()">↑ Bump a score</button>
+            <button type="button" (click)="reset()">Reset</button>
+          </div>
+
+          <ol class="board">
+            @for (p of players(); track p.id) {
+            <li>
+              <span class="rank">#{{ $index + 1 }}</span>
+              <span class="name">{{ p.name }}</span>
+              <span class="score">{{ p.score }}</span>
+            </li>
+            }
+          </ol>
+          <p class="muted">
+            Rows reorder automatically — no manual sort runs after mutations.
+          </p>
+        </div>
+      </st-example>
     </div>
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -109,7 +113,7 @@ interface LeaderboardState {
     `,
   ],
 })
-export class EntitySortComparerDemoComponent {
+export class EntitySortComparerDemoComponent implements OnDestroy {
   private nextId = 5;
   private readonly names = [
     'Ada',
@@ -167,5 +171,9 @@ export class EntitySortComparerDemoComponent {
       { id: 4, name: 'Euler', score: 60 },
     ]);
     this.nextId = 5;
+  }
+
+  ngOnDestroy(): void {
+    this.store.destroy();
   }
 }

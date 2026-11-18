@@ -1,4 +1,9 @@
-import { Component, computed, ChangeDetectionStrategy } from '@angular/core';
+import {
+  Component,
+  computed,
+  ChangeDetectionStrategy,
+  type OnDestroy,
+} from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { devTools, signalTree } from '@signal-tree/angular';
 
@@ -27,7 +32,6 @@ interface StateSnapshot {
 interface ActionRecord {
   name: string;
   timestamp: number;
-  duration: number;
   action: () => void;
 }
 
@@ -71,7 +75,10 @@ store.$.todos.update((todos) => [
   changeDetection: ChangeDetectionStrategy.OnPush,
   styleUrl: './devtools-demo.component.scss',
 })
-export class DevtoolsDemoComponent {
+export class DevtoolsDemoComponent implements OnDestroy {
+  private destroyed = false;
+  private replayTimer: ReturnType<typeof setTimeout> | undefined;
+  private finishReplayDelay: (() => void) | undefined;
   newTodoText = '';
   lastAction = 'Initial state';
 
@@ -128,17 +135,23 @@ export class DevtoolsDemoComponent {
 
   // Counter actions
   increment() {
-    this.store.$.counter.update((c) => c + 1);
+    const action = () => this.store.$.counter.update((c) => c + 1);
+    action();
+    this.recordAction('Increment counter', action);
     this.lastAction = 'Increment counter';
   }
 
   decrement() {
-    this.store.$.counter.update((c) => c - 1);
+    const action = () => this.store.$.counter.update((c) => c - 1);
+    action();
+    this.recordAction('Decrement counter', action);
     this.lastAction = 'Decrement counter';
   }
 
   reset() {
-    this.store.$.counter.set(0);
+    const action = () => this.store.$.counter.set(0);
+    action();
+    this.recordAction('Reset counter', action);
     this.lastAction = 'Reset counter';
   }
 
@@ -270,27 +283,37 @@ export class DevtoolsDemoComponent {
   }
 
   // Action History & Replay methods
-  private recordAction(name: string, action: () => void, duration = 0) {
+  private recordAction(name: string, action: () => void) {
     this.actionHistory.push({
       name,
       timestamp: Date.now(),
-      duration,
       action,
     });
   }
 
   async replayActions() {
-    if (this.actionHistory.length === 0 || this.replaying) return;
+    if (this.destroyed || this.actionHistory.length === 0 || this.replaying)
+      return;
 
     this.replaying = true;
     this.lastAction = 'Replaying all actions...';
 
-    for (let i = 0; i < this.actionHistory.length; i++) {
-      const action = this.actionHistory[i];
+    // Capture this replay request. New clicks cannot extend an active replay.
+    const actions = [...this.actionHistory];
+    for (const action of actions) {
+      if (this.destroyed) return;
       action.action();
-      await new Promise((resolve) => setTimeout(resolve, 300)); // Delay between actions
+      await new Promise<void>((resolve) => {
+        this.finishReplayDelay = resolve;
+        this.replayTimer = setTimeout(() => {
+          this.replayTimer = undefined;
+          this.finishReplayDelay = undefined;
+          resolve();
+        }, 300);
+      });
     }
 
+    if (this.destroyed) return;
     this.replaying = false;
     this.lastAction = 'Replay completed';
   }
@@ -311,5 +334,19 @@ export class DevtoolsDemoComponent {
   formatTimestamp(timestamp: number): string {
     const date = new Date(timestamp);
     return date.toLocaleTimeString();
+  }
+
+  ngOnDestroy(): void {
+    this.destroyed = true;
+    clearTimeout(this.replayTimer);
+    this.replayTimer = undefined;
+    // Release the paused replay as well as its timer. Its next step sees
+    // destroyed and returns without touching the closed tree.
+    this.finishReplayDelay?.();
+    this.finishReplayDelay = undefined;
+    this.actionHistory = [];
+    this.snapshots = [];
+    this.replaying = false;
+    this.store.destroy();
   }
 }

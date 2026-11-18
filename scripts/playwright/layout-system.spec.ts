@@ -2,6 +2,8 @@ import { expect, test } from '@playwright/test';
 
 const FRAME_ROUTES = [
   '/start',
+  '/frameworks',
+  '/independent-publication',
   '/external-truth',
   '/examples/fundamentals',
   '/batching',

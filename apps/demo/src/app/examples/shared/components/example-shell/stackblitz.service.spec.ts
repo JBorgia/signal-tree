@@ -1,5 +1,7 @@
 import sdk from '@stackblitz/sdk';
 
+import { DEMO_LIBRARY_VERSIONS } from '../../../../library-versions';
+
 import { StackblitzService } from './stackblitz.service';
 
 jest.mock('@stackblitz/sdk', () => ({
@@ -8,13 +10,29 @@ jest.mock('@stackblitz/sdk', () => ({
 }));
 
 describe('StackblitzService', () => {
-  it('opens a zoneless Angular project without a Zone.js runtime dependency', () => {
+  const candidate = DEMO_LIBRARY_VERSIONS['signaltree'];
+  afterEach(() => {
+    DEMO_LIBRARY_VERSIONS['signaltree'] = candidate;
+    jest.clearAllMocks();
+  });
+
+  it('does not offer an unresolved development candidate as a runnable remote project', () => {
+    DEMO_LIBRARY_VERSIONS['signaltree'] = '16.0.0-dev';
     const service = new StackblitzService();
+    expect(service.available).toBe(false);
+    service.open({ title: 'Candidate', files: {} });
+    expect(sdk.openProject).not.toHaveBeenCalled();
+  });
+  it('opens a zoneless Angular project without a Zone.js runtime dependency', () => {
+    // Fixture models a published version; candidate access is tested separately.
+    DEMO_LIBRARY_VERSIONS['signaltree'] = '15.4.8';
+    const service = new StackblitzService();
+    expect(service.available).toBe(true);
 
     service.open({
       title: 'Example',
       files: {
-        'src/app/app.component.ts': 'export class AppComponent {}',
+        'src/extra.ts': 'export const extra = true;',
       },
     });
 
@@ -25,6 +43,10 @@ describe('StackblitzService', () => {
     };
 
     expect(manifest.dependencies['zone.js']).toBeUndefined();
+    expect(manifest.dependencies['@signal-tree/angular']).toBe('15.4.8');
+    expect(project.files['src/app/app.component.ts']).toContain(
+      'onDestroy(() => this.tree.destroy())'
+    );
     expect(project.files['src/main.ts']).toContain(
       'provideZonelessChangeDetection()'
     );

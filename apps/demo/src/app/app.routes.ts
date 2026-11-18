@@ -6,9 +6,9 @@ export const appRoutes: Route[] = [
     loadComponent: () =>
       import('./components/home/home.component').then((c) => c.HomeComponent),
     data: {
-      title: 'Update one field. Keep the rest intact',
+      title: 'Review proposed changes · v16 development preview',
       description:
-        'Typed reactive state for nested data and live collections. Try SignalTree, compare workloads, and start with Angular, Vue, Solid, React, or TypeScript.',
+        'Try pending review, independent work, refused rollback and explicit recovery with the unreleased v16 candidate.',
     },
   },
 
@@ -85,9 +85,9 @@ export const appRoutes: Route[] = [
   {
     path: 'independent-publication',
     loadComponent: () =>
-      import('./pages/independent-publication/independent-publication.component').then(
-        (c) => c.IndependentPublicationComponent
-      ),
+      import(
+        './pages/independent-publication/independent-publication.component'
+      ).then((c) => c.IndependentPublicationComponent),
     data: {
       title: 'Independent publication · v16 development preview (unreleased)',
       description:
@@ -230,7 +230,7 @@ export const appRoutes: Route[] = [
     data: {
       title: 'Recommended architecture',
       description:
-        'The recommended SignalTree pattern: one runtime tree, typed feature slices, and root-level enhancers.',
+        'Own a feature tree and its operations together; release the owner on navigation and isolate independent editors.',
     },
   },
   {
@@ -248,9 +248,9 @@ export const appRoutes: Route[] = [
         (c) => c.MigrationRecipeComponent
       ),
     data: {
-      title: 'Migrate from NgRx',
+      title: 'Migration paths · owned state and v16 review',
       description:
-        'How to migrate an NgRx codebase to SignalTree: actions become operations, reducers become callable derivations, selectors become computed values.',
+        'Map existing state responsibilities, preserve business behavior and evaluate v16 pending-review guarantees with exact candidate packages.',
     },
   },
   // Performance comparisons
@@ -314,7 +314,7 @@ export const appRoutes: Route[] = [
     data: {
       title: 'Architecture overview',
       description:
-        'Verified SignalTree v15 ownership, state grammar, causal authority, operation coherence, entity identity, Link, and explanation boundaries.',
+        'Established v15 architecture foundations, with links to the additional pending-review and publication contracts in the v16 candidate.',
     },
   },
   // Backwards-compat redirect from the old path

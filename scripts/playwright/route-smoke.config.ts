@@ -10,6 +10,12 @@
  */
 import { defineConfig } from '@playwright/test';
 
+// Separate local worktrees must serve their own artifacts during validation.
+const port = Number(process.env['DEMO_PORT'] ?? '4173');
+if (!Number.isInteger(port) || port < 1024 || port > 65535)
+  throw new Error('DEMO_PORT must be an integer between 1024 and 65535');
+const baseURL = `http://127.0.0.1:${port}`;
+
 export default defineConfig({
   testDir: '.',
   testMatch: [
@@ -30,15 +36,15 @@ export default defineConfig({
   // would fail pre-publish validation's clean-working-dir gate.
   outputDir: '../../test-results/route-smoke',
   use: {
-    baseURL: 'http://127.0.0.1:4173',
+    baseURL,
     browserName: 'chromium',
     trace: 'retain-on-failure',
     screenshot: 'only-on-failure',
   },
   webServer: {
-    command: 'node scripts/playwright/serve-dist.mjs 4173',
+    command: `node scripts/playwright/serve-dist.mjs ${port}`,
     cwd: '../..',
-    url: 'http://127.0.0.1:4173',
+    url: baseURL,
     reuseExistingServer: !process.env['CI'],
     timeout: 30_000,
   },

@@ -13,7 +13,7 @@ import { APP_TREE } from '../tree';
  *   - hit the API
  *   - write the result back through entityMap
  */
-@Injectable({ providedIn: 'root' })
+@Injectable()
 export class PostOps {
   private readonly _api = inject(ApiService);
   private readonly _$ = inject(APP_TREE).$;

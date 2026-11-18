@@ -1,21 +1,36 @@
-<main class="architecture-overview">
+<article class="architecture-overview">
   <header class="architecture-hero">
     <div class="hero-copy">
-      <p class="hero-eyebrow">Verified architecture · v15</p>
+      <p class="hero-eyebrow">Established foundations · v15 reference</p>
       <h1>SignalTree v15 architecture</h1>
       <p class="hero-lede">
         A framework-neutral causal state kernel with framework-native
         observation. State authority stays in one place while framework
         realizations and plain TypeScript meet it on their own terms.
       </p>
+      <p>
+        These diagrams describe the established v15 foundations. This site is a
+        v16 development preview: its additional pending-review and publication
+        contracts are explained in the
+        <a href="/docs?package=migration-v15-v16">v16 migration guide</a> and
+        <a href="/independent-publication">working review story</a>.
+      </p>
     </div>
 
     <nav class="architecture-nav" aria-label="Architecture sections">
-      <a href="#package-ownership">Ownership</a>
-      <a href="#accessor-grammar">State grammar</a>
-      <a href="#causal-authority">Causality</a>
-      <a href="#entity-identity">Identity</a>
-      <a href="#link">Link</a>
+      <a routerLink="/architecture-overview" fragment="package-ownership"
+        >Ownership</a
+      >
+      <a routerLink="/architecture-overview" fragment="accessor-grammar"
+        >State grammar</a
+      >
+      <a routerLink="/architecture-overview" fragment="causal-authority"
+        >Causality</a
+      >
+      <a routerLink="/architecture-overview" fragment="entity-identity"
+        >Identity</a
+      >
+      <a routerLink="/architecture-overview" fragment="link">Link</a>
     </nav>
   </header>
 
@@ -104,4 +119,4 @@
       <app-architecture-diagram [diagram]="projection" />
     </div>
   </section>
-</main>
+</article>

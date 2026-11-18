@@ -14,7 +14,7 @@ describe('HomeComponent', () => {
     }).compileComponents();
   });
 
-  it('opens with the verified v15 mental model and current ST mark', () => {
+  it('opens with an explicitly unreleased review story and audience perspectives', () => {
     const fixture = TestBed.createComponent(HomeComponent);
     fixture.detectChanges();
     const text = renderedText(fixture.nativeElement);
@@ -22,13 +22,24 @@ describe('HomeComponent', () => {
       '[data-brand-mark]'
     ) as HTMLImageElement | null;
 
-    expect(text).toContain('State authority without state ceremony');
-    expect(text).toContain('Authored work');
-    expect(text).toContain('External truth');
-    expect(text).toContain('Framework-native observation');
+    expect(
+      fixture.nativeElement
+        .querySelector('a[fragment="accessor-grammar"]')
+        ?.getAttribute('href')
+    ).toBe('/architecture-overview#accessor-grammar');
+    expect(text).toContain('v16 development preview · Unreleased');
+    expect(text).toContain('Review proposed changes. Keep your work moving.');
+    expect(text).toContain('For the person using the app');
+    expect(text).toContain('For the developer');
+    expect(text).toContain('For the business');
     expect(text).toContain('See why causality compounds');
     expect(mark?.getAttribute('src')).toBe('/signaltree-mark.png');
     expect(mark?.getAttribute('alt')).toBe('SignalTree');
+    expect(
+      fixture.nativeElement
+        .querySelector('.action-primary')
+        ?.getAttribute('href')
+    ).toBe('/independent-publication');
   });
 
   it('promotes the causal value case from the first viewport', () => {

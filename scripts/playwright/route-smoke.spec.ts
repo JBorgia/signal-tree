@@ -19,8 +19,29 @@
  * assertion by design.
  */
 import { expect, test } from '@playwright/test';
+import { existsSync, readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
 
 import { DEMO_ROUTES } from './demo-routes';
+import { appRoutes } from '../../apps/demo/src/app/app.routes';
+
+const distRoot = resolve(
+  process.cwd(),
+  process.env['DEMO_DIST'] ?? 'dist/apps/demo/browser'
+);
+const hosting = JSON.parse(
+  readFileSync(resolve(process.cwd(), 'vercel.json'), 'utf8')
+);
+const legacyArchiveConfigured = hosting.routes.some(
+  (route: { src?: string; dest?: string }) =>
+    route.src === '/v14(?:/.*)?' && route.dest === '/v14/index.html'
+);
+
+const validInternalPaths = new Set(
+  appRoutes
+    .filter((route) => typeof route.path === 'string' && route.path !== '**')
+    .map((route) => '/' + route.path)
+);
 
 // Noise that is not a product bug and would make the gate flaky.
 const IGNORED_ERROR_PATTERNS = [/favicon/i];
@@ -59,9 +80,14 @@ for (const route of DEMO_ROUTES) {
 
     // The SPA booted and the lazy route chunk rendered something real.
     await expect(
-      page.locator('h1, main').first(),
-      `no visible h1/main on ${route}`
+      page.getByRole('main').locator('h1').first(),
+      `no visible route heading on ${route}`
     ).toBeVisible({ timeout: 20_000 });
+
+    await expect(
+      page.getByRole('main'),
+      `one main landmark on ${route}`
+    ).toHaveCount(1);
 
     // STRICT: the router landed on the exact path we asked for. A removed or
     // renamed route hits the `**` wildcard and redirects to '' (home) — the
@@ -74,6 +100,34 @@ for (const route of DEMO_ROUTES) {
       landed,
       `route ${route} redirected to '${landed}' — it was renamed/removed (the ** wildcard sent it home), or the path in this list is stale`
     ).toBe(expected);
+
+    const internalLinks = await page.locator('a[href]').evaluateAll((anchors) =>
+      anchors
+        .map(
+          (anchor) => new URL((anchor as HTMLAnchorElement).href, location.href)
+        )
+        .filter(
+          (url) =>
+            url.origin === location.origin &&
+            !url.pathname.startsWith('/assets/') &&
+            url.pathname !== '/llms.txt'
+        )
+        .map((url) => url.pathname)
+    );
+    expect(internalLinks.length).toBeGreaterThan(0);
+    for (const path of internalLinks) {
+      // The preserved v14 site is assembled by build-demo-site.mjs and checked
+      // by hosting qualification, outside this current-app Nx artifact.
+      if (path === '/v14' || path.startsWith('/v14/')) {
+        expect(legacyArchiveConfigured).toBe(true);
+        continue;
+      }
+      expect(
+        validInternalPaths.has(path) ||
+          existsSync(resolve(distRoot, path.slice(1))),
+        `broken internal link from ${route} to ${path}`
+      ).toBe(true);
+    }
 
     expect(
       errors,
@@ -254,4 +308,14 @@ test('/deep-typing: selected compiled depth generates and passes runtime checks'
   await expect(page.locator('#typing-depth-help')).toHaveText(
     'Enter a whole number from 1 to 40.'
   );
+});
+
+test('the browser inventory covers every routed component exactly once', () => {
+  const componentRoutes = appRoutes
+    .filter((route) => route.loadComponent)
+    .map((route) => '/' + route.path)
+    .sort();
+  expect(componentRoutes.length).toBeGreaterThan(0);
+  expect([...DEMO_ROUTES].sort()).toEqual(componentRoutes);
+  expect(new Set(DEMO_ROUTES).size).toBe(DEMO_ROUTES.length);
 });

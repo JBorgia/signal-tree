@@ -7,11 +7,14 @@ import {
 } from '@angular/core';
 import {
   link,
+  external,
   SignalTreePublicationError,
+  SignalTreeRollbackError,
   signalTree,
   transactions,
   type PendingTransaction,
   type PublicationState,
+  type TransactionInspection,
 } from '@signal-tree/angular';
 
 @Component({
@@ -23,39 +26,145 @@ import {
 })
 export class IndependentPublicationComponent implements OnDestroy {
   readonly tree = signalTree(
-    { route: 'north', note: '' },
+    { route: 'north', note: '', shipment: 'Ready' },
     { enhancers: [transactions()] }
   );
   readonly deliveredNotes = signal<readonly string[]>([]);
   readonly noteConnection = link(this.tree.$.note, {
     set: (value) => this.deliveredNotes.update((notes) => [...notes, value]),
   });
+  readonly deliveredRoutes = signal<readonly string[]>([]);
+  readonly routeConnection = link(this.tree.$.route, {
+    set: (value) => this.deliveredRoutes.update((routes) => [...routes, value]),
+  });
   private readonly proposal = signal<PendingTransaction | undefined>(undefined);
+  private readonly newerProposal = signal<PendingTransaction | undefined>(
+    undefined
+  );
   private destroyed = false;
   readonly hasPending = computed(() => this.proposal() !== undefined);
+  readonly hasNewerPending = computed(() => this.newerProposal() !== undefined);
+  readonly review = signal<TransactionInspection['changes']>([]);
+  readonly recovery = signal('No recovery needed');
   readonly decision = signal('Not proposed');
   readonly publishing = signal(false);
   readonly admission = signal<PublicationState | undefined>(undefined);
   readonly error = signal<string | undefined>(undefined);
 
   proposeWest(): void {
-    if (this.destroyed || this.hasPending() || this.publishing()) return;
+    if (
+      this.destroyed ||
+      this.hasPending() ||
+      this.publishing() ||
+      this.tree.$.route() !== 'north'
+    )
+      return;
     this.proposal.set(this.tree.transact(() => this.tree.$.route.set('west')));
     this.decision.set('Pending local review');
+    this.refreshReview();
+  }
+
+  async resetScenario(): Promise<void> {
+    // Reset is a local teaching action, never a way to discard unresolved owners.
+    if (
+      this.destroyed ||
+      this.hasPending() ||
+      this.hasNewerPending() ||
+      this.publishing()
+    )
+      return;
+    this.publishing.set(true);
+    try {
+      await Promise.all([
+        this.routeConnection.settled(),
+        this.noteConnection.settled(),
+      ]);
+      if (this.destroyed) return;
+      external(() => {
+        this.tree.$.route.set('north');
+        this.tree.$.note.set('');
+        this.tree.$.shipment.set('Ready');
+      });
+      this.deliveredRoutes.set([]);
+      this.deliveredNotes.set([]);
+      this.admission.set(undefined);
+      this.error.set(undefined);
+      this.decision.set('Not proposed');
+      this.recovery.set('No recovery needed');
+      this.refreshReview();
+    } finally {
+      if (!this.destroyed) this.publishing.set(false);
+    }
   }
 
   confirm(): void {
-    if (this.destroyed || this.publishing() || !this.hasPending()) return;
+    if (
+      this.destroyed ||
+      this.publishing() ||
+      !this.hasPending() ||
+      this.hasNewerPending()
+    )
+      return;
     this.proposal()?.confirm();
     this.proposal.set(undefined);
     this.decision.set('Confirmed locally');
+    this.refreshReview();
   }
 
   reject(): void {
     if (this.destroyed || this.publishing() || !this.hasPending()) return;
-    this.proposal()?.rollback();
-    this.proposal.set(undefined);
-    this.decision.set('Rejected locally');
+    try {
+      this.proposal()?.rollback();
+      this.proposal.set(undefined);
+      this.decision.set('Rejected locally');
+      this.recovery.set('Review complete; unrelated work remains');
+    } catch (error) {
+      if (!(error instanceof SignalTreeRollbackError)) throw error;
+      // A real refusal leaves the original handle owned and available. Do not
+      // clear it or tell the user the proposal was rejected successfully.
+      this.decision.set('Still pending · rejection refused');
+      this.recovery.set(
+        'Resolve the newer route proposal, then retry rejection'
+      );
+    }
+    this.refreshReview();
+  }
+
+  receiveShipment(): void {
+    if (this.destroyed || this.publishing()) return;
+    external(() => this.tree.$.shipment.set('Shipped'));
+    this.refreshReview();
+  }
+
+  proposeEast(): void {
+    if (
+      this.destroyed ||
+      this.publishing() ||
+      !this.hasPending() ||
+      this.hasNewerPending()
+    )
+      return;
+    this.newerProposal.set(
+      this.tree.transact(() => this.tree.$.route.set('east'))
+    );
+    this.recovery.set(
+      'Two route proposals are pending; resolve the newer one first'
+    );
+    this.refreshReview();
+  }
+
+  rejectNewer(): void {
+    if (this.destroyed || this.publishing() || !this.hasNewerPending()) return;
+    this.newerProposal()?.rollback();
+    this.newerProposal.set(undefined);
+    this.recovery.set('Newer proposal rejected; retry the original rejection');
+    this.refreshReview();
+  }
+
+  private refreshReview(): void {
+    // inspect() is a current snapshot. Explicitly resample after each action;
+    // the UI does not treat it as a signal, authorization or a value snapshot.
+    this.review.set(this.proposal()?.inspect().changes ?? []);
   }
 
   async publishIndependentNote(): Promise<void> {
@@ -79,7 +188,9 @@ export class IndependentPublicationComponent implements OnDestroy {
         this.error.set(
           error instanceof SignalTreePublicationError
             ? `${error.message} (${error.stage}: ${error.reason})`
-            : error instanceof Error ? error.message : String(error)
+            : error instanceof Error
+            ? error.message
+            : String(error)
         );
       }
     } finally {
@@ -91,6 +202,7 @@ export class IndependentPublicationComponent implements OnDestroy {
     if (this.destroyed) return;
     this.destroyed = true;
     this.noteConnection.dispose();
+    this.routeConnection.dispose();
     this.tree.destroy();
   }
 

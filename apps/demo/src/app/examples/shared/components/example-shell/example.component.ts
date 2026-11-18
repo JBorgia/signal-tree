@@ -40,17 +40,15 @@ import { StateInspectorComponent } from './state-inspector.component';
   template: `
     <section class="st-example">
       <header class="st-example__header">
-        @if (heading()) {
-          @if (headingLevel() === 1) {
-            <h1 class="st-example__heading">{{ heading() }}</h1>
-          } @else {
-            <h2 class="st-example__heading">{{ heading() }}</h2>
-          }
-        }
+        @if (heading()) { @if (headingLevel() === 1) {
+        <h1 class="st-example__heading">{{ heading() }}</h1>
+        } @else {
+        <h2 class="st-example__heading">{{ heading() }}</h2>
+        } }
         <div class="st-example__intro">
           <ng-content select="[intro]"></ng-content>
           @if (intro()) {
-            <p>{{ intro() }}</p>
+          <p>{{ intro() }}</p>
           }
         </div>
       </header>
@@ -60,40 +58,45 @@ import { StateInspectorComponent } from './state-inspector.component';
       </div>
 
       @if (state() !== undefined || emissions() !== null) {
-        <div class="st-example__reactive">
-          @if (state() !== undefined) {
-            <div class="st-example__panel">
-              <st-state-inspector
-                [value]="state()"
-                [label]="stateLabel()"
-              />
-            </div>
-          }
-          @if (emissions() !== null) {
-            <div class="st-example__panel">
-              <p class="st-example__panel-label">Emissions</p>
-              <st-emission-log [entries]="emissions() ?? []" />
-            </div>
+      <div class="st-example__reactive">
+        @if (state() !== undefined) {
+        <div class="st-example__panel">
+          <st-state-inspector [value]="state()" [label]="stateLabel()" />
+        </div>
+        } @if (emissions() !== null) {
+        <div class="st-example__panel">
+          <p class="st-example__panel-label">Emissions</p>
+          <st-emission-log [entries]="emissions() ?? []" />
+        </div>
+        }
+      </div>
+      } @if (code().length) {
+      <div class="st-example__code">
+        <div class="st-example__code-head">
+          <h3 class="st-example__code-title">Source</h3>
+          @if (stackblitz()) {
+          <button
+            class="st-example__edit"
+            type="button"
+            [disabled]="!playgroundAvailable"
+            (click)="openStackblitz()"
+          >
+            {{
+              playgroundAvailable
+                ? 'Edit in StackBlitz ↗'
+                : 'Playground needs a release'
+            }}
+          </button>
           }
         </div>
-      }
-
-      @if (code().length) {
-        <div class="st-example__code">
-          <div class="st-example__code-head">
-            <h3 class="st-example__code-title">Source</h3>
-            @if (stackblitz()) {
-              <button
-                class="st-example__edit"
-                type="button"
-                (click)="openStackblitz()"
-              >
-                Edit in StackBlitz ↗
-              </button>
-            }
-          </div>
-          <st-code-tabs [files]="code()" />
-        </div>
+        @if (stackblitz() && !playgroundAvailable) {
+        <p>
+          Unreleased candidate: copy the checked source below and use the
+          qualified local packages.
+        </p>
+        }
+        <st-code-tabs [files]="code()" />
+      </div>
       }
     </section>
   `,
@@ -101,6 +104,7 @@ import { StateInspectorComponent } from './state-inspector.component';
 })
 export class ExampleComponent {
   private readonly stackblitz_ = inject(StackblitzService);
+  readonly playgroundAvailable = this.stackblitz_.available;
 
   readonly heading = input<string>('');
   /**

@@ -5,6 +5,19 @@ React, Vue and Solid facades. Use one framework facade for application state.
 The candidate remains unreleased; consult [the release controller](../../RELEASE-CURRENT.md)
 for the exact qualified version and current follow-through work.
 
+Start with [one owned workflow](adoption-v16.md). The executable
+[route-review story](../../apps/demo/src/app/pages/independent-publication/independent-publication.component.ts)
+shows what the additional contract looks like to a user: ordinary external work
+survives review, a real refused rollback stays pending, and newer overlapping work
+is settled before retrying the older rejection. Its endpoint is deliberately in
+memory; keep backend authority and durable reconciliation in the application.
+
+Preserve the existing feature's business tests before adding the stronger
+behavior. Passing those tests after a method rename does not by itself verify
+new pending/publication/recovery requirements. There is no measured migration-time
+promise and no qualified mixed-major runtime bridge. Independent versions must
+not exchange live trees, entity or pending handles, enhancers or Link sources.
+
 ## Rename the transaction entry point
 
 Change `tree.transaction(callback)` to `tree.transact(callback)` wherever the

@@ -7,6 +7,7 @@ import { provideRouter, RouterLink } from '@angular/router';
 
 import { appRoutes } from '../app.routes';
 import { DocumentationComponent } from './documentation/documentation.component';
+import { FrameworksComponent } from './frameworks/frameworks.component';
 import { StartHereComponent } from './start-here/start-here.component';
 import { WhyCausalityComponent } from './why-causality/why-causality.component';
 
@@ -20,9 +21,8 @@ import { WhyCausalityComponent } from './why-causality/why-causality.component';
  * RouterLink directive instance, and asserts the resolved href matches a
  * path that actually exists in app.routes.ts.
  *
- * One shared spec instead of duplicating the same loop in every page spec —
- * architecture-overview carries no routerLinks at all
- * (verified by inspection) so they're not listed here. realistic-benchmark-history
+ * One shared spec instead of duplicating the same loop in every page spec.
+ * Whole-route browser checks cover the remaining pages. realistic-benchmark-history
  * has exactly one routerLink but it only renders in the zero-results empty
  * state, so that one is asserted inline in its own spec instead.
  */
@@ -45,6 +45,30 @@ function routerLinkTargets(fixture: ComponentFixture<unknown>): string[] {
 }
 
 describe('demo content pages: every routerLink resolves to a real route', () => {
+  it('framework setup links select the matching guide and React uses its callable writer', async () => {
+    await TestBed.configureTestingModule({
+      imports: [FrameworksComponent],
+      providers: [provideRouter([])],
+    }).compileComponents();
+    const fixture = TestBed.createComponent(FrameworksComponent);
+    fixture.detectChanges();
+    const cards = fixture.nativeElement.querySelectorAll('.framework-card');
+    expect(cards).toHaveLength(4);
+    fixture.componentInstance.shipping.forEach((framework, index) => {
+      expect(cards[index].querySelector('a').getAttribute('href')).toBe(
+        '/docs?package=' + framework.id
+      );
+    });
+    const react = fixture.componentInstance.shipping.find(
+      (framework) => framework.id === 'react'
+    );
+    expect(react?.write).toBe('tree.$.count(1)');
+    expect(fixture.nativeElement.textContent).not.toContain('B/entity');
+    for (const target of routerLinkTargets(fixture)) {
+      expect(validRoutePaths.has(target)).toBe(true);
+    }
+  });
+
   it('start-here', async () => {
     await TestBed.configureTestingModule({
       imports: [StartHereComponent],

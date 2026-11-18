@@ -1,4 +1,5 @@
 import { Component, ChangeDetectionStrategy } from '@angular/core';
+import { RouterLink } from '@angular/router';
 
 import { ArchitectureDiagramComponent } from './architecture-diagram.component';
 import {
@@ -15,7 +16,7 @@ import {
 @Component({
   selector: 'app-architecture-overview',
   standalone: true,
-  imports: [ArchitectureDiagramComponent],
+  imports: [ArchitectureDiagramComponent, RouterLink],
   templateUrl: './architecture-overview.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
   styleUrl: './architecture-overview.component.scss',
