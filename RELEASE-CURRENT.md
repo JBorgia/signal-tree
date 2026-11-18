@@ -1,4 +1,4 @@
-# 15.4.9 — authorized publication preparation
+# 15.4.9 — published and registry-verified
 
 The owner selected build, push and publication on November 18, including a
 separate provisional v16 test release. Target **15.4.9** on
@@ -12,8 +12,17 @@ growth controls, exact-tag CI and registry/deployment verification are required.
 No runtime feature or compatibility change is selected here. Local qualification
 now passes 91/91 normal gates, 91/91 mutation proofs with exact restoration, fresh
 installed consumers/AOT, the strict production demo and 179/179 browser checks.
-Publication remains pending exact-tag CI and registry verification; local checks
-are not proof that this release is published.
+Signed tag `v15.4.9` freezes `2ab7e24540e97b1afc29b084a73c95b7a9f83107`.
+Exact-tag Linux qualification and the canonical publisher both pass. All five
+15.4.9 packages are published under `latest`; downloaded registry archives match
+the CI publication journal byte-for-byte. All five registry signatures and
+attestations verify, including the exact tag, source commit and publish workflow.
+Fresh installed exports, strict bundler/node16 types and Angular AOT pass.
+The production demo is Ready at [signaltree.io](https://signaltree.io/) from the
+same commit. Its hosted Undo journey passes: the user's priority change is
+reversed while the external shipping update survives. Publication and hosted
+verification are complete. This documentation successor does not move or replace
+the signed release tag.
 
 ---
 

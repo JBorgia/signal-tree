@@ -1,0 +1,30 @@
+{
+  "observedAt": "2026-11-18T16:48:12.861861+00:00",
+  "deploymentId": "EA4NSjgz5y53yxh7PX9jsGiMUqpb",
+  "url": "https://signaltree.io/",
+  "deploymentUrl": "https://signaltree-e67j3jdz2-jonathan-d-borgias-projects.vercel.app/",
+  "environment": "Production",
+  "status": "Ready",
+  "sourceCommit": "2ab7e24540e97b1afc29b084a73c95b7a9f83107",
+  "visibleVersion": "15.4.9",
+  "hostedJourney": {
+    "path": "/",
+    "actions": [
+      "Make it Rush",
+      "Receive server update",
+      "Undo my edit"
+    ],
+    "beforeUndo": {
+      "priority": "Rush",
+      "status": "Shipped"
+    },
+    "afterUndo": {
+      "priority": "Standard",
+      "status": "Shipped",
+      "otherOrderPriority": "Standard",
+      "otherOrderStatus": "Ready"
+    },
+    "scope": "Manual hosted interaction with simulated shipment service; no backend durability claim"
+  },
+  "screenshot": "hosted-production-undo.png"
+}

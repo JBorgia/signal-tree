@@ -1,0 +1,260 @@
+{
+  "version": "15.4.9",
+  "sourceCommit": "2ab7e24540e97b1afc29b084a73c95b7a9f83107",
+  "tag": "v15.4.9",
+  "scope": "Exact-tag CI, verified npm publication and hosted production verification; frozen release commit remains unchanged.",
+  "receipts": [
+    {
+      "path": "publication-receipts/github-tag-run.json",
+      "source": "github-tag-run.json",
+      "bytes": 7767,
+      "sha256": "313646e1dce94d973e04dc1257b983d49a9c83cac217a05154fe8d674b3b4c61"
+    },
+    {
+      "path": "publication-receipts/github-tag-ci.log.gz",
+      "source": "github-tag-ci.log",
+      "bytes": 32953,
+      "sha256": "5777c60a43fd061caeb662aa7fb9bd62e76c7ec7713cbb7a417116eb933a11c3",
+      "rawBytes": 221645,
+      "rawSha256": "3006ed62950a407e45735e604ade50ebee33667595c6de5879540a53783581c3",
+      "encoding": "gzip; decompressed bytes equal original log"
+    },
+    {
+      "path": "publication-receipts/github-publish-run.json",
+      "source": "github-publish-run.json",
+      "bytes": 7022,
+      "sha256": "9bf2608da80a7edf470479e2bc2252b424180fa6e624d0b502acdd9d693ad5c9"
+    },
+    {
+      "path": "publication-receipts/github-publish-ci.log.gz",
+      "source": "github-publish-ci.log",
+      "bytes": 50010,
+      "sha256": "2feef36d385f9eea935b17f160bf00b981b0b88bd618d1e534ca53890b6fe171",
+      "rawBytes": 340932,
+      "rawSha256": "ef9e73983364483deceeaa2553fe088d6535d5b0c1fa42783b558ec4733d038e",
+      "encoding": "gzip; decompressed bytes equal original log"
+    },
+    {
+      "path": "publication-receipts/github-release.json",
+      "source": "github-release.json",
+      "bytes": 164,
+      "sha256": "9fc0918bde09946a4ff3331219bcfe4ef02bacde371b4ff8b969fbec7a7041dc"
+    },
+    {
+      "path": "publication-receipts/github-publish-artifacts.json",
+      "source": "github-publish-artifacts.json",
+      "bytes": 900,
+      "sha256": "e32b4030baabd4b93f0921f82ed08ac9352a975364d0a604dfaea48dca33ce1c"
+    },
+    {
+      "path": "publication-receipts/publish-dispatch.json",
+      "source": "publish-dispatch.json",
+      "bytes": 365,
+      "sha256": "ec28b581792ed7ca91ce63671638301dad7b66eb64d3a34b2729b702edffad7b"
+    },
+    {
+      "path": "publication-receipts/ci-published--15.4.9--candidate.json",
+      "source": "ci-published/15.4.9/candidate.json",
+      "bytes": 1655,
+      "sha256": "49259e3e6faa5c1e44899ffaf2f1c4c5da8f728a227fb8f8e4e03a8428d606ff"
+    },
+    {
+      "path": "publication-receipts/registry--verification.json",
+      "source": "registry/verification.json",
+      "bytes": 2355,
+      "sha256": "527d7a1adf6eb04e579f0bba7043eae1b77ae6e69d50af633f200b817eb81a55"
+    },
+    {
+      "path": "publication-receipts/registry--provenance-identity.json",
+      "source": "registry/provenance-identity.json",
+      "bytes": 3856,
+      "sha256": "b1164cbefe1b5808b42b7d05de5bee038a3dddf4c9782148b7757ae569cfbf76"
+    },
+    {
+      "path": "publication-receipts/registry-consumers.json",
+      "source": "registry-consumers.json",
+      "bytes": 1953,
+      "sha256": "641e940e997a56601b85a17866a761ad340040128f85d17e560e6ddf3308579a"
+    },
+    {
+      "path": "publication-receipts/registry-install.log.gz",
+      "source": "registry-install.log",
+      "bytes": 44,
+      "sha256": "a6cd30d0b7087ebd2f4f838bf00ad17761e53c1a4ac452937c8608fa81f07f8c",
+      "rawBytes": 24,
+      "rawSha256": "c276419b8da1d51dcbd7019a01c8e0d660b4450b521251121c9eca6ff607736c",
+      "encoding": "gzip; decompressed bytes equal original log"
+    },
+    {
+      "path": "publication-receipts/registry-resolution.log.gz",
+      "source": "registry-resolution.log",
+      "bytes": 284,
+      "sha256": "cebc1277f97249100ea8462713026a05908dd65e648f5b611f077ee7c4592948",
+      "rawBytes": 2480,
+      "rawSha256": "79de50118cf766c9afc4160fea9e4c75f88105c3aced0dd41354be4792b913e8",
+      "encoding": "gzip; decompressed bytes equal original log"
+    },
+    {
+      "path": "publication-receipts/registry-signatures.log.gz",
+      "source": "registry-signatures.log",
+      "bytes": 51,
+      "sha256": "ec8c3cfdfbaee950ce21d38e57ae2f35e2747a07394c6a9a7bacba24c4317113",
+      "rawBytes": 37,
+      "rawSha256": "539ea4684b22e24869bace50b48bda695776477f892861b08d51d219f0d08faf",
+      "encoding": "gzip; decompressed bytes equal original log"
+    },
+    {
+      "path": "publication-receipts/registry-signatures-coverage.log.gz",
+      "source": "registry-signatures-coverage.log",
+      "bytes": 122,
+      "sha256": "3e0fb5986aeeb14e42488336f3cd5b1900fbd4d00e56cb2999725ad3e1087b5e",
+      "rawBytes": 175,
+      "rawSha256": "482a058364807b1e194b34ea5c443dbf434caa29fd79a0db2f96113f7a8d3179",
+      "encoding": "gzip; decompressed bytes equal original log"
+    },
+    {
+      "path": "publication-receipts/registry-strict-types.log.gz",
+      "source": "registry-strict-types.log",
+      "bytes": 198,
+      "sha256": "b99c3447615d4a2092b770c21e308a361e99bc4f28104afd47c176f0cdaae255",
+      "rawBytes": 271,
+      "rawSha256": "a773289051a58cf35d19065195c79fa3457480d3518e371785cbe0611ffd35c0",
+      "encoding": "gzip; decompressed bytes equal original log"
+    },
+    {
+      "path": "publication-receipts/registry-angular-aot.log.gz",
+      "source": "registry-angular-aot.log",
+      "bytes": 164,
+      "sha256": "067569047688f3c484106e5258137a7bc346b337408c6a8206403e45312f1697",
+      "rawBytes": 213,
+      "rawSha256": "8076ea766d301ae307069e3114a197e0f4bd02dcc0768c6ab14420c725d817ed",
+      "encoding": "gzip; decompressed bytes equal original log"
+    },
+    {
+      "path": "publication-receipts/verify-registry.py",
+      "source": "verify-registry.py",
+      "bytes": 3506,
+      "sha256": "a30c315714f1c2731fbbd8dbd0b2c76362b2a6bae55f6746e5d2f8a5b7615413"
+    },
+    {
+      "path": "publication-receipts/vercel-candidate.json",
+      "source": "vercel-candidate.json",
+      "bytes": 955,
+      "sha256": "7dfd6350c4cfbf5003fe414db79260032d70c8de315036b5a70cfa592b0cf403"
+    },
+    {
+      "path": "publication-receipts/registry--kernel-metadata.json",
+      "source": "registry/kernel-metadata.json",
+      "bytes": 2998,
+      "sha256": "c0a637955284e158531f508a0dda31c4a763529e5f9d3a3ddcf6193f39909a79"
+    },
+    {
+      "path": "publication-receipts/registry--kernel-dist-tags.json",
+      "source": "registry/kernel-dist-tags.json",
+      "bytes": 49,
+      "sha256": "657840ff9c74296e9a46a715fa13eaee1cdd1a698806fc2b2a38f951e7bef41a"
+    },
+    {
+      "path": "publication-receipts/registry--kernel-attestations.json",
+      "source": "registry/kernel-attestations.json",
+      "bytes": 16887,
+      "sha256": "504b0de046b36af4634a43eb2b7b781d340ceb1c82813c22f5652a1bcfc9c84f"
+    },
+    {
+      "path": "publication-receipts/registry--angular-metadata.json",
+      "source": "registry/angular-metadata.json",
+      "bytes": 2764,
+      "sha256": "ff1b09c1458aed22e4cb952c20cf633c898361e71af31958d8421050c94aa4f2"
+    },
+    {
+      "path": "publication-receipts/registry--angular-dist-tags.json",
+      "source": "registry/angular-dist-tags.json",
+      "bytes": 49,
+      "sha256": "657840ff9c74296e9a46a715fa13eaee1cdd1a698806fc2b2a38f951e7bef41a"
+    },
+    {
+      "path": "publication-receipts/registry--angular-attestations.json",
+      "source": "registry/angular-attestations.json",
+      "bytes": 16817,
+      "sha256": "5364f7c4acc44f33531f7a3b5c7391259026ed95a1698ed76cc3521de22c6862"
+    },
+    {
+      "path": "publication-receipts/registry--react-metadata.json",
+      "source": "registry/react-metadata.json",
+      "bytes": 2725,
+      "sha256": "b442214e7497b268e26af456748c67d1f2945fe3733c543615fdf193691cebac"
+    },
+    {
+      "path": "publication-receipts/registry--react-dist-tags.json",
+      "source": "registry/react-dist-tags.json",
+      "bytes": 49,
+      "sha256": "657840ff9c74296e9a46a715fa13eaee1cdd1a698806fc2b2a38f951e7bef41a"
+    },
+    {
+      "path": "publication-receipts/registry--react-attestations.json",
+      "source": "registry/react-attestations.json",
+      "bytes": 16871,
+      "sha256": "6f0b30aa9068bc06a58192c465624528b965c26aad0f4dbfe771e7c7510eb3ec"
+    },
+    {
+      "path": "publication-receipts/registry--vue-metadata.json",
+      "source": "registry/vue-metadata.json",
+      "bytes": 2691,
+      "sha256": "850a7d2ff7f0fb79e8bbc1e935f1fdde23f81bbd0f049cddd142e22717022dba"
+    },
+    {
+      "path": "publication-receipts/registry--vue-dist-tags.json",
+      "source": "registry/vue-dist-tags.json",
+      "bytes": 49,
+      "sha256": "657840ff9c74296e9a46a715fa13eaee1cdd1a698806fc2b2a38f951e7bef41a"
+    },
+    {
+      "path": "publication-receipts/registry--vue-attestations.json",
+      "source": "registry/vue-attestations.json",
+      "bytes": 17065,
+      "sha256": "549d36d09568544770accfddaea99eb110c852922083cede5adbb0a351b8efd5"
+    },
+    {
+      "path": "publication-receipts/registry--solid-metadata.json",
+      "source": "registry/solid-metadata.json",
+      "bytes": 2716,
+      "sha256": "4609bcfae723d02f6b160ddb10485eb7b09130ba62e562f91cdaf417dc6d2563"
+    },
+    {
+      "path": "publication-receipts/registry--solid-dist-tags.json",
+      "source": "registry/solid-dist-tags.json",
+      "bytes": 25,
+      "sha256": "0c6547bbdb31a30fc80505bb719de9c65b45f324042e5825231e737c5c14e9be"
+    },
+    {
+      "path": "publication-receipts/registry--solid-attestations.json",
+      "source": "registry/solid-attestations.json",
+      "bytes": 17201,
+      "sha256": "68b70ff70d5d61b18ba6817154f84bac227129d0ddbddd27d382305f305104f2"
+    },
+    {
+      "path": "publication-receipts/vercel-production.json",
+      "source": "vercel-production.json",
+      "bytes": 900,
+      "sha256": "41ce696a8f600638fe24017dba23bf24c10727aaf174ef15a7582c909f5be5b5"
+    },
+    {
+      "path": "publication-receipts/hosted-production-undo.png",
+      "source": "hosted-production-undo.png",
+      "bytes": 95835,
+      "sha256": "635203d523ea43fca0bcd3f9f6b6295a6a5570a652f5b840627bb3e3e6be1efd"
+    },
+    {
+      "path": "publication-receipts/hosted-preview-undo.png",
+      "source": "hosted-preview-undo.png",
+      "bytes": 48919,
+      "sha256": "0609c84efa815a868056e87a1a034dc51580b3dd1273dad5f9080ceb9b9a12d8"
+    },
+    {
+      "path": "publication-receipts/signed-tag-verification.txt",
+      "command": "git tag -v v15.4.9",
+      "bytes": 283,
+      "sha256": "971ba618e58286c6bf7cdd3fcdb5ef9dc97e0da63d6064163c3f32bed4bf0bf5"
+    }
+  ]
+}

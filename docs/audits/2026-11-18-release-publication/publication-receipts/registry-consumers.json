@@ -1,0 +1,60 @@
+[
+  {
+    "name": "registry-install",
+    "command": [
+      "npm",
+      "install",
+      "--ignore-scripts",
+      "--legacy-peer-deps",
+      "--no-fund",
+      "--no-audit"
+    ],
+    "exit": 0,
+    "seconds": 2.09
+  },
+  {
+    "name": "registry-signatures",
+    "command": [
+      "npm",
+      "audit",
+      "signatures",
+      "--json"
+    ],
+    "exit": 0,
+    "seconds": 1.47
+  },
+  {
+    "name": "registry-resolution",
+    "command": [
+      "node",
+      "resolve.cjs"
+    ],
+    "exit": 0,
+    "seconds": 0.03
+  },
+  {
+    "name": "registry-strict-types",
+    "command": [
+      "node",
+      "tools/verify-consumer-typecheck.mjs",
+      "--tarball=/Users/jonathanborgia/code/signaltree/.worktrees/v15-optimization-sweep/artifacts/release-15.4.9/registry/signal-tree-kernel-15.4.9.tgz",
+      "--tarball=/Users/jonathanborgia/code/signaltree/.worktrees/v15-optimization-sweep/artifacts/release-15.4.9/registry/signal-tree-angular-15.4.9.tgz",
+      "--tarball=/Users/jonathanborgia/code/signaltree/.worktrees/v15-optimization-sweep/artifacts/release-15.4.9/registry/signal-tree-react-15.4.9.tgz",
+      "--tarball=/Users/jonathanborgia/code/signaltree/.worktrees/v15-optimization-sweep/artifacts/release-15.4.9/registry/signal-tree-vue-15.4.9.tgz",
+      "--tarball=/Users/jonathanborgia/code/signaltree/.worktrees/v15-optimization-sweep/artifacts/release-15.4.9/registry/signal-tree-solid-15.4.9.tgz"
+    ],
+    "exit": 0,
+    "seconds": 6.92
+  },
+  {
+    "name": "registry-angular-aot",
+    "command": [
+      "node",
+      "tools/verify-angular-aot-consumer.mjs",
+      "--kernel-tarball=/Users/jonathanborgia/code/signaltree/.worktrees/v15-optimization-sweep/artifacts/release-15.4.9/registry/signal-tree-kernel-15.4.9.tgz",
+      "--angular-tarball=/Users/jonathanborgia/code/signaltree/.worktrees/v15-optimization-sweep/artifacts/release-15.4.9/registry/signal-tree-angular-15.4.9.tgz"
+    ],
+    "exit": 0,
+    "seconds": 30.86
+  }
+]

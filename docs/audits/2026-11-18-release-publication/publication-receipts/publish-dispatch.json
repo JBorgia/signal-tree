@@ -1,0 +1,19 @@
+{
+  "command": [
+    "/opt/homebrew/bin/gh",
+    "workflow",
+    "run",
+    "publish.yml",
+    "--repo",
+    "JBorgia/signal-tree",
+    "--ref",
+    "v15.4.9",
+    "-f",
+    "release_tag=v15.4.9"
+  ],
+  "exit": 0,
+  "stdout": "",
+  "stderr": "",
+  "dispatchedAt": "2026-11-18T15:55:51.524638+00:00",
+  "expectedCommit": "2ab7e24540e97b1afc29b084a73c95b7a9f83107"
+}

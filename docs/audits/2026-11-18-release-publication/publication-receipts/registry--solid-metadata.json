@@ -1,0 +1,83 @@
+{
+  "bugs": {
+    "url": "https://github.com/JBorgia/signal-tree/issues"
+  },
+  "dist": {
+    "shasum": "4c90832279bc82fa448396e7134040ed7c0a8aaa",
+    "tarball": "https://registry.npmjs.org/@signal-tree/solid/-/solid-15.4.9.tgz",
+    "fileCount": 12,
+    "integrity": "sha512-SHxnL8PgNwWC8dP5RHtNtzzLbRVaGK4SEQogFf2r9IpGfhq/f9RUzXKumleJbGAtHACyatPkQQfpl8xfMUYyQQ==",
+    "signatures": [
+      {
+        "sig": "MEQCIAjxlhyLaxpZdJgWMuJgTU2B8vMzSXdgWw1WMFAGQ3EvAiAu6ndyQsA7C6KNm2PjjLIqJYn8Rk42Ux/8LYQNsAnQ7Q==",
+        "keyid": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U"
+      },
+      {
+        "sig": "MEQCIGdSQvdrb2mpACx7Ta7FDIoL7jF5unzF5s1QzCD0cNyaAiAY/tmjNoP5poW2WlrGGomP9b3EwXnuONKkDUZn3ZmKvg==",
+        "keyid": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U"
+      }
+    ],
+    "attestations": {
+      "url": "https://registry.npmjs.org/-/npm/v1/attestations/@signal-tree%2fsolid@15.4.9",
+      "provenance": {
+        "predicateType": "https://slsa.dev/provenance/v1"
+      }
+    },
+    "unpackedSize": 46033
+  },
+  "main": "./dist/index.js",
+  "name": "@signal-tree/solid",
+  "type": "module",
+  "_from": "file:/__w/signal-tree/signal-tree/.release/candidates/15.4.9/tarballs/signal-tree-solid-15.4.9.tgz",
+  "types": "./src/index.d.ts",
+  "module": "./dist/index.js",
+  "exports": {
+    ".": {
+      "types": "./src/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "license": "Apache-2.0",
+  "_npmUser": {
+    "name": "counterreset",
+    "email": "jonathanborgia@gmail.com"
+  },
+  "homepage": "https://github.com/JBorgia/signal-tree#readme",
+  "_resolved": "/__w/signal-tree/signal-tree/.release/candidates/15.4.9/tarballs/signal-tree-solid-15.4.9.tgz",
+  "_integrity": "sha512-SHxnL8PgNwWC8dP5RHtNtzzLbRVaGK4SEQogFf2r9IpGfhq/f9RUzXKumleJbGAtHACyatPkQQfpl8xfMUYyQQ==",
+  "repository": {
+    "url": "git+https://github.com/JBorgia/signal-tree.git",
+    "type": "git",
+    "directory": "packages/solid"
+  },
+  "_npmVersion": "11.21.3",
+  "description": "Solid observation for SignalTree.",
+  "directories": {},
+  "maintainers": [
+    {
+      "name": "counterreset",
+      "email": "jonathanborgia@gmail.com"
+    }
+  ],
+  "sideEffects": false,
+  "_nodeVersion": "24.15.0",
+  "dependencies": {
+    "@signal-tree/kernel": "15.4.9"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "_hasShrinkwrap": false,
+  "peerDependencies": {
+    "tslib": "^2.0.0",
+    "solid-js": "^1.9.0"
+  },
+  "_npmOperationalInternal": {
+    "tmp": "tmp/solid_15.4.9_1795019450662_0.7131894884322701",
+    "host": "s3://npm-registry-packages-npm-production"
+  },
+  "_id": "@signal-tree/solid@15.4.9",
+  "version": "15.4.9"
+}

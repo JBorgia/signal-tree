@@ -1,0 +1,83 @@
+{
+  "bugs": {
+    "url": "https://github.com/JBorgia/signal-tree/issues"
+  },
+  "dist": {
+    "shasum": "c3f984e53d6e57ca76ecd744be5f402bb2876997",
+    "tarball": "https://registry.npmjs.org/@signal-tree/vue/-/vue-15.4.9.tgz",
+    "fileCount": 12,
+    "integrity": "sha512-mqm3+p/7VJ0jnoF5x6PSyZd31FrUFUxiXF+qLda+JiIJeWP97Se+jWe2kU/zpxgwIkJ4O8LsyYFWp5cSnkbhzw==",
+    "signatures": [
+      {
+        "sig": "MEUCIDK9bYJNhmtXQA6j0C1AewdwBCaV4ZRgV03pAFAIr2TvAiEAqPX4JzxEQIaLCAx/raiy8P2l28QIz1oZNWfo8KJPnIM=",
+        "keyid": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U"
+      },
+      {
+        "sig": "MEUCIQDLQ5Ju1hEFRuMpnAB3xk76Fc5FoXwpjEvT3MbRIGQOsQIgUQZ8sfbdTPK/4uGrvVujJCQgHvgdg2v4MIHxNKviuAQ=",
+        "keyid": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U"
+      }
+    ],
+    "attestations": {
+      "url": "https://registry.npmjs.org/-/npm/v1/attestations/@signal-tree%2fvue@15.4.9",
+      "provenance": {
+        "predicateType": "https://slsa.dev/provenance/v1"
+      }
+    },
+    "unpackedSize": 46403
+  },
+  "main": "./dist/index.js",
+  "name": "@signal-tree/vue",
+  "type": "module",
+  "_from": "file:/__w/signal-tree/signal-tree/.release/candidates/15.4.9/tarballs/signal-tree-vue-15.4.9.tgz",
+  "types": "./src/index.d.ts",
+  "module": "./dist/index.js",
+  "exports": {
+    ".": {
+      "types": "./src/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "license": "Apache-2.0",
+  "_npmUser": {
+    "name": "counterreset",
+    "email": "jonathanborgia@gmail.com"
+  },
+  "homepage": "https://github.com/JBorgia/signal-tree#readme",
+  "_resolved": "/__w/signal-tree/signal-tree/.release/candidates/15.4.9/tarballs/signal-tree-vue-15.4.9.tgz",
+  "_integrity": "sha512-mqm3+p/7VJ0jnoF5x6PSyZd31FrUFUxiXF+qLda+JiIJeWP97Se+jWe2kU/zpxgwIkJ4O8LsyYFWp5cSnkbhzw==",
+  "repository": {
+    "url": "git+https://github.com/JBorgia/signal-tree.git",
+    "type": "git",
+    "directory": "packages/vue"
+  },
+  "_npmVersion": "11.21.3",
+  "description": "Vue observation for SignalTree.",
+  "directories": {},
+  "maintainers": [
+    {
+      "name": "counterreset",
+      "email": "jonathanborgia@gmail.com"
+    }
+  ],
+  "sideEffects": false,
+  "_nodeVersion": "24.15.0",
+  "dependencies": {
+    "@signal-tree/kernel": "15.4.9"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "_hasShrinkwrap": false,
+  "peerDependencies": {
+    "vue": "^3.5.0",
+    "tslib": "^2.0.0"
+  },
+  "_npmOperationalInternal": {
+    "tmp": "tmp/vue_15.4.9_1795019500014_0.5560465385843133",
+    "host": "s3://npm-registry-packages-npm-production"
+  },
+  "_id": "@signal-tree/vue@15.4.9",
+  "version": "15.4.9"
+}

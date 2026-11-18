@@ -1,0 +1,63 @@
+{
+  "verifiedAt": "2026-11-18T16:32:36.831055+00:00",
+  "sourceCommit": "2ab7e24540e97b1afc29b084a73c95b7a9f83107",
+  "candidate": "artifacts/release-15.4.9/ci-published/15.4.9/candidate.json",
+  "packages": [
+    {
+      "name": "@signal-tree/kernel",
+      "version": "15.4.9",
+      "integrity": "sha512-MZx/CMB+unHotdPhqSyGhssWnyMPzf/z+t29lNTS4NkYxT2g/rzVA6qSeJcXhAXSKZ9+B+Z45jvwdvfUrmONOA==",
+      "bytes": 204481,
+      "archive": "signal-tree-kernel-15.4.9.tgz",
+      "identicalToCiArchive": true,
+      "channel": "15.4.9",
+      "latest": "15.4.9",
+      "signatureAndAttestationPresent": true
+    },
+    {
+      "name": "@signal-tree/angular",
+      "version": "15.4.9",
+      "integrity": "sha512-clEH1KdRT43hWHUnZcOOVS6tARP6LZjxkjQ4qyjf2eGXE6gJ9sbIaz4idbsZw34Yf6udlA8pWZfYwThQsRggGw==",
+      "bytes": 20887,
+      "archive": "signal-tree-angular-15.4.9.tgz",
+      "identicalToCiArchive": true,
+      "channel": "15.4.9",
+      "latest": "15.4.9",
+      "signatureAndAttestationPresent": true
+    },
+    {
+      "name": "@signal-tree/react",
+      "version": "15.4.9",
+      "integrity": "sha512-WRFcnMompDNKXtlh8bMC7fZZpL6VimXVkUOtcqGqFnObgidec2+GIOL1nHUFGgCDMXWtGZ4pbvTdfUEAGrSNNA==",
+      "bytes": 15551,
+      "archive": "signal-tree-react-15.4.9.tgz",
+      "identicalToCiArchive": true,
+      "channel": "15.4.9",
+      "latest": "15.4.9",
+      "signatureAndAttestationPresent": true
+    },
+    {
+      "name": "@signal-tree/vue",
+      "version": "15.4.9",
+      "integrity": "sha512-mqm3+p/7VJ0jnoF5x6PSyZd31FrUFUxiXF+qLda+JiIJeWP97Se+jWe2kU/zpxgwIkJ4O8LsyYFWp5cSnkbhzw==",
+      "bytes": 16946,
+      "archive": "signal-tree-vue-15.4.9.tgz",
+      "identicalToCiArchive": true,
+      "channel": "15.4.9",
+      "latest": "15.4.9",
+      "signatureAndAttestationPresent": true
+    },
+    {
+      "name": "@signal-tree/solid",
+      "version": "15.4.9",
+      "integrity": "sha512-SHxnL8PgNwWC8dP5RHtNtzzLbRVaGK4SEQogFf2r9IpGfhq/f9RUzXKumleJbGAtHACyatPkQQfpl8xfMUYyQQ==",
+      "bytes": 16875,
+      "archive": "signal-tree-solid-15.4.9.tgz",
+      "identicalToCiArchive": true,
+      "channel": "15.4.9",
+      "latest": "15.4.9",
+      "signatureAndAttestationPresent": true
+    }
+  ],
+  "limit": "Hash, archive and channel verification. Cryptographic signature/provenance validation is a separate npm audit signatures check."
+}

@@ -1,0 +1,246 @@
+{
+  "conclusion": "success",
+  "headSha": "2ab7e24540e97b1afc29b084a73c95b7a9f83107",
+  "jobs": [
+    {
+      "completedAt": "2026-11-18T15:54:08Z",
+      "conclusion": "success",
+      "databaseId": 134916350432,
+      "name": "Verify tagged commit (full gate set)",
+      "startedAt": "2026-11-18T15:33:33Z",
+      "status": "completed",
+      "steps": [
+        {
+          "completedAt": "2026-11-18T15:33:35Z",
+          "conclusion": "success",
+          "name": "Set up job",
+          "number": 1,
+          "startedAt": "2026-11-18T15:33:34Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-18T15:34:07Z",
+          "conclusion": "success",
+          "name": "Initialize containers",
+          "number": 2,
+          "startedAt": "2026-11-18T15:33:35Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-18T15:34:07Z",
+          "conclusion": "success",
+          "name": "Resolve release tag",
+          "number": 3,
+          "startedAt": "2026-11-18T15:34:07Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-18T15:34:41Z",
+          "conclusion": "success",
+          "name": "Checkout tagged commit",
+          "number": 4,
+          "startedAt": "2026-11-18T15:34:07Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-18T15:34:41Z",
+          "conclusion": "success",
+          "name": "Trust and verify the mounted tagged checkout",
+          "number": 5,
+          "startedAt": "2026-11-18T15:34:41Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-18T15:34:42Z",
+          "conclusion": "success",
+          "name": "Setup pnpm",
+          "number": 6,
+          "startedAt": "2026-11-18T15:34:41Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-18T15:34:48Z",
+          "conclusion": "success",
+          "name": "Setup Node.js",
+          "number": 7,
+          "startedAt": "2026-11-18T15:34:42Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-18T15:35:00Z",
+          "conclusion": "success",
+          "name": "Install dependencies",
+          "number": 8,
+          "startedAt": "2026-11-18T15:34:48Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-18T15:35:01Z",
+          "conclusion": "success",
+          "name": "Install Chromium for packed Angular AOT gate",
+          "number": 9,
+          "startedAt": "2026-11-18T15:35:00Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-18T15:35:19Z",
+          "conclusion": "success",
+          "name": "Build all packages",
+          "number": 10,
+          "startedAt": "2026-11-18T15:35:01Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-18T15:44:47Z",
+          "conclusion": "success",
+          "name": "All release gates (including benchmark, memory, and package harnesses)",
+          "number": 11,
+          "startedAt": "2026-11-18T15:35:19Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-18T15:52:29Z",
+          "conclusion": "success",
+          "name": "Prove release gates can still fail",
+          "number": 12,
+          "startedAt": "2026-11-18T15:44:47Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-18T15:52:44Z",
+          "conclusion": "success",
+          "name": "Rebuild clean artifacts after mutation proofs",
+          "number": 13,
+          "startedAt": "2026-11-18T15:52:29Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-18T15:52:44Z",
+          "conclusion": "success",
+          "name": "Verify version claims",
+          "number": 14,
+          "startedAt": "2026-11-18T15:52:44Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-18T15:52:44Z",
+          "conclusion": "success",
+          "name": "Verify publish artifacts",
+          "number": 15,
+          "startedAt": "2026-11-18T15:52:44Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-18T15:53:14Z",
+          "conclusion": "success",
+          "name": "Tarball-consumer gate (self-test, then gate)",
+          "number": 16,
+          "startedAt": "2026-11-18T15:52:44Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-18T15:53:14Z",
+          "conclusion": "success",
+          "name": "Verify CHANGELOG has an entry for this version",
+          "number": 17,
+          "startedAt": "2026-11-18T15:53:14Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-18T15:54:01Z",
+          "conclusion": "success",
+          "name": "Post Setup Node.js",
+          "number": 31,
+          "startedAt": "2026-11-18T15:53:14Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-18T15:54:01Z",
+          "conclusion": "success",
+          "name": "Post Setup pnpm",
+          "number": 32,
+          "startedAt": "2026-11-18T15:54:01Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-18T15:54:02Z",
+          "conclusion": "success",
+          "name": "Post Checkout tagged commit",
+          "number": 33,
+          "startedAt": "2026-11-18T15:54:01Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-18T15:54:06Z",
+          "conclusion": "success",
+          "name": "Stop containers",
+          "number": 34,
+          "startedAt": "2026-11-18T15:54:02Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-18T15:54:06Z",
+          "conclusion": "success",
+          "name": "Complete job",
+          "number": 35,
+          "startedAt": "2026-11-18T15:54:06Z",
+          "status": "completed"
+        }
+      ],
+      "url": "https://github.com/JBorgia/signal-tree/actions/runs/44337013757/job/134916350432"
+    },
+    {
+      "completedAt": "2026-11-18T15:54:45Z",
+      "conclusion": "success",
+      "databaseId": 134930426406,
+      "name": "release",
+      "startedAt": "2026-11-18T15:54:12Z",
+      "status": "completed",
+      "steps": [
+        {
+          "completedAt": "2026-11-18T15:54:14Z",
+          "conclusion": "success",
+          "name": "Set up job",
+          "number": 1,
+          "startedAt": "2026-11-18T15:54:12Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-18T15:54:38Z",
+          "conclusion": "success",
+          "name": "Checkout",
+          "number": 2,
+          "startedAt": "2026-11-18T15:54:14Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-18T15:54:43Z",
+          "conclusion": "success",
+          "name": "Create GitHub Release",
+          "number": 3,
+          "startedAt": "2026-11-18T15:54:38Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-18T15:54:43Z",
+          "conclusion": "success",
+          "name": "Post Checkout",
+          "number": 6,
+          "startedAt": "2026-11-18T15:54:43Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-18T15:54:43Z",
+          "conclusion": "success",
+          "name": "Complete job",
+          "number": 7,
+          "startedAt": "2026-11-18T15:54:43Z",
+          "status": "completed"
+        }
+      ],
+      "url": "https://github.com/JBorgia/signal-tree/actions/runs/44337013757/job/134930426406"
+    }
+  ],
+  "status": "completed",
+  "url": "https://github.com/JBorgia/signal-tree/actions/runs/44337013757"
+}

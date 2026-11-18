@@ -1,0 +1,45 @@
+{
+  "schemaVersion": 1,
+  "commit": "2ab7e24540e97b1afc29b084a73c95b7a9f83107",
+  "version": "15.4.9",
+  "tag": "latest",
+  "gatedBuildIntegrity": "sha256-55d6443cba2a75d5058d9c0c8fe7e6f84fcefdc3bddc96d45c1775e6c1ec7006",
+  "packages": [
+    {
+      "name": "@signal-tree/kernel",
+      "package": "kernel",
+      "version": "15.4.9",
+      "tarball": "tarballs/signal-tree-kernel-15.4.9.tgz",
+      "integrity": "sha512-MZx/CMB+unHotdPhqSyGhssWnyMPzf/z+t29lNTS4NkYxT2g/rzVA6qSeJcXhAXSKZ9+B+Z45jvwdvfUrmONOA=="
+    },
+    {
+      "name": "@signal-tree/angular",
+      "package": "angular",
+      "version": "15.4.9",
+      "tarball": "tarballs/signal-tree-angular-15.4.9.tgz",
+      "integrity": "sha512-clEH1KdRT43hWHUnZcOOVS6tARP6LZjxkjQ4qyjf2eGXE6gJ9sbIaz4idbsZw34Yf6udlA8pWZfYwThQsRggGw=="
+    },
+    {
+      "name": "@signal-tree/react",
+      "package": "react",
+      "version": "15.4.9",
+      "tarball": "tarballs/signal-tree-react-15.4.9.tgz",
+      "integrity": "sha512-WRFcnMompDNKXtlh8bMC7fZZpL6VimXVkUOtcqGqFnObgidec2+GIOL1nHUFGgCDMXWtGZ4pbvTdfUEAGrSNNA=="
+    },
+    {
+      "name": "@signal-tree/vue",
+      "package": "vue",
+      "version": "15.4.9",
+      "tarball": "tarballs/signal-tree-vue-15.4.9.tgz",
+      "integrity": "sha512-mqm3+p/7VJ0jnoF5x6PSyZd31FrUFUxiXF+qLda+JiIJeWP97Se+jWe2kU/zpxgwIkJ4O8LsyYFWp5cSnkbhzw=="
+    },
+    {
+      "name": "@signal-tree/solid",
+      "package": "solid",
+      "version": "15.4.9",
+      "tarball": "tarballs/signal-tree-solid-15.4.9.tgz",
+      "integrity": "sha512-SHxnL8PgNwWC8dP5RHtNtzzLbRVaGK4SEQogFf2r9IpGfhq/f9RUzXKumleJbGAtHACyatPkQQfpl8xfMUYyQQ=="
+    }
+  ],
+  "state": "published"
+}

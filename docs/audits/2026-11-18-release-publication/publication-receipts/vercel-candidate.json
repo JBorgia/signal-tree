@@ -1,0 +1,23 @@
+{
+  "commit": "2ab7e24540e97b1afc29b084a73c95b7a9f83107",
+  "deploymentId": "BD7qA6EQH9fPxbSqERVyfKY3NgRV",
+  "dashboard": "https://vercel.com/jonathan-d-borgias-projects/signaltree/BD7qA6EQH9fPxbSqERVyfKY3NgRV",
+  "url": "https://signaltree-c2kw7n78u-jonathan-d-borgias-projects.vercel.app",
+  "branchAlias": "https://signaltree-git-codex-v15-154-6da032-jonathan-d-borgias-projects.vercel.app",
+  "productionPromoted": false,
+  "status": "READY",
+  "verifiedAt": "2026-11-18T15:48:08.348887+00:00",
+  "sourceHead": "2ab7e24540e97b1afc29b084a73c95b7a9f83107",
+  "candidateUrl": "https://signaltree-c2kw7n78u-jonathan-d-borgias-projects.vercel.app/",
+  "hostedJourney": {
+    "version": "15.4.9",
+    "actions": [
+      "Make Rush",
+      "Server update: Shipped",
+      "Undo"
+    ],
+    "observed": "Priority Standard; Order101 remains Shipped; Order102 unchanged",
+    "screenshot": "hosted-preview-undo.png"
+  },
+  "initialObservedState": "Building"
+}

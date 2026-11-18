@@ -1,0 +1,107 @@
+{
+  "packages": [
+    {
+      "name": "@signal-tree/kernel",
+      "sha512": "319c7f08c07eba71e8b5d3e1a92c8686cb169f230fcdfff3faddbd94d4d2e0d918c53da0febcd503aa927897178405d2299f7e07e678e63bf076f7d4ae638d38",
+      "workflow": {
+        "ref": "refs/tags/v15.4.9",
+        "repository": "https://github.com/JBorgia/signal-tree",
+        "path": ".github/workflows/publish.yml"
+      },
+      "resolvedDependencies": [
+        {
+          "uri": "git+https://github.com/JBorgia/signal-tree@refs/tags/v15.4.9",
+          "digest": {
+            "gitCommit": "2ab7e24540e97b1afc29b084a73c95b7a9f83107"
+          }
+        }
+      ],
+      "invocationId": "https://github.com/JBorgia/signal-tree/actions/runs/44341276111/attempts/1"
+    },
+    {
+      "name": "@signal-tree/angular",
+      "sha512": "725107d4a7514f8de158752765c38e552ead0113fa2d98f1923438ab28dfd9e19713a809f6c6c86b3e2275bb19c37e187fab9d940f295997d8c13850b118201b",
+      "workflow": {
+        "ref": "refs/tags/v15.4.9",
+        "repository": "https://github.com/JBorgia/signal-tree",
+        "path": ".github/workflows/publish.yml"
+      },
+      "resolvedDependencies": [
+        {
+          "uri": "git+https://github.com/JBorgia/signal-tree@refs/tags/v15.4.9",
+          "digest": {
+            "gitCommit": "2ab7e24540e97b1afc29b084a73c95b7a9f83107"
+          }
+        }
+      ],
+      "invocationId": "https://github.com/JBorgia/signal-tree/actions/runs/44341276111/attempts/1"
+    },
+    {
+      "name": "@signal-tree/react",
+      "sha512": "59115c9cca26a4334a5ed961f1b302edf659a4be958a65d59143ad72a1aa16739b82275e736f8620e2f59c75051a00833175ad199e296ef4dd7d41001ab48d34",
+      "workflow": {
+        "ref": "refs/tags/v15.4.9",
+        "repository": "https://github.com/JBorgia/signal-tree",
+        "path": ".github/workflows/publish.yml"
+      },
+      "resolvedDependencies": [
+        {
+          "uri": "git+https://github.com/JBorgia/signal-tree@refs/tags/v15.4.9",
+          "digest": {
+            "gitCommit": "2ab7e24540e97b1afc29b084a73c95b7a9f83107"
+          }
+        }
+      ],
+      "invocationId": "https://github.com/JBorgia/signal-tree/actions/runs/44341276111/attempts/1"
+    },
+    {
+      "name": "@signal-tree/vue",
+      "sha512": "9aa9b7fa9ffb549d239e8179c7a3d2c99777d45ad4154c625c5faa2dd6be2622097963fded27be8d67b6914ff3a718302242783bc2ecc98156a797129e46e1cf",
+      "workflow": {
+        "ref": "refs/tags/v15.4.9",
+        "repository": "https://github.com/JBorgia/signal-tree",
+        "path": ".github/workflows/publish.yml"
+      },
+      "resolvedDependencies": [
+        {
+          "uri": "git+https://github.com/JBorgia/signal-tree@refs/tags/v15.4.9",
+          "digest": {
+            "gitCommit": "2ab7e24540e97b1afc29b084a73c95b7a9f83107"
+          }
+        }
+      ],
+      "invocationId": "https://github.com/JBorgia/signal-tree/actions/runs/44341276111/attempts/1"
+    },
+    {
+      "name": "@signal-tree/solid",
+      "sha512": "487c672fc3e0370582f1d3f9447b4db73ccb6d155a18ae12110a2015fdabf48a467e1abf7fd454cd72ae9a57896c602d1c00b26ad3e44107e997cc5f31463241",
+      "workflow": {
+        "ref": "refs/tags/v15.4.9",
+        "repository": "https://github.com/JBorgia/signal-tree",
+        "path": ".github/workflows/publish.yml"
+      },
+      "resolvedDependencies": [
+        {
+          "uri": "git+https://github.com/JBorgia/signal-tree@refs/tags/v15.4.9",
+          "digest": {
+            "gitCommit": "2ab7e24540e97b1afc29b084a73c95b7a9f83107"
+          }
+        }
+      ],
+      "invocationId": "https://github.com/JBorgia/signal-tree/actions/runs/44341276111/attempts/1"
+    }
+  ],
+  "cryptographicValidation": {
+    "command": [
+      "npm",
+      "audit",
+      "signatures"
+    ],
+    "exit": 0,
+    "jsonResult": {
+      "invalid": [],
+      "missing": []
+    },
+    "coverageLog": "../registry-signatures-coverage.log"
+  }
+}
