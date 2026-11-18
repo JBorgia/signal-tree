@@ -5,8 +5,8 @@
 - [x] Reconcile versioned library and consumer AI guidance with installed types.
 - [x] Validate selected v15 in actual consumer session, ingress and editor flows.
 - [x] Execute ordinary migration behavior and v16-specific review/recovery checks.
-- [ ] Expand story-led demos and review all current demos for clarity and layout.
-- [ ] Fix avoidable eager demo loading and verify successful hosted deployments.
+- [x] Expand story-led demos and review all current demos for clarity and layout.
+- [x] Fix avoidable eager demo loading and verify successful hosted deployments.
 - [x] Measure a bounded TanStack read-model/editing-session integration.
 - [x] Record a prioritized private consumer opportunity list, independent review
       and exact-artifact evidence in the
@@ -30,10 +30,10 @@
       and falsifiers; document user-experience interpretation and dated preview
       results in the [register](docs/audits/2026-11-18-startup-market-economics/FINDINGS-AND-HYPOTHESES.md).
 
-Open hypotheses are research leads, not an automatic implementation queue. Before
-a selected v16 demo release, reconcile its strict initial-bundle failure with an
-explicit implementation or cost disposition and verify a successful deployment;
-the current candidate's runtime-size acceptance alone does not make that build pass.
+Open hypotheses are research leads, not an automatic implementation queue. The
+subsequent adoption phase above resolves the demo's strict initial-bundle failure
+through tutorial loading/ownership changes and verifies successful previews.
+The earlier failure remains evidence; runtime-size acceptance did not waive it.
 
 The [active protocol](docs/audits/2026-11-18-startup-market-economics/PROTOCOL.md)
 governs this work. Previous qualified artifacts remain separate identities;

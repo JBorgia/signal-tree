@@ -1,4 +1,4 @@
-# Adoption and workflow proof — validation and delivery
+# Adoption and workflow proof — implementation and preview delivery complete
 
 The owner authorized implementation of all November 18 adoption recommendations.
 The [active protocol](docs/audits/2026-11-18-adoption-workflow/PROTOCOL.md) covers
@@ -14,8 +14,11 @@ review and limits. All five arms pass 23 workflow/query checks plus five fault
 controls; the first comparative cohort passes all 68 CPU/heap observations.
 The study preview also receives the narrowly scoped tutorial ownership/loading
 repair and passes its unchanged strict initial budget. Versioned demo branches
-carry the full story, guidance and route-clarity changes. Hosted verification is
-the remaining delivery predicate; earlier failed preview receipts remain history.
+carry the full story, guidance and route-clarity changes. The study, v15 and v16
+review deployments are successful; hosted stories, guides and preserved archive
+navigation have been checked. The [delivery record](docs/audits/2026-11-18-adoption-workflow/DEPLOYMENTS.json)
+binds exact commits and observations. Earlier failed preview receipts remain
+history. No production promotion or new npm publication is selected by this phase.
 
 ---
 
