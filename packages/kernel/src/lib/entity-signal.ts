@@ -1416,6 +1416,40 @@ export function createEntitySignal<
     return {...result,complete:prepared.complete};
   }
 
+  function prepareAlignedFreshOrdinary(
+    changes: readonly CommittedEntityMutation[],
+    physical: ReturnType<typeof structuralStore.preparePlacement>,
+    entries: PreparedPlacementEntries<K>
+  ): OrdinaryRichPreparation {
+    // Only all-fresh, non-inspection units with no authored ordinary reorder
+    // reach here. Aligned old membership plus fresh unique lifetimes yields
+    // the exact physical-after adjacency. Keep every detached payload/fact;
+    // omit only the redundant ordinary placement replay and visibility index.
+    const completed = changes.map(change => {
+      const placement = physical.read(change.subject);
+      if (!placement.present) throw new Error('Fresh ordinary placement is absent');
+      const value = deepClone(change.after) as E;
+      return {
+        subject: change.subject,
+        before: undefined,
+        after: value,
+        structural: true,
+        path: `${basePath}.${String(placement.key)}`,
+        structuralRecord: ordinaryPresenceRecord('add', change.subject, { ...placement, value }),
+      };
+    });
+    const byStep = completed.map(change => [change]);
+    const install = ordinaryTopology.prepareInstall(physical, physical, entries);
+    return {
+      changes: completed,
+      byStep,
+      byPhysicalSubject: new Map(completed.map((change, index) => [change.subject, byStep[index]])),
+      install,
+      interval: install.interval,
+      ordinaryEndpoints: undefined,
+    };
+  }
+
   function prepareEntityMutationFrame(
     frame: EntityMutationFrame<K, E>,
     options?: { advancePhysicalRevision?: boolean; publication?: 'physical' }
@@ -1551,7 +1585,14 @@ export function createEntitySignal<
           },
         };
     }
-    const ordinaryPlan = prepareOrdinaryTopology(
+    const alignedFresh = changes.length > 0 &&
+      ambientMeta()?.participation !== 'inspection' &&
+      !frame.ordinaryOrder && ordinaryTopology.isAligned() &&
+      frame.mutations.every(mutation => mutation.kind === 'create-fresh-subject') &&
+      changes.every(change => !physicalPlacement.base(change.subject).present && physicalPlacement.read(change.subject).present);
+    const ordinaryPlan = alignedFresh
+      ? prepareAlignedFreshOrdinary(changes, physicalPlacement, physicalEntries)
+      : prepareOrdinaryTopology(
       'rich',
       changes,
       physicalPlacement,

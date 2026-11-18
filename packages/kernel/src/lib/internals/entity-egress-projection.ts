@@ -3,6 +3,7 @@ import { entityPublicationOrdinary, type EntityPublicationPacket, type EntityPub
 import type { EntityProjectionSeedEntry } from './entity-projection-seed';
 import { EntityContributorMap } from './entity-contributor-map';
 import { EntityEgressKeys } from './entity-egress-keys';
+import { orderRestoresForPlacement } from '../physical/order-restores-for-placement';
 import {
   createEntityTopology,
   type EntityTopology,
@@ -225,8 +226,32 @@ export function createEntityEgressProjection(
       // private draft retains the relationship's latent inspection topology,
       // rather than reseeding authority from the source's physical rows.
       const draft = createEntityEgressProjection(order.map(subjectId => {const key=keyOf.get(subjectId);if(key===undefined)throw new Error('Topology key missing');return {subjectId,key,row:rows.get(subjectId)};}), topology.fork(),undefined,contributors);
-      for (const edit of packet.physical)
-        if (edit.structural) draft.apply(edit.subject,edit.after,edit.structural,true,edit.fields);
+      // Completed source add facts can name another addition's final position.
+      // Install only the private topology in anchor-ready order: x -> future y
+      // -> surviving a must not become [a, x, y]. Payload/support edits below
+      // retain their original chronology. Removal and rekey end an add episode;
+      // nonstructural edits do not change its placement dependencies.
+      const additions: Array<{ owner: number; subjectId: number; edit: (typeof packet.physical)[number] }> = [];
+      const flushAdditions = () => {
+        const subjects = new Set(additions.map(value => value.subjectId));
+        const keys = new Set(additions.map(value => value.edit.structural?.kind === 'add' ? value.edit.structural.key : undefined));
+        const ordered = subjects.size === additions.length && keys.size === additions.length
+          ? orderRestoresForPlacement(additions, value => value.edit.structural?.kind === 'add' ? value.edit.structural : undefined,
+            (_value, subject) => draft.state().topology.has(subject))
+          : additions;
+        for (const { edit } of ordered)
+          draft.apply(edit.subject, edit.after, edit.structural, true, edit.fields);
+        additions.length = 0;
+      };
+      for (const edit of packet.physical) {
+        if (!edit.structural) continue;
+        if (edit.structural.kind === 'add') additions.push({ owner: packet.owner, subjectId: edit.structural.subject, edit });
+        else {
+          flushAdditions();
+          draft.apply(edit.subject, edit.after, edit.structural, true, edit.fields);
+        }
+      }
+      flushAdditions();
       if (packet.physicalOrder) draft.reorder(packet.physicalOrder,true);
       let changed = false;
       for (const edit of entityPublicationOrdinary(packet))

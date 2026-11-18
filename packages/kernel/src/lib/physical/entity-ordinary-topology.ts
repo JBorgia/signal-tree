@@ -52,9 +52,14 @@ export class EntityOrdinaryTopology<K extends string | number> {
   }
   prepareInstall(
     ordinary: EntityPlacementStage<K>,
-    physical: EntityPlacementStage<K>
+    physical: EntityPlacementStage<K>,
+    entries?: PreparedPlacementEntries<K>
   ): (() => void) & { readonly interval: TopologyViewInterval } {
-    const interval = this.prepareInterval(ordinary);
+    const interval = this.prepareInterval(ordinary, entries);
+    // A producer may prove that both views have this exact completed placement.
+    // Existing exceptions must still be normalized by the general path.
+    if (ordinary === physical && this.isAligned())
+      return Object.assign(() => { this.continuity = interval.after; }, { interval });
     const updates = new Map<number, PlacementPresence<K> | undefined>();
     const ids = new Set([...ordinary.patch.keys(), ...physical.patch.keys()]);
     for (const subject of ids) {

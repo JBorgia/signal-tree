@@ -374,7 +374,9 @@ export class StructuralStore<K extends string | number> {
     recordProductionSubstrateStat('structuralSubjectsCreated');
     this.nextSubjectId = Math.max(this.nextSubjectId, subjectId + 1);
     this.activateSubject(subjectId, key);
-    this.subjectRevisions.set(subjectId, 0);
+    // The getter owns the zero default. Preserve reset for an explicitly reused
+    // subject while avoiding an entry for every untouched fresh lifetime.
+    this.subjectRevisions.delete(subjectId);
     this.createAndAppendActiveNode(subjectId, key);
     this.orderFrontier = {};
   }

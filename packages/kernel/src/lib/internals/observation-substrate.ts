@@ -62,7 +62,9 @@ type LeafObservation = {
   releaseMutationObserver: () => void;
 };
 
-const OBSERVATION = new WeakMap<object, LeafObservation>();
+// Registration precedes callable escape; only the unused claim record waits.
+// Keep the first claimed record and its position identity after every release.
+const OBSERVATION = new WeakMap<object, LeafObservation | null>();
 
 // Only active scopes are indexed. Canonical stores unify a branch's accessor
 // and backing store without installing any work on dormant leaf writes.
@@ -87,21 +89,24 @@ export function inheritObservationForAddedMember(
  * for the leaf's lifetime.
  */
 export function installDormantObservation<T>(leaf: Location<T>): void {
-  OBSERVATION.set(leaf as object, {
-    claims: 0,
-    positionId: undefined,
-    releaseMutationObserver: () => undefined,
-  });
+  OBSERVATION.set(leaf as object, null);
 }
 
 /** Claim observation for one leaf, or `undefined` if it is not one. */
 function claimLeaf(node: object): (() => void) | undefined {
-  const state = OBSERVATION.get(node);
-  if (!state) return undefined;
+  const registered = OBSERVATION.get(node);
+  if (registered === undefined) return undefined;
 
   const registry = getPositionRegistry(node);
   const ownerPath = getOwnedOwnerPath(node);
   if (!registry || ownerPath === undefined) return undefined;
+
+  const state = registered ?? {
+    claims: 0,
+    positionId: undefined,
+    releaseMutationObserver: () => undefined,
+  };
+  if (registered === null) OBSERVATION.set(node, state);
 
   if (state.claims === 0) {
     if (state.positionId === undefined) {
