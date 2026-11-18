@@ -1,3 +1,31 @@
+# V15 startup allocation follow-through — local qualification complete
+
+Qualified source `e45fd69616586cae6f7f9e8622c082199d0fded0` contains runtime
+`90947841d9c29593a2ef9d8ebf22772cabaf5e70` on `codex/v15-startup-economics`.
+This controller is a documentation-only successor. The
+[completed audit](docs/audits/2026-11-18-startup-economics/README.md) records sparse
+zero revisions, first-claim observation allocation, actual live/transaction and
+maximum-demand costs, independent review and preserved first failures.
+
+Local qualification covers 90/91 normal gates after the documented output-buffer
+correction, all 91 mutation checks with restoration, five canonical archives and
+158 payloads, strict installed consumers/AOT/facades, the strict production demo
+and all 146 browser checks. Public types and facade payloads are unchanged.
+
+**Retain the compatible memory improvement with a new candidate-specific size
+acceptance.** Bare gzip shrinks to 11,048 / 13,197 bytes and passes. Entity gzip
+shrinks to 25,368 / 28,311 bytes, remaining 75.2 / 151 bytes over unchanged
+ceilings. Accept these residual measured costs for the demonstrated memory
+benefit; keep the numerical failure and thresholds unchanged. No general CPU
+speedup or fully demanded heap saving is claimed. Full-application and economic
+comparison has its own evidence identity on `codex/startup-market-economics`.
+
+No tag, merge, npm publication, exact-tag Linux validation or deployment is
+selected. Final runtime/artifact identity is frozen; documentation successors
+must not relabel the qualified source.
+
+---
+
 # V15 construction follow-through — local qualification complete
 
 Updated November 18, 2026 UTC. The qualified runtime is

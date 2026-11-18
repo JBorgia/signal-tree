@@ -1,0 +1,77 @@
+{
+  "head": "e45fd69616586cae6f7f9e8622c082199d0fded0",
+  "runtimeCommit": "90947841d9c29593a2ef9d8ebf22772cabaf5e70",
+  "trackedStatus": "clean",
+  "runtimeSources": {
+    "/Users/jonathanborgia/code/signaltree/.worktrees/v15-optimization-sweep/packages/kernel/src/lib/internals/observation-substrate.ts": "d213d317ac9657d2c70d4e874301a8ac011f5b677ebe7f041913eb8e6156d68a",
+    "/Users/jonathanborgia/code/signaltree/.worktrees/v15-optimization-sweep/packages/kernel/src/lib/physical/structural-store.ts": "f36e014378c63d8e9070b698ebe5b5e8416e14c7259b455ff80f1d97da89e4c0"
+  },
+  "buildSourceSeal": "723525c2648a3b793441b6ed29a891881dd176cb3ac571a4308814f1e2e883cc",
+  "sourceAndSnapshotInputsVerified": 877,
+  "sourceSnapshotsVerified": 877,
+  "canonicalPackages": {
+    "kernel": {
+      "baselineManifest": "/Users/jonathanborgia/code/signaltree/artifacts/v15-oversight-cost-2026-11-17/qualification/final-packed/packages/kernel.json",
+      "baselineManifestSha256": "31b22d5b5b1fe50b6c5223ae1cb5c523b646fce8a27bfd394e71894883f730ca",
+      "candidateManifest": "/Users/jonathanborgia/code/signaltree/artifacts/startup-market-economics-2026-11-18/qualification/v15-final-packed-packages/kernel.json",
+      "candidateManifestSha256": "36b8af01fa0d6279e89447450934180ee59a46a57b0c98855bb540b30a3bab02",
+      "fileCount": 109,
+      "changedPayloads": [
+        "dist/lib/internals/observation-substrate.js",
+        "dist/lib/physical/structural-store.js"
+      ],
+      "declarationsByteIdentical": true,
+      "candidateBuildReceiptJoined": true,
+      "canonicalArchiveAndJournalJoined": true
+    },
+    "angular": {
+      "baselineManifest": "/Users/jonathanborgia/code/signaltree/artifacts/v15-oversight-cost-2026-11-17/qualification/final-packed/packages/angular.json",
+      "baselineManifestSha256": "e893c71f2873ede9ba25583acc698b1aae03c6be5a3880667820dbbc3730815b",
+      "candidateManifest": "/Users/jonathanborgia/code/signaltree/artifacts/startup-market-economics-2026-11-18/qualification/v15-final-packed-packages/angular.json",
+      "candidateManifestSha256": "c30318d5c5ca2587e2e15b358fe951dccd59bc07cd7f690bff6636ba04935b46",
+      "fileCount": 16,
+      "changedPayloads": [],
+      "declarationsByteIdentical": true,
+      "candidateBuildReceiptJoined": true,
+      "canonicalArchiveAndJournalJoined": true
+    },
+    "react": {
+      "baselineManifest": "/Users/jonathanborgia/code/signaltree/artifacts/v15-oversight-cost-2026-11-17/qualification/final-packed/packages/react.json",
+      "baselineManifestSha256": "2fed1eb79e97f06b15ce4414903555b647dfcb19e9fd562cd3cc99e974023903",
+      "candidateManifest": "/Users/jonathanborgia/code/signaltree/artifacts/startup-market-economics-2026-11-18/qualification/v15-final-packed-packages/react.json",
+      "candidateManifestSha256": "7cf872ae9ab5d942103b46d5b82273cda02b10dc80c3b996c83962c60cba4ba8",
+      "fileCount": 9,
+      "changedPayloads": [],
+      "declarationsByteIdentical": true,
+      "candidateBuildReceiptJoined": true,
+      "canonicalArchiveAndJournalJoined": true
+    },
+    "vue": {
+      "baselineManifest": "/Users/jonathanborgia/code/signaltree/artifacts/v15-oversight-cost-2026-11-17/qualification/final-packed/packages/vue.json",
+      "baselineManifestSha256": "c310460f8f60c32d44ef010ba19ba24767e491fe0abd4481e5302d09ef05957d",
+      "candidateManifest": "/Users/jonathanborgia/code/signaltree/artifacts/startup-market-economics-2026-11-18/qualification/v15-final-packed-packages/vue.json",
+      "candidateManifestSha256": "f5590b6cbb559f23d47144df69c85a1ecd04bb7f623346c13d38883514df1707",
+      "fileCount": 12,
+      "changedPayloads": [],
+      "declarationsByteIdentical": true,
+      "candidateBuildReceiptJoined": true,
+      "canonicalArchiveAndJournalJoined": true
+    },
+    "solid": {
+      "baselineManifest": "/Users/jonathanborgia/code/signaltree/artifacts/v15-oversight-cost-2026-11-17/qualification/final-packed/packages/solid.json",
+      "baselineManifestSha256": "6932ef0e97973909dd6d96b410963a333e31e225be28e6ed4253ef03f5017856",
+      "candidateManifest": "/Users/jonathanborgia/code/signaltree/artifacts/startup-market-economics-2026-11-18/qualification/v15-final-packed-packages/solid.json",
+      "candidateManifestSha256": "3e8183f397ead9cd4f4f2b4ceb98cfaec648ac4fc6d5ca345d01d02a0c979456",
+      "fileCount": 12,
+      "changedPayloads": [],
+      "declarationsByteIdentical": true,
+      "candidateBuildReceiptJoined": true,
+      "canonicalArchiveAndJournalJoined": true
+    }
+  },
+  "totalShippedPayloads": 158,
+  "prototypeCombinedKernelFullyByteIdenticalToFinalCanonical": true,
+  "prototypeReceipt": "/Users/jonathanborgia/code/signaltree/artifacts/startup-economics-v15-2026-11-17/combined-artifact/receipt.json",
+  "prototypeReceiptSha256": "280459b9bc39c30de12fa7e2a667369def8883e33b63235b80758d8a56bbd09f",
+  "limits": "Source snapshot and package inventory join; earlier prototype timing/heap cohorts remain bounded by their own workload and sampling limits. Tool-only self-test JSON correction e45 follows runtime909. No publication."
+}

@@ -1,0 +1,107 @@
+{
+  "head": "e45fd69616586cae6f7f9e8622c082199d0fded0",
+  "runtimeCommit": "90947841d9c29593a2ef9d8ebf22772cabaf5e70",
+  "baselineRuntime": "4e791f32238fa7bdde480c5408a23dc4a4bca804",
+  "trackedStatus": "clean",
+  "publication": false,
+  "artifacts": {
+    "fullNormalFirstAttempt": {
+      "path": "/Users/jonathanborgia/code/signaltree/artifacts/startup-economics-v15-2026-11-17/qualification-normal/receipt.json",
+      "sha256": "ef8ec84187fafc1c14bfff49ad6439126710ff496dca8b396a370ca29a5b370b"
+    },
+    "normalCleanupCorrection": {
+      "path": "/Users/jonathanborgia/code/signaltree/artifacts/startup-economics-v15-2026-11-17/qualification-cleanup-correction/receipt.json",
+      "sha256": "3f494b7def35f291d6fd89386a832a3c74c03387f1a379d5407f0ceb6ce5687d"
+    },
+    "fullMutations": {
+      "path": "/Users/jonathanborgia/code/signaltree/artifacts/startup-economics-v15-2026-11-17/qualification-mutations/receipt.json",
+      "sha256": "8fb2d0dd5374d1791a372fd0711a06f3ead77a182b7217b2a718e3a852041820"
+    },
+    "normalBufferReproducer": {
+      "path": "/Users/jonathanborgia/code/signaltree/artifacts/startup-economics-v15-2026-11-17/cleanup-output-buffer/receipt.json",
+      "sha256": "501d7ddd86ba4c3c461394d6f5bb009fb5cf223ceda0445095255705166b6262"
+    },
+    "canonicalQualifier": {
+      "path": "/Users/jonathanborgia/code/signaltree/artifacts/startup-market-economics-2026-11-18/qualification/v15-final-artifact-checks/result.json",
+      "sha256": "3d7cf57321ed525291cc479dc323c993e7ec4ec1ae76c52dd8842bfd104574cc"
+    },
+    "artifactAdmissionControls": {
+      "path": "/Users/jonathanborgia/code/signaltree/artifacts/startup-market-economics-2026-11-18/qualification/v15-final-artifact-checks/completed-packed-admission.json",
+      "sha256": "70c0b5501162b90fdb00b9bd3ec2b5932a0c6994dc37ab2cf17641d964e41483"
+    },
+    "routes": {
+      "path": "/Users/jonathanborgia/code/signaltree/artifacts/startup-market-economics-2026-11-18/qualification/v15-final-artifact-checks/route-result.json",
+      "sha256": "b95cbb70b817cbd53615be09567a7fc99d85573479623bca5a27425a77ebb2e6"
+    },
+    "bundleEconomics": {
+      "path": "/Users/jonathanborgia/code/signaltree/artifacts/startup-market-economics-2026-11-18/qualification/v15-bundle-economics/result.json",
+      "sha256": "1297e69e22c62e0ded2ddc7cf4f04e2de5fb7a5d7f364b5d91285bcf12bca22b"
+    },
+    "sourcePayloadJoins": {
+      "path": "/Users/jonathanborgia/code/signaltree/artifacts/startup-market-economics-2026-11-18/qualification/v15-source-payload-joins.json",
+      "sha256": "5d276f677c6c84d4a81efb274e9f1c4ff8a8a1f0f63b1e9707a425c6c90d1acf"
+    },
+    "selectedProfile": {
+      "path": "/Users/jonathanborgia/code/signaltree/artifacts/startup-market-economics-2026-11-18/qualification/v15-selected-profile/summary.json",
+      "sha256": "2c6e5dd2ebe6432ee311cb773c24ec59ac75c7dddd32e99de3a66059360c846f"
+    },
+    "selectedProfileAdmission": {
+      "path": "/Users/jonathanborgia/code/signaltree/artifacts/startup-market-economics-2026-11-18/qualification/v15-selected-profile/admission.json",
+      "sha256": "47ff8e5884c47bda2365cadc45ca674ce00a0b8ef0e80a7719c6766dab7c9719"
+    },
+    "originalHeap": {
+      "path": "/Users/jonathanborgia/code/signaltree/artifacts/startup-economics-v15-2026-11-17/heap-summary.json",
+      "sha256": "0e52a6dcaad6a12741fdd6db73fa00d0d94f2ec47dc54bcbc2b1844ccfae6849"
+    },
+    "originalCPU": {
+      "path": "/Users/jonathanborgia/code/signaltree/artifacts/startup-economics-v15-2026-11-17/cpu-summary.json",
+      "sha256": "64cdff9057c92689637376851a86d28e88231c6dbd360b69cbaab192cfe9fd7f"
+    },
+    "CPUFollowup": {
+      "path": "/Users/jonathanborgia/code/signaltree/artifacts/startup-economics-v15-2026-11-17/followup-combined-summary.json",
+      "sha256": "0ab3012d2900844409549fcc3cbc2af5a87becf4bacfd082721184da42d3a616"
+    },
+    "liveActivation": {
+      "path": "/Users/jonathanborgia/code/signaltree/artifacts/startup-economics-v15-2026-11-17/activation-summary.json",
+      "sha256": "664b7096056a0bd1d5261bc1d68e9aff9fd8d4d43e9f48f5982f5ad5ee9a0a32"
+    },
+    "denseRevisionHeap": {
+      "path": "/Users/jonathanborgia/code/signaltree/artifacts/startup-market-economics-2026-11-18/qualification/v15-dense-revisions/summary.json",
+      "sha256": "8f531e625726204fe484751594c63f4247c1b80bfd295f665ab34d2c47eee1f6"
+    },
+    "denseFirstAttemptInvalid": {
+      "path": "/Users/jonathanborgia/code/signaltree/artifacts/startup-market-economics-2026-11-18/qualification/v15-dense-revisions/first-failure.json",
+      "sha256": "7e4cb43be3d3fdd65a45f18d44aa7c043ba7144f42b214a2eade1466bd713db4"
+    },
+    "denseCorrectedControls": {
+      "path": "/Users/jonathanborgia/code/signaltree/artifacts/startup-market-economics-2026-11-18/qualification/v15-dense-revisions/controls-v2/results.json",
+      "sha256": "d8b2280b810ce12515eedd6e131147c4b684c736b8bec50706182fe2af27ce65"
+    },
+    "denseCorrectedRaw": {
+      "path": "/Users/jonathanborgia/code/signaltree/artifacts/startup-market-economics-2026-11-18/qualification/v15-dense-revisions/heap-v2/results.json",
+      "sha256": "069e85e4d155c20296951a546ea7a49e37c03c549eaf7246893cc9cb67ef97d4"
+    },
+    "denseMatcherDiscrimination": {
+      "path": "/Users/jonathanborgia/code/signaltree/artifacts/startup-market-economics-2026-11-18/qualification/v15-dense-revisions/v2-error-matcher-selftest.json",
+      "sha256": "fead1e6f50c2f2eac58a6382a6a4e0f6fd9d6c2c525e52a1ff54fe432746a8dc"
+    },
+    "prependEightCases": {
+      "path": "/Users/jonathanborgia/code/signaltree/artifacts/startup-economics-v15-2026-11-17/prepend-link-witness.json",
+      "sha256": "1f71bc07b332362956b383a9d88a03b3dbcf62ee422d489c28ab3cd27fbc0c4b"
+    }
+  },
+  "gateDisposition": {
+    "normalFirst": "89/91 on runtime909; cleanup self-test output buffer and entity bundle budget failed. First result retained.",
+    "normalCorrection": "2/2 affected cleanup checks pass on e45, full parsed receipt unchanged; runtime unchanged. Full normal registry not rerun.",
+    "mutations": "91/91 on e45; clean restoration. Bundle fixture separate passing\u2192planted failure\u2192restored discrimination also passes.",
+    "canonical": "Five packages,158 payloads; installed consumers/AOT/facades and strict demo pass;146 routes pass, no override, no skipped/flaky routes.",
+    "remainingFailure": "Unchanged entity bundle ceilings:25368B production versus25292.8B,28311B diagnostics versus28160B. Both shrink from baseline; root owns measured-cost disposition."
+  },
+  "selectionLimits": [
+    "Memory-only selection; CPU cohorts mixed/noisy and do not establish speedup/equivalence.",
+    "Dense live ordinary observations erase the deferred-record saving; sparse demand keeps it.",
+    "Dense structural revision demand removes discernible sparse-map saving; ordinary value updates do not advance these revisions.",
+    "Selected one-process inspector profile uses separate phase boundaries and is not comparable to old whole-run baseline profile; inclusive bins overlap.",
+    "V15 dense revision metadata unavailable in production; public transitions/identity/order/values are asserted and revision density is source-supported. V1 controls invalidated, only v2 accepted."
+  ]
+}

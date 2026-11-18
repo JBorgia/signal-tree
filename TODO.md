@@ -2,6 +2,16 @@
 
 Work that is decided and not yet done. **This is not an RFC list.**
 
+## Startup allocation follow-through
+
+- [x] Test implicit zero revisions and first-claim ordinary observation records,
+  including sparse/dense live demand, actual transactions and fully rekeyed rows.
+- [x] Preserve public semantics and qualify exact artifacts with independent
+  review and the explicit reduced-size exception. See the
+  [audit](docs/audits/2026-11-18-startup-economics/README.md).
+- [x] Verify v15 already handles the ordered-Link case repaired in v16; share
+  compatible allocation techniques without changing stable-v15 publication rules.
+
 ## Construction memory follow-through
 
 - [x] Measure empty planning and lazy internal containers across neutral/Angular

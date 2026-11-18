@@ -1,0 +1,54 @@
+{
+  "runtimeHead": "e45fd69616586cae6f7f9e8622c082199d0fded0",
+  "documentationOnlySuccessor": true,
+  "records": {
+    "firstSelectorMistake": {
+      "path": "/Users/jonathanborgia/code/signaltree/artifacts/startup-market-economics-2026-11-18/qualification/v15-documentation-successor/receipt.json",
+      "sha256": "fea2fdc780f6380ed852df771fc67b149b67784128e97350b59a779d02cc1bc8",
+      "receipt": {
+        "command": [
+          "node",
+          "tools/verify-gates.mjs",
+          "--only",
+          "doc-links,doc-links:self,documented-imports,documented-symbols,documented-examples,version-claims,release-claims"
+        ],
+        "cwd": "/Users/jonathanborgia/code/signaltree/.worktrees/v15-optimization-sweep",
+        "startedUTC": "2026-11-18T06:43:18.630736+00:00",
+        "head": "e45fd69616586cae6f7f9e8622c082199d0fded0",
+        "status": "M  RELEASE-CURRENT.md\nM  TODO.md\nA  docs/audits/2026-11-18-startup-economics/BUNDLE-COST.json\nA  docs/audits/2026-11-18-startup-economics/PAYLOAD-JOINS.json\nA  docs/audits/2026-11-18-startup-economics/PROFILE-FOLLOWUP.json\nA  docs/audits/2026-11-18-startup-economics/QUALIFICATION.json\nA  docs/audits/2026-11-18-startup-economics/README.md\n",
+        "patchSha256": "e791280f7edc231203d4be0c36a6a787fed380bdb5a79f666d42d6a0031ded49",
+        "runnerSha256": "6e53606ad0deeb4c8a8f9710bb165d42fa45581c07ba6a9f68c0cd48ba470f18",
+        "node": "v24.15.0",
+        "exitCode": -15,
+        "seconds": 57.58843249990605,
+        "logSha256": "0230b659f53b01faa587e07fdb2d2b1e58c098a1393f28fc8e8333ba52a4d95b",
+        "trackedPatchUnchanged": true
+      }
+    },
+    "focusedCorrection": {
+      "path": "/Users/jonathanborgia/code/signaltree/artifacts/startup-market-economics-2026-11-18/qualification/v15-documentation-successor-focused/receipt.json",
+      "sha256": "fe3dce3d4478af9950d595f80987cd746a47a37f630c3cbf786798087b65e656",
+      "receipt": {
+        "command": [
+          "node",
+          "tools/verify-gates.mjs",
+          "--only=doc-links,doc-links:self,documented-imports,documented-symbols,documented-examples,version-claims,release-claims"
+        ],
+        "cwd": "/Users/jonathanborgia/code/signaltree/.worktrees/v15-optimization-sweep",
+        "startedUTC": "2026-11-18T06:44:50.586954+00:00",
+        "head": "e45fd69616586cae6f7f9e8622c082199d0fded0",
+        "status": "M  RELEASE-CURRENT.md\nM  TODO.md\nA  docs/audits/2026-11-18-startup-economics/BUNDLE-COST.json\nA  docs/audits/2026-11-18-startup-economics/PAYLOAD-JOINS.json\nA  docs/audits/2026-11-18-startup-economics/PROFILE-FOLLOWUP.json\nA  docs/audits/2026-11-18-startup-economics/QUALIFICATION.json\nA  docs/audits/2026-11-18-startup-economics/README.md\n",
+        "patchSha256": "e791280f7edc231203d4be0c36a6a787fed380bdb5a79f666d42d6a0031ded49",
+        "runnerSha256": "6e53606ad0deeb4c8a8f9710bb165d42fa45581c07ba6a9f68c0cd48ba470f18",
+        "node": "v24.15.0",
+        "exitCode": 0,
+        "seconds": 57.844983915798366,
+        "logSha256": "7e62ffaef3dd64d4e9d938f12caec03dca42166b62165ed2d8a73b9c95aacc3e",
+        "trackedPatchUnchanged": true
+      }
+    }
+  },
+  "selectedGates": 7,
+  "passedGates": 7,
+  "limits": "The split --only argument was unsupported and began the ordinary registry. Root terminated that exact v15 process tree (-15), preserved output, and reran the intended --only= selector. This does not replace runtime qualification; no runtime source changed."
+}

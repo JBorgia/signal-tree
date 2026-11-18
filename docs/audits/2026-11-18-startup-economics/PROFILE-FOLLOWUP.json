@@ -1,0 +1,173 @@
+{
+  "passed": true,
+  "head": "e45fd69616586cae6f7f9e8622c082199d0fded0",
+  "stages": {
+    "seed": {
+      "ns": 2331250,
+      "cpuUs": 4094
+    },
+    "factory": {
+      "ns": 3632792,
+      "cpuUs": 3572
+    },
+    "firstMarkerMaterialization": {
+      "ns": 685167,
+      "cpuUs": 767
+    },
+    "population": {
+      "ns": 9754000,
+      "cpuUs": 14593
+    },
+    "firstRead": {
+      "ns": 1561584,
+      "cpuUs": 2442
+    },
+    "firstDemand": {
+      "ns": 801334,
+      "cpuUs": 1207
+    },
+    "writes": {
+      "ns": 4423667,
+      "cpuUs": 11183
+    },
+    "replace": {
+      "ns": 5782542,
+      "cpuUs": 10529
+    },
+    "destroy": {
+      "ns": 193167,
+      "cpuUs": 211
+    }
+  },
+  "envelopes": {
+    "constructorThroughPopulation": {
+      "ns": 14142708,
+      "cpuUs": 19007,
+      "phases": [
+        "factory",
+        "firstMarkerMaterialization",
+        "population"
+      ],
+      "limits": "Seed excluded; includes intervening WeakRef/checkpoint/timer/promise work. Profiler start/stop calls excluded from envelope wall/CPU timing. One continuous inspector profile covers the envelope; phase timers do not nest profiler calls."
+    }
+  },
+  "startupExclusiveSamples": [
+    {
+      "function": "post",
+      "url": "node:inspector",
+      "lineZeroBased": 114,
+      "sampledMicroseconds": 18083
+    },
+    {
+      "function": "(garbage collector)",
+      "url": "",
+      "lineZeroBased": -1,
+      "sampledMicroseconds": 2208
+    },
+    {
+      "function": "setAll",
+      "url": "file:///Users/jonathanborgia/code/signaltree/artifacts/startup-market-economics-2026-11-18/qualification/v15-selected-profile/bundle/angular.mjs",
+      "lineZeroBased": 40728,
+      "sampledMicroseconds": 2082
+    },
+    {
+      "function": "createAndAppendActiveNode",
+      "url": "file:///Users/jonathanborgia/code/signaltree/artifacts/startup-market-economics-2026-11-18/qualification/v15-selected-profile/bundle/angular.mjs",
+      "lineZeroBased": 39246,
+      "sampledMicroseconds": 1250
+    },
+    {
+      "function": "activateSubject",
+      "url": "file:///Users/jonathanborgia/code/signaltree/artifacts/startup-market-economics-2026-11-18/qualification/v15-selected-profile/bundle/angular.mjs",
+      "lineZeroBased": 39328,
+      "sampledMicroseconds": 834
+    },
+    {
+      "function": "api.<computed>",
+      "url": "file:///Users/jonathanborgia/code/signaltree/artifacts/startup-market-economics-2026-11-18/qualification/v15-selected-profile/bundle/angular.mjs",
+      "lineZeroBased": 40948,
+      "sampledMicroseconds": 668
+    },
+    {
+      "function": "entityMap",
+      "url": "file:///Users/jonathanborgia/code/signaltree/artifacts/startup-market-economics-2026-11-18/qualification/v15-selected-profile/bundle/angular.mjs",
+      "lineZeroBased": 41069,
+      "sampledMicroseconds": 583
+    },
+    {
+      "function": "signalTreeImpl",
+      "url": "file:///Users/jonathanborgia/code/signaltree/artifacts/startup-market-economics-2026-11-18/qualification/v15-selected-profile/bundle/angular.mjs",
+      "lineZeroBased": 32457,
+      "sampledMicroseconds": 458
+    },
+    {
+      "function": "reorderActiveKeys",
+      "url": "file:///Users/jonathanborgia/code/signaltree/artifacts/startup-market-economics-2026-11-18/qualification/v15-selected-profile/bundle/angular.mjs",
+      "lineZeroBased": 39128,
+      "sampledMicroseconds": 458
+    },
+    {
+      "function": "appendDetachedNode",
+      "url": "file:///Users/jonathanborgia/code/signaltree/artifacts/startup-market-economics-2026-11-18/qualification/v15-selected-profile/bundle/angular.mjs",
+      "lineZeroBased": 39270,
+      "sampledMicroseconds": 334
+    },
+    {
+      "function": "retainSubjectValue",
+      "url": "file:///Users/jonathanborgia/code/signaltree/artifacts/startup-market-economics-2026-11-18/qualification/v15-selected-profile/bundle/angular.mjs",
+      "lineZeroBased": 38934,
+      "sampledMicroseconds": 333
+    },
+    {
+      "function": "timed",
+      "url": "file:///Users/jonathanborgia/code/signaltree/artifacts/startup-market-economics-2026-11-18/qualification/v15-selected-profile-followup/profile-startup-envelope.mjs",
+      "lineZeroBased": 74,
+      "sampledMicroseconds": 292
+    },
+    {
+      "function": "(program)",
+      "url": "",
+      "lineZeroBased": -1,
+      "sampledMicroseconds": 292
+    },
+    {
+      "function": "",
+      "url": "file:///Users/jonathanborgia/code/signaltree/artifacts/startup-market-economics-2026-11-18/qualification/v15-selected-profile/bundle/angular.mjs",
+      "lineZeroBased": 32513,
+      "sampledMicroseconds": 291
+    },
+    {
+      "function": "",
+      "url": "file:///Users/jonathanborgia/code/signaltree/artifacts/startup-market-economics-2026-11-18/qualification/v15-selected-profile/bundle/angular.mjs",
+      "lineZeroBased": 41084,
+      "sampledMicroseconds": 291
+    },
+    {
+      "function": "",
+      "url": "file:///Users/jonathanborgia/code/signaltree/artifacts/startup-market-economics-2026-11-18/qualification/v15-selected-profile/bundle/angular.mjs",
+      "lineZeroBased": 39871,
+      "sampledMicroseconds": 291
+    },
+    {
+      "function": "create",
+      "url": "file:///Users/jonathanborgia/code/signaltree/artifacts/startup-market-economics-2026-11-18/qualification/v15-selected-profile/bundle/angular.mjs",
+      "lineZeroBased": 32333,
+      "sampledMicroseconds": 250
+    },
+    {
+      "function": "createSubject",
+      "url": "file:///Users/jonathanborgia/code/signaltree/artifacts/startup-market-economics-2026-11-18/qualification/v15-selected-profile/bundle/angular.mjs",
+      "lineZeroBased": 39170,
+      "sampledMicroseconds": 250
+    }
+  ],
+  "bindings": {
+    "/Users/jonathanborgia/code/signaltree/artifacts/startup-market-economics-2026-11-18/qualification/v15-selected-profile-followup/plan.json": "0cf5d674eeb899faa8d1d4aea0cb3db0507971041bf5883ac14895db01fd64c0",
+    "/Users/jonathanborgia/code/signaltree/artifacts/startup-market-economics-2026-11-18/qualification/v15-selected-profile-followup/derivation.json": "31222d4ee9ed7f5901666d43d3df5ab7be30b5aa7a11eb5fe8bbc8f5761d5e25",
+    "/Users/jonathanborgia/code/signaltree/artifacts/startup-market-economics-2026-11-18/qualification/v15-selected-profile-followup/packet.json": "8cdcd30504c01044cc818f9160d950dbdc05468a7006ac01425cfb47f826b440",
+    "/Users/jonathanborgia/code/signaltree/artifacts/startup-market-economics-2026-11-18/qualification/v15-selected-profile-followup/profile-startup-envelope.mjs": "bb2ab9ad794d98b11dda044ec2326779e5dfb0faba59a189a2a5a0ffb4d49e61",
+    "/Users/jonathanborgia/code/signaltree/artifacts/startup-market-economics-2026-11-18/qualification/v15-selected-profile-followup/execution/receipt.json": "5664aea7d673175dffd5b2daae40fd1165032f2927db4777daf308bebf411688",
+    "/Users/jonathanborgia/code/signaltree/artifacts/startup-market-economics-2026-11-18/qualification/v15-selected-profile-followup/execution/command.log": "7b0e024639c0ab6cab17cf306513bb147483deae388f0363196cae9f1139c8c9"
+  },
+  "limits": "One instrumented diagnostic process, not comparative evidence. Startup envelope includes initial marker materialization and nested factory/population; it is not added to them. Sampling includes profiler/harness frames and nested inclusive categories would overlap."
+}
