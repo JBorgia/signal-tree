@@ -1,0 +1,81 @@
+{
+  "qualifiedSources": {
+    "v15": "e45fd69616586cae6f7f9e8622c082199d0fded0",
+    "v16": "f8cf26e50193ca8aa5580da15b739129313f256e"
+  },
+  "baselines": {
+    "v15": "4e791f32238fa7bdde480c5408a23dc4a4bca804",
+    "v16": "5801008ea4ca591b3be483e8bbb0aa02e15f59ed"
+  },
+  "entries": {
+    "qualification/v16-worker-result-index.json": {
+      "path": "/Users/jonathanborgia/code/signaltree/artifacts/startup-market-economics-2026-11-18/qualification/v16-worker-result-index.json",
+      "sha256": "c9ebe5fcceba0cea4c0cefa2b25a79fcdbdfb80ef5c97529f7317aad7465bfe0"
+    },
+    "application-run-1/driver-results.json": {
+      "path": "/Users/jonathanborgia/code/signaltree/artifacts/startup-market-economics-2026-11-18/application-run-1/driver-results.json",
+      "sha256": "305bb545b10cea530511df4f22a5b95f010bf9ecb57dd1aa1600c88bfa5a6b6d"
+    },
+    "application-run-1/completed-admission.json": {
+      "path": "/Users/jonathanborgia/code/signaltree/artifacts/startup-market-economics-2026-11-18/application-run-1/completed-admission.json",
+      "sha256": "4dec58690354d8592c3adebc4a708059e503f09c698f6a8e363532124e437267"
+    },
+    "application-cost-3/results.json": {
+      "path": "/Users/jonathanborgia/code/signaltree/artifacts/startup-market-economics-2026-11-18/application-cost-3/results.json",
+      "sha256": "52036e1243b80e294604d7af71451f274b0cdac0ec805a1aacd77743582bca1a"
+    },
+    "application-cost-controls-3/results.json": {
+      "path": "/Users/jonathanborgia/code/signaltree/artifacts/startup-market-economics-2026-11-18/application-cost-controls-3/results.json",
+      "sha256": "f78b14430f5a84bb90ca69bedb0ba18bf9f7ddbd2f97ba04060555dde8b63a99"
+    },
+    "native-run-1/results.json": {
+      "path": "/Users/jonathanborgia/code/signaltree/artifacts/startup-market-economics-2026-11-18/native-run-1/results.json",
+      "sha256": "207a507d823aca390cf90767117440c951d90e5a046d5978e61ab9ccbf793035"
+    },
+    "native-run-1/analysis/summary.json": {
+      "path": "/Users/jonathanborgia/code/signaltree/artifacts/startup-market-economics-2026-11-18/native-run-1/analysis/summary.json",
+      "sha256": "1d13c471e5b5eb8fc5c53966fddb35759e591bf5f6c29945ea7589b91a29caa0"
+    },
+    "oversight-run-1/results.json": {
+      "path": "/Users/jonathanborgia/code/signaltree/artifacts/startup-market-economics-2026-11-18/oversight-run-1/results.json",
+      "sha256": "2b4091f1f142e69710a63de3c98c1ef883ad8a28db4bc7244c022bdff13270a6"
+    },
+    "oversight-run-1/application-browser/manifest.json": {
+      "path": "/Users/jonathanborgia/code/signaltree/artifacts/startup-market-economics-2026-11-18/oversight-run-1/application-browser/manifest.json",
+      "sha256": "118c9f930c210f1fbb97a3d72bd131671b1447387b67f0ac72362659850065ea"
+    },
+    "oversight-run-1/application-controls/receipt.json": {
+      "path": "/Users/jonathanborgia/code/signaltree/artifacts/startup-market-economics-2026-11-18/oversight-run-1/application-controls/receipt.json",
+      "sha256": "3137d0fb2ede12e5ef651dd317ff85b5e6e05e8fd132f0de17838c46346a6438"
+    },
+    "economics/run-5/results.json": {
+      "path": "/Users/jonathanborgia/code/signaltree/artifacts/startup-market-economics-2026-11-18/economics/run-5/results.json",
+      "sha256": "c26f28116ac056897724a85987e3f7f313cb81b7046c22686195c970b4b96e91"
+    },
+    "economics/controls-5.json": {
+      "path": "/Users/jonathanborgia/code/signaltree/artifacts/startup-market-economics-2026-11-18/economics/controls-5.json",
+      "sha256": "26cd7df00a8610bbf614ad8e1048f7f35babff41f3e0747bd16d83e21ab4fcfb"
+    },
+    "economics/visual-controls-1.json": {
+      "path": "/Users/jonathanborgia/code/signaltree/artifacts/startup-market-economics-2026-11-18/economics/visual-controls-1.json",
+      "sha256": "5eaeca00b9dbc0045d0e3f6a6ae38c893b5ad8187d786a36dd08530ca0270aee"
+    },
+    "admission-controls-2/results.json": {
+      "path": "/Users/jonathanborgia/code/signaltree/artifacts/startup-market-economics-2026-11-18/admission-controls-2/results.json",
+      "sha256": "166f72300d9bec86b69a0f06ae64dccc38dccd159e381f5cb5bf3bd9764b38d4"
+    },
+    "metric-schema-controls-1/results.json": {
+      "path": "/Users/jonathanborgia/code/signaltree/artifacts/startup-market-economics-2026-11-18/metric-schema-controls-1/results.json",
+      "sha256": "d2e03861ab6ea83b93c4348f9e60b59a35a7e916ec3a5ba1d8e77d121cc33683"
+    },
+    "qualification/v15-result-index.json": {
+      "path": "/Users/jonathanborgia/code/signaltree/artifacts/startup-market-economics-2026-11-18/qualification/v15-result-index.json",
+      "sha256": "9195f8a3469935ee4087d5658f755c172b5e219f80db6e85940c7287ce4bcf40"
+    }
+  },
+  "limits": [
+    "Local qualification with specific unchanged numerical-size failures, not registry publication.",
+    "Common application outcomes do not substitute for native guarantees.",
+    "Economics are conditional capacity/resource scenarios, not measured buyer demand or cash savings."
+  ]
+}

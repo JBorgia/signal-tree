@@ -1,3 +1,33 @@
+# Both-line startup and market economics — comparison complete
+
+The [current study](docs/audits/2026-11-18-startup-market-economics/README.md)
+compares qualified v15 `e45fd69616586cae6f7f9e8622c082199d0fded0` and v16
+`f8cf26e50193ca8aa5580da15b739129313f256e` against their frozen current baselines.
+Both implementation branches retain their own exact qualification and
+candidate-specific numerical-size dispositions. This study branch changes tools
+and records; it does not replace their runtime identity.
+
+The 288-child production Angular comparison, full native v16 retained-store
+cohort, both public oversight contracts and installed durable v16 application
+complete. Independent reviews join artifacts/raw results and retain adverse
+settlement, dense-demand and residual-heap observations. V16 large-store startup
+improves materially; no universal CPU, heap, real-user responsiveness or
+native-contract-equivalence claim follows. V15's clearest selection is compatible
+memory reduction. No new public configuration or weakened guarantee is selected.
+
+The cross-version transfer report distinguishes adopted allocation ports,
+already-established retention transfers, version-specific algorithms and parked
+unmeasured leads. Conditional customer/supplier economics cover both public
+versions and hypothetical private tooling; no observed willingness to pay,
+market-size forecast or payroll cash saving is invented.
+
+Scope is local qualification, evidence closure and authorized review-branch
+sharing. No new tag, merge, registry publication or production deployment is
+selected. Numerical ceilings remain unchanged; prior controller records below
+retain their historical source identities.
+
+---
+
 # Current release — qualified candidates and oversight follow-through
 
 Updated November 18, 2026 UTC. This is the single active acceptance ledger. Historical

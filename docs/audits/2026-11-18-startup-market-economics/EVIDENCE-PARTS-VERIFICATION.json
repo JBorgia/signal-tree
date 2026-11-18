@@ -1,0 +1,98 @@
+{
+  "passed": true,
+  "sourceManifestSha256": "b32860b6147d8236d295e53d35963750106a52cd4a1e493240eeb1a3b3ae49c0",
+  "sourceIndexSha256": "12238ab9ffed8b7270255edd2c0bce06055e7092ca3a6c335ddc4d1d59f1ef71",
+  "archiveSha256": "b657f854c5f1150bbee2829f9356c94a232d7bbc0dc467b8ae312c117d888f8f",
+  "originalRepositoryReadsDenied": true,
+  "sourcePartsUnchanged": true,
+  "checks": [
+    {
+      "name": "assemble-intact",
+      "command": [
+        "/Library/Frameworks/Python.framework/Versions/3.14/bin/python3",
+        "-c",
+        "import os,runpy,sys\nprefix=os.path.realpath(sys.argv[2])+os.sep\nscript=sys.argv[1];sys.argv=[script,*sys.argv[3:]]\ndef audit(event,args):\n if event=='open' and isinstance(args[0],(str,bytes,os.PathLike)):\n  path=os.path.realpath(os.fsdecode(args[0]))\n  if path.startswith(prefix):raise PermissionError('Original repository reads denied: '+path)\nsys.addaudithook(audit);runpy.run_path(script,run_name='__main__')\n",
+        "/private/tmp/signaltree-startup-evidence-parts-controls-2026-11-18/assemble-evidence.py",
+        "/Users/jonathanborgia/code/signaltree",
+        "/private/tmp/signaltree-startup-evidence-parts-controls-2026-11-18/copied-parts/EVIDENCE-PARTS.json",
+        "/private/tmp/signaltree-startup-evidence-parts-controls-2026-11-18/joined"
+      ],
+      "exitCode": 0,
+      "logSha256": "a6e78da4ae2d2bcabecd6a84cbff1a77afe50a1383ccf13cb6ef279341e433d1"
+    },
+    {
+      "name": "verify-joined-payloads",
+      "command": [
+        "/Library/Frameworks/Python.framework/Versions/3.14/bin/python3",
+        "-c",
+        "import os,runpy,sys\nprefix=os.path.realpath(sys.argv[2])+os.sep\nscript=sys.argv[1];sys.argv=[script,*sys.argv[3:]]\ndef audit(event,args):\n if event=='open' and isinstance(args[0],(str,bytes,os.PathLike)):\n  path=os.path.realpath(os.fsdecode(args[0]))\n  if path.startswith(prefix):raise PermissionError('Original repository reads denied: '+path)\nsys.addaudithook(audit);runpy.run_path(script,run_name='__main__')\n",
+        "/private/tmp/signaltree-startup-evidence-parts-controls-2026-11-18/verify-evidence.py",
+        "/Users/jonathanborgia/code/signaltree",
+        "/private/tmp/signaltree-startup-evidence-parts-controls-2026-11-18/joined/EVIDENCE.json"
+      ],
+      "exitCode": 0,
+      "logSha256": "4bbc393b663d406b137c0f1e8462b14dab2b47191ab7471a718931528bebd57f"
+    },
+    {
+      "name": "reject-missing",
+      "command": [
+        "/Library/Frameworks/Python.framework/Versions/3.14/bin/python3",
+        "-c",
+        "import os,runpy,sys\nprefix=os.path.realpath(sys.argv[2])+os.sep\nscript=sys.argv[1];sys.argv=[script,*sys.argv[3:]]\ndef audit(event,args):\n if event=='open' and isinstance(args[0],(str,bytes,os.PathLike)):\n  path=os.path.realpath(os.fsdecode(args[0]))\n  if path.startswith(prefix):raise PermissionError('Original repository reads denied: '+path)\nsys.addaudithook(audit);runpy.run_path(script,run_name='__main__')\n",
+        "/private/tmp/signaltree-startup-evidence-parts-controls-2026-11-18/assemble-evidence.py",
+        "/Users/jonathanborgia/code/signaltree",
+        "/private/tmp/signaltree-startup-evidence-parts-controls-2026-11-18/missing/EVIDENCE-PARTS.json",
+        "/private/tmp/signaltree-startup-evidence-parts-controls-2026-11-18/missing-joined"
+      ],
+      "exitCode": 1,
+      "logSha256": "51067ed592c04dc9972c33b2760a53b6c8e08cd6dade830a15a4dcda921d4f1d"
+    },
+    {
+      "name": "reject-corrupt",
+      "command": [
+        "/Library/Frameworks/Python.framework/Versions/3.14/bin/python3",
+        "-c",
+        "import os,runpy,sys\nprefix=os.path.realpath(sys.argv[2])+os.sep\nscript=sys.argv[1];sys.argv=[script,*sys.argv[3:]]\ndef audit(event,args):\n if event=='open' and isinstance(args[0],(str,bytes,os.PathLike)):\n  path=os.path.realpath(os.fsdecode(args[0]))\n  if path.startswith(prefix):raise PermissionError('Original repository reads denied: '+path)\nsys.addaudithook(audit);runpy.run_path(script,run_name='__main__')\n",
+        "/private/tmp/signaltree-startup-evidence-parts-controls-2026-11-18/assemble-evidence.py",
+        "/Users/jonathanborgia/code/signaltree",
+        "/private/tmp/signaltree-startup-evidence-parts-controls-2026-11-18/corrupt/EVIDENCE-PARTS.json",
+        "/private/tmp/signaltree-startup-evidence-parts-controls-2026-11-18/corrupt-joined"
+      ],
+      "exitCode": 1,
+      "logSha256": "3ad922018d7671845b0769f2136b37dc76de491560bb409964b55b456c282ca9"
+    },
+    {
+      "name": "reject-reordered",
+      "command": [
+        "/Library/Frameworks/Python.framework/Versions/3.14/bin/python3",
+        "-c",
+        "import os,runpy,sys\nprefix=os.path.realpath(sys.argv[2])+os.sep\nscript=sys.argv[1];sys.argv=[script,*sys.argv[3:]]\ndef audit(event,args):\n if event=='open' and isinstance(args[0],(str,bytes,os.PathLike)):\n  path=os.path.realpath(os.fsdecode(args[0]))\n  if path.startswith(prefix):raise PermissionError('Original repository reads denied: '+path)\nsys.addaudithook(audit);runpy.run_path(script,run_name='__main__')\n",
+        "/private/tmp/signaltree-startup-evidence-parts-controls-2026-11-18/assemble-evidence.py",
+        "/Users/jonathanborgia/code/signaltree",
+        "/private/tmp/signaltree-startup-evidence-parts-controls-2026-11-18/reordered/EVIDENCE-PARTS.json",
+        "/private/tmp/signaltree-startup-evidence-parts-controls-2026-11-18/reordered-joined"
+      ],
+      "exitCode": 1,
+      "logSha256": "74712c752b487ca4bdc2c16618529ddaf1a1e64c8648da0f00973ac9e3b20cac"
+    },
+    {
+      "name": "reject-wrong-index",
+      "command": [
+        "/Library/Frameworks/Python.framework/Versions/3.14/bin/python3",
+        "-c",
+        "import os,runpy,sys\nprefix=os.path.realpath(sys.argv[2])+os.sep\nscript=sys.argv[1];sys.argv=[script,*sys.argv[3:]]\ndef audit(event,args):\n if event=='open' and isinstance(args[0],(str,bytes,os.PathLike)):\n  path=os.path.realpath(os.fsdecode(args[0]))\n  if path.startswith(prefix):raise PermissionError('Original repository reads denied: '+path)\nsys.addaudithook(audit);runpy.run_path(script,run_name='__main__')\n",
+        "/private/tmp/signaltree-startup-evidence-parts-controls-2026-11-18/assemble-evidence.py",
+        "/Users/jonathanborgia/code/signaltree",
+        "/private/tmp/signaltree-startup-evidence-parts-controls-2026-11-18/wrong-index/EVIDENCE-PARTS.json",
+        "/private/tmp/signaltree-startup-evidence-parts-controls-2026-11-18/wrong-index-joined"
+      ],
+      "exitCode": 1,
+      "logSha256": "788918e1fa86da4e3a7314ebc95755903877b692ddb30a6396be5c2e197e68c2"
+    }
+  ],
+  "sourceBindings": {
+    "/Users/jonathanborgia/code/signaltree/.worktrees/agent-collaboration-evaluation/tools/startup-economics/assemble-evidence-controls.py": "2da9934ed34972f79ed89a3ced02d7b8bb6e2e85d366565d4efa695218135c48",
+    "/Users/jonathanborgia/code/signaltree/.worktrees/agent-collaboration-evaluation/tools/startup-economics/assemble-evidence.py": "871d9a3733da5f42aa79267cfea3800228b08e4e22c817166f6a2011f05261e6",
+    "/Users/jonathanborgia/code/signaltree/.worktrees/agent-collaboration-evaluation/tools/agent-oversight-lab/application/verify-evidence.py": "ae79e507fd6720e1bc8bebdda134b2fa422f6e34b98f4dafd9b02836d7aafd15"
+  }
+}

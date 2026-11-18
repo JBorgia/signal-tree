@@ -1,0 +1,559 @@
+{
+  "schema_version": 1,
+  "retrieved_on_utc": "2026-11-18",
+  "currency": "USD",
+  "method": "Human-readable publisher pages opened with web tools; facts below are concise paraphrased extractions, not full archived source pages. Each source extraction stays below 200 words. Mutable URLs require revalidation before a real commercial decision.",
+  "sources": [
+    {
+      "id": "bls-developer-pay",
+      "title": "BLS Occupational Outlook Handbook: software developers",
+      "url": "https://www.bls.gov/ooh/computer-and-information-technology/software-developers.htm",
+      "retrieved_on_utc": "2026-11-18",
+      "observation_period": "May 2025",
+      "geography": "United States",
+      "source_kind": "primary publisher",
+      "facts": [
+        {
+          "metric": "software_developer_median_annual_wage",
+          "value": 135980,
+          "unit": "USD/worker/year"
+        },
+        {
+          "metric": "software_publisher_developer_median_annual_wage",
+          "value": 164550,
+          "unit": "USD/worker/year"
+        },
+        {
+          "metric": "finance_insurance_developer_median_annual_wage",
+          "value": 135460,
+          "unit": "USD/worker/year"
+        }
+      ],
+      "limits": [
+        "Occupation wages exclude the full employer cost of benefits and overhead.",
+        "Industry medians are not wages of SignalTree buyers.",
+        "Annual wages divided by assumed work hours and a broad benefits factor are scenario estimates, not measured developer hourly compensation."
+      ]
+    },
+    {
+      "id": "bls-employer-compensation",
+      "title": "BLS Employer Costs for Employee Compensation",
+      "url": "https://www.bls.gov/news.release/ecec.nr0.htm",
+      "retrieved_on_utc": "2026-11-18",
+      "observation_period": "June 2026; released September 9, 2026",
+      "geography": "United States",
+      "source_kind": "primary publisher",
+      "facts": [
+        {
+          "metric": "all_private_compensation",
+          "value": 46.89,
+          "unit": "USD/hour worked"
+        },
+        {
+          "metric": "all_private_wage_share",
+          "value": 0.7,
+          "unit": "fraction of employer compensation"
+        },
+        {
+          "metric": "full_time_private_compensation",
+          "value": 54.0,
+          "unit": "USD/hour worked"
+        },
+        {
+          "metric": "full_time_private_wage_share",
+          "value": 0.685,
+          "unit": "fraction of employer compensation"
+        }
+      ],
+      "limits": [
+        "Broad private-sector averages, not software-developer-specific benefits or business-reviewer rates.",
+        "Employer compensation is not automatically cash released when a task becomes faster."
+      ]
+    },
+    {
+      "id": "damodaran-us-margins",
+      "title": "Aswath Damodaran: Margins by Sector (US)",
+      "url": "https://pages.stern.nyu.edu/~adamodar/New_Home_Page/datafile/margin.html",
+      "retrieved_on_utc": "2026-11-18",
+      "observation_period": "January 2026 analysis",
+      "geography": "United States",
+      "source_kind": "primary published analysis of third-party financial data",
+      "facts": [
+        {
+          "sector": "Software (System & Application)",
+          "net_margin_percent": 25.49,
+          "sample_firms": 309
+        },
+        {
+          "sector": "Bank (Money Center)",
+          "net_margin_percent": 28.89,
+          "sample_firms": 15
+        },
+        {
+          "sector": "Insurance (General)",
+          "net_margin_percent": 12.37,
+          "sample_firms": 21
+        },
+        {
+          "sector": "Heathcare Information and Technology",
+          "net_margin_percent": 7.45,
+          "sample_firms": 115
+        },
+        {
+          "sector": "Healthcare Support Services",
+          "net_margin_percent": 1.25,
+          "sample_firms": 104
+        },
+        {
+          "sector": "Trucking",
+          "net_margin_percent": 3.79,
+          "sample_firms": 26
+        },
+        {
+          "sector": "Machinery",
+          "net_margin_percent": 10.58,
+          "sample_firms": 105
+        }
+      ],
+      "limits": [
+        "Author analysis uses multiple data services; it is primary published analysis, not primary company filings.",
+        "Sample company counts are not eligible buyers.",
+        "Sector margins are neither absolute profits nor account software budgets; private small firms may differ substantially.",
+        "Banking margins are not directly comparable with industrial accounting ratios."
+      ]
+    },
+    {
+      "id": "bea-corporate-profits",
+      "title": "BEA Corporate Profits",
+      "url": "https://www.bea.gov/data/income-saving/corporate-profits",
+      "retrieved_on_utc": "2026-11-18",
+      "observation_period": "2025 annual; current release September 30, 2026",
+      "geography": "United States",
+      "source_kind": "primary publisher",
+      "facts": [
+        {
+          "metric": "corporate_profits_from_current_production_with_inventory_valuation_and_capital_consumption_adjustments",
+          "value": 4025.0,
+          "unit": "billion USD/year"
+        }
+      ],
+      "limits": [
+        "Macroeconomic context only. No portion is assigned to SignalTree.",
+        "An annual profit flow is not an addressable software budget or customer count.",
+        "Quarterly levels and annualized rates are deliberately excluded from scenario inputs."
+      ]
+    },
+    {
+      "id": "langfuse-pricing",
+      "title": "Langfuse pricing",
+      "url": "https://langfuse.com/pricing",
+      "retrieved_on_utc": "2026-11-18",
+      "observation_period": "Public list prices observed November 18, 2026",
+      "geography": "Public USD pricing; region and tax terms may vary",
+      "source_kind": "primary publisher",
+      "facts": [
+        {
+          "plan": "Hobby",
+          "base_usd_per_month": 0
+        },
+        {
+          "plan": "Core",
+          "base_usd_per_month": 29,
+          "included_units_per_month": 100000
+        },
+        {
+          "plan": "Pro",
+          "base_usd_per_month": 199,
+          "included_units_per_month": 100000
+        },
+        {
+          "plan": "Pro Teams add-on",
+          "additional_usd_per_month": 300
+        },
+        {
+          "plan": "Enterprise",
+          "base_usd_per_month": 2499,
+          "included_units_per_month": 100000
+        },
+        {
+          "metric": "starting_additional_usage",
+          "value": 8,
+          "unit": "USD/100000 units; volume discounts apply"
+        },
+        {
+          "metric": "paid_plan_seats",
+          "value": "unlimited"
+        }
+      ],
+      "limits": [
+        "List-price anchor for a different and broader product, not evidence of SignalTree willingness to pay.",
+        "Base prices exclude excess usage and optional terms; public runtime adoption creates no subscription revenue."
+      ]
+    },
+    {
+      "id": "langsmith-pricing",
+      "title": "LangSmith plans and pricing",
+      "url": "https://www.langchain.com/pricing",
+      "retrieved_on_utc": "2026-11-18",
+      "observation_period": "Public list prices observed November 18, 2026",
+      "geography": "Public USD pricing; region and tax terms may vary",
+      "source_kind": "primary publisher",
+      "facts": [
+        {
+          "plan": "Developer",
+          "base_usd_per_seat_month": 0,
+          "included_seats": 1,
+          "included_base_traces_per_month": 5000
+        },
+        {
+          "plan": "Plus",
+          "base_usd_per_seat_month": 39,
+          "included_base_traces_per_month": 10000
+        },
+        {
+          "plan": "Enterprise",
+          "base_price": "custom"
+        },
+        {
+          "metric": "other_usage",
+          "value": "pay as you go; product-specific meters"
+        }
+      ],
+      "limits": [
+        "Seat pricing and trace allowances are not account-equivalent to Langfuse or modeled SignalTree tiers.",
+        "Tracing, evaluation, hosting and agent services are not all replaced by local state coordination."
+      ]
+    },
+    {
+      "id": "sentry-pricing",
+      "title": "Sentry pricing",
+      "url": "https://sentry.io/pricing/",
+      "retrieved_on_utc": "2026-11-18",
+      "observation_period": "Public list prices observed November 18, 2026",
+      "geography": "Public USD pricing; region and tax terms may vary",
+      "source_kind": "primary publisher",
+      "facts": [
+        {
+          "plan": "Developer",
+          "base_usd_per_month": 0,
+          "users": 1
+        },
+        {
+          "plan": "Team monthly billing",
+          "base_usd_per_month": 29
+        },
+        {
+          "plan": "Team annual billing",
+          "base_usd_per_month": 26
+        },
+        {
+          "plan": "Business monthly billing",
+          "base_usd_per_month": 89
+        },
+        {
+          "plan": "Business annual billing",
+          "base_usd_per_month": 80
+        },
+        {
+          "metric": "paid_plan_users",
+          "value": "unlimited"
+        },
+        {
+          "metric": "additional_log_ingestion",
+          "value": 0.5,
+          "unit": "USD/GB beyond included allowance"
+        }
+      ],
+      "limits": [
+        "Base prices exclude metered usage, some add-ons, tax and contract terms.",
+        "Error monitoring and tracing overlap investigation tooling, but a state library does not replace the full service."
+      ]
+    },
+    {
+      "id": "temporal-pricing",
+      "title": "Temporal Cloud pricing and support",
+      "url": "https://temporal.io/pricing",
+      "retrieved_on_utc": "2026-11-18",
+      "observation_period": "Public list prices observed November 18, 2026",
+      "geography": "Public USD pricing; region and tax terms may vary",
+      "source_kind": "primary publisher",
+      "facts": [
+        {
+          "metric": "pay_as_you_go_base_monthly_fee",
+          "value": 0,
+          "unit": "USD/month"
+        },
+        {
+          "metric": "starting_action_price",
+          "value": 50,
+          "unit": "USD/million actions"
+        },
+        {
+          "metric": "active_storage",
+          "value": 0.042,
+          "unit": "USD/GB-hour"
+        },
+        {
+          "metric": "retained_storage",
+          "value": 0.00105,
+          "unit": "USD/GB-hour"
+        },
+        {
+          "metric": "developer_support",
+          "value": 0.1,
+          "unit": "fraction of usage spend"
+        },
+        {
+          "metric": "business_support",
+          "value": "greater of USD 500/month or 10% of usage"
+        },
+        {
+          "metric": "scope",
+          "value": "durable workflow execution, event history, retries and operational support"
+        }
+      ],
+      "limits": [
+        "Main pricing page and current documentation agree; an older official AWS Marketplace acquisition page still advertises a USD 100 monthly plan fee.",
+        "Do not apply old Marketplace terms to this current standard price anchor.",
+        "This is a backend durable execution service, not a browser-state replacement."
+      ]
+    },
+    {
+      "id": "temporal-pricing-docs",
+      "title": "Temporal Cloud pricing documentation",
+      "url": "https://docs.temporal.io/cloud/pricing",
+      "retrieved_on_utc": "2026-11-18",
+      "observation_period": "Documentation observed November 18, 2026",
+      "geography": "Public USD pricing; region and tax terms may vary",
+      "source_kind": "primary publisher",
+      "facts": [
+        {
+          "metric": "invoice_components",
+          "value": "Actions, Storage, and Support"
+        },
+        {
+          "metric": "developer_support",
+          "value": "no base fee; 10% of usage spend"
+        },
+        {
+          "metric": "business_support",
+          "value": "greater of USD 500/month or 10% of usage spend"
+        }
+      ],
+      "limits": [
+        "Corroborates current main pricing; included allocations and commitment pricing affect exact invoices.",
+        "No invoice-replacement benefit is assumed."
+      ]
+    },
+    {
+      "id": "inngest-pricing",
+      "title": "Inngest pricing",
+      "url": "https://www.inngest.com/pricing",
+      "retrieved_on_utc": "2026-11-18",
+      "observation_period": "Public list prices observed November 18, 2026",
+      "geography": "Public USD pricing; region and tax terms may vary",
+      "source_kind": "primary publisher",
+      "facts": [
+        {
+          "plan": "Free",
+          "base_usd_per_month": 0,
+          "seats": 5,
+          "executions_per_month": 50000
+        },
+        {
+          "plan": "Pro",
+          "starting_usd_per_month": 99,
+          "seats": 15,
+          "executions_per_month": 1000000,
+          "trace_history_days": 7
+        },
+        {
+          "plan": "Business",
+          "starting_usd_per_month": 499,
+          "seats": 30,
+          "executions_per_month": 10000000,
+          "trace_history_days": 14
+        },
+        {
+          "plan": "Enterprise",
+          "base_price": "custom"
+        },
+        {
+          "metric": "scope",
+          "value": "event-driven application and agent orchestration; durable execution and observability"
+        }
+      ],
+      "limits": [
+        "Excess usage and add-ons change total costs.",
+        "A workflow orchestration complement; no assumed displacement by SignalTree."
+      ]
+    },
+    {
+      "id": "langfuse-capabilities",
+      "title": "Langfuse overview",
+      "url": "https://langfuse.com/docs",
+      "retrieved_on_utc": "2026-11-18",
+      "observation_period": "Documentation observed November 18, 2026",
+      "geography": "Global product documentation",
+      "source_kind": "primary publisher",
+      "facts": [
+        {
+          "metric": "capabilities",
+          "value": "LLM and non-LLM tracing, sessions, prompt management, evaluation, cost/latency analysis, and AI Gateway"
+        },
+        {
+          "metric": "integration",
+          "value": "JavaScript/Python SDKs, framework integrations and OpenTelemetry"
+        },
+        {
+          "metric": "deployment",
+          "value": "open, self-hostable and extensible"
+        }
+      ],
+      "limits": [
+        "Published feature descriptions are not independent performance or buyer-outcome measurements.",
+        "Runtime-owner correlation is a potential complementary context layer, not proof of replacing these products."
+      ]
+    },
+    {
+      "id": "otel-boundary",
+      "title": "OpenTelemetry: What is OpenTelemetry?",
+      "url": "https://opentelemetry.io/docs/what-is-opentelemetry/",
+      "retrieved_on_utc": "2026-11-18",
+      "observation_period": "Documentation observed November 18, 2026",
+      "geography": "Global project documentation",
+      "source_kind": "primary publisher",
+      "facts": [
+        {
+          "metric": "scope",
+          "value": "vendor-neutral generation, export and collection of traces, metrics and logs"
+        },
+        {
+          "metric": "boundary",
+          "value": "storage and visualization are left to other tools; OpenTelemetry is not an observability backend"
+        }
+      ],
+      "limits": [
+        "A transport or instrumentation integration would require actual implementation.",
+        "Compatibility does not establish present SignalTree support or saved customer effort."
+      ]
+    },
+    {
+      "id": "tanstack-db-overview",
+      "title": "TanStack DB overview",
+      "url": "https://tanstack.com/db/latest/docs/overview",
+      "retrieved_on_utc": "2026-11-18",
+      "observation_period": "Latest documentation observed November 18, 2026",
+      "geography": "Global project documentation",
+      "source_kind": "primary publisher",
+      "facts": [
+        {
+          "metric": "scope",
+          "value": "reactive client store, normalized collections, live queries and optimistic mutations"
+        },
+        {
+          "metric": "persistence",
+          "value": "documentation includes SQLite persistence and offline transactions"
+        },
+        {
+          "metric": "sync",
+          "value": "documentation describes eager, on-demand and progressive modes"
+        }
+      ],
+      "limits": [
+        "Latest documentation may differ from the pinned DB 0.15.2 in the prior comparison.",
+        "Feature listings do not establish equivalent full semantics or measured performance.",
+        "Do not claim that peer libraries lack all transactional, persistent or optimistic capabilities."
+      ]
+    },
+    {
+      "id": "ngrx-license",
+      "title": "NgRx project license",
+      "url": "https://github.com/ngrx/platform/blob/main/LICENSE",
+      "retrieved_on_utc": "2026-11-18",
+      "observation_period": "Repository main license observed November 18, 2026",
+      "geography": "Global project source",
+      "source_kind": "primary publisher",
+      "facts": [
+        {
+          "metric": "license",
+          "value": "MIT"
+        }
+      ],
+      "limits": [
+        "License fact only; no legal advice and no claim that adopting the library has zero engineering cost."
+      ]
+    },
+    {
+      "id": "tanstack-db-license",
+      "title": "TanStack DB project license",
+      "url": "https://github.com/TanStack/db/blob/main/LICENSE",
+      "retrieved_on_utc": "2026-11-18",
+      "observation_period": "Repository main license observed November 18, 2026",
+      "geography": "Global project source",
+      "source_kind": "primary publisher",
+      "facts": [
+        {
+          "metric": "license",
+          "value": "MIT"
+        }
+      ],
+      "limits": [
+        "License fact only; public runtime license fees are not a credible replacement-savings assumption."
+      ]
+    },
+    {
+      "id": "cloudflare-r2-pricing",
+      "title": "Cloudflare R2 pricing",
+      "url": "https://developers.cloudflare.com/r2/pricing/",
+      "retrieved_on_utc": "2026-11-18",
+      "observation_period": "Pricing observed November 18, 2026; page updated October 30, 2026",
+      "geography": "Public USD pricing; region and tax terms may vary",
+      "source_kind": "primary publisher",
+      "facts": [
+        {
+          "metric": "standard_storage",
+          "value": 0.015,
+          "unit": "USD/GB-month"
+        },
+        {
+          "metric": "standard_class_a_operations",
+          "value": 4.5,
+          "unit": "USD/million requests"
+        },
+        {
+          "metric": "standard_class_b_operations",
+          "value": 0.36,
+          "unit": "USD/million requests"
+        },
+        {
+          "metric": "internet_egress",
+          "value": 0,
+          "unit": "USD/GB"
+        }
+      ],
+      "limits": [
+        "A raw object-storage anchor only, not an actual Studio architecture or hosting quote.",
+        "Does not include compute, database/indexing, backup, availability, security, retention administration or labor.",
+        "Free tier, rounding and billing details must be applied to actual invoices."
+      ]
+    }
+  ],
+  "exclusions": [
+    "No buyer interviews, willingness-to-pay observations, adoption sample, churn study or SignalTree production incident-outcome study exists in this packet.",
+    "No market-size estimate or industry account count is inferred from listed-company samples, developer counts, vendor logos, downloads or global AI spending.",
+    "No competitor base subscription is assumed removable merely by adding SignalTree."
+  ],
+  "discrepancies": [
+    {
+      "subject": "Temporal base plan fee",
+      "current_sources": [
+        "temporal-pricing",
+        "temporal-pricing-docs"
+      ],
+      "older_official_url": "https://temporal.io/get-cloud/aws-marketplace",
+      "older_page_claim": "USD 100/month plan fee and USD 50/million actions",
+      "treatment": "Use current main pricing/docs for the public anchor; this is not a quote for a particular Marketplace contract."
+    }
+  ]
+}

@@ -1,0 +1,65 @@
+{
+  "purpose": "New versioned application-size cohort; old generators unchanged. Final destination hashes are frozen by execution plan.",
+  "files": [
+    {
+      "source": "tools/optimization-sweep/application/context-probe.mjs",
+      "sourceSha256": "c115875932e7fbaa56ecd6792e020ffc330d5befa356f9c441afdfb3e7fb6091",
+      "destination": "tools/startup-economics/application/context-probe.mjs"
+    },
+    {
+      "source": "tools/optimization-sweep/application/metrics-protocol.md",
+      "sourceSha256": "f4e6f99ab5d6fbc880e45614b0abf1a6c44bd0a741e1ff1cf838d245cf077637",
+      "destination": "tools/startup-economics/application/metrics-protocol.md"
+    },
+    {
+      "source": "tools/optimization-sweep/application/measure.mjs",
+      "sourceSha256": "9fff0333578f779adb7b8ff859ca4a558fc444b7b1cd906104c760ffe7ce7c82",
+      "destination": "tools/startup-economics/application/measure.mjs"
+    },
+    {
+      "source": "tools/optimization-sweep/application/historical-inputs.mjs",
+      "sourceSha256": "04a1e88a99292bf92945df4c773f0220dcdd62ad092820375224fa5d0f5cf8ff",
+      "destination": "tools/startup-economics/application/historical-inputs.mjs"
+    },
+    {
+      "source": "tools/optimization-sweep/application/analyze.mjs",
+      "sourceSha256": "570cdc097c7cc2f8a814a0745ccc6a927625f43cc4ef26e4c71b5b8ec0e1139d",
+      "destination": "tools/startup-economics/application/analyze.mjs"
+    },
+    {
+      "source": "tools/optimization-sweep/application/browser-metrics.mjs",
+      "sourceSha256": "74b41fb0e88e3bb8c0942dbd352b216640447742a3dcf5dcc630bb2843b3c436",
+      "destination": "tools/startup-economics/application/browser-metrics.mjs"
+    },
+    {
+      "source": "tools/optimization-sweep/application/metrics-schema.mjs",
+      "sourceSha256": "a3daea2192ffab7ad2bcf6037bab61b5c7c113f6bf8b243b180a5f29f31c8838",
+      "destination": "tools/startup-economics/application/metrics-schema.mjs"
+    },
+    {
+      "source": "tools/optimization-sweep/application/context-controls.mjs",
+      "sourceSha256": "4c74f6b84d3187b75d6db4dda5bbfefdfc178cd1a58b64254856155ae771638b",
+      "destination": "tools/startup-economics/application/context-controls.mjs"
+    },
+    {
+      "source": "tools/optimization-sweep/application/metrics-schema-selftest.mjs",
+      "sourceSha256": "0faf006a4e276ea956ee3f77a5bd05d16edaa9d6a1e9f2935e948ebc81f00180",
+      "destination": "tools/startup-economics/application/metrics-schema-selftest.mjs"
+    },
+    {
+      "source": "tools/optimization-sweep/application/analyzer-controls.mjs",
+      "sourceSha256": "f5adfbb08e7975645a07446fc1ed27c12b2d9b7e9faef3986638298ea6cc8590",
+      "destination": "tools/startup-economics/application/analyzer-controls.mjs"
+    },
+    {
+      "source": "tools/optimization-sweep/context-strategy-execution.mjs",
+      "sourceSha256": "89330bf4b1cf48ec76ea7efa8fc54a4e21a4c0c0da50b9515755e2f675ab8bdc",
+      "destination": "tools/startup-economics/context-strategy-execution.mjs"
+    },
+    {
+      "source": "tools/optimization-sweep/context-strategy-common.mjs",
+      "sourceSha256": "c9b341c54cf281e81505fe2597f52afc88cb144722499e2c29338c736e3de937",
+      "destination": "tools/startup-economics/context-strategy-common.mjs"
+    }
+  ]
+}

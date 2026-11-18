@@ -1,0 +1,40 @@
+{
+  "format": "signaltree-evidence-parts-v1",
+  "archive": {
+    "file": "evidence.tar.gz",
+    "sha256": "b657f854c5f1150bbee2829f9356c94a232d7bbc0dc467b8ae312c117d888f8f",
+    "bytes": 144660493
+  },
+  "index": {
+    "file": "EVIDENCE.json",
+    "sha256": "12238ab9ffed8b7270255edd2c0bce06055e7092ca3a6c335ddc4d1d59f1ef71"
+  },
+  "parts": [
+    {
+      "ordinal": 0,
+      "file": "evidence.tar.gz.part-000",
+      "bytes": 41943040,
+      "sha256": "07a8086fd4aeb483fbfd0223a9239e35fcbf9fc412c9b664be8d43d637fba0c4"
+    },
+    {
+      "ordinal": 1,
+      "file": "evidence.tar.gz.part-001",
+      "bytes": 41943040,
+      "sha256": "a1e6b040a44f87c2891cfd248344f59bd71a4321a63532ba0ecfad5a1583b754"
+    },
+    {
+      "ordinal": 2,
+      "file": "evidence.tar.gz.part-002",
+      "bytes": 41943040,
+      "sha256": "23dca9be137f956f16ee979c87821ab6f417d56dd88bd63b7a24128d168bf3a9"
+    },
+    {
+      "ordinal": 3,
+      "file": "evidence.tar.gz.part-003",
+      "bytes": 18831373,
+      "sha256": "60a24d56834ed9a314353fc950489adc23cab50e8d5faaffbadb321544a8e944"
+    }
+  ],
+  "assemblerSha256": "871d9a3733da5f42aa79267cfea3800228b08e4e22c817166f6a2011f05261e6",
+  "limits": "Parts reconstruct the unchanged archive. Run the payload verifier afterward; this is not an offline dependency or repository-history closure."
+}

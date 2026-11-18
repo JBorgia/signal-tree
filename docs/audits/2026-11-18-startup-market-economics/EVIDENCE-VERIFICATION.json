@@ -1,0 +1,45 @@
+{
+  "archiveSha256": "b657f854c5f1150bbee2829f9356c94a232d7bbc0dc467b8ae312c117d888f8f",
+  "indexSha256": "12238ab9ffed8b7270255edd2c0bce06055e7092ca3a6c335ddc4d1d59f1ef71",
+  "generatorSha256": "833055570180876b8cc814fe3549468f0d5461df32da3d1b7c9851e51e2a5799",
+  "verifierSha256": "ae79e507fd6720e1bc8bebdda134b2fa422f6e34b98f4dafd9b02836d7aafd15",
+  "command": [
+    "/Library/Frameworks/Python.framework/Versions/3.14/bin/python3",
+    "tools/agent-oversight-lab/application/verify-evidence-controls.py",
+    "/Users/jonathanborgia/code/signaltree/artifacts/startup-market-economics-evidence-2026-11-18/EVIDENCE.json",
+    "/private/tmp/signaltree-startup-market-economics-verification-2026-11-18"
+  ],
+  "originalRepositoryReadsDenied": true,
+  "containerHashesRecomputedForPayloadControls": true,
+  "originalArchiveUnchanged": true,
+  "results": [
+    {
+      "mode": "intact",
+      "exitCode": 0,
+      "expectedExitCode": 0,
+      "victim": null,
+      "logSha256": "4bbc393b663d406b137c0f1e8462b14dab2b47191ab7471a718931528bebd57f"
+    },
+    {
+      "mode": "corrupt-payload",
+      "exitCode": 1,
+      "expectedExitCode": 1,
+      "victim": "baselines/current-v15-built/angular.json",
+      "logSha256": "1f3ea00a4a605daaa12aea3ecbc4397c7bbdadd61b36385a25e461c32ccde4b5"
+    },
+    {
+      "mode": "missing-payload",
+      "exitCode": 1,
+      "expectedExitCode": 1,
+      "victim": "baselines/current-v15-built/angular.json",
+      "logSha256": "0dbfc9452e092ab04e331f5f2a55eb59328dac483c0c8b13b1fdec9978a181d1"
+    },
+    {
+      "mode": "intact-after-controls",
+      "exitCode": 0,
+      "expectedExitCode": 0,
+      "victim": null,
+      "logSha256": "4bbc393b663d406b137c0f1e8462b14dab2b47191ab7471a718931528bebd57f"
+    }
+  ]
+}

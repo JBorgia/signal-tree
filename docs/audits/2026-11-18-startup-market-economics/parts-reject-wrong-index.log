@@ -1,0 +1,11 @@
+Traceback (most recent call last):
+  File "<string>", line 8, in <module>
+    sys.addaudithook(audit);runpy.run_path(script,run_name='__main__')
+                            ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<frozen runpy>", line 294, in run_path
+  File "<frozen runpy>", line 98, in _run_module_code
+  File "<frozen runpy>", line 88, in _run_code
+  File "/private/tmp/signaltree-startup-evidence-parts-controls-2026-11-18/assemble-evidence.py", line 22, in <module>
+    assert hashlib.sha256(index_bytes).hexdigest() == manifest['index']['sha256']
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError

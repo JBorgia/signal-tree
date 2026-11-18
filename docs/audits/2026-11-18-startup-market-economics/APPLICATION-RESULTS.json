@@ -1,0 +1,1509 @@
+{
+  "application_rows": [
+    {
+      "rows": 500,
+      "arm": "native",
+      "factory_ms": 1.2000000476837158,
+      "navigation_to_layout_ms": 26.09999990463257,
+      "populated_absolute_heap_bytes": 2394504,
+      "populated_above_blank_bytes": 1877036,
+      "pending128_above_populated_bytes": 521432,
+      "settled128_absolute_heap_bytes": 3004052,
+      "settled128_above_populated_bytes": 613800,
+      "destroyed_above_blank_bytes": 1672736,
+      "full_context_repeated_p95_ms": 0.20000004768371582,
+      "enqueue_to_layout_p95_ms": 11.899999856948853,
+      "settlement128_elapsed_ms": 231.20000004768372,
+      "settlement128_per_response_p95_ms": 5.6000001430511475,
+      "complete180_elapsed_ms": 847.3000001907349,
+      "checked_commands_per_second": 212.43951370173536
+    },
+    {
+      "rows": 500,
+      "arm": "ngrx",
+      "factory_ms": 0.8999998569488525,
+      "navigation_to_layout_ms": 23.299999952316284,
+      "populated_absolute_heap_bytes": 2131684,
+      "populated_above_blank_bytes": 1614216,
+      "pending128_above_populated_bytes": 553104,
+      "settled128_absolute_heap_bytes": 2790684,
+      "settled128_above_populated_bytes": 663048,
+      "destroyed_above_blank_bytes": 1705540,
+      "full_context_repeated_p95_ms": 0.20000004768371582,
+      "enqueue_to_layout_p95_ms": 11.799999952316284,
+      "settlement128_elapsed_ms": 230.80000019073486,
+      "settlement128_per_response_p95_ms": 5.6000001430511475,
+      "complete180_elapsed_ms": 863.8000001907349,
+      "checked_commands_per_second": 208.38156976181335
+    },
+    {
+      "rows": 500,
+      "arm": "v15",
+      "factory_ms": 4.200000047683716,
+      "navigation_to_layout_ms": 30.299999952316284,
+      "populated_absolute_heap_bytes": 2599308,
+      "populated_above_blank_bytes": 2081840,
+      "pending128_above_populated_bytes": 1230504,
+      "settled128_absolute_heap_bytes": 3816432,
+      "settled128_above_populated_bytes": 1219584,
+      "destroyed_above_blank_bytes": 2553304,
+      "full_context_repeated_p95_ms": 0.20000004768371582,
+      "enqueue_to_layout_p95_ms": 12.100000143051147,
+      "settlement128_elapsed_ms": 231.70000004768372,
+      "settlement128_per_response_p95_ms": 5.6000001430511475,
+      "complete180_elapsed_ms": 861.8999998569489,
+      "checked_commands_per_second": 208.840932857495
+    },
+    {
+      "rows": 500,
+      "arm": "v16",
+      "factory_ms": 13.799999952316284,
+      "navigation_to_layout_ms": 42.59999990463257,
+      "populated_absolute_heap_bytes": 2911592,
+      "populated_above_blank_bytes": 2394124,
+      "pending128_above_populated_bytes": 1561704,
+      "settled128_absolute_heap_bytes": 4529404,
+      "settled128_above_populated_bytes": 1620108,
+      "destroyed_above_blank_bytes": 3218172,
+      "full_context_repeated_p95_ms": 0.20000004768371582,
+      "enqueue_to_layout_p95_ms": 12.300000190734863,
+      "settlement128_elapsed_ms": 230.79999995231628,
+      "settlement128_per_response_p95_ms": 5.700000047683716,
+      "complete180_elapsed_ms": 842.8000001907349,
+      "checked_commands_per_second": 213.57380156533463
+    },
+    {
+      "rows": 500,
+      "arm": "tanstack",
+      "factory_ms": 5.700000047683716,
+      "navigation_to_layout_ms": 38.299999952316284,
+      "populated_absolute_heap_bytes": 2940460,
+      "populated_above_blank_bytes": 2422992,
+      "pending128_above_populated_bytes": 1088784,
+      "settled128_absolute_heap_bytes": 4347048,
+      "settled128_above_populated_bytes": 1406828,
+      "destroyed_above_blank_bytes": 2955808,
+      "full_context_repeated_p95_ms": 0.20000004768371582,
+      "enqueue_to_layout_p95_ms": 12.200000047683716,
+      "settlement128_elapsed_ms": 229.70000004768372,
+      "settlement128_per_response_p95_ms": 5.799999952316284,
+      "complete180_elapsed_ms": 852,
+      "checked_commands_per_second": 211.26760563380282
+    },
+    {
+      "rows": 500,
+      "arm": "tanstack-variant",
+      "factory_ms": 5.5,
+      "navigation_to_layout_ms": 36.299999952316284,
+      "populated_absolute_heap_bytes": 2940492,
+      "populated_above_blank_bytes": 2423024,
+      "pending128_above_populated_bytes": 1090032,
+      "settled128_absolute_heap_bytes": 4347764,
+      "settled128_above_populated_bytes": 1407492,
+      "destroyed_above_blank_bytes": 2956448,
+      "full_context_repeated_p95_ms": 0.20000004768371582,
+      "enqueue_to_layout_p95_ms": 12.299999952316284,
+      "settlement128_elapsed_ms": 231.09999990463257,
+      "settlement128_per_response_p95_ms": 5.799999952316284,
+      "complete180_elapsed_ms": 863.7000000476837,
+      "checked_commands_per_second": 208.40569641086307
+    },
+    {
+      "rows": 10000,
+      "arm": "native",
+      "factory_ms": 7.099999904632568,
+      "navigation_to_layout_ms": 40.10000014305115,
+      "populated_absolute_heap_bytes": 11355800,
+      "populated_above_blank_bytes": 10838332,
+      "pending128_above_populated_bytes": 521500,
+      "settled128_absolute_heap_bytes": 11965168,
+      "settled128_above_populated_bytes": 613220,
+      "destroyed_above_blank_bytes": 1670532,
+      "full_context_repeated_p95_ms": 3.700000047683716,
+      "enqueue_to_layout_p95_ms": 12.200000047683716,
+      "settlement128_elapsed_ms": 232,
+      "settlement128_per_response_p95_ms": 5.599999904632568,
+      "complete180_elapsed_ms": 834.4000000953674,
+      "checked_commands_per_second": 215.72387341733818
+    },
+    {
+      "rows": 10000,
+      "arm": "ngrx",
+      "factory_ms": 4.700000047683716,
+      "navigation_to_layout_ms": 36.700000047683716,
+      "populated_absolute_heap_bytes": 5704172,
+      "populated_above_blank_bytes": 5186704,
+      "pending128_above_populated_bytes": 553468,
+      "settled128_absolute_heap_bytes": 6524868,
+      "settled128_above_populated_bytes": 664492,
+      "destroyed_above_blank_bytes": 1695336,
+      "full_context_repeated_p95_ms": 4.700000047683716,
+      "enqueue_to_layout_p95_ms": 11.200000047683716,
+      "settlement128_elapsed_ms": 264.2000000476837,
+      "settlement128_per_response_p95_ms": 6.299999952316284,
+      "complete180_elapsed_ms": 834.7999999523163,
+      "checked_commands_per_second": 215.62050791840153
+    },
+    {
+      "rows": 10000,
+      "arm": "v15",
+      "factory_ms": 11.400000095367432,
+      "navigation_to_layout_ms": 47.60000014305115,
+      "populated_absolute_heap_bytes": 7556144,
+      "populated_above_blank_bytes": 7038676,
+      "pending128_above_populated_bytes": 1231440,
+      "settled128_absolute_heap_bytes": 8776232,
+      "settled128_above_populated_bytes": 1222104,
+      "destroyed_above_blank_bytes": 2554124,
+      "full_context_repeated_p95_ms": 3.200000047683716,
+      "enqueue_to_layout_p95_ms": 12.299999952316284,
+      "settlement128_elapsed_ms": 231.5,
+      "settlement128_per_response_p95_ms": 5.700000047683716,
+      "complete180_elapsed_ms": 844.5999999046326,
+      "checked_commands_per_second": 213.1186360647935
+    },
+    {
+      "rows": 10000,
+      "arm": "v16",
+      "factory_ms": 133,
+      "navigation_to_layout_ms": 171.59999990463257,
+      "populated_absolute_heap_bytes": 8170120,
+      "populated_above_blank_bytes": 7652652,
+      "pending128_above_populated_bytes": 1563864,
+      "settled128_absolute_heap_bytes": 9751400,
+      "settled128_above_populated_bytes": 1581868,
+      "destroyed_above_blank_bytes": 3221884,
+      "full_context_repeated_p95_ms": 3.3000001907348633,
+      "enqueue_to_layout_p95_ms": 12.599999904632568,
+      "settlement128_elapsed_ms": 230.79999995231628,
+      "settlement128_per_response_p95_ms": 5.800000190734863,
+      "complete180_elapsed_ms": 856.7000000476837,
+      "checked_commands_per_second": 210.10855607561717
+    },
+    {
+      "rows": 10000,
+      "arm": "tanstack",
+      "factory_ms": 37.799999952316284,
+      "navigation_to_layout_ms": 80.09999990463257,
+      "populated_absolute_heap_bytes": 8144868,
+      "populated_above_blank_bytes": 7627400,
+      "pending128_above_populated_bytes": 1093556,
+      "settled128_absolute_heap_bytes": 9530656,
+      "settled128_above_populated_bytes": 1387388,
+      "destroyed_above_blank_bytes": 2959148,
+      "full_context_repeated_p95_ms": 3.200000047683716,
+      "enqueue_to_layout_p95_ms": 12.599999904632568,
+      "settlement128_elapsed_ms": 229.59999990463257,
+      "settlement128_per_response_p95_ms": 5.799999952316284,
+      "complete180_elapsed_ms": 857.1000001430511,
+      "checked_commands_per_second": 210.01050048997521
+    },
+    {
+      "rows": 10000,
+      "arm": "tanstack-variant",
+      "factory_ms": 36.09999990463257,
+      "navigation_to_layout_ms": 79.20000004768372,
+      "populated_absolute_heap_bytes": 8144932,
+      "populated_above_blank_bytes": 7627464,
+      "pending128_above_populated_bytes": 1095604,
+      "settled128_absolute_heap_bytes": 9532004,
+      "settled128_above_populated_bytes": 1388784,
+      "destroyed_above_blank_bytes": 2960044,
+      "full_context_repeated_p95_ms": 3.3999998569488525,
+      "enqueue_to_layout_p95_ms": 12.200000047683716,
+      "settlement128_elapsed_ms": 230.20000004768372,
+      "settlement128_per_response_p95_ms": 5.700000047683716,
+      "complete180_elapsed_ms": 834.2000000476837,
+      "checked_commands_per_second": 215.77559337054785
+    },
+    {
+      "rows": 50000,
+      "arm": "native",
+      "factory_ms": 27.90000009536743,
+      "navigation_to_layout_ms": 99.10000014305115,
+      "populated_absolute_heap_bytes": 48626116,
+      "populated_above_blank_bytes": 48108648,
+      "pending128_above_populated_bytes": 520896,
+      "settled128_absolute_heap_bytes": 49231576,
+      "settled128_above_populated_bytes": 608980,
+      "destroyed_above_blank_bytes": 1670840,
+      "full_context_repeated_p95_ms": 17.90000009536743,
+      "enqueue_to_layout_p95_ms": 12,
+      "settlement128_elapsed_ms": 228.70000004768372,
+      "settlement128_per_response_p95_ms": 5.5,
+      "complete180_elapsed_ms": 802.4000000953674,
+      "checked_commands_per_second": 224.32701891650862
+    },
+    {
+      "rows": 50000,
+      "arm": "ngrx",
+      "factory_ms": 22.09999990463257,
+      "navigation_to_layout_ms": 96,
+      "populated_absolute_heap_bytes": 21105424,
+      "populated_above_blank_bytes": 20587956,
+      "pending128_above_populated_bytes": 553344,
+      "settled128_absolute_heap_bytes": 22562728,
+      "settled128_above_populated_bytes": 660688,
+      "destroyed_above_blank_bytes": 1695688,
+      "full_context_repeated_p95_ms": 16.600000143051147,
+      "enqueue_to_layout_p95_ms": 0.9000000953674316,
+      "settlement128_elapsed_ms": 1310.1000001430511,
+      "settlement128_per_response_p95_ms": 12.299999952316284,
+      "complete180_elapsed_ms": 2008.6000001430511,
+      "checked_commands_per_second": 89.61465696862517
+    },
+    {
+      "rows": 50000,
+      "arm": "v15",
+      "factory_ms": 40.80000019073486,
+      "navigation_to_layout_ms": 115.10000014305115,
+      "populated_absolute_heap_bytes": 26946176,
+      "populated_above_blank_bytes": 26428708,
+      "pending128_above_populated_bytes": 1222456,
+      "settled128_absolute_heap_bytes": 28157628,
+      "settled128_above_populated_bytes": 1213420,
+      "destroyed_above_blank_bytes": 2554724,
+      "full_context_repeated_p95_ms": 17.200000047683716,
+      "enqueue_to_layout_p95_ms": 12.600000143051147,
+      "settlement128_elapsed_ms": 230.39999985694885,
+      "settlement128_per_response_p95_ms": 5.699999809265137,
+      "complete180_elapsed_ms": 853.9000000953674,
+      "checked_commands_per_second": 210.79751725014262
+    },
+    {
+      "rows": 50000,
+      "arm": "v16",
+      "factory_ms": 638.6999998092651,
+      "navigation_to_layout_ms": 722.3000001907349,
+      "populated_absolute_heap_bytes": 31337820,
+      "populated_above_blank_bytes": 30820352,
+      "pending128_above_populated_bytes": 1561684,
+      "settled128_absolute_heap_bytes": 32754148,
+      "settled128_above_populated_bytes": 1417908,
+      "destroyed_above_blank_bytes": 3226636,
+      "full_context_repeated_p95_ms": 20.40000009536743,
+      "enqueue_to_layout_p95_ms": 12.399999856948853,
+      "settlement128_elapsed_ms": 228.80000019073486,
+      "settlement128_per_response_p95_ms": 5.799999952316284,
+      "complete180_elapsed_ms": 833.5,
+      "checked_commands_per_second": 215.95680863827235
+    },
+    {
+      "rows": 50000,
+      "arm": "tanstack",
+      "factory_ms": 167,
+      "navigation_to_layout_ms": 252.29999995231628,
+      "populated_absolute_heap_bytes": 29037252,
+      "populated_above_blank_bytes": 28519784,
+      "pending128_above_populated_bytes": 1093872,
+      "settled128_absolute_heap_bytes": 30423940,
+      "settled128_above_populated_bytes": 1386872,
+      "destroyed_above_blank_bytes": 2961536,
+      "full_context_repeated_p95_ms": 18.699999809265137,
+      "enqueue_to_layout_p95_ms": 12.100000143051147,
+      "settlement128_elapsed_ms": 230.20000004768372,
+      "settlement128_per_response_p95_ms": 5.8999998569488525,
+      "complete180_elapsed_ms": 851.1999998092651,
+      "checked_commands_per_second": 211.46616546091866
+    },
+    {
+      "rows": 50000,
+      "arm": "tanstack-variant",
+      "factory_ms": 163.40000009536743,
+      "navigation_to_layout_ms": 244.10000014305115,
+      "populated_absolute_heap_bytes": 29037932,
+      "populated_above_blank_bytes": 28520464,
+      "pending128_above_populated_bytes": 1094896,
+      "settled128_absolute_heap_bytes": 30423564,
+      "settled128_above_populated_bytes": 1386580,
+      "destroyed_above_blank_bytes": 2962088,
+      "full_context_repeated_p95_ms": 19.299999952316284,
+      "enqueue_to_layout_p95_ms": 12,
+      "settlement128_elapsed_ms": 231.29999995231628,
+      "settlement128_per_response_p95_ms": 5.800000190734863,
+      "complete180_elapsed_ms": 839.2999999523163,
+      "checked_commands_per_second": 214.4644346601054
+    }
+  ],
+  "hypothetical_heap_envelopes": [
+    {
+      "rows": 500,
+      "arm": "native",
+      "illustrative_app_heap_allocation_decimal_mb": 32,
+      "populated_heap_fraction": 0.07482825
+    },
+    {
+      "rows": 500,
+      "arm": "native",
+      "illustrative_app_heap_allocation_decimal_mb": 128,
+      "populated_heap_fraction": 0.0187070625
+    },
+    {
+      "rows": 500,
+      "arm": "native",
+      "illustrative_app_heap_allocation_decimal_mb": 512,
+      "populated_heap_fraction": 0.004676765625
+    },
+    {
+      "rows": 500,
+      "arm": "ngrx",
+      "illustrative_app_heap_allocation_decimal_mb": 32,
+      "populated_heap_fraction": 0.066615125
+    },
+    {
+      "rows": 500,
+      "arm": "ngrx",
+      "illustrative_app_heap_allocation_decimal_mb": 128,
+      "populated_heap_fraction": 0.01665378125
+    },
+    {
+      "rows": 500,
+      "arm": "ngrx",
+      "illustrative_app_heap_allocation_decimal_mb": 512,
+      "populated_heap_fraction": 0.0041634453125
+    },
+    {
+      "rows": 500,
+      "arm": "v15",
+      "illustrative_app_heap_allocation_decimal_mb": 32,
+      "populated_heap_fraction": 0.081228375
+    },
+    {
+      "rows": 500,
+      "arm": "v15",
+      "illustrative_app_heap_allocation_decimal_mb": 128,
+      "populated_heap_fraction": 0.02030709375
+    },
+    {
+      "rows": 500,
+      "arm": "v15",
+      "illustrative_app_heap_allocation_decimal_mb": 512,
+      "populated_heap_fraction": 0.0050767734375
+    },
+    {
+      "rows": 500,
+      "arm": "v16",
+      "illustrative_app_heap_allocation_decimal_mb": 32,
+      "populated_heap_fraction": 0.09098725
+    },
+    {
+      "rows": 500,
+      "arm": "v16",
+      "illustrative_app_heap_allocation_decimal_mb": 128,
+      "populated_heap_fraction": 0.0227468125
+    },
+    {
+      "rows": 500,
+      "arm": "v16",
+      "illustrative_app_heap_allocation_decimal_mb": 512,
+      "populated_heap_fraction": 0.005686703125
+    },
+    {
+      "rows": 500,
+      "arm": "tanstack",
+      "illustrative_app_heap_allocation_decimal_mb": 32,
+      "populated_heap_fraction": 0.091889375
+    },
+    {
+      "rows": 500,
+      "arm": "tanstack",
+      "illustrative_app_heap_allocation_decimal_mb": 128,
+      "populated_heap_fraction": 0.02297234375
+    },
+    {
+      "rows": 500,
+      "arm": "tanstack",
+      "illustrative_app_heap_allocation_decimal_mb": 512,
+      "populated_heap_fraction": 0.0057430859375
+    },
+    {
+      "rows": 500,
+      "arm": "tanstack-variant",
+      "illustrative_app_heap_allocation_decimal_mb": 32,
+      "populated_heap_fraction": 0.091890375
+    },
+    {
+      "rows": 500,
+      "arm": "tanstack-variant",
+      "illustrative_app_heap_allocation_decimal_mb": 128,
+      "populated_heap_fraction": 0.02297259375
+    },
+    {
+      "rows": 500,
+      "arm": "tanstack-variant",
+      "illustrative_app_heap_allocation_decimal_mb": 512,
+      "populated_heap_fraction": 0.0057431484375
+    },
+    {
+      "rows": 10000,
+      "arm": "native",
+      "illustrative_app_heap_allocation_decimal_mb": 32,
+      "populated_heap_fraction": 0.35486875
+    },
+    {
+      "rows": 10000,
+      "arm": "native",
+      "illustrative_app_heap_allocation_decimal_mb": 128,
+      "populated_heap_fraction": 0.0887171875
+    },
+    {
+      "rows": 10000,
+      "arm": "native",
+      "illustrative_app_heap_allocation_decimal_mb": 512,
+      "populated_heap_fraction": 0.022179296875
+    },
+    {
+      "rows": 10000,
+      "arm": "ngrx",
+      "illustrative_app_heap_allocation_decimal_mb": 32,
+      "populated_heap_fraction": 0.178255375
+    },
+    {
+      "rows": 10000,
+      "arm": "ngrx",
+      "illustrative_app_heap_allocation_decimal_mb": 128,
+      "populated_heap_fraction": 0.04456384375
+    },
+    {
+      "rows": 10000,
+      "arm": "ngrx",
+      "illustrative_app_heap_allocation_decimal_mb": 512,
+      "populated_heap_fraction": 0.0111409609375
+    },
+    {
+      "rows": 10000,
+      "arm": "v15",
+      "illustrative_app_heap_allocation_decimal_mb": 32,
+      "populated_heap_fraction": 0.2361295
+    },
+    {
+      "rows": 10000,
+      "arm": "v15",
+      "illustrative_app_heap_allocation_decimal_mb": 128,
+      "populated_heap_fraction": 0.059032375
+    },
+    {
+      "rows": 10000,
+      "arm": "v15",
+      "illustrative_app_heap_allocation_decimal_mb": 512,
+      "populated_heap_fraction": 0.01475809375
+    },
+    {
+      "rows": 10000,
+      "arm": "v16",
+      "illustrative_app_heap_allocation_decimal_mb": 32,
+      "populated_heap_fraction": 0.25531625
+    },
+    {
+      "rows": 10000,
+      "arm": "v16",
+      "illustrative_app_heap_allocation_decimal_mb": 128,
+      "populated_heap_fraction": 0.0638290625
+    },
+    {
+      "rows": 10000,
+      "arm": "v16",
+      "illustrative_app_heap_allocation_decimal_mb": 512,
+      "populated_heap_fraction": 0.015957265625
+    },
+    {
+      "rows": 10000,
+      "arm": "tanstack",
+      "illustrative_app_heap_allocation_decimal_mb": 32,
+      "populated_heap_fraction": 0.254527125
+    },
+    {
+      "rows": 10000,
+      "arm": "tanstack",
+      "illustrative_app_heap_allocation_decimal_mb": 128,
+      "populated_heap_fraction": 0.06363178125
+    },
+    {
+      "rows": 10000,
+      "arm": "tanstack",
+      "illustrative_app_heap_allocation_decimal_mb": 512,
+      "populated_heap_fraction": 0.0159079453125
+    },
+    {
+      "rows": 10000,
+      "arm": "tanstack-variant",
+      "illustrative_app_heap_allocation_decimal_mb": 32,
+      "populated_heap_fraction": 0.254529125
+    },
+    {
+      "rows": 10000,
+      "arm": "tanstack-variant",
+      "illustrative_app_heap_allocation_decimal_mb": 128,
+      "populated_heap_fraction": 0.06363228125
+    },
+    {
+      "rows": 10000,
+      "arm": "tanstack-variant",
+      "illustrative_app_heap_allocation_decimal_mb": 512,
+      "populated_heap_fraction": 0.0159080703125
+    },
+    {
+      "rows": 50000,
+      "arm": "native",
+      "illustrative_app_heap_allocation_decimal_mb": 32,
+      "populated_heap_fraction": 1.519566125
+    },
+    {
+      "rows": 50000,
+      "arm": "native",
+      "illustrative_app_heap_allocation_decimal_mb": 128,
+      "populated_heap_fraction": 0.37989153125
+    },
+    {
+      "rows": 50000,
+      "arm": "native",
+      "illustrative_app_heap_allocation_decimal_mb": 512,
+      "populated_heap_fraction": 0.0949728828125
+    },
+    {
+      "rows": 50000,
+      "arm": "ngrx",
+      "illustrative_app_heap_allocation_decimal_mb": 32,
+      "populated_heap_fraction": 0.6595445
+    },
+    {
+      "rows": 50000,
+      "arm": "ngrx",
+      "illustrative_app_heap_allocation_decimal_mb": 128,
+      "populated_heap_fraction": 0.164886125
+    },
+    {
+      "rows": 50000,
+      "arm": "ngrx",
+      "illustrative_app_heap_allocation_decimal_mb": 512,
+      "populated_heap_fraction": 0.04122153125
+    },
+    {
+      "rows": 50000,
+      "arm": "v15",
+      "illustrative_app_heap_allocation_decimal_mb": 32,
+      "populated_heap_fraction": 0.842068
+    },
+    {
+      "rows": 50000,
+      "arm": "v15",
+      "illustrative_app_heap_allocation_decimal_mb": 128,
+      "populated_heap_fraction": 0.210517
+    },
+    {
+      "rows": 50000,
+      "arm": "v15",
+      "illustrative_app_heap_allocation_decimal_mb": 512,
+      "populated_heap_fraction": 0.05262925
+    },
+    {
+      "rows": 50000,
+      "arm": "v16",
+      "illustrative_app_heap_allocation_decimal_mb": 32,
+      "populated_heap_fraction": 0.979306875
+    },
+    {
+      "rows": 50000,
+      "arm": "v16",
+      "illustrative_app_heap_allocation_decimal_mb": 128,
+      "populated_heap_fraction": 0.24482671875
+    },
+    {
+      "rows": 50000,
+      "arm": "v16",
+      "illustrative_app_heap_allocation_decimal_mb": 512,
+      "populated_heap_fraction": 0.0612066796875
+    },
+    {
+      "rows": 50000,
+      "arm": "tanstack",
+      "illustrative_app_heap_allocation_decimal_mb": 32,
+      "populated_heap_fraction": 0.907414125
+    },
+    {
+      "rows": 50000,
+      "arm": "tanstack",
+      "illustrative_app_heap_allocation_decimal_mb": 128,
+      "populated_heap_fraction": 0.22685353125
+    },
+    {
+      "rows": 50000,
+      "arm": "tanstack",
+      "illustrative_app_heap_allocation_decimal_mb": 512,
+      "populated_heap_fraction": 0.0567133828125
+    },
+    {
+      "rows": 50000,
+      "arm": "tanstack-variant",
+      "illustrative_app_heap_allocation_decimal_mb": 32,
+      "populated_heap_fraction": 0.907435375
+    },
+    {
+      "rows": 50000,
+      "arm": "tanstack-variant",
+      "illustrative_app_heap_allocation_decimal_mb": 128,
+      "populated_heap_fraction": 0.22685884375
+    },
+    {
+      "rows": 50000,
+      "arm": "tanstack-variant",
+      "illustrative_app_heap_allocation_decimal_mb": 512,
+      "populated_heap_fraction": 0.0567147109375
+    }
+  ],
+  "hypothetical_transfer_floors": [
+    {
+      "arm": "native",
+      "hypothetical_connection_mbps": 1,
+      "gzip_transfer_floor_ms": 335.752
+    },
+    {
+      "arm": "native",
+      "hypothetical_connection_mbps": 10,
+      "gzip_transfer_floor_ms": 33.5752
+    },
+    {
+      "arm": "native",
+      "hypothetical_connection_mbps": 100,
+      "gzip_transfer_floor_ms": 3.35752
+    },
+    {
+      "arm": "ngrx",
+      "hypothetical_connection_mbps": 1,
+      "gzip_transfer_floor_ms": 349.888
+    },
+    {
+      "arm": "ngrx",
+      "hypothetical_connection_mbps": 10,
+      "gzip_transfer_floor_ms": 34.9888
+    },
+    {
+      "arm": "ngrx",
+      "hypothetical_connection_mbps": 100,
+      "gzip_transfer_floor_ms": 3.4988799999999998
+    },
+    {
+      "arm": "v15",
+      "hypothetical_connection_mbps": 1,
+      "gzip_transfer_floor_ms": 813.288
+    },
+    {
+      "arm": "v15",
+      "hypothetical_connection_mbps": 10,
+      "gzip_transfer_floor_ms": 81.3288
+    },
+    {
+      "arm": "v15",
+      "hypothetical_connection_mbps": 100,
+      "gzip_transfer_floor_ms": 8.13288
+    },
+    {
+      "arm": "v16",
+      "hypothetical_connection_mbps": 1,
+      "gzip_transfer_floor_ms": 1179.848
+    },
+    {
+      "arm": "v16",
+      "hypothetical_connection_mbps": 10,
+      "gzip_transfer_floor_ms": 117.9848
+    },
+    {
+      "arm": "v16",
+      "hypothetical_connection_mbps": 100,
+      "gzip_transfer_floor_ms": 11.79848
+    },
+    {
+      "arm": "tanstack",
+      "hypothetical_connection_mbps": 1,
+      "gzip_transfer_floor_ms": 1040.424
+    },
+    {
+      "arm": "tanstack",
+      "hypothetical_connection_mbps": 10,
+      "gzip_transfer_floor_ms": 104.04239999999999
+    },
+    {
+      "arm": "tanstack",
+      "hypothetical_connection_mbps": 100,
+      "gzip_transfer_floor_ms": 10.40424
+    },
+    {
+      "arm": "tanstack-variant",
+      "hypothetical_connection_mbps": 1,
+      "gzip_transfer_floor_ms": 1040.568
+    },
+    {
+      "arm": "tanstack-variant",
+      "hypothetical_connection_mbps": 10,
+      "gzip_transfer_floor_ms": 104.05680000000001
+    },
+    {
+      "arm": "tanstack-variant",
+      "hypothetical_connection_mbps": 100,
+      "gzip_transfer_floor_ms": 10.40568
+    }
+  ],
+  "hypothetical_blocking_delay_values": [
+    {
+      "rows": 500,
+      "numerator": "v15",
+      "denominator": "ngrx",
+      "paired_factory_delta_ms": 3.200000286102295,
+      "hypothetical_account_tier": "small",
+      "annual_sessions": 10000,
+      "store_constructions_per_session": 1,
+      "blocking_fraction": 0,
+      "recoverable_fraction": 0,
+      "annual_recoverable_delay_hours": 0.0,
+      "conditional_capacity_penalty_usd": 0.0
+    },
+    {
+      "rows": 500,
+      "numerator": "v15",
+      "denominator": "ngrx",
+      "paired_factory_delta_ms": 3.200000286102295,
+      "hypothetical_account_tier": "small",
+      "annual_sessions": 10000,
+      "store_constructions_per_session": 1,
+      "blocking_fraction": 0.25,
+      "recoverable_fraction": 0.25,
+      "annual_recoverable_delay_hours": 0.0005555556052260929,
+      "conditional_capacity_penalty_usd": 0.030000002682209016
+    },
+    {
+      "rows": 500,
+      "numerator": "v15",
+      "denominator": "ngrx",
+      "paired_factory_delta_ms": 3.200000286102295,
+      "hypothetical_account_tier": "small",
+      "annual_sessions": 10000,
+      "store_constructions_per_session": 1,
+      "blocking_fraction": 1,
+      "recoverable_fraction": 1,
+      "annual_recoverable_delay_hours": 0.008888889683617486,
+      "conditional_capacity_penalty_usd": 0.48000004291534426
+    },
+    {
+      "rows": 500,
+      "numerator": "v15",
+      "denominator": "ngrx",
+      "paired_factory_delta_ms": 3.200000286102295,
+      "hypothetical_account_tier": "mid",
+      "annual_sessions": 100000,
+      "store_constructions_per_session": 1,
+      "blocking_fraction": 0,
+      "recoverable_fraction": 0,
+      "annual_recoverable_delay_hours": 0.0,
+      "conditional_capacity_penalty_usd": 0.0
+    },
+    {
+      "rows": 500,
+      "numerator": "v15",
+      "denominator": "ngrx",
+      "paired_factory_delta_ms": 3.200000286102295,
+      "hypothetical_account_tier": "mid",
+      "annual_sessions": 100000,
+      "store_constructions_per_session": 1,
+      "blocking_fraction": 0.25,
+      "recoverable_fraction": 0.25,
+      "annual_recoverable_delay_hours": 0.005555556052260929,
+      "conditional_capacity_penalty_usd": 0.30000002682209015
+    },
+    {
+      "rows": 500,
+      "numerator": "v15",
+      "denominator": "ngrx",
+      "paired_factory_delta_ms": 3.200000286102295,
+      "hypothetical_account_tier": "mid",
+      "annual_sessions": 100000,
+      "store_constructions_per_session": 1,
+      "blocking_fraction": 1,
+      "recoverable_fraction": 1,
+      "annual_recoverable_delay_hours": 0.08888889683617486,
+      "conditional_capacity_penalty_usd": 4.800000429153442
+    },
+    {
+      "rows": 500,
+      "numerator": "v15",
+      "denominator": "ngrx",
+      "paired_factory_delta_ms": 3.200000286102295,
+      "hypothetical_account_tier": "enterprise",
+      "annual_sessions": 1000000,
+      "store_constructions_per_session": 1,
+      "blocking_fraction": 0,
+      "recoverable_fraction": 0,
+      "annual_recoverable_delay_hours": 0.0,
+      "conditional_capacity_penalty_usd": 0.0
+    },
+    {
+      "rows": 500,
+      "numerator": "v15",
+      "denominator": "ngrx",
+      "paired_factory_delta_ms": 3.200000286102295,
+      "hypothetical_account_tier": "enterprise",
+      "annual_sessions": 1000000,
+      "store_constructions_per_session": 1,
+      "blocking_fraction": 0.25,
+      "recoverable_fraction": 0.25,
+      "annual_recoverable_delay_hours": 0.055555560522609286,
+      "conditional_capacity_penalty_usd": 3.0000002682209015
+    },
+    {
+      "rows": 500,
+      "numerator": "v15",
+      "denominator": "ngrx",
+      "paired_factory_delta_ms": 3.200000286102295,
+      "hypothetical_account_tier": "enterprise",
+      "annual_sessions": 1000000,
+      "store_constructions_per_session": 1,
+      "blocking_fraction": 1,
+      "recoverable_fraction": 1,
+      "annual_recoverable_delay_hours": 0.8888889683617486,
+      "conditional_capacity_penalty_usd": 48.000004291534424
+    },
+    {
+      "rows": 500,
+      "numerator": "v16",
+      "denominator": "v15",
+      "paired_factory_delta_ms": 9.800000190734863,
+      "hypothetical_account_tier": "small",
+      "annual_sessions": 10000,
+      "store_constructions_per_session": 1,
+      "blocking_fraction": 0,
+      "recoverable_fraction": 0,
+      "annual_recoverable_delay_hours": 0.0,
+      "conditional_capacity_penalty_usd": 0.0
+    },
+    {
+      "rows": 500,
+      "numerator": "v16",
+      "denominator": "v15",
+      "paired_factory_delta_ms": 9.800000190734863,
+      "hypothetical_account_tier": "small",
+      "annual_sessions": 10000,
+      "store_constructions_per_session": 1,
+      "blocking_fraction": 0.25,
+      "recoverable_fraction": 0.25,
+      "annual_recoverable_delay_hours": 0.0017013889220025805,
+      "conditional_capacity_penalty_usd": 0.09187500178813934
+    },
+    {
+      "rows": 500,
+      "numerator": "v16",
+      "denominator": "v15",
+      "paired_factory_delta_ms": 9.800000190734863,
+      "hypothetical_account_tier": "small",
+      "annual_sessions": 10000,
+      "store_constructions_per_session": 1,
+      "blocking_fraction": 1,
+      "recoverable_fraction": 1,
+      "annual_recoverable_delay_hours": 0.027222222752041288,
+      "conditional_capacity_penalty_usd": 1.4700000286102295
+    },
+    {
+      "rows": 500,
+      "numerator": "v16",
+      "denominator": "v15",
+      "paired_factory_delta_ms": 9.800000190734863,
+      "hypothetical_account_tier": "mid",
+      "annual_sessions": 100000,
+      "store_constructions_per_session": 1,
+      "blocking_fraction": 0,
+      "recoverable_fraction": 0,
+      "annual_recoverable_delay_hours": 0.0,
+      "conditional_capacity_penalty_usd": 0.0
+    },
+    {
+      "rows": 500,
+      "numerator": "v16",
+      "denominator": "v15",
+      "paired_factory_delta_ms": 9.800000190734863,
+      "hypothetical_account_tier": "mid",
+      "annual_sessions": 100000,
+      "store_constructions_per_session": 1,
+      "blocking_fraction": 0.25,
+      "recoverable_fraction": 0.25,
+      "annual_recoverable_delay_hours": 0.017013889220025804,
+      "conditional_capacity_penalty_usd": 0.9187500178813934
+    },
+    {
+      "rows": 500,
+      "numerator": "v16",
+      "denominator": "v15",
+      "paired_factory_delta_ms": 9.800000190734863,
+      "hypothetical_account_tier": "mid",
+      "annual_sessions": 100000,
+      "store_constructions_per_session": 1,
+      "blocking_fraction": 1,
+      "recoverable_fraction": 1,
+      "annual_recoverable_delay_hours": 0.27222222752041286,
+      "conditional_capacity_penalty_usd": 14.700000286102295
+    },
+    {
+      "rows": 500,
+      "numerator": "v16",
+      "denominator": "v15",
+      "paired_factory_delta_ms": 9.800000190734863,
+      "hypothetical_account_tier": "enterprise",
+      "annual_sessions": 1000000,
+      "store_constructions_per_session": 1,
+      "blocking_fraction": 0,
+      "recoverable_fraction": 0,
+      "annual_recoverable_delay_hours": 0.0,
+      "conditional_capacity_penalty_usd": 0.0
+    },
+    {
+      "rows": 500,
+      "numerator": "v16",
+      "denominator": "v15",
+      "paired_factory_delta_ms": 9.800000190734863,
+      "hypothetical_account_tier": "enterprise",
+      "annual_sessions": 1000000,
+      "store_constructions_per_session": 1,
+      "blocking_fraction": 0.25,
+      "recoverable_fraction": 0.25,
+      "annual_recoverable_delay_hours": 0.17013889220025805,
+      "conditional_capacity_penalty_usd": 9.187500178813934
+    },
+    {
+      "rows": 500,
+      "numerator": "v16",
+      "denominator": "v15",
+      "paired_factory_delta_ms": 9.800000190734863,
+      "hypothetical_account_tier": "enterprise",
+      "annual_sessions": 1000000,
+      "store_constructions_per_session": 1,
+      "blocking_fraction": 1,
+      "recoverable_fraction": 1,
+      "annual_recoverable_delay_hours": 2.7222222752041287,
+      "conditional_capacity_penalty_usd": 147.00000286102295
+    },
+    {
+      "rows": 10000,
+      "numerator": "v15",
+      "denominator": "ngrx",
+      "paired_factory_delta_ms": 6.700000286102295,
+      "hypothetical_account_tier": "small",
+      "annual_sessions": 10000,
+      "store_constructions_per_session": 1,
+      "blocking_fraction": 0,
+      "recoverable_fraction": 0,
+      "annual_recoverable_delay_hours": 0.0,
+      "conditional_capacity_penalty_usd": 0.0
+    },
+    {
+      "rows": 10000,
+      "numerator": "v15",
+      "denominator": "ngrx",
+      "paired_factory_delta_ms": 6.700000286102295,
+      "hypothetical_account_tier": "small",
+      "annual_sessions": 10000,
+      "store_constructions_per_session": 1,
+      "blocking_fraction": 0.25,
+      "recoverable_fraction": 0.25,
+      "annual_recoverable_delay_hours": 0.0011631944941149818,
+      "conditional_capacity_penalty_usd": 0.06281250268220902
+    },
+    {
+      "rows": 10000,
+      "numerator": "v15",
+      "denominator": "ngrx",
+      "paired_factory_delta_ms": 6.700000286102295,
+      "hypothetical_account_tier": "small",
+      "annual_sessions": 10000,
+      "store_constructions_per_session": 1,
+      "blocking_fraction": 1,
+      "recoverable_fraction": 1,
+      "annual_recoverable_delay_hours": 0.01861111190583971,
+      "conditional_capacity_penalty_usd": 1.0050000429153443
+    },
+    {
+      "rows": 10000,
+      "numerator": "v15",
+      "denominator": "ngrx",
+      "paired_factory_delta_ms": 6.700000286102295,
+      "hypothetical_account_tier": "mid",
+      "annual_sessions": 100000,
+      "store_constructions_per_session": 1,
+      "blocking_fraction": 0,
+      "recoverable_fraction": 0,
+      "annual_recoverable_delay_hours": 0.0,
+      "conditional_capacity_penalty_usd": 0.0
+    },
+    {
+      "rows": 10000,
+      "numerator": "v15",
+      "denominator": "ngrx",
+      "paired_factory_delta_ms": 6.700000286102295,
+      "hypothetical_account_tier": "mid",
+      "annual_sessions": 100000,
+      "store_constructions_per_session": 1,
+      "blocking_fraction": 0.25,
+      "recoverable_fraction": 0.25,
+      "annual_recoverable_delay_hours": 0.011631944941149818,
+      "conditional_capacity_penalty_usd": 0.6281250268220901
+    },
+    {
+      "rows": 10000,
+      "numerator": "v15",
+      "denominator": "ngrx",
+      "paired_factory_delta_ms": 6.700000286102295,
+      "hypothetical_account_tier": "mid",
+      "annual_sessions": 100000,
+      "store_constructions_per_session": 1,
+      "blocking_fraction": 1,
+      "recoverable_fraction": 1,
+      "annual_recoverable_delay_hours": 0.18611111905839708,
+      "conditional_capacity_penalty_usd": 10.050000429153442
+    },
+    {
+      "rows": 10000,
+      "numerator": "v15",
+      "denominator": "ngrx",
+      "paired_factory_delta_ms": 6.700000286102295,
+      "hypothetical_account_tier": "enterprise",
+      "annual_sessions": 1000000,
+      "store_constructions_per_session": 1,
+      "blocking_fraction": 0,
+      "recoverable_fraction": 0,
+      "annual_recoverable_delay_hours": 0.0,
+      "conditional_capacity_penalty_usd": 0.0
+    },
+    {
+      "rows": 10000,
+      "numerator": "v15",
+      "denominator": "ngrx",
+      "paired_factory_delta_ms": 6.700000286102295,
+      "hypothetical_account_tier": "enterprise",
+      "annual_sessions": 1000000,
+      "store_constructions_per_session": 1,
+      "blocking_fraction": 0.25,
+      "recoverable_fraction": 0.25,
+      "annual_recoverable_delay_hours": 0.11631944941149817,
+      "conditional_capacity_penalty_usd": 6.2812502682209015
+    },
+    {
+      "rows": 10000,
+      "numerator": "v15",
+      "denominator": "ngrx",
+      "paired_factory_delta_ms": 6.700000286102295,
+      "hypothetical_account_tier": "enterprise",
+      "annual_sessions": 1000000,
+      "store_constructions_per_session": 1,
+      "blocking_fraction": 1,
+      "recoverable_fraction": 1,
+      "annual_recoverable_delay_hours": 1.8611111905839708,
+      "conditional_capacity_penalty_usd": 100.50000429153442
+    },
+    {
+      "rows": 10000,
+      "numerator": "v16",
+      "denominator": "v15",
+      "paired_factory_delta_ms": 121.39999985694885,
+      "hypothetical_account_tier": "small",
+      "annual_sessions": 10000,
+      "store_constructions_per_session": 1,
+      "blocking_fraction": 0,
+      "recoverable_fraction": 0,
+      "annual_recoverable_delay_hours": 0.0,
+      "conditional_capacity_penalty_usd": 0.0
+    },
+    {
+      "rows": 10000,
+      "numerator": "v16",
+      "denominator": "v15",
+      "paired_factory_delta_ms": 121.39999985694885,
+      "hypothetical_account_tier": "small",
+      "annual_sessions": 10000,
+      "store_constructions_per_session": 1,
+      "blocking_fraction": 0.25,
+      "recoverable_fraction": 0.25,
+      "annual_recoverable_delay_hours": 0.021076388864053622,
+      "conditional_capacity_penalty_usd": 1.1381249986588955
+    },
+    {
+      "rows": 10000,
+      "numerator": "v16",
+      "denominator": "v15",
+      "paired_factory_delta_ms": 121.39999985694885,
+      "hypothetical_account_tier": "small",
+      "annual_sessions": 10000,
+      "store_constructions_per_session": 1,
+      "blocking_fraction": 1,
+      "recoverable_fraction": 1,
+      "annual_recoverable_delay_hours": 0.33722222182485795,
+      "conditional_capacity_penalty_usd": 18.209999978542328
+    },
+    {
+      "rows": 10000,
+      "numerator": "v16",
+      "denominator": "v15",
+      "paired_factory_delta_ms": 121.39999985694885,
+      "hypothetical_account_tier": "mid",
+      "annual_sessions": 100000,
+      "store_constructions_per_session": 1,
+      "blocking_fraction": 0,
+      "recoverable_fraction": 0,
+      "annual_recoverable_delay_hours": 0.0,
+      "conditional_capacity_penalty_usd": 0.0
+    },
+    {
+      "rows": 10000,
+      "numerator": "v16",
+      "denominator": "v15",
+      "paired_factory_delta_ms": 121.39999985694885,
+      "hypothetical_account_tier": "mid",
+      "annual_sessions": 100000,
+      "store_constructions_per_session": 1,
+      "blocking_fraction": 0.25,
+      "recoverable_fraction": 0.25,
+      "annual_recoverable_delay_hours": 0.2107638886405362,
+      "conditional_capacity_penalty_usd": 11.381249986588955
+    },
+    {
+      "rows": 10000,
+      "numerator": "v16",
+      "denominator": "v15",
+      "paired_factory_delta_ms": 121.39999985694885,
+      "hypothetical_account_tier": "mid",
+      "annual_sessions": 100000,
+      "store_constructions_per_session": 1,
+      "blocking_fraction": 1,
+      "recoverable_fraction": 1,
+      "annual_recoverable_delay_hours": 3.372222218248579,
+      "conditional_capacity_penalty_usd": 182.09999978542328
+    },
+    {
+      "rows": 10000,
+      "numerator": "v16",
+      "denominator": "v15",
+      "paired_factory_delta_ms": 121.39999985694885,
+      "hypothetical_account_tier": "enterprise",
+      "annual_sessions": 1000000,
+      "store_constructions_per_session": 1,
+      "blocking_fraction": 0,
+      "recoverable_fraction": 0,
+      "annual_recoverable_delay_hours": 0.0,
+      "conditional_capacity_penalty_usd": 0.0
+    },
+    {
+      "rows": 10000,
+      "numerator": "v16",
+      "denominator": "v15",
+      "paired_factory_delta_ms": 121.39999985694885,
+      "hypothetical_account_tier": "enterprise",
+      "annual_sessions": 1000000,
+      "store_constructions_per_session": 1,
+      "blocking_fraction": 0.25,
+      "recoverable_fraction": 0.25,
+      "annual_recoverable_delay_hours": 2.107638886405362,
+      "conditional_capacity_penalty_usd": 113.81249986588955
+    },
+    {
+      "rows": 10000,
+      "numerator": "v16",
+      "denominator": "v15",
+      "paired_factory_delta_ms": 121.39999985694885,
+      "hypothetical_account_tier": "enterprise",
+      "annual_sessions": 1000000,
+      "store_constructions_per_session": 1,
+      "blocking_fraction": 1,
+      "recoverable_fraction": 1,
+      "annual_recoverable_delay_hours": 33.722222182485794,
+      "conditional_capacity_penalty_usd": 1820.9999978542328
+    },
+    {
+      "rows": 50000,
+      "numerator": "v15",
+      "denominator": "ngrx",
+      "paired_factory_delta_ms": 18.90000009536743,
+      "hypothetical_account_tier": "small",
+      "annual_sessions": 10000,
+      "store_constructions_per_session": 1,
+      "blocking_fraction": 0,
+      "recoverable_fraction": 0,
+      "annual_recoverable_delay_hours": 0.0,
+      "conditional_capacity_penalty_usd": 0.0
+    },
+    {
+      "rows": 50000,
+      "numerator": "v15",
+      "denominator": "ngrx",
+      "paired_factory_delta_ms": 18.90000009536743,
+      "hypothetical_account_tier": "small",
+      "annual_sessions": 10000,
+      "store_constructions_per_session": 1,
+      "blocking_fraction": 0.25,
+      "recoverable_fraction": 0.25,
+      "annual_recoverable_delay_hours": 0.0032812500165568456,
+      "conditional_capacity_penalty_usd": 0.17718750089406965
+    },
+    {
+      "rows": 50000,
+      "numerator": "v15",
+      "denominator": "ngrx",
+      "paired_factory_delta_ms": 18.90000009536743,
+      "hypothetical_account_tier": "small",
+      "annual_sessions": 10000,
+      "store_constructions_per_session": 1,
+      "blocking_fraction": 1,
+      "recoverable_fraction": 1,
+      "annual_recoverable_delay_hours": 0.05250000026490953,
+      "conditional_capacity_penalty_usd": 2.8350000143051144
+    },
+    {
+      "rows": 50000,
+      "numerator": "v15",
+      "denominator": "ngrx",
+      "paired_factory_delta_ms": 18.90000009536743,
+      "hypothetical_account_tier": "mid",
+      "annual_sessions": 100000,
+      "store_constructions_per_session": 1,
+      "blocking_fraction": 0,
+      "recoverable_fraction": 0,
+      "annual_recoverable_delay_hours": 0.0,
+      "conditional_capacity_penalty_usd": 0.0
+    },
+    {
+      "rows": 50000,
+      "numerator": "v15",
+      "denominator": "ngrx",
+      "paired_factory_delta_ms": 18.90000009536743,
+      "hypothetical_account_tier": "mid",
+      "annual_sessions": 100000,
+      "store_constructions_per_session": 1,
+      "blocking_fraction": 0.25,
+      "recoverable_fraction": 0.25,
+      "annual_recoverable_delay_hours": 0.032812500165568456,
+      "conditional_capacity_penalty_usd": 1.7718750089406967
+    },
+    {
+      "rows": 50000,
+      "numerator": "v15",
+      "denominator": "ngrx",
+      "paired_factory_delta_ms": 18.90000009536743,
+      "hypothetical_account_tier": "mid",
+      "annual_sessions": 100000,
+      "store_constructions_per_session": 1,
+      "blocking_fraction": 1,
+      "recoverable_fraction": 1,
+      "annual_recoverable_delay_hours": 0.5250000026490953,
+      "conditional_capacity_penalty_usd": 28.350000143051147
+    },
+    {
+      "rows": 50000,
+      "numerator": "v15",
+      "denominator": "ngrx",
+      "paired_factory_delta_ms": 18.90000009536743,
+      "hypothetical_account_tier": "enterprise",
+      "annual_sessions": 1000000,
+      "store_constructions_per_session": 1,
+      "blocking_fraction": 0,
+      "recoverable_fraction": 0,
+      "annual_recoverable_delay_hours": 0.0,
+      "conditional_capacity_penalty_usd": 0.0
+    },
+    {
+      "rows": 50000,
+      "numerator": "v15",
+      "denominator": "ngrx",
+      "paired_factory_delta_ms": 18.90000009536743,
+      "hypothetical_account_tier": "enterprise",
+      "annual_sessions": 1000000,
+      "store_constructions_per_session": 1,
+      "blocking_fraction": 0.25,
+      "recoverable_fraction": 0.25,
+      "annual_recoverable_delay_hours": 0.3281250016556846,
+      "conditional_capacity_penalty_usd": 17.718750089406967
+    },
+    {
+      "rows": 50000,
+      "numerator": "v15",
+      "denominator": "ngrx",
+      "paired_factory_delta_ms": 18.90000009536743,
+      "hypothetical_account_tier": "enterprise",
+      "annual_sessions": 1000000,
+      "store_constructions_per_session": 1,
+      "blocking_fraction": 1,
+      "recoverable_fraction": 1,
+      "annual_recoverable_delay_hours": 5.250000026490953,
+      "conditional_capacity_penalty_usd": 283.5000014305115
+    },
+    {
+      "rows": 50000,
+      "numerator": "v16",
+      "denominator": "v15",
+      "paired_factory_delta_ms": 596.8999998569489,
+      "hypothetical_account_tier": "small",
+      "annual_sessions": 10000,
+      "store_constructions_per_session": 1,
+      "blocking_fraction": 0,
+      "recoverable_fraction": 0,
+      "annual_recoverable_delay_hours": 0.0,
+      "conditional_capacity_penalty_usd": 0.0
+    },
+    {
+      "rows": 50000,
+      "numerator": "v16",
+      "denominator": "v15",
+      "paired_factory_delta_ms": 596.8999998569489,
+      "hypothetical_account_tier": "small",
+      "annual_sessions": 10000,
+      "store_constructions_per_session": 1,
+      "blocking_fraction": 0.25,
+      "recoverable_fraction": 0.25,
+      "annual_recoverable_delay_hours": 0.10362847219738695,
+      "conditional_capacity_penalty_usd": 5.595937498658896
+    },
+    {
+      "rows": 50000,
+      "numerator": "v16",
+      "denominator": "v15",
+      "paired_factory_delta_ms": 596.8999998569489,
+      "hypothetical_account_tier": "small",
+      "annual_sessions": 10000,
+      "store_constructions_per_session": 1,
+      "blocking_fraction": 1,
+      "recoverable_fraction": 1,
+      "annual_recoverable_delay_hours": 1.6580555551581913,
+      "conditional_capacity_penalty_usd": 89.53499997854233
+    },
+    {
+      "rows": 50000,
+      "numerator": "v16",
+      "denominator": "v15",
+      "paired_factory_delta_ms": 596.8999998569489,
+      "hypothetical_account_tier": "mid",
+      "annual_sessions": 100000,
+      "store_constructions_per_session": 1,
+      "blocking_fraction": 0,
+      "recoverable_fraction": 0,
+      "annual_recoverable_delay_hours": 0.0,
+      "conditional_capacity_penalty_usd": 0.0
+    },
+    {
+      "rows": 50000,
+      "numerator": "v16",
+      "denominator": "v15",
+      "paired_factory_delta_ms": 596.8999998569489,
+      "hypothetical_account_tier": "mid",
+      "annual_sessions": 100000,
+      "store_constructions_per_session": 1,
+      "blocking_fraction": 0.25,
+      "recoverable_fraction": 0.25,
+      "annual_recoverable_delay_hours": 1.0362847219738696,
+      "conditional_capacity_penalty_usd": 55.959374986588955
+    },
+    {
+      "rows": 50000,
+      "numerator": "v16",
+      "denominator": "v15",
+      "paired_factory_delta_ms": 596.8999998569489,
+      "hypothetical_account_tier": "mid",
+      "annual_sessions": 100000,
+      "store_constructions_per_session": 1,
+      "blocking_fraction": 1,
+      "recoverable_fraction": 1,
+      "annual_recoverable_delay_hours": 16.580555551581913,
+      "conditional_capacity_penalty_usd": 895.3499997854233
+    },
+    {
+      "rows": 50000,
+      "numerator": "v16",
+      "denominator": "v15",
+      "paired_factory_delta_ms": 596.8999998569489,
+      "hypothetical_account_tier": "enterprise",
+      "annual_sessions": 1000000,
+      "store_constructions_per_session": 1,
+      "blocking_fraction": 0,
+      "recoverable_fraction": 0,
+      "annual_recoverable_delay_hours": 0.0,
+      "conditional_capacity_penalty_usd": 0.0
+    },
+    {
+      "rows": 50000,
+      "numerator": "v16",
+      "denominator": "v15",
+      "paired_factory_delta_ms": 596.8999998569489,
+      "hypothetical_account_tier": "enterprise",
+      "annual_sessions": 1000000,
+      "store_constructions_per_session": 1,
+      "blocking_fraction": 0.25,
+      "recoverable_fraction": 0.25,
+      "annual_recoverable_delay_hours": 10.362847219738695,
+      "conditional_capacity_penalty_usd": 559.5937498658895
+    },
+    {
+      "rows": 50000,
+      "numerator": "v16",
+      "denominator": "v15",
+      "paired_factory_delta_ms": 596.8999998569489,
+      "hypothetical_account_tier": "enterprise",
+      "annual_sessions": 1000000,
+      "store_constructions_per_session": 1,
+      "blocking_fraction": 1,
+      "recoverable_fraction": 1,
+      "annual_recoverable_delay_hours": 165.80555551581912,
+      "conditional_capacity_penalty_usd": 8953.499997854233
+    }
+  ],
+  "base_delay_or_heap_money_value_usd": 0,
+  "provenance": {
+    "/Users/jonathanborgia/code/signaltree/artifacts/startup-market-economics-2026-11-18/application-run-1/analysis/summary.json": "84a4fba512ebf7409d18804dee1e8f55be59047524cfb808356d6bd81791554b",
+    "/Users/jonathanborgia/code/signaltree/artifacts/startup-market-economics-2026-11-18/application-run-1/packet/dispatch-build.json": "892340d4b363a8f2f4ebab593b3733ae02df4aeb92a9b2611813bf8e10ea505f",
+    "/Users/jonathanborgia/code/signaltree/.worktrees/agent-collaboration-evaluation/tools/startup-economics/market-research/scenario-inputs.json": "a8d0969ff9385aa0b81a82ac12b5b93d0dff1f4a6ade2318963021db56de880a",
+    "/Users/jonathanborgia/code/signaltree/artifacts/startup-market-economics-2026-11-18/application-run-1/driver-results.json": "305bb545b10cea530511df4f22a5b95f010bf9ecb57dd1aa1600c88bfa5a6b6d",
+    "/Users/jonathanborgia/code/signaltree/.worktrees/agent-collaboration-evaluation/tools/startup-economics/application-cost.py": "a12c4f9703b282142e53eba22742120da20dae08132a1f1d893eed8f140573d0",
+    "/Users/jonathanborgia/code/signaltree/.worktrees/agent-collaboration-evaluation/tools/startup-economics/admission.py": "a6dcd33ab15d90e9f5c840a780e04199bf9a626205d9a501fcd00f2a9a5a655b"
+  },
+  "completedApplicationAdmission": {
+    "identities": {
+      "v15": {
+        "kernel": {
+          "head": "e45fd69616586cae6f7f9e8622c082199d0fded0",
+          "sourceSeal": "723525c2648a3b793441b6ed29a891881dd176cb3ac571a4308814f1e2e883cc",
+          "buildReceiptSha256": "a235d9c11b0fbec51ea52ebd86f4eb6c8b01b3221e2d21d75ea7d6e300b37918"
+        },
+        "angular": {
+          "head": "e45fd69616586cae6f7f9e8622c082199d0fded0",
+          "sourceSeal": "723525c2648a3b793441b6ed29a891881dd176cb3ac571a4308814f1e2e883cc",
+          "buildReceiptSha256": "a235d9c11b0fbec51ea52ebd86f4eb6c8b01b3221e2d21d75ea7d6e300b37918"
+        }
+      },
+      "v16": {
+        "kernel": {
+          "head": "f8cf26e50193ca8aa5580da15b739129313f256e",
+          "sourceSeal": "542f5cebd9dc6c37c1777fd3e1227ba9abcd94d125e8764872e104d80fc2ff75",
+          "buildReceiptSha256": "ccc1748e5b7bb66f51e2bd017de2d19fa1b1a079620add799d56da0ec8d9ff34"
+        },
+        "angular": {
+          "head": "f8cf26e50193ca8aa5580da15b739129313f256e",
+          "sourceSeal": "542f5cebd9dc6c37c1777fd3e1227ba9abcd94d125e8764872e104d80fc2ff75",
+          "buildReceiptSha256": "ccc1748e5b7bb66f51e2bd017de2d19fa1b1a079620add799d56da0ec8d9ff34"
+        }
+      }
+    },
+    "counts": {
+      "dispatch": 88,
+      "context": 32,
+      "metric": 9,
+      "calibration": 16,
+      "comparison": 288,
+      "mainSamples": 240,
+      "sameArtifactSamples": 48,
+      "admission": 12
+    },
+    "verifiedBindings": 8370
+  },
+  "limits": [
+    "Workload row counts are not representative industry populations.",
+    "Optimistic UI latency ends before authoritative responses. New synthetic human input waits for prior-round settlement; this closed-loop schedule does not measure independently arriving input during response work, paint or INP.",
+    "Settlement-128 includes serial processing, stabilization and individual decision checks, and excludes subsequent aggregate assertions and dismissal. Complete-180 includes checks, logs, dismissal and yields; neither isolates library CPU.",
+    "Heap is whole-app live JavaScript after forced GC, not library-exclusive, peak RAM or a cloud bill.",
+    "32/128/512 MB allocations and 1/10/100 Mbps connections are illustrations, not measured application/device budgets.",
+    "Transfer floor assumes gzip payload only, no latency/cache/parse/other assets; not a measured load prediction.",
+    "Delay scenarios cross every account session-volume assumption with every workload; no tier mapping is implied.",
+    "One store construction/session, one blocked user, and the stated recovery fractions are assumptions. Delta floors at zero for penalty only; no negative penalty is promoted to savings.",
+    "Default monetization is zero. No measured business benefit or cost recovery is inferred from browser timings."
+  ]
+}

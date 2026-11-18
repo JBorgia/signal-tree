@@ -1,0 +1,11 @@
+Traceback (most recent call last):
+  File "<string>", line 10, in <module>
+    runpy.run_path(script,run_name='__main__')
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<frozen runpy>", line 294, in run_path
+  File "<frozen runpy>", line 98, in _run_module_code
+  File "<frozen runpy>", line 88, in _run_code
+  File "/private/tmp/signaltree-startup-market-economics-verification-2026-11-18/verify-evidence.py", line 29, in <module>
+    assert seen == set(expected)
+           ^^^^^^^^^^^^^^^^^^^^^
+AssertionError

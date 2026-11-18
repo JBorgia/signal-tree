@@ -1,5 +1,24 @@
 # TODO
 
+## Startup cost, cross-version reuse and market economics
+
+- [x] Attribute both current release lines; independently review compatible
+      allocation deferral, v16 population preparation and the discovered Link
+      ordering counterexample. Preserve initial failures and CPU uncertainty.
+- [x] Build and independently verify conditional customer/supplier economics,
+      including adoption, churn, public maintenance, negative cases and price
+      ceilings. No observed willingness to pay or market-size claim.
+- [x] Finish actual live-reader/transaction cost coverage, both selected source
+      candidates and complete exact-artifact qualification.
+- [x] Complete the registered three-tier, eight-implementation application
+      comparison and repeat installed native/durable application checks.
+- [x] Finalize the transfer report, measured application cost, economic
+      interpretation and verified portable evidence; prepare authorized branch delivery.
+
+The [active protocol](docs/audits/2026-11-18-startup-market-economics/PROTOCOL.md)
+governs this work. Previous qualified artifacts remain separate identities;
+prototypes and model arithmetic do not constitute a new release sign-off.
+
 ## Emerging agent oversight and v15 value
 
 - [x] Separate v15's current feature/cost question from the v16 emerging-market

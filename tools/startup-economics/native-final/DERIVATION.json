@@ -1,0 +1,17 @@
+{
+  "source": "/Users/jonathanborgia/code/signaltree/.worktrees/agent-collaboration-evaluation/tools/optimization-sweep/native-final",
+  "files": {
+    "run.mjs": "394627ddc1f4ac55d2dd7e97d6a7c19adfc70db9602c98ee1642dae1ababeda9",
+    "helper.mjs": "6c40ae477c50b274d435bb161cc7d858519cc493f6bf12c528757cd695ddb634",
+    "common.mjs": "7d9fa61d1bf86e7fb04574b25538e8333e2315bbb60dbf7cc6d421daccb89680",
+    "child.mjs": "faf67ff98a0ed2a7afe30c2900f29240178b7555802df4ecf26e75d062ed87ae",
+    "config.example.json": "ab2fed428dd9ae2674585e127e15dbda17620a7d3a69e0a387ad9024b4e8fb25",
+    "analyze.mjs": "ab179f112085b3bb361649c07dd02b8ee766f2c1f35981e2ec19af7f3686c6e6",
+    "native-execution.mjs": "b3885516efbb78f8a5a3ca5f7969c1cd393edfbfaced582b7018acac62ffc860",
+    "functional-child.mjs": "88fcaa502366f4526fbb1f80d7f74d654d426f5c0eb943a7665be80b1e872a28",
+    "prepare.mjs": "fc905a48b6ec11bab64704e5046c7efdcb3038641e55612067377656679789a1",
+    "protocol.md": "fa4df39824f5b7630c758e05d8d1fb259f4cd020e49c73daa7491c7c8f98e831"
+  },
+  "derived": "/Users/jonathanborgia/code/signaltree/.worktrees/agent-collaboration-evaluation/tools/startup-economics/native-final",
+  "changes": "Provenance descriptions only: before now means current qualified November 17 v16, joined to new application packet. All workload/schedule/control source unchanged."
+}

@@ -1,0 +1,194 @@
+{
+  "publicRoot": "/Users/jonathanborgia/code/signaltree",
+  "entries": [
+    {
+      "source": "/Users/jonathanborgia/code/signaltree/artifacts/startup-economics-dense-revisions-2026-11-18",
+      "destination": "evidence/startup-economics-dense-revisions-2026-11-18"
+    },
+    {
+      "source": "/Users/jonathanborgia/code/signaltree/artifacts/startup-economics-v15-2026-11-17",
+      "destination": "evidence/startup-economics-v15-2026-11-17"
+    },
+    {
+      "source": "/Users/jonathanborgia/code/signaltree/artifacts/startup-economics-v16-2026-11-17-baseline",
+      "destination": "evidence/startup-economics-v16-2026-11-17-baseline"
+    },
+    {
+      "source": "/Users/jonathanborgia/code/signaltree/artifacts/startup-economics-v16-2026-11-17-bound-baseline",
+      "destination": "evidence/startup-economics-v16-2026-11-17-bound-baseline"
+    },
+    {
+      "source": "/Users/jonathanborgia/code/signaltree/artifacts/startup-economics-v16-2026-11-17-bound-corrected",
+      "destination": "evidence/startup-economics-v16-2026-11-17-bound-corrected"
+    },
+    {
+      "source": "/Users/jonathanborgia/code/signaltree/artifacts/startup-economics-v16-2026-11-17-bound-optimized",
+      "destination": "evidence/startup-economics-v16-2026-11-17-bound-optimized"
+    },
+    {
+      "source": "/Users/jonathanborgia/code/signaltree/artifacts/startup-economics-v16-2026-11-17-bound-ported",
+      "destination": "evidence/startup-economics-v16-2026-11-17-bound-ported"
+    },
+    {
+      "source": "/Users/jonathanborgia/code/signaltree/artifacts/startup-economics-v16-2026-11-17-combined-focused-1.log",
+      "destination": "evidence/startup-economics-v16-2026-11-17-combined-focused-1.log"
+    },
+    {
+      "source": "/Users/jonathanborgia/code/signaltree/artifacts/startup-economics-v16-2026-11-17-combined-kernel",
+      "destination": "evidence/startup-economics-v16-2026-11-17-combined-kernel"
+    },
+    {
+      "source": "/Users/jonathanborgia/code/signaltree/artifacts/startup-economics-v16-2026-11-17-combined-packages",
+      "destination": "evidence/startup-economics-v16-2026-11-17-combined-packages"
+    },
+    {
+      "source": "/Users/jonathanborgia/code/signaltree/artifacts/startup-economics-v16-2026-11-17-combined-packages-retry",
+      "destination": "evidence/startup-economics-v16-2026-11-17-combined-packages-retry"
+    },
+    {
+      "source": "/Users/jonathanborgia/code/signaltree/artifacts/startup-economics-v16-2026-11-17-extra-focused-1.log",
+      "destination": "evidence/startup-economics-v16-2026-11-17-extra-focused-1.log"
+    },
+    {
+      "source": "/Users/jonathanborgia/code/signaltree/artifacts/startup-economics-v16-2026-11-17-extra-focused-2.log",
+      "destination": "evidence/startup-economics-v16-2026-11-17-extra-focused-2.log"
+    },
+    {
+      "source": "/Users/jonathanborgia/code/signaltree/artifacts/startup-economics-v16-2026-11-17-fix-focused-1.log",
+      "destination": "evidence/startup-economics-v16-2026-11-17-fix-focused-1.log"
+    },
+    {
+      "source": "/Users/jonathanborgia/code/signaltree/artifacts/startup-economics-v16-2026-11-17-fix-only-packages",
+      "destination": "evidence/startup-economics-v16-2026-11-17-fix-only-packages"
+    },
+    {
+      "source": "/Users/jonathanborgia/code/signaltree/artifacts/startup-economics-v16-2026-11-17-focused-1.log",
+      "destination": "evidence/startup-economics-v16-2026-11-17-focused-1.log"
+    },
+    {
+      "source": "/Users/jonathanborgia/code/signaltree/artifacts/startup-economics-v16-2026-11-17-focused-2.log",
+      "destination": "evidence/startup-economics-v16-2026-11-17-focused-2.log"
+    },
+    {
+      "source": "/Users/jonathanborgia/code/signaltree/artifacts/startup-economics-v16-2026-11-17-phase-comparison",
+      "destination": "evidence/startup-economics-v16-2026-11-17-phase-comparison"
+    },
+    {
+      "source": "/Users/jonathanborgia/code/signaltree/artifacts/startup-economics-v16-2026-11-17-port-activation-heap",
+      "destination": "evidence/startup-economics-v16-2026-11-17-port-activation-heap"
+    },
+    {
+      "source": "/Users/jonathanborgia/code/signaltree/artifacts/startup-economics-v16-2026-11-17-port-activation-heap.config.json",
+      "destination": "evidence/startup-economics-v16-2026-11-17-port-activation-heap.config.json"
+    },
+    {
+      "source": "/Users/jonathanborgia/code/signaltree/artifacts/startup-economics-v16-2026-11-17-port-focused-1.log",
+      "destination": "evidence/startup-economics-v16-2026-11-17-port-focused-1.log"
+    },
+    {
+      "source": "/Users/jonathanborgia/code/signaltree/artifacts/startup-economics-v16-2026-11-17-port-focused-2.log",
+      "destination": "evidence/startup-economics-v16-2026-11-17-port-focused-2.log"
+    },
+    {
+      "source": "/Users/jonathanborgia/code/signaltree/artifacts/startup-economics-v16-2026-11-17-port-validation-notes.json",
+      "destination": "evidence/startup-economics-v16-2026-11-17-port-validation-notes.json"
+    },
+    {
+      "source": "/Users/jonathanborgia/code/signaltree/artifacts/startup-economics-v16-2026-11-17-ported-packages",
+      "destination": "evidence/startup-economics-v16-2026-11-17-ported-packages"
+    },
+    {
+      "source": "/Users/jonathanborgia/code/signaltree/artifacts/startup-economics-v16-2026-11-18-bound-final",
+      "destination": "evidence/startup-economics-v16-2026-11-18-bound-final"
+    },
+    {
+      "source": "/Users/jonathanborgia/code/signaltree/artifacts/startup-economics-v16-aligned-prototype-1.patch",
+      "destination": "evidence/startup-economics-v16-aligned-prototype-1.patch"
+    },
+    {
+      "source": "/Users/jonathanborgia/code/signaltree/artifacts/startup-economics-v16-allocation-transfer.patch",
+      "destination": "evidence/startup-economics-v16-allocation-transfer.patch"
+    },
+    {
+      "source": "/Users/jonathanborgia/code/signaltree/artifacts/startup-economics-v16-combined-review.patch",
+      "destination": "evidence/startup-economics-v16-combined-review.patch"
+    },
+    {
+      "source": "/Users/jonathanborgia/code/signaltree/artifacts/startup-economics-v16-external-alias-oracle.spec.fixture",
+      "destination": "evidence/startup-economics-v16-external-alias-oracle.spec.fixture"
+    },
+    {
+      "source": "/Users/jonathanborgia/code/signaltree/artifacts/startup-economics-v16-final-profile-2026-11-18",
+      "destination": "evidence/startup-economics-v16-final-profile-2026-11-18"
+    },
+    {
+      "source": "/Users/jonathanborgia/code/signaltree/artifacts/startup-economics-v16-prepend-fix-prototype-1.patch",
+      "destination": "evidence/startup-economics-v16-prepend-fix-prototype-1.patch"
+    },
+    {
+      "source": "/Users/jonathanborgia/code/signaltree/artifacts/startup-economics-v16-resolver-review-1",
+      "destination": "evidence/startup-economics-v16-resolver-review-1"
+    },
+    {
+      "source": "/Users/jonathanborgia/code/signaltree/artifacts/startup-market-economics-2026-11-18",
+      "destination": "study"
+    },
+    {
+      "source": "/Users/jonathanborgia/code/signaltree/.worktrees/agent-collaboration-evaluation/tools/startup-economics",
+      "destination": "tools/startup-economics"
+    },
+    {
+      "source": "/Users/jonathanborgia/code/signaltree/.worktrees/agent-collaboration-evaluation/tools/agent-oversight-lab/application/collect-evidence.py",
+      "destination": "tools/collect-evidence.py"
+    },
+    {
+      "source": "/Users/jonathanborgia/code/signaltree/.worktrees/agent-collaboration-evaluation/tools/agent-oversight-lab/application/verify-evidence.py",
+      "destination": "tools/verify-evidence.py"
+    },
+    {
+      "source": "/Users/jonathanborgia/code/signaltree/.worktrees/agent-collaboration-evaluation/tools/agent-oversight-lab/application/verify-evidence-controls.py",
+      "destination": "tools/verify-evidence-controls.py"
+    },
+    {
+      "source": "/Users/jonathanborgia/code/signaltree/.worktrees/v15-optimization-sweep/tools/startup-economics-v15",
+      "destination": "tools/startup-economics-v15"
+    },
+    {
+      "source": "/Users/jonathanborgia/code/signaltree/.worktrees/v16-optimization-sweep/tools/startup-economics-v16",
+      "destination": "tools/startup-economics-v16"
+    },
+    {
+      "source": "/Users/jonathanborgia/code/signaltree/artifacts/v15-oversight-cost-2026-11-17/v15-final-packages",
+      "destination": "baselines/current-v15-built"
+    },
+    {
+      "source": "/Users/jonathanborgia/code/signaltree/artifacts/v15-oversight-cost-2026-11-17/qualification/final-packed",
+      "destination": "baselines/current-v15-canonical"
+    },
+    {
+      "source": "/Users/jonathanborgia/code/signaltree/artifacts/publication-activation-2026-11-17/v16-final-packages",
+      "destination": "baselines/current-v16"
+    }
+  ],
+  "excludeDirectories": [
+    "node_modules",
+    ".git",
+    ".nx",
+    ".angular",
+    "__pycache__",
+    "cache",
+    ".cache",
+    ".npm",
+    "test-results",
+    "playwright-report"
+  ],
+  "excludeSuffixes": [
+    ".DS_Store"
+  ],
+  "limits": [
+    "Selected public evidence only; no private Studio source.",
+    "Hashes establish supplied payload integrity, not full repository history, full dependency/browser closure or offline reproducibility of every command.",
+    "Current and historical measurements retain their original source/package identities; no prototype is relabeled as the final candidate.",
+    "Excluded caches and dependency directories are listed in the resulting inventory. Browser binaries and system toolchain are identified by receipts but not redistributed."
+  ]
+}

@@ -1,0 +1,7 @@
+{
+  "kind": "native-final-config-v1",
+  "artifactPlan": "/Users/jonathanborgia/code/signaltree/artifacts/startup-market-economics-2026-11-18/application-run-1/packet/plan.json",
+  "artifactPlanSha256": "FILL_FROM_FROZEN_FINAL_PLAN",
+  "dispatchBuild": "/Users/jonathanborgia/code/signaltree/artifacts/startup-market-economics-2026-11-18/application-run-1/packet/dispatch-build.json",
+  "dispatchBuildSha256": "FILL_FROM_FROZEN_FINAL_BUILD"
+}

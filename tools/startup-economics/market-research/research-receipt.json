@@ -1,0 +1,116 @@
+{
+  "schema_version": 1,
+  "recorded_on_utc": "2026-11-18",
+  "scope": "Research/input validation only; no model result, buyer observation, runtime qualification, publication, price commitment or adoption forecast.",
+  "source_commit_at_assignment": "1927c8836314feec37ba68313a41a6a33dd6c2a4",
+  "files": [
+    {
+      "path": "sources.json",
+      "bytes": 19786,
+      "sha256": "067b51733be471de77306b325137a0be0fdc89cc9d4e6f2b5fc5fd9a78688516"
+    },
+    {
+      "path": "industry-fit.json",
+      "bytes": 13906,
+      "sha256": "155dfc9cdb85ccbcccf955944e280108a9e8583df31db2465e6b140adb472b48"
+    },
+    {
+      "path": "scenario-inputs.json",
+      "bytes": 43130,
+      "sha256": "a8d0969ff9385aa0b81a82ac12b5b93d0dff1f4a6ade2318963021db56de880a"
+    },
+    {
+      "path": "validate-inputs.py",
+      "bytes": 5845,
+      "sha256": "484847cc16fcaa6d5f4bb133a02312422f3114ff628d4c2ddd29dc6f8972e775"
+    }
+  ],
+  "local_evidence": [
+    {
+      "path": "package.json",
+      "sha256": "7d43fe562e3532b093ffe03a0844b83e071314b949294ce6aa3c2a2e81f48c2b",
+      "bytes": 13015
+    },
+    {
+      "path": "docs/audits/2026-11-17-oversight-followthrough/README.md",
+      "sha256": "359631011e1137750ca29bdc1b779631e9ff75f9589136f920990eeaf30e7894",
+      "bytes": 18329
+    },
+    {
+      "path": "docs/audits/2026-11-18-startup-market-economics/PROTOCOL.md",
+      "sha256": "288dbd43ab7bfbd3570b60be76f9d350b0218e4f138e300bf945866597de2a6a",
+      "bytes": 6966
+    }
+  ],
+  "checks": [
+    {
+      "check": "Sixteen distinct HTTPS primary-publisher/author sources with dated paraphrases under 200 words each",
+      "result": "pass"
+    },
+    {
+      "check": "Every economic/industry source identifier resolves",
+      "result": "pass"
+    },
+    {
+      "check": "All numeric inputs finite and nonnegative; sensitivity ranges ordered",
+      "result": "pass"
+    },
+    {
+      "check": "Disjoint base benefit-hour inputs reconcile and do not exceed modeled staff capacity",
+      "result": "pass"
+    },
+    {
+      "check": "Risk and cash payroll release disabled in every base case",
+      "result": "pass"
+    },
+    {
+      "check": "Customer/supplier modeled prices and seats agree; account mix sums to one; counts remain conditional",
+      "result": "pass"
+    },
+    {
+      "check": "Free-runtime adoption has zero license revenue and separate support/maintenance costs",
+      "result": "pass"
+    }
+  ],
+  "method": "Python standard-library parsing, source-reference joins, numeric/range checks, disjoint-hour capacity bounds and SHA-256. Dated source facts came from publisher pages opened using web tools; full source pages are not archived.",
+  "status": "pass",
+  "command": [
+    "python3",
+    "tools/startup-economics/market-research/validate-inputs.py"
+  ],
+  "working_directory": "/Users/jonathanborgia/code/signaltree/.worktrees/agent-collaboration-evaluation",
+  "validation": {
+    "status": "pass",
+    "checks": [
+      "dated_distinct_sources_and_bounded_extractions",
+      "source_references_resolve",
+      "finite_nonnegative_inputs_and_ordered_ranges",
+      "base_hours_reconcile_and_fit_staff_capacity",
+      "base_risk_and_cash_release_zero",
+      "prices_seats_mix_and_conditional_scale_consistent",
+      "free_runtime_license_revenue_zero"
+    ],
+    "files": [
+      {
+        "path": "sources.json",
+        "bytes": 19786,
+        "sha256": "067b51733be471de77306b325137a0be0fdc89cc9d4e6f2b5fc5fd9a78688516"
+      },
+      {
+        "path": "industry-fit.json",
+        "bytes": 13906,
+        "sha256": "155dfc9cdb85ccbcccf955944e280108a9e8583df31db2465e6b140adb472b48"
+      },
+      {
+        "path": "scenario-inputs.json",
+        "bytes": 43130,
+        "sha256": "a8d0969ff9385aa0b81a82ac12b5b93d0dff1f4a6ade2318963021db56de880a"
+      },
+      {
+        "path": "validate-inputs.py",
+        "bytes": 5845,
+        "sha256": "484847cc16fcaa6d5f4bb133a02312422f3114ff628d4c2ddd29dc6f8972e775"
+      }
+    ]
+  }
+}

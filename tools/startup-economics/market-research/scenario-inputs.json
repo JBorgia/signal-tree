@@ -1,0 +1,972 @@
+{
+  "schema_version": 1,
+  "generated_on_utc": "2026-11-18",
+  "currency": "USD",
+  "geography": "US labor-cost scenarios; public USD vendor anchors",
+  "period": "Annual undiscounted scenarios; monthly inputs explicitly named. No inflation, tax, discount rate or revenue growth is implicit.",
+  "status": "Inputs only. All customer savings, rates, prices, hosting, support, CAC, churn and adoption counts are scenario hypotheses unless linked as a source fact. No model results or buyer observations.",
+  "units": {
+    "hours": "person-hours, not elapsed wall-clock time; annual staffing capacity assumes 2080 hours only as a convention",
+    "fraction": "0 to 1; sensitivity endpoints are independently varied, not joint probability bounds",
+    "monthly": "per account per calendar month unless otherwise named",
+    "annual_accounts": "average active paid accounts maintained during a steady-state year; initial-acquisition cash scenario must be reported separately"
+  },
+  "rate_basis": {
+    "source_ids": [
+      "bls-developer-pay",
+      "bls-employer-compensation"
+    ],
+    "explanation": "USD 100 engineering/hour is a rounded modeling assumption near May 2025 annual developer wages spread across 2080 assumed hours and a broad June 2026 benefits loading. The surveys measure different populations and dates. USD 54 reviewer/hour uses broad full-time private compensation as an anchor, not an observed reviewer wage. Neither includes a measured SignalTree-specific productivity value."
+  },
+  "default_analysis_rules": [
+    "Show capacity value separately from cash savings; cash_release_fraction defaults to zero. Apply capacity realization only to avoided task hours, not to adoption or operations cost.",
+    "First-year migration assumes no greenfield build credit. one_time_build_hours_avoided is available only in a separately labeled new-module counterfactual, and never added to hours already saved in recurring maintenance.",
+    "For paired v15/v16 analysis use the same account and v15 baseline. v16 adds only v16_increment_over_v15 benefits/costs plus its separately measured performance delta.",
+    "Private Studio benefit is incremental over the existing runtime and existing monitoring. Evaluate this separately before combining it with runtime value.",
+    "Keep all four recurring work buckets disjoint: v15 maintenance, v16 coordination maintenance, Studio engineering investigation, and operational review. Fix implementation work is excluded from investigation hours.",
+    "All source prices are anchors for alternatives, not validated pricing authority. All SignalTree paid prices apply only to future private offers, never the free public runtime.",
+    "Risk default is zero. Use the illustrative risk branch only with conspicuous hypothetical labeling and loss excluding already counted labor.",
+    "Performance input is left to measured application evidence; recoverable blocking-time value defaults to zero. No memory or browser delay is automatically converted into customer money.",
+    "A stable account count needs replacement acquisitions for churn; show replacement CAC and replacement onboarding. Initial acquisition of the entire account base is a separate cash requirement.",
+    "Do not count variable support/onboarding or sales acquisition costs again in fixed payroll. Charge founders labor and OSS maintenance even if unpaid.",
+    "Supplier profit is operating profit before income tax/financing, only after explicit labor, hosting, support, acquisition and fixed costs. ARR is not profit.",
+    "Aggregate net resource benefit removes subscription transfers and includes supplier real resource costs, free-runtime maintenance and customer integration/operations. It must not also count supplier revenue as newly created value."
+  ],
+  "customer_tiers": [
+    {
+      "id": "small",
+      "scenario_status": "unobserved illustrative account, not an empirical industry-size representative",
+      "engineers": 3,
+      "operational_reviewers": 2,
+      "end_users": 25,
+      "annual_sessions": 10000,
+      "annual_actions": 50000,
+      "loaded_engineering_hourly_usd": 100,
+      "loaded_reviewer_hourly_usd": 54,
+      "annual_hours_per_worker": 2080,
+      "capacity_realization_fraction": 0.5,
+      "cash_release_fraction": 0,
+      "v15_runtime": {
+        "counterfactual": "A competent implementation using an existing free framework/state library, retaining durable backend authority and existing observability.",
+        "recurring_build_maintenance_baseline_hours_per_month": 20,
+        "recurring_build_maintenance_avoided_fraction": 0.2,
+        "recurring_build_maintenance_avoided_hours_per_month": 4.0,
+        "one_time_build_hours_avoided": 4,
+        "one_time_integration_hours": 40,
+        "one_time_training_hours": 8,
+        "one_time_procurement_security_hours": 2,
+        "incremental_maintenance_hours_per_month": 1,
+        "recurring_license_usd_per_month": 0,
+        "incremental_customer_infrastructure_usd_per_month": 0,
+        "benefit_boundary": "Local state/entity maintenance only; excludes v16 coordinated-pending plumbing, Studio investigation, review, backend authorization, model quality and agent productivity."
+      },
+      "v16_increment_over_v15": {
+        "counterfactual": "v15 plus application code to implement only the additional coordinated pending/local publication behavior needed by this account; no equivalence for unmeasured full semantics is asserted.",
+        "recurring_coordination_baseline_hours_per_month": 0,
+        "recurring_coordination_avoided_fraction": 0.2,
+        "recurring_coordination_avoided_hours_per_month": 0.0,
+        "one_time_build_hours_avoided": 0,
+        "one_time_integration_hours": 8,
+        "one_time_training_hours": 2,
+        "incremental_maintenance_hours_per_month": 0.5,
+        "recurring_license_usd_per_month": 0,
+        "incremental_customer_infrastructure_usd_per_month": 0,
+        "benefit_boundary": "Disjoint coordinated-pending implementation/maintenance hours, beyond the v15 bucket. The small account has zero assumed recurring need and still incurs adoption cost."
+      },
+      "private_studio": {
+        "counterfactual": "Existing runtime plus the same tracing, monitoring and durable workflow services; no existing vendor subscription is removed.",
+        "price_usd_per_account_month": 29,
+        "paid_tool_users": 3,
+        "investigations_per_month": 2,
+        "baseline_engineering_hours_per_investigation": 4,
+        "investigation_hours_avoided_fraction": 0.25,
+        "investigation_hours_avoided_per_month": 2.0,
+        "baseline_reviewer_hours_per_month": 8,
+        "review_hours_avoided_fraction": 0.125,
+        "review_hours_avoided_per_month": 1.0,
+        "one_time_integration_hours": 8,
+        "one_time_training_hours": 4,
+        "one_time_procurement_security_hours": 2,
+        "incremental_engineering_operations_hours_per_month": 0.5,
+        "incremental_reviewer_operations_hours_per_month": 0.25,
+        "incremental_customer_infrastructure_usd_per_month": 0,
+        "hosting_cost_treatment": "Hypothetical hosted offer includes hosting in subscription; supplier COGS is separate. Customer self-hosting would replace this assumption with measured costs.",
+        "benefit_boundary": "Only marginal investigation and evidence-review work beyond existing tools, separate from building/fixing code and nonlabor losses.",
+        "readiness": "Future private-tool offer. Broader v16 private checks do not establish hosted multi-tenant, production IdP or SLA readiness. v15 has only narrow transaction-delegation checks, not full Studio qualification."
+      },
+      "risk_default": {
+        "enabled": false,
+        "eligible_incidents_per_year": 0,
+        "nonlabor_loss_usd_per_incident": 0,
+        "attributable_fraction": 0,
+        "prevented_fraction_of_attributable": 0
+      },
+      "risk_illustrative_sensitivity": {
+        "enabled": false,
+        "eligible_incidents_per_year": 1,
+        "nonlabor_loss_usd_per_incident": 5000,
+        "attributable_fraction": 0.1,
+        "prevented_fraction_of_attributable": 0.25,
+        "status": "Pure hypothetical sensitivity, not observed incident prevalence or efficacy. Loss excludes all labor already counted, insurance recovery, transferred payments and unproven fines."
+      },
+      "sensitivity_ranges": {
+        "loaded_engineering_hourly_usd": {
+          "lower": 75,
+          "base": 100,
+          "upper": 150,
+          "unit": "USD/hour",
+          "status": "assumption; not a confidence interval"
+        },
+        "loaded_reviewer_hourly_usd": {
+          "lower": 35,
+          "base": 54,
+          "upper": 90,
+          "unit": "USD/hour",
+          "status": "assumption; not a confidence interval"
+        },
+        "capacity_realization_fraction": {
+          "lower": 0.25,
+          "base": 0.5,
+          "upper": 1,
+          "unit": "fraction of avoided task hours converted to usable capacity",
+          "status": "assumption; not a confidence interval"
+        },
+        "v15_runtime.recurring_build_maintenance_avoided_fraction": {
+          "lower": 0,
+          "base": 0.2,
+          "upper": 0.35,
+          "unit": "fraction of disjoint relevant baseline hours",
+          "status": "assumption; not a confidence interval"
+        },
+        "v16_increment_over_v15.recurring_coordination_avoided_fraction": {
+          "lower": 0,
+          "base": 0.2,
+          "upper": 0.35,
+          "unit": "fraction of disjoint relevant baseline hours",
+          "status": "assumption; not a confidence interval"
+        },
+        "private_studio.investigation_hours_avoided_fraction": {
+          "lower": 0,
+          "base": 0.25,
+          "upper": 0.4,
+          "unit": "fraction of relevant investigation hours",
+          "status": "assumption; not a confidence interval"
+        },
+        "private_studio.review_hours_avoided_fraction": {
+          "lower": 0,
+          "base": 0.125,
+          "upper": 0.25,
+          "unit": "fraction of relevant reviewer hours",
+          "status": "assumption; not a confidence interval"
+        },
+        "v15_runtime.one_time_integration_hours": {
+          "lower": 10.0,
+          "base": 40,
+          "upper": 160,
+          "unit": "engineering hours",
+          "status": "assumption; not a confidence interval"
+        },
+        "v16_increment_over_v15.one_time_integration_hours": {
+          "lower": 2.0,
+          "base": 8,
+          "upper": 32,
+          "unit": "engineering hours",
+          "status": "assumption; not a confidence interval"
+        },
+        "private_studio.one_time_integration_hours": {
+          "lower": 4.0,
+          "base": 8,
+          "upper": 32,
+          "unit": "engineering hours",
+          "status": "assumption; not a confidence interval"
+        },
+        "private_studio.price_usd_per_account_month": {
+          "lower": 0,
+          "base": 29,
+          "upper": 79,
+          "unit": "USD/account/month",
+          "status": "assumption; not a confidence interval"
+        },
+        "ongoing_operations_multiplier": {
+          "lower": 0.5,
+          "base": 1,
+          "upper": 3,
+          "unit": "multiplier applied to each incremental monthly operations-hours input",
+          "status": "assumption; not a confidence interval"
+        }
+      }
+    },
+    {
+      "id": "mid",
+      "scenario_status": "unobserved illustrative account, not an empirical industry-size representative",
+      "engineers": 10,
+      "operational_reviewers": 10,
+      "end_users": 200,
+      "annual_sessions": 100000,
+      "annual_actions": 1000000,
+      "loaded_engineering_hourly_usd": 100,
+      "loaded_reviewer_hourly_usd": 54,
+      "annual_hours_per_worker": 2080,
+      "capacity_realization_fraction": 0.5,
+      "cash_release_fraction": 0,
+      "v15_runtime": {
+        "counterfactual": "A competent implementation using an existing free framework/state library, retaining durable backend authority and existing observability.",
+        "recurring_build_maintenance_baseline_hours_per_month": 80,
+        "recurring_build_maintenance_avoided_fraction": 0.2,
+        "recurring_build_maintenance_avoided_hours_per_month": 16.0,
+        "one_time_build_hours_avoided": 16,
+        "one_time_integration_hours": 160,
+        "one_time_training_hours": 24,
+        "one_time_procurement_security_hours": 16,
+        "incremental_maintenance_hours_per_month": 3,
+        "recurring_license_usd_per_month": 0,
+        "incremental_customer_infrastructure_usd_per_month": 0,
+        "benefit_boundary": "Local state/entity maintenance only; excludes v16 coordinated-pending plumbing, Studio investigation, review, backend authorization, model quality and agent productivity."
+      },
+      "v16_increment_over_v15": {
+        "counterfactual": "v15 plus application code to implement only the additional coordinated pending/local publication behavior needed by this account; no equivalence for unmeasured full semantics is asserted.",
+        "recurring_coordination_baseline_hours_per_month": 20,
+        "recurring_coordination_avoided_fraction": 0.2,
+        "recurring_coordination_avoided_hours_per_month": 4.0,
+        "one_time_build_hours_avoided": 4,
+        "one_time_integration_hours": 40,
+        "one_time_training_hours": 8,
+        "incremental_maintenance_hours_per_month": 1,
+        "recurring_license_usd_per_month": 0,
+        "incremental_customer_infrastructure_usd_per_month": 0,
+        "benefit_boundary": "Disjoint coordinated-pending implementation/maintenance hours, beyond the v15 bucket. The small account has zero assumed recurring need and still incurs adoption cost."
+      },
+      "private_studio": {
+        "counterfactual": "Existing runtime plus the same tracing, monitoring and durable workflow services; no existing vendor subscription is removed.",
+        "price_usd_per_account_month": 199,
+        "paid_tool_users": 10,
+        "investigations_per_month": 6,
+        "baseline_engineering_hours_per_investigation": 8,
+        "investigation_hours_avoided_fraction": 0.25,
+        "investigation_hours_avoided_per_month": 12.0,
+        "baseline_reviewer_hours_per_month": 64,
+        "review_hours_avoided_fraction": 0.125,
+        "review_hours_avoided_per_month": 8.0,
+        "one_time_integration_hours": 32,
+        "one_time_training_hours": 12,
+        "one_time_procurement_security_hours": 16,
+        "incremental_engineering_operations_hours_per_month": 1.5,
+        "incremental_reviewer_operations_hours_per_month": 1,
+        "incremental_customer_infrastructure_usd_per_month": 0,
+        "hosting_cost_treatment": "Hypothetical hosted offer includes hosting in subscription; supplier COGS is separate. Customer self-hosting would replace this assumption with measured costs.",
+        "benefit_boundary": "Only marginal investigation and evidence-review work beyond existing tools, separate from building/fixing code and nonlabor losses.",
+        "readiness": "Future private-tool offer. Broader v16 private checks do not establish hosted multi-tenant, production IdP or SLA readiness. v15 has only narrow transaction-delegation checks, not full Studio qualification."
+      },
+      "risk_default": {
+        "enabled": false,
+        "eligible_incidents_per_year": 0,
+        "nonlabor_loss_usd_per_incident": 0,
+        "attributable_fraction": 0,
+        "prevented_fraction_of_attributable": 0
+      },
+      "risk_illustrative_sensitivity": {
+        "enabled": false,
+        "eligible_incidents_per_year": 4,
+        "nonlabor_loss_usd_per_incident": 25000,
+        "attributable_fraction": 0.1,
+        "prevented_fraction_of_attributable": 0.25,
+        "status": "Pure hypothetical sensitivity, not observed incident prevalence or efficacy. Loss excludes all labor already counted, insurance recovery, transferred payments and unproven fines."
+      },
+      "sensitivity_ranges": {
+        "loaded_engineering_hourly_usd": {
+          "lower": 75,
+          "base": 100,
+          "upper": 150,
+          "unit": "USD/hour",
+          "status": "assumption; not a confidence interval"
+        },
+        "loaded_reviewer_hourly_usd": {
+          "lower": 35,
+          "base": 54,
+          "upper": 90,
+          "unit": "USD/hour",
+          "status": "assumption; not a confidence interval"
+        },
+        "capacity_realization_fraction": {
+          "lower": 0.25,
+          "base": 0.5,
+          "upper": 1,
+          "unit": "fraction of avoided task hours converted to usable capacity",
+          "status": "assumption; not a confidence interval"
+        },
+        "v15_runtime.recurring_build_maintenance_avoided_fraction": {
+          "lower": 0,
+          "base": 0.2,
+          "upper": 0.35,
+          "unit": "fraction of disjoint relevant baseline hours",
+          "status": "assumption; not a confidence interval"
+        },
+        "v16_increment_over_v15.recurring_coordination_avoided_fraction": {
+          "lower": 0,
+          "base": 0.2,
+          "upper": 0.35,
+          "unit": "fraction of disjoint relevant baseline hours",
+          "status": "assumption; not a confidence interval"
+        },
+        "private_studio.investigation_hours_avoided_fraction": {
+          "lower": 0,
+          "base": 0.25,
+          "upper": 0.4,
+          "unit": "fraction of relevant investigation hours",
+          "status": "assumption; not a confidence interval"
+        },
+        "private_studio.review_hours_avoided_fraction": {
+          "lower": 0,
+          "base": 0.125,
+          "upper": 0.25,
+          "unit": "fraction of relevant reviewer hours",
+          "status": "assumption; not a confidence interval"
+        },
+        "v15_runtime.one_time_integration_hours": {
+          "lower": 40.0,
+          "base": 160,
+          "upper": 640,
+          "unit": "engineering hours",
+          "status": "assumption; not a confidence interval"
+        },
+        "v16_increment_over_v15.one_time_integration_hours": {
+          "lower": 10.0,
+          "base": 40,
+          "upper": 160,
+          "unit": "engineering hours",
+          "status": "assumption; not a confidence interval"
+        },
+        "private_studio.one_time_integration_hours": {
+          "lower": 16.0,
+          "base": 32,
+          "upper": 128,
+          "unit": "engineering hours",
+          "status": "assumption; not a confidence interval"
+        },
+        "private_studio.price_usd_per_account_month": {
+          "lower": 99,
+          "base": 199,
+          "upper": 499,
+          "unit": "USD/account/month",
+          "status": "assumption; not a confidence interval"
+        },
+        "ongoing_operations_multiplier": {
+          "lower": 0.5,
+          "base": 1,
+          "upper": 3,
+          "unit": "multiplier applied to each incremental monthly operations-hours input",
+          "status": "assumption; not a confidence interval"
+        }
+      }
+    },
+    {
+      "id": "enterprise",
+      "scenario_status": "unobserved illustrative account, not an empirical industry-size representative",
+      "engineers": 30,
+      "operational_reviewers": 50,
+      "end_users": 2000,
+      "annual_sessions": 1000000,
+      "annual_actions": 20000000,
+      "loaded_engineering_hourly_usd": 100,
+      "loaded_reviewer_hourly_usd": 54,
+      "annual_hours_per_worker": 2080,
+      "capacity_realization_fraction": 0.5,
+      "cash_release_fraction": 0,
+      "v15_runtime": {
+        "counterfactual": "A competent implementation using an existing free framework/state library, retaining durable backend authority and existing observability.",
+        "recurring_build_maintenance_baseline_hours_per_month": 250,
+        "recurring_build_maintenance_avoided_fraction": 0.2,
+        "recurring_build_maintenance_avoided_hours_per_month": 50.0,
+        "one_time_build_hours_avoided": 80,
+        "one_time_integration_hours": 600,
+        "one_time_training_hours": 80,
+        "one_time_procurement_security_hours": 80,
+        "incremental_maintenance_hours_per_month": 10,
+        "recurring_license_usd_per_month": 0,
+        "incremental_customer_infrastructure_usd_per_month": 0,
+        "benefit_boundary": "Local state/entity maintenance only; excludes v16 coordinated-pending plumbing, Studio investigation, review, backend authorization, model quality and agent productivity."
+      },
+      "v16_increment_over_v15": {
+        "counterfactual": "v15 plus application code to implement only the additional coordinated pending/local publication behavior needed by this account; no equivalence for unmeasured full semantics is asserted.",
+        "recurring_coordination_baseline_hours_per_month": 80,
+        "recurring_coordination_avoided_fraction": 0.2,
+        "recurring_coordination_avoided_hours_per_month": 16.0,
+        "one_time_build_hours_avoided": 12,
+        "one_time_integration_hours": 160,
+        "one_time_training_hours": 24,
+        "incremental_maintenance_hours_per_month": 4,
+        "recurring_license_usd_per_month": 0,
+        "incremental_customer_infrastructure_usd_per_month": 0,
+        "benefit_boundary": "Disjoint coordinated-pending implementation/maintenance hours, beyond the v15 bucket. The small account has zero assumed recurring need and still incurs adoption cost."
+      },
+      "private_studio": {
+        "counterfactual": "Existing runtime plus the same tracing, monitoring and durable workflow services; no existing vendor subscription is removed.",
+        "price_usd_per_account_month": 1499,
+        "paid_tool_users": 30,
+        "investigations_per_month": 25,
+        "baseline_engineering_hours_per_investigation": 8,
+        "investigation_hours_avoided_fraction": 0.25,
+        "investigation_hours_avoided_per_month": 50.0,
+        "baseline_reviewer_hours_per_month": 320,
+        "review_hours_avoided_fraction": 0.125,
+        "review_hours_avoided_per_month": 40.0,
+        "one_time_integration_hours": 120,
+        "one_time_training_hours": 40,
+        "one_time_procurement_security_hours": 120,
+        "incremental_engineering_operations_hours_per_month": 6,
+        "incremental_reviewer_operations_hours_per_month": 4,
+        "incremental_customer_infrastructure_usd_per_month": 0,
+        "hosting_cost_treatment": "Hypothetical hosted offer includes hosting in subscription; supplier COGS is separate. Customer self-hosting would replace this assumption with measured costs.",
+        "benefit_boundary": "Only marginal investigation and evidence-review work beyond existing tools, separate from building/fixing code and nonlabor losses.",
+        "readiness": "Future private-tool offer. Broader v16 private checks do not establish hosted multi-tenant, production IdP or SLA readiness. v15 has only narrow transaction-delegation checks, not full Studio qualification."
+      },
+      "risk_default": {
+        "enabled": false,
+        "eligible_incidents_per_year": 0,
+        "nonlabor_loss_usd_per_incident": 0,
+        "attributable_fraction": 0,
+        "prevented_fraction_of_attributable": 0
+      },
+      "risk_illustrative_sensitivity": {
+        "enabled": false,
+        "eligible_incidents_per_year": 12,
+        "nonlabor_loss_usd_per_incident": 100000,
+        "attributable_fraction": 0.1,
+        "prevented_fraction_of_attributable": 0.25,
+        "status": "Pure hypothetical sensitivity, not observed incident prevalence or efficacy. Loss excludes all labor already counted, insurance recovery, transferred payments and unproven fines."
+      },
+      "sensitivity_ranges": {
+        "loaded_engineering_hourly_usd": {
+          "lower": 75,
+          "base": 100,
+          "upper": 150,
+          "unit": "USD/hour",
+          "status": "assumption; not a confidence interval"
+        },
+        "loaded_reviewer_hourly_usd": {
+          "lower": 35,
+          "base": 54,
+          "upper": 90,
+          "unit": "USD/hour",
+          "status": "assumption; not a confidence interval"
+        },
+        "capacity_realization_fraction": {
+          "lower": 0.25,
+          "base": 0.5,
+          "upper": 1,
+          "unit": "fraction of avoided task hours converted to usable capacity",
+          "status": "assumption; not a confidence interval"
+        },
+        "v15_runtime.recurring_build_maintenance_avoided_fraction": {
+          "lower": 0,
+          "base": 0.2,
+          "upper": 0.35,
+          "unit": "fraction of disjoint relevant baseline hours",
+          "status": "assumption; not a confidence interval"
+        },
+        "v16_increment_over_v15.recurring_coordination_avoided_fraction": {
+          "lower": 0,
+          "base": 0.2,
+          "upper": 0.35,
+          "unit": "fraction of disjoint relevant baseline hours",
+          "status": "assumption; not a confidence interval"
+        },
+        "private_studio.investigation_hours_avoided_fraction": {
+          "lower": 0,
+          "base": 0.25,
+          "upper": 0.4,
+          "unit": "fraction of relevant investigation hours",
+          "status": "assumption; not a confidence interval"
+        },
+        "private_studio.review_hours_avoided_fraction": {
+          "lower": 0,
+          "base": 0.125,
+          "upper": 0.25,
+          "unit": "fraction of relevant reviewer hours",
+          "status": "assumption; not a confidence interval"
+        },
+        "v15_runtime.one_time_integration_hours": {
+          "lower": 150.0,
+          "base": 600,
+          "upper": 2400,
+          "unit": "engineering hours",
+          "status": "assumption; not a confidence interval"
+        },
+        "v16_increment_over_v15.one_time_integration_hours": {
+          "lower": 40.0,
+          "base": 160,
+          "upper": 640,
+          "unit": "engineering hours",
+          "status": "assumption; not a confidence interval"
+        },
+        "private_studio.one_time_integration_hours": {
+          "lower": 60.0,
+          "base": 120,
+          "upper": 480,
+          "unit": "engineering hours",
+          "status": "assumption; not a confidence interval"
+        },
+        "private_studio.price_usd_per_account_month": {
+          "lower": 499,
+          "base": 1499,
+          "upper": 2499,
+          "unit": "USD/account/month",
+          "status": "assumption; not a confidence interval"
+        },
+        "ongoing_operations_multiplier": {
+          "lower": 0.5,
+          "base": 1,
+          "upper": 3,
+          "unit": "multiplier applied to each incremental monthly operations-hours input",
+          "status": "assumption; not a confidence interval"
+        }
+      }
+    }
+  ],
+  "scenario_overrides": [
+    {
+      "id": "no_additional_value",
+      "description": "Existing implementation and observability solve the problem.",
+      "set_avoided_fractions_to": 0,
+      "keep_all_costs": true
+    },
+    {
+      "id": "legacy_migration",
+      "description": "Planned upgrade becomes a broad migration.",
+      "multiply_all_one_time_integration_hours_by": 4,
+      "multiply_all_one_time_training_hours_by": 2,
+      "one_time_build_credit_enabled": false,
+      "keep_recurring_base_benefits": true
+    },
+    {
+      "id": "low_realized_value",
+      "description": "Little attributable savings and poor conversion to usable capacity.",
+      "set_all_recurring_avoided_fractions_to": 0.05,
+      "set_capacity_realization_fraction_to": 0.25,
+      "one_time_build_credit_enabled": false
+    },
+    {
+      "id": "new_bounded_module",
+      "description": "A greenfield bounded module avoids disjoint implementation work.",
+      "multiply_all_one_time_integration_hours_by": 0.25,
+      "one_time_build_credit_enabled": true,
+      "keep_training_and_ongoing_costs": true
+    },
+    {
+      "id": "support_heavy_supplier",
+      "description": "Paid accounts require much more staff help; prices remain unchanged.",
+      "multiply_support_hours_by": 5,
+      "multiply_hosting_cost_by": 3,
+      "multiply_cac_by": 2,
+      "keep_prices_and_account_mix": true
+    }
+  ],
+  "supplier_tiers": [
+    {
+      "id": "small",
+      "price_usd_per_account_month": 29,
+      "mix_fraction": 0.8,
+      "included_paid_tool_users": 3,
+      "pricing_unit": "account, not seat; model does not add a second seat charge",
+      "hosting_usd_per_account_month": 3,
+      "support_hours_per_account_month": 0.1,
+      "support_loaded_hourly_usd": 75,
+      "onboarding_delivery_hours_per_new_account": 0.5,
+      "payment_processing_fraction": 0.03,
+      "acquisition_cost_usd_per_new_account": 150,
+      "annual_account_churn_fraction": 0.25,
+      "cost_boundary": "Support and onboarding delivery labor is variable and excluded from fixed payroll. CAC covers acquisition/sales effort only, excluding delivery. Hosting includes all modeled service infrastructure and is unmeasured.",
+      "sensitivity_ranges": {
+        "hosting_usd_per_account_month": {
+          "lower": 1.5,
+          "base": 3,
+          "upper": 9,
+          "unit": "USD/account/month",
+          "status": "assumption; not a confidence interval"
+        },
+        "support_hours_per_account_month": {
+          "lower": 0.05,
+          "base": 0.1,
+          "upper": 0.5,
+          "unit": "hours/account/month",
+          "status": "assumption; not a confidence interval"
+        },
+        "acquisition_cost_usd_per_new_account": {
+          "lower": 75.0,
+          "base": 150,
+          "upper": 450,
+          "unit": "USD/new account",
+          "status": "assumption; not a confidence interval"
+        },
+        "annual_account_churn_fraction": {
+          "lower": 0.125,
+          "base": 0.25,
+          "upper": 0.5,
+          "unit": "lost accounts / starting accounts / year",
+          "status": "assumption; not a confidence interval"
+        }
+      }
+    },
+    {
+      "id": "mid",
+      "price_usd_per_account_month": 199,
+      "mix_fraction": 0.18,
+      "included_paid_tool_users": 10,
+      "pricing_unit": "account, not seat; model does not add a second seat charge",
+      "hosting_usd_per_account_month": 30,
+      "support_hours_per_account_month": 0.4,
+      "support_loaded_hourly_usd": 75,
+      "onboarding_delivery_hours_per_new_account": 4,
+      "payment_processing_fraction": 0.03,
+      "acquisition_cost_usd_per_new_account": 2000,
+      "annual_account_churn_fraction": 0.15,
+      "cost_boundary": "Support and onboarding delivery labor is variable and excluded from fixed payroll. CAC covers acquisition/sales effort only, excluding delivery. Hosting includes all modeled service infrastructure and is unmeasured.",
+      "sensitivity_ranges": {
+        "hosting_usd_per_account_month": {
+          "lower": 15.0,
+          "base": 30,
+          "upper": 90,
+          "unit": "USD/account/month",
+          "status": "assumption; not a confidence interval"
+        },
+        "support_hours_per_account_month": {
+          "lower": 0.2,
+          "base": 0.4,
+          "upper": 2.0,
+          "unit": "hours/account/month",
+          "status": "assumption; not a confidence interval"
+        },
+        "acquisition_cost_usd_per_new_account": {
+          "lower": 1000.0,
+          "base": 2000,
+          "upper": 6000,
+          "unit": "USD/new account",
+          "status": "assumption; not a confidence interval"
+        },
+        "annual_account_churn_fraction": {
+          "lower": 0.075,
+          "base": 0.15,
+          "upper": 0.3,
+          "unit": "lost accounts / starting accounts / year",
+          "status": "assumption; not a confidence interval"
+        }
+      }
+    },
+    {
+      "id": "enterprise",
+      "price_usd_per_account_month": 1499,
+      "mix_fraction": 0.02,
+      "included_paid_tool_users": 30,
+      "pricing_unit": "account, not seat; model does not add a second seat charge",
+      "hosting_usd_per_account_month": 200,
+      "support_hours_per_account_month": 2,
+      "support_loaded_hourly_usd": 75,
+      "onboarding_delivery_hours_per_new_account": 24,
+      "payment_processing_fraction": 0.03,
+      "acquisition_cost_usd_per_new_account": 15000,
+      "annual_account_churn_fraction": 0.08,
+      "cost_boundary": "Support and onboarding delivery labor is variable and excluded from fixed payroll. CAC covers acquisition/sales effort only, excluding delivery. Hosting includes all modeled service infrastructure and is unmeasured.",
+      "sensitivity_ranges": {
+        "hosting_usd_per_account_month": {
+          "lower": 100.0,
+          "base": 200,
+          "upper": 600,
+          "unit": "USD/account/month",
+          "status": "assumption; not a confidence interval"
+        },
+        "support_hours_per_account_month": {
+          "lower": 1.0,
+          "base": 2,
+          "upper": 10,
+          "unit": "hours/account/month",
+          "status": "assumption; not a confidence interval"
+        },
+        "acquisition_cost_usd_per_new_account": {
+          "lower": 7500.0,
+          "base": 15000,
+          "upper": 45000,
+          "unit": "USD/new account",
+          "status": "assumption; not a confidence interval"
+        },
+        "annual_account_churn_fraction": {
+          "lower": 0.04,
+          "base": 0.08,
+          "upper": 0.16,
+          "unit": "lost accounts / starting accounts / year",
+          "status": "assumption; not a confidence interval"
+        }
+      }
+    }
+  ],
+  "supplier_scales": [
+    {
+      "paid_accounts": 100,
+      "account_mix": "unchanged supplier_tiers mix at every scale",
+      "fixed_staff_fte": 2,
+      "fixed_loaded_cost_usd_per_fte_year": 180000,
+      "fixed_nonpayroll_usd_per_year": 70000,
+      "scope": "Core private product engineering, product, G&A and service security operations. Excludes variable support/onboarding, CAC, public-runtime maintenance and one-time commercial-readiness build.",
+      "sensitivity_ranges": {
+        "fixed_staff_fte": {
+          "lower": 1.5,
+          "base": 2,
+          "upper": 4,
+          "unit": "FTE",
+          "status": "assumption; not a confidence interval"
+        },
+        "fixed_loaded_cost_usd_per_fte_year": {
+          "lower": 150000,
+          "base": 180000,
+          "upper": 220000,
+          "unit": "USD/FTE/year",
+          "status": "assumption; not a confidence interval"
+        },
+        "fixed_nonpayroll_usd_per_year": {
+          "lower": 35000.0,
+          "base": 70000,
+          "upper": 140000,
+          "unit": "USD/year",
+          "status": "assumption; not a confidence interval"
+        }
+      }
+    },
+    {
+      "paid_accounts": 1000,
+      "account_mix": "unchanged supplier_tiers mix at every scale",
+      "fixed_staff_fte": 6,
+      "fixed_loaded_cost_usd_per_fte_year": 180000,
+      "fixed_nonpayroll_usd_per_year": 220000,
+      "scope": "Core private product engineering, product, G&A and service security operations. Excludes variable support/onboarding, CAC, public-runtime maintenance and one-time commercial-readiness build.",
+      "sensitivity_ranges": {
+        "fixed_staff_fte": {
+          "lower": 3,
+          "base": 6,
+          "upper": 10,
+          "unit": "FTE",
+          "status": "assumption; not a confidence interval"
+        },
+        "fixed_loaded_cost_usd_per_fte_year": {
+          "lower": 150000,
+          "base": 180000,
+          "upper": 220000,
+          "unit": "USD/FTE/year",
+          "status": "assumption; not a confidence interval"
+        },
+        "fixed_nonpayroll_usd_per_year": {
+          "lower": 110000.0,
+          "base": 220000,
+          "upper": 440000,
+          "unit": "USD/year",
+          "status": "assumption; not a confidence interval"
+        }
+      }
+    },
+    {
+      "paid_accounts": 10000,
+      "account_mix": "unchanged supplier_tiers mix at every scale",
+      "fixed_staff_fte": 20,
+      "fixed_loaded_cost_usd_per_fte_year": 180000,
+      "fixed_nonpayroll_usd_per_year": 800000,
+      "scope": "Core private product engineering, product, G&A and service security operations. Excludes variable support/onboarding, CAC, public-runtime maintenance and one-time commercial-readiness build.",
+      "sensitivity_ranges": {
+        "fixed_staff_fte": {
+          "lower": 12,
+          "base": 20,
+          "upper": 35,
+          "unit": "FTE",
+          "status": "assumption; not a confidence interval"
+        },
+        "fixed_loaded_cost_usd_per_fte_year": {
+          "lower": 150000,
+          "base": 180000,
+          "upper": 220000,
+          "unit": "USD/FTE/year",
+          "status": "assumption; not a confidence interval"
+        },
+        "fixed_nonpayroll_usd_per_year": {
+          "lower": 400000.0,
+          "base": 800000,
+          "upper": 1600000,
+          "unit": "USD/year",
+          "status": "assumption; not a confidence interval"
+        }
+      }
+    }
+  ],
+  "commercial_readiness_one_time": {
+    "engineering_hours": 4000,
+    "engineering_loaded_hourly_usd": 100,
+    "external_assurance_and_setup_usd": 25000,
+    "unvalidated_scope": [
+      "Hosted multi-tenant service",
+      "Production identity integration",
+      "Data isolation, privacy and retention controls",
+      "Operational runbooks and realistic support service levels",
+      "Full Studio-v15 qualification and compatibility upkeep"
+    ],
+    "status": "Planning reserve, not a cost estimate from implemented work or a certification commitment. Excluded from ongoing fixed payroll and must be shown separately or explicitly amortized.",
+    "sensitivity_ranges": {
+      "engineering_hours": {
+        "lower": 1000,
+        "base": 4000,
+        "upper": 10000,
+        "unit": "engineering hours",
+        "status": "assumption; not a confidence interval"
+      },
+      "external_assurance_and_setup_usd": {
+        "lower": 5000,
+        "base": 25000,
+        "upper": 100000,
+        "unit": "USD once",
+        "status": "assumption; not a confidence interval"
+      }
+    }
+  },
+  "oss_adoption_scales": [
+    {
+      "active_free_runtime_organizations": 1000,
+      "annual_runtime_revenue_usd": 0,
+      "fixed_maintenance_fte": 0.5,
+      "loaded_cost_usd_per_fte_year": 180000,
+      "inbound_support_requests_per_organization_year": 0.02,
+      "hours_per_request": 0.5,
+      "loaded_support_hourly_usd": 75,
+      "status": "Independent conditional adoption scale; not a conversion rate, actual installations, or a service obligation. Free-use request rate and maintenance needs are unknown.",
+      "sensitivity_ranges": {
+        "inbound_support_requests_per_organization_year": {
+          "lower": 0.002,
+          "base": 0.02,
+          "upper": 0.1,
+          "unit": "requests/organization/year",
+          "status": "assumption; not a confidence interval"
+        },
+        "hours_per_request": {
+          "lower": 0.25,
+          "base": 0.5,
+          "upper": 1,
+          "unit": "hours/request",
+          "status": "assumption; not a confidence interval"
+        },
+        "fixed_maintenance_fte": {
+          "lower": 0.25,
+          "base": 0.5,
+          "upper": 1.0,
+          "unit": "FTE",
+          "status": "assumption; not a confidence interval"
+        }
+      }
+    },
+    {
+      "active_free_runtime_organizations": 10000,
+      "annual_runtime_revenue_usd": 0,
+      "fixed_maintenance_fte": 1,
+      "loaded_cost_usd_per_fte_year": 180000,
+      "inbound_support_requests_per_organization_year": 0.02,
+      "hours_per_request": 0.5,
+      "loaded_support_hourly_usd": 75,
+      "status": "Independent conditional adoption scale; not a conversion rate, actual installations, or a service obligation. Free-use request rate and maintenance needs are unknown.",
+      "sensitivity_ranges": {
+        "inbound_support_requests_per_organization_year": {
+          "lower": 0.002,
+          "base": 0.02,
+          "upper": 0.1,
+          "unit": "requests/organization/year",
+          "status": "assumption; not a confidence interval"
+        },
+        "hours_per_request": {
+          "lower": 0.25,
+          "base": 0.5,
+          "upper": 1,
+          "unit": "hours/request",
+          "status": "assumption; not a confidence interval"
+        },
+        "fixed_maintenance_fte": {
+          "lower": 0.5,
+          "base": 1,
+          "upper": 2,
+          "unit": "FTE",
+          "status": "assumption; not a confidence interval"
+        }
+      }
+    },
+    {
+      "active_free_runtime_organizations": 100000,
+      "annual_runtime_revenue_usd": 0,
+      "fixed_maintenance_fte": 2,
+      "loaded_cost_usd_per_fte_year": 180000,
+      "inbound_support_requests_per_organization_year": 0.02,
+      "hours_per_request": 0.5,
+      "loaded_support_hourly_usd": 75,
+      "status": "Independent conditional adoption scale; not a conversion rate, actual installations, or a service obligation. Free-use request rate and maintenance needs are unknown.",
+      "sensitivity_ranges": {
+        "inbound_support_requests_per_organization_year": {
+          "lower": 0.002,
+          "base": 0.02,
+          "upper": 0.1,
+          "unit": "requests/organization/year",
+          "status": "assumption; not a confidence interval"
+        },
+        "hours_per_request": {
+          "lower": 0.25,
+          "base": 0.5,
+          "upper": 1,
+          "unit": "hours/request",
+          "status": "assumption; not a confidence interval"
+        },
+        "fixed_maintenance_fte": {
+          "lower": 1.0,
+          "base": 2,
+          "upper": 4,
+          "unit": "FTE",
+          "status": "assumption; not a confidence interval"
+        }
+      }
+    }
+  ],
+  "oss_scale_pairing": "Free-runtime and paid-account scenarios are independent axes. If paired for display, label the assumed pairing; it is not measured conversion.",
+  "eligible_paid_account_count": null,
+  "pricing_evidence_source_ids": [
+    "langfuse-pricing",
+    "langsmith-pricing",
+    "sentry-pricing",
+    "temporal-pricing",
+    "inngest-pricing"
+  ],
+  "hosting_evidence_source_ids": [
+    "cloudflare-r2-pricing"
+  ],
+  "hosting_anchor_limit": "R2 rates only establish that raw storage is one small component. Scenario hosting inputs also need compute, database/indexing, security, backup and operations; none is a measured Studio deployment.",
+  "telemetry_sensitivity_inputs": {
+    "events_per_account_month": [
+      100000,
+      1000000,
+      10000000
+    ],
+    "mean_bytes_per_event": [
+      500,
+      2000,
+      10000
+    ],
+    "retention_days": [
+      7,
+      30,
+      365
+    ],
+    "events_per_object": [
+      1,
+      100,
+      1000
+    ],
+    "status": "Independent illustrative volume grid, not measured production event sizes or a selected architecture. Use real counts and retention before estimating a bill."
+  },
+  "missing_evidence": [
+    "Actual buyer workflow times and pain frequency",
+    "Human comprehension or review-speed improvement",
+    "Observed attributable incident prevention",
+    "Buyer willingness to pay or paid conversion",
+    "Production hosting bill and retention distribution",
+    "Support request rate, CAC, churn and expansion",
+    "Full v15 Studio qualification and commercial hosted delivery",
+    "Defensible total eligible account count"
+  ]
+}

@@ -1,0 +1,214 @@
+{
+  "schema_version": 1,
+  "retrieved_on_utc": "2026-11-18",
+  "status": "Analyst hypotheses for screening; not observed adoption, WTP or industry-specific efficacy. Root owns final interpretation.",
+  "ranking_basis": "Relevant recurring workflow cost, ability to amortize integration, reachable budget owner and procurement friction. Margins provide context, not ranking weights or purchasing evidence.",
+  "ranked_beachheads": [
+    {
+      "rank": 1,
+      "segment": "Vertical B2B SaaS and operational software vendors",
+      "buyer": "Engineering or product leader owning several interactive customer workflows",
+      "examples": [
+        "Order and dispatch workbenches",
+        "Customer-service exception tools",
+        "Multi-record approval and reconciliation screens"
+      ],
+      "fit": "Repeated client-state coordination and investigation work can be reused across customers. One vendor purchase may serve many downstream firms.",
+      "profitable_context_source": "damodaran-us-margins",
+      "profit_context_sector": "Software (System & Application)",
+      "integration_friction": "Low for a new module; medium to high for an established platform",
+      "paid_budget_hypothesis": "mid or enterprise account tier only when attributable labor benefits exceed integration and subscription cost",
+      "v15_role": "State and entity coordination where existing contracts are sufficient",
+      "v16_incremental_role": "Long-lived proposals and coordinated publication when useful work overlaps asynchronous approval or delivery",
+      "private_tooling_role": "Correlating owner, entity lifetime and command evidence with existing logs",
+      "first_falsifier": "Measure actual state-related maintenance and investigation hours on one production workflow; reject savings that existing tracing already provides.",
+      "bad_fit": "A simple form or a vendor whose debugging costs concern only remote model quality or database behavior."
+    },
+    {
+      "rank": 2,
+      "segment": "Fintech and insurance operations software teams",
+      "buyer": "Platform or application engineering owner, with operational control owner",
+      "examples": [
+        "Payment-exception review",
+        "Claims adjustment workbenches",
+        "Reconciliation and account-change approval"
+      ],
+      "fit": "Conflicting edits, uncertain completion and command attribution have a plausible operational role; service-side authorization and durable effects remain necessary.",
+      "profitable_context_source": "damodaran-us-margins",
+      "profit_context_sector": "Insurance (General); Bank (Money Center) are broad context only",
+      "integration_friction": "Medium for a new internal workbench; high for regulated legacy platforms",
+      "paid_budget_hypothesis": "mid or enterprise, contingent on a reviewable deployment and existing vendor requirements",
+      "v15_role": "Ordinary state/entity coordination",
+      "v16_incremental_role": "Coordinated pending state and publication while authoritative services settle approved commands",
+      "private_tooling_role": "Investigation evidence, subject to privacy and retention requirements",
+      "first_falsifier": "Time recent state-correlation investigations and the extra review/retention burden; price only the portion local context can change.",
+      "bad_fit": "Claims that SignalTree itself prevents fraud, satisfies financial regulation or makes payments transactional."
+    },
+    {
+      "rank": 3,
+      "segment": "Logistics, field-service and industrial operations software vendors or larger internal teams",
+      "buyer": "TMS/ERP product engineering owner or internal digital operations team",
+      "examples": [
+        "Dispatch changes",
+        "Job and capacity allocation",
+        "Order and work-instruction exceptions"
+      ],
+      "fit": "Concurrent edits and delayed acknowledgements resemble the tested dispatch application, but that resemblance is not a customer outcome study. Selling through software vendors may amortize engineering across fleets.",
+      "profitable_context_source": "damodaran-us-margins",
+      "profit_context_sector": "Trucking; Machinery are separate broad contexts",
+      "integration_friction": "Medium for a new console; high for legacy ERP/TMS integration",
+      "paid_budget_hypothesis": "mid for a focused team; enterprise only for multiple evidenced workflows",
+      "v15_role": "State, entities and local coordination",
+      "v16_incremental_role": "Pending coordinated changes where several actors or services operate on the same entities",
+      "private_tooling_role": "Investigate stale/replayed/uncertain commands across UI and backend",
+      "first_falsifier": "Measure dispatch exception volume and hours attributable to application-state ambiguity, excluding driver delay or freight losses without a demonstrated causal path.",
+      "bad_fit": "Small carriers without engineering teams, tiny state surfaces or thin margins paired with expensive migration."
+    },
+    {
+      "rank": 4,
+      "segment": "Enterprise manufacturing, wholesale and commerce back-office application teams",
+      "buyer": "Internal platform owner funding one bounded operational console",
+      "examples": [
+        "Order amendments",
+        "Returns and exception approvals",
+        "Inventory allocation review"
+      ],
+      "fit": "Repeated transactional user interactions can create value, but existing ERP, workflow and state investments raise replacement costs.",
+      "profitable_context_source": "damodaran-us-margins",
+      "profit_context_sector": "Machinery is illustrative, not a proxy for all manufacturers or merchants",
+      "integration_friction": "High unless introduced at a planned module boundary",
+      "paid_budget_hypothesis": "mid or enterprise after measured marginal benefit against incumbent tooling",
+      "v15_role": "New bounded UI state modules",
+      "v16_incremental_role": "Only workflows needing the additional coordinated pending contract",
+      "private_tooling_role": "Cross-layer investigation, not ERP replacement",
+      "first_falsifier": "Compare an incremental adapter/new module against whole-store migration, including parallel support and regression qualification.",
+      "bad_fit": "Replacing stable ERP state wholesale to obtain a small debugging convenience."
+    },
+    {
+      "rank": 5,
+      "segment": "Healthcare IT vendors building administrative workflows",
+      "buyer": "Healthcare software engineering owner",
+      "examples": [
+        "Administrative scheduling exceptions",
+        "Nonclinical authorization-routing workbenches",
+        "Billing-review coordination"
+      ],
+      "fit": "Operational state ambiguity may matter, but privacy, data minimization and deployment review can dominate integration cost. Direct clinical use is outside this evidence.",
+      "profitable_context_source": "damodaran-us-margins",
+      "profit_context_sector": "Heathcare Information and Technology; Healthcare Support Services are distinct",
+      "integration_friction": "High",
+      "paid_budget_hypothesis": "enterprise only if the deployment requirements are actually supported; otherwise no sale assumed",
+      "v15_role": "Ordinary state/entity coordination in bounded administrative modules",
+      "v16_incremental_role": "Coordinated pending state where the application requires it",
+      "private_tooling_role": "Minimized, scoped evidence with a separately validated retention policy",
+      "first_falsifier": "Establish a lawful, acceptable data flow and measure operational labor; do not monetize clinical errors or regulatory penalties.",
+      "bad_fit": "Clinical decision correctness, a substitute for health-data controls, or a low-budget provider without its own software team."
+    }
+  ],
+  "comparators": [
+    {
+      "category": "Other public state libraries and native framework state",
+      "examples": [
+        "NgRx Signals",
+        "TanStack DB",
+        "Native Angular signals"
+      ],
+      "relationship": "Direct alternatives for some client-state work; full contracts differ",
+      "supported_sources": [
+        "ngrx-license",
+        "tanstack-db-license",
+        "tanstack-db-overview"
+      ],
+      "cost_treatment": "Assume zero displaced runtime license fee; compare engineering, measured performance and migration.",
+      "limit": "Do not infer equivalent guarantees or universal uniqueness from feature names."
+    },
+    {
+      "category": "LLM observability and evaluation",
+      "examples": [
+        "Langfuse",
+        "LangSmith"
+      ],
+      "relationship": "Primarily complementary; private investigation tooling partly overlaps",
+      "supported_sources": [
+        "langfuse-capabilities",
+        "langfuse-pricing",
+        "langsmith-pricing"
+      ],
+      "cost_treatment": "Keep existing subscription and usage costs unless a specific tested removal is justified. Count only additional labor benefit.",
+      "limit": "Runtime-owner evidence does not evaluate model reasoning or output correctness."
+    },
+    {
+      "category": "General application monitoring",
+      "examples": [
+        "Sentry",
+        "OpenTelemetry-based observability stacks"
+      ],
+      "relationship": "Complementary instrumentation and troubleshooting context with partial tooling overlap",
+      "supported_sources": [
+        "sentry-pricing",
+        "otel-boundary"
+      ],
+      "cost_treatment": "No full monitoring bill is credited as saved. Include incremental capture, storage and review cost.",
+      "limit": "OpenTelemetry is instrumentation/transport, not hosted storage; interoperability is a candidate integration, not a claimed present feature."
+    },
+    {
+      "category": "Durable workflow orchestration",
+      "examples": [
+        "Temporal",
+        "Inngest"
+      ],
+      "relationship": "Backend complement; may compete with custom application orchestration code, not be replaced by local state",
+      "supported_sources": [
+        "temporal-pricing",
+        "temporal-pricing-docs",
+        "inngest-pricing"
+      ],
+      "cost_treatment": "No assumed savings in workflow-engine subscriptions, durable effects or authentication.",
+      "limit": "Browser-owned coordination is not durable external authority."
+    }
+  ],
+  "pricing_and_readiness": [
+    "Public runtime remains free under its existing license. No paid runtime toll, retroactive license change or paid-user conversion is assumed.",
+    "Private Studio, hosted retention, support or integration are separate potential offers. A modeled price is not an offer, commitment or proof of capability.",
+    "An enterprise price requires enterprise delivery capacity. No present SLA, certification, SSO, hosting region or procurement readiness is inferred.",
+    "Buyer WTP remains unobserved; a calculated maximum affordable price is a conditional value ceiling, not demonstrated demand.",
+    "Current private Studio evidence is broader for v16. v15 only has narrow transaction-delegation checks; full Studio-v15 qualification is unestablished.",
+    "Hosted multi-tenant delivery, production identity integration and commercial SLAs are not established. Enterprise amounts are future-package hypotheses requiring additional build and support cost.",
+    "Widespread free-runtime adoption incurs maintenance/community-support costs. It produces no license revenue in this model."
+  ],
+  "eligibility": {
+    "eligible_account_count": null,
+    "eligible_market_usd": null,
+    "reason": "No source connects firm/developer counts to supported interactive applications, relevant recurring pain, integration feasibility and a paid tooling budget. Public counts cannot complete that chain.",
+    "unit": "one paying organization/account; downstream users and deployments are separate denominators",
+    "necessary_conditions": [
+      "Supported application architecture and an owner able to integrate it",
+      "A recurring coordination or investigation problem within the demonstrated local/application boundary",
+      "A measurable incremental advantage over existing state, tracing and workflow tools",
+      "Acceptable performance, privacy, retention and support requirements",
+      "Sufficient recoverable labor or separately validated nonlabor risk benefit to cover total cost"
+    ],
+    "conditional_counts": [
+      100,
+      1000,
+      10000
+    ],
+    "conditional_counts_mean": "Sensitivity assumptions for eligible paying accounts, not a forecast or measured addressable population.",
+    "aggregation_limit": "Do not count the same engineering benefit at both the software vendor and all downstream customers. Deduct customer integration and operations plus supplier real resource costs; subscription payments are transfers in a joint-system calculation."
+  },
+  "negative_fit_cases": [
+    "Simple CRUD, static websites, read-only dashboards and low-incident projects",
+    "Backend-only agents needing durable workflow orchestration without interactive state",
+    "Model-quality or prompt-injection problems without an attributable state-coordination mechanism",
+    "Stable legacy stores whose migration and training cost exceed incremental benefit",
+    "High-volume short-lived stores when measured startup cost violates the application budget",
+    "Sensitive-data deployments whose retention/control requirements are not yet supported",
+    "Tiny teams satisfied by free runtime and free existing observability",
+    "Buyers seeking certification, autonomous error prevention or guaranteed business correctness"
+  ],
+  "local_evidence": {
+    "path": "docs/audits/2026-11-17-oversight-followthrough/README.md",
+    "study_commit": "1927c8836314feec37ba68313a41a6a33dd6c2a4",
+    "meaning": "Supports tested application boundaries and limits, not human comprehension, production incident reduction or savings."
+  }
+}
