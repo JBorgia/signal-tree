@@ -1,0 +1,296 @@
+{
+  "scope": "Functional observations and explicit limitation witnesses; not an overall oversight-product or release pass",
+  "runs": {
+    "v15-common-1": {
+      "line": "15",
+      "assertionCases": 9,
+      "passed": 9,
+      "diagnostics": [
+        {
+          "line": "15",
+          "nativeOwners": 2,
+          "concurrentlyAwaitingReceipts": 2,
+          "agentEffects": 1,
+          "A": "failed",
+          "B": "succeeded"
+        },
+        {
+          "line": "15",
+          "healthyEvents": 3,
+          "confirmed": true,
+          "failedSinkWasIsolated": true
+        },
+        {
+          "line": "15",
+          "observed": 6,
+          "transitions": 9,
+          "missing": 3,
+          "retainedTurns": 2,
+          "truncated": true
+        },
+        {
+          "line": "15",
+          "pendingRetained": true,
+          "consequencesReleased": true,
+          "sendsBeforeExplicitRecovery": 2,
+          "v16ContainmentRequirement": "NOT MET (documented v15 behavior)"
+        },
+        {
+          "requirement": "durable exactly-once effect/receipt recovery",
+          "verdict": "NOT ESTABLISHED",
+          "fixtureReconstructionEffects": 2,
+          "scope": "new in-memory backend objects, not an actual process restart or external side effect"
+        }
+      ],
+      "testSourceSha256": "3239c13dc467db02c7132644a070869373f586ea70611c3f2e7a20bcfe38bfd2",
+      "commands": [
+        {
+          "id": "pack-tslib",
+          "command": "npm",
+          "args": [
+            "pack",
+            "--offline",
+            "--ignore-scripts",
+            "--json",
+            "--pack-destination",
+            "/Users/jonathanborgia/code/signaltree/artifacts/agent-oversight-2026-11-17-v15-common-1/peer-packs"
+          ],
+          "cwd": "/Users/jonathanborgia/code/signaltree/.worktrees/application-comparison/node_modules/.pnpm/tslib@2.8.1/node_modules/tslib",
+          "exit": 0,
+          "log": "/Users/jonathanborgia/code/signaltree/artifacts/agent-oversight-2026-11-17-v15-common-1/pack-tslib.log",
+          "sha256": "3f94f053b8259cdd953bbb03dc4b1628c8f01e9aa04e280c228a70651b6d7682"
+        },
+        {
+          "id": "install",
+          "command": "npm",
+          "args": [
+            "install",
+            "--offline",
+            "--ignore-scripts",
+            "--no-audit",
+            "--no-fund",
+            "/Users/jonathanborgia/code/signaltree/artifacts/agent-oversight-2026-11-17-v15-packet-2/packs/signal-tree-kernel-15.4.9.tgz",
+            "/Users/jonathanborgia/code/signaltree/artifacts/agent-oversight-2026-11-17-v15-common-1/peer-packs/tslib-2.8.1.tgz"
+          ],
+          "cwd": "/Users/jonathanborgia/code/signaltree/artifacts/agent-oversight-2026-11-17-v15-common-1/consumer",
+          "exit": 0,
+          "log": "/Users/jonathanborgia/code/signaltree/artifacts/agent-oversight-2026-11-17-v15-common-1/install.log",
+          "sha256": "3cfb02844028615ea867f45ac131e11bcc280654caba0c78668e991025e95314"
+        },
+        {
+          "id": "oversight",
+          "command": "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+          "args": [
+            "--test",
+            "oversight.checks.mjs"
+          ],
+          "cwd": "/Users/jonathanborgia/code/signaltree/artifacts/agent-oversight-2026-11-17-v15-common-1/consumer",
+          "exit": 0,
+          "log": "/Users/jonathanborgia/code/signaltree/artifacts/agent-oversight-2026-11-17-v15-common-1/oversight.log",
+          "sha256": "5556231e93c90c4d0a5b09de09433196785bb586564ef4f31c7accbb37eca186"
+        }
+      ]
+    },
+    "v16-common-5": {
+      "line": "16",
+      "assertionCases": 9,
+      "passed": 9,
+      "diagnostics": [
+        {
+          "line": "16",
+          "nativeOwners": 2,
+          "concurrentlyAwaitingReceipts": 2,
+          "agentEffects": 1,
+          "A": "failed",
+          "B": "succeeded"
+        },
+        {
+          "line": "16",
+          "healthyEvents": 3,
+          "confirmed": true,
+          "failedSinkWasIsolated": true
+        },
+        {
+          "line": "16",
+          "observed": 6,
+          "transitions": 9,
+          "missing": 3,
+          "retainedTurns": 2,
+          "truncated": true
+        },
+        {
+          "line": "16",
+          "pendingRetained": true,
+          "consequencesReleased": false,
+          "sendsBeforeExplicitRecovery": 1,
+          "v16ContainmentRequirement": "MET in tested publication case"
+        },
+        {
+          "requirement": "durable exactly-once effect/receipt recovery",
+          "verdict": "NOT ESTABLISHED",
+          "fixtureReconstructionEffects": 2,
+          "scope": "new in-memory backend objects, not an actual process restart or external side effect"
+        }
+      ],
+      "testSourceSha256": "3239c13dc467db02c7132644a070869373f586ea70611c3f2e7a20bcfe38bfd2",
+      "commands": [
+        {
+          "id": "pack-tslib",
+          "command": "npm",
+          "args": [
+            "pack",
+            "--offline",
+            "--ignore-scripts",
+            "--json",
+            "--pack-destination",
+            "/Users/jonathanborgia/code/signaltree/artifacts/agent-oversight-2026-11-17-v16-common-5/peer-packs"
+          ],
+          "cwd": "/Users/jonathanborgia/code/signaltree/.worktrees/application-comparison/node_modules/.pnpm/tslib@2.8.1/node_modules/tslib",
+          "exit": 0,
+          "log": "/Users/jonathanborgia/code/signaltree/artifacts/agent-oversight-2026-11-17-v16-common-5/pack-tslib.log",
+          "sha256": "3f94f053b8259cdd953bbb03dc4b1628c8f01e9aa04e280c228a70651b6d7682"
+        },
+        {
+          "id": "install",
+          "command": "npm",
+          "args": [
+            "install",
+            "--offline",
+            "--ignore-scripts",
+            "--no-audit",
+            "--no-fund",
+            "/Users/jonathanborgia/code/signaltree/artifacts/agent-oversight-2026-11-17-v16-packet-3/packs/signal-tree-kernel-16.0.0-dev.tgz",
+            "/Users/jonathanborgia/code/signaltree/artifacts/agent-oversight-2026-11-17-v16-common-5/peer-packs/tslib-2.8.1.tgz"
+          ],
+          "cwd": "/Users/jonathanborgia/code/signaltree/artifacts/agent-oversight-2026-11-17-v16-common-5/consumer",
+          "exit": 0,
+          "log": "/Users/jonathanborgia/code/signaltree/artifacts/agent-oversight-2026-11-17-v16-common-5/install.log",
+          "sha256": "8a67d741ed00cc309a59bddc1227677653b18f54c8fc73cd9b488dfcf314047a"
+        },
+        {
+          "id": "oversight",
+          "command": "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+          "args": [
+            "--test",
+            "oversight.checks.mjs"
+          ],
+          "cwd": "/Users/jonathanborgia/code/signaltree/artifacts/agent-oversight-2026-11-17-v16-common-5/consumer",
+          "exit": 0,
+          "log": "/Users/jonathanborgia/code/signaltree/artifacts/agent-oversight-2026-11-17-v16-common-5/oversight.log",
+          "sha256": "374ec83a847f511bfc9ac928654f0f33d17c14cc504c556f432d5d16cbf08b92"
+        }
+      ]
+    },
+    "existing-public-v16": {
+      "nodePassed": 62,
+      "angularBrowserPassed": 15,
+      "note": "Public workflow passed; the enclosing earlier common-suite attempt failed its scalar-trigger assumption and is preserved separately."
+    },
+    "http-browser-1": {
+      "control": "none",
+      "controlDetected": false,
+      "cases": [
+        {
+          "id": "accepted",
+          "outcome": "PASS"
+        },
+        {
+          "id": "producer-cancel",
+          "outcome": "PASS"
+        },
+        {
+          "id": "delayed-aba-independent",
+          "outcome": "PASS"
+        },
+        {
+          "id": "exact-approval",
+          "outcome": "PASS"
+        },
+        {
+          "id": "permission-revoked",
+          "outcome": "PASS"
+        },
+        {
+          "id": "lost-ack-retry",
+          "outcome": "PASS"
+        },
+        {
+          "id": "accepted-newer-owner",
+          "outcome": "PASS"
+        },
+        {
+          "id": "entity-replacement",
+          "outcome": "PASS"
+        },
+        {
+          "id": "reject-preserves-human",
+          "outcome": "PASS"
+        },
+        {
+          "id": "transport-cannot-approve",
+          "outcome": "PASS"
+        },
+        {
+          "id": "accepted-cleanup-ack-lost",
+          "outcome": "PASS"
+        },
+        {
+          "id": "rejected-cleanup-ack-lost",
+          "outcome": "PASS"
+        }
+      ],
+      "command": [
+        "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+        "/Users/jonathanborgia/code/signaltree/.worktrees/agent-collaboration-evaluation/tools/agent-collaboration-lab/http-browser/run.mjs",
+        "/Users/jonathanborgia/code/signaltree/artifacts/agent-oversight-2026-11-17-v16-packet-3/config.json",
+        "/Users/jonathanborgia/code/signaltree/artifacts/agent-oversight-2026-11-17-http-browser-1"
+      ]
+    },
+    "http-control-settlement": {
+      "control": "skip-native-settlement",
+      "controlDetected": true,
+      "cases": [
+        {
+          "id": "accepted",
+          "outcome": "FAIL"
+        }
+      ],
+      "command": [
+        "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+        "/Users/jonathanborgia/code/signaltree/.worktrees/agent-collaboration-evaluation/tools/agent-collaboration-lab/http-browser/run.mjs",
+        "/Users/jonathanborgia/code/signaltree/artifacts/agent-oversight-2026-11-17-v16-packet-3/config.json",
+        "/Users/jonathanborgia/code/signaltree/artifacts/agent-oversight-2026-11-17-http-control-settlement",
+        "--control=skip-native-settlement"
+      ]
+    },
+    "http-control-instance": {
+      "control": "ignore-instance",
+      "controlDetected": true,
+      "cases": [
+        {
+          "id": "entity-replacement",
+          "outcome": "FAIL"
+        }
+      ],
+      "command": [
+        "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+        "/Users/jonathanborgia/code/signaltree/.worktrees/agent-collaboration-evaluation/tools/agent-collaboration-lab/http-browser/run.mjs",
+        "/Users/jonathanborgia/code/signaltree/artifacts/agent-oversight-2026-11-17-v16-packet-3/config.json",
+        "/Users/jonathanborgia/code/signaltree/artifacts/agent-oversight-2026-11-17-http-control-instance",
+        "--control=ignore-instance"
+      ]
+    }
+  },
+  "artifacts": {
+    "15": {
+      "head": "891159222d40ccb8f55da038334b9197e0bc3432",
+      "sourceSeal": "ca812245415f34dc64bf69601b45e26f58fa9a40fc48d23fb590b194727ebbed",
+      "buildReceiptSha256": "1cd8e65c89c16e49b4dae024471bab6fc726164c253ba5c5f37aeab7a4deccb1"
+    },
+    "16": {
+      "head": "5801008ea4ca591b3be483e8bbb0aa02e15f59ed",
+      "sourceSeal": "9e88629aecfbd59014940bca99650c353e8d72817b869a47d838bda54575bf78",
+      "buildReceiptSha256": "54a67797f498c281b8f00f5712ae56547d3f60a9d168a09091625313a2ff1b18"
+    }
+  }
+}

@@ -1,0 +1,305 @@
+{
+  "files": {
+    "v15-common-1/receipt.json": {
+      "sha256": "9527f1db2c1aa9de24c0117c9cd17cc6798aa4da98eecc22d8405ee232d0dd11",
+      "original": "/Users/jonathanborgia/code/signaltree/artifacts/agent-oversight-2026-11-17-v15-common-1/receipt.json"
+    },
+    "v15-common-1/oversight.log": {
+      "sha256": "5556231e93c90c4d0a5b09de09433196785bb586564ef4f31c7accbb37eca186",
+      "original": "/Users/jonathanborgia/code/signaltree/artifacts/agent-oversight-2026-11-17-v15-common-1/oversight.log"
+    },
+    "v15-common-1/oversight.checks.mjs": {
+      "sha256": "3239c13dc467db02c7132644a070869373f586ea70611c3f2e7a20bcfe38bfd2",
+      "original": "/Users/jonathanborgia/code/signaltree/artifacts/agent-oversight-2026-11-17-v15-common-1/consumer/oversight.checks.mjs"
+    },
+    "v15-packet-2/config.json": {
+      "sha256": "d7a2660aca748815b7a44e19654bce721177c7ed5718e36e83b52d35c8be02fd",
+      "original": "/Users/jonathanborgia/code/signaltree/artifacts/agent-oversight-2026-11-17-v15-packet-2/config.json"
+    },
+    "v15-packet-2/plan.json": {
+      "sha256": "11f7e6ed183de028b3f0851303d36bd19cfc44a1992a3bc3e2cf288145933d6f",
+      "original": "/Users/jonathanborgia/code/signaltree/artifacts/agent-oversight-2026-11-17-v15-packet-2/plan.json"
+    },
+    "v15-packet-2/packs/signal-tree-kernel-15.4.9.tgz": {
+      "sha256": "e3edc4f8cd930fcbb7617a8966df352117473d95dd9b696280dac80014626859",
+      "original": "/Users/jonathanborgia/code/signaltree/artifacts/agent-oversight-2026-11-17-v15-packet-2/packs/signal-tree-kernel-15.4.9.tgz"
+    },
+    "v15-packet-2/packs/signal-tree-angular-15.4.9.tgz": {
+      "sha256": "1aa50b5e7e83bf71947beba81cee26895d3e4030c4bdb8e9286a13780b63338c",
+      "original": "/Users/jonathanborgia/code/signaltree/artifacts/agent-oversight-2026-11-17-v15-packet-2/packs/signal-tree-angular-15.4.9.tgz"
+    },
+    "v15-packet-2/build-inputs/build-receipt.json": {
+      "sha256": "1cd8e65c89c16e49b4dae024471bab6fc726164c253ba5c5f37aeab7a4deccb1",
+      "original": "/Users/jonathanborgia/code/signaltree/artifacts/publication-activation-2026-11-17/v15-final-packages/build-receipt.json"
+    },
+    "v15-packet-2/build-inputs/kernel.json": {
+      "sha256": "6756fd541627967345761fecebeaf07817cc58b91b9f4d70353a88323c2fbcbf",
+      "original": "/Users/jonathanborgia/code/signaltree/artifacts/publication-activation-2026-11-17/v15-final-packages/kernel.json"
+    },
+    "v15-packet-2/build-inputs/angular.json": {
+      "sha256": "06577b99f53d63326354a9d0a9c7b301084364e3632215a722d4ef8287559072",
+      "original": "/Users/jonathanborgia/code/signaltree/artifacts/publication-activation-2026-11-17/v15-final-packages/angular.json"
+    },
+    "v16-common-5/receipt.json": {
+      "sha256": "918f24fbd3cbd9ba14d3cab3c515c94fc96dc74444c6dc64ba058923eeea0012",
+      "original": "/Users/jonathanborgia/code/signaltree/artifacts/agent-oversight-2026-11-17-v16-common-5/receipt.json"
+    },
+    "v16-common-5/oversight.log": {
+      "sha256": "374ec83a847f511bfc9ac928654f0f33d17c14cc504c556f432d5d16cbf08b92",
+      "original": "/Users/jonathanborgia/code/signaltree/artifacts/agent-oversight-2026-11-17-v16-common-5/oversight.log"
+    },
+    "v16-common-5/oversight.checks.mjs": {
+      "sha256": "3239c13dc467db02c7132644a070869373f586ea70611c3f2e7a20bcfe38bfd2",
+      "original": "/Users/jonathanborgia/code/signaltree/artifacts/agent-oversight-2026-11-17-v16-common-5/consumer/oversight.checks.mjs"
+    },
+    "v16-packet-3/config.json": {
+      "sha256": "b71ec9c7afb6a1a5324c84df3d3e404eaa0fd9d2628eb2172e84672ab1470621",
+      "original": "/Users/jonathanborgia/code/signaltree/artifacts/agent-oversight-2026-11-17-v16-packet-3/config.json"
+    },
+    "v16-packet-3/plan.json": {
+      "sha256": "06d062a8d4d7dd4f13a84d987f6f296837fdc1772e6899bc83545f0c247da597",
+      "original": "/Users/jonathanborgia/code/signaltree/artifacts/agent-oversight-2026-11-17-v16-packet-3/plan.json"
+    },
+    "v16-packet-3/packs/signal-tree-kernel-16.0.0-dev.tgz": {
+      "sha256": "7fc83a413d3a9d654a7203dbec73392b49a8c727c97e576d1229536a713a801b",
+      "original": "/Users/jonathanborgia/code/signaltree/artifacts/agent-oversight-2026-11-17-v16-packet-3/packs/signal-tree-kernel-16.0.0-dev.tgz"
+    },
+    "v16-packet-3/packs/signal-tree-angular-16.0.0-dev.tgz": {
+      "sha256": "74224b15095ec37dfe60d3e52a83f292a17a77ff0e27e22a5964709b346110a6",
+      "original": "/Users/jonathanborgia/code/signaltree/artifacts/agent-oversight-2026-11-17-v16-packet-3/packs/signal-tree-angular-16.0.0-dev.tgz"
+    },
+    "v16-packet-3/build-inputs/build-receipt.json": {
+      "sha256": "54a67797f498c281b8f00f5712ae56547d3f60a9d168a09091625313a2ff1b18",
+      "original": "/Users/jonathanborgia/code/signaltree/artifacts/publication-activation-2026-11-17/v16-final-packages/build-receipt.json"
+    },
+    "v16-packet-3/build-inputs/kernel.json": {
+      "sha256": "f8f2d7e47e91e4ff533a66965c3b9865292070e2ebcd54de240648da675e0edf",
+      "original": "/Users/jonathanborgia/code/signaltree/artifacts/publication-activation-2026-11-17/v16-final-packages/kernel.json"
+    },
+    "v16-packet-3/build-inputs/angular.json": {
+      "sha256": "5bf8a15da349df2886d41a24bd1d3a28c65bd0c96f0ad00a1c7b2309ae0d1a7e",
+      "original": "/Users/jonathanborgia/code/signaltree/artifacts/publication-activation-2026-11-17/v16-final-packages/angular.json"
+    },
+    "existing-public-v16/manifest.json": {
+      "sha256": "4ebda9117d6d74ffb7918d92d760b62d874d7145e8f40367fba677e1e4680bc2",
+      "original": "/Users/jonathanborgia/code/signaltree/artifacts/agent-oversight-2026-11-17-v16-run-3/public/manifest.json"
+    },
+    "existing-public-v16/browser-results.json": {
+      "sha256": "3c69e839950e968706850dbe66c1b5f96afa2b55bca2821868a527a32b5a104e",
+      "original": "/Users/jonathanborgia/code/signaltree/artifacts/agent-oversight-2026-11-17-v16-run-3/public/browser-results.json"
+    },
+    "existing-public-v16/coordinator-protocol-http.log": {
+      "sha256": "97a69aeb94929f7d1c39b454e058bd8bd704ae32633801eb02e21d7bee761ac6",
+      "original": "/Users/jonathanborgia/code/signaltree/artifacts/agent-oversight-2026-11-17-v16-run-3/public/logs/coordinator-protocol-http.log"
+    },
+    "existing-public-v16/aot.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "original": "/Users/jonathanborgia/code/signaltree/artifacts/agent-oversight-2026-11-17-v16-run-3/public/logs/aot.log"
+    },
+    "http-browser-1/manifest.json": {
+      "sha256": "d965a8b6eb45958253042829985799ebdee9e3fcb0dc363a27720b2d9d2ff5e3",
+      "original": "/Users/jonathanborgia/code/signaltree/artifacts/agent-oversight-2026-11-17-http-browser-1/manifest.json"
+    },
+    "http-browser-1/browser-results.json": {
+      "sha256": "aefb56cc78f5a9147acd0e76f931b718e08a6aecd4a8ffa0a1ce38aebc12da99",
+      "original": "/Users/jonathanborgia/code/signaltree/artifacts/agent-oversight-2026-11-17-http-browser-1/browser-results.json"
+    },
+    "http-browser-1/logs/pack-@angular-compiler.log": {
+      "sha256": "aca91ffd1a5dcd17669bf8bfefb4b4aa524044276386a8c5f70134cf5e9f678b",
+      "original": "/Users/jonathanborgia/code/signaltree/artifacts/agent-oversight-2026-11-17-http-browser-1/logs/pack-@angular-compiler.log"
+    },
+    "http-browser-1/logs/strict-aot.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "original": "/Users/jonathanborgia/code/signaltree/artifacts/agent-oversight-2026-11-17-http-browser-1/logs/strict-aot.log"
+    },
+    "http-browser-1/logs/extract-angular.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "original": "/Users/jonathanborgia/code/signaltree/artifacts/agent-oversight-2026-11-17-http-browser-1/logs/extract-angular.log"
+    },
+    "http-browser-1/logs/pack-tslib.log": {
+      "sha256": "3f94f053b8259cdd953bbb03dc4b1628c8f01e9aa04e280c228a70651b6d7682",
+      "original": "/Users/jonathanborgia/code/signaltree/artifacts/agent-oversight-2026-11-17-http-browser-1/logs/pack-tslib.log"
+    },
+    "http-browser-1/logs/pack-@angular-core.log": {
+      "sha256": "7a4274c72eb89d414ed0573c54dbd1ab38772304390d58ee53d388d3ce2539df",
+      "original": "/Users/jonathanborgia/code/signaltree/artifacts/agent-oversight-2026-11-17-http-browser-1/logs/pack-@angular-core.log"
+    },
+    "http-browser-1/logs/pack-@angular-common.log": {
+      "sha256": "9580ac0aba87bc71c05f75ba5c652962446d7fa88987b2c6e9102da4fdae20af",
+      "original": "/Users/jonathanborgia/code/signaltree/artifacts/agent-oversight-2026-11-17-http-browser-1/logs/pack-@angular-common.log"
+    },
+    "http-browser-1/logs/pack-@angular-platform-browser.log": {
+      "sha256": "c20998f79af7ea428e5141c51b293730543aca6ccbfff0050a4acd089bfaba41",
+      "original": "/Users/jonathanborgia/code/signaltree/artifacts/agent-oversight-2026-11-17-http-browser-1/logs/pack-@angular-platform-browser.log"
+    },
+    "http-browser-1/logs/pack-rxjs.log": {
+      "sha256": "4211af52e4430b32b87642fa0f33ced9224a16d7f3e78777a2bca89b4b0ae527",
+      "original": "/Users/jonathanborgia/code/signaltree/artifacts/agent-oversight-2026-11-17-http-browser-1/logs/pack-rxjs.log"
+    },
+    "http-browser-1/logs/extract-kernel.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "original": "/Users/jonathanborgia/code/signaltree/artifacts/agent-oversight-2026-11-17-http-browser-1/logs/extract-kernel.log"
+    },
+    "http-browser-1/logs/install.log": {
+      "sha256": "881fa96ffbb7709d398edc95a1312b740811ab29f505320e71d5f7cee6fa52f3",
+      "original": "/Users/jonathanborgia/code/signaltree/artifacts/agent-oversight-2026-11-17-http-browser-1/logs/install.log"
+    },
+    "http-control-settlement/manifest.json": {
+      "sha256": "ab6c7faeb8640e0971143414de7979a3b93d715c6776f39e1f491a1a26607ed1",
+      "original": "/Users/jonathanborgia/code/signaltree/artifacts/agent-oversight-2026-11-17-http-control-settlement/manifest.json"
+    },
+    "http-control-settlement/browser-results.json": {
+      "sha256": "14ce35495dbe3e230d828ee020f50fa0dabb76947e8545c4fccd678a3b78c569",
+      "original": "/Users/jonathanborgia/code/signaltree/artifacts/agent-oversight-2026-11-17-http-control-settlement/browser-results.json"
+    },
+    "http-control-settlement/logs/pack-@angular-compiler.log": {
+      "sha256": "aca91ffd1a5dcd17669bf8bfefb4b4aa524044276386a8c5f70134cf5e9f678b",
+      "original": "/Users/jonathanborgia/code/signaltree/artifacts/agent-oversight-2026-11-17-http-control-settlement/logs/pack-@angular-compiler.log"
+    },
+    "http-control-settlement/logs/strict-aot.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "original": "/Users/jonathanborgia/code/signaltree/artifacts/agent-oversight-2026-11-17-http-control-settlement/logs/strict-aot.log"
+    },
+    "http-control-settlement/logs/extract-angular.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "original": "/Users/jonathanborgia/code/signaltree/artifacts/agent-oversight-2026-11-17-http-control-settlement/logs/extract-angular.log"
+    },
+    "http-control-settlement/logs/pack-tslib.log": {
+      "sha256": "3f94f053b8259cdd953bbb03dc4b1628c8f01e9aa04e280c228a70651b6d7682",
+      "original": "/Users/jonathanborgia/code/signaltree/artifacts/agent-oversight-2026-11-17-http-control-settlement/logs/pack-tslib.log"
+    },
+    "http-control-settlement/logs/pack-@angular-core.log": {
+      "sha256": "7a4274c72eb89d414ed0573c54dbd1ab38772304390d58ee53d388d3ce2539df",
+      "original": "/Users/jonathanborgia/code/signaltree/artifacts/agent-oversight-2026-11-17-http-control-settlement/logs/pack-@angular-core.log"
+    },
+    "http-control-settlement/logs/pack-@angular-common.log": {
+      "sha256": "9580ac0aba87bc71c05f75ba5c652962446d7fa88987b2c6e9102da4fdae20af",
+      "original": "/Users/jonathanborgia/code/signaltree/artifacts/agent-oversight-2026-11-17-http-control-settlement/logs/pack-@angular-common.log"
+    },
+    "http-control-settlement/logs/pack-@angular-platform-browser.log": {
+      "sha256": "c20998f79af7ea428e5141c51b293730543aca6ccbfff0050a4acd089bfaba41",
+      "original": "/Users/jonathanborgia/code/signaltree/artifacts/agent-oversight-2026-11-17-http-control-settlement/logs/pack-@angular-platform-browser.log"
+    },
+    "http-control-settlement/logs/pack-rxjs.log": {
+      "sha256": "4211af52e4430b32b87642fa0f33ced9224a16d7f3e78777a2bca89b4b0ae527",
+      "original": "/Users/jonathanborgia/code/signaltree/artifacts/agent-oversight-2026-11-17-http-control-settlement/logs/pack-rxjs.log"
+    },
+    "http-control-settlement/logs/extract-kernel.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "original": "/Users/jonathanborgia/code/signaltree/artifacts/agent-oversight-2026-11-17-http-control-settlement/logs/extract-kernel.log"
+    },
+    "http-control-settlement/logs/install.log": {
+      "sha256": "881fa96ffbb7709d398edc95a1312b740811ab29f505320e71d5f7cee6fa52f3",
+      "original": "/Users/jonathanborgia/code/signaltree/artifacts/agent-oversight-2026-11-17-http-control-settlement/logs/install.log"
+    },
+    "http-control-instance/manifest.json": {
+      "sha256": "450678e01f34d39c7233f4290123e9b6192d5998c7d99f8f2d6b3ce5c462a577",
+      "original": "/Users/jonathanborgia/code/signaltree/artifacts/agent-oversight-2026-11-17-http-control-instance/manifest.json"
+    },
+    "http-control-instance/browser-results.json": {
+      "sha256": "f2f85093bc1603b03c7612343c4a009fde097e45b4763ca7c08e225b5864a585",
+      "original": "/Users/jonathanborgia/code/signaltree/artifacts/agent-oversight-2026-11-17-http-control-instance/browser-results.json"
+    },
+    "http-control-instance/logs/pack-@angular-compiler.log": {
+      "sha256": "aca91ffd1a5dcd17669bf8bfefb4b4aa524044276386a8c5f70134cf5e9f678b",
+      "original": "/Users/jonathanborgia/code/signaltree/artifacts/agent-oversight-2026-11-17-http-control-instance/logs/pack-@angular-compiler.log"
+    },
+    "http-control-instance/logs/strict-aot.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "original": "/Users/jonathanborgia/code/signaltree/artifacts/agent-oversight-2026-11-17-http-control-instance/logs/strict-aot.log"
+    },
+    "http-control-instance/logs/extract-angular.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "original": "/Users/jonathanborgia/code/signaltree/artifacts/agent-oversight-2026-11-17-http-control-instance/logs/extract-angular.log"
+    },
+    "http-control-instance/logs/pack-tslib.log": {
+      "sha256": "3f94f053b8259cdd953bbb03dc4b1628c8f01e9aa04e280c228a70651b6d7682",
+      "original": "/Users/jonathanborgia/code/signaltree/artifacts/agent-oversight-2026-11-17-http-control-instance/logs/pack-tslib.log"
+    },
+    "http-control-instance/logs/pack-@angular-core.log": {
+      "sha256": "7a4274c72eb89d414ed0573c54dbd1ab38772304390d58ee53d388d3ce2539df",
+      "original": "/Users/jonathanborgia/code/signaltree/artifacts/agent-oversight-2026-11-17-http-control-instance/logs/pack-@angular-core.log"
+    },
+    "http-control-instance/logs/pack-@angular-common.log": {
+      "sha256": "9580ac0aba87bc71c05f75ba5c652962446d7fa88987b2c6e9102da4fdae20af",
+      "original": "/Users/jonathanborgia/code/signaltree/artifacts/agent-oversight-2026-11-17-http-control-instance/logs/pack-@angular-common.log"
+    },
+    "http-control-instance/logs/pack-@angular-platform-browser.log": {
+      "sha256": "c20998f79af7ea428e5141c51b293730543aca6ccbfff0050a4acd089bfaba41",
+      "original": "/Users/jonathanborgia/code/signaltree/artifacts/agent-oversight-2026-11-17-http-control-instance/logs/pack-@angular-platform-browser.log"
+    },
+    "http-control-instance/logs/pack-rxjs.log": {
+      "sha256": "4211af52e4430b32b87642fa0f33ced9224a16d7f3e78777a2bca89b4b0ae527",
+      "original": "/Users/jonathanborgia/code/signaltree/artifacts/agent-oversight-2026-11-17-http-control-instance/logs/pack-rxjs.log"
+    },
+    "http-control-instance/logs/extract-kernel.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "original": "/Users/jonathanborgia/code/signaltree/artifacts/agent-oversight-2026-11-17-http-control-instance/logs/extract-kernel.log"
+    },
+    "http-control-instance/logs/install.log": {
+      "sha256": "881fa96ffbb7709d398edc95a1312b740811ab29f505320e71d5f7cee6fa52f3",
+      "original": "/Users/jonathanborgia/code/signaltree/artifacts/agent-oversight-2026-11-17-http-control-instance/logs/install.log"
+    },
+    "first-attempts/v16-packet/angular-pack.log": {
+      "sha256": "affc444ecfc5a491b7100c153c267226f0cdc3eb428c03b6fec7d5c65776ad52",
+      "original": "/Users/jonathanborgia/code/signaltree/artifacts/agent-oversight-2026-11-17-v16-packet/angular-pack.log"
+    },
+    "first-attempts/v16-packet/kernel-pack.log": {
+      "sha256": "6f44f9fde9406c0731c2f6e54f7840de67754f44c7fa40b006e244f19d84c5dd",
+      "original": "/Users/jonathanborgia/code/signaltree/artifacts/agent-oversight-2026-11-17-v16-packet/kernel-pack.log"
+    },
+    "first-attempts/v16-run-2/receipt.json": {
+      "sha256": "93b56ae7d53f75b70b32d4915231be0f47f61f1b1837f98e0d12b756b6d5bfae",
+      "original": "/Users/jonathanborgia/code/signaltree/artifacts/agent-oversight-2026-11-17-v16-run-2/receipt.json"
+    },
+    "first-attempts/v16-run-2/public-workflow.log": {
+      "sha256": "8f74b43a02a2f6201ed19ba4dddc76700dedad365926874a57c1720b9ceafe3d",
+      "original": "/Users/jonathanborgia/code/signaltree/artifacts/agent-oversight-2026-11-17-v16-run-2/public-workflow.log"
+    },
+    "first-attempts/v16-run-2/public/logs/coordinator-protocol-http.log": {
+      "sha256": "bd6b40a8a2f499ace939249602c8a126b3c1a8e0f753b4b961e381e3050db56f",
+      "original": "/Users/jonathanborgia/code/signaltree/artifacts/agent-oversight-2026-11-17-v16-run-2/public/logs/coordinator-protocol-http.log"
+    },
+    "first-attempts/v16-run-3/receipt.json": {
+      "sha256": "9967945a5a8ae3d4101902062c141d889a4ca370d4e6041572806fc5c0a5c137",
+      "original": "/Users/jonathanborgia/code/signaltree/artifacts/agent-oversight-2026-11-17-v16-run-3/receipt.json"
+    },
+    "first-attempts/v16-run-3/oversight.log": {
+      "sha256": "a2cfe42058bfb0e3fc32a4ccc0183a9438a31f87610e9c0b49661799ef93128a",
+      "original": "/Users/jonathanborgia/code/signaltree/artifacts/agent-oversight-2026-11-17-v16-run-3/oversight.log"
+    },
+    "first-attempts/v16-run-3/public/consumer/oversight.checks.mjs": {
+      "sha256": "064301857acfa86832db3445fca8fda267a4b9bfda35d34f2eb16a273c7c76c7",
+      "original": "/Users/jonathanborgia/code/signaltree/artifacts/agent-oversight-2026-11-17-v16-run-3/public/consumer/oversight.checks.mjs"
+    },
+    "first-attempts/v16-common-4/receipt.json": {
+      "sha256": "75cee19c9051d48dec64d4f4db8671dcf0d727254962003dc72b6cd0bde159da",
+      "original": "/Users/jonathanborgia/code/signaltree/artifacts/agent-oversight-2026-11-17-v16-common-4/receipt.json"
+    },
+    "first-attempts/v16-common-4/install.log": {
+      "sha256": "070d19f944be66d805916590e043bb82ffcb858a10d1a9329b8b6ee435a1d5a3",
+      "original": "/Users/jonathanborgia/code/signaltree/artifacts/agent-oversight-2026-11-17-v16-common-4/install.log"
+    },
+    "collect.py": {
+      "sha256": "d5aba7ed29fa52c42fa41ac8a45ca4dfe62ccedf34a1cbd6cc5b5ee780c5f8c4",
+      "original": "/Users/jonathanborgia/code/signaltree/.worktrees/agent-collaboration-evaluation/tools/agent-oversight-lab/collect.py"
+    }
+  },
+  "resultsSha256": "fc9fb747df8100cc479edda93f5a90e6e17ce7b84cf855c6c180d65d51553297",
+  "limits": "Selected raw outputs, source copies and exact package archives. External peer/tool installations and all repository history are not bundled; absolute paths record the original execution.",
+  "archive": {
+    "file": "evidence.tar.gz",
+    "sha256": "7f89c0f384079b9de804f0815891d0e4c92b4131dc090ae8f0650a0e550309c4",
+    "verifiedPayloads": 71
+  },
+  "packGenerator": {
+    "path": "/Users/jonathanborgia/code/signaltree/.worktrees/agent-collaboration-evaluation/tools/agent-oversight-lab/pack-evidence.py",
+    "sha256": "ef7c7ef6f9ef5eae47ea4f6be270ae6e84befdb02faa3440711f1689f2560a18",
+    "command": [
+      "/Library/Frameworks/Python.framework/Versions/3.14/bin/python3",
+      "tools/agent-oversight-lab/pack-evidence.py",
+      "docs/audits/2026-11-17-agent-oversight",
+      "/Users/jonathanborgia/code/signaltree/artifacts/agent-oversight-2026-11-17-collected-raw"
+    ]
+  }
+}

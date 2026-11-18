@@ -1,5 +1,26 @@
 # TODO
 
+## Emerging agent oversight and v15 value
+
+- [x] Separate v15's current feature/cost question from the v16 emerging-market
+      hypothesis; audit built-in versus optional costs without assuming that
+      every feature is unique or that every allocation is irreducible.
+- [x] Derive concrete oversight/functionality requirements from primary incident
+      evidence and run common v15/v16 authority, concurrency, observation,
+      uncertainty and real refusal-publication probes. See the
+      [oversight evaluation](docs/audits/2026-11-17-agent-oversight/README.md).
+- [ ] Next application proof: concurrent browser approvals; actual restart after
+      effect-before-receipt failure; navigation/session isolation; authenticated
+      principal, tenant and destination binding. Keep durable authority in the
+      backend and preserve the public-library/private-Studio boundary.
+- [ ] Evaluate redacted, gap-aware oversight presentation and investigator tasks,
+      including recorder disconnect/backpressure and overhead with observation
+      off, minimal metadata and chosen history enabled. Do not infer human
+      understanding from an automated DOM pass.
+- [ ] Bound v15 optimization experiments for empty enhancer planning and lazy
+      empty runtime containers; measure before adopting. EntityMap method-level
+      separation needs equivalent-work cost evidence and compatibility review.
+
 ## Legacy scope and publication activation
 
 - [x] Audit v15's supported responsibilities and remove unreachable legacy
