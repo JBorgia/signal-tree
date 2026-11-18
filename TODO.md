@@ -14,6 +14,14 @@
       comparison and repeat installed native/durable application checks.
 - [x] Finalize the transfer report, measured application cost, economic
       interpretation and verified portable evidence; prepare authorized branch delivery.
+- [x] Consolidate findings, rejected premises and hypotheses with their evidence
+      and falsifiers; document user-experience interpretation and dated preview
+      results in the [register](docs/audits/2026-11-18-startup-market-economics/FINDINGS-AND-HYPOTHESES.md).
+
+Open hypotheses are research leads, not an automatic implementation queue. Before
+a selected v16 demo release, reconcile its strict initial-bundle failure with an
+explicit implementation or cost disposition and verify a successful deployment;
+the current candidate's runtime-size acceptance alone does not make that build pass.
 
 The [active protocol](docs/audits/2026-11-18-startup-market-economics/PROTOCOL.md)
 governs this work. Previous qualified artifacts remain separate identities;

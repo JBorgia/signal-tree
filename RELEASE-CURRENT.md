@@ -21,6 +21,13 @@ unmeasured leads. Conditional customer/supplier economics cover both public
 versions and hypothetical private tooling; no observed willingness to pay,
 market-size forecast or payroll cash saving is invented.
 
+The [consolidated findings register](docs/audits/2026-11-18-startup-market-economics/FINDINGS-AND-HYPOTHESES.md)
+records rejected premises, adverse cases, open hypotheses and dated branch
+delivery observations. V15's checked preview is Ready; v16 and the study preview
+failed their unchanged strict initial-bundle budgets. This does not change the
+qualified runtime identities or turn those failed predicates green. Mobile
+perception and AI-assisted adoption remain unmeasured.
+
 Scope is local qualification, evidence closure and authorized review-branch
 sharing. No new tag, merge, registry publication or production deployment is
 selected. Numerical ceilings remain unchanged; prior controller records below

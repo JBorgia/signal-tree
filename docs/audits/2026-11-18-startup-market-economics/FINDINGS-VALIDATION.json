@@ -1,0 +1,88 @@
+{
+  "scope": "Documentation-only follow-up. No runtime or benchmark changes. This record is outside the frozen measurement archive.",
+  "inputFiles": {
+    "RELEASE-CURRENT.md": "038390e6e7b6e351250067d7c806a56b4b42bed321d11d80fe63ec6a395d8ceb",
+    "TODO.md": "4de8a5ae8fc8a72a30273b07b21553bd832775aa30e70ec2b402d7eb4289dafd",
+    "docs/audits/2026-11-18-startup-market-economics/DELIVERY-OBSERVATION.json": "761f4e85f2409f8e894f37006bae6f60e9016c5a1919ebf70ca35d1dc7d5f8ee",
+    "docs/audits/2026-11-18-startup-market-economics/DELIVERY-PROVENANCE.json": "cffa3eb4a24ab903e23a2e424732205d377176d9b3f513738b90fa2a22ae6ce3",
+    "docs/audits/2026-11-18-startup-market-economics/FINDINGS-AND-HYPOTHESES.md": "85397d0a09e6a072fc7c56d6c9c1d714c4c5e9a5463621d25832dd587aa2bd1c",
+    "docs/audits/2026-11-18-startup-market-economics/README.md": "f744b6c51e2a18c5b3a9417cff21ab10ac5356b5007a20bebf3644d71d19807b",
+    "docs/audits/2026-11-18-startup-market-economics/USER-EXPERIENCE.md": "adc1dcb22d9c81fcb9510067be0e235890e4ede60fa6f8114f0026fc2f8babe2"
+  },
+  "checks": [
+    {
+      "receipt": {
+        "command": [
+          "node",
+          "tools/verify-gates.mjs",
+          "--only=doc-links,doc-links:self,documented-imports,documented-symbols,documented-examples,version-claims,release-claims"
+        ],
+        "cwd": "/Users/jonathanborgia/code/signaltree/.worktrees/agent-collaboration-evaluation",
+        "startedUTC": "2026-11-18T11:17:53.275020+00:00",
+        "head": "2b086a39f061631f1d0ef676fc2f2f7f12c5a351",
+        "status": "M  RELEASE-CURRENT.md\nM  TODO.md\nA  docs/audits/2026-11-18-startup-market-economics/DELIVERY-OBSERVATION.json\nA  docs/audits/2026-11-18-startup-market-economics/DELIVERY-PROVENANCE.json\nA  docs/audits/2026-11-18-startup-market-economics/FINDINGS-AND-HYPOTHESES.md\nM  docs/audits/2026-11-18-startup-market-economics/README.md\nA  docs/audits/2026-11-18-startup-market-economics/USER-EXPERIENCE.md\n",
+        "patchSha256": "5caa0098873a8905bd53833b04fd48375d39aa38d7df0a9d4fc8b93c7171eebb",
+        "runnerSha256": "6e53606ad0deeb4c8a8f9710bb165d42fa45581c07ba6a9f68c0cd48ba470f18",
+        "node": "v24.15.0",
+        "exitCode": 0,
+        "seconds": 43.29151741694659,
+        "logSha256": "7e62ffaef3dd64d4e9d938f12caec03dca42166b62165ed2d8a73b9c95aacc3e",
+        "trackedPatchUnchanged": true
+      },
+      "preservedLog": "findings-documentation.log"
+    },
+    {
+      "receipt": {
+        "command": [
+          "pnpm",
+          "nx",
+          "build",
+          "demo",
+          "--configuration=production",
+          "--base-href=/",
+          "--skip-nx-cache"
+        ],
+        "cwd": "/Users/jonathanborgia/code/signaltree/.worktrees/agent-collaboration-evaluation",
+        "startedUTC": "2026-11-18T11:19:37.145227+00:00",
+        "head": "2b086a39f061631f1d0ef676fc2f2f7f12c5a351",
+        "status": "M  RELEASE-CURRENT.md\nM  TODO.md\nA  docs/audits/2026-11-18-startup-market-economics/DELIVERY-OBSERVATION.json\nA  docs/audits/2026-11-18-startup-market-economics/DELIVERY-PROVENANCE.json\nA  docs/audits/2026-11-18-startup-market-economics/FINDINGS-AND-HYPOTHESES.md\nM  docs/audits/2026-11-18-startup-market-economics/README.md\nA  docs/audits/2026-11-18-startup-market-economics/USER-EXPERIENCE.md\n",
+        "patchSha256": "5caa0098873a8905bd53833b04fd48375d39aa38d7df0a9d4fc8b93c7171eebb",
+        "runnerSha256": "6e53606ad0deeb4c8a8f9710bb165d42fa45581c07ba6a9f68c0cd48ba470f18",
+        "node": "v24.15.0",
+        "exitCode": 1,
+        "seconds": 13.896125999977812,
+        "logSha256": "43e43bb0255e5d3f8965bd414214d15e0767a46dec12a4ed67028c64dcf302e2",
+        "trackedPatchUnchanged": true
+      },
+      "preservedLog": "findings-production-demo.log"
+    }
+  ],
+  "firstAttempt": {
+    "plan": {
+      "command": [
+        "pnpm",
+        "nx",
+        "build",
+        "demo",
+        "--configuration=production",
+        "--base-href=/",
+        "--skip-nx-cache"
+      ],
+      "cwd": "/Users/jonathanborgia/code/signaltree/.worktrees/agent-collaboration-evaluation",
+      "startedUTC": "2026-11-18T11:18:56.510089+00:00",
+      "head": "2b086a39f061631f1d0ef676fc2f2f7f12c5a351",
+      "status": "M  RELEASE-CURRENT.md\nM  TODO.md\nA  docs/audits/2026-11-18-startup-market-economics/DELIVERY-OBSERVATION.json\nA  docs/audits/2026-11-18-startup-market-economics/DELIVERY-PROVENANCE.json\nA  docs/audits/2026-11-18-startup-market-economics/FINDINGS-AND-HYPOTHESES.md\nM  docs/audits/2026-11-18-startup-market-economics/README.md\nA  docs/audits/2026-11-18-startup-market-economics/USER-EXPERIENCE.md\n",
+      "patchSha256": "5caa0098873a8905bd53833b04fd48375d39aa38d7df0a9d4fc8b93c7171eebb",
+      "runnerSha256": "6e53606ad0deeb4c8a8f9710bb165d42fa45581c07ba6a9f68c0cd48ba470f18",
+      "node": "v24.15.0"
+    },
+    "commandStarted": false,
+    "runnerException": "FileNotFoundError: [Errno 2] No such file or directory: 'pnpm'",
+    "correction": "Added the existing /Users/jonathanborgia/Library/pnpm directory to PATH; verified pnpm 10.17.0 and kept Node 24.15.0. Fresh output directory preserves first attempt."
+  },
+  "disposition": {
+    "documentationGates": "All seven pass.",
+    "productionDemo": "Strict build fails: initial 815.62 kB exceeds unchanged 570.00 kB ceiling. This is the study branch inherited runtime, not selected v16. No ceiling or runtime edited.",
+    "qualification": "No new release sign-off, registry publication or production promotion."
+  }
+}

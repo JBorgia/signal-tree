@@ -1,0 +1,11 @@
+{
+  "schema": "signaltree.dated-delivery-observation.v1",
+  "record": "DELIVERY-OBSERVATION.json",
+  "sha256": "761f4e85f2409f8e894f37006bae6f60e9016c5a1919ebf70ca35d1dc7d5f8ee",
+  "bytes": 2390,
+  "originalArtifact": "artifacts/startup-market-economics-delivery-2026-11-18/RESULTS.json",
+  "originalObservationUTC": "2026-11-18 08:41:02 UTC",
+  "copiedWithoutModification": true,
+  "scope": "Dated exact-commit remote and browser observations preserved from the preceding delivery pass. Not a new runtime measurement or current status for later heads.",
+  "outsideFrozenPortableArchive": true
+}

@@ -20,6 +20,14 @@ This study branches from `1927c8836314feec37ba68313a41a6a33dd6c2a4` on
 `codex/startup-market-economics`. Later documentation commits do not relabel
 qualified source or earlier experiments.
 
+The [findings and hypotheses register](FINDINGS-AND-HYPOTHESES.md) consolidates
+measured results, rejected premises, adverse cases, commercial assumptions and
+unmeasured leads with discriminating tests. The [user-experience narrative](USER-EXPERIENCE.md)
+explains likely visible behavior, mobile limits, library choice and AI-assisted
+adoption. Those interpretations are not new device or human-study measurements.
+The register also preserves the dated post-push preview results: v15 Ready,
+v16 and the study branch failing their unchanged strict demo size budgets.
+
 ## What changed and why
 
 Both lines omit stored zero revisions because the accessor already returns zero

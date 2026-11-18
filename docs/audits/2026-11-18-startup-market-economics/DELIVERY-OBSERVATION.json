@@ -1,0 +1,70 @@
+{
+  "checkedUTC": "2026-11-18 08:41:02 UTC",
+  "heads": {
+    "v15": "5e5675122e75ac6736da40d107eee6bcd6863b26",
+    "v16": "06a896fd137c7be0e4e31a16410c5d03ad8c9907",
+    "study": "2b086a39f061631f1d0ef676fc2f2f7f12c5a351"
+  },
+  "remoteHeadsVerified": true,
+  "verification": "GitHub git/ref/heads API matched all three exact local commit identities.",
+  "statuses": {
+    "v15": {
+      "statuses": [
+        {
+          "context": "Vercel",
+          "state": "success",
+          "target_url": "https://vercel.com/jonathan-d-borgias-projects/signaltree/9AVD7GZsMLx4bbPxZz8krM5raiKc"
+        }
+      ]
+    },
+    "v16": {
+      "statuses": [
+        {
+          "context": "Vercel",
+          "state": "failure",
+          "target_url": "https://vercel.com/jonathan-d-borgias-projects/signaltree/2TvkF4RBoaPGPfB1t1b2PvVHv3jx"
+        }
+      ]
+    },
+    "study": {
+      "statuses": [
+        {
+          "context": "Vercel",
+          "state": "failure",
+          "target_url": "https://vercel.com/jonathan-d-borgias-projects/signaltree/2GrV4HHmijJC9FTi6FXrTKpm1VvB"
+        }
+      ]
+    }
+  },
+  "uiObservations": {
+    "v15": {
+      "state": "Ready",
+      "url": "https://signaltree-ai2p9ymph-jonathan-d-borgias-projects.vercel.app/",
+      "checks": [
+        "Home loaded @signal-tree/kernel v15.4.9",
+        "Rush→server update→undo restored Standard while retaining Shipped; other row stayed Standard/Ready",
+        "/v14/ displayed historical archive and @signaltree/core v14.1.3"
+      ]
+    },
+    "v16": {
+      "state": "Error",
+      "initialKB": 828.55,
+      "maximumKB": 570,
+      "node": "24.22.3",
+      "cause": "Strict production demo initial-bundle budget; build log inspected in authenticated Vercel UI."
+    },
+    "study": {
+      "state": "Error",
+      "initialKB": 815.62,
+      "maximumKB": 570,
+      "node": "24.22.3",
+      "cause": "Strict production demo initial-bundle budget in study branch's inherited runtime; this is not the selected v16 artifact."
+    }
+  },
+  "limits": [
+    "Read-only deployment inspection; no production promotion or redeployment.",
+    "CLI lacked credentials; authenticated browser supplied deployment details.",
+    "Hosted toolchain differs from pinned local qualification. Size failures remain failed.",
+    "Study artifacts/source snapshots and selected runtime candidates retain separate identities."
+  ]
+}
