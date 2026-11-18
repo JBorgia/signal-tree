@@ -421,7 +421,10 @@ export class StructuralStore<K extends string | number> {
     recordProductionSubstrateStat('structuralSubjectsCreated');
     this.nextSubjectId = Math.max(this.nextSubjectId, subjectId + 1);
     this.activateSubject(subjectId, key);
-    this.subjectRevisions.set(subjectId, 0);
+    // Revision zero is represented by absence (subjectRevision owns that
+    // default). Keep the initial population sparse until a lifetime changes;
+    // delete also preserves createSubject's reset behavior for a reused id.
+    this.subjectRevisions.delete(subjectId);
     this.createAndAppendActiveNode(subjectId, key);
     this.orderFrontier = {};
   }

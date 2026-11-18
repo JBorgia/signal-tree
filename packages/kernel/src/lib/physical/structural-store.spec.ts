@@ -149,6 +149,55 @@ const acquireExistingHandle = (store: StructuralStore<string>, key: string) => {
 };
 
 describe('StructuralStore', () => {
+  it('keeps untouched revisions implicit through reads and prepared targets', () => {
+    const store = seedStore();
+    const revisions = () => (store as unknown as {
+      subjectRevisions: Map<number, number>;
+    }).subjectRevisions;
+    const held = acquireExistingHandle(store, 'B');
+    expect(held.acquiredRevision).toBe(0);
+    expect(revisions().size).toBe(0);
+    store.installPreparedTarget(store.prepareTarget([
+      { subjectId: 1, key: 'A' }, { subjectId: 2, key: 'B' },
+      { subjectId: 3, key: 'C' },
+    ], [1, 2, 3], {}));
+    expect(revisions().size).toBe(0);
+
+    store.bumpSubjectRevision(2);
+    store.bumpSubjectRevision(2);
+    expect(store.subjectRevision(2)).toBe(2);
+    expect(store.resolveSubjectHandle(held)).toMatchObject({ revision: 2 });
+    expect([...revisions()]).toEqual([[2, 2]]);
+
+    const target = store.prepareTarget([
+      { subjectId: 1, key: 'A' }, { subjectId: 2, key: 'X' },
+    ], [2, 1], {});
+    expect(store.subjectRevision(2)).toBe(2);
+    store.installPreparedTarget(target);
+    expect(store.subjectRevision(1)).toBe(0);
+    expect(store.subjectRevision(2)).toBe(3);
+    expect(store.subjectRevision(3)).toBe(1);
+    expect(store.resolveSubjectHandle(held)).toMatchObject({ key: 'X', revision: 3 });
+    expect([...revisions()]).toEqual([[2, 3], [3, 1]]);
+
+    store.forgetSubject(3);
+    store.createSubject(4, 'C');
+    expect(store.subjectRevision(4)).toBe(0);
+    expect([...revisions()]).toEqual([[2, 3]]);
+    expect(store.activeKeysSnapshot()).toEqual(['X', 'A', 'C']);
+    assertActiveOrderIntegrity(store);
+  });
+
+  it('resets an explicitly recreated subject to implicit revision zero', () => {
+    const store = seedStore();
+    store.bumpSubjectRevision(2);
+    store.tombstoneSubject(2, 'B', true);
+    store.createSubject(2, 'B');
+    expect(store.acquireSubjectHandleForKey('B')?.acquiredRevision).toBe(0);
+    expect(store.subjectRevision(2)).toBe(0);
+    assertActiveOrderIntegrity(store);
+  });
+
   it('detects a broken active chain in the test-only integrity checker', () => {
     const store = seedStore();
     const graph = store as unknown as { activeHead: ActiveNode<string> };

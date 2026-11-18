@@ -54,7 +54,11 @@ type LeafObservation = {
   releaseMutationObserver: () => void;
 };
 
-const OBSERVATION = new WeakMap<object, LeafObservation>();
+// Null registers a leaf before its callable can escape, without allocating an
+// unused claim record. The intrinsic write interception is already installed
+// by the location runtime. Once claimed, retain the record and its identity
+// across every disarm/rearm cycle.
+const OBSERVATION = new WeakMap<object, LeafObservation | null>();
 
 /**
  * @internal Install the stable interception point on an ordinary leaf.
@@ -64,21 +68,24 @@ const OBSERVATION = new WeakMap<object, LeafObservation>();
  * for the leaf's lifetime.
  */
 export function installDormantObservation<T>(leaf: Location<T>): void {
-  OBSERVATION.set(leaf as object, {
-    claims: 0,
-    positionId: undefined,
-    releaseMutationObserver: () => undefined,
-  });
+  OBSERVATION.set(leaf as object, null);
 }
 
 /** Claim observation for one leaf, or `undefined` if it is not one. */
 function claimLeaf(node: object): (() => void) | undefined {
-  const state = OBSERVATION.get(node);
-  if (!state) return undefined;
+  const registered = OBSERVATION.get(node);
+  if (registered === undefined) return undefined;
 
   const registry = getPositionRegistry(node);
   const ownerPath = getOwnedOwnerPath(node);
   if (!registry || ownerPath === undefined) return undefined;
+
+  const state = registered ?? {
+    claims: 0,
+    positionId: undefined,
+    releaseMutationObserver: () => undefined,
+  };
+  if (registered === null) OBSERVATION.set(node, state);
 
   if (state.claims === 0) {
     if (state.positionId === undefined) {

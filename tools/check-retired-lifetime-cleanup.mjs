@@ -17,8 +17,10 @@
  * StructuralStore.snapshotActiveOrder is separately hooked across initial setAll
  * to capture exactly one real store (the order read setAll makes beside its
  * frontier read; `activeOrderFrontier` is an instance arrow now, passed to the
- * transition binding as is, so it is no longer on the prototype to hook). Its live lifetime/revision maps must contain
- * both private handles before retirement; never cache maps that installation swaps.
+ * transition binding as is, so it is no longer on the prototype to hook). Its live
+ * lifetime map must contain both private handles before retirement. Revisions
+ * are sparse: zero is implicit, and public rekeys seed a nonzero survivor.
+ * Never cache maps that installation swaps.
  * --self-test copies the artifact and independently removes activation cleanup
  * restores historical post-forget publication, and removes the late registration
  * guard. Each mutation must fail only
@@ -229,6 +231,7 @@ async function probe(artifact) {
       cleanupCalls++;
     });
     let registry, store;
+    const expectedRevisions = new Map();
     // Always fetch maps from the captured store: installPreparedTarget replaces them.
     const checkStore = (phase, expectedIds, retiredIds) => {
       for (const [field, label] of [
@@ -239,18 +242,29 @@ async function probe(artifact) {
           store[field] instanceof Map,
           `${field} must remain a live Map`
         );
-        check(`${label}: ${phase} size`, store[field].size, expectedIds.length);
+        const presentIds = field === 'subjectRevisions'
+          ? expectedIds.filter(id => (expectedRevisions.get(id) ?? 0) !== 0)
+          : expectedIds;
+        check(`${label}: ${phase} size`, store[field].size, presentIds.length);
         check(
           `${label}: ${phase} keys`,
           [...store[field].keys()].sort((a, b) => a - b),
-          [...expectedIds].sort((a, b) => a - b)
+          [...presentIds].sort((a, b) => a - b)
         );
-        for (const id of expectedIds)
+        for (const id of presentIds)
           check(
             `${label}: ${phase} survivor ${id} present`,
             store[field].has(id),
             true
           );
+        if (field === 'subjectRevisions') {
+          check(`${label}: ${phase} exact nonzero values`,
+            [...store[field]].sort(([a], [b]) => a - b),
+            presentIds.map(id => [id, expectedRevisions.get(id)]).sort(([a], [b]) => a - b));
+          for (const id of expectedIds)
+            check(`${label}: ${phase} survivor ${id} effective value`,
+              store.subjectRevision(id), expectedRevisions.get(id) ?? 0);
+        }
         for (const id of retiredIds)
           check(
             `${label}: ${phase} retired ${id} absent`,
@@ -279,6 +293,9 @@ async function probe(artifact) {
         heldB = rows.byId('B');
       assert.equal(typeof heldA, 'function');
       assert.equal(typeof heldB, 'function');
+      assert.equal(store.subjectRevisions.size, 0, 'Untouched revisions stay implicit');
+      rows.changeId('B', 'B-next');
+      rows.changeId('B-next', 'B');
       const handleA = rows.__acquireEntityHandleForTesting('A');
       const handleB = rows.__acquireEntityHandleForTesting('B');
       const idA = handleA.subjectId,
@@ -287,7 +304,7 @@ async function probe(artifact) {
       assert.ok(store.subjectStates instanceof Map);
       assert.ok(store.subjectRevisions instanceof Map);
       assert.equal(store.subjectStates.size, 2);
-      assert.equal(store.subjectRevisions.size, 2);
+      assert.equal(store.subjectRevisions.size, 1);
       for (const [handle, key] of [
         [handleA, 'A'],
         [handleB, 'B'],
@@ -295,14 +312,16 @@ async function probe(artifact) {
         assert.equal(Number.isSafeInteger(handle.subjectId), true);
         assert.equal(Number.isSafeInteger(handle.acquiredRevision), true);
         assert.equal(store.subjectStates.has(handle.subjectId), true);
-        assert.equal(store.subjectRevisions.has(handle.subjectId), true);
+        expectedRevisions.set(handle.subjectId, handle.acquiredRevision);
+        assert.equal(store.subjectRevisions.has(handle.subjectId), key === 'B');
+        assert.equal(handle.acquiredRevision, key === 'B' ? 2 : 0);
         assert.deepEqual(store.subjectStates.get(handle.subjectId), {
           active: true,
           key,
           restoreAllowed: true,
         });
         assert.equal(
-          store.subjectRevisions.get(handle.subjectId),
+          store.subjectRevision(handle.subjectId),
           handle.acquiredRevision
         );
       }
@@ -628,7 +647,7 @@ function runChild(artifact, expectedIdentity, label, runs) {
     assert.equal(c.structuralPrototypeRestored, true);
     assert.equal(c.nonvacuousPopulation.structuralStores, 1);
     assert.equal(c.nonvacuousPopulation.lifetimeEntries, 2);
-    assert.equal(c.nonvacuousPopulation.revisionEntries, 2);
+    assert.equal(c.nonvacuousPopulation.revisionEntries, 1);
     assert.ok(c.checks.length > 0);
   }
   assert.deepEqual(
