@@ -37,8 +37,14 @@ export function orderRestoresForPlacement<
   const dependents = new Map<string, T[]>();
   const full: T[] = [];
   const partial: T[] = [];
+  // A pending predecessor that becomes placed queues its dependent below.
+  // Only initial nonpending-predecessor heads can win a later empty-queue
+  // fallback; index them during the existing anchor pass instead of rescanning.
+  const heads: T[] = [];
   for (const effect of restores) {
     const anchors = anchorsOf(effect);
+    if (anchors?.beforeSubject === undefined ||
+        !pending.has(rowScope(effect.owner, anchors.beforeSubject))) heads.push(effect);
     let count = 0;
     for (const subject of [anchors?.beforeSubject, anchors?.afterSubject]) {
       if (subject === undefined) continue;
@@ -60,26 +66,24 @@ export function orderRestoresForPlacement<
   const ordered: T[] = [];
   let fullHead = 0;
   let partialHead = 0;
-  const isWaitingOn = (effect: T, subject: number | undefined): boolean => {
-    if (subject === undefined) return false;
-    const anchor = pending.get(rowScope(effect.owner, subject));
-    return anchor !== undefined && !placed.has(anchor);
-  };
+  let headCursor = 0;
+  // Stable input order remains the tie-breaker when a component is cyclic.
+  let cycleCursor = 0;
   while (ordered.length < restores.length) {
     while (fullHead < full.length && placed.has(full[fullHead])) fullHead += 1;
     while (partialHead < partial.length && placed.has(partial[partialHead])) {
       partialHead += 1;
     }
+    while (headCursor < heads.length && placed.has(heads[headCursor])) headCursor++;
+    while (cycleCursor < restores.length && placed.has(restores[cycleCursor])) cycleCursor++;
     const next =
       fullHead < full.length
         ? full[fullHead++]
         : partialHead < partial.length
         ? partial[partialHead++]
-        : restores.find(
-            (effect) =>
-              !placed.has(effect) &&
-              !isWaitingOn(effect, anchorsOf(effect)?.beforeSubject)
-          ) ?? (restores.find((effect) => !placed.has(effect)) as T);
+        : headCursor < heads.length
+        ? heads[headCursor++]
+        : restores[cycleCursor++];
     placed.add(next);
     ordered.push(next);
     for (const dependent of dependents.get(

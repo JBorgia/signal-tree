@@ -75,3 +75,16 @@ consumed shared build inputs including `llms.txt`, any declared Nx
 It removes only that workspace's output and runs uncached serial canonical
 builds for all five packages. A successful receipt requires unchanged source;
 final package qualification remains separate. `snapshot` performs no build.
+
+Full qualification exposed six existing rollback work-bound failures after the
+ordering correction: its additional resolver searched a reversed restore chain
+for the head, adding N predicate visits to the existing `2N+1` bound. The bound
+is unchanged. The resolver now indexes initial heads during its existing anchor
+pass and uses stable cursors for heads and cycle breaks. Full/partial queue
+priority and effect identity/order remain unchanged. Exact comparison with the
+preserved old helper covers synthetic finite adjacency graphs (including cycles,
+missing/live anchors and duplicate scoped subjects); public rollback and Link
+fixtures remain the reachability tests. Proxy input-read and anchor-callback
+counts reject repeated scans disguised as loops. The additional head queue is
+transient O(N) space; this is not a claim that the whole rollback is linear or
+that CPU improved by the same amount.
