@@ -1,0 +1,18 @@
+{
+  "command": [
+    "node",
+    "tools/verify-gates.mjs",
+    "--only=doc-links,doc-links:self,documented-imports,documented-symbols,documented-examples,version-claims,release-claims"
+  ],
+  "cwd": "/Users/jonathanborgia/code/signaltree/.worktrees/v16-optimization-sweep",
+  "startedUTC": "2026-11-18T08:29:48.808373+00:00",
+  "head": "f8cf26e50193ca8aa5580da15b739129313f256e",
+  "status": "M  RELEASE-CURRENT.md\nM  TODO.md\nA  docs/audits/2026-11-18-startup-economics/BUNDLE-COST.json\nA  docs/audits/2026-11-18-startup-economics/DEMO-COMPARISON.json\nA  docs/audits/2026-11-18-startup-economics/PAYLOAD-JOINS.json\nA  docs/audits/2026-11-18-startup-economics/QUALIFICATION.json\nA  docs/audits/2026-11-18-startup-economics/README.md\n",
+  "patchSha256": "e796a7e79143e6c66632c73900ab22d8a4528eaf38defa6be7222728407e6b19",
+  "runnerSha256": "6e53606ad0deeb4c8a8f9710bb165d42fa45581c07ba6a9f68c0cd48ba470f18",
+  "node": "v24.15.0",
+  "exitCode": 0,
+  "seconds": 79.83677674992941,
+  "logSha256": "7e62ffaef3dd64d4e9d938f12caec03dca42166b62165ed2d8a73b9c95aacc3e",
+  "trackedPatchUnchanged": true
+}

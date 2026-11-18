@@ -1,0 +1,50 @@
+{
+  "baseline": [
+    {
+      "id": "signaltree-bare",
+      "prodBytes": 18407,
+      "devBytes": 20785,
+      "prodLimitBytes": 12707.84,
+      "devLimitBytes": 15144.96
+    },
+    {
+      "id": "signaltree-entities",
+      "prodBytes": 45595,
+      "devBytes": 49365,
+      "prodLimitBytes": 26787.84,
+      "devLimitBytes": 29675.52
+    }
+  ],
+  "candidate": [
+    {
+      "id": "signaltree-bare",
+      "prodBytes": 18385,
+      "devBytes": 20763,
+      "prodLimitBytes": 12707.84,
+      "devLimitBytes": 15144.96
+    },
+    {
+      "id": "signaltree-entities",
+      "prodBytes": 45837,
+      "devBytes": 49556,
+      "prodLimitBytes": 26787.84,
+      "devLimitBytes": 29675.52
+    }
+  ],
+  "deltaBytes": [
+    {
+      "prodBytes": -22,
+      "devBytes": -22,
+      "id": "signaltree-bare"
+    },
+    {
+      "prodBytes": 242,
+      "devBytes": 191,
+      "id": "signaltree-entities"
+    }
+  ],
+  "passingFixtureDiscrimination": true,
+  "fixtureRestoredExactly": true,
+  "inputsUnchanged": true,
+  "publication": false
+}

@@ -1,5 +1,15 @@
 # TODO
 
+## Completed startup and population follow-through
+
+- [x] Attribute population and first-use costs; specialize aligned fresh population.
+- [x] Adapt v15's sparse revisions and first-claim records with live/dense demand checks.
+- [x] Repair ordered-Link placement and preserve the original rollback work bounds.
+- [x] Qualify exact packages and production behavior; retain numerical failures and
+  the specific [cost decision](docs/audits/2026-11-18-startup-economics/README.md).
+- [x] Compare complete applications and document compatible cross-version transfers
+  in the central startup/economics study. No additional public flag is selected.
+
 ## Completed publication activation and legacy cleanup
 
 - [x] Remove unreachable audit source while preserving live behavior coverage.

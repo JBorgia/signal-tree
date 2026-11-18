@@ -1,3 +1,30 @@
+# V16 startup and population follow-through — local qualification complete
+
+Qualified source `f8cf26e50193ca8aa5580da15b739129313f256e` on
+`codex/v16-startup-economics` adds aligned fresh-population preparation,
+compatible demand-allocation ports and the ordered-Link/resolver corrections.
+The [completed audit](docs/audits/2026-11-18-startup-economics/README.md) retains
+first failures, unchanged work bounds, exact artifacts and independent review.
+
+Normal gates pass 86/87; all 87 mutation checks pass with restoration. Five
+canonical packages/193 shipped payloads, installed types/AOT/facades/SSR and
+137 browser behavior checks pass. Bundle, strict-demo and one browser-size
+predicate remain numerical failures.
+
+**Retain this candidate with the audit's specific size acceptance.** Entity gzip
+adds 242 production / 191 development bytes; bare gzip shrinks 22/22 bytes.
+The demo main adds 1,401 bytes over the comparable archived baseline. These costs
+buy required ordering correctness and measured large-store startup/heap gains;
+no ceiling changes. Complete-app factory paired medians improve 37.9 ms at 10,000
+rows and 201.6 ms at 50,000 rows, while absolute startup remains materially higher
+than v15. Dense demand consumes memory savings and retains adverse observations.
+
+No public switch or guarantee changes. No tag, merge, npm publication, exact-tag
+Linux run or deployment is selected. This documentation successor does not
+relabel the qualified runtime or earlier prototype measurements.
+
+---
+
 # v16 publication activation — local qualification complete
 
 The qualified source is `5801008ea4ca591b3be483e8bbb0aa02e15f59ed` on

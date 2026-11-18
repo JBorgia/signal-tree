@@ -1,0 +1,121 @@
+{
+  "head": "f8cf26e50193ca8aa5580da15b739129313f256e",
+  "sourceSeal": "542f5cebd9dc6c37c1777fd3e1227ba9abcd94d125e8764872e104d80fc2ff75",
+  "command": [
+    "/Users/jonathanborgia/code/signaltree/artifacts/startup-economics-v16-final-profile-2026-11-18/finalize-evidence.py"
+  ],
+  "runnerSha256": "cffaac8d2e9e482ad8f85d57637960fe6e0fbb1ca9276c63608c1e0577d3da14",
+  "entries": {
+    "commandPlan": {
+      "path": "/Users/jonathanborgia/code/signaltree/artifacts/startup-market-economics-2026-11-18/qualification/v16-command-plan-r2.json",
+      "sha256": "481ba9f13d03c2dde98d1c15b4860d0223b07f0f095393e11fee5155df1cbaff"
+    },
+    "frozenLockfile": {
+      "path": "/Users/jonathanborgia/code/signaltree/artifacts/startup-market-economics-2026-11-18/qualification/v16-frozen-lockfile-r2/receipt.json",
+      "sha256": "c609e48cfb88e4e95639f492bcaad022f10e61626805e510fe7252b9da2225c2"
+    },
+    "normalRegistry": {
+      "path": "/Users/jonathanborgia/code/signaltree/artifacts/startup-market-economics-2026-11-18/qualification/v16-normal-gates-r2/receipt.json",
+      "sha256": "4d99c3e0ad1f518bc5229e739f0b8b420fca97cf2b9ec30bc1184a1eb42c63fb"
+    },
+    "mutationRegistry": {
+      "path": "/Users/jonathanborgia/code/signaltree/artifacts/startup-market-economics-2026-11-18/qualification/v16-mutation-gates/receipt.json",
+      "sha256": "de1dff7a8efa554b5e38cb975ff07c8c4667b0755b3cd1682bd79189636f7133"
+    },
+    "priorCandidatePreservation": {
+      "path": "/Users/jonathanborgia/code/signaltree/artifacts/startup-market-economics-2026-11-18/qualification/v16-prior-canonical-candidate-preservation.json",
+      "sha256": "d6b774d2ef885ba892fb69b9942c6b0051625edda97e15277d0e2d28cf64a8bd"
+    },
+    "finalBuild": {
+      "path": "/Users/jonathanborgia/code/signaltree/artifacts/startup-market-economics-2026-11-18/qualification/v16-final-packages/build-receipt.json",
+      "sha256": "ccc1748e5b7bb66f51e2bd017de2d19fa1b1a079620add799d56da0ec8d9ff34"
+    },
+    "finalQualification": {
+      "path": "/Users/jonathanborgia/code/signaltree/artifacts/startup-market-economics-2026-11-18/qualification/v16-final-artifact-checks/result.json",
+      "sha256": "4867563cb3f9d8a66da022e1fe511777ee670281b82a396860b63728f9233926"
+    },
+    "packedPayloads": {
+      "path": "/Users/jonathanborgia/code/signaltree/artifacts/startup-market-economics-2026-11-18/qualification/v16-final-artifact-checks/packed-payloads.json",
+      "sha256": "df91ca4a6cdfeed0909f86b7ad17a375a4124bce9637c6a28b6d81f230eace5f"
+    },
+    "packedAdmission": {
+      "path": "/Users/jonathanborgia/code/signaltree/artifacts/startup-market-economics-2026-11-18/qualification/v16-final-artifact-checks/completed-packed-admission.json",
+      "sha256": "d1ee8b70ea037e7eec830d991ee92aeae1ba9012f6e6c1f1513df2224b34f732"
+    },
+    "strictDemo": {
+      "path": "/Users/jonathanborgia/code/signaltree/artifacts/startup-market-economics-2026-11-18/qualification/v16-final-artifact-checks/strict-demo-production/receipt.json",
+      "sha256": "c47c3acb95f01245c683319624310a0a42fca637090d79862a6ad1e7e5ae0d37"
+    },
+    "demoRoutes": {
+      "path": "/Users/jonathanborgia/code/signaltree/artifacts/startup-market-economics-2026-11-18/qualification/v16-final-artifact-checks/route-result.json",
+      "sha256": "25ed301b7a59575bd318293ab609131f3f64308e4bf9a0e426e42bca71aec0dc"
+    },
+    "demoComparison": {
+      "path": "/Users/jonathanborgia/code/signaltree/artifacts/startup-economics-v16-final-profile-2026-11-18/demo-comparison.json",
+      "sha256": "eea9c2cc1dffda432d19589d852389ab267348f89267fbe98b469c32173eb5e5"
+    },
+    "bundleComparison": {
+      "path": "/Users/jonathanborgia/code/signaltree/artifacts/startup-market-economics-2026-11-18/qualification/v16-bundle-economics/result.json",
+      "sha256": "55bad5db424102dfbf4d5de9b911698ed4abfde8fc01a46cff01d60b866ff387"
+    },
+    "finalProfile": {
+      "path": "/Users/jonathanborgia/code/signaltree/artifacts/startup-economics-v16-final-profile-2026-11-18/final-attribution.json",
+      "sha256": "a414f7bc71c38d093f3a12100ed5f541725edcd517b8de243ed4da8982542e5d"
+    },
+    "finalCostMap": {
+      "path": "/Users/jonathanborgia/code/signaltree/artifacts/startup-economics-v16-final-profile-2026-11-18/source-cost-map-final.json",
+      "sha256": "e4e4e95a4c67d1afaa3860fab6d0ae20cf4c638ab00d7df4d2143adc7283854a"
+    },
+    "compiledContinuity": {
+      "path": "/Users/jonathanborgia/code/signaltree/artifacts/startup-economics-v16-final-profile-2026-11-18/compiled-continuity.json",
+      "sha256": "3f0114456029c65adf722a02e3c234abbe56c9417768f577cab9b7053f1903e2"
+    },
+    "denseRevisions": {
+      "path": "/Users/jonathanborgia/code/signaltree/artifacts/startup-economics-dense-revisions-2026-11-18/v16-v2/summary.json",
+      "sha256": "2cff9e2add352c19869a4238c4798783befe2f6638f53dbc84dd1848ec1eb4e0"
+    },
+    "oldIsolatedAllocationCohort": {
+      "path": "/Users/jonathanborgia/code/signaltree/artifacts/startup-economics-v16-2026-11-17-port-activation-heap/summary.json",
+      "sha256": "71bbec556742f91d36040603c0ded7ce82f8b19ef295342d4b35c9f9b4fc66df"
+    },
+    "oldPhaseComparison": {
+      "path": "/Users/jonathanborgia/code/signaltree/artifacts/startup-economics-v16-2026-11-17-phase-comparison/summary.json",
+      "sha256": "1f8ec57dcf00df522f4b514e5e39b6ceb050589ca5d5cd76de049af9ee25c3bb"
+    },
+    "resolverEquivalence": {
+      "path": "/Users/jonathanborgia/code/signaltree/artifacts/startup-economics-v16-resolver-review-1/comparison-1.json",
+      "sha256": "1ac3f5725abf782706412d81dd780136002a56504d522dcf917c8fcd71227a25"
+    },
+    "resolverFocused": {
+      "path": "/Users/jonathanborgia/code/signaltree/artifacts/startup-economics-v16-resolver-review-1/focused-1.log",
+      "sha256": "ef13a20dda51f441e9d5a979756818cf6ebc92969d33c9c6c9ab105f63877009"
+    },
+    "firstFullNormalFailure": {
+      "path": "/Users/jonathanborgia/code/signaltree/artifacts/startup-market-economics-2026-11-18/qualification/v16-normal-gates/receipt.json",
+      "sha256": "63e38ca2baa682c9677eb9735a761b527084691dd141608f9b76c011cac07e1d"
+    },
+    "allocationFixtureFailureNotes": {
+      "path": "/Users/jonathanborgia/code/signaltree/artifacts/startup-economics-v16-2026-11-17-port-validation-notes.json",
+      "sha256": "680c0562c702631581a89ff6f1d8147cbf41fb7e24bc94bf406a7d62940b976c"
+    }
+  },
+  "canonicalBuiltManifests": "/Users/jonathanborgia/code/signaltree/artifacts/startup-market-economics-2026-11-18/qualification/v16-final-packages",
+  "canonicalPackedManifests": "/Users/jonathanborgia/code/signaltree/artifacts/startup-market-economics-2026-11-18/qualification/v16-final-packed-packages",
+  "status": "Implementation and registered qualification completed. Numeric bundle/demo ceilings remain failed; explicit owner cost disposition remains separate. No publication.",
+  "results": {
+    "normal": "86/87; sole bundle-budget failure",
+    "mutations": "87/87,13 companion self-tests,source restored",
+    "canonical": "5packages193shipped payloads,strict consumer/AOT/facade/SSR and archive joins passed",
+    "routes": "137 functional checks passed; one numerical main-size assertion failed",
+    "dense": "2 exact omitted-work controls,9 positive children,5 reducer-admission controls passed"
+  },
+  "preservedOtherEvidence": [
+    "/Users/jonathanborgia/code/signaltree/artifacts/startup-economics-v16-2026-11-17-bound-baseline",
+    "/Users/jonathanborgia/code/signaltree/artifacts/startup-economics-v16-2026-11-17-bound-corrected",
+    "/Users/jonathanborgia/code/signaltree/artifacts/startup-economics-v16-2026-11-17-bound-optimized",
+    "/Users/jonathanborgia/code/signaltree/artifacts/startup-economics-v16-external-alias-oracle.spec.fixture",
+    "/Users/jonathanborgia/code/signaltree/artifacts/startup-economics-v16-2026-11-17-combined-packages",
+    "/Users/jonathanborgia/code/signaltree/artifacts/startup-economics-v16-2026-11-17-combined-packages-retry"
+  ],
+  "limits": "Earlier d482/pre-port measurements retain original whole-artifact identity. Compiled module continuity does not relabel them final. Diagnostic phases are not CPU wins; dense scalar Links are not a typical app footprint; inclusive profile rows overlap. Source-reasoning exclusions are distinguished from executed failures. Root owns application/native/oversight cohorts, final docs and cost disposition."
+}
