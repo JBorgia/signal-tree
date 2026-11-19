@@ -1,0 +1,19 @@
+{
+  "name": "@signal-tree/core",
+  "version": "0.0.0-dev",
+  "private": true,
+  "type": "module",
+  "sideEffects": false,
+  "license": "Apache-2.0",
+  "exports": {
+    ".": { "types": "./src/index.ts", "default": "./src/index.ts" },
+    "./adapter": { "types": "./src/adapter/index.ts", "default": "./src/adapter/index.ts" },
+    "./transactions": { "types": "./src/transactions/index.ts", "default": "./src/transactions/index.ts" },
+    "./restoration": { "types": "./src/restoration/index.ts", "default": "./src/restoration/index.ts" },
+    "./writers": { "types": "./src/writers/index.ts", "default": "./src/writers/index.ts" },
+    "./devtools": { "types": "./src/devtools/index.ts", "default": "./src/devtools/index.ts" }
+  },
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json"
+  }
+}

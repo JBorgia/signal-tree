@@ -1,0 +1,7 @@
+packages:
+  - packages/*
+  - bench
+  - bench/apps/*
+  - tests/oracle
+onlyBuiltDependencies:
+  - esbuild

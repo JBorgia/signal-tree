@@ -1,0 +1,20 @@
+{
+  "name": "@signal-tree/react",
+  "version": "0.0.0-dev",
+  "private": true,
+  "type": "module",
+  "sideEffects": false,
+  "license": "Apache-2.0",
+  "exports": {
+    ".": { "types": "./src/index.ts", "default": "./src/index.ts" }
+  },
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json"
+  },
+  "dependencies": {
+    "@signal-tree/core": "workspace:*"
+  },
+  "peerDependencies": {
+    "react": "^18.0.0 || ^19.0.0"
+  }
+}

@@ -1,0 +1,14 @@
+node_modules/
+dist/
+.pnpm-store/
+.DS_Store
+*.log
+
+# Oracle and harness outputs are CI artifacts, never committed (BRIEF.md 6.1)
+tests/oracle/out/
+bench/out/
+test-results/
+playwright-report/
+
+# Temporary bundles made by ci/core-bundle-scan.mjs
+ci/.scan-*
