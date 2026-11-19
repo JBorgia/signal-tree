@@ -6,11 +6,17 @@
  */
 declare const __SIGNAL_TREE_BENCH__: boolean | undefined;
 
-export function measuredTurn(label: string, fn: () => void): void {
+/**
+ * Runs `fn` as one measured turn. #12: `lazyReads`, when given, runs inside the
+ * same measure after `fn`, so reads the adapter would otherwise do lazily
+ * (pulled later by change detection) are charged to the store. Bench builds only.
+ */
+export function measuredTurn(label: string, fn: () => void, lazyReads?: () => void): void {
   if (typeof __SIGNAL_TREE_BENCH__ !== 'undefined' && __SIGNAL_TREE_BENCH__) {
     const start = performance.now();
     try {
       fn();
+      lazyReads?.();
     } finally {
       performance.measure('signal-tree:turn', { start, end: performance.now(), detail: label });
     }

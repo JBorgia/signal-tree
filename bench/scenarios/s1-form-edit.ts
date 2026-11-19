@@ -8,10 +8,10 @@ export const S1_SETUP = { perSection: 20, warmupKeystrokes: 5, settleAfterKeyMs:
 /**
  * S1: one keystroke into the 500-field form at 4× CPU throttle. Each input is
  * bound to one store leaf; the keystroke's write is one store turn.
- * Store work = the turn's `signal-tree:` measure. Interaction = Event Timing
- * duration of the keystroke (the longest entry with its interactionId, as INP
- * measures it), or the keydown-to-next-frame estimate when the interaction
- * stayed under Event Timing's 16 ms reporting floor.
+ * Store work = the turn's `signal-tree:` measure (#12: with the adapter's
+ * lazy reads of handed-out leaves inside it). #13: interaction = keydown to
+ * the next paint, the same source in every run; Event Timing is reported
+ * alongside when the browser reported the interaction.
  */
 export const S1: ScenarioDefinition = {
   id: 'S1',
@@ -20,9 +20,10 @@ export const S1: ScenarioDefinition = {
   requires: ['leaf'],
   metrics: {
     storeWorkMs: { unit: 'ms', better: 'lower', description: 'store turn of the keystroke' },
-    interactionMs: { unit: 'ms', better: 'lower', description: 'keystroke interaction latency (input to next paint)' },
-    interactionProcessingMs: { unit: 'ms', better: 'lower', description: 'input delay plus event processing, without presentation' },
-    interactionFromEventTiming: { unit: 'bool', better: 'none', description: '1 when Event Timing reported the interaction' },
+    interactionMs: { unit: 'ms', better: 'lower', description: '#13: keydown to the next paint' },
+    eventTimingMs: { unit: 'ms', better: 'none', description: 'Event Timing duration, when reported (8 ms granularity, 16 ms floor)' },
+    interactionProcessingMs: { unit: 'ms', better: 'none', description: 'Event Timing input delay plus processing, when reported' },
+    eventTimingReported: { unit: 'bool', better: 'none', description: '1 when Event Timing reported the interaction' },
     longFramesDuringKeystroke: { unit: 'frames', better: 'lower', description: 'long animation frames while the keystroke was handled' },
   },
   run: (ctx) =>
@@ -45,13 +46,13 @@ export const S1: ScenarioDefinition = {
       const turns = perf.turns.filter((turn) => turn.label === 'S1.keystroke');
       if (turns.length !== 1) throw new Error(`expected one keystroke turn, saw ${turns.length}`);
       const latency = keystrokeLatency(perf);
-      ctx.note('interactionSource', latency.source);
       const values: Record<string, number> = {
         storeWorkMs: turns[0]!.duration,
         interactionMs: latency.ms,
-        interactionFromEventTiming: latency.source === 'event-timing' ? 1 : 0,
+        eventTimingReported: Number.isFinite(latency.eventTimingMs) ? 1 : 0,
         longFramesDuringKeystroke: perf.loaf.length,
       };
+      if (Number.isFinite(latency.eventTimingMs)) values['eventTimingMs'] = latency.eventTimingMs;
       if (Number.isFinite(latency.processingMs)) values['interactionProcessingMs'] = latency.processingMs;
       return values;
     }),

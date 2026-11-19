@@ -1,4 +1,4 @@
-import { framesOverlappingTurns } from '../runner/browser.ts';
+import { framesChargedToStore, framesOverlappingTurns } from '../runner/browser.ts';
 import type { ScenarioDefinition } from '../runner/types.ts';
 import { withBenchPage } from './page.ts';
 
@@ -13,8 +13,11 @@ export const S2_SETUP = { fieldsPerUpdate: 3, seed: 2026 } as const;
  * uniformly from the whole collection; each row update changes
  * `fieldsPerUpdate` fields.
  *
- * - Long tasks attributed to the store: long animation frames in the window
- *   that overlap a `signal-tree:` turn measure (ruling 7).
+ * - Long tasks attributed to the store (#12, provisional): long animation
+ *   frames in the window whose `signal-tree:` turn time is greater than the
+ *   frame's duration minus the long-task threshold; turns include the
+ *   adapter's lazy reads of the rendered cells. Frames that merely overlap a
+ *   turn (ruling 7) are reported next to it.
  * - Store share: summed turn time / main-thread task time (CDP
  *   Performance.getMetrics TaskDuration) over the window.
  * - Heap overhead: CDP-forced GC, then Runtime.getHeapUsage. plain = heap with
@@ -28,7 +31,8 @@ export const S2: ScenarioDefinition = {
   environment: 'browser',
   requires: ['collection'],
   metrics: {
-    longTasksAttributedToStore: { unit: 'frames', better: 'lower', description: 'long animation frames overlapping a store turn' },
+    longTasksAttributedToStore: { unit: 'frames', better: 'lower', description: '#12: long frames that would not be long without the store' },
+    longFramesOverlappingStore: { unit: 'frames', better: 'lower', description: 'long frames overlapping any store turn (reported)' },
     storeShareOfMainThread: { unit: 'ratio', better: 'lower', description: 'store turn time / main-thread task time' },
     storeHeapOverheadRatio: { unit: 'x', better: 'lower', description: 'store heap overhead / retained plain rows' },
     storeHeapOverheadAfterLoadRatio: { unit: 'x', better: 'lower', description: 'overhead right after setAll' },
@@ -46,7 +50,7 @@ export const S2: ScenarioDefinition = {
   },
   run: (ctx) =>
     withBenchPage(ctx, async (page) => {
-      const p = ctx.params as Record<string, number>;
+      const p = ctx.params as Record<string, number>; // #12's threshold arrives as params.storeCharge
       await page.invoke('mount.collection', { variant: ctx.variant });
       const heapBefore = await page.heapUsed();
       await page.invoke('collection.generate', { rows: p['rows'], fields: p['fields'] });
@@ -82,7 +86,8 @@ export const S2: ScenarioDefinition = {
       const afterRun = (heapAfter - heapPlain) / plain;
       const sortedTurns = turns.map((turn) => turn.duration).sort((a, b) => a - b);
       return {
-        longTasksAttributedToStore: framesOverlappingTurns(frames, turns).length,
+        longTasksAttributedToStore: framesChargedToStore(frames, turns, (p['storeCharge'] as unknown as { longTaskMs: number }).longTaskMs).length,
+        longFramesOverlappingStore: framesOverlappingTurns(frames, turns).length,
         storeShareOfMainThread: storeMs / mainThreadTaskMs,
         storeHeapOverheadRatio: Math.max(afterLoad, afterRun),
         storeHeapOverheadAfterLoadRatio: afterLoad,

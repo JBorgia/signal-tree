@@ -1,6 +1,6 @@
 {
   "$comment": "Machine-readable transcription of BRIEF.md 6.2 (scale) and 6.3 (gates) as modified by Jonathan's rulings of Nov 19, 2026. Owned by Jonathan (CODEOWNERS); frozen once approved. 'text' quotes the brief or the ruling; 'metric' names the harness result key a condition reads; 'ruling' cites the ruling that changed the brief.",
-  "source": "BRIEF.md 6.2 and 6.3, as of Nov 19, 2026, with rulings 1, 2, 4, 5 and 7",
+  "source": "BRIEF.md 6.2 and 6.3, as of Nov 19, 2026, with rulings 1, 2, 4, 5 and 7 and provisional issues #12 and #13",
   "approved": false,
   "scale": {
     "$comment": "6.2. Defaults until Jonathan replaces them with first production adopter numbers.",
@@ -58,7 +58,10 @@
       "parameters": { "formBoundFields": { "$ref": "scale.largestFormBoundFields" }, "keystrokes": 1 },
       "conditions": [
         { "id": "S1.store", "text": "Store work ≤ 1 ms", "metric": "storeWorkMs", "op": "<=", "value": 1 },
-        { "id": "S1.interaction", "text": "whole interaction processing ≤ 50 ms", "metric": "interactionMs", "op": "<=", "value": 50 }
+        { "id": "S1.interaction", "text": "whole interaction processing ≤ 50 ms (#13, provisional: keydown to the next paint in every run; Event Timing reported alongside)", "metric": "interactionMs", "op": "<=", "value": 50 }
+      ],
+      "reported": [
+        { "text": "#13: Event Timing reported alongside", "metric": "eventTimingMs" }
       ]
     },
     "S2": {
@@ -69,12 +72,16 @@
         "rendered": { "$ref": "scale.rowsRenderedAtOnce" },
         "rowUpdatesPerSecond": { "$ref": "scale.sustainedServerUpdates.rowUpdatesPerSecond" },
         "batchEveryMs": { "$ref": "scale.sustainedServerUpdates.batchEveryMs" },
-        "durationSeconds": 60
+        "durationSeconds": 60,
+        "storeCharge": { "text": "#12 (provisional): a long frame is charged to the store only when the store's marked time inside it is greater than (frame duration − 50 ms)", "longTaskMs": 50 }
       },
       "conditions": [
-        { "id": "S2.longTasks", "text": "Zero long tasks attributed to the store (long animation frames attributed by overlap with the signal-tree: marks)", "metric": "longTasksAttributedToStore", "op": "==", "value": 0, "ruling": 7 },
+        { "id": "S2.longTasks", "text": "Zero long tasks attributed to the store (long animation frames charged by #12, provisional; the plain overlap count is reported)", "metric": "longTasksAttributedToStore", "op": "==", "value": 0, "ruling": 7 },
         { "id": "S2.share", "text": "store ≤ 10% of main-thread time", "metric": "storeShareOfMainThread", "op": "<=", "value": 0.10 },
         { "id": "S2.heap", "text": "store heap overhead ≤ 1× the retained size of the plain row objects", "metric": "storeHeapOverheadRatio", "op": "<=", "value": 1 }
+      ],
+      "reported": [
+        { "text": "#12: the plain overlap count is reported next to it", "metric": "longFramesOverlappingStore" }
       ]
     },
     "S3": {

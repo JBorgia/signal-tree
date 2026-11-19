@@ -63,6 +63,7 @@ export const S4b: ScenarioDefinition = {
     }),
 };
 
+/** #13: every keystroke measured keydown to next paint. */
 function keystrokeLatencies(perf: PerfDrain): number[] {
   const out: number[] = [];
   for (const key of perf.keys) out.push(keystrokeLatency(perf, key).ms);
@@ -76,7 +77,7 @@ export const S4c: ScenarioDefinition = {
   requires: ['collection', 'collectionFieldWrite', 'writers', 'hold'],
   metrics: {
     heldValueOverwrites: { unit: 'count', better: 'lower', description: "agent batches after which the user's held value differed from what the user typed" },
-    maxKeystrokeMs: { unit: 'ms', better: 'lower', description: 'slowest keystroke interaction' },
+    maxKeystrokeMs: { unit: 'ms', better: 'lower', description: 'slowest keystroke, keydown to next paint (#13)' },
     agentRefusals: { unit: 'count', better: 'none', description: 'agent row updates refused' },
   },
   run: (ctx) =>

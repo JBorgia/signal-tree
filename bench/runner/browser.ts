@@ -33,9 +33,10 @@ export interface TurnEntry {
   readonly duration: number;
 }
 
+/** #13: one keystroke, from its keydown timestamp to just after the next paint. */
 export interface KeyEstimate {
   readonly start: number;
-  readonly nextFrame: number;
+  readonly nextPaint: number;
 }
 
 export interface PerfDrain {
@@ -61,9 +62,15 @@ const INIT_SCRIPT = `(() => {
       processingStart: e.processingStart, processingEnd: e.processingEnd, interactionId: e.interactionId,
     });
   }).observe({ type: 'event', durationThreshold: 16, buffered: true });
+  // #13: keydown to next paint. The rAF callback runs in the next frame before
+  // paint; a message posted from it is handled in the first task after that frame.
   addEventListener('keydown', (e) => {
     const start = e.timeStamp;
-    requestAnimationFrame(() => setTimeout(() => perf.keys.push({ start, nextFrame: performance.now() }), 0));
+    requestAnimationFrame(() => {
+      const channel = new MessageChannel();
+      channel.port1.onmessage = () => perf.keys.push({ start, nextPaint: performance.now() });
+      channel.port2.postMessage(0);
+    });
   }, true);
 })();`;
 
@@ -130,6 +137,8 @@ export async function openBenchPage(options: OpenOptions): Promise<BenchPage> {
     await cdp.send('Emulation.setCPUThrottlingRate', { rate: options.cpuThrottlingRate });
     await cdp.send('Performance.enable', { timeDomain: 'timeTicks' });
     await page.addInitScript(INIT_SCRIPT);
+    // The harness tests' fake subject reads its planted faults from here (subjects/test-fake.ts).
+    if (process.env['BENCH_FAKE_FAULTS']) await page.addInitScript(`globalThis.__BENCH_FAKE_FAULTS__ = ${JSON.stringify(process.env['BENCH_FAKE_FAULTS'])};`);
     const errors: string[] = [];
     page.on('pageerror', (error) => errors.push(String(error)));
     const port = (server.address() as AddressInfo).port;
@@ -192,29 +201,42 @@ export async function openBenchPage(options: OpenOptions): Promise<BenchPage> {
   }
 }
 
-/** Long animation frames that overlap at least one turn measure (ruling 7). */
+/** Milliseconds of `turns` that fall inside `frame`. */
+export function storeMsInFrame(frame: LoafEntry, turns: readonly TurnEntry[]): number {
+  const end = frame.startTime + frame.duration;
+  let ms = 0;
+  for (const turn of turns) ms += Math.max(0, Math.min(end, turn.startTime + turn.duration) - Math.max(frame.startTime, turn.startTime));
+  return ms;
+}
+
+/** Long animation frames that overlap at least one turn measure (ruling 7; reported next to #12). */
 export function framesOverlappingTurns(frames: readonly LoafEntry[], turns: readonly TurnEntry[]): LoafEntry[] {
-  return frames.filter((frame) =>
-    turns.some((turn) => turn.startTime < frame.startTime + frame.duration && frame.startTime < turn.startTime + turn.duration),
-  );
+  return frames.filter((frame) => storeMsInFrame(frame, turns) > 0);
 }
 
 /**
- * Interaction latency of one keystroke (`key`, default the first one drained):
- * Event Timing (the longest entry sharing the keydown's interactionId, as INP
- * does), or, when no entry passed the API's 16 ms reporting floor, the in-page
- * keydown-to-next-frame estimate.
+ * #12 (provisional): a long animation frame is charged to the store only when
+ * the store's marked time inside it is greater than the frame's duration minus
+ * the long-task threshold, i.e. the frame would not have been long without it.
  */
-export function keystrokeLatency(perf: PerfDrain, key: KeyEstimate | undefined = perf.keys[0]): { ms: number; source: 'event-timing' | 'next-frame-estimate'; processingMs: number } {
+export function framesChargedToStore(frames: readonly LoafEntry[], turns: readonly TurnEntry[], longTaskMs: number): LoafEntry[] {
+  return frames.filter((frame) => storeMsInFrame(frame, turns) > frame.duration - longTaskMs);
+}
+
+/**
+ * #13: one keystroke's latency, always from the same source: keydown to the
+ * next paint (`ms`). Event Timing is reported alongside when the browser
+ * reported the interaction (it rounds to 8 ms and drops entries under 16 ms):
+ * `eventTimingMs` is the longest entry sharing the keydown's interactionId, as
+ * INP measures it, and `processingMs` runs to the end of event processing.
+ */
+export function keystrokeLatency(perf: PerfDrain, key: KeyEstimate | undefined = perf.keys[0]): { ms: number; eventTimingMs: number; processingMs: number } {
   if (!key) throw new Error('no keystroke was observed');
   const keydown = perf.events.find((event) => event.name === 'keydown' && event.interactionId > 0 && Math.abs(event.startTime - key.start) < 1);
-  if (keydown) {
-    const group = perf.events.filter((event) => event.interactionId === keydown.interactionId);
-    return {
-      ms: Math.max(...group.map((event) => event.duration)),
-      source: 'event-timing',
-      processingMs: Math.max(...group.map((event) => event.processingEnd)) - keydown.startTime,
-    };
-  }
-  return { ms: key.nextFrame - key.start, source: 'next-frame-estimate', processingMs: Number.NaN };
+  const group = keydown ? perf.events.filter((event) => event.interactionId === keydown.interactionId) : [];
+  return {
+    ms: key.nextPaint - key.start,
+    eventTimingMs: keydown ? Math.max(...group.map((event) => event.duration)) : Number.NaN,
+    processingMs: keydown ? Math.max(...group.map((event) => event.processingEnd)) - keydown.startTime : Number.NaN,
+  };
 }
